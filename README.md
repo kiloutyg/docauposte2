@@ -1,18 +1,18 @@
-## DocAuPoste2
+# DocAuPoste2
 Version perso de l'app de PO.
 
-# Language : 
+### Language : 
 -Php 5.2
 -Angular (?)
 -JavaScript
 -HTML
 
-# Config avec URL de base : 
+### Config avec URL de base : 
 application/config/config.php
 
-# Route :
+### Route :
 application/config/routes.php
 
-# Controleur : 
+### Controleur : 
 application/controllers 
 Controleur identifié : Welcome.php
