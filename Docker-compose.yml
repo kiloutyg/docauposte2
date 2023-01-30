@@ -51,5 +51,5 @@ services:
     volumes: 
       - ./myapp:/app/myapp
     ports:
-      - "8000:80"
+      - "8000:8000"
       - "9080:8080"
