@@ -1,10 +1,55 @@
 #Compose file test to run DocAuPoste app locally to permit dev activity. 
 version: '3.8'
 services:
+  database:
+    image: mariadb:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: database
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "8081:80"
+    depends_on:
+      - database
+
+#   web:
+#     image: php:8.1-rc-apache-buster
+#     volumes: 
+#       - ./:/var/www
+#     ports:
+#       - "8000:80"
+#       - "8080:8080"
+
+#   web:
+#     image: php:5.6.40-fpm-jessie
+#     volumes: 
+#       - ./:/var/www
+#     ports:
+#       - "8000:80"
+#       - "8080:8080"
+
+
+  # web:
+  #   image: bitnami/codeigniter:3.1.11
+  #   volumes: 
+  #     - ./:/var/www
+  #   ports:
+  #     - "8000:80"
+  #     - "9080:8080"
+
   web:
-    image: php:8.1-rc-apache-buster
+    image: bitnami/codeigniter:3.1.11
     volumes: 
-      - ./:/var/www
+      - ./myapp:/app/myapp
     ports:
       - "8000:80"
-      - "8080:8080"
+      - "9080:8080"

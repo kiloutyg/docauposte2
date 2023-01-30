@@ -18,3 +18,5 @@ application/controllers
 Controleur identifié : Welcome.php
 *Page d'accueil qui "reoriente" vers les fonctions metiers. 
 *Renvoi directement vers l'injection sans proposer d'autres fonctions metiers. 
+
+
