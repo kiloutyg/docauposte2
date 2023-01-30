@@ -1,9 +1,9 @@
 #Compose file test to run DocAuPoste app locally to permit dev activity. 
 version: '3.8'
-  services:
-    web:
-      image: php:8.1-rc-apache-buster
-      volumes: ./:/var/www
-      ports:
-        - "8000:80"
-        - "8080:8080"
+services:
+  web:
+    image: php:8.1-rc-apache-buster
+    volumes: ./:/var/www
+    ports:
+      - "8000:80"
+      - "8080:8080"
