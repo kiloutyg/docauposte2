@@ -22,11 +22,11 @@ services:
       - database
   web:
     image: bitnami/codeigniter:3.1.11
-    volumes: 
+    volumes:
       - ./myapp:/app/myapp
     ports:
       - "8000:80"
       - "9000:8000"
       - "9080:8080"
     depends_on :
-      - database 
+      - database
