@@ -20,48 +20,13 @@ services:
       - "8081:80"
     depends_on:
       - database
-
-#   web:
-#     image: php:8.1-rc-apache-buster
-#     volumes: 
-#       - ./:/var/www
-#     ports:
-#       - "8000:80"
-#       - "8080:8080"
-
-#   web:
-#     image: php:5.6.40-fpm-jessie
-#     volumes: 
-#       - ./:/var/www
-#     ports:
-#       - "8000:80"
-#       - "8080:8080"
-
-
-  # web:
-  #   image: bitnami/codeigniter:3.1.11
-  #   volumes: 
-  #     - ./:/var/www
-  #   ports:
-  #     - "8000:80"
-  #     - "9080:8080"
-
-  # web:
-  #   image: bitnami/codeigniter:3.1.11
-  #   volumes: 
-  #     - ./myapp:/app/myapp
-  #   ports:
-  #     - "8000:80"
-  #     - "9000:8000"
-  #     - "9080:8080"
-
-    web:
-      image: bitnami/codeigniter:3.1.11
-      volumes: 
-        - ./myapp:/app/myapp
-      ports:
-        - "8000:80"
-        - "9000:8000"
-        - "9080:8080"
-      depends_on :
-        - database 
+  web:
+    image: bitnami/codeigniter:3.1.11
+    volumes: 
+      - ./myapp:/app/myapp
+    ports:
+      - "8000:80"
+      - "9000:8000"
+      - "9080:8080"
+    depends_on :
+      - database 
