@@ -1,5 +1,4 @@
-#Compose file test to run DocAuPoste app locally to permit dev activity. 
-version: '3.8'
+version: '3.7'
 services:
   database:
     image: mariadb:latest
@@ -21,9 +20,11 @@ services:
     depends_on:
       - database
   web:
-    image: bitnami/codeigniter:3.1.11
+  #  image: bitnami/codeigniter:3.1.11
+    build: .
     volumes:
-      - ./myapp:/app/myapp
+  #    - ./myapp:/app/myapp
+      - ./:/var/www
     ports:
       - "8000:80"
       - "9000:8000"
