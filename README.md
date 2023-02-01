@@ -1,22 +1,9 @@
 # DocAuPoste2
-Version perso de l'app de PO.
+Created from scratch with Docker, PHP8 and Symfony.
 
-### Language : 
--Php 5.2
--Angular (?)
--JavaScript
--HTML
+### Run With Docker
 
-### Config avec URL de base : 
-application/config/config.php
+#### First version 
 
-### Route :
-application/config/routes.php
-
-### Controleur : 
-application/controllers 
-Controleur identifié : Welcome.php
-*Page d'accueil qui "reoriente" vers les fonctions metiers. 
-*Renvoi directement vers l'injection sans proposer d'autres fonctions metiers. 
-
+Juste clone the git repo and run " docker compose up -d --build " inside the local directory after having personalized your DotEnv. 
 
