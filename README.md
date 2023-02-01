@@ -1,5 +1,5 @@
 # DocAuPoste2
-Created from scratch with Docker, PHP8 and Symfony.
+Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
 ### Git usage basics.
 
