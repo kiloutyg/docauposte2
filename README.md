@@ -16,5 +16,7 @@ Created from scratch with Docker, PHP8 and Symfony.
 
 #### First version 
 
-Juste clone the git repo and run " docker compose up -d --build " inside the local directory after having personalized your DotEnv. 
-
+    1 - After cloning the git repo, create a directory namde database_data
+    2 - modify your pass in the DotEnv file
+    3 - run the " docker compose up --build " command. 
+    
