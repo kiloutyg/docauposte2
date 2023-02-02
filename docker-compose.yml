@@ -44,8 +44,8 @@ services:
       - database
   web:
     # image: bitnami/codeigniter:3.1.11
-    image: php:8.2-rc-apache
-    # build: .
+    # image: php:8.2-rc-apache
+    build: .
     volumes:
   #    - ./myapp:/app/myapp
       - ./:/var/www
