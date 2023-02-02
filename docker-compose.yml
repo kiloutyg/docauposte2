@@ -43,8 +43,9 @@ services:
     depends_on:
       - database
   web:
-  #  image: bitnami/codeigniter:3.1.11
-    build: .
+    # image: bitnami/codeigniter:3.1.11
+    image: php:8.2-rc-apache
+    # build: .
     volumes:
   #    - ./myapp:/app/myapp
       - ./:/var/www

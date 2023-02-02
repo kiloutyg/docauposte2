@@ -1,19 +1,19 @@
-FROM php:8.1-rc-apache-buster
+FROM php:8.2-rc-apache-buster
 
 RUN a2enmod rewrite
-RUN apt-get update -y \
-  && apt-get install -y curl libxslt-dev libzip-dev git wget libmagickwand-dev --no-install-recommends \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# RUN apt-get update -y \
+#   && apt-get install -y curl libxslt-dev libzip-dev git wget libmagickwand-dev --no-install-recommends \
+#   && apt-get clean \
+#   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
  
 RUN docker-php-ext-install pdo mysqli pdo_mysql zip opcache xsl
 RUN pecl install xdebug imagick \
     && docker-php-ext-enable imagick xdebug mysqli pdo_mysql pdo zip opcache xsl
 
 # fix git author
-RUN git config --global user.email "symfo@symfo"
-RUN git config --global user.name "symfo"
-RUN git config --global --add safe.directory /var/www
+# RUN git config --global user.email "symfo@symfo"
+# RUN git config --global user.name "symfo"
+# RUN git config --global --add safe.directory /var/www
 
 # set default vhost to target /symfony/app/public
 WORKDIR /var/www
@@ -21,9 +21,9 @@ RUN sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/sites-avail
 
 # install nodejs 
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
-RUN apt-get install -y nodejs \
-&& apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# RUN apt-get install -y nodejs \
+# && apt-get clean \
+#   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
  
 RUN npm install -g yarn
 
