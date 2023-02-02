@@ -1,4 +1,4 @@
-FROM php:8.2-rc-apache-buster
+FROM php:8.1-rc-apache-buster
 
 RUN a2enmod rewrite
 RUN apt-get update -y \
