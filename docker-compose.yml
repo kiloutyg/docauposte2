@@ -29,8 +29,11 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    # volumes :
-    # - ./database_data:/var/lib/mysql
+    volumes :
+    - ./database_data:/var/lib/mysql
+    networks:
+      vpcbr:
+        ipv4_address : 172.20.0.2
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: unless-stopped
@@ -39,7 +42,10 @@ services:
       PMA_USER: ${MYSQL_USER}
       PMA_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "8081:80"
+      - "8082:80"
+    networks:
+      vpcbr:
+        ipv4_address : 172.20.0.3
     depends_on:
       - database
   web:
@@ -55,3 +61,13 @@ services:
       - "9080:8080"
     depends_on :
       - database
+    networks:
+      vpcbr:
+        ipv4_address : 172.20.0.4
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
