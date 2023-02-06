@@ -19,4 +19,8 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
     1 - After cloning the git repo, create a directory namde database_data
     2 - modify your pass in the DotEnv file
     3 - run the " docker compose up --build " command. 
+    4 - Inside the web container, in the correct directory (/var/www) type : 
+        a - composer install
+        b - composer require symfony/webpack-encore-bundle
+        c - composer require symfony/apache-pack
     
