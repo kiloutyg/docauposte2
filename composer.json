@@ -14,6 +14,7 @@
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.16",
         "sensio/framework-extra-bundle": "^6.2",
+        "symfony/apache-pack": "^1.0",
         "symfony/asset": "6.2.*",
         "symfony/console": "6.2.*",
         "symfony/doctrine-messenger": "6.2.*",
@@ -26,7 +27,7 @@
         "symfony/intl": "6.2.*",
         "symfony/mailer": "6.2.*",
         "symfony/mime": "6.2.*",
-        "symfony/monolog-bundle": "^3.0",
+        "symfony/monolog-bundle": "^3.8",
         "symfony/notifier": "6.2.*",
         "symfony/process": "6.2.*",
         "symfony/property-access": "6.2.*",
@@ -87,7 +88,7 @@
     },
     "extra": {
         "symfony": {
-            "allow-contrib": false,
+            "allow-contrib": true,
             "require": "6.2.*"
         }
     },

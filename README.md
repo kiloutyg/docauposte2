@@ -23,4 +23,6 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
         a - composer install
         b - composer require symfony/webpack-encore-bundle
         c - composer require symfony/apache-pack
+        d - composer require --dev symfony/profiler-pack
+        e - yarn install 
     

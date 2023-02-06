@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
+use function Symfony\Component\String\u;
 
 #[Route('/', name: 'front_')]
 class DapController extends AbstractController
@@ -19,6 +20,29 @@ class DapController extends AbstractController
         return $this->render('dapcontroller/index.html.twig', [
             'controller_name' => 'Dapcontroller',
         ]);
+    }
+
+    // #[Route('/browse', name: 'browse')]
+    // public function browse(): Response
+    // {
+    //     return new Response('Title : Doc Au Poste ptet, on verra :');
+    // }
+    #[Route('/browse/{slug}', name: 'browse_genre')]
+    public function search(string $slug = null): Response
+    {
+        // $title = 'Doc Au Poste : '.$slug;
+        // $title = str_replace('-', ' ', $slug);
+
+       if ($slug) {
+            $title = 'Zone : ' .u(str_replace('-', ' ', $slug))->title(true);
+        } else {
+            $title = 'Doc Au Poste';
+        }
+        return new Response($title);
+       
+        // $title = u(str_replace('-', ' ', $slug))->title(true);
+        
+        // return new Response('Title : Doc Au Poste pour '.$title);
     }
 
 }
