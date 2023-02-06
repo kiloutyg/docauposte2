@@ -1,8 +1,8 @@
-FROM php:8.2-rc-apache-buster
+FROM php:8.1-rc-apache-buster
 
 RUN a2enmod rewrite
 # RUN apt-get update -y \
-#   && apt-get install -y curl libxslt-dev libzip-dev git wget libmagickwand-dev --no-install-recommends \
+#   && apt-get install -y curl libxslt-dev libzip-dev git wget libmagickwand-dev libncurses-dev nano --no-install-recommends \
 #   && apt-get clean \
 #   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
  
