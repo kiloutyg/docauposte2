@@ -7,10 +7,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use function Symfony\Component\String\u;
 
-#[Route('/', name: 'front_')]
+#[Route('/', name: 'app_')]
 class DapController extends AbstractController
 {
-    #[Route(path: '/', name: 'index')]
+    #[Route(path: '/', name: 'homepage')]
 
     public function homepage(): Response
     {
@@ -49,22 +49,30 @@ class DapController extends AbstractController
     // {
     //     return new Response('Title : Doc Au Poste ptet, on verra :');
     // }
-    #[Route('/browse/{slug}', name: 'browse_genre')]
-    public function search(string $slug = null): Response
+    #[Route('/browse/{slug}', name: 'browse')]
+    public function browse(string $slug = null): Response
     {
         // $title = 'Doc Au Poste : '.$slug;
         // $title = str_replace('-', ' ', $slug);
 
-        if ($slug) {
-            $title = 'Zone : ' . u(str_replace('-', ' ', $slug))->title(true);
-        } else {
-            $title = 'Doc Au Poste';
-        }
-        return new Response($title);
+        // if ($slug) {
+        //     $title = 'Zone : ' . u(str_replace('-', ' ', $slug))->title(true);
+        // } else {
+        //     $title = 'Doc Au Poste';
+        // }
+        $genre = $slug ? u(str_replace('-', ' ', $slug))->title(true) : null;
+        
+
+        // return new Response($title);
+        return $this->render('Dap/browse.html.twig', [
+            // 'title' => $title,
+            'genre' => $genre,
+        ]);
+    }
 
         // $title = u(str_replace('-', ' ', $slug))->title(true);
 
         // return new Response('Title : Doc Au Poste pour '.$title);
-    }
+    
 
 }
