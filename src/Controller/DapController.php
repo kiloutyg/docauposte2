@@ -10,7 +10,7 @@ use function Symfony\Component\String\u;
 #[Route('/', name: 'front_')]
 class DapController extends AbstractController
 {
-    #[Route(path:'/', name: 'index')]
+    #[Route(path: '/', name: 'index')]
 
     public function homepage(): Response
     {
@@ -34,6 +34,9 @@ class DapController extends AbstractController
             // 'MATRICES-ILUO - Déchargement Reprise',
             // 'P87 - Déchargement Reprise',
         ];
+        // Method to dump the specified variables : 
+        // dump($zones);
+        // dd($zones);
 
         return $this->render('Dap/homepage.html.twig', [
             'title' => 'DocAuPoste',
@@ -52,15 +55,15 @@ class DapController extends AbstractController
         // $title = 'Doc Au Poste : '.$slug;
         // $title = str_replace('-', ' ', $slug);
 
-       if ($slug) {
-            $title = 'Zone : ' .u(str_replace('-', ' ', $slug))->title(true);
+        if ($slug) {
+            $title = 'Zone : ' . u(str_replace('-', ' ', $slug))->title(true);
         } else {
             $title = 'Doc Au Poste';
         }
         return new Response($title);
-       
+
         // $title = u(str_replace('-', ' ', $slug))->title(true);
-        
+
         // return new Response('Title : Doc Au Poste pour '.$title);
     }
 

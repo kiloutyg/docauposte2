@@ -1,4 +1,5 @@
 # DocAuPoste2
+
 Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
 ### Git usage basics.
@@ -21,9 +22,10 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
     3 - run the " docker compose up --build " command. 
     4 - Inside the web container, in the correct directory (/var/www) type : 
         a - composer install
-        b - composer require symfony/webpack-encore-bundle
+        b - composer require symfony/webpack-encore-bundle or composer require asset
         c - composer require symfony/apache-pack
         d - composer require --dev symfony/profiler-pack
+            - composer require debug
         e - yarn install 
         f - composer require templates
     

@@ -1,17 +1,28 @@
+#Project that serve as inspiration for my work : 
 https://github.com/martinoyovo/file-manager
 https://github.com/opendocman/opendocman
 https://gitlab.com/neodigit/cesi/wishtransfer
-https://kinsta.com/fr/blog/tutoriels-php/
-https://symfony.com/doc/current/index.html
-https://symfonycasts.com/screencast/symfony
 
+#Tutorials for symfony and php :
+https://symfonycasts.com/screencast/symfony
+https://kinsta.com/fr/blog/tutoriels-php/
+
+#Tutorials about building CI/CD process in github :
 https://github.blog/2022-02-02-build-ci-cd-pipeline-github-actions-four-steps/
+
+#Documentation about Alpine running apache2 for the purposes to build a container :
 https://wiki.alpinelinux.org/wiki/Setting_Up_Apache_with_PHP
 https://wiki.alpinelinux.org/wiki/How-To_Alpine_Wall
+
+#Documentation about Symfony : 
+https://symfony.com/doc/current/index.html
 
 #To add symfony plugins to work with apache : 
 https://symfony.com/doc/current/setup/web_server_configuration.html
 
-#To run a local container registry with portainer. 
+#To run a local container registry with portainer : 
 https://www.blackvoid.club/private-docker-registry-with-portainer/
+
+#To get rid of the intl deprecation message : 
+https://www.php.net/manual/en/intl.installation.php
 

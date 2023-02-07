@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<h1>{%block title%} {{ parent() }}  {{ title }}  {% endblock %}</h1>
+
+################################ 
+<h3> Bon, hein, faut bien commencer quelques part. </h3>
+################################
+
+<div>
+<h4>Zones :</h4> 
+
+    <!-- Dump of the specified variable list :  {{ dump (zones) }} -->
+    <!-- Dump of all variable : {{ dump() }} -->
+
+    <ul>
+        {% for zones in zones %}
+            <li>
+            {{ zones.Ligne }} - {{ zones.Zone }}
+            </li>
+        {% endfor %}
+    </ul>
+
+</div>
+
+{% endblock %}
