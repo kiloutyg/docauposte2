@@ -5,6 +5,8 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
+// use Twig\Environment;
+
 use function Symfony\Component\String\u;
 
 #[Route('/', name: 'app_')]
@@ -12,6 +14,7 @@ class DapController extends AbstractController
 {
     #[Route(path: '/', name: 'homepage')]
 
+    // public function homepage(Environment $twig): Response
     public function homepage(): Response
     {
         $zones = [
@@ -41,7 +44,12 @@ class DapController extends AbstractController
         return $this->render('Dap/homepage.html.twig', [
             'title' => 'DocAuPoste',
             'zones' => $zones,
+        // $html = $twig->render('Dap/homepage.html.twig', [
+        //     'title' => 'DocAuPoste',
+        //     'zones' => $zones,
         ]);
+        // dd($html);
+        // return new Response($html);
     }
 
     // #[Route('/browse', name: 'browse')]
@@ -60,13 +68,13 @@ class DapController extends AbstractController
         // } else {
         //     $title = 'Doc Au Poste';
         // }
-        $genre = $slug ? u(str_replace('-', ' ', $slug))->title(true) : null;
+        $zone = $slug ? u(str_replace('-', ' ', $slug))->title(true) : null;
         
 
         // return new Response($title);
         return $this->render('Dap/browse.html.twig', [
             // 'title' => $title,
-            'genre' => $genre,
+            'zone' => $zone,
         ]);
     }
 

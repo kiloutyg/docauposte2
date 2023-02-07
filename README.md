@@ -26,6 +26,8 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
         c - composer require symfony/apache-pack
         d - composer require --dev symfony/profiler-pack
             - composer require debug
-        e - yarn install 
-        f - composer require templates
+        e - composer require templates
+        f - composer require symfony/ux-turbo
+
+    5 - yarn install
     
