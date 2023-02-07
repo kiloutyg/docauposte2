@@ -11,6 +11,7 @@ services:
   mailer:
     image: schickling/mailcatcher
     ports: ["1025", "1080"]
+    restart: unless-stopped
     networks:
       vpcbr:
         ipv4_address : 172.20.0.5

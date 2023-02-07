@@ -54,6 +54,7 @@ services:
     # image: php-alpine:latest
     image: kiloutyg/po:docauposteweb
     # build: .
+    restart: unless-stopped
     volumes:
   #    - ./myapp:/app/myapp
       - ./:/var/www

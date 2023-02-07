@@ -14,11 +14,30 @@ class DapController extends AbstractController
 
     public function homepage(): Response
     {
-        // die('Title : Doc Au Poste II');
-        // die('DocAuPoste 2 est le renouveau de l\'application metier de gestion et mise a disposition des documents aux operateurs sur les lignes de productions');
-        // return new Response('Title : Doc Au Poste II');
-        return $this->render('dapcontroller/index.html.twig', [
-            'controller_name' => 'Dapcontroller',
+        $zones = [
+            ['Ligne' => 'D41', 'Zone' => 'Assemblage'],
+            ['Ligne' => 'Démontage', 'Zone' => 'Assemblage'],
+            ['Ligne' => 'Enjoliveur', 'Zone' => 'Assemblage'],
+            ['Ligne' => 'D41', 'Zone' => 'Déchargement Reprise'],
+            ['Ligne' => 'DEFAUTHEQUE', 'Zone' => 'Déchargement Reprise'],
+
+            // 'Demontage - Assemblage',
+            // 'Enjoliveur P51 - Assemblage',
+            // 'P54 - Assemblage',
+            // 'P8 MV - Assemblage',
+            // 'Panneaux - Assemblage',
+            // 'T9 MV - Assemblage',
+            // 'D41 - Déchargement Reprise',
+            // 'DEFAUTHEQUE - Déchargement Reprise',
+            // 'GESTION-DR - Déchargement Reprise',
+            // 'LUX-DR - Déchargement Reprise',
+            // 'MATRICES-ILUO - Déchargement Reprise',
+            // 'P87 - Déchargement Reprise',
+        ];
+
+        return $this->render('Dap/homepage.html.twig', [
+            'title' => 'DocAuPoste',
+            'zones' => $zones,
         ]);
     }
 

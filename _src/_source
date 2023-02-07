@@ -9,4 +9,9 @@ https://github.blog/2022-02-02-build-ci-cd-pipeline-github-actions-four-steps/
 https://wiki.alpinelinux.org/wiki/Setting_Up_Apache_with_PHP
 https://wiki.alpinelinux.org/wiki/How-To_Alpine_Wall
 
-#To add symfony plugins to work with apache : https://symfony.com/doc/current/setup/web_server_configuration.html
+#To add symfony plugins to work with apache : 
+https://symfony.com/doc/current/setup/web_server_configuration.html
+
+#To run a local container registry with portainer. 
+https://www.blackvoid.club/private-docker-registry-with-portainer/
+
