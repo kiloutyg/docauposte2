@@ -32,6 +32,7 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
         h - yarn add @fontsource/roboto-condensed --dev  
         i - yarn add @fortawesome/fontawesome-free --dev 
         j - yarn add axios --dev
+        k - composer require symfony/ux-turbo
 
     5 - yarn install
     6 - yarn watch 
