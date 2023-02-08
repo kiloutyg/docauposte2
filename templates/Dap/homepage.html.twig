@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'baase.html.twig' %}
 
 {% block title %} Doc Au Poste | {{ parent() }}{% endblock %}
 
@@ -33,126 +33,16 @@
             </svg>
         </div>
         <div class="col-12 col-md-8 ps-5">
-            <h2 class="mb-4">10 songs (30 minutes of 60 still available)</h2>
-            {% for zones in zones %}
-            {# <div class="song-list">
+            <h2 class="mb-4">10 lines (30 minutes of 60 still available)</h2>
+            {% for zone in zones %}
+             <div class="line-list"{{ stimulus_controller('line-controls', {
+                infoUrl: path('api_poduct_get_line', { id: loop.index })
+             }) }}>
                 <div class="d-flex mb-3">
-                    <a href="#">
+                    <a href="#"{{ stimulus_action('line-controls', 'play') }}>
                         <i class="fas fa-play me-3"></i>
                     </a>
-                    <span class="song-details">Gangsta's Paradise - Coolio</span>
-                    <a href="#">
-                        <i class="fas fa-bars mx-3"></i>
-                    </a>
-                    <a href="#">
-                        <i class="fas fa-times"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="song-list">
-                <div class="d-flex mb-3">
-                    <a href="#">
-                        <i class="fas fa-play me-3"></i>
-                    </a>
-                    <span class="song-details">Waterfalls - TLC</span>
-                    <a href="#">
-                        <i class="fas fa-bars mx-3"></i>
-                    </a>
-                    <a href="#">
-                        <i class="fas fa-times"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="song-list">
-                <div class="d-flex mb-3">
-                    <a href="#">
-                        <i class="fas fa-play me-3"></i>
-                    </a>
-                    <span class="song-details">Creep - TLC</span>
-                    <a href="#">
-                        <i class="fas fa-bars mx-3"></i>
-                    </a>
-                    <a href="#">
-                        <i class="fas fa-times"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="song-list">
-                <div class="d-flex mb-3">
-                    <a href="#">
-                        <i class="fas fa-play me-3"></i>
-                    </a>
-                    <span class="song-details">Kiss from a Rose - Seal</span>
-                    <a href="#">
-                        <i class="fas fa-bars mx-3"></i>
-                    </a>
-                    <a href="#">
-                        <i class="fas fa-times"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="song-list">
-                <div class="d-flex mb-3">
-                    <a href="#">
-                        <i class="fas fa-play me-3"></i>
-                    </a>
-                    <span class="song-details">On Bended Knee - Boyz II Men</span>
-                    <a href="#">
-                        <i class="fas fa-bars mx-3"></i>
-                    </a>
-                    <a href="#">
-                        <i class="fas fa-times"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="song-list">
-                <div class="d-flex mb-3">
-                    <a href="#">
-                        <i class="fas fa-play me-3"></i>
-                    </a>
-                    <span class="song-details">Another Night - Real McCoy</span>
-                    <a href="#">
-                        <i class="fas fa-bars mx-3"></i>
-                    </a>
-                    <a href="#">
-                        <i class="fas fa-times"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="song-list">
-                <div class="d-flex mb-3">
-                    <a href="#">
-                        <i class="fas fa-play me-3"></i>
-                    </a>
-                    <span class="song-details">Fantasy - Mariah Carey</span>
-                    <a href="#">
-                        <i class="fas fa-bars mx-3"></i>
-                    </a>
-                    <a href="#">
-                        <i class="fas fa-times"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="song-list">
-                <div class="d-flex mb-3">
-                    <a href="#">
-                        <i class="fas fa-play me-3"></i>
-                    </a>
-                    <span class="song-details">Take a Bow - Madonna</span>
-                    <a href="#">
-                        <i class="fas fa-bars mx-3"></i>
-                    </a>
-                    <a href="#">
-                        <i class="fas fa-times"></i>
-                    </a>
-                </div>
-            </div> #}
-             <div class="song-list">
-                <div class="d-flex mb-3">
-                    <a href="#">
-                        <i class="fas fa-play me-3"></i>
-                    </a>
-                    <span class="song-details">{{ zones.Ligne }} - {{ zones.Zone }}</span>
+                    <span class="line-details">{{ zone.ligne }} - {{ zone.zones }}</span>
                     <a href="#">
                         <i class="fas fa-bars mx-3"></i>
                     </a>
@@ -162,7 +52,7 @@
                 </div>
             </div>
             {% endfor %}
-            <button type="button" class="btn btn-success"><i class="fas fa-plus"></i> Add a song</button>
+            <button type="button" class="btn btn-success"><i class="fas fa-plus"></i> Add a line</button>
         </div>
     </div>
 </div>

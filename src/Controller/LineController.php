@@ -6,27 +6,25 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-// use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class LineController extends AbstractController
 
 {
-    #[Route('/api/line/{id<\d+>}', name: 'app_PoductLine', methods: ['GET'])]
+    #[Route('/api/line/{id<\d+>}', methods: ['GET'], name: 'api_poduct_get_line')]
     public function getLine(int $id, LoggerInterface $logger): Response
     {
         // TODO query the database
         $line = [
             'id' => $id,
             'name' => 'Waterfalls',
-            'url' => 'https://symfonycasts.s3.amazonaws.com/sample.mp3',
+            'url' => 'http://symfonycasts.s3.amazonaws.com/sample.mp3',
         ];
 
-        // $logger->info('Returning API response for Line'.$id);
-        $logger->info('Returning API response for Line {Line}', [
-            'Line' => $id, 
+        $logger->info('Returning API response for Line {line}', [
+            'line' => $id, 
         ]);
 
-        // return new JsonResponse($line);
         return $this->json($line);
     }
 }

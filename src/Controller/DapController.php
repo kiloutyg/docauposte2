@@ -18,11 +18,11 @@ class DapController extends AbstractController
     public function homepage(): Response
     {
         $zones = [
-            ['Ligne' => 'D41', 'Zone' => 'Assemblage'],
-            ['Ligne' => 'Démontage', 'Zone' => 'Assemblage'],
-            ['Ligne' => 'Enjoliveur', 'Zone' => 'Assemblage'],
-            ['Ligne' => 'D41', 'Zone' => 'Déchargement Reprise'],
-            ['Ligne' => 'DEFAUTHEQUE', 'Zone' => 'Déchargement Reprise'],
+            ['ligne' => 'D41', 'zones' => 'Assemblage'],
+            ['ligne' => 'Démontage', 'zones' => 'Assemblage'],
+            ['ligne' => 'Enjoliveur', 'zones' => 'Assemblage'],
+            ['ligne' => 'D41', 'zones' => 'Déchargement Reprise'],
+            ['ligne' => 'DEFAUTHEQUE', 'zones' => 'Déchargement Reprise'],
 
             // 'Demontage - Assemblage',
             // 'Enjoliveur P51 - Assemblage',
@@ -64,7 +64,7 @@ class DapController extends AbstractController
         // $title = str_replace('-', ' ', $slug);
 
         // if ($slug) {
-        //     $title = 'Zone : ' . u(str_replace('-', ' ', $slug))->title(true);
+        //     $title = 'zone : ' . u(str_replace('-', ' ', $slug))->title(true);
         // } else {
         //     $title = 'Doc Au Poste';
         // }

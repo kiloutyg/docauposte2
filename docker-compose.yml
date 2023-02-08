@@ -54,6 +54,7 @@ services:
     # image: php-alpine:latest
     image: kiloutyg/po:docauposteweb
     # build: .
+    # entrypoint: "./entrypoint.sh"
     restart: unless-stopped
     volumes:
   #    - ./myapp:/app/myapp

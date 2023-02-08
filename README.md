@@ -12,10 +12,10 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
     3 - Clone the repo locally in the directory of your choosing. 
     4 - Done ! Your ready to go. 
 
-### Run With Docker
+### Run With Docker.
 
 
-#### First version 
+#### First version, development version. 
 
     1 - After cloning the git repo, create a directory namde database_data
     2 - modify your pass in the DotEnv file
@@ -28,6 +28,11 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
             - composer require debug
         e - composer require templates
         f - composer require symfony/ux-turbo
+        g - yarn add bootstrap --dev && yarn add jquery @popperjs/core --dev
+        h - yarn add @fontsource/roboto-condensed --dev  
+        i - yarn add @fortawesome/fontawesome-free --dev 
+        j - yarn add axios --dev
 
     5 - yarn install
+    6 - yarn watch 
     
