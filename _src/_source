@@ -39,4 +39,6 @@ https://openclassrooms.com/
 https://www.it-connect.fr/definir-un-proxy-pour-apt-sous-ubuntudebian%EF%BB%BF/ 
 https://kifarunix.com/configure-apt-proxy-on-debian-10-buster/
     address 10.0.0.1:80
+    export http_proxy='http://10.0.0.1:80'
 
+https://developer.mozilla.org/fr/
