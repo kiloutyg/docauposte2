@@ -11,8 +11,8 @@
     background-color: rgb(12, 24, 179);
 } */
 body {
-    background-color: #17242C;
-    color: #fff;
+    background-color: #1b93de;
+    color: #740909;
     font-family: 'Roboto Condensed', sans-serif;
 }
 
@@ -35,7 +35,7 @@ body {
 }
 
 .mixed-vinyl-container {
-    background: rgb(23,36,44);
+    background: rgb(30, 106, 152);
     background: linear-gradient(180deg, rgba(23,36,44,1) 1%, rgba(34,47,54,1) 97%);
     border-radius: 5px;
 
