@@ -31,7 +31,7 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
         g - yarn add bootstrap --dev && yarn add jquery @popperjs/core --dev
         h - yarn add @fontsource/roboto-condensed --dev  
         i - yarn add @fortawesome/fontawesome-free --dev 
-        j - yarn add axios --dev
+        j - yarn add axios --dev core-js webpack encore webpack-cli webpack-notifier @symfony/webpack-encore
         k - composer require symfony/ux-turbo
 
     5 - yarn install
