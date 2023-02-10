@@ -16,15 +16,15 @@ body {
     font-family: 'Roboto Condensed', sans-serif;
 }
 
-.song-list i {
+.line-list i {
     margin-top: 7px;
 }
 
-.song-list a {
+.line-list a {
     color: #fff;
 }
 
-.song-details {
+.line-details {
     background-color: #222F36;
     border-radius: 5px;
     padding: 5px;
@@ -39,4 +39,27 @@ body {
     background: linear-gradient(180deg, rgba(23,36,44,1) 1%, rgba(34,47,54,1) 97%);
     border-radius: 5px;
 
+}
+
+.div {
+    border-top: 4px dashed blue;
+    background-color: gold;
+    height: 100px;
+    width: 100px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  p,
+dt {
+    font-weight: bold;
+}
+
+dl,
+dd {
+    font-size: 0.9rem;
+}
+
+dd {
+    margin-bottom: 1em;
 }
