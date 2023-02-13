@@ -17,17 +17,17 @@
                 </p>
                 <p>
                     <ol>
-                        <li><a href="{{path('app_sommere')}}#Assemblage" <b> Assemblage</b></a></li>
+                        {# <li> <a href="{{path('app_sommere')}}#Assemblage" <b> Assemblage</b></a></li> #}
             {% for zone in zones %}          
                 <div class="d-flex ps-5 mb-5 mt-5  line-list">
                 <a href="{{path('app_sommere')}}#{{ zone.zones }}">
-                    <span class="line-details">{{ zone.zones }}> </span>
+                    <li><span class="line-details">{{ zone.zones }} </span></li>
                 </a>
                 </div>
             {% endfor %}
-        </div>
+{#        
                         <li><i>italic</i></li>
-                        <li><u>souligné</u></li>
+                        <li><u>souligné</u></li> #}
                     </ol>
 
                     <p>
