@@ -2,24 +2,61 @@
 
 namespace App\Controller;
 
+
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+
+
 #[Route('/', name: 'app_')]
+
 
 class HtmlController extends AbstractController
 {
-    #[Route('/', name: 'index')]
+    #[Route('/', name: 'base')]
+
+    public function base(): Response
+    {
+        return $this->render('base.html.twig');
+    }
+
+
+    #[Route('/index', name: 'index')]
 
     public function index(): Response
     {
-        return $this->render('html/index.html.twig');
+        // return $this->render('html/index.html.twig');
+        $zones = [
+            ['ligne' => 'D41', 'zones' => 'Assemblage'],
+            ['ligne' => 'Démontage', 'zones' => 'Assemblage'],
+            ['ligne' => 'Enjoliveur', 'zones' => 'Assemblage'],
+            ['ligne' => 'D41', 'zones' => 'Déchargement Reprise'],
+            ['ligne' => 'DEFAUTHEQUE', 'zones' => 'Déchargement Reprise'],
+        
+            // 'Demontage - Assemblage',
+            // 'Enjoliveur P51 - Assemblage',
+            // 'P54 - Assemblage',
+            // 'P8 MV - Assemblage',
+            // 'Panneaux - Assemblage',
+            // 'T9 MV - Assemblage',
+            // 'D41 - Déchargement Reprise',
+            // 'DEFAUTHEQUE - Déchargement Reprise',
+            // 'GESTION-DR - Déchargement Reprise',
+            // 'LUX-DR - Déchargement Reprise',
+            // 'MATRICES-ILUO - Déchargement Reprise',
+            // 'P87 - Déchargement Reprise',
+        ];
+        return $this->render('html/index.html.twig', [
+        'title' => 'DocAuPoste',
+        'zones' => $zones]);
     }
 
     #[Route('/sommere', name: 'sommere')]
 
     public function sommere(): Response
+    
     {
         // return $this->render('html/sommere.html.twig');
         $zones = [
@@ -28,7 +65,7 @@ class HtmlController extends AbstractController
             ['ligne' => 'Enjoliveur', 'zones' => 'Assemblage'],
             ['ligne' => 'D41', 'zones' => 'Déchargement Reprise'],
             ['ligne' => 'DEFAUTHEQUE', 'zones' => 'Déchargement Reprise'],
-
+        
             // 'Demontage - Assemblage',
             // 'Enjoliveur P51 - Assemblage',
             // 'P54 - Assemblage',

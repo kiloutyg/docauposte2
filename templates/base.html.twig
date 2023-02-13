@@ -54,10 +54,17 @@
             </div>
         </nav>
         <!-- End Main Navigation -->
-
+<div style="margin-left: 15% " >
         {% block body %}
+            <p >
+                <strong>Liste <h1>Doc Au Poste</h1></strong>
+            </p>
+            <div class=" mb-3 line-list">
+            <p><a href="{{path('app_index')}}"> Index </a> </p>
+            <p><a href="{{path('app_sommere')}}"> Sommere </a> </p>
+            </div>
         {% endblock %}
-
+</div>
         <!-- Footer -->
         <div class="container mt-5">
             <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
@@ -68,12 +75,16 @@
                         PlasticOmnium
                     </a>
                 </div>
-
+                <div>
+                    <a href="../"><i class="fa fa-arrow-circle-o-left" aria-hidden="false">Page d'Accueil</i></a>
+                </div>  
                 <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
                     <li class="ms-3"><a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/staging2"><i class="fab fa-github"></i></a></li>
                 </ul>
             </footer>
         </div>
+
+
         <!-- End Footer -->
 
     </body>

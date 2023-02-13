@@ -13,12 +13,12 @@
             <strong> Sommere </strong>
         </h2>
     <p>
-        <div class="col-12 col-md-8 ps-5 " >
+        <div class="col-12 col-md-8 ps-5 mb-5 mt-5 " >
             <h2 class="mb-4">La somme des meres</h2>
             {% for zone in zones %}          
-                <div class="d-flex mb-3 line-list">
+                <div class="d-flex ps-5 mb-5 mt-5  line-list">
                     <a href="#"
-                    <span class="line-details">{{ zone.ligne }} - {{ zone.zones }}</span>
+                    <span class="line-details">{{ zone.ligne }} - {{ zone.zones }} <id={{zone.zones}}> </span>
                 </a>
                 </div>
             {% endfor %}
