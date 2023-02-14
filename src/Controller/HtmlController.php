@@ -66,4 +66,22 @@ private $zones = [
     {
         return $this->render('html/upload.html.twig');
     }
+
+    #[Route('/css', name: 'css')]
+    public function css(): Response
+    {
+        return $this->render('html/css.html.twig');
+    }
+    
+    #[Route('/css/menu', name: 'menu')]
+    public function menu(): Response
+    {
+        return $this->render('html/css/menu.html');
+    }
+    
+    #[Route('/css/contact', name: 'contact')]
+    public function contact(): Response
+    {
+        return $this->render('html/css/contact.html');
+    }
 }

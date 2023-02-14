@@ -1,29 +1,6 @@
 {% extends 'base.html.twig' %} {%block title %} Doc Au Poste | {{ parent() }}{% endblock %} {% block body %}
 <!DOCTYPE html>
 <html>
-<style>
-    form {
-        display: table;
-    }
-    
-    label,
-    input {
-        display: table-cell;
-        margin-bottom: 10px;
-        margin: 0.6rem;
-    }
-    
-    label {
-        padding-right: 10px;
-        margin: 5%;
-    }
-    
-    legend {
-        background-color: #000;
-        color: #fff;
-        padding: 3px 6px;
-    }
-</style>
 
 <body>
     <div class="justify-content-between align-items-center" style="margin-left: 10% ">
@@ -41,25 +18,29 @@
             </div>
         </p>
     </div>
-    <div class="container">
-        <form class="d-flex justify-content-center align-items-center ml-1" action="{{path('app_upload')}}">
+    <div class="container-fluid">
+        <form class="d-flex justify-content-center " action="{{path('app_upload')}}">
             <fieldset class="border">
                 <legend class="mt-1">Ajouter un document</legend>
                 <div class="ml-1">
                     <label class="border-top ml-1" for="upload">Document à ajouter : </label>
-                    <input type="file" name="upload" id="upload" accept=".pdf" />
+                    <input type="file" name="upload" id="upload" accept=".pdf" required/>
                 </div>
                 <div class="ml-1">
                     <label class="border-top ml-1" for="uploadname">Nom attribué au document : </label>
-                    <input type="text" name="uploadname" id="uploadname" value="TchoungOdoC.pdf" />
+                    <input type="number" name="uploadname" id="uploadname" placeholder="TchoungOdoC.pdf" required/>
                 </div>
                 <div class="ml-1">
                     <label class="border-top ml-1" for="uploadtype">Type de document : </label>
-                    <select class="mt-1" name="uploadtype" id="uploadtype">
+                    <select class="mt-1" name="uploadtype" id="uploadtype" multiple>
                     <option value="1">Document de travail</option>
                     <option value="2">Document de référence</option>
                     <option value="3">Document de formation</option>
                 </select>
+                </div>
+                <div>
+                    <label for="commentaire">Commentaire</label>
+                    <textarea name="commentaire" id="commentaire" cols="30" rows="5" spellcheck="true" wrap="soft" placeholder="Mon commentaire est d'une importance capitale"></textarea>
                 </div>
                 <div>
                     <legend class="border-top ml-1 mt-1">Rendre le document publique ?</legend>
@@ -69,6 +50,9 @@
                     <div>
                         <label class="border-top ml-1" for="publishingupload"><input type="radio" name="publishingupload" id="publishingupload" />privé</label>
                     </div>
+                </div>
+                <div>
+                    <input type="submit" value="Envoyer le document">
                 </div>
             </fieldset>
         </form>
