@@ -42,3 +42,5 @@ https://kifarunix.com/configure-apt-proxy-on-debian-10-buster/
     export http_proxy='http://10.0.0.1:80'
 
 https://developer.mozilla.org/fr/
+
+https://developer.mozilla.org/en-US/docs/Learn/Front-end_web_developer

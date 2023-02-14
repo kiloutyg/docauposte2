@@ -13,13 +13,13 @@
             </p>
             <body>
                 <p>
-                <a href="{{path('app_sommere')}}"> <h1>tchoung</h1></a>
+                <a href="{{path('app_sommere')}}" title="C'est ici qu'on somme des meres"> <h1>tchoung</h1></a>
                 </p>
                 <p>
                     <ol>
                         {# <li> <a href="{{path('app_sommere')}}#Assemblage" <b> Assemblage</b></a></li> #}
             {% for zone in zones %}          
-                <div class="d-flex ps-5 mb-5 mt-5  line-list">
+                <div class="d-flex ps-5 mb-5 mt-5 line-list">
                 <a href="{{path('app_sommere')}}#{{ zone.zones }}">
                     <li><span class="line-details">{{ zone.zones }} </span></li>
                 </a>

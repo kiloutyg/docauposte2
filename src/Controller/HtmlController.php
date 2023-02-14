@@ -49,16 +49,21 @@ private $zones = [
         ]);
     }
 
-    // #[Route('/sommere/{slug}', name: 'browse')]
-    // public function browse(string $slug = null): Response
-    // {
-    //     $zoneList = array_column($this->zones, 'zones');
+    #[Route('/table', name: 'table')]
+    public function table(): Response
+    {
+    return $this->render('html/table.html.twig');
+    }
+    
+    #[Route('/formulaire', name: 'formulaire')]
+    public function formulaire(): Response
+    {
+    return $this->render('html/forms.html.twig');
+    }
 
-    //     $slug ? u(str_replace('-', ' ', $slug))->title(true) : null;
-
-    //     return $this->render('html/sommere.html.twig', [
-    //         // 'title' => $title,
-    //         'zone' => $zoneList,
-    //     ]);
-    // }
+    #[Route('/upload', name: 'upload')]
+    public function upload(): Response
+    {
+        return $this->render('html/upload.html.twig');
+    }
 }

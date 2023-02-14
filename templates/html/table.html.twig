@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %} {%block title %} Doc Au Poste | {{ parent() }}{%
+endblock %} {% block body %}
+<!DOCTYPE html>
+<html>
+  <table>
+    <thead>
+      <tr>
+        <th>Nome de produit</th>
+        <th>Prix HT</th>
+        <th>Quantité</th>
+        <th>Prix TTC</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Truc1</td>
+        <td>PrixHT1</td>
+        <td>Quantité1</td>
+        <td>PrixTTC1</td>
+      </tr>
+      <tr>
+        <td>Truc2</td>
+        <td>PrixHT2</td>
+        <td>Quantité2</td>
+        <td>PrixTTC2</td>
+      </tr>
+      <tr>
+        <td>Truc3</td>
+        <td>PrixHT3</td>
+        <td>Quantité3</td>
+        <td>PrixTTC3</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2"></td>
+        <td>TotalHT</td>
+        <td>100 €</td>
+      </tr>
+      <tr>
+        <td colspan="2"></td>
+        <td>TotalTTC</td>
+        <td>125 €</td>
+      </tr>
+    </tfoot>
+  </table>
+</html>
+
+{% endblock %}
