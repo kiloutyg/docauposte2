@@ -42,5 +42,10 @@ https://kifarunix.com/configure-apt-proxy-on-debian-10-buster/
     export http_proxy='http://10.0.0.1:80'
 
 https://developer.mozilla.org/fr/
+# Partie importante pour les formulaires d'ajouts de documents: 
+https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form
 
 https://developer.mozilla.org/en-US/docs/Learn/Front-end_web_developer
+
+# Quant à la personalisation de l'interface d'upload : 
+https://freshdesignweb.com/jquery-html5-file-upload/
