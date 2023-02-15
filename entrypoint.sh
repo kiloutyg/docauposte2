@@ -6,7 +6,7 @@ composer install
 yarn install
 composer clear-cache
 chmod 777 . 
-# yarn watch &
 # yarn encore production &
 export http_proxy='http://10.0.0.1:80'
-exec apache2-foreground 
+exec apache2-foreground  &
+yarn watch

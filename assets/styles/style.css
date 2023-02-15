@@ -1,9 +1,17 @@
-h2 {
-    color: red;
+header {
+    background-color: #2c6a91;
+    color: #e76969;
+    font-family: "Roboto Condensed", sans-serif;
 }
 
 h1 {
-    color: red;
+    color: blue;
+    background-color: aqua;
+}
+
+h2 {
+    color: blue;
+    background-color: beige;
 }
 
 h3 {
@@ -14,10 +22,10 @@ h4 {
     color: red;
 }
 
-h6 {
+h5 {
     color: red;
 }
 
-h5 {
+h6 {
     color: red;
 }
