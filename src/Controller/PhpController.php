@@ -25,10 +25,15 @@ class PhpController extends AbstractController
     //     ['ligne' => 'DEFAUTHEQUE', 'zones' => 'Déchargement Reprise'],
     // ];
     // private $zone = [array_column($zones, 'zones')];
-    
-        #[Route('/', name: 'basephp')]
-        public function base(): Response
-        {
-            return $this->render('/php/base.html.twig');
-        }
-    }    
+
+    #[Route('/', name: 'basephp')]
+    public function base(): Response
+    {
+        return $this->render('/php/basephp.html.twig');
+    }
+    #[Route('/demo', name: 'demo')]
+    public function demo(): Response
+    {
+        return $this->render('/php/demo.php');
+    }
+}
