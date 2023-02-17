@@ -1,10 +1,9 @@
- /*
- <!-- {% extends '/php/basephp.html.twig' %}
+<!-- {% extends '/php/basephp.html.twig' %}
 {% block body %}
 {% endblock %} -->
- */
- <?php
-    /*
+
+<?php
+/*
 $prenom = 'Jean';
 $nom = 'Dupont';
 $note = 12;
@@ -246,7 +245,7 @@ VRAI || FAUX = VRAI
 FAUX || VRAI = VRAI
 FAUX || FAUX = FAUX
 */
-    /*
+/*
     echo "\n";
     echo "\n";
     echo "\n";
@@ -313,17 +312,211 @@ FAUX || FAUX = FAUX
     for ($i = 0; $i > -10; $i -= 2) {
         echo "- $i \n";
     }
- */
-    echo "\n";
-    echo "\n";
-    echo "\nLoop avec for pour afficher une liste complete.   \n";
-    echo "\n";
 
-    $notes = [10, 12, 8, 20, 18, 16, 14];
+echo "\n";
+echo "\n";
+echo "\nLoop avec for pour afficher une liste complete.   \n";
+echo "\n";
 
-    for ($i = 0; $i < count($notes); $i++) {
-        echo "- $notes[$i]" . "\n";
+$notes = [10, 12, 8, 20, 18, 16, 14];
+
+for ($i = 0; $i < count($notes); $i++) {
+    echo "- $notes[$i]" . "\n";
+}
+echo "\n";
+ 
+
+echo "\n";
+echo "\n";
+echo "\nLoop avec foreach pour faire de l'exploration de tableau.   \n";
+echo "\n";
+
+$notes = [10, 12, 8, 20, 18, 16, 14];
+
+echo "\nPremiere solution, en utilisant for pour faire lister toutes les notes.   \n";
+
+for ($i = 0; $i < count($notes); $i++) {
+    echo "- $notes[$i]" . "\n";
+}
+echo "\n";
+echo "\nSeconde solution, en utilisant foreach pour faire lister toutes les notes. En les listant as Note pour chacune des valeurs.  \n";
+echo "\n";
+foreach ($notes as $note) {
+    echo "- $note" . "\n";
+}
+echo "\n";
+echo "\nCette boucle peut recevoir un deuxieme parametre pour afficher la clef de la valeur.  \n";
+echo "\n";
+$eleves = [
+    'cm2' => 'Jean',
+    '6eme' => 'Pierre',
+    'cm1' => 'Paul',
+];
+echo "\n";
+foreach ($eleves as $classe => $eleve) {
+    echo "- $eleve est en $classe" . "\n";
+}
+
+echo "\n";
+echo "\nCette boucle peut aussi explorer des données complexe types tableau contenant les eleves. En faisant des boucles dans les boucles.   \n";
+echo "\n";
+*/
+/* Objectif : 
+    la classe cm2: 
+        - Jean
+        - Jacques
+        - Marie
+    la classe 6eme:
+        - Pierre
+        - Paul
+        - Jacques
+        etc...
+        
+
+$eleves = [
+    'cm2' => ['Jean', 'Jacques', 'Marie'],
+    '6eme' => ['Pierre', 'Paul', 'Jacques'],
+    'cm1' => ['Paul', 'Pierre', 'Marie'],
+];
+
+echo "\n";
+foreach ($eleves as $classe => $ListeEleves) {
+    echo "Les eleves de la classe de $classe sont : " . "\n";
+    foreach ($ListeEleves as $eleve) {
+        echo "- $eleve" . "\n";
     }
     echo "\n";
+}
 
-    ?>
+
+echo "\n";
+echo "\n";
+echo "\nFaire un algo qui permet d'entrée les notes d'un eleve et de les afficher. ( d'un ensemble  de notes et de les afficher)  \n";
+echo "\n";
+$notes = [];
+$note = null;
+$nb = 0;
+*/
+/*
+//on demande une note en indiquant les conditions de fin de boucle. 
+TANT QUE la note est differente de 0, on continue de demander une note.
+    //on ajoute la note dans le tableau et on continue tant que le user ne tape pas 0 ou equivalent.
+POUR chaque note dans le tableau, on affiche la note et on augment le nombre de notes totales.
+    //Enfin on affiche le nombre de notes totales puis les notes sous formes de listes.
+
+
+$note = (int)readline("Entrez les notes puis enfin entrer 0 lorsque vous avez fini : ");
+echo "\n";
+
+while ($note !== 0) {
+    $notes[] = $note;
+    $nb = $nb + 1;
+    $note = (int)readline("Entrez la note suivante : ");
+}
+echo "\n";
+echo "\n $nb notes ont été entrées : \n";
+
+foreach ($notes as $note) {
+    echo "- $note" . "\n";
+}
+*/
+/* CORRECTION DE L'EXERCICE SELON LE TUTO : 
+
+$notes = [];
+$action = null;
+
+//TANT QUE l'utilisateur ne tape pas "fin"
+while ($action !== 'fin') {
+    $action = readline('Entrer une nouvelle note (ou \'fin\' pour terminer la saisie) : ');
+    // On ajoute la note tapée au tableau notes
+    if ($action !== 'fin') {
+        $notes[] = (int)$action;
+    }
+}
+// POUR CHAQUE note dans le tableau notes
+foreach ($notes as $note) {
+    // On affiche la note
+    echo "- $note" . "\n";
+}
+
+///Autre solution avec while(true) et break pour sortir de la boucle :\\\
+   
+$notes = [];
+$action = null;
+
+//TANT QUE l'utilisateur ne tape pas "fin"
+while (true) {
+    $action = readline('Entrer une nouvelle note (ou \'fin\' pour terminer la saisie) : ');
+    // On ajoute la note tapée au tableau notes
+    if ($action === 'fin') {
+        break;
+        
+        $notes[] = (int)$action;
+    }
+}
+// POUR CHAQUE note dans le tableau notes
+foreach ($notes as $note) {
+    // On affiche la note
+    echo "- $note" . "\n";
+} 
+*/
+
+/*
+On veut demander à l'utilisateur de rentrer les horaires d'ouverture d'un magasin. 
+(entrer l'heure de debut et de fin et lui demander si il veut ajouter une nouvelle plage horaire)
+
+On demande à l'utilisateur de rentrer une heure et on lui dira si le magasin est ouvert sous cette forme : 
+    
+$heure = (int)readline("Entrez une heure : ");
+
+if ($heure < 9 || $heure > 12 && $heure < 14 || $heure > 18) {
+    echo "Le magasin est fermé";
+} else {
+    echo "Le magasin est ouvert";
+}
+TANT QUE $heure n'est pas egal a zero  on continue a demander des plages horaires. 
+    //On demande à l'utilisateur l'heure de debut, la deuxieme heure puis la troisieme heure et ainsi de suite jusqu'a ce que l'utilisateur tape 0.
+    Les heures ne peuvent pas etre superieur a 24 et inferieur a 0 et ne peuvent etre qu'en couple de deux avec une heure de debut et une heure de fin de plages.
+
+*/
+
+$heures = [];
+$heure = null;
+$nb = null;
+$plage = null;
+echo "\n";
+
+$nb = (($plage = (int)readline("\nEntrez le nombre de plages horaires : \n")) * 2);
+
+// echo $nb;
+
+
+
+while ($nb !== 0) {
+    while ($heure !== 0) {
+        $heure = (int)readline("Entrez l'heure de debut de la plage horaire : ");
+        if ($heure < 0 || $heure > 24) {
+            echo "L'heure de debut ne peut pas etre inferieur a 0 ou superieur a 24";
+        }
+        $heures[] = $heure;
+        $nb = $nb - 1;
+        $heure = (int)readline("Entrez l'heure de fin de la plage horaire : ");
+        if ($heure < 0 || $heure > 24) {
+            echo "L'heure de fin ne peut pas etre inferieur a 0 ou superieur a 24";
+        }
+        $heures[] = $heure;
+        $nb = $nb - 1;
+        if ($heures[0] >= $heures[1]) {
+            echo "\nL'heure de debut ne peut pas etre superieur ou egale à l'heure de fin.\n\n";
+            $heure === null;
+            echo "L'heure de debut ne peut pas etre superieur ou egale à l'heure de fin. \nEssaye encore: \n\n";
+        }
+        $heure = $nb;
+    }
+}
+
+echo " Il y a $plage plages dont les horaires sont : \n";
+foreach ($heures as $heure) {
+    echo "- $heure" . "h\n";
+}
+?>
