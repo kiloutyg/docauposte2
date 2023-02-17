@@ -8,6 +8,7 @@ $nom = 'Dupont';
 $note = 12;
 $note2 = 15;
 
+
 echo 'Bonjour ' . $prenom . ' ' . $nom .  ' vous avez eu ' . $note .  ' et ' . $note2 . ' sur 20.';
 
 echo "\nBonjour $prenom $nom vous avez eu $note et $note2 sur 20.\n";
@@ -85,6 +86,35 @@ $classe = [
 echo "\n afficher les informations d'un des eleves du tableau classe, specifiquement une de ses notes \n";
 
 echo $classe[1]['notes'][1];
+echo "\n";
+echo "\n";
+
+echo "\nAjout de logique avec les conditions : \n";
+echo "\n";
+
+$note3 = 8;
 
 
+if ($note >= 10) {
+    echo "Vous avez la moyenne";
+} else {
+    echo "Vous n'avez pas la moyenne";
+}
+echo "\n";
+if ($note3 >= 10) {
+    echo "Vous avez la moyenne";
+} else {
+    echo "Vous n'avez pas la moyenne";
+}
+
+echo "\n";
+echo "\n Ajout d'une readline pour effectuer une entrée de donnée \n";
+$note4 = readline("Entrez une note : ");
+echo "\n";
+echo "\n";
+if ($note4 >= 10) {
+    echo "Vous avez la moyenne";
+} else {
+    echo "Vous n'avez pas la moyenne";
+}
 ?>
