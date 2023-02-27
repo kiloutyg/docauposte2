@@ -744,9 +744,10 @@ if ($creneautrouve) {
 } else {
     echo "Le magasin sera fermé.";
 }
-
+========================================================================================================================= */
+// Afficher les horaires du magasin en claire de maniere automatique. 
 /// Exemple : le magasin est ouvert de 14h à 18h et de 9h à 12h.
-
+/*
 echo "\n";
 echo " Le magasin est ouvert de ";
 echo implode('h à ', $creneaux[0]) . "h";
@@ -754,4 +755,211 @@ echo implode('h à ', $creneaux[0]) . "h";
 echo " Le magasin est ouvert de " . $creneaux[0][0] . "h à " . $creneaux[0][1] . "h";
 
 // Avec echo implode on peut afficher les horaires du magasin. 
+echo "\n";
+
+echo "\n";
+echo " Le magasin est ouvert de ";
+echo implode('h à ', $creneaux[0]) . "h";
+echo implode('h à ', $creneaux[1]) . "h";
+echo "\n";
+echo "\n";
+
+echo " Le magasin est ouvert de " . $creneaux[0][0] . "h à " . $creneaux[0][1] . "h";
+echo "\n";
+echo "\n";
+
+echo " Le magasin est ouvert de ";
+foreach ($creneaux as $creneau) {
+    echo "{$creneau[0]}h à {$creneau[1]}h ";
+}
+echo "\n";
+echo "\n";
+
+echo " Le magasin est ouvert de ";
+foreach ($creneaux as $creneau) {
+    echo $creneau[0] . "h à " . $creneau[1] . "h ";
+}
+echo "\n";
+echo "\n";
+
+echo " Le magasin est ouvert de ";
+foreach ($creneaux as $k => $creneau) {
+    if ($k > 0) {
+        echo " et de ";
+    }
+    echo "{$creneau[0]}h à {$creneau[1]}h";
+}
+
+========================================================================================================================= */
+
+/* // Les FONCTIONS SOUS PHP
+
+// On peut créer des fonctions pour réutiliser du code.
+
+demonstration($variable1, '1234');
+
+Ou stocker dans une variable comme ceci : 
+
+$variable1 = demonstration($variable1, '1234');
+
+function demonstration($parametre1, $parametre2) {
+    return $parametre1 . $parametre2;
+}
+
+echo "Premier test avec readline et les fonctions de PHP\n \n";
+echo "Entrez une valeur : ";
+$variable = readline();
+print_r($variable);
+
+/// En ajoutant le booleen true à la fin de la fonction de print_r on retourne l'information plutot que de l'afficher.
+
+echo "Premier test avec readline et les fonctions de PHP\n \n";
+echo "Entrez une valeur : ";
+$variable = readline();
+print_r($variable, true);
+
+/// Avec var_dump on peut afficher le type de la variable : 
+
+echo "Premier test avec readline et les fonctions de PHP\n \n";
+echo "Entrez une valeur : ";
+$variable = readline();
+echo " \n \nVous avez entré : ";
+var_dump($variable);
+
+// On va demander a l'utilisateur de rentrer un mot, pour afficher si oui ou non c'est un palindrome.
+
+$pizza = strtolower((string)readline("\n What type of pizza do you wish to order? "));
+$zzapi = strrev($pizza);
+
+// echo "\n \nYour order is in verlen: $zzapi \n \n";
+
+if ($pizza === $zzapi) {
+    echo "\n \n $pizza is a palindrome \n \n";
+} else {
+    echo "\n \n $pizza is not a palindrome \n \n";
+}
+
+// On va calculer la moyenne des notes d'un eleve, depuis un tableau possedant plusieurs valeurs. 
+
+$notes = [12, 15, 18, 20, 10, 8, 16, 19, 17, 11, 13, 14, 9, 7, 6, 5, 4, 3, 2, 1];
+$notesnb = count($notes);
+$notessum = array_sum($notes);
+$notesavg = $notessum / $notesnb;
+
+$notesavg = array_sum($notes) / count($notes);
+
+echo "La moyenne est de $notesavg";
+
+//Correction de l'exercice :
+
+$notes = [10, 20, 13];
+$sum = array_sum($notes);
+$count = count($notes);
+echo "La moyenne est de " . ($sum / $count);
+
+// Pour obtenir un arrondi a 2 chiffres apres la virgule on peut utiliser la fonction round().
+$notes = [10, 20, 13];
+$sum = array_sum($notes);
+$count = count($notes);
+echo "La moyenne est de " . round(($sum / $count), 2);
+
+// Les variables passer par reference.
+// D'abord on ajoute une valeur au tableau et imprime un var_dump et print_r pour voir le resultat.
+
+$notes = [10, 20, 13];
+$notes[] = 16;
+var_dump($notes);
+print_r($notes);
+
+// La reference est une variable qui pointe vers une autre variable. 
+$notes = [10, 20, 13];
+$notes2 = &$notes;
+$notes2[] = 10;
+var_dump($notes, $notes2);
+// Ici on voit que les deux variables pointent vers la meme adresse memoire.(le parametre ajouter a $notes2 est ajouter a $notes)
+
+// En reprenant l'exercice du palindrome et en utilisant la fonction exit : 
+
+while (true) {
+    $mot = readline('Entrez un mot : ');
+    if ($mot === '') {
+        exit('Fin du programme');
+    }
+    $reverse = strtolower(strrev($mot));
+    if (strtolower($mot) === $reverse) {
+        echo 'Le mot est un palindrome';
+    } else {
+        echo 'Le mot n\'est pas un palindrome';
+    }
+}
+
+// Creer une fonction qui permet de filtrer les insultes dans un texte.
+$insultes = ['merde', 'connard', 'pute', 'salope', 'enculé', 'enculée', 'con', 'conne', 'connasse', 'conasse', 'conard', 'conasse', 'conne', 'conas'];
+
+$text = readline('Entrez un texte : ');
+
+// foreach ($insultes as $insulte) {
+//     if (strpos($text, $insulte) !== false) {
+//         $text = str_replace($insulte, '***', $text);
+//     }
+// }
+// echo $text;
+
+// avec la fonction strlen pour compter le nombre de caractères dans la chaîne de caractères (les insultes) et les remplacer par des étoiles avec str_repeat. 
+
+
+foreach ($insultes as $insulte) {
+    $etoile = str_repeat('*', strlen($insulte));
+    $text = str_replace($insulte, $etoile, $text);
+};
+echo $text;
+
+// Ou plus proprement : 
+
+// foreach ($insultes as $insulte) {
+//     $nb = strlen($insulte);
+//     $etoile = str_repeat('*', $nb);
+//     $text = str_replace($insulte, $etoile, $text);
+// }
+// echo $text;
+
+/// En generant un tableau d'equivalence d'etoiles pour chacune des insultes! 
+
+$insultes = ['merde', 'connard', 'pute', 'salope', 'enculé', 'enculée', 'con', 'conne', 'connasse', 'conasse', 'conard', 'conasse', 'conne', 'conas'];
+
+$text = readline('Entrez un texte : ');
+
+$asterisk = [];
+
+foreach ($insultes as $insulte) {
+    $etoile[] = str_repeat('*', strlen($insulte));
+}
+
+foreach ($insultes as $insulte) {
+    $text = str_replace($insultes, $etoile, $text);
+};
+echo $text;
+
+// Ou encore plus proprement :
+
+/// Trouver la premiere lettre de chaque insulte, la garder et remplacer le reste par des etoiles.
+// Trouver la premiere lettre du mot
+// Trouver la longueur du mot (-1)
+//concatener la premiere lettre et le reste avec des etoiles(str_repeat)
+
+$insultes = ['merde', 'connard', 'pute', 'salope', 'enculé', 'enculée', 'con', 'conne', 'connasse', 'conasse', 'conard', 'conasse', 'conne', 'conas'];
+
+$text = readline('Entrez un texte : ');
+
+$etoile = [];
+
+foreach ($insultes as $insulte) {
+    $etoile[] = substr_replace($insulte, str_repeat('*', strlen($insulte) - 1), 1);
+}
+
+foreach ($insultes as $insulte) {
+    $text = str_replace($insultes, $etoile, $text);
+};
+print_r($text);
+
 ?>
