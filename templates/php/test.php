@@ -1,15 +1,8 @@
 <?php
-$insultes = ['merde', 'connard', 'pute', 'salope', 'enculé', 'enculée', 'con', 'conne', 'connasse', 'conasse', 'conard', 'conasse', 'conne', 'conas'];
-
-$text = readline('Entrez un texte : ');
-
-$etoile = [];
-
-foreach ($insultes as $insulte) {
-    $etoile[] = substr_replace($insulte, str_repeat('*', strlen($insulte) - 1), 1);
+$nom = 'jean';
+function bonjour($nom)
+{
+    return 'Bonjour ' . $nom . "! \n";
 }
-
-foreach ($insultes as $insulte) {
-    $text = str_replace($insultes, $etoile, $text);
-};
-print_r($text);
+$salutation = bonjour($nom);
+echo $salutation;

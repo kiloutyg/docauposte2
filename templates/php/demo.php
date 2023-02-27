@@ -961,5 +961,59 @@ foreach ($insultes as $insulte) {
     $text = str_replace($insultes, $etoile, $text);
 };
 print_r($text);
+ 
+// Correction de l'exercice :
+
+$insultes = ['merde', 'connard', 'pute', 'salope', 'enculé', 'enculée', 'con', 'conne', 'connasse', 'conasse', 'conard', 'conasse', 'conne', 'conas'];
+
+$text = readline('Entrez un texte : ');
+
+$etoile = [];
+
+foreach ($insultes as $insulte) {
+    $etoile[] = substr($insulte, 0, 1) . str_repeat('*', strlen($insulte) - 1);
+}
+
+foreach ($insultes as $insulte) {
+    $text = str_replace($insultes, $etoile, $text);
+};
+print_r($text);
+
+// Creer ses propres fonctions :
+/// ici une fonction pour dire bonjour a une personne : 
+
+$nom = readline();
+function bonjour($nom)
+{
+    echo "Bonjour $nom !";
+}
+bonjour($nom);
+
+// On peut passer la fonction en variable :
+$nom = 'jean';
+function bonjour($nom)
+{
+    echo "Bonjour $nom !";
+}
+$salutation = bonjour($nom);
+echo $salutation;
+
+// la fonction peut servir à renvoyer un resultat, resultat qui sera stocker dans une variable comme precedemment dans ce cas là il faudra utiliser le mot cle return pour renvoyer le resultat de la fonction.
+$nom = 'jean';
+function bonjour($nom)
+{
+    return 'Bonjour ' . $nom . "! \n";
+}
+$salutation = bonjour($nom);
+echo $salutation;
+
+/// On peut ajouter une valeur par defaut a une fonction :
+function bonjour($nom = 'jean')
+{
+    return 'Bonjour ' . $nom . "! \n";
+}
+$salutation = bonjour($nom);
+echo $salutation;
+
 
 ?>
