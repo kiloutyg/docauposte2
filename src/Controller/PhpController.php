@@ -26,14 +26,25 @@ class PhpController extends AbstractController
     // ];
     // private $zone = [array_column($zones, 'zones')];
 
-    #[Route('/', name: 'basephp')]
+    #[Route('/', name: 'index')]
     public function base(): Response
     {
-        return $this->render('/php/basephp.html.twig');
+        return $this->render('/php/index.php');
     }
-    #[Route('/demo', name: 'demo')]
-    public function demo(): Response
-    {
-        return $this->render('/php/demo.php');
-    }
+
+    // #[Route('/contact', name: 'contact')]
+    // public function contact(): Response
+    // {
+    //     return $this->render('/php/contact.php');
+    // }
+    // #[Route('/header', name: 'header')]
+    // public function header(): Response
+    // {
+    //     return $this->render('/php/header.php');
+    // }
+    // #[Route('/footer', name: 'footer')]
+    // public function footer(): Response
+    // {
+    //     return $this->render('/php/footer.php');
+    // }
 }

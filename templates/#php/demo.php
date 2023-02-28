@@ -701,7 +701,7 @@ if ($creneautrouve) {
 
 // Deuxieme exercice dans ce style à la difference que l'on decide de directement afficher les horaires d'ouverture du magasin.
 
-On veut deùander à mon utilisateur de rentrer les horaires d'ouverture d'un magasin.
+On veut demander à l'utilisateur de rentrer les horaires d'ouverture d'un magasin.
 
 // On demande à l'utilisateur de rentrer un creneaux 
   // On demande l'heure de debut
@@ -1014,6 +1014,255 @@ function bonjour($nom = 'jean')
 }
 $salutation = bonjour($nom);
 echo $salutation;
+
+/// En ajoutant un test pour repondre seulement bonjour si il n'y a pas de nom :
+
+function bonjour($nom = null)
+{
+    if ($nom == null) {
+        return "Bonjour ! \n";
+    }
+    return 'Bonjour ' . $nom . "! \n";
+}
+$salutation = bonjour($nom);
+echo $salutation;
+
+
+/// Dans ce cas la fonciton s'execute en huis clos et ne recupere pas la valeur de la variable $nom, il faut donc passer la variable en parametre de la fonction.
+
+$nom = 'truc';
+function bonjour($prenom = null)
+{
+    if ($prenom === null) {
+        return "Bonjour ! \n";
+    }
+    return 'Bonjour ' . $prenom . " " . $nom . "\n";
+}
+
+echo bonjour('machin');
+
+/// Il faut donc passer la variable en parametre de la fonction.
+
+$nom = 'truc';
+function bonjour($prenom = null, $nom = null)
+{
+    if ($prenom === null) {
+        return "Bonjour ! \n";
+    }
+    return 'Bonjour ' . $prenom . " " . $nom . "\n";
+}
+
+echo bonjour('machin', $nom);
+
+/// On peut passer la variable en global dans la fonction pour qu'elle puisse etre recuperee :
+$nom = 'truc';
+function bonjour($prenom = null)
+{
+    global $nom;
+    if ($prenom === null) {
+        return "Bonjour ! \n";
+    }
+    return 'Bonjour ' . $prenom . " " . $nom . "\n";
+}
+
+echo bonjour('machin');
+
+//// Exercice : obj prendre en parametre une phrase et demaner a l'utilisateur de rentrer oui ou nom, 
+//// si il ne reponds pas la question devra lui etre posé a nouveau.
+//// La reponse oui renvera un booleen true et la reponse non renvera un booleen false.
+
+function repondre_oui_non($question)
+{
+    $reponse = readline($question . ' (oui/non) ');
+    if ($reponse == 'oui' || $reponse == 'o') {
+        return true;
+    } elseif ($reponse == 'non' || $reponse == 'n') {
+        return false;
+    } else {
+        echo 'Réponse incorrecte ! Veuillez répondre par oui ou non.\n';
+        return repondre_oui_non($question);
+    }
+    
+}
+
+$resultat = repondre_oui_non('Voulez-vous continuer ?');
+//Si oui = true, si non = false
+var_dump($resultat);
+
+// Avec un switch case :
+
+function repondre_oui_non($question)
+{
+    $reponse = readline($question . ' (oui/non) ');
+    switch ($reponse) {
+        case 'oui':
+        case 'o':
+            return true;
+        case 'non':
+        case 'n':
+            return false;
+        default:
+            echo 'Réponse incorrecte ! Veuillez répondre par oui ou non.\n';
+            return repondre_oui_non($question);
+    }
+}
+
+$resultat = repondre_oui_non('Voulez-vous continuer ?');
+//Si oui = true, si non = false
+var_dump($resultat);
+
+// Avec un while(true) pour continuer a executer la boucle : 
+function repondre_oui_non($question)
+{
+    while (true) {
+        $reponse = readline($question . ' (oui/non) ');
+        if ($reponse == 'oui' || $reponse == 'o') {
+            return true;
+        } elseif ($reponse == 'non' || $reponse == 'n') {
+            return false;
+        }
+        echo "Réponse incorrecte ! Veuillez répondre par oui ou non.\n";
+        return repondre_oui_non($question);
+    }
+}
+
+$resultat = repondre_oui_non('Voulez-vous continuer ?');
+//Si oui = true, si non = false
+var_dump($resultat);
+
+// Ajout d'une fonction avec les creneaux horaires comme precedement:
+ /// Solution perso : 
+ 
+ function demander_creneau($question = 'Veuillez entrer un creneau ')
+{
+    echo $question . ": \n";
+    while (true) {
+        $reponsedebut = (int)readline('Heure de debut : ');
+        $reponsefin = (int)readline('Heure de fin : ');
+        if (($reponsedebut < 0 || $reponsedebut > 23) || ($reponsefin < 0 || $reponsefin > 23) || ($reponsefin <= $reponsedebut)) {
+            echo "Réponse incorrecte ! Veuillez répondre par un horaire entre 0h et 23h et un horaire de debut précedant celui de fin.\n";
+            return demander_creneau();
+        }
+        return [$reponsedebut, $reponsefin];
+    }
+}
+$creneau = demander_creneau();
+$creneau2 = demander_creneau('Veuillez entrer votre creneau horaire ');
+var_dump($creneau, $creneau2);
+
+/// Correction exo : 
+
+function demander_creneau($phrase = 'Veuillez entrer un crenau horaire ')
+{
+    echo $phrase . ": \n";
+    while (true) {
+        $ouverture = (int)readline("Heure de debut : ");
+        if ($ouverture >= 0 && $ouverture <= 23) {
+            break;
+        }
+    }
+    while (true) {
+        $fermeture = (int)readline("Heure de fin : ");
+        if ($fermeture >= 0 && $fermeture <= 23 && $fermeture > $ouverture) {
+            break;
+        }
+    }
+    return [$ouverture, $fermeture];
+}
+$creneau = demander_creneau();
+$creneau2 = demander_creneau('Veuillez entrer votre creneau horaire ');
+var_dump($creneau, $creneau2);
+
+
+// Faire une fonction qui demande plusieur creneaux horaires a l'utilisateur et les stocke dans un tableau
+// en utilisant les fonctions repondre_oui_non et demander_creneau() precedement creee : 
+
+
+
+function repondre_oui_non($question)
+{
+    while (true) {
+        $reponse = readline($question . ' (oui/non) ');
+        if ($reponse == 'oui' || $reponse == 'o') {
+            return true;
+        } elseif ($reponse == 'non' || $reponse == 'n') {
+            return false;
+        }
+        echo "Réponse incorrecte ! Veuillez répondre par oui ou non.\n";
+        return repondre_oui_non($question);
+    }
+}
+
+// $resultat = repondre_oui_non('Voulez-vous continuer ?');
+// var_dump($resultat);
+//Si oui = true, si non = false
+// Ajout d'une demande de creneaux horaires : 
+
+
+function demander_creneau($question = 'Veuillez entrer un creneau ')
+{
+    echo $question . ": \n";
+    while (true) {
+        $reponsedebut = (int)readline('Heure de debut : ');
+        $reponsefin = (int)readline('Heure de fin : ');
+        if (($reponsedebut < 0 || $reponsedebut > 23) || ($reponsefin < 0 || $reponsefin > 23) || ($reponsefin <= $reponsedebut)) {
+            echo "Réponse incorrecte ! Veuillez répondre par un horaire entre 0h et 23h et un horaire de debut précedant celui de fin.\n";
+            return demander_creneau();
+        }
+        return [$reponsedebut, $reponsefin];
+    }
+}
+
+// $creneau = demander_creneau();
+// $creneau2 = demander_creneau('Veuillez entrer votre creneau horaire ');
+// var_dump($creneau, $creneau2);
+
+// Ajout d'une demande de creneaux horaires dans le but d'obtenir un tableau de creneaux horaires :
+/*
+*[
+*   [8, 12],
+*   [14, 16],
+*]
+
+Je vois deux approches possibles :
+- Soit on demande un creneau, on l'ajoute au tableau, et on demande si on veut en ajouter un autre
+- Soit on demande d'office combien de crenaux il y a. 
+
+/ Version où on demande a l'utilsateur s'il veut ajouter un autre creneau :
+
+function demander_creneaux($phrase)
+{
+    echo $phrase . ": \n";
+    $creneaux = [];
+    while (true) {
+        $creneaux[] = demander_creneau();
+        $reponse = repondre_oui_non('Voulez-vous ajouter un autre creneau ?');
+        if ($reponse == false) {
+            return $creneaux;
+        }
+    }
+}
+
+$creneaux = demander_creneaux('Entrez vos creneaux horaires ');
+var_dump($creneaux);
+print_r($creneaux);
+
+function demander_creneaux($phrase = 'Veuillez entrer vos creneaux horaires ')
+{
+    echo $phrase . ": \n";
+    $creneaux = [];
+    $continuer = true;
+    while ($continuer) {
+        $creneaux[] = demander_creneau();
+        $continuer = repondre_oui_non('Voulez-vous ajouter un autre creneau ?');
+    }
+    return $creneaux;
+}
+
+$creneaux = demander_creneaux('Entrez vos creneaux horaires ');
+var_dump($creneaux);
+print_r($creneaux);
+
 
 
 ?>
