@@ -16,5 +16,6 @@ function nav_menu(string $linkclass = ''): string
 {
     return
         nav_item('/index.php', 'Accueil', $linkclass) .
+        nav_item('/jeu.php', 'Jeu', $linkclass) .
         nav_item('/contact.php', 'Contact', $linkclass);
 }
