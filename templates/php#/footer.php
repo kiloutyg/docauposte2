@@ -1,5 +1,4 @@
 <?php
-require 'functions.php';
 ?>
 </main><!-- /.container -->
 <footer>
@@ -9,10 +8,7 @@ require 'functions.php';
         <div class="col-md-4">
             <h5>Navigation</h5>
             <ul class="list-unstyled text-small">
-                <?php
-                // $class = '';
-                // require 'menu.php'
-                nav_menu('') ?>
+                <?= nav_menu('') ?>
             </ul>
         </div>
     </div>
