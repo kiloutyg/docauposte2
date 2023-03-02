@@ -15,6 +15,25 @@ if (isset($_POST['chiffre'])) {
     $value = (int)$_POST['chiffre'];
 }
 require('header.php');
+/// Composer un formulaire pour demander a l'utilisateur comment composer sa glace.
+/// Construire un formulaire qui permet de cochet les differentes cases et donner le prix de la glace et enfin partager la glace avec des amis.
+// Checkbox
+$parfum = [
+    'Fraise' => 4,
+    'Chocolat' => 5,
+    'Vanille' => 3
+];
+// Radio (pas de value car une seule valeur possible)
+$cornets = [
+    'Pot' => 2,
+    'Cornet' => 3
+];
+//Checkbox
+$supplements = [
+    'Pépites de chocolat' => 1,
+    'Chantilly' => 0.5
+];
+
 ?>
 
 <!doctype html>
@@ -47,18 +66,59 @@ require('header.php');
         </form>
     </div>
     <div class="container">
-        <form class="mt-5" action="/jeu.php">
+        <form class="mt-5" action="/jeu.php" method="GET">
             <div>
-                <input type="checkbox" name="parfum" value="fraise">Fraise<br>
-                <input type="checkbox" name="parfum" value="vanille">Vanille<br>
-                <input type="checkbox" name="parfum" value="chocolat">Chocolat<br>
+                <h5>Composer votre glace</h5>
+
+
+            </div>
+        </form>
+    </div>
+
+    <div class="container">
+
+        <form class="mt-5" action="/jeu.php" method="GET">
+            <div>
+                <h5>Composer votre glace</h5>
+                <table>
+
+                    <table mat-table #table [dataSource]="dataSource">
+                        <ng-container matColumnDef="column">
+                            <th mat-header-cell *matHeaderCellDef> Parfum </th>
+                            <tbody>
+                                <td mat-cell *matCellDef="let row">
+                                    <input type="checkbox" name="parfum[]" value="fraise">Fraise<br>
+                                    <input type="checkbox" name="parfum[]" value="vanille">Vanille<br>
+                                    <input type="checkbox" name="parfum[]" value="chocolat">Chocolat<br>
+                                </td>
+                            </tbody>
+                            <th mat-header-cell *matHeaderCellDef> Cornets </th>
+                            <tbody>
+                                <td mat-cell *matCellDef="let row">
+                                    <input type="checkbox" name="cornets[]" value="pot">Pot<br>
+                                    <input type="checkbox" name="cornets[]" value="cornets">Cornets<br>
+                                </td>
+                            </tbody>
+                            <th mat-header-cell *matHeaderCellDef> Suppléments </th>
+                            <tbody>
+                                <td mat-cell *matCellDef="let row">
+                                    <input type="checkbox" name="supplements[]" value="pepites de chocolat">Pépites
+                                    de
+                                    chocolat<br>
+                                    <input type="checkbox" name="supplements[]" value="chantilly">Chantilly<br>
+                                </td>
+                            </tbody>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="['column']"></tr>
+                        <tr mat-row *matRowDef="let row; columns: ['column'];"></tr>
+                    </table>
             </div>
             <button class="btn btn-primary mt-3" type="submit">Deviner</button>
         </form>
     </div>
 </div>
 
-<div>
+<div class="container">
     <pre>
         <h5>$_POST</h5>
         <?php
