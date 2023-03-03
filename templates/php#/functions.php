@@ -63,6 +63,7 @@ function checkbox(string $name, string $value, array $data): string
     <input type="checkbox" name="{$name}[]" value="{$value}" {$attributes}> 
 HTML;
 }
+
 // checkbox('parfums', $parfum, $_GET)
 function radio(string $name, string $value, array $data): string
 {
@@ -74,6 +75,7 @@ function radio(string $name, string $value, array $data): string
     <input type="radio" name="{$name}" value="{$value}" {$attributes}> 
 HTML;
 }
+
 function print_var_name($variable)
 {
     foreach ($GLOBALS as $var_name => $value) {
@@ -84,6 +86,7 @@ function print_var_name($variable)
 
     return false;
 }
+
 function dump($variable)
 {
     echo '<pre>';
@@ -102,6 +105,7 @@ function creneaux_html(array $creneaux): string
     }
     return 'Ouvert ' . implode('   et   ', $phrases);
 }
+
 function creneaux2_html(array $creneaux)
 {
     echo " Le magasin est ouvert de ";
@@ -112,6 +116,7 @@ function creneaux2_html(array $creneaux)
         echo "{$creneau[0]}h à {$creneau[1]}h";
     }
 }
+
 /*
 Creer une fonction pour retourner un tableau sous la forme: 
     [
@@ -124,9 +129,28 @@ Creer une fonction pour retourner un tableau sous la forme:
     puis enfin utiliser implode pour construire la phrase finale.
 */
 
-function creneaux3_html(array $creneaux)
+function creneaux3_html(array $creneaux): string
 {
+    $phrase = [];
     foreach ($creneaux as $creneau) {
-        echo "$creneau[0]h à $creneau[1]h" . '<br>';
+        $phrase[] =  " $creneau[0]h à $creneau[1]h";
     }
+    $phrases = 'Le magasin est ouvert de' . implode(' et ', $phrase);
+    return $phrases . '.';
+}
+
+function creneaux4_html(array $jours, array $creneaux): string
+{
+    foreach ($jours as $jour) {
+        if (empty($creneaux[$jour])) {
+            $phrases = 'Fermé';
+        } else {
+            $phrase = [];
+            foreach ($creneaux[$jour] as $creneau) {
+                $phrase[] =  " $creneau[0]h à $creneau[1]h";
+            }
+            $phrases = 'Le magasin est ouvert de' . implode(' et ', $phrase);
+        }
+    }
+    return "Le $jour le magasin est ouvert de" . implode(' et ', $phrases);
 }

@@ -3,7 +3,9 @@ $title = 'Page de contact';
 $nav = 'contact';
 require 'header.php';
 require_once('config.php');
-$creneaux = CRENEAUX;
+$creneaux = CRENEAU;
+$creneaux2 = CRENEAUX;
+
 ?>
 
 <div class="row">
@@ -11,20 +13,21 @@ $creneaux = CRENEAUX;
         <h2>Nous contacter</h2>
         <div class="d-flex">
             <p> lorem ipsum </p>
-
         </div>
-
     </div>
     <div class="col-md-4">
         <h2>Horaires d'ouverture</h2>
         <div class="d-flex">
-            <?= creneaux_html(CRENEAUX) ?>
+            <?= creneaux_html(CRENEAU) ?>
         </div>
         <div class="d-flex">
-            <?= creneaux2_html(CRENEAUX) ?>
+            <?= creneaux2_html(CRENEAU) ?>
         </div>
         <div class="d-flex">
-            <?= creneaux3_html(CRENEAUX) ?>
+            <?= creneaux3_html(CRENEAU) ?>
+        </div>
+        <div class="d-flex">
+            <?= creneaux4_html(JOURS, CRENEAUX) ?>
         </div>
         </ul>
     </div>

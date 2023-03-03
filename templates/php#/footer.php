@@ -7,7 +7,7 @@
             <div class="col-md-4"></div>
             <div class="col-md-4"></div>
             <div class="col-md-4">
-                <h5>Navigation</h5>
+                <h2>Navigation</h2>
                 <ul class="nav justify-content-center border-bottom pb-3 mb-3">
                     <?= nav_menu('nav-link px-2 text-muted') ?>
                 </ul>
