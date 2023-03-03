@@ -23,27 +23,62 @@ $supplements = [
 $ingredients = [];
 $ingredientsprices = [];
 $total = 0;
-if (isset($_GET['Parfums'])) {
-    foreach ($_GET['Parfums'] as $parfum) {
-        $ingredients[] = $parfum;
-        $total += $parfums[$parfum];
-        $ingredientsprices[] = $parfums[$parfum];
+
+// foreach (['parfums', 'supplements', 'cornets'] as $name) {
+//     if (isset($_GET[$name])) {
+//         if (is_array(($_GET[$name]))) {
+//             foreach ($_GET[$name] as $value) {
+//                 $ingredients[] = $value;
+//                 $total += $$name[$value];
+//                 $ingredientsprices[] = $$name[$value];
+//             }
+//         }
+//         if (is_string(($_GET[$name]))) {
+//             $ingredients[] = ($_GET[$name]);
+//             $total += $$name[($_GET[$name])];
+//             $ingredientsprices[] = $$name[($_GET[$name])];
+//         }
+//     }
+// }
+foreach (['parfums', 'supplements', 'cornets'] as $name) {
+    if (isset($_GET[$name])) {
+        $choix = $_GET[$name];
+        if (is_array($choix)) {
+            foreach ($choix as $value) {
+                $ingredients[] = $value;
+                $total += $$name[$value];
+                $ingredientsprices[] = $$name[$value];
+            }
+        }
+        if (is_string($choix)) {
+            $ingredients[] = ($choix);
+            $total += $$name[$choix];
+            $ingredientsprices[] = $$name[$choix];
+        }
     }
 }
 
-if (isset($_GET['Cornets'])) { {
-        $ingredients[] = ($_GET['Cornets']);
-        $total += $cornets[($_GET['Cornets'])];
-        $ingredientsprices[] = $cornets[($_GET['Cornets'])];
-    }
-}
-if (isset($_GET['Suppléments'])) {
-    foreach ($_GET['Suppléments'] as $supplement) {
-        $ingredients[] = $supplement;
-        $total += $supplements[$supplement];
-        $ingredientsprices[] = $supplements[$supplement];
-    }
-}
+// if (isset($_GET['parfums'])) {
+//     foreach ($_GET['parfums'] as $parfum) {
+//         $ingredients[] = $parfum;
+//         $total += $parfums[$parfum];
+//         $ingredientsprices[] = $parfums[$parfum];
+//     }
+// }
+
+// if (isset($_GET['supplements'])) {
+//     foreach ($_GET['supplements'] as $supplement) {
+//         $ingredients[] = $supplement;
+//         $total += $supplements[$supplement];
+//         $ingredientsprices[] = $supplements[$supplement];
+//     }
+// }
+// if (isset($_GET['cornets'])) { {
+//         $ingredients[] = ($_GET['cornets']);
+//         $total += $cornets[($_GET['cornets'])];
+//         $ingredientsprices[] = $cornets[($_GET['cornets'])];
+//     }
+// }
 ?>
 
 <!doctype html>
@@ -64,7 +99,10 @@ if (isset($_GET['Suppléments'])) {
                         <?php foreach ($ingredients as $ingredient) : ?>
                         <li><?= $ingredient ?></li>
                         <?php endforeach; ?>
-                        <?= $total ?> €
+                        <p><strong>
+                                <?= $total ?> €
+                            </strong>
+                        </p>
                     </mat-list-item>
                 </mat-list>
             </ul>
@@ -73,11 +111,11 @@ if (isset($_GET['Suppléments'])) {
     <div class="col-md-8 ">
         <form class="mt-5 " action="/glace.php" method="GET">
             <div>
-                <h5 class="mt-2">Choisissez vos parfums</h5>
+                <h5 class="mt-2">Choisissez vos Parfums</h5>
                 <?php foreach ($parfums as $parfum => $price) : ?>
                 <div class="checkbox mb-2">
                     <tr>
-                        <?= checkbox('Parfums', $parfum, $_GET) ?>
+                        <?= checkbox('parfums', $parfum, $_GET) ?>
                         <?= $parfum ?> - <?= $price ?> €
                     </tr>
                 </div>
@@ -86,16 +124,16 @@ if (isset($_GET['Suppléments'])) {
                 <?php foreach ($cornets as $cornet => $price) : ?>
                 <div class="checkbox mb-2">
                     <tr>
-                        <?= radio('Cornets', $cornet, $_GET) ?>
+                        <?= radio('cornets', $cornet, $_GET) ?>
                         <?= $cornet ?> - <?= $price ?> €
                     </tr>
                 </div>
                 <?php endforeach; ?>
-                <h5 class="mt-2">Choisissez vos suppléments</h5>
+                <h5 class="mt-2">Choisissez vos Suppléments</h5>
                 <?php foreach ($supplements as $supplement => $price) : ?>
                 <div class="checkbox mb-2">
                     <tr>
-                        <?= checkbox('Suppléments', $supplement, $_GET) ?>
+                        <?= checkbox('supplements', $supplement, $_GET) ?>
                         <?= $supplement ?> - <?= $price ?> €
                     </tr>
                 </div>

@@ -90,3 +90,43 @@ function dump($variable)
     var_dump($variable);
     echo '</pre>';
 }
+
+function creneaux_html(array $creneaux): string
+{
+    if (empty($creneaux)) {
+        return 'Fermé';
+    }
+    $phrases = [];
+    foreach ($creneaux as $creneau) {
+        $phrases[] = "de  <strong>{$creneau[0]}h</strong> à  <strong>{$creneau[1]}h</strong>";
+    }
+    return 'Ouvert ' . implode('   et   ', $phrases);
+}
+function creneaux2_html(array $creneaux)
+{
+    echo " Le magasin est ouvert de ";
+    foreach ($creneaux as $k => $creneau) {
+        if ($k > 0) {
+            echo " et de ";
+        }
+        echo "{$creneau[0]}h à {$creneau[1]}h";
+    }
+}
+/*
+Creer une fonction pour retourner un tableau sous la forme: 
+    [
+        '9h à 12h',
+        '14h à 19h'
+    ]
+    en utilisant implode. 
+    Il faut construire le tableau intermédiaire
+    qui contiendra le de Xh à Yh,
+    puis enfin utiliser implode pour construire la phrase finale.
+*/
+
+function creneaux3_html(array $creneaux)
+{
+    foreach ($creneaux as $creneau) {
+        echo "$creneau[0]h à $creneau[1]h" . '<br>';
+    }
+}
