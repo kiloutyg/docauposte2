@@ -266,3 +266,12 @@ function select(string $name, $value, array $options): string
     }
     return "<select class='form-control' name='$name'>" . implode($html_options) . '</select>';
 }
+function selectheure(string $name, string $value, array $data): string
+{
+    $attributes = '';
+    if (isset($data[$name]))
+        $attributes .= 'selected';
+    return <<<HTML
+    <input  class="form-control" type="number" name="{$name}[]" value="{$value}" {$attributes}> 
+HTML;
+}
