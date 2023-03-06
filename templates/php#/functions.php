@@ -139,18 +139,130 @@ function creneaux3_html(array $creneaux): string
     return $phrases . '.';
 }
 
-function creneaux4_html(array $jours, array $creneaux): string
+
+function creneaux4_html(array $jours, array $creneaux)
 {
-    foreach ($jours as $jour) {
-        if (empty($creneaux[$jour])) {
-            $phrases = 'Fermé';
+    foreach ($jours as $k => $jour) {
+        if (empty($creneaux[$k])) {
+            echo "Le <strong>$jour</strong> le magasin est fermé. <br>";
         } else {
+            echo "Le <strong>$jour</strong> ";
             $phrase = [];
-            foreach ($creneaux[$jour] as $creneau) {
-                $phrase[] =  " $creneau[0]h à $creneau[1]h";
+            foreach ($creneaux[$k] as $creneau) {
+                $phrase[] =  " <strong>$creneau[0]h</strong> à <strong>$creneau[1]h</strong>";
             }
-            $phrases = 'Le magasin est ouvert de' . implode(' et ', $phrase);
+            echo 'le magasin est ouvert de' . implode(' et ', $phrase) . '.' . '<br>';
         }
     }
-    return "Le $jour le magasin est ouvert de" . implode(' et ', $phrases);
+}
+
+function creneaux5_html(array $jours, array $creneaux)
+{
+    foreach ($jours as $k => $jour) {
+        if ($k + 1 === (int) date('N')) {
+            echo '<div class="alert alert-success"> Le magasin est ouvert aujourd\'hui </div>';
+            echo '<li style="color:green">';
+        } else {
+            echo '<li>';
+        }
+        if (empty($creneaux[$k])) {
+            echo "Le <strong>$jour</strong> le magasin est fermé. <br>";
+        } else {
+            echo "Le <strong>$jour</strong> ";
+            $phrase = [];
+            foreach ($creneaux[$k] as $creneau) {
+                $phrase[] =  " <strong>$creneau[0]h</strong> à <strong>$creneau[1]h</strong>";
+            }
+            echo 'le magasin est ouvert de' . implode(' et ', $phrase) . '.' . '<br>';
+        }
+        echo '</li>';
+    }
+}
+// elseif ($k + 1 !== (int) date('N')) {
+//             echo '<div class="alert alert-danger"> Le magasin est fermé aujourd\'hui </div>';
+//         }
+
+/* Faire une fonction pour avoir le message d'ouverture du magasin en temps reel 
+tout au long de la semaine. 
+*/
+
+function in_creneaux(int $heure, array $creneaux): bool
+{
+    foreach ($creneaux as $creneau) {
+        $debut = $creneau[0];
+        $fin = $creneau[1];
+        if ($heure >= $debut && $heure < $fin) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function creneaux6_html(array $jours, array $creneaux): string
+{
+    $ouvert = false;
+    $phrases = [];
+    foreach ($jours as $k => $jour) {
+        if (empty($creneaux[$k])) {
+            $phrases[] = "Le <strong>$jour</strong> le magasin est fermé.";
+        } else {
+            $ouvert = true;
+            $phrases[] = "Le <strong>$jour</strong> ";
+            $phrase = [];
+            foreach ($creneaux[$k] as $creneau) {
+                $phrase[] =  " <strong>$creneau[0]h</strong> à <strong>$creneau[1]h</strong>";
+            }
+            $phrases[] = 'le magasin est ouvert de' . implode(' et ', $phrase) . '.';
+        }
+    }
+    if (!$ouvert) {
+        return 'Fermé';
+    }
+    return implode('<br>', $phrases);
+}
+function creneaux7_html(array $jours, array $creneaux, bool $ouvert)
+{
+
+    if ($ouvert === true) {
+        echo '<div class="alert alert-success"> Le magasin est actuellement ouvert </div>';
+    } else {
+        echo '<div class="alert alert-danger"> Le magasin est actuellement fermé </div>';
+    }
+    foreach ($jours as $k => $jour) {
+        if ($k + 1 === (int) date('N')) {
+            echo '<li style="color:green">';
+        } else {
+            echo '<li>';
+        }
+        if (empty($creneaux[$k])) {
+            echo "Le <strong>$jour</strong> le magasin est fermé. <br>";
+        } else {
+            echo "Le <strong>$jour</strong> ";
+            $phrase = [];
+            foreach ($creneaux[$k] as $creneau) {
+                $phrase[] =  " <strong>$creneau[0]h</strong> à <strong>$creneau[1]h</strong>";
+            }
+            echo 'le magasin est ouvert de' . implode(' et ', $phrase) . '.' . '<br>';
+        }
+        echo '</li>';
+    }
+}
+function creneaux8_html(bool $ouvert)
+{
+
+    if ($ouvert === true) {
+        echo '<div class="alert alert-success"> Le magasin sera ouvert </div>';
+    } else {
+        echo '<div class="alert alert-danger"> Le magasin sera fermé </div>';
+    }
+}
+//fonction pour afficher un select
+function select(string $name, $value, array $options): string
+{
+    $html_options = [];
+    foreach ($options as $k => $option) {
+        $attributes = $k == $value ? 'selected' : '';
+        $html_options[] = "<option value='$k' $attributes>$option</option>";
+    }
+    return "<select class='form-control' name='$name'>" . implode($html_options) . '</select>';
 }
