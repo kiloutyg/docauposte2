@@ -1,5 +1,5 @@
 <?php
-require 'header.php';
+require_once 'header.php';
 $title = 'Composer votre Glace';
 
 /// Composer un formulaire pour demander a l'utilisateur comment composer sa glace.

@@ -18,7 +18,9 @@ function nav_menu(string $linkclass = ''): string
         nav_item('/index.php', 'Accueil', $linkclass) .
         nav_item('/jeu.php', 'Jeu', $linkclass) .
         nav_item('/contact.php', 'Contact', $linkclass) .
-        nav_item('/glace.php', 'Glace', $linkclass);
+        nav_item('/glace.php', 'Glace', $linkclass) .
+        nav_item('/menu.php', 'Menu', $linkclass) .
+        nav_item('/newsletter.php', 'Newsletter', $linkclass);
 }
 
 // function checkbox(string $name, array $data): string
@@ -275,3 +277,178 @@ function select(string $name, $value, array $options): string
 //     <input  class="form-control" type="number" name="{$name}[]" value="{$value}" {$attributes}> 
 // HTML;
 // }
+
+//fonction pour afficher un menu au format tsv (tabulation separated values)
+
+// for ($i = 0; $i < 20; $i++) {
+//     echo fread($tsvressource, 14);
+//     echo '<br>';
+//     echo fgets($tsvressource);
+//     echo '<br>';
+// }
+// $line = fgets($tsvressource);
+// print_r(explode("\t", $line, 3));
+// $lines[] = fgets($tsvressource);
+// foreach ($lines as $k => $line) {
+//     $lines[$k] = explode("\t", $line, 3);
+// }
+// var_dump($lines);
+
+// while ($line = fgets($tsvressource)) {
+//     $line = explode("\t", $line, 3);
+
+//     if ($line[0] === 'Déssert') {
+//         break;
+//     } else {
+//         echo " <h4> $line[0] </h4>";
+//         // echo '<br>';
+//         echo $line[1] . '.';
+//         echo '<br>';
+//         echo $line[2] . '€';
+//         echo '<br> <br>';
+//     }
+// } 
+// function menu_tsv(string $name, $ressource, string $endname)
+// {
+//     while ($line = fgets($ressource)) {
+
+//         $line = explode("\t", $line, 3);
+//         if ($line[0] === $name) {
+//             echo "<h2> $line[0] </h2>";
+//         }
+//         if ($line[0] === $endname) {
+//             break;
+//         } else {
+//             echo " <h4> $line[0] </h4>";
+//             echo $line[1] . '.';
+//             echo '<br>';
+//             echo $line[2] . '€';
+//             echo '<br> <br>';
+//         }
+//     }
+//     echo '<br> <br> <br> <br>';
+//     if (feof($ressource) === true) {
+//         fclose($ressource);
+//     }
+// }
+
+// function menu_tsv(string $name, $ressource, string $endname)
+// {
+
+//     while ($line = fgets($ressource)) {
+//         $line = explode("\t", $line, 3);
+
+//         if (($line[0] === $endname)) {
+//             break;
+//         } else {
+//             if (empty($line[1] && $line[2]) || $line[0] === $name) {
+//                 echo '<br> <br> <br> <br>';
+//                 echo " <h1> $line[0] </h1>";
+//             } elseif ($line[0] !== $name) {
+//                 echo " <h4> $line[0] </h4>";
+//                 echo $line[1] . '.';
+//                 echo '<br>';
+//                 echo $line[2] . '€';
+//                 echo '<br> <br>';
+//             }
+//         }
+//     }
+// }
+
+// function menu_tsv(string $name, $fichier, string $endname)
+// {
+//     $ressource = fopen($fichier, 'r');
+
+//     while ($line = fgets($ressource)) {
+//         $line = explode("\t", $line, 3);
+
+//         if (($line[0] === $endname)) {
+//             break;
+//         } else {
+//             if (empty($line[1] && $line[2]) || $line[0] === $name) {
+//                 echo '<br> <br> <br> <br>';
+//                 echo " <h1> $line[0] </h1>";
+//             } elseif (($line[0] !== $name)) {
+//                 echo " <h4> $line[0] </h4>";
+//                 echo $line[1] . '.';
+//                 echo '<br>';
+//                 echo $line[2] . '€';
+//                 echo '<br> <br>';
+//             }
+//         }
+//     }
+//     if (feof($ressource) === true) {
+//         fclose($ressource);
+//     }
+// }
+// function menu_tsv($fichier)
+// {
+//     $ressource = fopen($fichier, 'r');
+
+//     while ($line = fgets($ressource)) {
+//         $line = explode("\t", $line, 3);
+
+
+//         if (empty($line[1] && $line[2])) {
+//             echo '<br> <br> <br> <br>';
+//             echo " <h1> $line[0] </h1>";
+//         } elseif ((empty($line[1] && $line[2]) === false)) {
+//             echo " <h5> <b> $line[0] </b> </h5>";
+//             echo $line[1] . '.';
+//             echo '<br>';
+//             echo $line[2] . '€';
+//             echo '<br> <br>';
+//         }
+//     }
+
+//     if (feof($ressource) === true) {
+//         fclose($ressource);
+//     }
+// }
+// function menu_tsv($fichier)
+// {
+//     $ressource = fopen($fichier, 'r');
+//     while ($line = fgets($ressource)) {
+//         $line = explode("\t", trim($line), 3);
+//         if (empty($line[1])) {
+//             echo '</ul><br> <br>';
+//             echo " <h1> $line[0] </h1><ul>";
+//         } elseif ((empty($line[1] && $line[2]) === false)) {
+//             echo "
+//              <h5> <b> $line[0] </b> </h5>
+//             <li>$line[1].</li>
+//             <li>$line[2]€</li>
+//             ";
+//         }
+//     }
+//     if (feof($ressource) === true) {
+//         fclose($ressource);
+//     }
+// }
+function menu_tsv($fichier)
+{
+    $ressource = fopen($fichier, 'r');
+    while ($line = fgets($ressource)) {
+        $line = explode("\t", trim($line), 3);
+        if (empty($line[1])) {
+            echo '</ul><br> <br>';
+            echo " <h1> $line[0] </h1><ul>";
+        } elseif ((empty($line[1] && $line[2]) === false)) {
+            $prix = number_format($line[2], 2, ',', '');
+            echo <<<HTML
+             <br><h5> <b>$line[0]</b> </h5>
+             <div class="row">
+<div class="col-sm-8">
+    <li>$line[1].</li>
+</div> 
+<div class="col-sm-4">
+    <li> <strong> $prix € </strong></li>
+</div>
+</div>
+HTML;
+        }
+    }
+    if (feof($ressource) === true) {
+        fclose($ressource);
+    }
+}
