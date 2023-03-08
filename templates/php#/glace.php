@@ -1,6 +1,7 @@
 <?php
+$title = 'Glace';
 require_once 'header.php';
-$title = 'Composer votre Glace';
+
 
 /// Composer un formulaire pour demander a l'utilisateur comment composer sa glace.
 /// Construire un formulaire qui permet de cochet les differentes cases et donner le prix de la glace et enfin partager la glace avec des amis.

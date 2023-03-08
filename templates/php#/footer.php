@@ -3,15 +3,25 @@
 </main><!-- /.container -->
 <div class="container ">
     <footer>
+        <hr>
         <div class="row py-4 ">
             <div class="col-md-4"></div>
-            <div class="col-md-4"></div>
+            <div class="col-md-4 bottom"> <br><br><br>
+                <form action="" method="POST" class="form-inline">
+                    <div class="form-group">
+                        <input type="email" name="email" placeholder="Votre email" required class="form-control">
+                    </div>
+
+                    <button type=" submit" class="btn btn-primary">Envoyer</button>
+                </form>
+            </div>
             <div class="col-md-4">
                 <h2>Navigation</h2>
                 <ul class="nav justify-content-center border-bottom pb-3 mb-3">
                     <?= nav_menu('nav-link px-2 text-muted') ?>
                 </ul>
             </div>
+
         </div>
         <!-- Bootstrap core JavaScript
 ================================================== -->

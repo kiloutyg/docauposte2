@@ -20,7 +20,9 @@ function nav_menu(string $linkclass = ''): string
         nav_item('/contact.php', 'Contact', $linkclass) .
         nav_item('/glace.php', 'Glace', $linkclass) .
         nav_item('/menu.php', 'Menu', $linkclass) .
-        nav_item('/newsletter.php', 'Newsletter', $linkclass);
+        nav_item('/newsletter.php', 'Newsletter', $linkclass) .
+        nav_item('/cookie.php', 'Cookie', $linkclass) .
+        nav_item('/profil.php', 'Profil', $linkclass);
 }
 
 // function checkbox(string $name, array $data): string
