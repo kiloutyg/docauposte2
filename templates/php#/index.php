@@ -1,4 +1,7 @@
 <?php
+session_start();
+$_SESSION['role'] = 'administrateur';
+
 $title = 'Page d\' Accueil';
 $nav = 'index';
 

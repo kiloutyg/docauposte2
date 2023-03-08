@@ -1,4 +1,5 @@
 <?php
+session_start();
 $title = 'Page de contact';
 $nav = 'contact';
 require 'header.php';
@@ -26,10 +27,13 @@ $checkjour = (int)($_GET['jour'] ?? Date('N') - 1);
 
 $ouverture = in_creneaux($checkheure, CRENEAUX[$checkjour]);
 ?>
+
 <?php
 
 dump($checkjour);
 dump($checkheure);
+dump($_SESSION);
+
 ?>
 <div class="row">
     <div class="container col-md-9">
