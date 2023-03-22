@@ -7,8 +7,6 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use function Symfony\Component\String\print_var_name;
-use function Symfony\Component\String\u;
 
 
 #[Route('/', name: 'app_')]
