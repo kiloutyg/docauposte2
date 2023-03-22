@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+{%block title %} Doc Au Poste | {{ parent() }}{% endblock %}
+{% block body %}
+<!DOCTYPE html>
+<html>
+    <div   class="justify-content-between align-items-center" style="margin-left: 10% " >       
+        <head>
+            <title>Somme Mer</title> 
+            <meta charset="utf-8" name="Sommaire" content="C'est ici qu'on somme des meres"/>
+        </head>
+            <p >
+                <strong>Liste <h1>Doc Au Poste</h1></strong>
+            </p>
+            <body>
+                <p>
+                <a href="{{path('app_sommere')}}" title="C'est ici qu'on somme des meres"> <h1>tchoung</h1></a>
+                </p>
+                <p>
+                    <ol>
+                        {# <li> <a href="{{path('app_sommere')}}#Assemblage" <b> Assemblage</b></a></li> #}
+            {% for zone in zones %}          
+                <div class="d-flex ps-5 mb-5 mt-5 line-list">
+                <a href="{{path('app_sommere')}}#{{ zone.zones }}">
+                    <li><span class="line-details">{{ zone.zones }} </span></li>
+                </a>
+                </div>
+            {% endfor %}
+{#        
+                        <li><i>italic</i></li>
+                        <li><u>souligné</u></li> #}
+                    </ol>
+
+                    <p>
+                        Cryptids of Cornwall:
+                    </p>
+                    <dl>
+                        <dt>Beast of Bodmin</dt>
+                        <dd>A large feline inhabiting Bodmin Moor.</dd>
+
+                        <dt>Morgawr</dt>
+                        <dd>A sea serpent.</dd>
+
+                        <dt>Owlman</dt>
+                        <dd>A giant owl-like creature.</dd>
+                    </dl>
+
+                    <ul>
+                        <li><b>Gras</b></li>
+                        <li><i>italic</i></li>
+                        <li><u>souligné</u></li>
+                    </ul>
+                </p>
+                <p>
+                    <em> des different languages utiliser dans l'application.</em>
+                </p>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.<br> Recusandae natus delectus fuga blanditiis error unde hic eum eveniet neque consequuntur quos voluptas repellat, placeat deserunt, vero doloribus, modi sed quaerat?
+                </p>               
+            </body>
+    </div> 
+</html>
+{% endblock %}

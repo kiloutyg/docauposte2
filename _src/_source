@@ -1,5 +1,68 @@
+<<<<<<< HEAD
 https://github.com/martinoyovo/file-manager
 https://github.com/opendocman/opendocman
 https://gitlab.com/neodigit/cesi/wishtransfer
 https://kinsta.com/fr/blog/tutoriels-php/
 https://symfony.com/doc/current/index.html
+=======
+# Project that serve as inspiration for my work : 
+https://github.com/martinoyovo/file-manager
+https://github.com/opendocman/opendocman
+https://gitlab.com/neodigit/cesi/wishtransfer
+
+# Tutorials for symfony and php :
+https://symfonycasts.com/screencast/symfony
+https://kinsta.com/fr/blog/tutoriels-php/
+
+# Tutorials about building CI/CD process in github :
+https://github.blog/2022-02-02-build-ci-cd-pipeline-github-actions-four-steps/
+
+# Documentation about Alpine running apache2 for the purposes to build a container :
+https://wiki.alpinelinux.org/wiki/Setting_Up_Apache_with_PHP
+https://wiki.alpinelinux.org/wiki/How-To_Alpine_Wall
+
+# Documentation about Symfony : 
+https://symfony.com/doc/current/index.html
+
+# To add symfony plugins to work with apache : 
+https://symfony.com/doc/current/setup/web_server_configuration.html
+
+# To run a local container registry with portainer : 
+https://www.blackvoid.club/private-docker-registry-with-portainer/
+
+# To get rid of the intl deprecation message : 
+https://www.php.net/manual/en/intl.installation.php
+
+https://grafikart.fr/
+https://www.codewars.com/
+https://www.frontendmentor.io/
+https://codepip.com/
+https://cssgridgarden.com/#fr
+https://flexboxfroggy.com/#fr
+https://openclassrooms.com/
+
+
+# Proxy related issues :  
+https://www.it-connect.fr/definir-un-proxy-pour-apt-sous-ubuntudebian%EF%BB%BF/ 
+https://kifarunix.com/configure-apt-proxy-on-debian-10-buster/
+    address 10.0.0.1:80
+    export http_proxy='http://10.0.0.1:80'
+
+https://developer.mozilla.org/fr/
+# Partie importante pour les formulaires d'ajouts de documents: 
+https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form
+
+https://developer.mozilla.org/en-US/docs/Learn/Front-end_web_developer
+
+# Quant à la personalisation de l'interface d'upload : 
+https://freshdesignweb.com/jquery-html5-file-upload/
+
+# Pour travailler l'algorithmique et convertir les aglo entre algobox et javascript: 
+
+http://proglab.fr/
+https://public.iutenligne.net/informatique/algorithme-et-programmation/raffinat/algo/environnement/larp.html
+https://www.youtube.com/watch?v=HLhTkeOlmjg&list=PL1aYsXmhJ1WdPv2oGgVQ17mLbmSQv_BLs
+https://www.xm1math.net
+
+# A tester en plus d'Algobox : https://larp.software.informer.com/download/ La source a l'air assez pourrave, faudra tester le truc dans un environnement safe. 
+>>>>>>> stagingphp

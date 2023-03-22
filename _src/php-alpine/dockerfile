@@ -1,0 +1,88 @@
+FROM php:8.1-cli-alpine3.17
+
+# WORKDIR /var/www/
+
+RUN apk update && apk upgrade 
+RUN apk add apache2 apache2-utils php81-apache2
+RUN cp /usr/sbin/envvars /etc/apache2/envvars
+ENV APACHE_CONFDIR /etc/apache2
+ENV APACHE_ENVVARS $APACHE_CONFDIR/envvars
+# RUN set -eux; \
+# # generically convert lines like
+# #   export APACHE_RUN_USER=www-data
+# # into
+# #   : ${APACHE_RUN_USER:=www-data}
+# #   export APACHE_RUN_USER
+# # so that they can be overridden at runtime ("-e APACHE_RUN_USER=...")
+# 	sed -ri 's/^export ([^=]+)=(.*)$/: ${\1:=\2}\nexport \1/' "$APACHE_ENVVARS"; \
+# 	\
+# # setup directories and permissions
+# 	. "$APACHE_ENVVARS"; \
+# 	for dir in \
+# 		"$APACHE_LOCK_DIR" \
+# 		"$APACHE_RUN_DIR" \
+# 		"$APACHE_LOG_DIR" \
+# 	; do \
+# 		rm -rvf "$dir"; \
+# 		mkdir -p "$dir"; \
+# 		chown "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir"; \
+# # allow running as an arbitrary user (https://github.com/docker-library/php/issues/743)
+# 		chmod 777 "$dir"; \
+# # 	done; \
+# RUN	\
+# # delete the "index.html" that installing Apache drops in here
+# 	rm -rvf /var/www/html/*; \
+	# \
+# # logs should go to stdout / stderr
+# 	ln -sfT /dev/stderr "$APACHE_LOG_DIR/error.log"; \
+# 	ln -sfT /dev/stdout "$APACHE_LOG_DIR/access.log"; \
+# 	ln -sfT /dev/stdout "$APACHE_LOG_DIR/other_vhosts_access.log"; \
+# 	chown -R --no-dereference "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$APACHE_LOG_DIR"
+
+# Apache + PHP requires preforking Apache for best results
+RUN rm -rvf /var/www/html/*;
+RUN a2dismod mpm_event && a2enmod mpm_prefork
+COPY apache2-foreground /usr/local/bin/
+
+RUN apk add openrc bash nano ufw
+RUN apk add --update curl libxslt-dev libzip-dev git wget imagemagick-dev autoconf build-base linux-headers
+RUN docker-php-ext-install pdo mysqli pdo_mysql zip opcache xsl
+RUN pecl install xdebug imagick \
+    && docker-php-ext-enable imagick xdebug mysqli pdo_mysql pdo zip opcache xsl
+
+# RUN rc-service apache2 start
+# RUN rc-update add apache2
+
+# fix git author
+RUN git config --global user.email "symfo@symfo"
+RUN git config --global user.name "symfo"
+RUN git config --global --add safe.directory /var/www
+
+# set default vhost to target /symfony/app/public
+WORKDIR /var/www
+RUN sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/conf.d/default.conf
+
+# install nodejs 
+# RUN curl -sL https://apk.nodesource.com/setup_16.x | bash -
+RUN apk add nodejs npm
+ 
+RUN npm install -g yarn
+
+# install composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+RUN php -r "if (hash_file('sha384', 'composer-setup.php') === '55ce33d7678c5a611085589f1f3ddf8b3c52d662cd01d4ba75c0ee0459970c2200a51f492d557530c71c15d8dba01eae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+RUN php composer-setup.php
+RUN php -r "unlink('composer-setup.php');"
+RUN mv composer.phar /usr/bin/composer && chmod +x /usr/bin/composer
+
+# install symfony cli
+RUN curl -sS https://get.symfony.com/cli/installer | bash \
+    && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
+
+WORKDIR /var/www/
+
+EXPOSE 80
+EXPOSE 8080
+EXPOSE 8000
+
+CMD ["apache2-foreground"]

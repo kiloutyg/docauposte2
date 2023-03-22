@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>C'est Hess Hess! Les contactes. </title>
+    <meta name="La page du C'est Hess Hess" content="La petite page marron" />
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <img src="{{asset('Plastic_Omnium.svg')}}" alt="Le logo" width="60%">
+        <h1>C'est Hess Hess!</h1>
+        <nav>
+            <ul>
+                <li><a href="{{path('app_css')}}">IndexCSS</a></li>
+                <li><a href="{{path('app_menu')}}">MenuCSS</a></li>
+                <li><a href="{{path('app_contact')}}">ContactCSS</a></li>
+            </ul>
+        </nav>
+        <p>
+            <h4>
+                La page du C'est Hess Hess
+            </h4>
+        </p>
+        <p>
+            <h5>
+                La petite page marron
+            </h5>
+        </p>
+    </header>
+    <article>
+        <section>
+            <h2>
+                Où nous trouver
+            </h2>
+            <p>
+
+                1 rue du C'est Hess Hess<br> 67000 Strasbourg <br> France
+
+
+            </p>
+            <p>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2639.0548914927085!2d7.691159514956543!3d48.58964782754637!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4796b7cecf56f5c9%3A0xbe2d064a402f855f!2s46%20Rue%20Romain%20Rolland%2C%2067200%20Strasbourg!5e0!3m2!1sen!2sfr!4v1676389239134!5m2!1sen!2sfr"
+                    width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </p>
+        </section>
+        <section>
+            <h2>
+                Nous contacter :
+            </h2>
+            <form action="contact.html">
+                <p>
+                    <div>
+                        <label for="email">Votre email <sup>*</sup></label>
+                        <input type="email" name="emailcontact" id="emailcontact" required>
+                    </div>
+                    <div>
+                        <label for="firstname ">Votre Prenom <sup>*</sup></label>
+                        <input type="text" name="firstname" id="firstname" required>
+                    </div>
+                    <div>
+                        <label for="lastname ">Votre Nom <sup>*</sup></label>
+                        <input type="text" name="lastname" id="lastname" required>
+                    </div>
+                    <div>
+                        <label for="sujet">Sujet <sup>*</sup></label>
+                        <input type="text" name="sujet" id="sujet" required>
+                    </div>
+                    <div>
+                        <label for="message">Votre message <sup>*</sup></label>
+                        <textarea name="message" id="message" cols="30" rows="10" required></textarea>
+                    </div>
+                    <div>
+                        <input type="submit" value="Envoyer">
+                </p>
+            </form>
+    </article>
+    <footer>
+        <address>
+            1 rue du C'est Hess Hess, 67000 Strasbourg
+        </address>
+    </footer>
+
+</body>
+
+</html>
