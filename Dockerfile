@@ -1,5 +1,6 @@
-FROM php:8.1-rc-apache-buster
+FROM php:8.2-apache-bullseye
 
+ENV http_proxy='http://10.0.0.1:80'
 RUN a2enmod rewrite
 RUN apt-get update -y \
   && apt-get install -y curl libxslt-dev libzip-dev git wget libmagickwand-dev --no-install-recommends \

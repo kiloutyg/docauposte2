@@ -1,0 +1,31 @@
+header {
+    background-color: #2c6a91;
+    color: #e76969;
+    font-family: "Roboto Condensed", sans-serif;
+}
+
+h1 {
+    color: blue;
+    background-color: aqua;
+}
+
+h2 {
+    color: blue;
+    background-color: beige;
+}
+
+h3 {
+    color: red;
+}
+
+h4 {
+    color: red;
+}
+
+h5 {
+    color: red;
+}
+
+h6 {
+    color: red;
+}
