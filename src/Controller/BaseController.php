@@ -7,6 +7,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use function Symfony\Component\String\print_var_name;
 use function Symfony\Component\String\u;
 
 
@@ -16,18 +17,20 @@ use function Symfony\Component\String\u;
 
 class BaseController extends AbstractController
 {
-    private $zones = [
-        ['ligne' => 'D41', 'zones' => 'Assemblage'],
-        ['ligne' => 'Démontage', 'zones' => 'Assemblage'],
-        ['ligne' => 'Enjoliveur', 'zones' => 'Assemblage'],
-        ['ligne' => 'D41', 'zones' => 'Déchargement Reprise'],
-        ['ligne' => 'DEFAUTHEQUE', 'zones' => 'Déchargement Reprise'],
+    private $categories = [
+        [
+            'zones' => ['Assemblage' => ['lignes' => ['D41', 'Demontage', 'Enjoliveur']], 'Déchargement Reprise' => ['lignes' => ['D41', 'DEFAUTHEQUE']]]
+        ]
     ];
 
     #[Route('/', name: 'base')]
     public function base(): Response
     {
-        return $this->render('base.html.twig');
+        return $this->render('base.html.twig', [
+            'categories' => $this->categories,
+        ]);
     }
+
+
 
 }

@@ -102,6 +102,7 @@
         "symfony/phpunit-bridge": "^6.2",
         "symfony/stopwatch": "6.2.*",
         "symfony/ux-turbo": "^2.7",
+        "symfony/var-dumper": "6.2.*",
         "symfony/web-profiler-bundle": "6.2.*"
     }
 }
