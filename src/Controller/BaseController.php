@@ -2,11 +2,10 @@
 
 namespace App\Controller;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
 
 use App\Repository\ZoneRepository;
 use App\Repository\ProductLineRepository;
@@ -27,8 +26,9 @@ class BaseController extends AbstractController
     protected $userRepository;
     protected $documentRepository;
     protected $em;
+    protected $request;
 
-    public function __construct(ZoneRepository $zoneRepository, ProductLineRepository $productLineRepository, RoleRepository $roleRepository, UserRepository $userRepository, DocumentRepository $documentRepository, EntityManager $em)
+    public function __construct(ZoneRepository $zoneRepository, ProductLineRepository $productLineRepository, RoleRepository $roleRepository, UserRepository $userRepository, DocumentRepository $documentRepository, EntityManagerInterface $em)
     {
         $this->zoneRepository        = $zoneRepository;
         $this->productLineRepository = $productLineRepository;
@@ -38,18 +38,38 @@ class BaseController extends AbstractController
         $this->em                    = $em;
     }
 
-    private $categories = [
-        [
-            'zones' => ['Assemblage' => ['lignes' => ['D41', 'Demontage', 'Enjoliveur']], 'Déchargement Reprise' => ['lignes' => ['D41', 'DEFAUTHEQUE']]]
-        ]
-    ];
+
 
     #[Route('/', name: 'base')]
     public function base(): Response
     {
-        return $this->render('base.html.twig', [
-            'categories' => $this->categories,
-        ]);
+        return $this->render(
+            'base.html.twig',
+            [
+                'zones'        => $this->zoneRepository->findAll(),
+                'productLines' => $this->productLineRepository->findAll(),
+                'roles'        => $this->roleRepository->findAll(),
+                'users'        => $this->userRepository->findAll(),
+                'documents'    => $this->documentRepository->findAll(),
+            ]
+        );
+    }
+
+    #[Route('/zone/{id}', name: 'zone')]
+
+    public function zone(string $id = null): Response
+    {
+        $zone = $this->zoneRepository->findOneBy(['id' => $id]);
+
+        return $this->render(
+            'zone.html.twig',
+            [
+
+                'zone'         => $zone,
+                'productLines' => $this->productLineRepository->findAll(),
+                'roles'        => $this->roleRepository->findAll(),
+            ]
+        );
     }
 
 
