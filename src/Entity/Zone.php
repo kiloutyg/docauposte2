@@ -8,6 +8,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
+use App\Entity\ProductLine;
+use App\Entity\Role;
+
+
 #[ORM\Entity(repositoryClass: ZoneRepository::class)]
 #[Broadcast]
 class Zone
@@ -20,16 +24,17 @@ class Zone
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'zone_id', targetEntity: ProductLine::class)]
-    private Collection $productLines;
 
     #[ORM\ManyToMany(targetEntity: Role::class, mappedBy: 'zone_id')]
     private Collection $roles;
 
+    #[ORM\OneToMany(mappedBy: 'zone', targetEntity: ProductLine::class, orphanRemoval: true)]
+    private Collection $productLines;
+
     public function __construct()
     {
         $this->productLines = new ArrayCollection();
-        $this->roles = new ArrayCollection();
+        $this->roles        = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -49,35 +54,6 @@ class Zone
         return $this;
     }
 
-    /**
-     * @return Collection<int, ProductLine>
-     */
-    public function getProductLines(): Collection
-    {
-        return $this->productLines;
-    }
-
-    public function addProductLine(ProductLine $productLine): self
-    {
-        if (!$this->productLines->contains($productLine)) {
-            $this->productLines->add($productLine);
-            $productLine->setZoneId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeProductLine(ProductLine $productLine): self
-    {
-        if ($this->productLines->removeElement($productLine)) {
-            // set the owning side to null (unless already changed)
-            if ($productLine->getZoneId() === $this) {
-                $productLine->setZoneId(null);
-            }
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Role>
@@ -101,6 +77,36 @@ class Zone
     {
         if ($this->roles->removeElement($role)) {
             $role->removeZoneId($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductLine>
+     */
+    public function getProductLines(): Collection
+    {
+        return $this->productLines;
+    }
+
+    public function addProductLines(ProductLine $productLines): self
+    {
+        if (!$this->productLines->contains($productLines)) {
+            $this->productLines->add($productLines);
+            $productLines->setZone($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductLines(ProductLine $productLines): self
+    {
+        if ($this->productLines->removeElement($productLines)) {
+            // set the owning side to null (unless already changed)
+            if ($productLines->getZone() === $this) {
+                $productLines->setZone(null);
+            }
         }
 
         return $this;

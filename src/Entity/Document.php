@@ -26,7 +26,7 @@ class Document
 
     #[ORM\ManyToOne(inversedBy: 'documents')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?ProductLine $product_line_id = null;
+    private ?ProductLine $productline = null;
 
     public function getId(): ?int
     {
@@ -69,14 +69,14 @@ class Document
         return $this;
     }
 
-    public function getProductLineId(): ?ProductLine
+    public function getProductline(): ?ProductLine
     {
-        return $this->product_line_id;
+        return $this->productline;
     }
 
-    public function setProductLineId(?ProductLine $product_line_id): self
+    public function setProductline(?ProductLine $productline): self
     {
-        $this->product_line_id = $product_line_id;
+        $this->productline = $productline;
 
         return $this;
     }

@@ -78,7 +78,6 @@
 		</div>
 	</body>
 </html></nav><!-- End Main Navigation -->{% block body %}
-{{ dump(zones) }}
 
 <div style="margin-left: 15%" class="container">
 	<p>
@@ -95,7 +94,7 @@
 	</p>
 	{% for zone in zones %}
 		<div class="d-flex ps-5 mb-5 mt-5  line-list">
-			<a href="{{path('app_zone', {id: zone.id})}}" <span class="line-details"> {{ zone.name }} <id={{zone.id}}>>{{ dump(zone.id) }}</span>
+			<a href="{{path('app_zone', {id: zone.id})}}" <span class="line-details"> {{ zone.name }} <id={{zone.id}}>></span>
 		</a>
 	</div>
 {% endfor %}</div>{% endblock %}<!-- Footer --><div class="container mt-5"><footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">

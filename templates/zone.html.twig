@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{%block title %}
+{% block title %}
 	{{zone.name}}
 	|
 	{{ parent() }}
@@ -20,14 +20,9 @@
 						<h2 class="mb-4">Les lignes de la zone
 							{{zone.name}}:
 						</h2>
-						{{ dump(zone) }}
-						{{ dump(zone.id) }}
-						{{ dump(productLines) }}
-						{{ dump(zone.productLines) }}
-
 						{% set matchingProductLines = [] %}
 						{% for productLine in productLines %}
-							{% if productLine.zoneid.id == zone.id %}
+							{% if productLine.zone.id is same as(zone.id)  %}
 								{% set matchingProductLines = matchingProductLines|merge([productLine]) %}
 							{% endif %}
 						{% endfor %}
@@ -35,7 +30,7 @@
 						{% if matchingProductLines|length > 0 %}
 							{% for productLine in matchingProductLines %}
 								<div class="d-flex ps-5 mb-5 mt-5 line-list">
-									<a href="{{path('app_productline', {product_line_id: productLine.id} )}}">
+									<a href="{{path('app_productline', {id: productLine.id} )}}">
 										<span class="line-details">
 											-{{ productLine.name }}
 											<id={{productLine.id}}>></span>
@@ -50,11 +45,10 @@
 								</div>
 							{% endif %}
 
-
 						</p>
 					</p>
 				</p>
-			</body>
+			</p>
 		</body>
 	</html>
-</p></body></body></html></body></html></div></body></html></p> </div></body></html>{% endblock %}
+</body></html></p></body></body></html></body></html></div></body> </html></p></div></body></html>{% endblock %}

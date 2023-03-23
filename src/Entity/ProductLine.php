@@ -8,6 +8,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
+use App\Entity\Zone;
+use App\Entity\Document;
+
+
 #[ORM\Entity(repositoryClass: ProductLineRepository::class)]
 #[Broadcast]
 class ProductLine
@@ -22,9 +26,9 @@ class ProductLine
 
     #[ORM\ManyToOne(inversedBy: 'productLines')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?zone $zone_id = null;
+    private ?zone $zone = null;
 
-    #[ORM\OneToMany(mappedBy: 'product_line_id', targetEntity: Document::class)]
+    #[ORM\OneToMany(mappedBy: 'productline', targetEntity: Document::class, orphanRemoval: true)]
     private Collection $documents;
 
     public function __construct()
@@ -49,14 +53,15 @@ class ProductLine
         return $this;
     }
 
-    public function getZoneId(): ?zone
+
+    public function getZone(): ?zone
     {
-        return $this->zone_id;
+        return $this->zone;
     }
 
-    public function setZoneId(?zone $zone_id): self
+    public function setZone(?zone $zone): self
     {
-        $this->zone_id = $zone_id;
+        $this->zone = $zone;
 
         return $this;
     }
@@ -69,22 +74,22 @@ class ProductLine
         return $this->documents;
     }
 
-    public function addDocument(Document $document): self
+    public function addDocuments(Document $documents): self
     {
-        if (!$this->documents->contains($document)) {
-            $this->documents->add($document);
-            $document->setProductLineId($this);
+        if (!$this->documents->contains($documents)) {
+            $this->documents->add($documents);
+            $documents->setProductline($this);
         }
 
         return $this;
     }
 
-    public function removeDocument(Document $document): self
+    public function removeDocuments(Document $documents): self
     {
-        if ($this->documents->removeElement($document)) {
+        if ($this->documents->removeElement($documents)) {
             // set the owning side to null (unless already changed)
-            if ($document->getProductLineId() === $this) {
-                $document->setProductLineId(null);
+            if ($documents->getProductline() === $this) {
+                $documents->setProductline(null);
             }
         }
 

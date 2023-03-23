@@ -15,6 +15,12 @@ use App\Repository\ProductLineRepository;
 use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
 use App\Repository\DocumentRepository;
+use App\Entity\Zone;
+use App\Entity\ProductLine;
+use App\Entity\Role;
+use App\Entity\User;
+use App\Entity\Document;
+
 
 
 #[Route('/', name: 'app_')]
@@ -33,6 +39,7 @@ class BaseController extends AbstractController
     protected $security;
     protected $passwordHasher;
     protected $requestStack;
+
 
     public function __construct(ZoneRepository $zoneRepository, ProductLineRepository $productLineRepository, RoleRepository $roleRepository, UserRepository $userRepository, DocumentRepository $documentRepository, EntityManagerInterface $em, RequestStack $requestStack, Security $security, UserPasswordHasherInterface $passwordHasher)
     {
