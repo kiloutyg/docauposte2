@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\File;
 
-
+use App\Entity\Upload;
 use App\Entity\Document;
 use App\Repository\DocumentRepository;
 use App\Entity\Zone;
@@ -81,7 +81,6 @@ class FrontController extends BaseController
     {
         $productLine = $this->productLineRepository->findoneBy(['name' => $id]);
         $zone        = $productLine->getZone();
-
         return $this->render(
             'upload.html.twig',
             [
@@ -96,43 +95,63 @@ class FrontController extends BaseController
         );
     }
 
-    #[Route('/zone/{name}/productline/{id}/upload', name: 'upload_files')]
-    public function upload_files(string $id = null): Response
+    // #[Route('/zone/{name}/productline/{id}/upload', name: 'upload_files')]
+    // public function upload_files(string $id = null): Response
+    // {
+    //     $productLine = $this->productLineRepository->findoneBy(['id' => $id]);
+    //     $zone        = $productLine->getZone();
+
+    //     foreach ($_FILES as $file) {
+
+    //         $productLineid = $productLine->getId();
+    //         $public_dir    = $this->getParameter('kernel.project_dir') . '/public';
+    //         $filename      = $file['name'];
+    //         $path          = $public_dir . '/doc/' . $filename;
+    //         move_uploaded_file($file['tmp_name'], $path);
+
+    //         $document = new Document();
+    //         $document->setFile(new File($path));
+    //         $document->setProductline($productLineid);
+    //         $document->setName($filename);
+    //         $document->setPath($path);
+    //         $document->setUploadedAt(new \DateTime());
+    //         $this->em->persist($document);
+    //     }
+    //     $this->em->flush();
+
+    //     return $this->redirectToRoute(
+    //         'app_productline_upload',
+    //         [
+    //             'zone'        => $zone,
+
+    //             // 'zones'       => $this->zoneRepository->findAll(),
+
+    //             'productLine' => $productLine,
+
+    //             'roles'       => $this->roleRepository->findAll(),
+    //         ]
+    //     );
+    // }
+    #[Route('/upload', name: 'upload_files')]
+    public function upload_files(): Response
     {
-        $productLine = $this->productLineRepository->findoneBy(['id' => $id]);
-        $zone        = $productLine->getZone();
-
         foreach ($_FILES as $file) {
-
-            $productLineid = $productLine->getId();
-            $public_dir    = $this->getParameter('kernel.project_dir') . '/public';
-            $filename      = $file['name'];
-            $path          = $public_dir . '/doc/' . $filename;
+            $public_dir = $this->getParameter('kernel.project_dir') . '/public';
+            $filename   = uniqid() . '_' . $file['name'];
+            $path       = $public_dir . '/doc/' . $filename;
             move_uploaded_file($file['tmp_name'], $path);
 
-            $document = new Document();
-            $document->setFile(new File($path));
-            $document->setProductline($productLineid);
-            $document->setName($filename);
-            $document->setPath($path);
-            $document->setUploadedAt(new \DateTime());
-            $this->em->persist($document);
+            $upload = new Upload();
+            $upload->setFile(new File($path));
+            $upload->setProductline(1);
+            $upload->setFilename($file['name']);
+            $upload->setPath($path);
+            $upload->setUploadedAt(new \DateTime());
+            $this->em->persist($upload);
         }
         $this->em->flush();
 
-        return $this->redirectToRoute(
-            'app_productline_upload',
-            [
-                'zone'        => $zone,
-
-                // 'zones'       => $this->zoneRepository->findAll(),
-
-                'productLine' => $productLine,
-
-                'roles'       => $this->roleRepository->findAll(),
-            ]
-        );
+        return $this->redirectToRoute('app_base');
     }
-
 
 }

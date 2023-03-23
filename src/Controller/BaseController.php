@@ -21,6 +21,7 @@ use App\Entity\ProductLine;
 use App\Entity\Role;
 use App\Entity\User;
 use App\Entity\Document;
+use App\Repository\UploadRepository;
 
 
 
@@ -40,10 +41,12 @@ class BaseController extends AbstractController
     protected $security;
     protected $passwordHasher;
     protected $requestStack;
+    protected $uploadRepository;
 
-
-    public function __construct(ZoneRepository $zoneRepository, ProductLineRepository $productLineRepository, RoleRepository $roleRepository, UserRepository $userRepository, DocumentRepository $documentRepository, EntityManagerInterface $em, RequestStack $requestStack, Security $security, UserPasswordHasherInterface $passwordHasher)
+    public function __construct(UploadRepository $uploadRepository, ZoneRepository $zoneRepository, ProductLineRepository $productLineRepository, RoleRepository $roleRepository, UserRepository $userRepository, DocumentRepository $documentRepository, EntityManagerInterface $em, RequestStack $requestStack, Security $security, UserPasswordHasherInterface $passwordHasher)
     {
+        $this->uploadRepository = $uploadRepository;
+
         $this->zoneRepository        = $zoneRepository;
         $this->productLineRepository = $productLineRepository;
         $this->roleRepository        = $roleRepository;
