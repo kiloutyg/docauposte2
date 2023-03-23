@@ -78,7 +78,6 @@
 		</div>
 	</body>
 </html></nav><!-- End Main Navigation -->{% block body %}
-
 <div style="margin-left: 15%" class="container">
 	<p>
 		<strong>
@@ -92,12 +91,15 @@
 				Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
 		</h3>
 	</p>
-	{% for zone in zones %}
-		<div class="d-flex ps-5 mb-5 mt-5  line-list">
-			<a href="{{path('app_zone', {id: zone.id})}}" <span class="line-details"> {{ zone.name }} <id={{zone.id}}>></span>
-		</a>
-	</div>
-{% endfor %}</div>{% endblock %}<!-- Footer --><div class="container mt-5"><footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+	<p>
+		{% for zone in zones %}
+			<div class="d-flex ps-5 mb-5 mt-5  line-list">
+				<a href="{{path('app_zone', {id: zone.id})}}" <span class="line-details"> {{ zone.name }} <id={{zone.id}}>></span>
+			</a>
+		</div>
+	{% endfor %}
+</p></div>{% endblock %}<!-- Footer --><div class="container align-items-center"><footer class="d-flex flex-wrap justify-content-between  py-3 my-4 border-top">
+
 <div class="col-md-4 d-flex align-items-center">
 	<span class="me-1" style="color: red">
 		<i class="fas fa-heart"></i>
@@ -118,4 +120,4 @@
 			<i class="fab fa-github"></i>
 		</a>
 	</li>
-</ul></footer></div><!-- End Footer --></body></html>
+</ul></footer></div><!-- End Footer -->

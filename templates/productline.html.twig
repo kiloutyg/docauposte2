@@ -8,13 +8,17 @@
 	<!DOCTYPE html>
 	<html>
 		<body>
-			<div class="justify-content-between align-items-center" style="margin-left: 10% ">
+			<div class="container justify-content-between align-items-center" style="margin-left: 10% ">
 
 				<h2>
 					<strong>
 						{{ productLine.name }}
 					</strong>
 				</h2>
+				<aside>
+					<a href="{{ path('app_productline_upload', {'id': productLine.name, name:productLine.zone.name}) }}" class="btn" style="color:white">Upload</a>
+				</aside>
+
 				<p>
 					<div class="col-12 col-md-8 ps-5 mb-5 mt-5 ">
 						<h2 class="mb-4">{{productLine.name}}</h2>
@@ -23,7 +27,7 @@
 
 					</p>
 				</p>
-			</p>
+			</div>
 		</body>
 	</html>
-{% endblock %}
+</p></body></html>{% endblock %}
