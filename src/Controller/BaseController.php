@@ -4,8 +4,11 @@ namespace App\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
 
 use App\Repository\ZoneRepository;
 use App\Repository\ProductLineRepository;
@@ -27,8 +30,11 @@ class BaseController extends AbstractController
     protected $documentRepository;
     protected $em;
     protected $request;
+    protected $security;
+    protected $passwordHasher;
+    protected $requestStack;
 
-    public function __construct(ZoneRepository $zoneRepository, ProductLineRepository $productLineRepository, RoleRepository $roleRepository, UserRepository $userRepository, DocumentRepository $documentRepository, EntityManagerInterface $em)
+    public function __construct(ZoneRepository $zoneRepository, ProductLineRepository $productLineRepository, RoleRepository $roleRepository, UserRepository $userRepository, DocumentRepository $documentRepository, EntityManagerInterface $em, RequestStack $requestStack, Security $security, UserPasswordHasherInterface $passwordHasher)
     {
         $this->zoneRepository        = $zoneRepository;
         $this->productLineRepository = $productLineRepository;
@@ -36,42 +42,10 @@ class BaseController extends AbstractController
         $this->userRepository        = $userRepository;
         $this->documentRepository    = $documentRepository;
         $this->em                    = $em;
+        $this->requestStack          = $requestStack;
+        $this->security              = $security;
+        $this->passwordHasher        = $passwordHasher;
+        $this->request               = $this->requestStack->getCurrentRequest();
     }
-
-
-
-    #[Route('/', name: 'base')]
-    public function base(): Response
-    {
-        return $this->render(
-            'base.html.twig',
-            [
-                'zones'        => $this->zoneRepository->findAll(),
-                'productLines' => $this->productLineRepository->findAll(),
-                'roles'        => $this->roleRepository->findAll(),
-                'users'        => $this->userRepository->findAll(),
-                'documents'    => $this->documentRepository->findAll(),
-            ]
-        );
-    }
-
-    #[Route('/zone/{id}', name: 'zone')]
-
-    public function zone(string $id = null): Response
-    {
-        $zone = $this->zoneRepository->findOneBy(['id' => $id]);
-
-        return $this->render(
-            'zone.html.twig',
-            [
-
-                'zone'         => $zone,
-                'productLines' => $this->productLineRepository->findAll(),
-                'roles'        => $this->roleRepository->findAll(),
-            ]
-        );
-    }
-
-
 
 }

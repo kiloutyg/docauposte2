@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 {%block title %}
-	Sommere |
+	{{zone.name}}
+	|
 	{{ parent() }}
 {% endblock %}
 {% block body %}
@@ -11,23 +12,49 @@
 
 				<h2>
 					<strong>
-						Sommere
+						{{ zone.name }}
 					</strong>
 				</h2>
 				<p>
 					<div class="col-12 col-md-8 ps-5 mb-5 mt-5 ">
-						<h2 class="mb-4">La somme des meres</h2>
-
+						<h2 class="mb-4">Les lignes de la zone
+							{{zone.name}}:
+						</h2>
+						{{ dump(zone) }}
+						{{ dump(zone.id) }}
 						{{ dump(productLines) }}
-						{% for productLine in productLines %}
+						{{ dump(zone.productLines) }}
 
-							<div class="d-flex ps-5 mb-5 mt-5  line-list">
-								<a{{productLine.name}} href="#" <span class="line-details"> - {{ productLine.name }} <id={{productLine.name}}>></span>
-							</a>
-						</div>
-					{% endfor %}
+						{% set matchingProductLines = [] %}
+						{% for productLine in productLines %}
+							{% if productLine.zoneid.id == zone.id %}
+								{% set matchingProductLines = matchingProductLines|merge([productLine]) %}
+							{% endif %}
+						{% endfor %}
+
+						{% if matchingProductLines|length > 0 %}
+							{% for productLine in matchingProductLines %}
+								<div class="d-flex ps-5 mb-5 mt-5 line-list">
+									<a href="{{path('app_productline', {product_line_id: productLine.id} )}}">
+										<span class="line-details">
+											-{{ productLine.name }}
+											<id={{productLine.id}}>></span>
+										</a>
+									</div>
+								{% endfor %}
+							{% else %}
+								<div class="alert alert-danger">
+									<a href="{{path('app_base')}}">
+										Il n'y a pas de lignes dans cette zone.
+									</a>
+								</div>
+							{% endif %}
+
+
+						</p>
+					</p>
 				</p>
-			</div>
+			</body>
 		</body>
 	</html>
-</p></div></body></html>{% endblock %}
+</p></body></body></html></body></html></div></body></html></p> </div></body></html>{% endblock %}
