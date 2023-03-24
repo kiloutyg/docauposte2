@@ -75,49 +75,14 @@
 				<!-- End If Authenticated -->
 
 			</div>
-		</div>
+		</body>
 	</body>
-</html></nav><!-- End Main Navigation -->{% block body %}
-<div style="margin-left: 15%" class="container">
-	<p>
-		<strong>
-			<h1>
-				Doc Au Poste</h1>
-		</strong>
-	</p>
-	<p>
-		<h3>
-			<strong>
-				Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
-		</h3>
-	</p>
-	<p>
-		{% for zone in zones %}
-			<div class="d-flex ps-5 mb-5 mt-5  line-list">
-				<a href="{{path('app_zone', {id: zone.id})}}" <span class="line-details"> {{ zone.name }} <id={{zone.id}}>></span>
-			</a>
-		</div>
-	{% endfor %}
-</p></div>{% endblock %}<!-- Footer --><div class="container align-items-center"><footer class="d-flex flex-wrap justify-content-between  py-3 my-4 border-top">
-
-<div class="col-md-4 d-flex align-items-center">
-	<span class="me-1" style="color: red">
-		<i class="fas fa-heart"></i>
-	</span>
-	<span class="text-muted me-1">The guys and gals at</span>
-	<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3 me-2 mb-md-0 text-decoration-none lh-1">
-		PlasticOmnium
-	</a>
-</div>
-<div>
-	<a href="../">
-		<i class="fa fa-arrow-circle-o-left" aria-hidden="false">Page d'Accueil</i>
-	</a>
-</div>
-<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-	<li class="ms-3">
-		<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/staging2">
-			<i class="fab fa-github"></i>
-		</a>
-	</li>
-</ul></footer></div><!-- End Footer -->
+</html></div></body></html></nav><!-- End Main Navigation -->{% block body %}<div style="margin-left: 15%" class="container align-center"><p><strong>
+<h1>
+	Doc Au Poste</h1></strong></p><p><h3>
+<strong>
+	Le site qui vous permet de trouver les documents dont vous avez besoin.</strong></h3></p><p>{% for zone in zones %}
+<div class="d-flex ps-5 mb-5 mt-5  line-list">
+	<a href="{{path('app_zone', {id: zone.id})}}" <span class="line-details"> {{ zone.name }} <id={{zone.id}}>></span>
+</a></div>{% endfor %}</p></div>{% endblock %}<!-- Footer --><div class="container align-items-center"><footer class="d-flex flex-wrap justify-content-between  py-3 my-4 border-top"><div class="col-md-4 d-flex align-items-center"><span class="me-1" style="color: red"><i class="fas fa-heart"></i></span><span class="text-muted me-1">The guys and gals at</span><a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium</a></div><div><a href="../"><i class="fa fa-arrow-circle-o-left" aria-hidden="false">Page d'Accueil</i></a></div><ul class="nav col-md-4 justify-content-end list-unstyled d-flex"><li class="ms-3"><a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/staging2">
+<i class="fab fa-github"></i></a></li></ul></footer></div><!-- End Footer -->
