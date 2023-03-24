@@ -14,13 +14,11 @@ use App\Entity\Zone;
 use App\Entity\ProductLine;
 use App\Entity\Role;
 use App\Entity\User;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 
 
 #[Route('/', name: 'app_')]
-
-
-
 class FrontController extends BaseController
 {
     #[Route('/', name: 'base')]
@@ -38,11 +36,12 @@ class FrontController extends BaseController
         );
     }
 
-    #[Route('/zone/{id}', name: 'zone')]
 
-    public function zone(int $id = null): Response
+
+    #[Route('/zone/{id}', name: 'zone')]
+    public function zone(string $id = null): Response
     {
-        $zone = $this->zoneRepository->findOneBy(['id' => $id]);
+        $zone = $this->zoneRepository->findOneBy(['name' => $id]);
 
         return $this->render(
             'zone.html.twig',
@@ -61,7 +60,7 @@ class FrontController extends BaseController
     public function productline(string $id = null): Response
     {
 
-        $productLine = $this->productLineRepository->findoneBy(['id' => $id]);
+        $productLine = $this->productLineRepository->findoneBy(['name' => $id]);
         $zone        = $productLine->getZone();
         return $this->render(
             'productline.html.twig',
@@ -74,6 +73,7 @@ class FrontController extends BaseController
             ]
         );
     }
+
 
     // Upload page for documents for a product line
     #[Route('/zone/{name}/productline/{id}/upload', name: 'productline_upload')]
@@ -98,13 +98,13 @@ class FrontController extends BaseController
     #[Route('/zone/{name}/productline/{id}/uploading', name: 'upload_files')]
     public function upload_files(int $id = null): Response
     {
-        $productLine = $this->productLineRepository->findoneBy(['id' => $id]);
+        $productLine = $this->productLineRepository->findoneBy(['name' => $id]);
         $zone        = $productLine->getZone();
 
         foreach ($_FILES as $file) {
             // $productLineid = $productLine->getId();
             $public_dir = $this->getParameter('kernel.project_dir') . '/public';
-            $filename   = uniqid() . '_' . $file['name'];
+            $filename   = $file['name'];
             $path       = $public_dir . '/doc/' . $filename;
             move_uploaded_file($file['tmp_name'], $path);
 
@@ -127,11 +127,13 @@ class FrontController extends BaseController
         );
     }
 
+
     #[Route('/zone/{name}/productline/{id}/uploaded', name: 'uploaded_files')]
     public function uploaded_files(string $id = null): Response
     {
-        $productLine = $this->productLineRepository->findoneBy(['id' => $id]);
+        $productLine = $this->productLineRepository->findoneBy(['name' => $id]);
         $zone        = $productLine->getZone();
+
 
         return $this->render(
             'uploaded.html.twig',
@@ -142,8 +144,57 @@ class FrontController extends BaseController
 
                 'uploads'     => $this->uploadRepository->findAll(),
 
+
+
             ]
         );
     }
+
+
+    // create a route to download a file
+    #[Route('/zone/{name}/productline/{id}/download/{filename}', name: 'download_file')]
+    public function download_file(string $filename = null): Response
+    {
+        $public_dir = $this->getParameter('kernel.project_dir') . '/public';
+        $path       = $public_dir . '/doc/' . $filename;
+        $file       = new File($path);
+        return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
+    }
+
+
+    // create a route to delete a file
+    #[Route('/zone/{name}/productline/{id}/delete/{filename}', name: 'delete_file')]
+    public function delete_file(string $filename = null, string $id = null): Response
+    {
+        $upload     = $this->uploadRepository->findOneBy(['filename' => $filename]);
+        $public_dir = $this->getParameter('kernel.project_dir') . '/public';
+        $path       = $public_dir . '/doc/' . $filename;
+
+        $name = $filename;
+        unlink($path);
+
+        $this->em->remove($upload);
+        $this->em->flush();
+        $this->addFlash('success', 'File ' . $name . ' deleted');
+
+        $productLine = $this->productLineRepository->findoneBy(['id' => $id]);
+        $zone        = $productLine->getZone();
+
+        return $this->redirectToRoute(
+            'app_uploaded_files',
+
+            [
+                'zone'        => $zone,
+                'name'        => $zone->getName(),
+                'id'          => $id,
+                'productLine' => $productLine,
+                'uploads'     => $this->uploadRepository->findAll(),
+
+            ]
+        );
+
+    }
+
+
 
 }

@@ -28,7 +28,7 @@
 				{% if matchingProductLines|length > 0 %}
 					{% for productLine in matchingProductLines %}
 						<div class="d-flex ps-5 mb-5 mt-5 line-list">
-							<a href="{{path('app_productline', {id: productLine.id, name: productLine.zone.name} )}}">
+							<a href="{{path('app_productline', {id: productLine.name, name: productLine.zone.name} )}}">
 								<span class="line-details">
 									-{{ productLine.name }}
 									<id={{productLine.id}}>></span>
