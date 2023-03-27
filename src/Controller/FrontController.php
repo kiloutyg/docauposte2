@@ -96,7 +96,7 @@ class FrontController extends BaseController
 
 
     #[Route('/zone/{name}/productline/{id}/uploading', name: 'upload_files')]
-    public function upload_files(int $id = null): Response
+    public function upload_files(string $id = null): Response
     {
         $productLine = $this->productLineRepository->findoneBy(['name' => $id]);
         $zone        = $productLine->getZone();
