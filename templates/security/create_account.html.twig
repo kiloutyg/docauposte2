@@ -8,9 +8,9 @@
 		<div class="row">
 			<div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
 				<div class="card border-0 shadow rounded-3 my-5">
-					<div class="card-body p-4 p-sm-5">
+					<div class="card-body">
 						<h5 class="card-title text-center mb-5 fw-light fs-5">Create an account</h5>
-						<form method="post">
+						<form class="row form-floating justify-content-center " method="post">
 							{% if error %}
 								<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
 							{% endif %}
@@ -21,13 +21,25 @@
 									<a href="{{ path('app_logout') }}">Logout</a>
 								</div>
 							{% endif %}
-							<div class="form-floating mb-3">
-								<input type="text" value="{{ last_username }}" name="name" id="name" class="form-control" placeholder="Username">
-								<label for="username">Username</label>
+							<div class="form-control mb-3">
+								<input type="text" value="{{ last_username }}" name="name" placeholder="Username">
 							</div>
-							<div class="form-floating mb-3">
-								<input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
-								<label for="floatingPassword">Password</label>
+							<div class="form-control mb-3">
+								<input type="password" id="floatingPassword" placeholder="Password" name="password">
+							</div>
+							<div class="form-control mb-5">
+								<label>Choose a Role for your new user:</label>
+								<select name="role" id="role">
+									<option value="">--Please choose a Role--</option>
+									{% for role in roles %}
+										{% if role.name is same as('super-admin') %}
+											{% else %}
+												<option value="{{ role.name }}">{{ role.name }}</option>
+										{% endif %}
+
+									{% endfor %}
+
+								</select>
 							</div>
 
 							<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
