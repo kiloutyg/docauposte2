@@ -21,13 +21,13 @@ class SecurityController extends BaseController
     {
         if ($this->getUser()) {
             $this->addFlash('success', 'You have been logged in');
-            return $this->redirectToRoute('front_index');
+            return $this->redirectToRoute('app_index');
         }
 
         $error        = $authenticationUtils->getLastAuthenticationError(); // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
+        return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error, 'user' => $this->getUser()]);
     }
 
     #[Route(path: '/logout', name: 'app_logout')]
@@ -38,7 +38,7 @@ class SecurityController extends BaseController
     }
 
     #[Route(path: '/create_account', name: 'app_create_account')]
-    public function create_account(UserPasswordHasherInterface $passwordHasher, AuthenticationUtils $authenticationUtils, Request $request, UserRepository $userRepository, EntityManagerInterface $manager, SessionRepository $sessionRepository): Response
+    public function create_account(UserPasswordHasherInterface $passwordHasher, AuthenticationUtils $authenticationUtils, Request $request, UserRepository $userRepository, EntityManagerInterface $manager): Response
     {
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -49,28 +49,35 @@ class SecurityController extends BaseController
         if ($request->getMethod() == 'POST') {
             $name     = $request->request->get('name');
             $password = $request->request->get('password');
+            $role    = $request->request->get('role');
 
             // check if the email is already in use
             $user = $userRepository->findOneBy(['name' => $name]);
             if ($user) {
-                $error = 'The email is already in use';
+                $error = 'This username is already in use';
             } else {
                 // create the user
                 $user     = new User();
                 $password = $passwordHasher->hashPassword($user, $password);
                 $user->setName($name);
                 $user->setHashedPassword($password);
+                $user->setRole($this->roleRepository->findOneBy(['name' => $role]));
                 $manager->persist($user);
                 $manager->flush();
 
                 $this->authenticateUser($user);
                 $this->addFlash('success', 'Your account has been created');
 
-                return $this->redirectToRoute('front_index');
+                return $this->redirectToRoute('app_index');
             }
         }
 
-        return $this->render('security/create_account.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
+        return $this->render('security/create_account.html.twig', [
+            'last_username' => $lastUsername,
+            'error' => $error,
+            'user' => $this->getUser(),
+            'roles' => $this->roleRepository->findAll()
+        ]);
     }
 
     private function authenticateUser(User $user)

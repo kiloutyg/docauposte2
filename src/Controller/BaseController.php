@@ -42,11 +42,11 @@ class BaseController extends AbstractController
     protected $passwordHasher;
     protected $requestStack;
     protected $uploadRepository;
+    protected $session;
 
     public function __construct(UploadRepository $uploadRepository, ZoneRepository $zoneRepository, ProductLineRepository $productLineRepository, RoleRepository $roleRepository, UserRepository $userRepository, DocumentRepository $documentRepository, EntityManagerInterface $em, RequestStack $requestStack, Security $security, UserPasswordHasherInterface $passwordHasher)
     {
-        $this->uploadRepository = $uploadRepository;
-
+        $this->uploadRepository      = $uploadRepository;
         $this->zoneRepository        = $zoneRepository;
         $this->productLineRepository = $productLineRepository;
         $this->roleRepository        = $roleRepository;
@@ -57,6 +57,22 @@ class BaseController extends AbstractController
         $this->security              = $security;
         $this->passwordHasher        = $passwordHasher;
         $this->request               = $this->requestStack->getCurrentRequest();
-    }
+        $this->session               = $this->requestStack->getSession();
 
+
+
+        if ($this->session->get('id') == null) {
+            $this->session->set('id', uniqid());
+        } else {
+            // check if user is connected to update session with user
+            $user = $this->security->getUser();
+            if ($user != null) {
+                $user    = $userRepository->findOneBy(['name' => $user->getName()]);
+                $role   = $roleRepository->findOneBy(['id' => $user->getRole()]);
+                $this->session->set('user', $user);
+                $this->session->set('role', $role);
+            }
+            $user = null;
+        }
+    }
 }

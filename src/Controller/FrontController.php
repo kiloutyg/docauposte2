@@ -32,6 +32,7 @@ class FrontController extends BaseController
                 'roles'        => $this->roleRepository->findAll(),
                 'users'        => $this->userRepository->findAll(),
                 'documents'    => $this->documentRepository->findAll(),
+                'user'         => $this->getUser(),
             ]
         );
     }
@@ -192,9 +193,5 @@ class FrontController extends BaseController
 
             ]
         );
-
     }
-
-
-
 }

@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
+use App\Entity\Zone;
+
 #[ORM\Entity(repositoryClass: RoleRepository::class)]
 #[Broadcast]
 class Role
@@ -85,7 +87,7 @@ class Role
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
-            $user->setRoleId($this);
+            $user->setRole($this);
         }
 
         return $this;
@@ -95,8 +97,8 @@ class Role
     {
         if ($this->users->removeElement($user)) {
             // set the owning side to null (unless already changed)
-            if ($user->getRoleId() === $this) {
-                $user->setRoleId(null);
+            if ($user->getRole() === $this) {
+                $user->setRole(null);
             }
         }
 
