@@ -44,13 +44,14 @@
 
 				</a>
 			</div>
+
 			<div class="container-fluid align-center justify-content-center">
 				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
 					<li
 						class="nav-item">
 						{# <a class="nav-link active" aria-current="page" href="#!">Home</a> #}
 
-						{% if user is null %}
+						{% if app.user is null %}
 							<a class="btn btn-primary" href="{{ path('app_login') }}">Login</a>
 						{% else %}
 							<a class="btn btn-primary" href="{{ path('app_logout') }}">Logout</a>
@@ -71,8 +72,15 @@
 		</nav>
 	</body>
 	<!-- End Main Navigation -->
+	<div>
+		{{dump(app.session)}}
+		{{dump(app.user)}}
+	</div>
 	{% block body %}
+		{% include "_toasts.html.twig" %}
+
 		<body>
+
 			<div style="margin-left: 15%" class="container align-center">
 				<p>
 					<h1>
@@ -101,6 +109,7 @@
 			</div>
 		</body>
 	{% endblock body %}
+	{% include "_toasts.html.twig" %}
 	<!-- Footer -->
 	<footer class="container align-items-center border-top">
 		<div class="d-flex flex-wrap justify-content-between  py-3 my-4 ">

@@ -67,8 +67,8 @@ class BaseController extends AbstractController
             // check if user is connected to update session with user
             $user = $this->security->getUser();
             if ($user != null) {
-                $user    = $userRepository->findOneBy(['name' => $user->getName()]);
-                $role   = $roleRepository->findOneBy(['id' => $user->getRole()]);
+                $user    = $userRepository->findOneBy(['username' => $user->getUserIdentifier()]);
+                $role   = $roleRepository->findOneBy(['id' => $user->getRoles()]);
                 $this->session->set('user', $user);
                 $this->session->set('role', $role);
             }

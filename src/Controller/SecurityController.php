@@ -21,7 +21,7 @@ class SecurityController extends BaseController
     {
         if ($this->getUser()) {
             $this->addFlash('success', 'You have been logged in');
-            return $this->redirectToRoute('app_index');
+            // return $this->redirectToRoute('app_base');
         }
 
         $error        = $authenticationUtils->getLastAuthenticationError(); // last username entered by the user
@@ -47,28 +47,28 @@ class SecurityController extends BaseController
 
         // catch the form data with POST method
         if ($request->getMethod() == 'POST') {
-            $name     = $request->request->get('name');
+            $name     = $request->request->get('username');
             $password = $request->request->get('password');
             $role    = $request->request->get('role');
 
-            // check if the email is already in use
-            $user = $userRepository->findOneBy(['name' => $name]);
+            // check if the username is already in use
+            $user = $userRepository->findOneBy(['username' => $name]);
             if ($user) {
                 $error = 'This username is already in use';
             } else {
                 // create the user
                 $user     = new User();
                 $password = $passwordHasher->hashPassword($user, $password);
-                $user->setName($name);
-                $user->setHashedPassword($password);
-                $user->setRole($this->roleRepository->findOneBy(['name' => $role]));
+                $user->setUsername($name);
+                $user->setPassword($password);
+                // $user->setRoles($this->roleRepository->findOneBy(['name' => $role]));
                 $manager->persist($user);
                 $manager->flush();
 
                 $this->authenticateUser($user);
                 $this->addFlash('success', 'Your account has been created');
 
-                return $this->redirectToRoute('app_index');
+                return $this->redirectToRoute('app_login');
             }
         }
 
