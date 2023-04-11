@@ -10,4 +10,4 @@ chmod 777 .
 # yarn encore production &
 
 exec apache2-foreground  &
-yarn watch
+yarn watch & yarn encore dev --watch
