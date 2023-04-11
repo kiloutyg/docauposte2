@@ -23,7 +23,8 @@ security:
                 target: app_base
     role_hierarchy:
         ROLE_PRODUCT_ADMIN: ROLE_USER
-        ROLE_SUPER_ADMIN: [ROLE_PRODUCT_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_ADMIN: [ROLE_PRODUCT_ADMIN]
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
