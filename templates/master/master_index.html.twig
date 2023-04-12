@@ -4,23 +4,32 @@
 {% endblock %}
 
 {% block body %}
-	<body>
-		<div class='container'>
-			<div>
-				<h2>Formulaire de creation de zones</h2>
-				<form>
-					<input type="text" name="nom" placeholder="Nom de la zone">
-					<bouton type="submit">Valider</bouton>
-				</form>
+
+
+	<div class="container">
+		<div class="row">
+			<h1>Page d'administration</h1>
+			<h2>Formulaire de creation de zones</h2>
+			<div class="card border-0 shadow rounded-3 my-5 ">
+				<div class="card-body row-cols-4">
+					<form class="row form-floating justify-content-center " method="POST" action="{{ path('app_master_create_zone') }}">
+						<div class="form-control mb-3">
+							<input type="text" name="zonename" placeholder="Nom de la zone" required>
+						</div>
+						<div class="form-control mb-3">
+							<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Valider</bouton>
+						</div>
+					</form>
+				</div>
 			</div>
 
 
 			<div>
 				<h2>Formulaire de creation de compte utilisateur</h2>
-				<form>
+				<form method="POST" action="{{ path('app_master_create_admin') }}">
 					{% include 'security/create_account.html.twig' %}
 				</form>
 			</div>
 		</div>
-	</body>
+	</div>
 {% endblock %}

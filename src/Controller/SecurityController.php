@@ -9,10 +9,12 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use App\Event\SecurityEvents;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Event\SecurityEvents;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use App\Service\AccountService;
 
 class SecurityController extends BaseController
 {
@@ -38,38 +40,20 @@ class SecurityController extends BaseController
     }
 
     #[Route(path: '/create_account', name: 'app_create_account')]
-    public function create_account(UserPasswordHasherInterface $passwordHasher, AuthenticationUtils $authenticationUtils, Request $request, UserRepository $userRepository, EntityManagerInterface $manager): Response
+    public function create_account(AccountService $accountService, AuthenticationUtils $authenticationUtils, Request $request): Response
     {
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        // catch the form data with POST method
-        if ($request->getMethod() == 'POST') {
-            $name     = $request->request->get('username');
-            $password = $request->request->get('password');
-            $role    = $request->request->get('role');
+        $user = $accountService->createAccount($request, $error);
 
-            // check if the username is already in use
-            $user = $userRepository->findOneBy(['username' => $name]);
-            if ($user) {
-                $error = 'This username is already in use';
-            } else {
-                // create the user
-                $user     = new User();
-                $password = $passwordHasher->hashPassword($user, $password);
-                $user->setUsername($name);
-                $user->setPassword($password);
-                // $user->setRoles($this->roleRepository->findOneBy(['name' => $role]));
-                $manager->persist($user);
-                $manager->flush();
+        if ($user) {
+            $this->authenticateUser($user);
+            $this->addFlash('success', 'Your account has been created');
 
-                $this->authenticateUser($user);
-                $this->addFlash('success', 'Your account has been created');
-
-                return $this->redirectToRoute('app_login');
-            }
+            return $this->redirectToRoute('app_login');
         }
 
         return $this->render('security/create_account.html.twig', [

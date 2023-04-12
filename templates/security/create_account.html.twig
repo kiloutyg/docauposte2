@@ -20,25 +20,19 @@
 					</div>
 				{% endif %}
 				<div class="form-control mb-3">
-					<input type="text" value="{{ last_username }}" name="username" placeholder="Username">
+					<input type="text" name="username" placeholder="Username" required>
 				</div>
 				<div class="form-control mb-3">
-					<input type="password" id="floatingPassword" placeholder="Password" name="password">
+					<input type="password" id="floatingPassword" placeholder="Password" name="password" required>
 				</div>
-				{# <div class="form-control mb-5">
-									<label>Choose a Role for your new user:</label>
-									<select name="role" id="role">
-										<option value="">--Please choose a Role--</option>
-										{% for role in roles %}
-											{% if role.name is same as('super-admin') %}
-												{% else %}
-													<option value="{{ role.name }}">{{ role.name }}</option>
-											{% endif %}
-				
-										{% endfor %}
-				
-									</select>
-								</div> #}
+				<div class="form-control mb-5">
+					<label>Choose a Role for your new user:</label>
+					<select name="role" id="role">
+						<option value="">--Please choose a Role--</option>
+						<option value="ROLE_ADMIN">Admin de Zone</option>
+						<option value="ROLE_USER">User</option>
+					</select>
+				</div>
 
 				<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 				<div class="d-grid">
