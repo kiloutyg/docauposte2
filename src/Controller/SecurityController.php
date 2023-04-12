@@ -39,7 +39,6 @@ class SecurityController extends BaseController
         //throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
-    #[Route(path: '/create_account', name: 'app_create_account')]
     public function create_account(AccountService $accountService, AuthenticationUtils $authenticationUtils, Request $request): Response
     {
         // get the login error if there is one
@@ -56,7 +55,7 @@ class SecurityController extends BaseController
             return $this->redirectToRoute('app_login');
         }
 
-        return $this->render('security/create_account.html.twig', [
+        return $this->render('services/create_account.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
             'user' => $this->getUser(),

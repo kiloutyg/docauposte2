@@ -5,14 +5,22 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
+	<div style="margin-left: 15%" class="container align-center">
 
-	<div class="container justify-content-between align-items-center" style="margin-left: 10% ">
-
+		{% if app.user %}
+			{% if  is_granted('ROLE_ADMIN', object = null, field = null) %}
+				<aside>
+					<a href="{{ path('app_admin', {id: zone.name}) }}" class="btn" style="color:white">Admin Center</a>
+				</aside>
+			{% endif %}
+		{% endif %}
 		<h2>
 			<strong>
 				{{ zone.name }}
 			</strong>
 		</h2>
+
+
 		<p>
 			<div class="col-12 col-md-8 ps-5 mb-5 mt-5 ">
 				<h2 class="mb-4">Les lignes de la zone
@@ -47,6 +55,4 @@
 			</p>
 		</p>
 	</div>
-
-
 {% endblock %}

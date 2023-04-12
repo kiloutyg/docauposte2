@@ -79,12 +79,15 @@
 			{{dump(app.user.roles)}}
 		{% endif %}
 	</div>
-	{% block body %}
-		{% include "_toasts.html.twig" %}
-		<body>
+	<div style="margin-left: 15%" class="container align-center">
+
+		{% block body %}
 			<div style="margin-left: 15%" class="container align-center">
-				{% if app.user is not empty %}
-					{% if app.user.roles[0] == 'ROLE_SUPER_ADMIN' %}
+
+				{% include "_toasts.html.twig" %}
+
+				{% if app.user %}
+					{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
 						<aside>
 							<a href="{{ path('app_master') }}" class="btn" style="color:white">Master Center</a>
 						</aside>
@@ -93,7 +96,6 @@
 				<p>
 					<h1>
 						<strong>
-
 							Doc Au Poste
 						</strong>
 					</h1>
@@ -114,26 +116,30 @@
 						</div>
 					{% endfor %}
 				</p>
-			</body>
-		</body>
-	</html>
-</div></body>{% endblock body %}<!-- Footer --><footer class="container align-items-center border-top"><div class="d-flex flex-wrap justify-content-between  py-3 my-4 ">
-<div class="col-md-4 d-flex align-items-center">
-	<span class="me-1" style="color: red">
-		<i class="fas fa-heart"></i>
-	</span>
-	<span class="text-muted me-1">The guys and gals at</span>
-	<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium</a>
-</div>
-<div>
-	<a href="../">
-		<i class="fa fa-arrow-circle-o-left" aria-hidden="false">Page d'Accueil</i>
-	</a>
-</div>
-<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-	<li class="ms-3">
-		<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/staging2">
-			<i class="fab fa-github"></i>
-		</a>
-	</li>
-</ul></div></footer><!-- End Footer --></html></body></html>
+			</div>
+		{% endblock body %}
+	</div>
+	<!-- Footer -->
+	<footer class="container align-items-center border-top">
+		<div class="d-flex flex-wrap justify-content-between  py-3 my-4 ">
+			<div class="col-md-4 d-flex align-items-center">
+				<span class="me-1" style="color: red">
+					<i class="fas fa-heart"></i>
+				</span>
+				<span class="text-muted me-1">The guys and gals at</span>
+				<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium</a>
+			</div>
+			<div>
+				<a href="../">
+					<i class="fa fa-arrow-circle-o-left" aria-hidden="false">Page d'Accueil</i>
+				</a>
+			</div>
+			<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+				<li class="ms-3">
+					<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/staging2">
+						<i class="fab fa-github"></i>
+					</a>
+				</li>
+			</ul>
+		</div>
+	</footer><!-- End Footer --></html></html></body></html>
