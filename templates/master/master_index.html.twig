@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello MasterController!
+{% endblock %}
+
+{% block body %}
+	<body>
+		<div class='container'>
+			<div>
+				<h2>Formulaire de creation de zones</h2>
+				<form>
+					<input type="text" name="nom" placeholder="Nom de la zone">
+					<bouton type="submit">Valider</bouton>
+				</form>
+			</div>
+
+
+			<div>
+				<h2>Formulaire de creation de compte utilisateur</h2>
+				<form>
+					{% include 'security/create_account.html.twig' %}
+				</form>
+			</div>
+		</div>
+	</body>
+{% endblock %}
