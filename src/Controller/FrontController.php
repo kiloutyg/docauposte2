@@ -6,6 +6,8 @@ namespace App\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 use App\Entity\Upload;
 use App\Entity\Document;
@@ -36,6 +38,8 @@ class FrontController extends BaseController
             ]
         );
     }
+
+
 
 
 

@@ -46,6 +46,7 @@ class BaseController extends AbstractController
 
     public function __construct(UploadRepository $uploadRepository, ZoneRepository $zoneRepository, ProductLineRepository $productLineRepository, RoleRepository $roleRepository, UserRepository $userRepository, DocumentRepository $documentRepository, EntityManagerInterface $em, RequestStack $requestStack, Security $security, UserPasswordHasherInterface $passwordHasher)
     {
+
         $this->uploadRepository      = $uploadRepository;
         $this->zoneRepository        = $zoneRepository;
         $this->productLineRepository = $productLineRepository;
@@ -74,5 +75,10 @@ class BaseController extends AbstractController
             }
             $user = null;
         }
+    }
+    public function redirectToLogin()
+    {
+        $this->si->set('previous_url', $this->generateUrl('app_master')); // Store the current URL in the session
+        return $this->redirectToRoute('app_login');
     }
 }

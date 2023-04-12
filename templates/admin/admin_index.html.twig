@@ -12,7 +12,7 @@
 			<h2>Formulaire de creation de Ligne</h2>
 			<div class="card border-0 shadow rounded-3 my-5 ">
 				<div class="card-body row-cols-4">
-					<form class="row form-floating justify-content-center " method="POST" action="{{ path('app_admin_create_productline') }}">
+					<form class="row form-floating justify-content-center " method="POST" action="{{ path('app_admin_create_productline', {id: zone.name}) }}">
 						<div class="form-control mb-3">
 							<input type="text" name="productlinename" placeholder="Nom de la Ligne" required>
 						</div>
@@ -24,7 +24,7 @@
 			</div>
 			<div>
 				<h2>Formulaire de creation de compte utilisateur</h2>
-				<form method="POST" action="{{ path('app_admin_create_manager') }}">
+				<form method="POST" action="{{ path('app_admin_create_manager', {id: zone.name}) }}">
 					{% include 'services/create_account.html.twig' %}
 				</form>
 			</div>

@@ -10,6 +10,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 use App\Event\SecurityEvents;
 use App\Entity\User;
@@ -18,12 +19,17 @@ use App\Service\AccountService;
 
 class SecurityController extends BaseController
 {
+
+
     #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response
+    public function login(AuthenticationUtils $authenticationUtils)
     {
         if ($this->getUser()) {
             $this->addFlash('success', 'You have been logged in');
             // return $this->redirectToRoute('app_base');
+
+            // Fallback to a default route if the previous URL is not set in the session
+            return $this->redirectToRoute('app_base');
         }
 
         $error        = $authenticationUtils->getLastAuthenticationError(); // last username entered by the user
