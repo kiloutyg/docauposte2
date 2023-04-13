@@ -39,27 +39,29 @@ class AdminController extends BaseController
     }
 
     #[Route('/admin/create_manager/{id}', name: 'app_admin_create_manager')]
-    public function createAdmin(string $id = null, AccountService $accountService, Request $request): Response
+
+
+    public function createLineAdmin(string $id = null, AccountService $accountService, Request $request): Response
     {
         $zone = $this->zoneRepository->findOneBy(['name' => $id]);
 
+        $error = null;
+        $result = $accountService->createAccount($request, $error, 'app_zone', [
+            'zone'         => $zone,
+            'id' => $zone->getName(),
+            'productLines' => $this->productLineRepository->findAll(),
+        ]);
 
-        // Use createAccount() function from AccountService
-
-        $user = $accountService->createAccount($request, $error);
-
-        if ($user) {
-            // Handle the created user, for example, by redirecting to a specific route
-            // return $this->redirectToRoute('some_route');
-
-            $this->addFlash('success', 'account has been created');
-            return $this->redirectToRoute('app_admin', [
-                'zone'         => $zone,
-                'id' => $zone->getName(),
-                'productLines' => $this->productLineRepository->findAll(),
-            ]);
+        if ($result) {
+            $this->addFlash('success', 'Account has been created');
+            return $this->redirectToRoute($result['route'], $result['params']);
         }
-        return $this->redirectToRoute('app_admin', [
+
+        if ($error) {
+            $this->addFlash('error', $error);
+        }
+
+        return $this->redirectToRoute('app_zone', [
             'zone'         => $zone,
             'id' => $zone->getName(),
             'productLines' => $this->productLineRepository->findAll(),

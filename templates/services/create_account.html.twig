@@ -9,8 +9,10 @@
 		<div class="card-body">
 			<h5 class="card-title text-center mb-5 fw-light fs-5">Create an account</h5>
 			<form class="row form-floating justify-content-center " method="post">
-				{% if error %}
-					<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+				{% if error is defined %}
+					{% if error %}
+						<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+					{% endif %}
 				{% endif %}
 				{% if app.user  %}
 					<div class="mb-3">
@@ -26,26 +28,15 @@
 				<div class="form-control mb-3">
 					<input type="password" id="floatingPassword" placeholder="Password" name="password" required>
 				</div>
-				<div class="form-control mb-5">
-					<label>Choose a Role for your new user:</label>
-					<select name="role" id="role">
-						<option value="">--Please choose a Role--</option>
-						<option value="ROLE_SUPER_ADMIN">Super Admin</option>
-						<option value="ROLE_ADMIN">Admin de Zone</option>
-						<option value="ROLE_LINE_ADMIN">Admin de Ligne</option>
-						<option value="ROLE_MANAGER">Manager</option>
-						<option value="ROLE_USER">User</option>
-					</select>
-				</div>
+
+				{% include 'services/accountservices/role_affectation.html.twig' %}
 
 				<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 				<div class="d-grid">
 					<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Create account</button>
 				</div>
 				<hr class="my-4">
-				<p class="mt-5 mb-3 text-muted">You already have an account ?
-					<a href="{{path('app_login')}}">Sign in</a>
-				</p>
+
 			</form>
 		</div>
 	</div>

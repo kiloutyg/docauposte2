@@ -35,6 +35,9 @@
 						</strong>
 					</h1>
 				</a>
+				<div>
+					{% include "services/_toasts.html.twig" %}
+				</div>
 				<div class="ms-auto d-flex align-items-center">
 					{% if app.user is null %}
 						<a class="btn btn-primary" href="{{ path('app_login') }}">Login</a>
@@ -47,8 +50,18 @@
 		<!-- End Main Navigation -->
 
 		<div class="container">
+			{% if users is defined %}
+				{% if users is empty %}
+					<form class="d-flex flex-wrap justify-content-between" action="{{ path('app_create_super_admin') }}" method="post">
+						{% include "services/create_account.html.twig" %}
+					</form>
+				{% endif %}
+			{% endif %}
 			{{dump(app.session)}}
 			{{dump(app.user)}}
+			{% if users is defined %}
+				{{ dump(users) }}
+			{% endif %}
 			{% if app.user is not empty %}
 				{{dump(app.user.roles)}}
 			{% endif %}

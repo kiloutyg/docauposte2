@@ -17,6 +17,7 @@ use App\Entity\ProductLine;
 use App\Entity\Role;
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use App\Service\AccountService;
 
 
 
@@ -38,7 +39,23 @@ class FrontController extends BaseController
             ]
         );
     }
+    #[Route('/createSuperAdmin', name: 'create_super_admin')]
+    public function createSuperAdmin(AccountService $accountService, Request $request): Response
+    {
+        $error = null;
+        $result = $accountService->createAccount($request, $error, 'app_base', []);
 
+        if ($result) {
+            $this->addFlash('success', 'Account has been created');
+            return $this->redirectToRoute($result['route'], $result['params']);
+        }
+
+        if ($error) {
+            $this->addFlash('error', $error);
+        }
+
+        return $this->redirectToRoute('app_base');
+    }
 
 
 
@@ -71,6 +88,7 @@ class FrontController extends BaseController
             'productline.html.twig',
             [
                 'zone'        => $zone,
+                'name'        => $zone->getName(),
 
                 'productLine' => $productLine,
 
@@ -91,7 +109,11 @@ class FrontController extends BaseController
             [
                 'zone'        => $zone,
 
+                'name' => $zone->getName(),
+
                 'productLine' => $productLine,
+
+                'id' => $productLine->getName(),
 
                 'roles'       => $this->roleRepository->findAll(),
             ]

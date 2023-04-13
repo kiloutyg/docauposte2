@@ -35,7 +35,12 @@ class SecurityController extends BaseController
         $error        = $authenticationUtils->getLastAuthenticationError(); // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error, 'user' => $this->getUser()]);
+        return $this->render('security/login.html.twig', [
+            'last_username' => $lastUsername,
+            'users'        => $this->userRepository->findAll(),
+            'error' => $error,
+            'user' => $this->getUser()
+        ]);
     }
 
     #[Route(path: '/logout', name: 'app_logout')]
@@ -45,7 +50,6 @@ class SecurityController extends BaseController
         //throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
-    #[Route(path: '/Gel0p_42', name: 'app_create_account')]
 
     public function create_account(AccountService $accountService, AuthenticationUtils $authenticationUtils, Request $request): Response
     {
