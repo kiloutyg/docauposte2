@@ -31,8 +31,8 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
     
 4 - Then prepare Doctrine migration and then migrate : 
 
-    php bin/console make:migrations
-    php bin/console doctrine:make:migrate
+    php bin/console make:migration
+    php bin/console doctrine:migrations:migrate
     
 5 - Access the account creation forms to create the superadmin : 
 
