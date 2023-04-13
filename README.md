@@ -39,6 +39,7 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
     http://wheretheappis/Gel0p_42
     
 6 - Be sure to put the correct role.
+
 7 - At this point you can begin to configure the App depending on your need. 
 
 
