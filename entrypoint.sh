@@ -6,7 +6,7 @@ yarn add bootstrap jquery @popperjs/core @fontsource/roboto-condensed @fortaweso
 composer install 
 yarn install
 composer clear-cache
-chmod 777 . 
+chmod 777 . -R
 # yarn encore production &
 
 exec apache2-foreground  &
