@@ -1,10 +1,7 @@
 # DocAuPoste2
-<<<<<<< HEAD
 Created from scratch with Docker, PHP8 and Symfony.
-=======
 
 Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
->>>>>>> stagingphp
 
 ### Git usage basics.
 
@@ -15,14 +12,6 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
         b - Copy your Pubkey to your account. ( In your profile setting, SSH - GPG keys, new key, then validate)
     3 - Clone the repo locally in the directory of your choosing. 
     4 - Done ! Your ready to go. 
-<<<<<<< HEAD
-### Run With Docker
-
-#### First version 
-
-Juste clone the git repo and run " docker compose up -d --build " inside the local directory after having personalized your DotEnv. 
-
-=======
 
 ### Run With Docker.
 
@@ -49,4 +38,10 @@ Juste clone the git repo and run " docker compose up -d --build " inside the loc
     5 - yarn install
     6 - yarn watch ## Mandatory step to execute the webapp correctly ##
     
->>>>>>> stagingphp
+# Latest Version : 
+
+1 - Clone the repo:
+    git clone git@github.com:kiloutyg/docauposte2
+    cd docauposte2
+
+2 - If Docker and Docker compose are installed already, just run " docker compose up --build "
