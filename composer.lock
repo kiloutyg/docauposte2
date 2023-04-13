@@ -5709,16 +5709,16 @@
         },
         {
             "name": "symfony/security-bundle",
-            "version": "v6.2.6",
+            "version": "v6.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security-bundle.git",
-                "reference": "f3feb140c13015adecbeb51d49e45256aaf8a140"
+                "reference": "c781ba5ab5f71a5c8bd5fce5b4c8b6ad9eb7f3d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security-bundle/zipball/f3feb140c13015adecbeb51d49e45256aaf8a140",
-                "reference": "f3feb140c13015adecbeb51d49e45256aaf8a140",
+                "url": "https://api.github.com/repos/symfony/security-bundle/zipball/c781ba5ab5f71a5c8bd5fce5b4c8b6ad9eb7f3d5",
+                "reference": "c781ba5ab5f71a5c8bd5fce5b4c8b6ad9eb7f3d5",
                 "shasum": ""
             },
             "require": {
@@ -5789,7 +5789,7 @@
             "description": "Provides a tight integration of the Security component into the Symfony full-stack framework",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/security-bundle/tree/v6.2.6"
+                "source": "https://github.com/symfony/security-bundle/tree/v6.2.8"
             },
             "funding": [
                 {
@@ -5805,7 +5805,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-01-30T15:46:28+00:00"
+            "time": "2023-03-10T10:06:03+00:00"
         },
         {
             "name": "symfony/security-core",
@@ -6886,16 +6886,16 @@
         },
         {
             "name": "symfony/var-dumper",
-            "version": "v6.2.7",
+            "version": "v6.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-dumper.git",
-                "reference": "cf8d4ca1ddc1e3cc242375deb8fc23e54f5e2a1e"
+                "reference": "d37ab6787be2db993747b6218fcc96e8e3bb4bd0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/cf8d4ca1ddc1e3cc242375deb8fc23e54f5e2a1e",
-                "reference": "cf8d4ca1ddc1e3cc242375deb8fc23e54f5e2a1e",
+                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/d37ab6787be2db993747b6218fcc96e8e3bb4bd0",
+                "reference": "d37ab6787be2db993747b6218fcc96e8e3bb4bd0",
                 "shasum": ""
             },
             "require": {
@@ -6954,7 +6954,7 @@
                 "dump"
             ],
             "support": {
-                "source": "https://github.com/symfony/var-dumper/tree/v6.2.7"
+                "source": "https://github.com/symfony/var-dumper/tree/v6.2.8"
             },
             "funding": [
                 {
@@ -6970,7 +6970,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-02-24T10:42:00+00:00"
+            "time": "2023-03-29T21:42:15+00:00"
         },
         {
             "name": "symfony/var-exporter",

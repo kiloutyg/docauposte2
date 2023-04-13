@@ -7,112 +7,137 @@
 				DocAuPoste
 			{% endblock %}
 		</title>
-
-
-		{# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css" integrity="sha512-p0wIO77pxglJp61ES8/3Tq1xC/0JY/LdqI7k8C+OxOJwU6XYyU6Wb8Ov+Ucv7/TjXlZa5D5J5ogdA5y5YN5yQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+		<script src="https://kit.fontawesome.com/a076d05399.js"></script>
 		{% block stylesheets %}
 			{{
-      encore_entry_link_tags("app")
-    }}
+            encore_entry_link_tags("app")
+        }}
 		{% endblock %}
 		{% block javascripts %}
 			{{
-      encore_entry_script_tags("app")
-    }}
+            encore_entry_script_tags("app")
+        }}
 		{% endblock %}
 	</head>
 	<body>
 		<!-- Main Navigation -->
 		<nav class="navbar navbar-expand-lg navbar-dark mb-5" style="background-color: #1f3e52">
-			<div class="container-fluid">
+			<div class="container">
 				<a class="navbar-brand" href="{{ path('app_base') }}">
 					<img class="img-fluid align-center justify-content-center" src="{{ asset('Plastic_Omnium.svg') }}" alt="Logo de PlasticOmnium" role="img" width="125"/></a>
-			</div>
-			<div class="container-fluid align-center justify-content-center">
-				<a
-					class="navbar-brand" href="{{ path('app_base') }}">
-
-					{# <i class="fas fa-"></i> #}
+				<a class="navbar-brand" href="{{ path('app_base') }}">
 					<h1>
 						<strong>
 							DocAuPoste
 						</strong>
 					</h1>
-
 				</a>
+				<div>
+					{% include "services/_toasts.html.twig" %}
+				</div>
+				<div class="ms-auto d-flex align-items-center">
+					{% if app.user is null %}
+						<a class="btn btn-primary" href="{{ path('app_login') }}">Login</a>
+					{% else %}
+						<a class="btn btn-primary" href="{{ path('app_logout') }}">Logout</a>
+					{% endif %}
+				</div>
 			</div>
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="container-fluid align-center ">
-				<a class="nav-link" style="margin-top: 20px" href="#">
-					<h3>Liste de Produits</a>
-				</h3>
+		</nav>
+		<!-- End Main Navigation -->
+
+		<div class="container">
+			{% if users is defined %}
+				{% if users is empty %}
+					<form class="d-flex flex-wrap justify-content-between" action="{{ path('app_create_super_admin') }}" method="post">
+						{% include "services/create_account.html.twig" %}
+					</form>
+				{% endif %}
+			{% endif %}
+			{{dump(app.session)}}
+			{{dump(app.user)}}
+			{% if users is defined %}
+				{{ dump(users) }}
+			{% endif %}
+			{% if app.user is not empty %}
+				{{dump(app.user.roles)}}
+			{% endif %}
+			{% if zone is defined %}
+				{{dump(zone)}}
+			{% endif %}
+			{% if productLine is defined %}
+				{{dump(productLine)}}
+			{% endif %}
+			{% if refererUrl is defined %}
+				{{dump(refererUrl)}}
+			{% endif %}
+		</div>
+
+		<div
+			class="container">
+			{# {% include "services/login_out_button.html.twig" %} #}
+			{% block body %}
+				{% if app.user %}
+					{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
+						<aside>
+							<a href="{{ path('app_master') }}" class="btn" style="color:white">Master Center</a>
+						</aside>
+					{% endif %}
+				{% endif %}
+				<p>
+					<h1>
+						<strong>
+							Doc Au Poste
+						</strong>
+					</h1>
+				</p>
+				<p>
+					<h3>
+						<strong>
+							Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
+					</h3>
+				</p>
+				<p>
+					<div class="d-flex flex-column ">
+						{% for zone in zones %}
+							<div class="d-flex ps-5 mb-5 mt-5  line-list">
+								<a href="{{path('app_zone', {id: zone.name})}}" <span class="line-details">>
+									{{ zone.name }}
+									<id={{zone.id}}></span>
+								</a>
+							</div>
+						{% endfor %}
+					</div>
+				</p>
 			</div>
-			<div class="collapse navbar-collapse  justify-content-end align-center" id="navbarNavDropdown">
-				<ul class="navbar-nav">
-					<li class="nav-item"></li>
-					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-							<i class="fas fa-user p-2" style="border: solid 1px #fff; border-radius: 50px; font-size: 40px; "></i>
+		{% endblock body %}
+		<!-- Footer -->
+		<footer class="container mt-auto py-3 border-top">
+			<div class="d-flex flex-wrap justify-content-between">
+				<div class="col-md-4 d-flex align-items-center">
+					<span class="me-1" style="color: red">
+						<i class="fas fa-heart"></i>
+					</span>
+					<span class="text-muted me-1">The guys and gals at</span>
+					<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium</a>
+				</div>
+				<div>
+					<a href="../">
+						<i class="fa fa-arrow-circle-o-left" aria-hidden="false">Page d'Accueil</i>
+					</a>
+				</div>
+				<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+					<li class="ms-3">
+						<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/staging2">
+							<i class="fab fa-github"></i>
 						</a>
-						<ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-							<li>
-								<a class="dropdown-item" href="#">Mes Produits</a>
-							</li>
-							<li>
-								<a class="dropdown-item" href="#">Signout</a>
-							</li>
-						</ul>
 					</li>
 				</ul>
-				<!-- Not Authenticated -->
-			{# <li class="nav-item"><button href="#" class="btn btn-primary btn-sm">Login</button></li> #}
-				<!-- End Not Authenticated -->
-
-				<!-- If Authenticated -->
-
-				<!-- End If Authenticated -->
-
 			</div>
-		</div>
+		</footer>
+		<!-- End Footer -->
 	</body>
-</html></nav><!-- End Main Navigation -->{% block body %}
-
-<div style="margin-left: 15%" class="container">
-	<p>
-		<strong>
-			<h1>
-				Doc Au Poste</h1>
-		</strong>
-	</p>
-	<p>
-		<h3>
-			<strong>
-				Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
-		</h3>
-	</p>
-</div>{% endblock %}<!-- Footer --><div class="container mt-5">
-<footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-	<div class="col-md-4 d-flex align-items-center">
-		<span class="me-1" style="color: red">
-			<i class="fas fa-heart"></i>
-		</span>
-		<span class="text-muted me-1">The guys and gals at</span>
-		<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3 me-2 mb-md-0 text-decoration-none lh-1">
-			PlasticOmnium
-		</a>
-	</div>
-	<div>
-		<a href="../">
-			<i class="fa fa-arrow-circle-o-left" aria-hidden="false">Page d'Accueil</i>
-		</a>
-	</div>
-	<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-		<li class="ms-3">
-			<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/staging2">
-				<i class="fab fa-github"></i>
-			</a>
-		</li>
-	</ul>
-</footer></div><!-- End Footer --></body></html>
+</html>

@@ -10,5 +10,6 @@ import './styles/app.css';
 
 // start the Stimulus application
 import './bootstrap';
+import './toast';
 
 console.log('Hello Stimulus!');

@@ -1,0 +1,22 @@
+{% block body %}
+	<aside>
+
+		<div class="container-fluid align-center justify-content-center">
+			<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+				<li class="nav-item">
+					<p>
+						{% if app.user is null %}
+							You are not logged in!
+							<a class="btn btn-primary" href="{{ path('app_login') }}">Login</a>
+						{% else %}
+							You are logged in as
+							{{ app.user.username }}
+							<a class="btn btn-primary" href="{{ path('app_logout') }}">Logout</a>
+
+						{% endif %}
+					</p>
+				</li>
+			</ul>
+		</div>
+	</aside>
+{% endblock %}

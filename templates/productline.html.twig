@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{productLine.name}}
+	|
+	{{ parent() }}
+{% endblock %}
+{% block body %}
+
+	<div class=" container  align-items-center">
+
+		<div class="container">
+			{% if app.user %}
+				{% if is_granted('ROLE_ADMIN', object = null, field = null)  %}
+					{# <a href="{{ path('app_productline_edit', {'id': productLine.name, name:productLine.zone.name}) }}" class="btn btn-primary">Edit</a>
+																																																																{{ include('product_line/_delete_form.html.twig') }} #}
+					<aside>
+						<a href="{{ path('app_productline_upload', {id: productLine.name, name:productLine.zone.name}) }}" class="btn" style="color:white">Upload</a>
+						<br>
+						<a href="{{path('app_upload_files', {id: productLine.name, name: productLine.zone.name})}}" class="btn" style="color:white">
+							Uploaded files
+						</a>
+					</aside>
+				{% endif %}
+			{% endif %}
+
+			<h2>
+				<strong>
+					{{ productLine.name|capitalize }}
+				</strong>
+			</h2>
+
+
+			<p>
+				<div class="col-12 col-md-8 ps-5 mb-5 mt-5 ">
+					<h2 class="mb-4">{{productLine.name}}</h2>
+
+				</div>
+			</p>
+			<p>
+				<div class="  align-items-center card text-white bg-secondary my-5 py-4 text-center mydropzone">
+					{% include 'services/uploads/uploaded_list.html.twig' %}
+
+				</div>
+			</p>
+		</div>
+	</div>
+
+{% endblock %}

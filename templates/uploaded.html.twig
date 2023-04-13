@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	Upload pour
+	{{productLine.name}}
+	|
+	{{ parent() }}
+{% endblock %}
+{% block body %}
+	<div>
+		<div class="container">
+			<div class="justify-content-between align-items-center ">
+				<h2>
+					<strong>
+						Upload pour
+						{{productLine.name}}
+					</strong>
+				</h2>
+				<p>
+					{{ dump(zone)}}
+					{{ dump(productLine) }}
+					{{ dump(uploads) }}
+				</p>
+				{% include 'services/uploads/uploaded_list.html.twig' %}
+			</div>
+		</div>
+	</div>
+{% endblock %}

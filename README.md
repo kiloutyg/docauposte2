@@ -1,10 +1,7 @@
 # DocAuPoste2
-<<<<<<< HEAD
 Created from scratch with Docker, PHP8 and Symfony.
-=======
 
 Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
->>>>>>> stagingphp
 
 ### Git usage basics.
 
@@ -15,14 +12,38 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
         b - Copy your Pubkey to your account. ( In your profile setting, SSH - GPG keys, new key, then validate)
     3 - Clone the repo locally in the directory of your choosing. 
     4 - Done ! Your ready to go. 
-<<<<<<< HEAD
-### Run With Docker
 
-#### First version 
+    
+# Latest Version : 
 
-Juste clone the git repo and run " docker compose up -d --build " inside the local directory after having personalized your DotEnv. 
+1 - Clone the repo:
 
-=======
+    git clone git@github.com:kiloutyg/docauposte2
+    cd docauposte2
+
+2 - If Docker and Docker compose are installed already, just run (with or without sudo depending of Docker config":
+    
+    docker compose up --build
+    
+3 - Once the containers are ready and running enter the "web" one : 
+    
+    docker compose exec -ti web bash
+    
+4 - Then prepare Doctrine migration and then migrate : 
+
+    php bin/console make:migrations
+    php bin/console doctrine:make:migrate
+    
+5 - Access the account creation forms to create the superadmin : 
+
+    http://wheretheappis/Gel0p_42
+    
+6 - Be sure to put the correct role.
+
+7 - Run a CHMOD command on the app folder to be sure to stay in control of every file. 
+
+8 - At this point you can begin to configure the App depending on your need. 
+
 
 ### Run With Docker.
 
@@ -48,5 +69,4 @@ Juste clone the git repo and run " docker compose up -d --build " inside the loc
 
     5 - yarn install
     6 - yarn watch ## Mandatory step to execute the webapp correctly ##
-    
->>>>>>> stagingphp
+   
