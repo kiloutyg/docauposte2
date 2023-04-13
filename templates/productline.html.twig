@@ -10,10 +10,10 @@
 
 		<div class="container">
 			{% if app.user %}
-				{% if is_granted('ROLE_ADMIN', object = null, field = null)  %}
-					{# <a href="{{ path('app_productline_edit', {'id': productLine.name, name:productLine.zone.name}) }}" class="btn btn-primary">Edit</a>
-																																																																{{ include('product_line/_delete_form.html.twig') }} #}
+				{% if  is_granted('ROLE_LINE_ADMIN', object = null, field = null) %}
 					<aside>
+						<a href="{{ path('app_line_admin', {id: productLine.name}) }}" class="btn" style="color:white">Centre d'Administration de Ligne</a>
+						<br>
 						<a href="{{ path('app_productline_upload', {id: productLine.name, name:productLine.zone.name}) }}" class="btn" style="color:white">Upload</a>
 						<br>
 						<a href="{{path('app_upload_files', {id: productLine.name, name: productLine.zone.name})}}" class="btn" style="color:white">
@@ -44,5 +44,4 @@
 			</p>
 		</div>
 	</div>
-
 {% endblock %}

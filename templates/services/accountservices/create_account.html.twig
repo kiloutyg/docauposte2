@@ -7,7 +7,7 @@
 
 	<div class="card border-0 shadow rounded-3 my-5">
 		<div class="card-body">
-			<h5 class="card-title text-center mb-5 fw-light fs-5">Create an account</h5>
+			<h5 class="card-title text-center mb-5 fw-light fs-5">Creation de compte</h5>
 			<form class="row form-floating justify-content-center " method="post">
 				{% if error is defined %}
 					{% if error %}
@@ -16,24 +16,24 @@
 				{% endif %}
 				{% if app.user  %}
 					<div class="mb-3">
-						You are logged in as
+						Vous êtes connecté en tant que
 						{{ app.user.userIdentifier }},
 						<a href="{{ path('app_logout') }}">Logout</a>
 					</div>
 				{% endif %}
 
 				<div class="form-control mb-3">
-					<input type="text" name="username" placeholder="Username" required>
+					<input type="text" name="username" placeholder="Nom d'utilisateur" required>
 				</div>
 				<div class="form-control mb-3">
-					<input type="password" id="floatingPassword" placeholder="Password" name="password" required>
+					<input type="password" id="floatingPassword" placeholder="Mot de passe" name="password" required>
 				</div>
 
 				{% include 'services/accountservices/role_affectation.html.twig' %}
 
 				<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 				<div class="d-grid">
-					<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Create account</button>
+					<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Création du compte</button>
 				</div>
 				<hr class="my-4">
 

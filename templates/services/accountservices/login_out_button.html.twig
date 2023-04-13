@@ -6,12 +6,12 @@
 				<li class="nav-item">
 					<p>
 						{% if app.user is null %}
-							You are not logged in!
-							<a class="btn btn-primary" href="{{ path('app_login') }}">Login</a>
+							Vous n'êtes pas connecté!
+							<a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
 						{% else %}
-							You are logged in as
+							Vous êtes connecté en tant que
 							{{ app.user.username }}
-							<a class="btn btn-primary" href="{{ path('app_logout') }}">Logout</a>
+							<a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
 
 						{% endif %}
 					</p>

@@ -35,14 +35,12 @@
 						</strong>
 					</h1>
 				</a>
-				<div>
-					{% include "services/_toasts.html.twig" %}
-				</div>
+				<div></div>
 				<div class="ms-auto d-flex align-items-center">
 					{% if app.user is null %}
-						<a class="btn btn-primary" href="{{ path('app_login') }}">Login</a>
+						<a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
 					{% else %}
-						<a class="btn btn-primary" href="{{ path('app_logout') }}">Logout</a>
+						<a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
 					{% endif %}
 				</div>
 			</div>
@@ -50,10 +48,12 @@
 		<!-- End Main Navigation -->
 
 		<div class="container">
+			{% include "services/_toasts.html.twig" %}
+
 			{% if users is defined %}
 				{% if users is empty %}
 					<form class="d-flex flex-wrap justify-content-between" action="{{ path('app_create_super_admin') }}" method="post">
-						{% include "services/create_account.html.twig" %}
+						{% include "services/accountservices/create_account.html.twig" %}
 					</form>
 				{% endif %}
 			{% endif %}

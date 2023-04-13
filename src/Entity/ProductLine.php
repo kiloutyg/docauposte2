@@ -34,10 +34,14 @@ class ProductLine
     #[ORM\OneToMany(mappedBy: 'productline', targetEntity: Upload::class)]
     private Collection $uploads;
 
+    #[ORM\OneToMany(mappedBy: 'ProductLine', targetEntity: Category::class)]
+    private Collection $categories;
+
     public function __construct()
     {
         $this->documents = new ArrayCollection();
         $this->uploads = new ArrayCollection();
+        $this->categories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -124,6 +128,36 @@ class ProductLine
             // set the owning side to null (unless already changed)
             if ($upload->getProductline() === $this) {
                 $upload->setProductline(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Category>
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    public function addCategory(Category $category): self
+    {
+        if (!$this->categories->contains($category)) {
+            $this->categories->add($category);
+            $category->setProductLine($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(Category $category): self
+    {
+        if ($this->categories->removeElement($category)) {
+            // set the owning side to null (unless already changed)
+            if ($category->getProductLine() === $this) {
+                $category->setProductLine(null);
             }
         }
 
