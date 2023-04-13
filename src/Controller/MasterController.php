@@ -31,6 +31,8 @@ class MasterController extends BaseController
             'controller_name' => 'MasterController',
             'error' => $error,
             'last_username' => $lastUsername,
+            'zones' => $this->zoneRepository->findAll(),
+            'users' => $this->userRepository->findAll()
         ]);
     }
 
@@ -74,6 +76,21 @@ class MasterController extends BaseController
                 $this->addFlash('success', 'Zone has been created');
                 return $this->redirectToRoute('app_master');
             }
+        }
+    }
+
+    #[Route('/master/delete_zone/{id}', name: 'app_master_delete_zone')]
+    public function deleteZone($id)
+    {
+        $zone = $this->zoneRepository->find($id);
+        if ($zone) {
+            $this->em->remove($zone);
+            $this->em->flush();
+            $this->addFlash('success', 'Zone has been deleted');
+            return $this->redirectToRoute('app_master');
+        } else {
+            $this->addFlash('danger', 'Zone does not exist');
+            return $this->redirectToRoute('app_master');
         }
     }
 }
