@@ -40,7 +40,9 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
     
 6 - Be sure to put the correct role.
 
-7 - At this point you can begin to configure the App depending on your need. 
+7 - Run a CHMOD command on the app folder to be sure to stay in control of every file. 
+
+8 - At this point you can begin to configure the App depending on your need. 
 
 
 ### Run With Docker.
