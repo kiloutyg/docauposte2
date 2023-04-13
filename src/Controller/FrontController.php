@@ -89,6 +89,7 @@ class FrontController extends BaseController
             [
                 'zone'        => $zone,
                 'name'        => $zone->getName(),
+                'uploads'     => $this->uploadRepository->findAll(),
 
                 'productLine' => $productLine,
 

@@ -6,46 +6,43 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-	<!DOCTYPE html>
-	<html>
-		<body>
-			<div class="container">
-				<div class="justify-content-between align-items-center ">
 
-					<h2>
-						<strong>
-							Upload pour
-							{{productLine.name}}
-						</strong>
-					</h2>
-					<p>
-						{{ dump(zone)}}
-						{{ dump(productLine) }}
-					</p>
-					<p>
-						<div class="  align-items-center card text-white bg-secondary my-5 py-4 text-center mydropzone">
-							<div class="card-body">
-								<p class="text-white m-0">Boost your file now !</p>
+	<div class="container">
+		<div class="justify-content-between align-items-center ">
 
-								<form action="{{path('app_upload_files', {id: productLine.name, name: productLine.zone.name})}}" method="POST" enctype="multipart/form-data">
-									<div class="fallback">
-										<input name="file" type="file" multiple/>
-									</div>
-									<button type="submit" class="btn btn-primary">Upload</button>
-								</form>
+			<h2>
+				<strong>
+					Upload pour
+					{{productLine.name}}
+				</strong>
+			</h2>
+			<p>
+				{{ dump(zone)}}
+				{{ dump(productLine) }}
+			</p>
+			<p>
+				<div class="  align-items-center card text-white bg-secondary my-5 py-4 text-center mydropzone">
+					<div class="card-body">
+						<p class="text-white m-0">Boost your file now !</p>
+
+						<form action="{{path('app_upload_files', {id: productLine.name, name: productLine.zone.name})}}" method="POST" enctype="multipart/form-data">
+							<div class="fallback">
+								<input name="file" type="file" multiple/>
 							</div>
+							<button type="submit" class="btn btn-primary">Upload</button>
+						</form>
+					</div>
 
-						</div>
-						<div class="  align-items-center card text-white bg-secondary my-5 py-4 text-center ">
-							<h4 class="card-title">
-								<a href="{{path('app_upload_files', {id: productLine.name, name: productLine.zone.name})}}">
-									<button type="submit" class="btn btn-primary">Uploaded files</button>
-								</a>
-							</h4>
-						</div>
-					</p>
-				</p>
-			</div>
-		</body>
-	</html>
-</div></body></html>{% endblock %}
+				</div>
+				<div class="  align-items-center card text-white bg-secondary my-5 py-4 text-center ">
+					<h4 class="card-title">
+						<a href="{{path('app_upload_files', {id: productLine.name, name: productLine.zone.name})}}">
+							<button type="submit" class="btn btn-primary">Uploaded files</button>
+						</a>
+					</h4>
+				</div>
+			</p>
+		</p>
+	</div>
+
+{% endblock %}

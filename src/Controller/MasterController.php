@@ -35,22 +35,7 @@ class MasterController extends BaseController
     }
 
     #[Route('/master/create_admin', name: 'app_master_create_admin')]
-    // public function createAdmin(AccountService $accountService, Request $request): Response
-    // {
 
-    //     // Use createAccount() function from AccountService
-
-    //     $user = $accountService->createAccount($request, $error);
-
-    //     if ($user) {
-    //         // Handle the created user, for example, by redirecting to a specific route
-    //         // return $this->redirectToRoute('some_route');
-
-    //         $this->addFlash('success', 'account has been created');
-    //         return $this->redirectToRoute('app_master');
-    //     }
-    //     return $this->redirectToRoute('app_master');
-    // }
     public function createAdmin(AccountService $accountService, Request $request): Response
     {
         $error = null;
