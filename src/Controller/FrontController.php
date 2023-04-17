@@ -84,16 +84,72 @@ class FrontController extends BaseController
 
         $productLine = $this->productLineRepository->findoneBy(['name' => $id]);
         $zone        = $productLine->getZone();
+
         return $this->render(
             'productline.html.twig',
             [
                 'zone'        => $zone,
                 'name'        => $zone->getName(),
                 'uploads'     => $this->uploadRepository->findAll(),
+                'id' => $productLine->getName(),
+                'categories'  => $this->categoryRepository->findAll(),
 
                 'productLine' => $productLine,
 
                 'roles'       => $this->roleRepository->findAll(),
+            ]
+        );
+    }
+
+
+
+
+    #[Route('/zone/{name}/productline/{id}/category/{category}', name: 'category')]
+
+    public function category(string $category = null): Response
+    {
+        $category    = $this->categoryRepository->findoneBy(['name' => $category]);
+        $productLine = $category->getProductLine();
+        $zone        = $productLine->getZone();
+
+
+        return $this->render(
+            'category.html.twig',
+            [
+                'zone'        => $zone,
+                'name'        => $zone->getName(),
+                'productLine' => $productLine,
+                'id'          => $productLine->getName(),
+                'category'    => $category,
+                'categories'  => $this->categoryRepository->findAll(),
+                'buttons'     => $this->buttonRepository->findAll(),
+            ]
+        );
+    }
+
+
+    #[Route('/zone/{name}/productline/{id}/category/{category}/button', name: 'button')]
+    public function ButtonShowingUploadedFile(string $category = null): Response
+    {
+        $category    = $this->categoryRepository->findoneBy(['name' => $category]);
+        $productLine = $category->getProductLine();
+        $zone        = $productLine->getZone();
+
+
+        return $this->render(
+            'uploaded.html.twig',
+            [
+                'zone'        => $zone,
+                'name'        => $zone->getName(),
+                'productLine' => $productLine,
+                'id'          => $productLine->getName(),
+                'category'    => $category,
+                'categories'  => $this->categoryRepository->findAll(),
+                'buttons'     => $this->buttonRepository->findAll(),
+                'uploads'     => $this->uploadRepository->findAll(),
+
+
+
             ]
         );
     }
@@ -128,6 +184,7 @@ class FrontController extends BaseController
     {
         $productLine = $this->productLineRepository->findoneBy(['name' => $id]);
         $zone        = $productLine->getZone();
+        $zonename    = $zone->getName();
 
         foreach ($_FILES as $file) {
             // $productLineid = $productLine->getId();
@@ -150,7 +207,7 @@ class FrontController extends BaseController
             'app_uploaded_files',
             [
                 'id'   => $id,
-                'name' => $zone->getName(),
+                'name' => $zonename,
             ]
         );
     }
@@ -167,8 +224,10 @@ class FrontController extends BaseController
             'uploaded.html.twig',
             [
                 'zone'        => $zone,
+                'name' => $zone->getName(),
 
                 'productLine' => $productLine,
+                'id' => $productLine->getName(),
 
                 'uploads'     => $this->uploadRepository->findAll(),
 
@@ -190,7 +249,7 @@ class FrontController extends BaseController
     }
 
 
-    // create a route to delete a file
+    // create a route to delete a file. I'll need to refactor of move this function elsewhere
     #[Route('/zone/{name}/productline/{id}/delete/{filename}', name: 'delete_file')]
     public function delete_file(string $filename = null, string $id = null): Response
     {

@@ -38,7 +38,7 @@ class AdminController extends BaseController
         ]);
     }
 
-    #[Route('/admin/create_manager/{id}', name: 'app_admin_create_manager')]
+    #[Route('/admin/create_line_admin/{id}', name: 'app_admin_create_line_admin')]
 
 
     public function createLineAdmin(string $id = null, AccountService $accountService, Request $request): Response

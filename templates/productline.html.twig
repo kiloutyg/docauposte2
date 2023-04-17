@@ -5,43 +5,61 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-
-	<div class=" container  align-items-center">
-
-		<div class="container">
-			{% if app.user %}
-				{% if  is_granted('ROLE_LINE_ADMIN', object = null, field = null) %}
-					<aside>
-						<a href="{{ path('app_line_admin', {id: productLine.name}) }}" class="btn" style="color:white">Centre d'Administration de Ligne</a>
-						<br>
-						<a href="{{ path('app_productline_upload', {id: productLine.name, name:productLine.zone.name}) }}" class="btn" style="color:white">Upload</a>
-						<br>
-						<a href="{{path('app_upload_files', {id: productLine.name, name: productLine.zone.name})}}" class="btn" style="color:white">
-							Uploaded files
-						</a>
-					</aside>
-				{% endif %}
+	<div class="container">
+		{% if app.user %}
+			{% if  is_granted('ROLE_LINE_ADMIN', object = null, field = null) %}
+				<aside class="position-absolute end-0">
+					<a href="{{ path('app_line_admin', {id: productLine.name}) }}" class="btn" style="color:white">Centre d'Administration de Ligne</a>
+					<br>
+					<a href="{{ path('app_productline_upload', {id: productLine.name, name:productLine.zone.name}) }}" class="btn" style="color:white">Upload</a>
+					<br>
+					<a href="{{path('app_upload_files', {id: productLine.name, name: productLine.zone.name})}}" class="btn" style="color:white">
+						Uploaded files
+					</a>
+				</aside>
 			{% endif %}
-
-			<h2>
-				<strong>
+		{% endif %}
+		<h2 class="mt-5">
+			<strong>
+				{{ productLine.name|capitalize }}
+			</strong>
+		</h2>
+		<p>
+			<div class=" mb-5 mt-5">
+				<h2 class="mb-4 text-justify">Les catégories de la ligne
 					{{ productLine.name|capitalize }}
-				</strong>
-			</h2>
-
-
-			<p>
-				<div class="col-12 col-md-8 ps-5 mb-5 mt-5 ">
-					<h2 class="mb-4">{{productLine.name}}</h2>
-
-				</div>
+					:
+				</h2>
+				{% set matchingCategories = [] %}
+				{% for category in categories %}
+					{% if category.productLine.id is same as(productLine.id)  %}
+						{% set matchingCategories = matchingCategories|merge([category]) %}
+					{% endif %}
+				{% endfor %}
 			</p>
-			<p>
-				<div class="  align-items-center card text-white bg-secondary my-5 py-4 text-center mydropzone">
-					{% include 'services/uploads/uploaded_list.html.twig' %}
-
+		</p>
+		<p>
+			<div>
+				{% if matchingCategories|length > 0 %}
+					{% for category in matchingCategories %}
+						<div class="d-flex ps-5 mb-5 mt-5 line-list">
+							<a href="{{path('app_category', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}">
+								<span class="line-details text-justify">
+									-{{ category.name }}
+									<id={{category.id}}>>
+									</span>
+								</a>
+							</div>
+						{% endfor %}
+					{% else %}
+						<div class="alert alert-danger">
+							<a href="{{path('app_base')}}">
+								Il n'y a pas de catégories dans cette ligne.
+							</a>
+						</div>
+					{% endif %}
 				</div>
-			</p>
-		</div>
+			</div>
+		</p>
 	</div>
 {% endblock %}

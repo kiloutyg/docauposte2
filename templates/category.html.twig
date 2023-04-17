@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{category.name}}
+	|
+	{{ parent() }}
+{% endblock %}
+{% block body %}
+	<div class="container">
+		{% if app.user %}
+			{% if  is_granted('ROLE_MANAGER') %}
+				{# <aside class="position-absolute end-0">
+								<a href="{{ path('app_line_admin', {id: category.name}) }}" class="btn" style="color:white">Centre d'Administration de Ligne</a>
+								<br>
+								<a href="{{ path('app_category_upload', {id: category.name, name:category.zone.name}) }}" class="btn" style="color:white">Upload</a>
+								<br>
+								<a href="{{path('app_upload_files', {id: category.name, name: category.zone.name})}}" class="btn" style="color:white">
+									Uploaded files
+								</a>
+							</aside> #}
+			{% endif %}
+		{% endif %}
+		<h2 class="mt-5">
+			<strong>
+				{{ category.name|capitalize }}
+			</strong>
+		</h2>
+		<p>
+			<div class=" mb-5 mt-5">
+				<h2 class="mb-4 text-justify">Les boutons de la categories
+					{{ category.name|capitalize }}
+					:
+				</h2>
+				{% set matchingButtons = [] %}
+				{% for button in buttons %}
+					{% if button.category.id is same as(category.id)  %}
+						{% set matchingButtons = matchingButtons|merge([button]) %}
+					{% endif %}
+				{% endfor %}
+			</p>
+		</p>
+		<p>
+			<div>
+				{% if matchingButtons|length > 0 %}
+					{% for button in matchingButtons %}
+						<div class="d-flex ps-5 mb-5 mt-5 line-list">
+							<a href="{{path('app_upload_files', {category: category.name, id: category.productLine.name, name: category.productLine.zone.name})}}" class="btn" style="color:white">
+								<span class="line-details text-justify">
+									-{{ button.name }}
+									<id={{button.id}}>>
+									</span>
+								</a>
+							</div>
+						{% endfor %}
+					{% else %}
+						<div class="alert alert-danger">
+							<a href="{{path('app_base')}}">
+								Il n'y a pas de boutons dans cette catégories.
+							</a>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		</p>
+	</div>
+{% endblock %}

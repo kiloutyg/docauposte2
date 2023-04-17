@@ -16,12 +16,20 @@ use App\Repository\ProductLineRepository;
 use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
 use App\Repository\DocumentRepository;
+use App\Repository\UploadRepository;
+use App\Repository\CategoryRepository;
+use App\Repository\ButtonRepository;
+use App\Repository\SignatureRepository;
+
 use App\Entity\Zone;
 use App\Entity\ProductLine;
 use App\Entity\Role;
 use App\Entity\User;
 use App\Entity\Document;
-use App\Repository\UploadRepository;
+use App\Entity\Upload;
+use App\Entity\Category;
+use App\Entity\Button;
+use App\Entity\Signature;
 
 
 
@@ -43,9 +51,27 @@ class BaseController extends AbstractController
     protected $requestStack;
     protected $uploadRepository;
     protected $session;
+    protected $categoryRepository;
+    protected $buttonRepository;
+    protected $signatureRepository;
 
-    public function __construct(UploadRepository $uploadRepository, ZoneRepository $zoneRepository, ProductLineRepository $productLineRepository, RoleRepository $roleRepository, UserRepository $userRepository, DocumentRepository $documentRepository, EntityManagerInterface $em, RequestStack $requestStack, Security $security, UserPasswordHasherInterface $passwordHasher)
-    {
+
+
+    public function __construct(
+        UploadRepository $uploadRepository,
+        ZoneRepository $zoneRepository,
+        ProductLineRepository $productLineRepository,
+        RoleRepository $roleRepository,
+        UserRepository $userRepository,
+        DocumentRepository $documentRepository,
+        EntityManagerInterface $em,
+        RequestStack $requestStack,
+        Security $security,
+        UserPasswordHasherInterface $passwordHasher,
+        CategoryRepository $categoryRepository,
+        ButtonRepository $buttonRepository,
+        SignatureRepository $signatureRepository
+    ) {
 
         $this->uploadRepository      = $uploadRepository;
         $this->zoneRepository        = $zoneRepository;
@@ -53,6 +79,9 @@ class BaseController extends AbstractController
         $this->roleRepository        = $roleRepository;
         $this->userRepository        = $userRepository;
         $this->documentRepository    = $documentRepository;
+        $this->categoryRepository    = $categoryRepository;
+        $this->buttonRepository      = $buttonRepository;
+        $this->signatureRepository   = $signatureRepository;
         $this->em                    = $em;
         $this->requestStack          = $requestStack;
         $this->security              = $security;
