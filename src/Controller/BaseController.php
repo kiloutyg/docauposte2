@@ -15,7 +15,6 @@ use App\Repository\ZoneRepository;
 use App\Repository\ProductLineRepository;
 use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
-use App\Repository\DocumentRepository;
 use App\Repository\UploadRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ButtonRepository;
@@ -25,7 +24,6 @@ use App\Entity\Zone;
 use App\Entity\ProductLine;
 use App\Entity\Role;
 use App\Entity\User;
-use App\Entity\Document;
 use App\Entity\Upload;
 use App\Entity\Category;
 use App\Entity\Button;
@@ -43,7 +41,6 @@ class BaseController extends AbstractController
     protected $productLineRepository;
     protected $roleRepository;
     protected $userRepository;
-    protected $documentRepository;
     protected $em;
     protected $request;
     protected $security;
@@ -63,7 +60,6 @@ class BaseController extends AbstractController
         ProductLineRepository $productLineRepository,
         RoleRepository $roleRepository,
         UserRepository $userRepository,
-        DocumentRepository $documentRepository,
         EntityManagerInterface $em,
         RequestStack $requestStack,
         Security $security,
@@ -78,7 +74,6 @@ class BaseController extends AbstractController
         $this->productLineRepository = $productLineRepository;
         $this->roleRepository        = $roleRepository;
         $this->userRepository        = $userRepository;
-        $this->documentRepository    = $documentRepository;
         $this->categoryRepository    = $categoryRepository;
         $this->buttonRepository      = $buttonRepository;
         $this->signatureRepository   = $signatureRepository;

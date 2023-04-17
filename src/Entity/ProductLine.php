@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
 use App\Entity\Zone;
-use App\Entity\Document;
 
 
 #[ORM\Entity(repositoryClass: ProductLineRepository::class)]
@@ -28,8 +27,6 @@ class ProductLine
     #[ORM\JoinColumn(nullable: false)]
     private ?zone $zone = null;
 
-    #[ORM\OneToMany(mappedBy: 'productline', targetEntity: Document::class, orphanRemoval: true)]
-    private Collection $documents;
 
     #[ORM\OneToMany(mappedBy: 'productline', targetEntity: Upload::class)]
     private Collection $uploads;
@@ -74,35 +71,6 @@ class ProductLine
         return $this;
     }
 
-    /**
-     * @return Collection<int, Document>
-     */
-    public function getDocuments(): Collection
-    {
-        return $this->documents;
-    }
-
-    public function addDocuments(Document $documents): self
-    {
-        if (!$this->documents->contains($documents)) {
-            $this->documents->add($documents);
-            $documents->setProductline($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDocuments(Document $documents): self
-    {
-        if ($this->documents->removeElement($documents)) {
-            // set the owning side to null (unless already changed)
-            if ($documents->getProductline() === $this) {
-                $documents->setProductline(null);
-            }
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Upload>

@@ -10,8 +10,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 use App\Entity\Upload;
-use App\Entity\Document;
-use App\Repository\DocumentRepository;
+
 use App\Entity\Zone;
 use App\Entity\ProductLine;
 use App\Entity\Role;
@@ -34,7 +33,6 @@ class FrontController extends BaseController
                 'productLines' => $this->productLineRepository->findAll(),
                 'roles'        => $this->roleRepository->findAll(),
                 'users'        => $this->userRepository->findAll(),
-                'documents'    => $this->documentRepository->findAll(),
                 'user'         => $this->getUser(),
             ]
         );
