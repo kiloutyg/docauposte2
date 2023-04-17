@@ -10,18 +10,59 @@
 			<h1>Page d'administration de la Zone
 				{{zone.name}}</h1>
 			<h2>Formulaire de creation de Ligne</h2>
-			<div class="card border-0 shadow rounded-3 my-5 ">
-				<div class="card-body row-cols-4">
-					<form class="row form-floating justify-content-center " method="POST" action="{{ path('app_admin_create_productline', {id: zone.name}) }}">
-						<div class="form-control mb-3">
-							<input type="text" name="productlinename" placeholder="Nom de la Ligne" required>
+			<div class=" card border-0 shadow rounded-3 my-5 ">
+				<div class="card-body ">
+					<div class="row">
+						<div class="col-md-6">
+							<form class="form-floating justify-content-center " method="POST" action="{{ path('app_admin_create_productline', {id: zone.name}) }}">
+								<div class="form-control mb-3">
+									<input type="text" name="productlinename" placeholder="Nom de la Ligne" required>
+								</div>
+								<div class="form-control mb-3">
+									<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Valider</bouton>
+								</div>
+							</form>
 						</div>
-						<div class="form-control mb-3">
-							<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Valider</bouton>
-						</div>
-					</form>
+						<div class="col-md-6">
+							<ul>
+								<p>
+
+									{% set matchingProductLines = [] %}
+									{% for productLine in productLines %}
+										{% if productLine.zone.id is same as(zone.id)  %}
+											{% set matchingProductLines = matchingProductLines|merge([productLine]) %}
+										{% endif %}
+									{% endfor %}
+								</p>
+							</p>
+							<p>
+								<div>
+									{% if matchingProductLines|length > 0 %}
+										{% for productLine in matchingProductLines %}
+											<div class="d-flex ps-5 mb-5 mt-5 line-list">
+												<a href="{{path('app_productline', {id: productLine.name, name: productLine.zone.name} )}}">
+													<span class="line-details text-justify">
+														-{{ productLine.name }}
+														<id={{productLine.id}}>>
+														</span>
+													</a>
+												</div>
+											{% endfor %}
+										{% else %}
+											<div class="alert alert-danger">
+												<a href="{{path('app_base')}}">
+													Il n'y a pas de lignes dans cette zone.
+												</a>
+											</div>
+										{% endif %}
+									</div>
+								</div>
+							</p>
+						</ul>
+					</div>
 				</div>
 			</div>
+
 			<div>
 				<h2>Formulaire de creation de compte utilisateur</h2>
 				<form method="POST" action="{{ path('app_admin_create_line_admin', {id: zone.name}) }}">
@@ -30,4 +71,4 @@
 			</div>
 		</div>
 	</div>
-{% endblock %}
+</div></div>{% endblock %}

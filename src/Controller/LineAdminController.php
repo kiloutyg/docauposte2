@@ -102,9 +102,12 @@ class LineAdminController extends BaseController
                 $this->addFlash('danger', 'Category already exists');
                 return $this->redirectToRoute('app_line_admin', [
                     'controller_name'   => 'LineAdminController',
-                    'zone'              => $zone,
-                    'productLine'       => $productLine,
-                    'categories'        => $this->categoryRepository->findAll(),
+                    'zone'          => $zone,
+                    'name'          => $zone->getName(),
+                    'productLine'   => $productLine,
+                    'id'            => $productLine->getName(),
+                    'categories'    => $this->categoryRepository->findAll(),
+
                 ]);
             } else {
                 $category = new Category();
@@ -115,9 +118,11 @@ class LineAdminController extends BaseController
                 $this->addFlash('success', 'The Category has been created');
                 return $this->redirectToRoute('app_line_admin', [
                     'controller_name'   => 'LineAdminController',
-                    'zone'              => $zone,
-                    'productLine'       => $productLine,
-                    'categories'        => $this->categoryRepository->findAll(),
+                    'zone'          => $zone,
+                    'name'          => $zone->getName(),
+                    'productLine'   => $productLine,
+                    'id'            => $productLine->getName(),
+                    'categories'    => $this->categoryRepository->findAll(),
                 ]);
             }
         }

@@ -17,7 +17,7 @@
 			<div class="card-body ">
 				<div class="row">
 					<div class="col-md-6">
-						<form class="form-floating justify-content-center " method="POST" action="{{ path('app_line_admin_create_category', {id: productLine.name}) }}">
+						<form class="form-floating justify-content-center " method="POST" action="{{ path('app_line_admin_create_category', {id: productLine.name, name: productLine.zone.name}) }}">
 							<div class="form-control mb-3">
 								<input type="text" name="categoryname" placeholder="Nom de la Catégorie" required>
 							</div>
@@ -28,9 +28,39 @@
 					</div>
 					<div class="col-md-6">
 						<ul>
-							{% for category in categories %}
-								<li>{{ category.name }}</li>
-							{% endfor %}
+							<p>
+								<div class=" mb-5 mt-5">
+									{% set matchingCategories = [] %}
+									{% for category in categories %}
+										{% if category.productLine.id is same as(productLine.id)  %}
+											{% set matchingCategories = matchingCategories|merge([category]) %}
+										{% endif %}
+									{% endfor %}
+								</p>
+							</p>
+							<p>
+								<div>
+									{% if matchingCategories|length > 0 %}
+										{% for category in matchingCategories %}
+											<div class="d-flex ps-5 mb-5 mt-5 line-list">
+												<a href="{{path('app_category', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}">
+													<span class="line-details text-justify">
+														-{{ category.name }}
+														<id={{category.id}}>>
+														</span>
+													</a>
+												</div>
+											{% endfor %}
+										{% else %}
+											<div class="alert alert-danger">
+												<a href="{{path('app_base')}}">
+													Il n'y a pas de catégories dans cette ligne.
+												</a>
+											</div>
+										{% endif %}
+									</div>
+								</div>
+							</p>
 						</ul>
 					</div>
 				</div>

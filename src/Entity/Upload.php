@@ -35,15 +35,16 @@ class Upload
     #[ORM\ManyToOne(inversedBy: 'uploads')]
     private ?ProductLine $productline = null;
 
+    #[ORM\ManyToOne(inversedBy: 'uploads')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Button $button = null;
+
 
 
     #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
 
 
-    public function __construct()
-    {
-        $this->downloads = new ArrayCollection();
-    }
+
 
     public function setFile(?File $file = null): void
     {
@@ -124,5 +125,15 @@ class Upload
         return $this;
     }
 
+    public function getButton(): ?Button
+    {
+        return $this->button;
+    }
 
+    public function setButton(?Button $button): self
+    {
+        $this->button = $button;
+
+        return $this;
+    }
 }

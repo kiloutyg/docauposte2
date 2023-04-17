@@ -25,7 +25,12 @@
 						<div class="col-md-6">
 							<ul>
 								{% for zone in zones %}
-									<li>{{ zone.name }}</li>
+									<div class="d-flex ps-5 mb-5 mt-5  line-list">
+										<a href="{{path('app_zone', {id: zone.name})}}" <span class="line-details">>
+											{{ zone.name }}
+											<id={{zone.id}}></span>
+										</a>
+									</div>
 								{% endfor %}
 							</ul>
 						</div>
