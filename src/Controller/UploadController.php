@@ -54,15 +54,39 @@ class UploadController extends FrontController
 
 
 
-    #[Route('/zone/{name}/productline/{id}/uploading', name: 'upload_files')]
+    #[Route('/uploading', name: 'upload_files')]
+    // public function upload_files(string $id = null): Response
+    // {
+    //     $button = $this->buttonRepository->findoneBy(['name' => $id]);
+
+    //     foreach ($_FILES as $file) {
+    //         $public_dir = $this->getParameter('kernel.project_dir') . '/public';
+    //         $filename   = $file['name'];
+    //         $path       = $public_dir . '/doc/' . $filename;
+    //         move_uploaded_file($file['tmp_name'], $path);
+
+    //         $upload = new Upload();
+    //         $upload->setFile(new File($path));
+    //         $upload->setFilename($file['name']);
+    //         $upload->setButton($button);
+    //         $upload->setPath($path);
+    //         $upload->setUploadedAt(new \DateTime());
+    //         $this->em->persist($upload);
+    //     }
+    //     $this->em->flush();
+
+    //     return $this->redirectToRoute(
+    //         'app_uploaded_files',
+    //         [
+    //             'id'   => $id,
+    //         ]
+    //     );
+    // }
     public function upload_files(string $id = null): Response
     {
-        $productLine = $this->productLineRepository->findoneBy(['name' => $id]);
-        $zone        = $productLine->getZone();
-        $zonename    = $zone->getName();
+        $button = $this->buttonRepository->findoneBy(['name' => $id]);
 
         foreach ($_FILES as $file) {
-            // $productLineid = $productLine->getId();
             $public_dir = $this->getParameter('kernel.project_dir') . '/public';
             $filename   = $file['name'];
             $path       = $public_dir . '/doc/' . $filename;
@@ -70,8 +94,8 @@ class UploadController extends FrontController
 
             $upload = new Upload();
             $upload->setFile(new File($path));
-            $upload->setProductline($productLine);
             $upload->setFilename($file['name']);
+            $upload->setButton($button);
             $upload->setPath($path);
             $upload->setUploadedAt(new \DateTime());
             $this->em->persist($upload);
@@ -82,11 +106,9 @@ class UploadController extends FrontController
             'app_uploaded_files',
             [
                 'id'   => $id,
-                'name' => $zonename,
             ]
         );
     }
-
 
     #[Route('/zone/{name}/productline/{id}/uploaded', name: 'uploaded_files')]
     public function uploaded_files(string $id = null): Response

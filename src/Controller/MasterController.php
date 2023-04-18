@@ -41,11 +41,10 @@ class MasterController extends BaseController
     public function createAdmin(AccountService $accountService, Request $request): Response
     {
         $error = null;
-        $result = $accountService->createAccount($request, $error, 'app_base', []);
+        $result = $accountService->createAccount($request, $error);
 
         if ($result) {
             $this->addFlash('success', 'Account has been created');
-            return $this->redirectToRoute($result['route'], $result['params']);
         }
 
         if ($error) {
@@ -54,6 +53,22 @@ class MasterController extends BaseController
 
         return $this->redirectToRoute('app_login');
     }
+    // public function createAdmin(AccountService $accountService, Request $request): Response
+    // {
+    //     $error = null;
+    //     $result = $accountService->createAccount($request, $error, 'app_base', []);
+
+    //     if ($result) {
+    //         $this->addFlash('success', 'Account has been created');
+    //         return $this->redirectToRoute($result['route'], $result['params']);
+    //     }
+
+    //     if ($error) {
+    //         $this->addFlash('error', $error);
+    //     }
+
+    //     return $this->redirectToRoute('app_login');
+    // }
 
 
     #[Route('/master/create_zone', name: 'app_master_create_zone')]

@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\File;
@@ -10,12 +10,11 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 use App\Entity\Upload;
-
 use App\Entity\Zone;
 use App\Entity\ProductLine;
 use App\Entity\Role;
 use App\Entity\User;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+
 use App\Service\AccountService;
 
 

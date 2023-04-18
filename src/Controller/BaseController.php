@@ -29,6 +29,9 @@ use App\Entity\Category;
 use App\Entity\Button;
 use App\Entity\Signature;
 
+use App\Service\EntityDeletionService;
+use App\Service\AccountService;
+
 
 
 #[Route('/', name: 'app_')]
@@ -52,6 +55,9 @@ class BaseController extends AbstractController
     protected $buttonRepository;
     protected $signatureRepository;
 
+    protected $entitydeletionService;
+    protected $accountService;
+
 
 
     public function __construct(
@@ -66,7 +72,9 @@ class BaseController extends AbstractController
         UserPasswordHasherInterface $passwordHasher,
         CategoryRepository $categoryRepository,
         ButtonRepository $buttonRepository,
-        SignatureRepository $signatureRepository
+        SignatureRepository $signatureRepository,
+        EntityDeletionService $entitydeletionService,
+        AccountService $accountService
     ) {
 
         $this->uploadRepository      = $uploadRepository;
@@ -81,6 +89,8 @@ class BaseController extends AbstractController
         $this->requestStack          = $requestStack;
         $this->security              = $security;
         $this->passwordHasher        = $passwordHasher;
+        $this->entitydeletionService = $entitydeletionService;
+        $this->accountService        = $accountService;
         $this->request               = $this->requestStack->getCurrentRequest();
         $this->session               = $this->requestStack->getSession();
 

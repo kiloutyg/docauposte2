@@ -32,8 +32,6 @@ class Upload
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $uploaded_at = null;
 
-    #[ORM\ManyToOne(inversedBy: 'uploads')]
-    private ?ProductLine $productline = null;
 
     #[ORM\ManyToOne(inversedBy: 'uploads')]
     #[ORM\JoinColumn(nullable: false)]
@@ -113,17 +111,6 @@ class Upload
         return $this;
     }
 
-    public function getProductline(): ?ProductLine
-    {
-        return $this->productline;
-    }
-
-    public function setProductline(?ProductLine $productline): self
-    {
-        $this->productline = $productline;
-
-        return $this;
-    }
 
     public function getButton(): ?Button
     {
