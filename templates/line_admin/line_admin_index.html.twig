@@ -11,7 +11,7 @@
 				{{productLine.name|capitalize}}</h1>
 		</div>
 		<div>
-			<h2>Formulaire de creation de categories</h2>
+			<h2>Formulaire de creation de categories :</h2>
 		</div>
 		<div class=" card border-0 shadow rounded-3 my-5 ">
 			<div class="card-body ">
@@ -46,8 +46,7 @@
 												<a href="{{path('app_category', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}">
 													<span class="line-details text-justify">
 														-{{ category.name }}
-														<id={{category.id}}>>
-														</span>
+														<id={{category.id}}></span>
 													</a>
 												</div>
 											{% endfor %}
@@ -68,7 +67,7 @@
 		</div>
 
 		<div>
-			<h2>Formulaire de creation de compte utilisateur</h2>
+			<h2>Formulaire de creation de compte utilisateur :</h2>
 			<form method="POST" action="{{ path('app_line_admin_create_manager', {id: productLine.name}) }}">
 				{% include "services/accountservices/create_account.html.twig" %}
 			</form>

@@ -48,7 +48,7 @@
 						{% endfor %}
 					{% else %}
 						<div class="alert alert-danger">
-							<a href="{{path('app_base')}}">
+							<a href="#" onclick="event.preventDefault(); window.history.back();">
 								Il n'y a pas de lignes dans cette zone.
 							</a>
 						</div>

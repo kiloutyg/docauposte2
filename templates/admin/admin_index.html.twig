@@ -9,7 +9,7 @@
 		<div class="row">
 			<h1>Page d'administration de la Zone
 				{{zone.name}}</h1>
-			<h2>Formulaire de creation de Ligne</h2>
+			<h2>Formulaire de creation de Ligne :</h2>
 			<div class=" card border-0 shadow rounded-3 my-5 ">
 				<div class="card-body ">
 					<div class="row">
@@ -64,7 +64,7 @@
 			</div>
 
 			<div>
-				<h2>Formulaire de creation de compte utilisateur</h2>
+				<h2>Formulaire de creation de compte utilisateur :</h2>
 				<form method="POST" action="{{ path('app_admin_create_line_admin', {id: zone.name}) }}">
 					{% include "services/accountservices/create_account.html.twig" %}
 				</form>

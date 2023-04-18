@@ -29,6 +29,8 @@ class FrontController extends BaseController
         return $this->render(
             'base.html.twig',
             [
+                'categories'  => $this->categoryRepository->findAll(),
+
                 'zones'        => $this->zoneRepository->findAll(),
                 'productLines' => $this->productLineRepository->findAll(),
                 'roles'        => $this->roleRepository->findAll(),
@@ -135,7 +137,7 @@ class FrontController extends BaseController
 
 
         return $this->render(
-            'uploaded.html.twig',
+            'uploads/uploaded.html.twig',
             [
                 'zone'        => $zone,
                 'name'        => $zone->getName(),
@@ -160,7 +162,7 @@ class FrontController extends BaseController
         $productLine = $this->productLineRepository->findoneBy(['name' => $id]);
         $zone        = $productLine->getZone();
         return $this->render(
-            'upload.html.twig',
+            'uploads/upload.html.twig',
             [
                 'zone'        => $zone,
 
@@ -219,7 +221,7 @@ class FrontController extends BaseController
 
 
         return $this->render(
-            'uploaded.html.twig',
+            'uploads/uploaded.html.twig',
             [
                 'zone'        => $zone,
                 'name' => $zone->getName(),

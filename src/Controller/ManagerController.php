@@ -27,12 +27,13 @@ use App\Entity\Button;
 class ManagerController extends BaseController
 {
 
-    #[Route('/manager/{id}', name: 'app_manager')]
+    #[Route('/manager/{category}', name: 'app_manager')]
 
-    public function index(AuthenticationUtils $authenticationUtils, string $id = null): Response
+    public function index(AuthenticationUtils $authenticationUtils, string $category = null): Response
     {
-        $productLine = $this->productLineRepository->findOneBy(['name' => $id]);
-        $zone = $productLine->getZone();
+        $category    = $this->categoryRepository->findoneBy(['name' => $category]);
+        $productLine = $category->getProductLine();
+        $zone        = $productLine->getZone();
 
         // Get the error and last username using AuthenticationUtils
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -40,23 +41,29 @@ class ManagerController extends BaseController
 
         return $this->render('manager/manager_index.html.twig', [
             'controller_name' => 'managerController',
-            'zone'          => $zone,
-            'name'          => $zone->getName(),
-            'productLine'   => $productLine,
-            'id'            => $productLine->getName(),
-            'categories'    => $this->categoryRepository->findAll(),
+            'zone'        => $zone,
+            'name'        => $zone->getName(),
+            'productLine' => $productLine,
+            'id'          => $productLine->getName(),
+            'category'    => $category,
+            'categories'  => $this->categoryRepository->findAll(),
+            'buttons'     => $this->buttonRepository->findAll(),
+            'uploads'     => $this->uploadRepository->findAll(),
+
             'error'         => $error,
             'last_username' => $lastUsername,
         ]);
     }
 
-    #[Route('/manager/create_manager/{id}', name: 'app_manager_create_manager')]
+
+    #[Route('/manager/create_user/{category}', name: 'app_manager_create_user')]
 
 
-    public function createManager(string $id = null, AccountService $accountService, Request $request): Response
+    public function createUser(string $category = null, AccountService $accountService, Request $request): Response
     {
-        $productLine = $this->productLineRepository->findOneBy(['name' => $id]);
-        $zone = $productLine->getZone();
+        $category    = $this->categoryRepository->findoneBy(['name' => $category]);
+        $productLine = $category->getProductLine();
+        $zone        = $productLine->getZone();
 
         $error = null;
         $result = $accountService->createAccount($request, $error, 'app_productline', [
@@ -87,40 +94,41 @@ class ManagerController extends BaseController
         ]);
     }
 
-    #[Route('/manager/create_category/{id}', name: 'app_manager_create_category')]
-    public function createCategory(Request $request, string $id = null)
+    #[Route('/manager/create_button/{category}', name: 'app_manager_create_button')]
+    public function createButton(Request $request, string $category = null)
     {
-        $productLine = $this->productLineRepository->findOneBy(['name' => $id]);
-        $zone = $productLine->getZone();
+        $categoryentity    = $this->categoryRepository->findoneBy(['name' => $category]);
 
-        // Create a category
+
+        // Create a button
         if ($request->getMethod() == 'POST') {
 
-            $categoryname = $request->request->get('categoryname');
+            $buttonname = $request->request->get('buttonname');
 
-            $productLine = $this->productLineRepository->findOneBy(['name' => $id]);
+            $categoryentity   = $this->categoryRepository->findoneBy(['name' => $category]);
 
-            $category = $this->categoryRepository->findOneBy(['name' => $categoryname]);
-            if ($category) {
+
+            $button = $this->buttonRepository->findoneBy(['name' => $buttonname]);
+            if ($button) {
                 $this->addFlash('danger', 'Category already exists');
                 return $this->redirectToRoute('app_manager', [
                     'controller_name'   => 'managerController',
-                    'zone'              => $zone,
-                    'productLine'       => $productLine,
-                    'categories'        => $this->categoryRepository->findAll(),
+                    'category'    => $category,
+                    'buttons'     => $this->buttonRepository->findAll(),
+                    'uploads'     => $this->uploadRepository->findAll(),
                 ]);
             } else {
-                $category = new Category();
-                $category->setName($categoryname);
-                $category->setProductLine($productLine);
-                $this->em->persist($category);
+                $button = new Button();
+                $button->setName($buttonname);
+                $button->setCategory($categoryentity);
+                $this->em->persist($button);
                 $this->em->flush();
-                $this->addFlash('success', 'The Category has been created');
+                $this->addFlash('success', 'The Button has been created');
                 return $this->redirectToRoute('app_manager', [
                     'controller_name'   => 'managerController',
-                    'zone'              => $zone,
-                    'productLine'       => $productLine,
-                    'categories'        => $this->categoryRepository->findAll(),
+                    'category'    => $category,
+                    'buttons'     => $this->buttonRepository->findAll(),
+                    'uploads'     => $this->uploadRepository->findAll(),
                 ]);
             }
         }

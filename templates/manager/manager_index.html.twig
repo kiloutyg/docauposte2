@@ -7,19 +7,19 @@
 	<div class="container">
 
 		<div>
-			<h1>Page d'administration de la ligne
+			<h1>Page d'administration de la catégorie
 				{{category.name|capitalize}}</h1>
 		</div>
 		<div>
-			<h2>Formulaire de creation de categories</h2>
+			<h2>Formulaire de creation de boutons :</h2>
 		</div>
 		<div class=" card border-0 shadow rounded-3 my-5 ">
 			<div class="card-body ">
 				<div class="row">
 					<div class="col-md-6">
-						<form class="form-floating justify-content-center " method="POST" action="{{ path('app_line_admin_create_category', {id: category.name}) }}">
+						<form class="form-floating justify-content-center " method="POST" action="{{ path('app_manager_create_button', {category: category.name, id: category.productline.name, name: category.productline.zone.name}) }}">
 							<div class="form-control mb-3">
-								<input type="text" name="categoryname" placeholder="Nom de la Catégorie" required>
+								<input type="text" name="buttonname" placeholder="Nom du Bouton" required>
 							</div>
 							<div class="form-control mb-3">
 								<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Valider</bouton>
@@ -28,20 +28,49 @@
 					</div>
 					<div class="col-md-6">
 						<ul>
-							{% for category in categories %}
-								<li>{{ category.name }}</li>
-							{% endfor %}
+							<p>
+								<div class=" mb-5 mt-5">
+
+									{% set matchingButtons = [] %}
+									{% for button in buttons %}
+										{% if button.category.id is same as(category.id)  %}
+											{% set matchingButtons = matchingButtons|merge([button]) %}
+										{% endif %}
+									{% endfor %}
+								</p>
+							</p>
+							<p>
+								<div>
+									{% if matchingButtons|length > 0 %}
+										{% for button in matchingButtons %}
+											<div class="d-flex ps-5 mb-5 mt-5 line-list">
+												<a href="{{path('app_button', {category: category.name, id: category.productLine.name, name: category.productLine.zone.name})}}" class="btn" style="color:white">
+													<span class="line-details text-justify">
+														-{{ button.name }}
+														<id={{button.id}}></span>
+													</a>
+												</div>
+											{% endfor %}
+										{% else %}
+											<div class="alert alert-danger">
+												<a href="#" onclick="event.preventDefault(); window.history.back();">
+													Il n'y a pas de boutons dans cette catégories.
+												</a>
+											</div>
+										{% endif %}
+									</div>
+								</div>
+							</p>
 						</ul>
 					</div>
 				</div>
 			</div>
 		</div>
-
 		<div>
-			<h2>Formulaire de creation de compte utilisateur</h2>
-			<form method="POST" action="{{ path('app_line_admin_create_manager', {id: category.name}) }}">
+			<h2>Formulaire de creation de compte utilisateur :</h2>
+			<form method="POST" action="{{ path('app_manager_create_user', {category: category.name}) }}">
 				{% include "services/accountservices/create_account.html.twig" %}
 			</form>
 		</div>
 	</div>
-</div>{% endblock %}
+{% endblock %}
