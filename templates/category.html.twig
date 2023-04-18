@@ -39,7 +39,7 @@
 				{% if matchingButtons|length > 0 %}
 					{% for button in matchingButtons %}
 						<div class="d-flex ps-5 mb-5 mt-5 line-list">
-							<a href="{{path('app_button', {category: category.name, id: category.productLine.name, name: category.productLine.zone.name})}}" class="btn" style="color:white">
+							<a href="{{path('app_button', {button: button.name, category: button.category.name, id: button.category.productLine.name, name: button.category.productLine.zone.name})}}" class="btn" style="color:white">
 								<span class="line-details text-justify">
 									-{{ button.name }}
 									<id={{button.id}}>>

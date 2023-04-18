@@ -31,6 +31,7 @@ use App\Entity\Signature;
 
 use App\Service\EntityDeletionService;
 use App\Service\AccountService;
+use App\Service\UploadsService;
 
 
 
@@ -54,9 +55,9 @@ class BaseController extends AbstractController
     protected $categoryRepository;
     protected $buttonRepository;
     protected $signatureRepository;
-
     protected $entitydeletionService;
     protected $accountService;
+    protected $uploadsService;
 
 
 
@@ -74,7 +75,8 @@ class BaseController extends AbstractController
         ButtonRepository $buttonRepository,
         SignatureRepository $signatureRepository,
         EntityDeletionService $entitydeletionService,
-        AccountService $accountService
+        AccountService $accountService,
+        UploadsService $uploadsServices
     ) {
 
         $this->uploadRepository      = $uploadRepository;
@@ -91,6 +93,7 @@ class BaseController extends AbstractController
         $this->passwordHasher        = $passwordHasher;
         $this->entitydeletionService = $entitydeletionService;
         $this->accountService        = $accountService;
+        $this->uploadsService        = $uploadsServices;
         $this->request               = $this->requestStack->getCurrentRequest();
         $this->session               = $this->requestStack->getSession();
 

@@ -29,7 +29,7 @@ class FrontController extends BaseController
             'base.html.twig',
             [
                 'categories'  => $this->categoryRepository->findAll(),
-
+                'buttons' => $this->buttonRepository->findAll(),
                 'zones'        => $this->zoneRepository->findAll(),
                 'productLines' => $this->productLineRepository->findAll(),
                 'roles'        => $this->roleRepository->findAll(),
@@ -127,24 +127,25 @@ class FrontController extends BaseController
     }
 
 
-    #[Route('/zone/{name}/productline/{id}/category/{category}/button', name: 'button')]
-    public function ButtonShowingUploadedFile(string $category = null): Response
+    #[Route('/zone/{name}/productline/{id}/category/{category}/button/{button}', name: 'button')]
+    public function ButtonShowingUploadedFile(string $button = null): Response
     {
-        $category    = $this->categoryRepository->findoneBy(['name' => $category]);
+        $buttonEntity = $this->buttonRepository->findoneBy(['name' => $button]);
+        $category    = $buttonEntity->getCategory();
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
 
 
         return $this->render(
-            'uploads/uploaded.html.twig',
+            'button.html.twig',
             [
                 'zone'        => $zone,
                 'name'        => $zone->getName(),
                 'productLine' => $productLine,
                 'id'          => $productLine->getName(),
-                'category'    => $category,
+                'category'    => $buttonEntity->getName(),
                 'categories'  => $this->categoryRepository->findAll(),
-                'buttons'     => $this->buttonRepository->findAll(),
+                'button'      => $buttonEntity,
                 'uploads'     => $this->uploadRepository->findAll(),
 
 

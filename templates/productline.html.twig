@@ -11,11 +11,8 @@
 				<aside class="position-absolute end-0">
 					<a href="{{ path('app_line_admin', {id: productLine.name}) }}" class="btn" style="color:white">Centre d'Administration de Ligne</a>
 					<br>
-					<a href="{{ path('app_productline_upload', {id: productLine.name, name:productLine.zone.name}) }}" class="btn" style="color:white">Upload</a>
-					<br>
-					<a href="{{path('app_upload_files', {id: productLine.name, name: productLine.zone.name})}}" class="btn" style="color:white">
-						Uploaded files
-					</a>
+
+
 				</aside>
 			{% endif %}
 		{% endif %}
