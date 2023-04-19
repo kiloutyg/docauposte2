@@ -62,34 +62,33 @@
 					</form>
 				{% endif %}
 			{% endif %}
-			{{dump(app.session)}}
-			{{dump(app.user)}}
-			{% if users is defined %}
-				{{ dump(users) }}
-			{% endif %}
-			{% if app.user is not empty %}
-				{{dump(app.user.roles)}}
-			{% endif %}
-			{% if zone is defined %}
-				{{dump(zone)}}
-			{% endif %}
-			{% if productLine is defined %}
-				{{dump(productLine)}}
-			{% endif %}
-			{% if categories is defined %}
-				{{dump(categories)}}
-			{% endif %}
-			{% if buttons is defined %}
-				{{dump(buttons)}}
-			{% endif %}
-			{% if refererUrl is defined %}
-				{{dump(refererUrl)}}
-			{% endif %}
+			{# 			
+																																																			{{dump(app.session)}}
+																																																			{{dump(app.user)}}
+																																																			{% if users is defined %}
+																																																				{{ dump(users) }}
+																																																			{% endif %}
+																																																			{% if app.user is not empty %}
+																																																				{{dump(app.user.roles)}}
+																																																			{% endif %}
+																																																			{% if zone is defined %}
+																																																				{{dump(zone)}}
+																																																			{% endif %}
+																																																			{% if productLine is defined %}
+																																																				{{dump(productLine)}}
+																																																			{% endif %}
+																																																			{% if categories is defined %}
+																																																				{{dump(categories)}}
+																																																			{% endif %}
+																																																			{% if buttons is defined %}
+																																																				{{dump(buttons)}}
+																																																			{% endif %}
+																																																			{% if refererUrl is defined %}
+																																																				{{dump(refererUrl)}}
+																																																			{% endif %} #}
 		</div>
 
-		<div
-			class="container">
-			{# {% include "services/login_out_button.html.twig" %} #}
+		<div class="container">
 			{% block body %}
 				{% if app.user %}
 					{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
@@ -123,32 +122,33 @@
 						{% endfor %}
 					</div>
 				</p>
-			</div>
-		{% endblock body %}
-		<!-- Footer -->
-		<footer class="container mt-auto py-3 border-top">
-			<div class="d-flex flex-wrap justify-content-between">
-				<div class="col-md-4 d-flex align-items-center">
-					<span class="me-1" style="color: red">
-						<i class="fas fa-heart"></i>
-					</span>
-					<span class="text-muted me-1">The guys and gals at</span>
-					<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium</a>
-				</div>
-				<div>
-					<a href="#" onclick="event.preventDefault(); window.history.back();">
-						<i class="fa fa-arrow-circle-o-left" aria-hidden="false">Page d'Accueil</i>
-					</a>
-				</div>
-				<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-					<li class="ms-3">
-						<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/staging2">
-							<i class="fab fa-github"></i>
-						</a>
-					</li>
-				</ul>
-			</div>
-		</footer>
-		<!-- End Footer -->
+			{% endblock body %}
+		</div>
 	</body>
-</html></body></html></body></html>
+
+	<!-- Footer -->
+	<footer class="container mt-auto py-3 border-top">
+		<div class="d-flex flex-wrap justify-content-between">
+			<div class="col-md-4 d-flex align-items-center">
+				<span class="me-1" style="color: red">
+					<i class="fas fa-heart"></i>
+				</span>
+				<span class="text-muted me-1">The guys and gals at</span>
+				<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium</a>
+			</div>
+			<div>
+				<a href="#" onclick="event.preventDefault(); window.history.back();">
+					<i class="fa fa-arrow-circle-o-left" aria-hidden="false">Page d'Accueil</i>
+				</a>
+			</div>
+			<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+				<li class="ms-3">
+					<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/staging2">
+						<i class="fab fa-github"></i>
+					</a>
+				</li>
+			</ul>
+		</div>
+	</footer>
+	<!-- End Footer -->
+</html>

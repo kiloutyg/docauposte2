@@ -37,6 +37,8 @@ security:
     access_control:
         - { path: ^/master, roles: ROLE_SUPER_ADMIN}
         - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/lineadmin, roles: ROLE_LINE_ADMIN }
+        - { path: ^/manager, roles: ROLE_MANAGER }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

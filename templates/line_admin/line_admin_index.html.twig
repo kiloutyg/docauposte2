@@ -43,22 +43,29 @@
 									{% if matchingCategories|length > 0 %}
 										{% for category in matchingCategories %}
 											<div class="d-flex ps-5 mb-5 mt-5 line-list">
-												<a href="{{path('app_category', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}">
+												<a href="{{path('app_category', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}" class="btn" style="color:white">
 													<span class="line-details text-justify">
 														-{{ category.name }}
 														<id={{category.id}}></span>
 													</a>
+													<a href="{{path('app_line_admin_delete_category', {id: category.name})}}" class="btn" style="color:white">
+														<span class="line-details  text-justify">
+															- Supprimer
+															<id={{category.id}}></span>
+														</a>
+													</div>
+												{% endfor %}
+											{% else %}
+												<div class="alert alert-danger">
+													<a href="{{path('app_base')}}">
+														Il n'y a pas de catégories dans cette ligne.
+													</a>
+
 												</div>
-											{% endfor %}
-										{% else %}
-											<div class="alert alert-danger">
-												<a href="{{path('app_base')}}">
-													Il n'y a pas de catégories dans cette ligne.
-												</a>
-											</div>
-										{% endif %}
+											{% endif %}
+										</div>
 									</div>
-								</div>
+								</p>
 							</p>
 						</ul>
 					</div>

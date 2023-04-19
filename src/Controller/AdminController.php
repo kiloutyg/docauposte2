@@ -36,6 +36,8 @@ class AdminController extends BaseController
             'productLines' => $this->productLineRepository->findAll(),
             'error' => $error,
             'last_username' => $lastUsername,
+            'users' => $this->userRepository->findAll()
+
         ]);
     }
 
@@ -106,6 +108,30 @@ class AdminController extends BaseController
                     'productLines' => $this->productLineRepository->findAll(),
                 ]);
             }
+        }
+    }
+
+    #[Route('/admin/delete_productline/{id}', name: 'app_admin_delete_productline')]
+    public function deleteEntity(string $id): Response
+    {
+        $entityType = 'productline';
+        $entityid = $this->productLineRepository->findOneBy(['name' => $id]);
+
+        $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
+
+        $zone = $entityid->getZone()->getName();
+
+        if ($entity == true) {
+
+            $this->addFlash('success', $entityType . ' has been deleted');
+            return $this->redirectToRoute('app_admin', [
+                'id' => $zone,
+            ]);
+        } else {
+            $this->addFlash('danger',  $entityType . '  does not exist');
+            return $this->redirectToRoute('app_admin', [
+                'id' => $zone,
+            ]);
         }
     }
 }

@@ -17,7 +17,7 @@ class LineAdminController extends BaseController
 {
 
 
-    #[Route('/lineadmin/{id}', name: 'app_line_admin')]
+    #[Route('/line_admin/{id}', name: 'app_line_admin')]
 
     public function index(AuthenticationUtils $authenticationUtils, string $id = null): Response
     {
@@ -37,11 +37,13 @@ class LineAdminController extends BaseController
             'categories'    => $this->categoryRepository->findAll(),
             'error'         => $error,
             'last_username' => $lastUsername,
+            'users' => $this->userRepository->findAll()
+
         ]);
     }
 
 
-    #[Route('/lineadmin/create_manager/{id}', name: 'app_line_admin_create_manager')]
+    #[Route('/line_admin/create_manager/{id}', name: 'app_line_admin_create_manager')]
 
     public function createManager(string $id = null, AccountService $accountService, Request $request): Response
     {
@@ -78,11 +80,12 @@ class LineAdminController extends BaseController
             'id'          => $productLine->getName(),
             'categories'  => $this->categoryRepository->findAll(),
             'productLine' => $productLine,
+
         ]);
     }
 
 
-    #[Route('/lineadmin/create_category/{id}', name: 'app_line_admin_create_category')]
+    #[Route('/line_admin/create_category/{id}', name: 'app_line_admin_create_category')]
     public function createCategory(Request $request, string $id = null)
     {
         $productLine = $this->productLineRepository->findOneBy(['name' => $id]);
@@ -123,6 +126,30 @@ class LineAdminController extends BaseController
                     'categories'    => $this->categoryRepository->findAll(),
                 ]);
             }
+        }
+    }
+
+    #[Route('/line_admin/delete_category/{id}', name: 'app_line_admin_delete_category')]
+    public function deleteEntity(string $id): Response
+    {
+        $entityType = 'category';
+        $entityid = $this->categoryRepository->findOneBy(['name' => $id]);
+
+        $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
+
+        $productLine = $entityid->getProductLine()->getName();
+
+        if ($entity == true) {
+
+            $this->addFlash('success', $entityType . ' has been deleted');
+            return $this->redirectToRoute('app_line_admin', [
+                'id'   => $productLine,
+            ]);
+        } else {
+            $this->addFlash('danger',  $entityType . '  does not exist');
+            return $this->redirectToRoute('app_line_admin', [
+                'id'   => $productLine,
+            ]);
         }
     }
 }

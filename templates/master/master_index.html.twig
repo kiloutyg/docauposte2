@@ -5,51 +5,49 @@
 
 {% block body %}
 
-	<div class="container">
-		<div>
-			<h1>Page d'administration</h1>
-			<h2>Formulaire de creation de zones :</h2>
-			<div class=" card border-0 shadow rounded-3 my-5 ">
-				<div class="card-body ">
-					<div class="row">
-						<div class="col-md-6">
-							<form class="form-floating justify-content-center " method="POST" action="{{ path('app_master_create_zone') }}">
-								<div class="form-control mb-3">
-									<input type="text" name="zonename" placeholder="Nom de la zone" required>
-								</div>
-								<div class="form-control mb-3">
-									<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Valider</button>
-								</div>
-							</form>
+	<h1>Page d'administration</h1>
+	<h2>Formulaire de creation de zones :</h2>
+	<div class=" card border-0 shadow rounded-3 my-5 ">
+		<div class="card-body ">
+			<div class="row">
+				<div class="col-md-6">
+					<form class="form-floating justify-content-center " method="POST" action="{{ path('app_master_create_zone') }}">
+						<div class="form-control mb-3">
+							<input type="text" name="zonename" placeholder="Nom de la zone" required>
 						</div>
-						<div class="col-md-6">
-							<ul>
-								{% for zone in zones %}
-									<div class="d-flex ps-5 mb-5 mt-5  line-list">
-										<a href="{{path('app_zone', {id: zone.name})}}">
-											<span class="line-details">
-												{{ zone.name }}
-												<id={{zone.id}}></span>
-											</a>
-											<a href="{{path('app_master_delete_zone', {id: zone.name})}}">
-												<span class="line-details">
-													- Supprimer
-													<id={{zone.id}}></span>
-												</a>
-											</div>
-										{% endfor %}
-									</ul>
-								</div>
+						<div class="form-control mb-3">
+							<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Valider</button>
+						</div>
+					</form>
+				</div>
+				<div class="col-md-6">
+					<ul>
+						{% for zone in zones %}
+							<div class="d-flex ps-5 mb-5 mt-5  line-list">
+								<span class="line-details  text-justify">
+									<a href="{{path('app_zone', {id: zone.name})}}" class="btn" style="color:white">
+										-{{ zone.name }}
+										<id={{zone.id}}></id>
+									</a>
+								</span>
+								<span class="line-details  text-justify">
+									<a href="{{path('app_master_delete_zone', {id: zone.name})}}" class="btn" style="color:white">
+										- Supprimer
+										<id={{zone.id}}></id>
+									</a>
+								</span>
 							</div>
-						</div>
-					</div>
-
-					<div>
-						<h2>Formulaire de creation de compte utilisateur :</h2>
-						<form method="POST" action="{{ path('app_master_create_admin') }}">
-							{% include "services/accountservices/create_account.html.twig" %}
-						</form>
-					</div>
+						{% endfor %}
+					</ul>
 				</div>
 			</div>
-		{% endblock %}
+		</div>
+	</div>
+	<div>
+		<h2>Formulaire de creation de compte utilisateur :</h2>
+		<form method="POST" action="{{ path('app_master_create_admin') }}">
+			{% include "services/accountservices/create_account.html.twig" %}
+		</form>
+	</div>
+
+</div>{% endblock %}

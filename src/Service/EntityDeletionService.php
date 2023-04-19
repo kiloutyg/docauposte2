@@ -4,12 +4,15 @@
 
 namespace App\Service;
 
+use Doctrine\ORM\EntityManagerInterface;
+
 use App\Repository\ZoneRepository;
 use App\Repository\ProductLineRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ButtonRepository;
 use App\Repository\UploadRepository;
-use Doctrine\ORM\EntityManagerInterface;
+
+use App\Service\UploadsService;
 
 class EntityDeletionService
 {
@@ -19,6 +22,7 @@ class EntityDeletionService
     private $categoryRepository;
     private $buttonRepository;
     private $uploadRepository;
+    private $uploadsService;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -26,7 +30,8 @@ class EntityDeletionService
         ProductLineRepository $productLineRepository,
         CategoryRepository $categoryRepository,
         ButtonRepository $buttonRepository,
-        UploadRepository $uploadRepository
+        UploadRepository $uploadRepository,
+        UploadsService $uploadsService
     ) {
         $this->em = $em;
         $this->zoneRepository = $zoneRepository;
@@ -34,10 +39,12 @@ class EntityDeletionService
         $this->categoryRepository = $categoryRepository;
         $this->buttonRepository = $buttonRepository;
         $this->uploadRepository = $uploadRepository;
+        $this->uploadsService = $uploadsService;
     }
 
     public function deleteEntity(string $entityType, int $id): bool
     {
+
         $repository = null;
         switch ($entityType) {
             case 'zone':
@@ -72,31 +79,21 @@ class EntityDeletionService
             foreach ($entity->getProductLines() as $productLine) {
                 $this->deleteEntity('productline', $productLine->getId());
             }
-            foreach ($productLine->getCategories() as $category) {
-                $this->deleteEntity('category', $category->getId());
-            }
-            foreach ($category->getButtons() as $button) {
-                $this->deleteEntity('button', $button->getId());
-            }
         } elseif ($entityType === 'productline') {
             foreach ($entity->getCategories() as $category) {
                 $this->deleteEntity('category', $category->getId());
-            }
-            foreach ($category->getButtons() as $button) {
-                $this->deleteEntity('button', $button->getId());
             }
         } elseif ($entityType === 'category') {
             foreach ($entity->getButtons() as $button) {
                 $this->deleteEntity('button', $button->getId());
             }
+        } elseif ($entityType === 'button') {
+            foreach ($entity->getUploads() as $upload) {
+                $this->deleteEntity('upload', $upload->getId());
+            }
+        } elseif ($entityType === 'upload') {
+            $this->uploadsService->deleteFile($entity->getFilename(), $entity->getButton()->getId());
         }
-        //  elseif ($entityType === 'button') { 
-        //     foreach ($entity->getUploads() as $upload) {
-        //         $this->deleteEntity('upload', $upload->getId());
-        //     }
-        // Add deletion logic for categories
-        // Continue with other entity types and their related entities
-
         $this->em->remove($entity);
         $this->em->flush();
 

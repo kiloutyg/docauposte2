@@ -40,23 +40,28 @@
 									{% if matchingProductLines|length > 0 %}
 										{% for productLine in matchingProductLines %}
 											<div class="d-flex ps-5 mb-5 mt-5 line-list">
-												<a href="{{path('app_productline', {id: productLine.name, name: productLine.zone.name} )}}">
+												<a href="{{path('app_productline', {id: productLine.name, name: productLine.zone.name} )}}" class="btn" style="color:white">
 													<span class="line-details text-justify">
 														-{{ productLine.name }}
-														<id={{productLine.id}}>>
-														</span>
+														<id={{productLine.id}}></span>
+													</a>
+													<a href="{{path('app_admin_delete_productline', {id: productLine.name})}}" class="btn" style="color:white">
+														<span class="line-details  text-justify">
+															- Supprimer
+															<id={{productLine.id}}></span>
+														</a>
+													</div>
+												{% endfor %}
+											{% else %}
+												<div class="alert alert-danger">
+													<a href="{{path('app_base')}}">
+														Il n'y a pas de lignes dans cette zone.
 													</a>
 												</div>
-											{% endfor %}
-										{% else %}
-											<div class="alert alert-danger">
-												<a href="{{path('app_base')}}">
-													Il n'y a pas de lignes dans cette zone.
-												</a>
-											</div>
-										{% endif %}
+											{% endif %}
+										</div>
 									</div>
-								</div>
+								</p>
 							</p>
 						</ul>
 					</div>

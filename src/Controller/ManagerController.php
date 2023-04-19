@@ -39,6 +39,8 @@ class ManagerController extends BaseController
             'categories'  => $this->categoryRepository->findAll(),
             'buttons'     => $this->buttonRepository->findAll(),
             'uploads'     => $this->uploadRepository->findAll(),
+            'users' => $this->userRepository->findAll(),
+
             'error'         => $error,
             'last_username' => $lastUsername,
         ]);
@@ -104,7 +106,7 @@ class ManagerController extends BaseController
 
             $button = $this->buttonRepository->findoneBy(['name' => $buttonname]);
             if ($button) {
-                $this->addFlash('danger', 'Category already exists');
+                $this->addFlash('danger', 'bouton already exists');
                 return $this->redirectToRoute('app_manager', [
                     'controller_name'   => 'managerController',
                     'category'    => $category,
@@ -125,6 +127,29 @@ class ManagerController extends BaseController
                     'uploads'     => $this->uploadRepository->findAll(),
                 ]);
             }
+        }
+    }
+    #[Route('/manager/delete_button/{id}', name: 'app_manager_delete_button')]
+    public function deleteEntity(string $id): Response
+    {
+        $entityType = 'button';
+        $entityid = $this->buttonRepository->findOneBy(['name' => $id]);
+
+        $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
+
+        $category = $entityid->getCategory()->getName();
+
+        if ($entity == true) {
+
+            $this->addFlash('success', $entityType . ' has been deleted');
+            return $this->redirectToRoute('app_manager', [
+                'category'    => $category,
+            ]);
+        } else {
+            $this->addFlash('danger',  $entityType . '  does not exist');
+            return $this->redirectToRoute('app_manager', [
+                'category'    => $category,
+            ]);
         }
     }
 }

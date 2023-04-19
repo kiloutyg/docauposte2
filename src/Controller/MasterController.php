@@ -64,29 +64,40 @@ class MasterController extends BaseController
             $zone = $this->zoneRepository->findOneBy(['name' => $zonename]);
             if ($zone) {
                 $this->addFlash('danger', 'Zone already exists');
-                return $this->redirectToRoute('app_master');
+                return $this->redirectToRoute('app_master', [
+                    'controller_name' => 'MasterController',
+                    'zones' => $this->zoneRepository->findAll(),
+                    'users' => $this->userRepository->findAll()
+                ]);
             } else {
                 $zone = new Zone();
                 $zone->setName($zonename);
                 $this->em->persist($zone);
                 $this->em->flush();
                 $this->addFlash('success', 'Zone has been created');
-                return $this->redirectToRoute('app_master');
+                return $this->redirectToRoute('app_master', [
+                    'controller_name' => 'MasterController',
+                    'zones' => $this->zoneRepository->findAll(),
+                    'users' => $this->userRepository->findAll()
+                ]);
             }
         }
     }
 
     #[Route('/master/delete_zone/{id}', name: 'app_master_delete_zone')]
-    public function deleteZone($id)
+    public function deleteEntity(string $id): Response
     {
-        $zone = $this->zoneRepository->find($id);
-        if ($zone) {
-            $this->em->remove($zone);
-            $this->em->flush();
-            $this->addFlash('success', 'Zone has been deleted');
+        $entityType = 'zone';
+        $entityid = $this->zoneRepository->findOneBy(['name' => $id]);
+
+        $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
+
+        if ($entity == true) {
+
+            $this->addFlash('success', $entityType . ' has been deleted');
             return $this->redirectToRoute('app_master');
         } else {
-            $this->addFlash('danger', 'Zone does not exist');
+            $this->addFlash('danger',  $entityType . '  does not exist');
             return $this->redirectToRoute('app_master');
         }
     }

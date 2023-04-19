@@ -1,38 +1,62 @@
 {% block body %}
 
 	<div class="card border-0 shadow rounded-3 my-5">
-		<div class="card-body">
-			<h5 class="card-title text-center mb-5 fw-light fs-5">Creation de compte</h5>
-			<form class="row form-floating justify-content-center " method="post">
-				{% if error is defined %}
-					{% if error %}
-						<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+		<div class="card-body row">
+			<div class="col-6">
+				<h5 class="card-title text-center mb-5 fw-light fs-5">Creation de compte</h5>
+				<form class="form-floating justify-content-center " method="post">
+					{% if error is defined %}
+						{% if error %}
+							<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+						{% endif %}
 					{% endif %}
-				{% endif %}
-				{% if app.user  %}
-					<div class="mb-3">
-						Vous êtes connecté en tant que
-						{{ app.user.userIdentifier }},
-						<a href="{{ path('app_logout') }}">Déconnexion</a>
+					{% if app.user  %}
+						<div class="mb-3">
+							Vous êtes connecté en tant que
+							{{ app.user.userIdentifier }},
+							<a href="{{ path('app_logout') }}">Déconnexion</a>
+						</div>
+					{% endif %}
+
+					<div class="form-control mb-3">
+						<input type="text" name="username" placeholder="Nom d'utilisateur" required>
 					</div>
-				{% endif %}
+					<div class="form-control mb-3">
+						<input type="password" id="floatingPassword" placeholder="Mot de passe" name="password" required>
+					</div>
 
-				<div class="form-control mb-3">
-					<input type="text" name="username" placeholder="Nom d'utilisateur" required>
-				</div>
-				<div class="form-control mb-3">
-					<input type="password" id="floatingPassword" placeholder="Mot de passe" name="password" required>
-				</div>
+					{% include 'services/accountservices/role_affectation.html.twig' %}
 
-				{% include 'services/accountservices/role_affectation.html.twig' %}
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+					<div class="d-grid">
+						<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Création du compte</button>
+					</div>
+					<hr class="my-4">
 
-				<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-				<div class="d-grid">
-					<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Création du compte</button>
-				</div>
-				<hr class="my-4">
 
-			</form>
+				</form>
+			</div>
+			{{ dump(app.user.roles) }}
+			<div class="col-6">
+				<ul>
+					{% for user in users %}
+						{% if user.roles > app.user.roles %}
+
+
+							<span>
+								<li>{{ user.username }}
+									-
+									{{ user.roles|json_encode|convert_encoding('UTF-8', 'UTF-8') }}</li>
+							</span>
+							<span class="line-details text-justify">
+								<a href="{{path('app_delete_account', {id: user.id})}}" class="btn" style="color:white">
+									- Supprimer
+								</a>
+							</span>
+						{% endif %}
+					{% endfor %}
+				</ul>
+			</div>
 		</div>
 	</div>
 

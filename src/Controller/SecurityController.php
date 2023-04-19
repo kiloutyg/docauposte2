@@ -76,4 +76,15 @@ class SecurityController extends BaseController
 
         $this->container->get('security.token_storage')->setToken($token);
     }
+
+    #[Route(path: '/delete_account', name: 'app_delete_account')]
+    public function delete_account(AccountService $accountService, Request $request): Response
+    {
+        $id = $request->query->get('id');
+        $accountService->deleteUser($id);
+
+        $this->addFlash('success', 'Your account has been deleted');
+
+        return $this->redirectToRoute('app_login');
+    }
 }
