@@ -3,17 +3,14 @@
 namespace App\Controller;
 
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Doctrine\ORM\EntityManagerInterface;
 
-use App\Controller\AdminController;
-use App\Controller\SecurityController;
+
 use App\Service\AccountService;
-use App\Repository\ZoneRepository;
+
 use App\Entity\Zone;
 
 class MasterController extends BaseController
@@ -53,22 +50,7 @@ class MasterController extends BaseController
 
         return $this->redirectToRoute('app_login');
     }
-    // public function createAdmin(AccountService $accountService, Request $request): Response
-    // {
-    //     $error = null;
-    //     $result = $accountService->createAccount($request, $error, 'app_base', []);
 
-    //     if ($result) {
-    //         $this->addFlash('success', 'Account has been created');
-    //         return $this->redirectToRoute($result['route'], $result['params']);
-    //     }
-
-    //     if ($error) {
-    //         $this->addFlash('error', $error);
-    //     }
-
-    //     return $this->redirectToRoute('app_login');
-    // }
 
 
     #[Route('/master/create_zone', name: 'app_master_create_zone')]

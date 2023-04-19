@@ -26,24 +26,30 @@
 							<ul>
 								{% for zone in zones %}
 									<div class="d-flex ps-5 mb-5 mt-5  line-list">
-										<a href="{{path('app_zone', {id: zone.name})}}" <span class="line-details">>
-											{{ zone.name }}
-											<id={{zone.id}}></span>
-										</a>
-									</div>
-								{% endfor %}
-							</ul>
+										<a href="{{path('app_zone', {id: zone.name})}}">
+											<span class="line-details">
+												{{ zone.name }}
+												<id={{zone.id}}></span>
+											</a>
+											<a href="{{path('app_master_delete_zone', {id: zone.name})}}">
+												<span class="line-details">
+													- Supprimer
+													<id={{zone.id}}></span>
+												</a>
+											</div>
+										{% endfor %}
+									</ul>
+								</div>
+							</div>
 						</div>
+					</div>
+
+					<div>
+						<h2>Formulaire de creation de compte utilisateur :</h2>
+						<form method="POST" action="{{ path('app_master_create_admin') }}">
+							{% include "services/accountservices/create_account.html.twig" %}
+						</form>
 					</div>
 				</div>
 			</div>
-
-			<div>
-				<h2>Formulaire de creation de compte utilisateur :</h2>
-				<form method="POST" action="{{ path('app_master_create_admin') }}">
-					{% include "services/accountservices/create_account.html.twig" %}
-				</form>
-			</div>
-		</div>
-	</div>
-{% endblock %}
+		{% endblock %}

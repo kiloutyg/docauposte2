@@ -7,14 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
-use App\Event\SecurityEvents;
 use App\Entity\User;
-use App\Repository\UserRepository;
+
 use App\Service\AccountService;
 
 class SecurityController extends BaseController
@@ -71,7 +66,6 @@ class SecurityController extends BaseController
             'last_username' => $lastUsername,
             'error' => $error,
             'user' => $this->getUser(),
-            'roles' => $this->roleRepository->findAll()
         ]);
     }
 

@@ -2,21 +2,11 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-use App\Entity\Upload;
-use App\Entity\Zone;
-use App\Entity\ProductLine;
-use App\Entity\Role;
-use App\Entity\User;
-
 use App\Service\AccountService;
-
 
 
 #[Route('/', name: 'app_')]
@@ -32,7 +22,6 @@ class FrontController extends BaseController
                 'buttons' => $this->buttonRepository->findAll(),
                 'zones'        => $this->zoneRepository->findAll(),
                 'productLines' => $this->productLineRepository->findAll(),
-                'roles'        => $this->roleRepository->findAll(),
                 'users'        => $this->userRepository->findAll(),
                 'user'         => $this->getUser(),
             ]
@@ -42,11 +31,15 @@ class FrontController extends BaseController
     public function createSuperAdmin(AccountService $accountService, Request $request): Response
     {
         $error = null;
-        $result = $accountService->createAccount($request, $error, 'app_base', []);
+        $result = $accountService->createAccount(
+            $request,
+            $error,
+            // 'app_base', []
+        );
 
         if ($result) {
             $this->addFlash('success', 'Account has been created');
-            return $this->redirectToRoute($result['route'], $result['params']);
+            // return $this->redirectToRoute($result['route'], $result['params']);
         }
 
         if ($error) {
@@ -58,7 +51,6 @@ class FrontController extends BaseController
 
 
 
-
     #[Route('/zone/{id}', name: 'zone')]
     public function zone(string $id = null): Response
     {
@@ -67,10 +59,8 @@ class FrontController extends BaseController
         return $this->render(
             'zone.html.twig',
             [
-
                 'zone'         => $zone,
                 'productLines' => $this->productLineRepository->findAll(),
-                'roles'        => $this->roleRepository->findAll(),
             ]
         );
     }
@@ -92,14 +82,10 @@ class FrontController extends BaseController
                 'uploads'     => $this->uploadRepository->findAll(),
                 'id' => $productLine->getName(),
                 'categories'  => $this->categoryRepository->findAll(),
-
                 'productLine' => $productLine,
-
-                'roles'       => $this->roleRepository->findAll(),
             ]
         );
     }
-
 
 
 

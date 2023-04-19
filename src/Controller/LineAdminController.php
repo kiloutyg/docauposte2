@@ -4,25 +4,18 @@
 namespace App\Controller;
 
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Doctrine\ORM\EntityManagerInterface;
 
 use App\Service\AccountService;
 
-use App\Controller\SecurityController;
-
-use App\Repository\CategoryRepository;
-use App\Repository\ProductLineRepository;
-
-use App\Entity\ProductLine;
 use App\Entity\Category;
 
 class LineAdminController extends BaseController
 {
+
 
     #[Route('/lineadmin/{id}', name: 'app_line_admin')]
 
@@ -47,8 +40,8 @@ class LineAdminController extends BaseController
         ]);
     }
 
-    #[Route('/lineadmin/create_manager/{id}', name: 'app_line_admin_create_manager')]
 
+    #[Route('/lineadmin/create_manager/{id}', name: 'app_line_admin_create_manager')]
 
     public function createManager(string $id = null, AccountService $accountService, Request $request): Response
     {
@@ -56,18 +49,22 @@ class LineAdminController extends BaseController
         $zone = $productLine->getZone();
 
         $error = null;
-        $result = $accountService->createAccount($request, $error, 'app_productline', [
-            'zone'        => $zone,
-            'name'        => $zone->getName(),
-            'uploads'     => $this->uploadRepository->findAll(),
-            'id'          => $productLine->getName(),
-            'categories'  => $this->categoryRepository->findAll(),
-            'productLine' => $productLine,
-        ]);
+        $result = $accountService->createAccount(
+            $request,
+            $error,
+            // 'app_productline', [
+            //     'zone'        => $zone,
+            //     'name'        => $zone->getName(),
+            //     'uploads'     => $this->uploadRepository->findAll(),
+            //     'id'          => $productLine->getName(),
+            //     'categories'  => $this->categoryRepository->findAll(),
+            //     'productLine' => $productLine,
+            // ]
+        );
 
         if ($result) {
             $this->addFlash('success', 'Account has been created');
-            return $this->redirectToRoute($result['route'], $result['params']);
+            // return $this->redirectToRoute($result['route'], $result['params']);
         }
 
         if ($error) {
@@ -83,6 +80,7 @@ class LineAdminController extends BaseController
             'productLine' => $productLine,
         ]);
     }
+
 
     #[Route('/lineadmin/create_category/{id}', name: 'app_line_admin_create_category')]
     public function createCategory(Request $request, string $id = null)

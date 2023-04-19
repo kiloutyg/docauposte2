@@ -20,6 +20,7 @@ use App\Entity\ProductLine;
 class AdminController extends BaseController
 {
 
+
     #[Route('/admin/{id}', name: 'app_admin')]
 
     public function index(AuthenticationUtils $authenticationUtils, string $id = null): Response
@@ -38,23 +39,27 @@ class AdminController extends BaseController
         ]);
     }
 
-    #[Route('/admin/create_line_admin/{id}', name: 'app_admin_create_line_admin')]
 
+    #[Route('/admin/create_line_admin/{id}', name: 'app_admin_create_line_admin')]
 
     public function createLineAdmin(string $id = null, AccountService $accountService, Request $request): Response
     {
         $zone = $this->zoneRepository->findOneBy(['name' => $id]);
 
         $error = null;
-        $result = $accountService->createAccount($request, $error, 'app_zone', [
-            'zone'         => $zone,
-            'id' => $zone->getName(),
-            'productLines' => $this->productLineRepository->findAll(),
-        ]);
+        $result = $accountService->createAccount(
+            $request,
+            $error,
+            //  'app_zone', [
+            //     'zone'         => $zone,
+            //     'id' => $zone->getName(),
+            //     'productLines' => $this->productLineRepository->findAll(),
+            // ]
+        );
 
         if ($result) {
             $this->addFlash('success', 'Account has been created');
-            return $this->redirectToRoute($result['route'], $result['params']);
+            // return $this->redirectToRoute($result['route'], $result['params']);
         }
 
         if ($error) {
@@ -68,6 +73,7 @@ class AdminController extends BaseController
         ]);
     }
 
+
     #[Route('/admin/create_productline/{id}', name: 'app_admin_create_productline')]
     public function createProductLine(Request $request, string $id = null)
     {
@@ -77,10 +83,9 @@ class AdminController extends BaseController
         if ($request->getMethod() == 'POST') {
 
             $productlinename = $request->request->get('productlinename');
-
             $zone = $this->zoneRepository->findOneBy(['name' => $id]);
-
             $productline = $this->productLineRepository->findOneBy(['name' => $productlinename]);
+
             if ($productline) {
                 $this->addFlash('danger', 'productline already exists');
                 return $this->redirectToRoute('app_admin', [
