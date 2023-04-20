@@ -37,7 +37,9 @@ class LineAdminController extends BaseController
             'categories'    => $this->categoryRepository->findAll(),
             'error'         => $error,
             'last_username' => $lastUsername,
-            'users' => $this->userRepository->findAll()
+            'uploads'       => $this->uploadRepository->findAll(),
+            'users'         => $this->userRepository->findAll(),
+            'buttons'       => $this->buttonRepository->findAll(),
 
         ]);
     }

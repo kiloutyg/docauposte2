@@ -20,6 +20,17 @@
 			{{
             encore_entry_script_tags("app")
         }}
+			<script>
+				document.getElementById('upload-form').addEventListener('submit', function (event) {
+var newFileName = document.getElementById('newFileName').value;
+
+// If the newFileName is not empty, check if it has an extension
+if (newFileName && ! newFileName.includes('.')) {
+event.preventDefault(); // Cancel the form submission
+alert('Please add a file extension to the file name.');
+}
+});
+			</script>
 		{% endblock %}
 	</head>
 	<body>
@@ -63,29 +74,29 @@
 				{% endif %}
 			{% endif %}
 			{# 			
-																																																			{{dump(app.session)}}
-																																																			{{dump(app.user)}}
-																																																			{% if users is defined %}
-																																																				{{ dump(users) }}
-																																																			{% endif %}
-																																																			{% if app.user is not empty %}
-																																																				{{dump(app.user.roles)}}
-																																																			{% endif %}
-																																																			{% if zone is defined %}
-																																																				{{dump(zone)}}
-																																																			{% endif %}
-																																																			{% if productLine is defined %}
-																																																				{{dump(productLine)}}
-																																																			{% endif %}
-																																																			{% if categories is defined %}
-																																																				{{dump(categories)}}
-																																																			{% endif %}
-																																																			{% if buttons is defined %}
-																																																				{{dump(buttons)}}
-																																																			{% endif %}
-																																																			{% if refererUrl is defined %}
-																																																				{{dump(refererUrl)}}
-																																																			{% endif %} #}
+																																																						{{dump(app.session)}}
+																																																						{{dump(app.user)}}
+																																																						{% if users is defined %}
+																																																							{{ dump(users) }}
+																																																						{% endif %}
+																																																						{% if app.user is not empty %}
+																																																							{{dump(app.user.roles)}}
+																																																						{% endif %}
+																																																						{% if zone is defined %}
+																																																							{{dump(zone)}}
+																																																						{% endif %}
+																																																						{% if productLine is defined %}
+																																																							{{dump(productLine)}}
+																																																						{% endif %}
+																																																						{% if categories is defined %}
+																																																							{{dump(categories)}}
+																																																						{% endif %}
+																																																						{% if buttons is defined %}
+																																																							{{dump(buttons)}}
+																																																						{% endif %}
+																																																						{% if refererUrl is defined %}
+																																																							{{dump(refererUrl)}}
+																																																						{% endif %} #}
 		</div>
 
 		<div class="container">

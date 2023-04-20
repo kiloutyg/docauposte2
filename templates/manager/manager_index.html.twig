@@ -78,5 +78,11 @@
 				{% include "services/accountservices/create_account.html.twig" %}
 			</form>
 		</div>
+		<div>
+			<h2>Formulaire d'upload :</h2>
+			<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+				{% include "services/uploads/upload.html.twig" %}
+			</form>
+		</div>
 	</div>
 {% endblock %}

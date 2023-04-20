@@ -25,13 +25,17 @@ class UploadsService
         $this->projectDir = $params->get('kernel.project_dir');
     }
 
-    public function uploadFiles(Request $request, $button)
+    public function uploadFiles(Request $request, $button, $newFileName = null)
     {
         $files = $request->files->all();
 
         foreach ($files as $file) {
             $public_dir = $this->projectDir . '/public';
-            $filename   = $file->getClientOriginalName();
+            if ($newFileName) {
+                $filename   = $newFileName;
+            } else {
+                $filename   = $file->getClientOriginalName();
+            }
             $path       = $public_dir . '/doc/' . $filename;
             $file->move($public_dir . '/doc/', $filename);
             $name = $filename;

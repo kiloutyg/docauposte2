@@ -26,6 +26,9 @@ class MasterController extends BaseController
 
         return $this->render('master/master_index.html.twig', [
             'controller_name' => 'MasterController',
+            'buttons'     => $this->buttonRepository->findAll(),
+            'uploads'     => $this->uploadRepository->findAll(),
+
             'error' => $error,
             'last_username' => $lastUsername,
             'zones' => $this->zoneRepository->findAll(),

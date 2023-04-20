@@ -36,6 +36,9 @@ class AdminController extends BaseController
             'productLines' => $this->productLineRepository->findAll(),
             'error' => $error,
             'last_username' => $lastUsername,
+            'buttons'     => $this->buttonRepository->findAll(),
+            'uploads'     => $this->uploadRepository->findAll(),
+
             'users' => $this->userRepository->findAll()
 
         ]);
