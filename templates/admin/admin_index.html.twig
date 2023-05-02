@@ -7,7 +7,7 @@
 
 	<div class="container">
 		<div class="row">
-			<h1>Page d'administration de la Zone
+			<h1>Page d'administration des Lignes de la Zone
 				{{zone.name}}</h1>
 			<h2>Formulaire de creation de Ligne :</h2>
 			<div class=" card border-0 shadow rounded-3 my-5 ">
@@ -25,6 +25,13 @@
 						</div>
 						<div class="col-md-6">
 							<ul>
+								<h5>
+									<strong>
+										Liste des Lignes de la zone
+										{{zone.name}}
+										:
+									</strong>
+								</h5>
 								<p>
 
 									{% set matchingProductLines = [] %}
@@ -34,40 +41,39 @@
 										{% endif %}
 									{% endfor %}
 								</p>
-							</p>
-							<p>
-								<div>
-									{% if matchingProductLines|length > 0 %}
-										{% for productLine in matchingProductLines %}
-											<div class="d-flex ps-5 mb-5 mt-5 line-list">
-												<a href="{{path('app_productline', {id: productLine.name, name: productLine.zone.name} )}}" class="btn" style="color:white">
-													<span class="line-details text-justify">
-														-{{ productLine.name }}
-														<id={{productLine.id}}></span>
+								<p>
+									<div>
+										{% if matchingProductLines|length > 0 %}
+											{% for productLine in matchingProductLines %}
+												<div class="d-flex ps-5 mb-1 mt-1 line-list">
+													<a href="{{path('app_productline', {id: productLine.name, name: productLine.zone.name} )}}" class="btn" style="color:white">
+														<span class="line-details text-justify">
+															-{{ productLine.name }}
+															<id={{productLine.id}}></id>
+														</span>
 													</a>
 													<a href="{{path('app_admin_delete_productline', {id: productLine.name})}}" class="btn" style="color:white">
 														<span class="line-details  text-justify">
 															- Supprimer
-															<id={{productLine.id}}></span>
-														</a>
-													</div>
-												{% endfor %}
-											{% else %}
-												<div class="alert alert-danger">
-													<a href="{{path('app_base')}}">
-														Il n'y a pas de lignes dans cette zone.
+															<id={{productLine.id}}></id>
+														</span>
 													</a>
 												</div>
-											{% endif %}
-										</div>
+											{% endfor %}
+										{% else %}
+											<div class="alert alert-danger">
+												<a href="{{path('app_base')}}">
+													Il n'y a pas de lignes dans cette zone.
+												</a>
+											</div>
+										{% endif %}
 									</div>
 								</p>
-							</p>
-						</ul>
+							</ul>
+						</div>
 					</div>
 				</div>
 			</div>
-
 			<div>
 				<h2>Formulaire de creation de compte utilisateur :</h2>
 				<form method="POST" action="{{ path('app_admin_create_line_admin', {id: zone.name}) }}">
@@ -78,8 +84,7 @@
 		<div>
 			<h2>Formulaire d'upload :</h2>
 			<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
-				{% include "services/uploads/upload.html.twig" %}
-			</form>
+				{% include "services/uploads/upload.html.twig" %}</form>
 		</div>
 	</div>
-</div></div>{% endblock %}
+{% endblock %}

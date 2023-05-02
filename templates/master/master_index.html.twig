@@ -5,7 +5,7 @@
 
 {% block body %}
 
-	<h1>Page d'administration</h1>
+	<h1>Page de Super-Administration</h1>
 	<h2>Formulaire de creation de zones :</h2>
 	<div class=" card border-0 shadow rounded-3 my-5 ">
 		<div class="card-body ">
@@ -22,8 +22,13 @@
 				</div>
 				<div class="col-md-6">
 					<ul>
+						<h5>
+							<strong>
+								Liste des zones :
+							</strong>
+						</h5>
 						{% for zone in zones %}
-							<div class="d-flex ps-5 mb-5 mt-5  line-list">
+							<div class="d-flex ps-5 mb-1 mt-1  line-list">
 								<span class="line-details  text-justify">
 									<a href="{{path('app_zone', {id: zone.name})}}" class="btn" style="color:white">
 										-{{ zone.name }}
@@ -56,4 +61,4 @@
 		</form>
 	</div>
 
-</div>{% endblock %}
+{% endblock %}

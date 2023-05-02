@@ -31,3 +31,7 @@ yarn-error.log
 ###> symfony/maker-bundle ###
 /migrations/*
 ###> symfony/maker-bundle ###
+
+###> VSC stuff ###
+.vscode
+###> VSC stuff ###
