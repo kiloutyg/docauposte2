@@ -1,17 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello MasterController!
+{% block title %}SupAdmin!
 {% endblock %}
 
 {% block body %}
-
 	<h1>Page de Super-Administration</h1>
 	<h2>Formulaire de creation de zones :</h2>
 	<div class=" card border-0 shadow rounded-3 my-5 ">
 		<div class="card-body ">
 			<div class="row">
 				<div class="col-md-6">
-					<form class="form-floating justify-content-center " method="POST" action="{{ path('app_master_create_zone') }}">
+					<form class="form-floating justify-content-center " method="POST" action="{{ path('app_super_admin_create_zone') }}">
 						<div class="form-control mb-3">
 							<input type="text" name="zonename" placeholder="Nom de la zone" required>
 						</div>
@@ -28,15 +27,15 @@
 							</strong>
 						</h5>
 						{% for zone in zones %}
-							<div class="d-flex ps-5 mb-1 mt-1  line-list">
+							<div class="d-flex ps-5 mb-1 mt-1 line-list">
 								<span class="line-details  text-justify">
 									<a href="{{path('app_zone', {id: zone.name})}}" class="btn" style="color:white">
-										-{{ zone.name }}
+										-{{ zone.name|capitalize}}
 										<id={{zone.id}}></id>
 									</a>
 								</span>
 								<span class="line-details  text-justify">
-									<a href="{{path('app_master_delete_zone', {id: zone.name})}}" class="btn" style="color:white">
+									<a href="{{path('app_super_admin_delete_zone', {id: zone.name})}}" class="btn" style="color:white">
 										- Supprimer
 										<id={{zone.id}}></id>
 									</a>
@@ -50,7 +49,7 @@
 	</div>
 	<div>
 		<h2>Formulaire de creation de compte utilisateur :</h2>
-		<form method="POST" action="{{ path('app_master_create_admin') }}">
+		<form method="POST" action="{{ path('app_super_admin_create_admin') }}">
 			{% include "services/accountservices/create_account.html.twig" %}
 		</form>
 	</div>

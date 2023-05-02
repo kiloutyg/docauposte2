@@ -29,7 +29,6 @@ class LineAdminController extends BaseController
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('line_admin/line_admin_index.html.twig', [
-            'controller_name' => 'LineAdminController',
             'zone'          => $zone,
             'name'          => $zone->getName(),
             'productLine'   => $productLine,
@@ -56,19 +55,11 @@ class LineAdminController extends BaseController
         $result = $accountService->createAccount(
             $request,
             $error,
-            // 'app_productline', [
-            //     'zone'        => $zone,
-            //     'name'        => $zone->getName(),
-            //     'uploads'     => $this->uploadRepository->findAll(),
-            //     'id'          => $productLine->getName(),
-            //     'categories'  => $this->categoryRepository->findAll(),
-            //     'productLine' => $productLine,
-            // ]
+
         );
 
         if ($result) {
             $this->addFlash('success', 'Account has been created');
-            // return $this->redirectToRoute($result['route'], $result['params']);
         }
 
         if ($error) {

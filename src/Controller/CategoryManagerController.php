@@ -14,10 +14,10 @@ use App\Service\AccountService;
 use App\Entity\Button;
 
 
-class ManagerController extends BaseController
+class CategoryManagerController extends BaseController
 {
 
-    #[Route('/manager/{category}', name: 'app_manager')]
+    #[Route('/category_manager/{category}', name: 'app_category_manager')]
 
     public function index(AuthenticationUtils $authenticationUtils, string $category = null): Response
     {
@@ -29,8 +29,7 @@ class ManagerController extends BaseController
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('manager/manager_index.html.twig', [
-            'controller_name' => 'managerController',
+        return $this->render('category_manager/category_manager_index.html.twig', [
             'zone'        => $zone,
             'name'        => $zone->getName(),
             'productLine' => $productLine,
@@ -40,7 +39,6 @@ class ManagerController extends BaseController
             'buttons'     => $this->buttonRepository->findAll(),
             'uploads'     => $this->uploadRepository->findAll(),
             'users' => $this->userRepository->findAll(),
-
             'error'         => $error,
             'last_username' => $lastUsername,
         ]);
@@ -48,7 +46,7 @@ class ManagerController extends BaseController
 
 
 
-    #[Route('/manager/create_user/{category}', name: 'app_manager_create_user')]
+    #[Route('/category_manager/create_user/{category}', name: 'app_category_manager_create_user')]
 
     public function createUser(string $category = null, AccountService $accountService, Request $request): Response
     {
@@ -60,19 +58,10 @@ class ManagerController extends BaseController
         $result = $accountService->createAccount(
             $request,
             $error,
-            //  'app_productline', [
-            //     'zone'        => $zone,
-            //     'name'        => $zone->getName(),
-            //     'uploads'     => $this->uploadRepository->findAll(),
-            //     'id'          => $productLine->getName(),
-            //     'categories'  => $this->categoryRepository->findAll(),
-            //     'productLine' => $productLine,
-            // ]
         );
 
         if ($result) {
             $this->addFlash('success', 'Account has been created');
-            // return $this->redirectToRoute($result['route'], $result['params']);
         }
 
         if ($error) {
@@ -91,7 +80,7 @@ class ManagerController extends BaseController
     }
 
 
-    #[Route('/manager/create_button/{category}', name: 'app_manager_create_button')]
+    #[Route('/category_manager/create_button/{category}', name: 'app_category_manager_create_button')]
 
     public function createButton(Request $request, string $category = null)
     {
@@ -107,8 +96,8 @@ class ManagerController extends BaseController
             $button = $this->buttonRepository->findoneBy(['name' => $buttonname]);
             if ($button) {
                 $this->addFlash('danger', 'bouton already exists');
-                return $this->redirectToRoute('app_manager', [
-                    'controller_name'   => 'managerController',
+                return $this->redirectToRoute('app_category_manager', [
+                    'controller_name'   => 'category_managerController',
                     'category'    => $category,
                     'buttons'     => $this->buttonRepository->findAll(),
                     'uploads'     => $this->uploadRepository->findAll(),
@@ -120,8 +109,8 @@ class ManagerController extends BaseController
                 $this->em->persist($button);
                 $this->em->flush();
                 $this->addFlash('success', 'The Button has been created');
-                return $this->redirectToRoute('app_manager', [
-                    'controller_name'   => 'managerController',
+                return $this->redirectToRoute('app_category_manager', [
+                    'controller_name'   => 'category_managerController',
                     'category'    => $category,
                     'buttons'     => $this->buttonRepository->findAll(),
                     'uploads'     => $this->uploadRepository->findAll(),
@@ -129,7 +118,7 @@ class ManagerController extends BaseController
             }
         }
     }
-    #[Route('/manager/delete_button/{id}', name: 'app_manager_delete_button')]
+    #[Route('/category_manager/delete_button/{id}', name: 'app_category_manager_delete_button')]
     public function deleteEntity(string $id): Response
     {
         $entityType = 'button';
@@ -142,12 +131,12 @@ class ManagerController extends BaseController
         if ($entity == true) {
 
             $this->addFlash('success', $entityType . ' has been deleted');
-            return $this->redirectToRoute('app_manager', [
+            return $this->redirectToRoute('app_category_manager', [
                 'category'    => $category,
             ]);
         } else {
             $this->addFlash('danger',  $entityType . '  does not exist');
-            return $this->redirectToRoute('app_manager', [
+            return $this->redirectToRoute('app_category_manager', [
                 'category'    => $category,
             ]);
         }

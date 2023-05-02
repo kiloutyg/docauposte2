@@ -9,7 +9,7 @@
 		{% if app.user %}
 			{% if  is_granted('ROLE_MANAGER') %}
 				<aside class="position-absolute end-0">
-					<a href="{{ path('app_manager', {category: category.name}) }}" class="btn" style="color:white">Centre d'Administration de Catégories</a>
+					<a href="{{ path('app_category_manager', {category: category.name}) }}" class="btn" style="color:white">Centre d'Administration de Catégories</a>
 					<br>
 
 				</aside>

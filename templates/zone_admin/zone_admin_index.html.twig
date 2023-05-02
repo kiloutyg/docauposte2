@@ -1,20 +1,19 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello AdminController!
+{% block title %}ZoneAdminCenter
 {% endblock %}
 
 {% block body %}
-
 	<div class="container">
 		<div class="row">
 			<h1>Page d'administration des Lignes de la Zone
-				{{zone.name}}</h1>
+				{{zone.name|capitalize}}</h1>
 			<h2>Formulaire de creation de Ligne :</h2>
 			<div class=" card border-0 shadow rounded-3 my-5 ">
 				<div class="card-body ">
 					<div class="row">
 						<div class="col-md-6">
-							<form class="form-floating justify-content-center " method="POST" action="{{ path('app_admin_create_productline', {id: zone.name}) }}">
+							<form class="form-floating justify-content-center " method="POST" action="{{ path('app_zone_admin_create_productline', {id: zone.name}) }}">
 								<div class="form-control mb-3">
 									<input type="text" name="productlinename" placeholder="Nom de la Ligne" required>
 								</div>
@@ -28,7 +27,7 @@
 								<h5>
 									<strong>
 										Liste des Lignes de la zone
-										{{zone.name}}
+										{{zone.name|capitalize}}
 										:
 									</strong>
 								</h5>
@@ -52,7 +51,7 @@
 															<id={{productLine.id}}></id>
 														</span>
 													</a>
-													<a href="{{path('app_admin_delete_productline', {id: productLine.name})}}" class="btn" style="color:white">
+													<a href="{{path('app_zone_admin_delete_productline', {id: productLine.name})}}" class="btn" style="color:white">
 														<span class="line-details  text-justify">
 															- Supprimer
 															<id={{productLine.id}}></id>
@@ -76,7 +75,7 @@
 			</div>
 			<div>
 				<h2>Formulaire de creation de compte utilisateur :</h2>
-				<form method="POST" action="{{ path('app_admin_create_line_admin', {id: zone.name}) }}">
+				<form method="POST" action="{{ path('app_zone_admin_create_line_admin', {id: zone.name}) }}">
 					{% include "services/accountservices/create_account.html.twig" %}
 				</form>
 			</div>

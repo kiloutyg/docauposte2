@@ -13,10 +13,10 @@ use App\Service\AccountService;
 
 use App\Entity\Zone;
 
-class MasterController extends BaseController
+class SuperAdminController extends BaseController
 {
 
-    #[Route('/master', name: 'app_master')]
+    #[Route('/super_admin', name: 'app_super_admin')]
 
     public function index(AuthenticationUtils $authenticationUtils,): Response
     {
@@ -24,11 +24,9 @@ class MasterController extends BaseController
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('master/master_index.html.twig', [
-            'controller_name' => 'MasterController',
+        return $this->render('super_admin/super_admin_index.html.twig', [
             'buttons'     => $this->buttonRepository->findAll(),
             'uploads'     => $this->uploadRepository->findAll(),
-
             'error' => $error,
             'last_username' => $lastUsername,
             'zones' => $this->zoneRepository->findAll(),
@@ -36,7 +34,7 @@ class MasterController extends BaseController
         ]);
     }
 
-    #[Route('/master/create_admin', name: 'app_master_create_admin')]
+    #[Route('/super_admin/create_admin', name: 'app_super_admin_create_admin')]
 
     public function createAdmin(AccountService $accountService, Request $request): Response
     {
@@ -56,7 +54,7 @@ class MasterController extends BaseController
 
 
 
-    #[Route('/master/create_zone', name: 'app_master_create_zone')]
+    #[Route('/super_admin/create_zone', name: 'app_super_admin_create_zone')]
     public function createZone(Request $request)
     {
         // Create a zone
@@ -67,8 +65,7 @@ class MasterController extends BaseController
             $zone = $this->zoneRepository->findOneBy(['name' => $zonename]);
             if ($zone) {
                 $this->addFlash('danger', 'Zone already exists');
-                return $this->redirectToRoute('app_master', [
-                    'controller_name' => 'MasterController',
+                return $this->redirectToRoute('app_super_admin', [
                     'zones' => $this->zoneRepository->findAll(),
                     'users' => $this->userRepository->findAll()
                 ]);
@@ -78,8 +75,7 @@ class MasterController extends BaseController
                 $this->em->persist($zone);
                 $this->em->flush();
                 $this->addFlash('success', 'Zone has been created');
-                return $this->redirectToRoute('app_master', [
-                    'controller_name' => 'MasterController',
+                return $this->redirectToRoute('app_super_admin', [
                     'zones' => $this->zoneRepository->findAll(),
                     'users' => $this->userRepository->findAll()
                 ]);
@@ -87,7 +83,7 @@ class MasterController extends BaseController
         }
     }
 
-    #[Route('/master/delete_zone/{id}', name: 'app_master_delete_zone')]
+    #[Route('/super_admin/delete_zone/{id}', name: 'app_super_admin_delete_zone')]
     public function deleteEntity(string $id): Response
     {
         $entityType = 'zone';
@@ -98,10 +94,10 @@ class MasterController extends BaseController
         if ($entity == true) {
 
             $this->addFlash('success', $entityType . ' has been deleted');
-            return $this->redirectToRoute('app_master');
+            return $this->redirectToRoute('app_super_admin');
         } else {
             $this->addFlash('danger',  $entityType . '  does not exist');
-            return $this->redirectToRoute('app_master');
+            return $this->redirectToRoute('app_super_admin');
         }
     }
 }

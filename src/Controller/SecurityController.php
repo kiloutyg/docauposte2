@@ -55,7 +55,7 @@ class SecurityController extends BaseController
 
         $user = $accountService->createAccount($request, $error);
 
-        if ($user) {
+        if ($user instanceof User) {
             $this->authenticateUser($user);
             $this->addFlash('success', 'Your account has been created');
 

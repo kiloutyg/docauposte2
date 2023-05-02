@@ -73,30 +73,8 @@ alert('Please add a file extension to the file name.');
 					</form>
 				{% endif %}
 			{% endif %}
-			{# 			
-																																																						{{dump(app.session)}}
-																																																						{{dump(app.user)}}
-																																																						{% if users is defined %}
-																																																							{{ dump(users) }}
-																																																						{% endif %}
-																																																						{% if app.user is not empty %}
-																																																							{{dump(app.user.roles)}}
-																																																						{% endif %}
-																																																						{% if zone is defined %}
-																																																							{{dump(zone)}}
-																																																						{% endif %}
-																																																						{% if productLine is defined %}
-																																																							{{dump(productLine)}}
-																																																						{% endif %}
-																																																						{% if categories is defined %}
-																																																							{{dump(categories)}}
-																																																						{% endif %}
-																																																						{% if buttons is defined %}
-																																																							{{dump(buttons)}}
-																																																						{% endif %}
-																																																						{% if refererUrl is defined %}
-																																																							{{dump(refererUrl)}}
-																																																						{% endif %} #}
+
+
 		</div>
 
 		<div class="container">
@@ -104,7 +82,7 @@ alert('Please add a file extension to the file name.');
 				{% if app.user %}
 					{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
 						<aside class="position-absolute end-0">
-							<a href="{{ path('app_master') }}" class="btn" style="color:white">Master Center</a>
+							<a href="{{ path('app_super_admin') }}" class="btn" style="color:white">Centre de Super-Administration</a>
 						</aside>
 					{% endif %}
 				{% endif %}

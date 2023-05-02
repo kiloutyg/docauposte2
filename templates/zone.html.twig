@@ -8,7 +8,7 @@
 	{% if app.user %}
 		{% if  is_granted('ROLE_ADMIN') %}
 			<aside class="position-absolute end-0">
-				<a href="{{ path('app_admin', {id: zone.name}) }}" class="btn" style="color:white">Centre d'Administration de Zone</a>
+				<a href="{{ path('app_zone_admin', {id: zone.name}) }}" class="btn" style="color:white">Centre d'Administration de Zone</a>
 			</aside>
 		{% endif %}
 	{% endif %}

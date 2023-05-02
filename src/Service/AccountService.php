@@ -45,7 +45,9 @@ class AccountService
                 $this->manager->persist($user);
                 $this->manager->flush();
 
-                return  ['user' => $user];
+                // return  ['user' => $user];
+
+                return  $user;
             }
         }
 

@@ -4,24 +4,20 @@
 namespace App\Controller;
 
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Doctrine\ORM\EntityManagerInterface;
 
 
-use App\Controller\SecurityController;
 use App\Service\AccountService;
-use App\Repository\ProductLineRepository;
 use App\Entity\ProductLine;
 
-class AdminController extends BaseController
+class ZoneAdminController extends BaseController
 {
 
 
-    #[Route('/admin/{id}', name: 'app_admin')]
+    #[Route('/zone_admin/{id}', name: 'app_zone_admin')]
 
     public function index(AuthenticationUtils $authenticationUtils, string $id = null): Response
     {
@@ -30,22 +26,20 @@ class AdminController extends BaseController
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('admin/admin_index.html.twig', [
-            'controller_name' => 'AdminController',
+        return $this->render('zone_admin/zone_admin_index.html.twig', [
             'zone'         => $zone,
             'productLines' => $this->productLineRepository->findAll(),
             'error' => $error,
             'last_username' => $lastUsername,
             'buttons'     => $this->buttonRepository->findAll(),
             'uploads'     => $this->uploadRepository->findAll(),
-
             'users' => $this->userRepository->findAll()
 
         ]);
     }
 
 
-    #[Route('/admin/create_line_admin/{id}', name: 'app_admin_create_line_admin')]
+    #[Route('/zone_admin/create_line_admin/{id}', name: 'app_zone_admin_create_line_admin')]
 
     public function createLineAdmin(string $id = null, AccountService $accountService, Request $request): Response
     {
@@ -55,16 +49,10 @@ class AdminController extends BaseController
         $result = $accountService->createAccount(
             $request,
             $error,
-            //  'app_zone', [
-            //     'zone'         => $zone,
-            //     'id' => $zone->getName(),
-            //     'productLines' => $this->productLineRepository->findAll(),
-            // ]
         );
 
         if ($result) {
             $this->addFlash('success', 'Account has been created');
-            // return $this->redirectToRoute($result['route'], $result['params']);
         }
 
         if ($error) {
@@ -79,7 +67,7 @@ class AdminController extends BaseController
     }
 
 
-    #[Route('/admin/create_productline/{id}', name: 'app_admin_create_productline')]
+    #[Route('/zone_admin/create_productline/{id}', name: 'app_zone_admin_create_productline')]
     public function createProductLine(Request $request, string $id = null)
     {
         $zone = $this->zoneRepository->findOneBy(['name' => $id]);
@@ -93,7 +81,7 @@ class AdminController extends BaseController
 
             if ($productline) {
                 $this->addFlash('danger', 'productline already exists');
-                return $this->redirectToRoute('app_admin', [
+                return $this->redirectToRoute('app_zone_admin', [
                     'zone'         => $zone,
                     'id' => $zone->getName(),
                     'productLines' => $this->productLineRepository->findAll(),
@@ -105,7 +93,7 @@ class AdminController extends BaseController
                 $this->em->persist($productline);
                 $this->em->flush();
                 $this->addFlash('success', 'The Product Line has been created');
-                return $this->redirectToRoute('app_admin', [
+                return $this->redirectToRoute('app_zone_admin', [
                     'zone'         => $zone,
                     'id' => $zone->getName(),
                     'productLines' => $this->productLineRepository->findAll(),
@@ -114,7 +102,7 @@ class AdminController extends BaseController
         }
     }
 
-    #[Route('/admin/delete_productline/{id}', name: 'app_admin_delete_productline')]
+    #[Route('/zone_admin/delete_productline/{id}', name: 'app_zone_admin_delete_productline')]
     public function deleteEntity(string $id): Response
     {
         $entityType = 'productline';
@@ -127,12 +115,12 @@ class AdminController extends BaseController
         if ($entity == true) {
 
             $this->addFlash('success', $entityType . ' has been deleted');
-            return $this->redirectToRoute('app_admin', [
+            return $this->redirectToRoute('app_zone_admin', [
                 'id' => $zone,
             ]);
         } else {
             $this->addFlash('danger',  $entityType . '  does not exist');
-            return $this->redirectToRoute('app_admin', [
+            return $this->redirectToRoute('app_zone_admin', [
                 'id' => $zone,
             ]);
         }
