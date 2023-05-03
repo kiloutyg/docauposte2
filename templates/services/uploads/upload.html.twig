@@ -1,39 +1,38 @@
 {% block body %}
-	<div class="align-items-center card text-white bg-secondary my-5 py-4 text-center mydropzone">
+	<div class="card align-items-center  text-white bg-secondary my-5 py-4 text-center mydropzone">
 		<div class="card-header">
 			<div class="row">
 
 				<div class="col-6">
-					<div class="card-body">
-						<p class="text-white m-0">
-							Ajouter des fichiers :
-						</p>
-						<form id="upload-form" action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
-							<div class="fallback">
-								<input name="file" type="file">
-								<div class="mb-3">
-									<label for="newFileName" class="form-label">Nom du fichier :</label>
-									<input type="text" class="form-control" id="newFileName" name="newFileName" placeholder="Entrer un nouveau nom de fichier (optionnel)">
+					<p class="text-white m-0">
+						Ajouter des fichiers :
+					</p>
+					<form class="form-floating justify-content-center " id="upload-form" action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+						<div class="fallback">
+							<input name="file" type="file" required>
+							<div class="mb-3">
+								<label for="newFileName" class="form-label">Nom du fichier :</label>
+								<input type="text" class="form-control" id="newFileName" name="newFileName" placeholder="Entrer un nouveau nom de fichier (optionnel)">
+							</div>
+							<div class="row">
+								<div class="col-md-4 col-sm-12">
+									<label for="button">Bouton :</label>
 								</div>
-								<div class="row">
-									<div class="col-md-4 col-sm-12">
-										<label for="button">Bouton :</label>
-									</div>
-									<div class="col-md-8 col-sm-12">
-										<select name="button" id="button" class="form-select">
-											{% for button in buttons %}
-												<option value="{{button.id}}">{{button.name}}</option>
-											{% endfor %}
-										</select>
-									</div>
+								<div class="col-md-8 col-sm-12">
+									<select name="button" id="button" class="form-select" required>
+										<option value="" selected disabled hidden>Choisir un bouton</option>
+										{% for button in buttons %}
+											<option value="{{button.id}}">{{button.name}}</option>
+										{% endfor %}
+									</select>
 								</div>
 							</div>
-							<div class="d-grid gap-2 d-md-flex justify-content-md-center">
-								<button type="submit" class="btn btn-primary">Charger</button>
-							</div>
+						</div>
+						<div class="d-grid gap-2 d-md-flex justify-content-md-center">
+							<button type="submit" class="btn btn-primary">Charger</button>
+						</div>
 
-						</form>
-					</div>
+					</form>
 				</div>
 				<div class="col-6">
 					{% for button in buttons %}

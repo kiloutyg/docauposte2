@@ -20,100 +20,101 @@
 			{{
             encore_entry_script_tags("app")
         }}
-			<script>
-				document.getElementById('upload-form').addEventListener('submit', function (event) {
-var newFileName = document.getElementById('newFileName').value;
-
-// If the newFileName is not empty, check if it has an extension
-if (newFileName && ! newFileName.includes('.')) {
-event.preventDefault(); // Cancel the form submission
-alert('Please add a file extension to the file name.');
-}
-});
-			</script>
 		{% endblock %}
-	</head>
-	<body>
-		<!-- Main Navigation -->
-		<nav class="navbar navbar-expand-lg navbar-dark mb-5" style="background-color: #1f3e52">
-			<div class="container">
-				<a class="navbar-brand" href="{{ path('app_base') }}">
-					<img class="img-fluid align-center justify-content-center" src="{{ asset('Plastic_Omnium.svg') }}" alt="Logo de PlasticOmnium" role="img" width="125"/></a>
-				<a class="navbar-brand" href="{{ path('app_base') }}">
-					<h1>
-						<strong>
-							DocAuPoste
-						</strong>
-					</h1>
-				</a>
-				<div></div>
-				<div class="ms-auto d-flex align-items-center">
-					{% if app.user is null %}
-						<a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
-					{% else %}
-						<p>
-							<strong>
-								{{ app.user.username|capitalize }}
-							</strong>
-							<a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
-						</p>
-					{% endif %}
-				</div>
-			</div>
-		</nav>
-		<!-- End Main Navigation -->
-
-		<div class="container">
+		{% block script %}
+			<script>
+				var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+var toastList = toastElList.map(function (toastEl) {
+return new bootstrap.Toast(toastEl, {autohide: false})
+})
+toastList.forEach(toast => toast.show()); // This shows them
+			</script>
 			{% include "services/_toasts.html.twig" %}
 
-			{% if users is defined %}
-				{% if users is empty %}
-					<form class="d-flex flex-wrap justify-content-between" action="{{ path('app_create_super_admin') }}" method="post">
-						{% include "services/accountservices/create_account.html.twig" %}
-					</form>
+		{% endblock %}
+	</head>
+	<!-- Main Navigation -->
+	<nav class="navbar navbar-expand-lg navbar-dark mb-5" style="background-color: #1f3e52">
+		<div class="container">
+			<a class="navbar-brand" href="{{ path('app_base') }}">
+				<img class="img-fluid align-center justify-content-center" src="{{ asset('Plastic_Omnium.svg') }}" alt="Logo de PlasticOmnium" role="img" width="125"/></a>
+			<a class="navbar-brand" href="{{ path('app_base') }}">
+				<h1>
+					<strong>
+						DocAuPoste
+					</strong>
+				</h1>
+			</a>
+			<div></div>
+			<div class="ms-auto d-flex align-items-center">
+				{% if app.user is null %}
+					<a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
+				{% else %}
+					<p>
+						<strong>
+							{{ app.user.username|capitalize }}
+						</strong>
+						<a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
+					</p>
+				{% endif %}
+			</div>
+		</div>
+	</nav>
+	<!-- End Main Navigation -->
+
+	<div class="container">
+
+		{% if users is defined %}
+			{% if users is empty %}
+				<form class="d-flex flex-wrap justify-content-between" action="{{ path('app_create_super_admin') }}" method="post">
+					{% include "services/accountservices/create_account.html.twig" %}
+				</form>
+			{% endif %}
+		{% endif %}
+
+		{{ dump(app.flashes) }}
+
+	</div>
+
+	<div class="container">
+
+		{% block body %}
+
+			{% if app.user %}
+				{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
+					<aside class="position-absolute end-0">
+						<a href="{{ path('app_super_admin') }}" class="btn" style="color:white">Centre de Super-Administration</a>
+					</aside>
 				{% endif %}
 			{% endif %}
+			<p>
+				<h1>
+					<strong>
+						Doc Au Poste
+					</strong>
+				</h1>
+			</p>
+			<p>
+				<h3>
+					<strong>
+						Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
+				</h3>
+			</p>
+			<p>
+				<div class="d-flex flex-column ">
+					{% for zone in zones %}
+						<div class="d-flex ps-5 mb-5 mt-5  line-list">
+							<a href="{{path('app_zone', {id: zone.name})}}" <span class="line-details">>
+								{{ zone.name }}
+								<id={{zone.id}}></span>
+							</a>
+						</div>
+					{% endfor %}
+				</div>
+			</p>
 
-
-		</div>
-
-		<div class="container">
-			{% block body %}
-				{% if app.user %}
-					{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
-						<aside class="position-absolute end-0">
-							<a href="{{ path('app_super_admin') }}" class="btn" style="color:white">Centre de Super-Administration</a>
-						</aside>
-					{% endif %}
-				{% endif %}
-				<p>
-					<h1>
-						<strong>
-							Doc Au Poste
-						</strong>
-					</h1>
-				</p>
-				<p>
-					<h3>
-						<strong>
-							Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
-					</h3>
-				</p>
-				<p>
-					<div class="d-flex flex-column ">
-						{% for zone in zones %}
-							<div class="d-flex ps-5 mb-5 mt-5  line-list">
-								<a href="{{path('app_zone', {id: zone.name})}}" <span class="line-details">>
-									{{ zone.name }}
-									<id={{zone.id}}></span>
-								</a>
-							</div>
-						{% endfor %}
-					</div>
-				</p>
-			{% endblock body %}
-		</div>
-	</body>
+		{% endblock body %}
+	</div>
 
 	<!-- Footer -->
 	<footer class="container mt-auto py-3 border-top">

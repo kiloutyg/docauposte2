@@ -79,42 +79,12 @@ class UploadController extends FrontController
         );
     }
 
-    // #[Route('/uploading', name: 'generic_upload_files')]
-    // public function generic_upload_files(UploadsService $uploadsService, Request $request, string $button = null, string $newFileName = null): Response
-    // {
-    //     $this->uploadsService = $uploadsService;
-
-    //     $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
-    //     $category    = $buttonEntity->getCategory();
-    //     $productLine = $category->getProductLine();
-    //     $zone        = $productLine->getZone();
-
-
-    //     // Use the UploadsService to handle file uploads
-    //     $name = $this->uploadsService->uploadFiles($request, $buttonEntity, $newFileName);
-    //     $this->addFlash('success', 'The file '  . $name .  'has been uploaded successfully!');
-
-    // return $this->redirectToRoute(
-    //     'app_uploaded_files',
-    //     [
-    //         'zone'        => $zone,
-    //         'name'        => $zone->getName(),
-    //         'productLine' => $productLine,
-    //         'id'          => $productLine->getName(),
-    //         'category'    => $category->getName(),
-    //         'categories'  => $this->categoryRepository->findAll(),
-    //         'buttons'     => $this->buttonRepository->findAll(),
-    //         'button'      => $buttonEntity->getName(),
-    //         'uploads'     => $this->uploadRepository->findAll(),
-    //     ]
-    //     );
-    // }
 
     #[Route('/uploading', name: 'generic_upload_files')]
     public function generic_upload_files(UploadsService $uploadsService, Request $request): Response
     {
         $this->uploadsService = $uploadsService;
-
+        $this->addFlash('error', 'Shit hit the fan dude');
         // Check if the form is submitted
         if ($request->isMethod('POST')) {
             // Get the button and newFileName values from the submitted form data
@@ -160,6 +130,7 @@ class UploadController extends FrontController
     #[Route('/download/{filename}', name: 'download_file')]
     public function download_file(string $filename = null): Response
     {
+
         $public_dir = $this->getParameter('kernel.project_dir') . '/public';
         $path       = $public_dir . '/doc/' . $filename;
         $file       = new File($path);

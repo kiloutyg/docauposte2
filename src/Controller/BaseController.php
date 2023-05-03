@@ -94,23 +94,22 @@ class BaseController extends AbstractController
 
 
 
-        if ($this->session->get('id') == null) {
-            $this->session->set('id', uniqid());
-        } else {
-            // check if user is connected to update session with user
-            $user = $this->security->getUser();
-            if ($user != null) {
-                $user    = $userRepository->findOneBy(['username' => $user->getUserIdentifier()]);
-                // $role   = $roleRepository->findOneBy(['id' => $user->getRoles()]);
-                $this->session->set('user', $user);
-                // $this->session->set('role', $role);
-            }
-            $user = null;
-        }
-    }
-    public function redirectToLogin()
-    {
-        $this->si->set('previous_url', $this->generateUrl('app_master')); // Store the current URL in the session
-        return $this->redirectToRoute('app_login');
+        //     if ($this->session->get('id') == null) {
+        //         $this->session->set('id', uniqid());
+        //     } else {
+        //         // check if user is connected to update session with user
+        //         $user = $this->security->getUser();
+        //         if ($user != null) {
+        //             $user    = $userRepository->findOneBy(['username' => $user->getUserIdentifier()]);
+        //             // $role   = $roleRepository->findOneBy(['id' => $user->getRoles()]);
+        //             $this->session->set('user', $user);
+        //             // $this->session->set('role', $role);
+        //         }
+        //         $user = null;
+        //     }
+        // }
+        // public function redirectToLogin()
+        // {
+        //     return $this->redirectToRoute('app_login');
     }
 }

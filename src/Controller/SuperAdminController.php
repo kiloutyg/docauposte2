@@ -49,7 +49,13 @@ class SuperAdminController extends BaseController
             $this->addFlash('error', $error);
         }
 
-        return $this->redirectToRoute('app_login');
+        return $this->redirectToRoute('app_super_admin', [
+            'buttons'     => $this->buttonRepository->findAll(),
+            'uploads'     => $this->uploadRepository->findAll(),
+            'error' => $error,
+            'zones' => $this->zoneRepository->findAll(),
+            'users' => $this->userRepository->findAll()
+        ]);
     }
 
 
