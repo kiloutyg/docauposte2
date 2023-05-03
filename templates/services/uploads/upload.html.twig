@@ -1,24 +1,24 @@
 {% block body %}
-	<div class="card align-items-center  text-white bg-secondary my-5 py-4 text-center mydropzone">
-		<div class="card-header">
-			<div class="row">
+	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
+		<div class="card-body ">
+			<div class="row d-flex align-items-center gy-lg-0 gy-5">
 
-				<div class="col-6">
+				<div class="col-md-6">
 					<p class="text-white m-0">
 						Ajouter des fichiers :
 					</p>
 					<form class="form-floating justify-content-center " id="upload-form" action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
 						<div class="fallback">
-							<input name="file" type="file" required>
+							<input name="file" type="file" accept=".pdf" required>
 							<div class="mb-3">
 								<label for="newFileName" class="form-label">Nom du fichier :</label>
 								<input type="text" class="form-control" id="newFileName" name="newFileName" placeholder="Entrer un nouveau nom de fichier (optionnel)">
 							</div>
 							<div class="row">
-								<div class="col-md-4 col-sm-12">
+								<div class="col-md-2 col-sm-2">
 									<label for="button">Bouton :</label>
 								</div>
-								<div class="col-md-8 col-sm-12">
+								<div class="col-md-10 col-sm-10">
 									<select name="button" id="button" class="form-select" required>
 										<option value="" selected disabled hidden>Choisir un bouton</option>
 										{% for button in buttons %}
@@ -28,13 +28,13 @@
 								</div>
 							</div>
 						</div>
-						<div class="d-grid gap-2 d-md-flex justify-content-md-center">
+						<div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
 							<button type="submit" class="btn btn-primary">Charger</button>
 						</div>
 
 					</form>
 				</div>
-				<div class="col-6">
+				<div class="col-md-6">
 					{% for button in buttons %}
 						{% set matchinguploads = [] %}
 						{% for upload in uploads %}

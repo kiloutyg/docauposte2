@@ -4,91 +4,95 @@
 {% endblock %}
 
 {% block body %}
-	<div class="container">
-		<div>
-			<h1>Page d'administration de la ligne
-				{{productLine.name|capitalize}}
-				de la Zone
-				{{productLine.zone.name|capitalize }}
-			</h1>
-		</div>
-		<div>
-			<h2>Formulaire de creation de categories :</h2>
-		</div>
-		<div class=" card border-0 shadow rounded-3 my-5 ">
-			<div class="card-body ">
-				<div class="row">
-					<div class="col-md-6">
-						<form class="form-floating justify-content-center " method="POST" action="{{ path('app_line_admin_create_category', {id: productLine.name, name: productLine.zone.name}) }}">
-							<div class="form-control mb-3">
-								<input type="text" name="categoryname" placeholder="Nom de la Catégorie" required>
+	<h1 class="my-4">
+		<strong>Page d'administration de la ligne
+			{{productLine.name|capitalize}}
+			de la Zone
+			{{productLine.zone.name|capitalize }}
+		</strong>
+	</h1>
+	<h2 class="my-4">
+		<strong>Formulaire de creation de categories :</strong>
+	</h2>
+	<div class="card border-0 shadow rounded-3 my-5">
+		<div class="card-body">
+			<div class="row">
+				<div class="card border-0 shadow rounded-3 my-5  bg-secondary">
+					<div class="card-body">
+						<div class="row d-flex align-items-center gy-lg-0 gy-5">
+							<div class="col-md-6">
+
+								<h5 class="card-title text-center mb-5 fw-light fs-5">
+									<strong>Creation de Catégories</strong>
+								</h5>
+								<form class="form-control" method="POST" action="{{ path('app_line_admin_create_category', {id: productLine.name, name: productLine.zone.name}) }}">
+									<div class="mb-3">
+										<label for="categoryname">Nom de la Catégorie</label>
+										<input type="text" name="categoryname" placeholder="Nom de la Catégorie" required class="form-control" id="categoryname">
+									</div>
+									<div class="d-grid">
+										<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Valider</button>
+									</div>
+
+
+								</form>
+								<hr class="my-4">
 							</div>
-							<div class="form-control mb-3">
-								<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Valider</bouton>
-							</div>
-						</form>
-					</div>
-					<div class="col-md-6">
-						<ul>
-							<h5>
-								<strong>
-									Liste des Catégories de la Ligne
-									{{productLine.name|capitalize}}
-									:
-								</strong>
-							</h5>
-							<p>
-								{% set matchingCategories = [] %}
-								{% for category in categories %}
-									{% if category.productLine.id is same as(productLine.id)  %}
-										{% set matchingCategories = matchingCategories|merge([category]) %}
-									{% endif %}
-								{% endfor %}
-							</p>
-							<p>
-								<div>
-									{% if matchingCategories|length > 0 %}
-										{% for category in matchingCategories %}
-											<div class="d-flex ps-5 mb-1 mt-1 line-list">
-												<a href="{{path('app_category', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}" class="btn" style="color:white">
-													<span class="line-details text-justify">
-														-{{ category.name }}
-														<id={{category.id}}></id>
-													</span>
-												</a>
-												<a href="{{path('app_line_admin_delete_category', {id: category.name})}}" class="btn" style="color:white">
-													<span class="line-details  text-justify">
-														- Supprimer
-														<id={{category.id}}></id>
-													</span>
-												</a>
-											</div>
-										{% endfor %}
-									{% else %}
-										<div class="alert alert-danger">
-											<a href="{{path('app_base')}}">
-												Il n'y a pas de catégories dans cette ligne.
+
+							<div class="col-md-6">
+								<h5 class="card-title text-center mb-5 fw-light fs-5">
+									<strong>Liste des Catégories de la Ligne
+										{{productLine.name|capitalize}}:</strong>
+								</h5>
+								<ul class="list-unstyled">
+									{% set matchingCategories = categories|filter(category => category.productLine.id is same as(productLine.id)) %}
+									{% for category in matchingCategories %}
+										<li class="form-control d-flex justify-content-between align-items-center mb-2">
+											<a href="{{path('app_category', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}" class="btn btn-link">
+												{{ category.name|capitalize }}
+												<span class="visually-hidden">{{ category.id }}</span>
 											</a>
-										</div>
-									{% endif %}
-								</div>
-							</p>
-						</ul>
+											<a href="{{path('app_line_admin_delete_category', {id: category.name})}}" class="btn btn-danger">
+												Supprimer
+												<span class="visually-hidden">{{ category.id }}</span>
+											</a>
+										</li>
+									{% else %}
+										<li class="alert alert-danger">
+											<a href="{{path('app_base')}}">Il n'y a pas de catégories dans cette ligne.</a>
+										</li>
+									{% endfor %}
+								</ul>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div>
-			<h2>Formulaire de creation de compte utilisateur :</h2>
-			<form method="POST" action="{{ path('app_line_admin_create_manager', {id: productLine.name}) }}">
-				{% include "services/accountservices/create_account.html.twig" %}
-			</form>
+	</div>
+	<h2 class="my-4">
+		<strong>Formulaire de creation de compte utilisateur :</strong>
+	</h2>
+	<div class="card border-0 shadow rounded-3 my-5">
+		<div class="card-body">
+			<div class="row">
+				<form method="POST" action="{{ path('app_line_admin_create_manager', {id: productLine.name}) }}">
+					{% include "services/accountservices/create_account.html.twig" %}
+				</form>
+			</div>
 		</div>
-		<div>
-			<h2>Formulaire d'upload :</h2>
-			<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
-				{% include "services/uploads/upload.html.twig" %}
-			</form>
+	</div>
+	<h2 class="my-4">
+		<strong>Formulaire d'upload :</strong>
+	</h2>
+
+	<div class="card border-0 shadow rounded-3 my-5">
+		<div class="card-body">
+			<div class="row">
+				<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+					{% include "services/uploads/upload.html.twig" %}
+				</form>
+			</div>
 		</div>
 	</div>
 {% endblock %}

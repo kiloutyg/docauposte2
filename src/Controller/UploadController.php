@@ -49,35 +49,35 @@ class UploadController extends FrontController
     }
 
 
-    #[Route('/zone/{name}/productline/{id}/category/{category}/button/{button}/uploading', name: 'upload_files')]
-    public function upload_files(UploadsService $uploadsService, Request $request, string $button = null): Response
-    {
-        $this->uploadsService = $uploadsService;
+    // #[Route('/zone/{name}/productline/{id}/category/{category}/button/{button}/uploading', name: 'upload_files')]
+    // public function upload_files(UploadsService $uploadsService, Request $request, string $button = null): Response
+    // {
+    //     $this->uploadsService = $uploadsService;
 
-        $buttonEntity = $this->buttonRepository->findoneBy(['name' => $button]);
-        $category    = $buttonEntity->getCategory();
-        $productLine = $category->getProductLine();
-        $zone        = $productLine->getZone();
+    //     $buttonEntity = $this->buttonRepository->findoneBy(['name' => $button]);
+    //     $category    = $buttonEntity->getCategory();
+    //     $productLine = $category->getProductLine();
+    //     $zone        = $productLine->getZone();
 
 
-        // Use the UploadsService to handle file uploads
-        $name = $this->uploadsService->uploadFiles($request, $buttonEntity);
-        $this->addFlash('success', 'The file '  . $name .  'has been uploaded successfully!');
+    //     // Use the UploadsService to handle file uploads
+    //     $name = $this->uploadsService->uploadFiles($request, $buttonEntity);
+    //     $this->addFlash('success', 'The file '  . $name .  'has been uploaded successfully!');
 
-        return $this->redirectToRoute(
-            'app_uploaded_files',
-            [
-                'zone'        => $zone,
-                'name'        => $zone->getName(),
-                'productLine' => $productLine,
-                'id'          => $productLine->getName(),
-                'category'    => $category->getName(),
-                'categories'  => $this->categoryRepository->findAll(),
-                'button'      => $buttonEntity->getName(),
-                'uploads'     => $this->uploadRepository->findAll(),
-            ]
-        );
-    }
+    //     return $this->redirectToRoute(
+    //         'app_uploaded_files',
+    //         [
+    //             'zone'        => $zone,
+    //             'name'        => $zone->getName(),
+    //             'productLine' => $productLine,
+    //             'id'          => $productLine->getName(),
+    //             'category'    => $category->getName(),
+    //             'categories'  => $this->categoryRepository->findAll(),
+    //             'button'      => $buttonEntity->getName(),
+    //             'uploads'     => $this->uploadRepository->findAll(),
+    //         ]
+    //     );
+    // }
 
 
     #[Route('/uploading', name: 'generic_upload_files')]

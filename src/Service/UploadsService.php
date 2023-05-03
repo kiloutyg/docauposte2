@@ -6,12 +6,15 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+
 
 use App\Repository\UploadRepository;
 
 use App\Entity\Upload;
 
-class UploadsService
+class UploadsService extends AbstractController
 {
 
     protected $uploadRepository;
@@ -27,15 +30,25 @@ class UploadsService
 
     public function uploadFiles(Request $request, $button, $newFileName = null)
     {
+        $allowedExtensions = ['pdf'];
         $files = $request->files->all();
 
         foreach ($files as $file) {
+
+            $extension = $file->guessExtension();
+
+            if (!in_array($extension, $allowedExtensions)) {
+                // throw new \Exception('Le fichier doit être au format PDF');
+                return $this->addFlash('error', 'Shit hit the fan dude');;
+            }
+
             $public_dir = $this->projectDir . '/public';
             if ($newFileName) {
                 $filename   = $newFileName;
             } else {
                 $filename   = $file->getClientOriginalName();
             }
+
             $path       = $public_dir . '/doc/' . $filename;
             $file->move($public_dir . '/doc/', $filename);
             $name = $filename;
@@ -58,7 +71,9 @@ class UploadsService
         $name = $filename;
         $public_dir = $this->projectDir . '/public';
         $path       = $public_dir . '/doc/' . $filename;
-        unlink($path);
+        if (file_exists($path)) {
+            unlink($path);
+        }
 
         $upload = $this->uploadRepository->findOneBy(['filename' => $filename, 'button' => $button]);
         $this->manager->remove($upload);

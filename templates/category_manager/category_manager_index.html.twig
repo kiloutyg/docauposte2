@@ -1,92 +1,103 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello LineAdminController!
+{% block title %}Administration - Category
+	{{ category.name|capitalize }}
 {% endblock %}
 
 {% block body %}
-	<div class="container">
+	<h1 class="my-4">
+		<strong>Page d'administration de la catégorie
+			{{ category.name|capitalize }}</strong>
+	</h1>
 
-		<div>
-			<h1>Page d'administration de la catégorie
-				{{category.name|capitalize}}</h1>
-		</div>
-		<div>
-			<h2>Formulaire de creation de boutons :</h2>
-		</div>
-		<div class=" card border-0 shadow rounded-3 my-5 ">
-			<div class="card-body ">
-				<div class="row">
-					<div class="col-md-6">
-						<form class="form-floating justify-content-center " method="POST" action="{{ path('app_category_manager_create_button', {category: category.name, id: category.productline.name, name: category.productline.zone.name}) }}">
-							<div class="form-control mb-3">
-								<input type="text" name="buttonname" placeholder="Nom du Bouton" required>
-							</div>
-							<div class="form-control mb-3">
-								<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Valider</bouton>
-							</div>
-						</form>
-					</div>
-					<div class="col-md-6">
-						<ul>
-							<h5>
-								<strong>
-									Liste des boutons de la Catégorie
-									{{category.name|capitalize}}
-									:
-								</strong>
-							</h5>
-							<p>
-								{% set matchingButtons = [] %}
-								{% for button in buttons %}
-									{% if button.category.id is same as(category.id)  %}
-										{% set matchingButtons = matchingButtons|merge([button]) %}
-									{% endif %}
-								{% endfor %}
-							</p>
-						</p>
-						<p>
-							<div>
-								{% if matchingButtons|length > 0 %}
-									{% for button in matchingButtons %}
-										<div class="d-flex ps-5 mb-1 mt-1 line-list">
-											<a href="{{path('app_button', {button: button.name, category: button.category.name, id: button.category.productLine.name, name: button.category.productLine.zone.name})}}" class="btn" style="color:white">
-												<span class="line-details text-justify">
-													-{{ button.name }}
-													<id={{button.id}}></span>
-												</a>
-												<a href="{{path('app_category_manager_delete_button', {id: button.name})}}" class="btn" style="color:white">
-													<span class="line-details  text-justify">
-														- Supprimer
-														<id={{button.id}}></span>
-													</a>
-												</div>
-											{% endfor %}
-										{% else %}
-											<div class="alert alert-danger">
-												<a href="#" onclick="event.preventDefault(); window.history.back();">
-													Il n'y a pas de boutons dans cette catégories.
-												</a>
-											</div>
-										{% endif %}
+	<h2 class="my-4">
+		<strong>Formulaire de création de boutons :</strong>
+	</h2>
+
+	<div class="card border-0 shadow rounded-3 my-5">
+		<div class="card-body">
+			<div class="row">
+				<div class="card border-0 shadow rounded-3 my-5">
+					<div class="card-body">
+						<div class="row d-flex align-items-center gy-lg-0 gy-5">
+							<div class="col-md-6">
+
+								<h5 class="card-title text-center mb-5 fw-light fs-5">
+									<strong>Creation de Bouttons</strong>
+								</h5>
+
+								<form class="form-control" method="POST" action="{{ path('app_category_manager_create_button', {category: category.name, id: category.productline.name, name: category.productline.zone.name}) }}">
+									<div class="mb-3">
+										<label for="buttonname">Nom du Bouton</label>
+										<input type="text" name="buttonname" placeholder="Nom du Bouton" required class="form-control" id="buttonname">
 									</div>
-								</div>
-							</p>
-						</p>
-					</ul>
+									<div class="d-grid">
+										<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Valider</button>
+									</div>
+									<hr class="my-4">
+
+								</form>
+							</div>
+							<div class="col-md-6">
+								<h5 class="card-title text-center mb-5 fw-light fs-5">
+									<strong>Liste des boutons de la Catégorie
+										{{ category.name|capitalize }}:</strong>
+								</h5>
+								<ul class="list-unstyled">
+									{% set matchingButtons = buttons|filter(button => button.category.id is same as(category.id)) %}
+									{% for button in matchingButtons %}
+										<li class="form-control d-flex justify-content-between align-items-center mb-2">
+											<a href="{{path('app_button', {button: button.name, category: button.category.name, id: button.category.productLine.name, name: button.category.productLine.zone.name})}}" class="btn btn-link">
+												{{ button.name|capitalize }}
+												<span class="visually-hidden">{{ button.id }}</span>
+											</a>
+											<a href="{{path('app_category_manager_delete_button', {id: button.name})}}" class="btn btn-danger">
+												Supprimer
+												<span class="visually-hidden">{{ button.id }}</span>
+											</a>
+										</li>
+									{% else %}
+										<li class="alert alert-danger">
+											<a href="#" onclick="event.preventDefault(); window.history.back();">
+												Il n'y a pas de boutons dans cette catégorie.
+											</a>
+										</li>
+									{% endfor %}
+								</ul>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div>
-		<h2>Formulaire de creation de compte utilisateur :</h2>
-		<form method="POST" action="{{ path('app_category_manager_create_user', {category: category.name}) }}">
-			{% include "services/accountservices/create_account.html.twig" %}
-		</form>
+
+	<h2 class="my-4">
+		<strong>Formulaire de création de compte utilisateur :</strong>
+	</h2>
+
+	<div class="card border-0 shadow rounded-3 my-5">
+		<div class="card-body">
+			<div class="row">
+				<form method="POST" action="{{ path('app_category_manager_create_user', {category: category.name}) }}">
+					{% include "services/accountservices/create_account.html.twig" %}
+				</form>
+			</div>
+		</div>
 	</div>
-	<div>
-		<h2>Formulaire d'upload :</h2>
-		<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
-			{% include "services/uploads/upload.html.twig" %}
-		</form>
+
+	<h2 class="my-4">
+		<strong>Formulaire d'upload :</strong>
+	</h2>
+
+	<div class="card border-0 shadow rounded-3 my-5">
+		<div class="card-body">
+			<div class="row">
+
+				<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+					{% include "services/uploads/upload.html.twig" %}
+				</form>
+			</div>
+		</div>
 	</div>
-</div>{% endblock %}
+{% endblock %}
