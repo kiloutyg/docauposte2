@@ -4,16 +4,50 @@
 			Version fish l'info
 		</strong>
 	</h1>
-	{% if (zone is defined) and (zone is not empty)  %}
-		{% elseif  (productLine is defined) and (productLine is not empty)   %}
-		{% elseif  (category is defined) and (category is not empty)   %}
-		{% elseif  (button is defined) and (button is not empty)   %}
-		{% else %}
-			<div class="alert alert-danger">
-				<a href="{{path('app_base')}}">
-					Il n'y a pas de documents disponible pour ce bouton.
-				</a>
-			</div>
+
+	{% if (buttons is defined) and (buttons is not empty) %}
+		<div>
+			{% for button in buttons %}
+				<strong>
+					Boutton
+					{{ button.name|capitalize }}</strong>
+				{% set matchinguploads = uploads|filter(upload => upload.button.id == button.id) %}
+				{% if matchinguploads|length > 0 %}
+					{% for upload in matchinguploads %}
+						<li class="form-control shadow d-flex justify-content-between align-items-center mb-3">
+							<a href="{{ path('app_download_file', { 'filename': upload.filename }) }}" class="btn btn-link" target="_blank">
+								-
+								{{ upload.filename }}
+								<span class="visually-hidden">{{ upload.id }}</span>
+							</a>
+							<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id }) }}" class="btn btn-danger">
+								Supprimer
+								<span class="visually-hidden">{{ upload.id }}</span>
+							</a>
+						</li>
+					{% endfor %}
+				{% else %}
+					<div class="alert alert-danger">
+						<a href="{{path('app_base')}}">
+							Il n'y a pas de documents disponible pour le bouton
+							{{button.name}}
+							de la catégorie
+							{{button.category.name}}
+							de la ligne
+							{{button.category.productLine.name}}
+							de la zone
+							{{button.category.productLine.zone.name}}.
+						</a>
+					</div>
+				{% endif %}
+			{% endfor %}
+		</div>
+	{% else %}
+		<div class="alert alert-danger">
+			<a href="{{path('app_base')}}">
+				Il n'y a pas de documents disponible pour ce bouton.
+			</a>
+		</div>
 	{% endif %}
 
 	<h1>
@@ -67,11 +101,13 @@
 			</div>
 		{% endif %}
 	</div>
+
 	<h1>
 		<strong>
 			Version grosse boucle
 		</strong>
 	</h1>
+
 	{% if (zones is defined) and (zones is not empty) %}
 		{% for zone in zones %}
 			{% if (zone.productLines is not empty) %}
