@@ -114,7 +114,7 @@ class FrontController extends BaseController
 
 
     #[Route('/zone/{name}/productline/{id}/category/{category}/button/{button}', name: 'button')]
-    public function ButtonShowingUploadedFile(string $button = null): Response
+    public function ButtonShowing(string $button = null): Response
     {
         $buttonEntity = $this->buttonRepository->findoneBy(['name' => $button]);
         $category    = $buttonEntity->getCategory();

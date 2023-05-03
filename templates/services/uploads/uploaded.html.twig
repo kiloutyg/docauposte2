@@ -1,0 +1,41 @@
+<p>
+	<div class="  align-items-center  text-white bg-secondary my-5 py-4 text-center mydropzone">
+		{% set matchinguploads = [] %}
+		{% for upload in uploads %}
+			{% if upload.button.id is same as(button.id)  %}
+				{% set matchinguploads = matchinguploads|merge([upload]) %}
+			{% endif %}
+		{% endfor %}
+		<p>
+			{% if matchinguploads|length > 0 %}
+				{% for upload in matchinguploads %}
+					<div class="d-flex ps-5 mb-5 mt-5 line-list">
+						<a href="{{path('app_download_file', {filename:upload.filename, button: button.name, category: button.category.name, id: button.category.productLine.name, name: button.category.productLine.zone.name})}}" target="_blank">
+							<span class="line-details">
+								-{{ upload.filename }}
+								<id={{upload.id}}>></span>
+							</a>
+							<a href="{{path('app_delete_file', {filename:upload.filename, button: button.name, category: button.category.name, id: button.category.productLine.name, name: button.category.productLine.zone.name})}}">
+								<span class="line-details">
+									- Supprimer
+									<id={{upload.id}}>></span>
+								</a>
+							</div>
+						{% endfor %}
+					{% else %}
+
+						<div class="card border-0 shadow rounded-3 my-5">
+							<div class="card-body">
+								<div class="row">
+									<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+										{% include "services/uploads/upload.html.twig" %}
+									</form>
+								</div>
+							</div>
+						</div>
+					{% endif %}
+				</div>
+			</p>
+		</p>
+	</div>
+</p>
