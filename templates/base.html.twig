@@ -21,123 +21,122 @@
             encore_entry_script_tags("app")
         }}
 		{% endblock %}
+		{% block script %}
+			<script>
+				var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+var toastList = toastElList.map(function (toastEl) {
+return new bootstrap.Toast(toastEl, {autohide: false})
+})
+toastList.forEach(toast => toast.show()); // This shows them
+			</script>
+			{% include "services/_toasts.html.twig" %}
+
+		{% endblock %}
 	</head>
-	<body>
-		<!-- Main Navigation -->
-		<nav class="navbar navbar-expand-lg navbar-dark mb-5" style="background-color: #1f3e52">
-			<div class="container">
-				<a class="navbar-brand" href="{{ path('app_base') }}">
-					<img class="img-fluid align-center justify-content-center" src="{{ asset('Plastic_Omnium.svg') }}" alt="Logo de PlasticOmnium" role="img" width="125"/></a>
-				<a class="navbar-brand" href="{{ path('app_base') }}">
-					<h1>
-						<strong>
-							DocAuPoste
-						</strong>
-					</h1>
-				</a>
-				<div>
-					{% include "services/_toasts.html.twig" %}
-				</div>
-				<div class="ms-auto d-flex align-items-center">
-					{% if app.user is null %}
-						<a class="btn btn-primary" href="{{ path('app_login') }}">Login</a>
-					{% else %}
-						<a class="btn btn-primary" href="{{ path('app_logout') }}">Logout</a>
-					{% endif %}
-				</div>
-			</div>
-		</nav>
-		<!-- End Main Navigation -->
-
+	<!-- Main Navigation -->
+	<nav class="navbar navbar-expand-lg navbar-dark mb-5" style="background-color: #1f3e52">
 		<div class="container">
-			{% if users is defined %}
-				{% if users is empty %}
-					<form class="d-flex flex-wrap justify-content-between" action="{{ path('app_create_super_admin') }}" method="post">
-						{% include "services/create_account.html.twig" %}
-					</form>
-				{% endif %}
-			{% endif %}
-			{{dump(app.session)}}
-			{{dump(app.user)}}
-			{% if users is defined %}
-				{{ dump(users) }}
-			{% endif %}
-			{% if app.user is not empty %}
-				{{dump(app.user.roles)}}
-			{% endif %}
-			{% if zone is defined %}
-				{{dump(zone)}}
-			{% endif %}
-			{% if productLine is defined %}
-				{{dump(productLine)}}
-			{% endif %}
-			{% if refererUrl is defined %}
-				{{dump(refererUrl)}}
-			{% endif %}
-		</div>
-
-		<div
-			class="container">
-			{# {% include "services/login_out_button.html.twig" %} #}
-			{% block body %}
-				{% if app.user %}
-					{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
-						<aside>
-							<a href="{{ path('app_master') }}" class="btn" style="color:white">Master Center</a>
-						</aside>
-					{% endif %}
-				{% endif %}
-				<p>
-					<h1>
+			<a class="navbar-brand" href="{{ path('app_base') }}">
+				<img class="img-fluid align-center justify-content-center" src="{{ asset('Plastic_Omnium.svg') }}" alt="Logo de PlasticOmnium" role="img" width="125"/></a>
+			<a class="navbar-brand" href="{{ path('app_base') }}">
+				<h1>
+					<strong>
+						DocAuPoste
+					</strong>
+				</h1>
+			</a>
+			<div></div>
+			<div class="ms-auto d-flex align-items-center">
+				{% if app.user is null %}
+					<a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
+				{% else %}
+					<p>
 						<strong>
-							Doc Au Poste
+							{{ app.user.username|capitalize }}
 						</strong>
-					</h1>
-				</p>
-				<p>
-					<h3>
-						<strong>
-							Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
-					</h3>
-				</p>
-				<p>
-					<div class="d-flex flex-column ">
-						{% for zone in zones %}
-							<div class="d-flex ps-5 mb-5 mt-5  line-list">
-								<a href="{{path('app_zone', {id: zone.name})}}" <span class="line-details">>
-									{{ zone.name }}
-									<id={{zone.id}}></span>
-								</a>
-							</div>
-						{% endfor %}
-					</div>
-				</p>
+						<a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
+					</p>
+				{% endif %}
 			</div>
+		</div>
+	</nav>
+	<!-- End Main Navigation -->
+
+	<div class="container">
+
+		{% if users is defined %}
+			{% if users is empty %}
+				<form class="d-flex flex-wrap justify-content-between" action="{{ path('app_create_super_admin') }}" method="post">
+					{% include "services/accountservices/create_account.html.twig" %}
+				</form>
+			{% endif %}
+		{% endif %}
+
+	</div>
+
+	<div class="container">
+
+		{% block body %}
+
+			{% if app.user %}
+				{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
+					<aside class="position-absolute end-0">
+						<a href="{{ path('app_super_admin') }}" class="btn" style="color:white">Centre de Super-Administration</a>
+					</aside>
+				{% endif %}
+			{% endif %}
+			<p>
+				<h1>
+					<strong>
+						Doc Au Poste
+					</strong>
+				</h1>
+			</p>
+			<p>
+				<h3>
+					<strong>
+						Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
+				</h3>
+			</p>
+			<p>
+				<div class="d-flex flex-column ">
+					{% for zone in zones %}
+						<div class="d-flex ps-5 mb-5 mt-5  line-list">
+							<a href="{{path('app_zone', {id: zone.name})}}" <span class="line-details">>
+								{{ zone.name }}
+								<id={{zone.id}}></span>
+							</a>
+						</div>
+					{% endfor %}
+				</div>
+			</p>
+
 		{% endblock body %}
-		<!-- Footer -->
-		<footer class="container mt-auto py-3 border-top">
-			<div class="d-flex flex-wrap justify-content-between">
-				<div class="col-md-4 d-flex align-items-center">
-					<span class="me-1" style="color: red">
-						<i class="fas fa-heart"></i>
-					</span>
-					<span class="text-muted me-1">The guys and gals at</span>
-					<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium</a>
-				</div>
-				<div>
-					<a href="../">
-						<i class="fa fa-arrow-circle-o-left" aria-hidden="false">Page d'Accueil</i>
-					</a>
-				</div>
-				<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-					<li class="ms-3">
-						<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/staging2">
-							<i class="fab fa-github"></i>
-						</a>
-					</li>
-				</ul>
+	</div>
+
+	<!-- Footer -->
+	<footer class="container mt-auto py-3 border-top">
+		<div class="d-flex flex-wrap justify-content-between">
+			<div class="col-md-4 d-flex align-items-center">
+				<span class="me-1" style="color: red">
+					<i class="fas fa-heart"></i>
+				</span>
+				<span class="text-muted me-1">The guys and gals at</span>
+				<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium</a>
 			</div>
-		</footer>
-		<!-- End Footer -->
-	</body>
+			<div>
+				<a href="#" onclick="event.preventDefault(); window.history.back();">
+					<i class="fa fa-arrow-circle-o-left" aria-hidden="false">Page d'Accueil</i>
+				</a>
+			</div>
+			<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+				<li class="ms-3">
+					<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/staging2">
+						<i class="fab fa-github"></i>
+					</a>
+				</li>
+			</ul>
+		</div>
+	</footer>
+	<!-- End Footer -->
 </html>

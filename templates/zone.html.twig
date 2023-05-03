@@ -5,53 +5,56 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-
 	{% if app.user %}
-		{% if  is_granted('ROLE_ADMIN', object = null, field = null) %}
-			<aside>
-				<a href="{{ path('app_admin', {id: zone.name}) }}" class="btn" style="color:white">Admin Center</a>
+		{% if  is_granted('ROLE_ADMIN') %}
+			<aside class="position-absolute end-0">
+				<a href="{{ path('app_zone_admin', {id: zone.name}) }}" class="btn" style="color:white">Centre d'Administration de Zone</a>
 			</aside>
 		{% endif %}
 	{% endif %}
-	<h2>
-		<strong>
-			{{ zone.name }}
-		</strong>
-	</h2>
-
-
-	<div class="col-12 col-md-8 ps-5 mb-5 mt-5 ">
-		<h2 class="mb-4">Les lignes de la zone
-			{{zone.name}}:
-		</h2>
-		{% set matchingProductLines = [] %}
-		{% for productLine in productLines %}
-			{% if productLine.zone.id is same as(zone.id)  %}
-				{% set matchingProductLines = matchingProductLines|merge([productLine]) %}
-			{% endif %}
-		{% endfor %}
-		<div>
-			{% if matchingProductLines|length > 0 %}
-				{% for productLine in matchingProductLines %}
-					<div class="d-flex ps-5 mb-5 mt-5 line-list">
-						<a href="{{path('app_productline', {id: productLine.name, name: productLine.zone.name} )}}">
-							<span class="line-details">
-								-{{ productLine.name }}
-								<id={{productLine.id}}>>
-								</span>
+	<div class="container">
+		<p>
+			<h2 class="text-justify">
+				<strong>
+					{{ zone.name }}
+				</strong>
+			</h2>
+		</p>
+		<p>
+			<div class=" mb-5 mt-5">
+				<h2 class="mb-4 text-justify">Les lignes de la zone
+					{{zone.name}}:
+				</h2>
+				{% set matchingProductLines = [] %}
+				{% for productLine in productLines %}
+					{% if productLine.zone.id is same as(zone.id)  %}
+						{% set matchingProductLines = matchingProductLines|merge([productLine]) %}
+					{% endif %}
+				{% endfor %}
+			</p>
+		</p>
+		<p>
+			<div>
+				{% if matchingProductLines|length > 0 %}
+					{% for productLine in matchingProductLines %}
+						<div class="d-flex ps-5 mb-5 mt-5 line-list">
+							<a href="{{path('app_productline', {id: productLine.name, name: productLine.zone.name} )}}">
+								<span class="line-details text-justify">
+									-{{ productLine.name }}
+									<id={{productLine.id}}>>
+									</span>
+								</a>
+							</div>
+						{% endfor %}
+					{% else %}
+						<div class="alert alert-danger">
+							<a href="#" onclick="event.preventDefault(); window.history.back();">
+								Il n'y a pas de lignes dans cette zone.
 							</a>
 						</div>
-					{% endfor %}
-				{% else %}
-					<div class="alert alert-danger">
-						<a href="{{path('app_base')}}">
-							Il n'y a pas de lignes dans cette zone.
-						</a>
-					</div>
-				{% endif %}
-
+					{% endif %}
+				</div>
 			</div>
-
-		</div>
+		</p>
 	</div>
 {% endblock %}

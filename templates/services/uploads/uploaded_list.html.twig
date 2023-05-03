@@ -1,8 +1,8 @@
 <p>
-	<div class="  align-items-center card text-white bg-secondary my-5 py-4 text-center mydropzone">
+	<div class="  align-items-center  text-white bg-secondary my-5 py-4 text-center mydropzone">
 		{% set matchinguploads = [] %}
 		{% for upload in uploads %}
-			{% if upload.productLine.id is same as(productLine.id)  %}
+			{% if upload.button.id is same as(button.id)  %}
 				{% set matchinguploads = matchinguploads|merge([upload]) %}
 			{% endif %}
 		{% endfor %}
@@ -10,33 +10,28 @@
 			{% if matchinguploads|length > 0 %}
 				{% for upload in matchinguploads %}
 					<div class="d-flex ps-5 mb-5 mt-5 line-list">
-						<a href="{{path('app_download_file', {filename:upload.filename, name:zone.name, id:productLine.name})}}" target="_blank">
+						<a href="{{path('app_download_file', {filename:upload.filename, button: button.name, category: button.category.name, id: button.category.productLine.name, name: button.category.productLine.zone.name})}}" target="_blank">
 							<span class="line-details">
 								-{{ upload.filename }}
 								<id={{upload.id}}>></span>
 							</a>
-							<a href="{{path('app_delete_file', {filename:upload.filename, name:zone.name, id:productLine.id})}}">
+							<a href="{{path('app_delete_file', {filename:upload.filename, button: button.name, category: button.category.name, id: button.category.productLine.name, name: button.category.productLine.zone.name})}}">
 								<span class="line-details">
-									- Delete
+									- Supprimer
 									<id={{upload.id}}>></span>
 								</a>
 							</div>
 						{% endfor %}
 					{% else %}
-						<div class="alert alert-danger">
-							<a href="{{path('app_base')}}">
-								Il n'y a pas de documents disponible pour cette ligne.
-							</a>
-						</div>
-						<div class="card-body">
-							<p class="text-white m-0">
-								Ajouter des fichiers :
-							</p>
-							<form action="{{path('app_upload_files', {id: productLine.id, name: productLine.zone.name})}}" method="POST" enctype="multipart/form-data">
-								<div class="fallback">
-									<input name="file" type="file" multiple/><button type="submit" class="btn btn-primary">Upload</button>
+
+						<div class="card border-0 shadow rounded-3 my-5">
+							<div class="card-body">
+								<div class="row">
+									<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+										{% include "services/uploads/upload.html.twig" %}
+									</form>
 								</div>
-							</form>
+							</div>
 						</div>
 					{% endif %}
 				</div>

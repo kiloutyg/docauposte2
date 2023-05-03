@@ -24,7 +24,7 @@ class AccountService
         $this->manager = $manager;
     }
 
-    public function createAccount(Request $request, &$error, $currentRoute, $routeParams)
+    public function createAccount(Request $request, &$error)
     {
         if ($request->getMethod() == 'POST') {
             $name = $request->request->get('username');
@@ -45,10 +45,19 @@ class AccountService
                 $this->manager->persist($user);
                 $this->manager->flush();
 
-                return  ['user' => $user, 'route' => $currentRoute, 'params' => $routeParams];
+                // return  ['user' => $user];
+
+                return  $user;
             }
         }
 
         return null;
+    }
+
+    public function deleteUser($id)
+    {
+        $user = $this->userRepository->find($id);
+        $this->manager->remove($user);
+        $this->manager->flush();
     }
 }

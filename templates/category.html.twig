@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{category.name}}
+	|
+	{{ parent() }}
+{% endblock %}
+{% block body %}
+	<div class="container">
+		{% if app.user %}
+			{% if  is_granted('ROLE_MANAGER') %}
+				<aside class="position-absolute end-0">
+					<a href="{{ path('app_category_manager', {category: category.name}) }}" class="btn" style="color:white">Centre d'Administration de Catégories</a>
+					<br>
+
+				</aside>
+			{% endif %}
+		{% endif %}
+		<h2 class="mt-5">
+			<strong>
+				{{ category.name|capitalize }}
+			</strong>
+		</h2>
+		<p>
+			<div class=" mb-5 mt-5">
+				<h2 class="mb-4 text-justify">Les boutons de la catégorie
+					{{ category.name|capitalize }}
+					:
+				</h2>
+				{% set matchingButtons = [] %}
+				{% for button in buttons %}
+					{% if button.category.id is same as(category.id)  %}
+						{% set matchingButtons = matchingButtons|merge([button]) %}
+					{% endif %}
+				{% endfor %}
+			</p>
+		</p>
+		<p>
+			<div>
+				{% if matchingButtons|length > 0 %}
+					{% for button in matchingButtons %}
+						<div class="d-flex ps-5 mb-5 mt-5 line-list">
+							<a href="{{path('app_button', {button: button.name, category: button.category.name, id: button.category.productLine.name, name: button.category.productLine.zone.name})}}" class="btn" style="color:white">
+								<span class="line-details text-justify">
+									-{{ button.name }}
+									<id={{button.id}}>>
+									</span>
+								</a>
+							</div>
+						{% endfor %}
+					{% else %}
+						<div class="alert alert-danger">
+							<a href="#" onclick="event.preventDefault(); window.history.back();">
+								Il n'y a pas de boutons dans cette catégories.
+							</a>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		</p>
+	</div>
+{% endblock %}

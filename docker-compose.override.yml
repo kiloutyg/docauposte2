@@ -8,11 +8,11 @@ services:
 ###< doctrine/doctrine-bundle ###
 
 ###> symfony/mailer ###
-  mailer:
-    image: schickling/mailcatcher
-    ports: ["1025", "1080"]
-    restart: unless-stopped
-    networks:
-      vpcbr:
-        ipv4_address : 172.20.0.5
+  # mailer:
+  #   image: schickling/mailcatcher
+  #   ports: ["1025", "1080"]
+  #   restart: unless-stopped
+  #   networks:
+  #     vpcbr:
+  #       ipv4_address : 172.20.0.5
 ###< symfony/mailer ###
