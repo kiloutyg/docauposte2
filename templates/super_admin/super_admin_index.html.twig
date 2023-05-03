@@ -47,6 +47,7 @@
 									{% for zone in zones %}
 										<li class="form-control d-flex justify-content-between align-items-center mb-2">
 											<a href="{{path('app_zone', {id: zone.name})}}" class="btn btn-link">
+												-
 												{{ zone.name|capitalize }}
 												<span class="visually-hidden">{{ zone.id }}</span>
 											</a>
