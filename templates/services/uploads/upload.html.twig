@@ -1,27 +1,27 @@
 {% block body %}
-	{{dump(app.session)}}
-	{{dump(app.user)}}
-	{% if users is defined %}
-		{{ dump(users) }}
-	{% endif %}
-	{% if app.user is not empty %}
-		{{dump(app.user.roles)}}
-	{% endif %}
-	{% if zone is defined %}
-		{{dump(zone)}}
-	{% endif %}
-	{% if productLine is defined %}
-		{{dump(productLine)}}
-	{% endif %}
-	{% if category is defined %}
-		{{dump(category)}}
-	{% endif %}
-	{% if button is defined %}
-		{{dump(button)}}
-	{% endif %}
-	{% if refererUrl is defined %}
-		{{dump(refererUrl)}}
-	{% endif %}
+	{# {{dump(app.session)}}
+			{{dump(app.user)}}
+			{% if users is defined %}
+				{{ dump(users) }}
+			{% endif %}
+			{% if app.user is not empty %}
+				{{dump(app.user.roles)}}
+			{% endif %}
+			{% if zone is defined %}
+				{{dump(zone)}}
+			{% endif %}
+			{% if productLine is defined %}
+				{{dump(productLine)}}
+			{% endif %}
+			{% if category is defined %}
+				{{dump(category)}}
+			{% endif %}
+			{% if button is defined %}
+				{{dump(button)}}
+			{% endif %}
+			{% if refererUrl is defined %}
+				{{dump(refererUrl)}}
+			{% endif %} #}
 	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
 		<div class="card-body ">
 			<div class="row d-flex align-items-center gy-lg-0 gy-5">
@@ -62,50 +62,7 @@
 				</div>
 
 				<div class="col-md-6">
-					{% if (buttons is defined) and (buttons is not empty) %}
-						<div>
-							{% for button in buttons %}
-								<strong>
-									Boutton
-									{{ button.name|capitalize }}</strong>
-								{% set matchinguploads = uploads|filter(upload => upload.button.id == button.id) %}
-								{% if matchinguploads|length > 0 %}
-									{% for upload in matchinguploads %}
-										<li class="form-control shadow d-flex justify-content-between align-items-center mb-3">
-											<a href="{{ path('app_download_file', { 'filename': upload.filename }) }}" class="btn btn-link" target="_blank">
-												-
-												{{ upload.filename }}
-												<span class="visually-hidden">{{ upload.id }}</span>
-											</a>
-											<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id }) }}" class="btn btn-danger">
-												Supprimer
-												<span class="visually-hidden">{{ upload.id }}</span>
-											</a>
-										</li>
-									{% endfor %}
-								{% else %}
-									<div class="alert alert-danger">
-										<a href="{{path('app_base')}}">
-											Il n'y a pas de documents disponible pour le bouton
-											{{button.name}}
-											de la catégorie
-											{{button.category.name}}
-											de la ligne
-											{{button.category.productLine.name}}
-											de la zone
-											{{button.category.productLine.zone.name}}.
-										</a>
-									</div>
-								{% endif %}
-							{% endfor %}
-						</div>
-					{% else %}
-						<div class="alert alert-danger">
-							<a href="{{path('app_base')}}">
-								Il n'y a pas de documents disponible pour ce bouton.
-							</a>
-						</div>
-					{% endif %}
+
 					{% include 'services/uploads/uploaded_list.html.twig' %}
 				</div>
 			</div>
