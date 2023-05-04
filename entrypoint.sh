@@ -1,7 +1,7 @@
 #!/bin/sh
 mkdir -p ./public/doc 
 export http_proxy='http://10.0.0.1:80'
-composer require asset symfony/apache-pack debug templates symfony/ux-turbo symfony/profiler-pack symfony/var-dumper --dev
+composer require --dev asset symfony/apache-pack debug templates symfony/ux-turbo symfony/profiler-pack symfony/var-dumper 
 yarn add bootstrap jquery @popperjs/core @fontsource/roboto-condensed @fortawesome/fontawesome-free axios core-js webpack encore webpack-cli webpack-notifier @symfony/webpack-encore --dev
 composer install
 composer update 
@@ -11,4 +11,5 @@ chmod 777 . -R -v
 # yarn encore production &
 
 exec apache2-foreground  &
-yarn watch & yarn encore dev --watch
+# yarn watch &
+yarn encore dev --watch

@@ -66,9 +66,19 @@ toastList.forEach(toast => toast.show()); // This shows them
 
 		{% if users is defined %}
 			{% if users is empty %}
-				<form class="d-flex flex-wrap justify-content-between" action="{{ path('app_create_super_admin') }}" method="post">
-					{% include "services/accountservices/create_account.html.twig" %}
-				</form>
+				<h4 class="my-4">
+					<strong>Pour commencer à utiliser l'application, veuillez créer le superadministrateur :
+					</strong>
+				</h4>
+				<div class="card border-0 shadow rounded-3 my-5">
+					<div class="card-body">
+						<div class="row">
+							<form action="{{ path('app_create_super_admin') }}" method="post">
+								{% include "services/accountservices/create_account.html.twig" %}
+							</form>
+						</div>
+					</div>
+				</div>
 			{% endif %}
 		{% endif %}
 
