@@ -51,7 +51,7 @@
 											<td>{{ user.username }}</td>
 											<td>{{ user.roles|json_encode|convert_encoding('UTF-8', 'UTF-8') }}</td>
 											<td>
-												<a href="{{path('app_delete_account', {id: user.id})}}" class="btn btn-danger">
+												<a href="{{path('app_delete_account', {id: user.id})}}" class="btn btn-danger delete-user">
 													Supprimer
 												</a>
 											</td>

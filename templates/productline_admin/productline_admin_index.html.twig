@@ -25,7 +25,7 @@
 								<h5 class="card-title text-center mb-5 fw-light fs-5">
 									<strong>Creation de Catégories</strong>
 								</h5>
-								<form class="form-control" method="POST" action="{{ path('app_line_admin_create_category', {id: productLine.name, name: productLine.zone.name}) }}">
+								<form class="form-control" method="POST" action="{{ path('app_productline_admin_create_category', {id: productLine.name, name: productLine.zone.name}) }}">
 									<div class="mb-3">
 										<label for="categoryname">Nom de la Catégorie</label>
 										<input type="text" name="categoryname" placeholder="Nom de la Catégorie" required class="form-control" id="categoryname">
@@ -48,11 +48,11 @@
 									{% set matchingCategories = categories|filter(category => category.productLine.id is same as(productLine.id)) %}
 									{% for category in matchingCategories %}
 										<li class="form-control d-flex justify-content-between align-items-center mb-2">
-											<a href="{{path('app_category', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}" class="btn btn-link">
+											<a href="{{path('app_category_manager', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}" class="btn btn-link">
 												{{ category.name|capitalize }}
 												<span class="visually-hidden">{{ category.id }}</span>
 											</a>
-											<a href="{{path('app_line_admin_delete_category', {id: category.name})}}" class="btn btn-danger">
+											<a href="{{path('app_productline_admin_delete_category', {id: category.name})}}" class="btn btn-danger delete-category">
 												Supprimer
 												<span class="visually-hidden">{{ category.id }}</span>
 											</a>
@@ -76,7 +76,7 @@
 	<div class="card border-0 shadow rounded-3 my-5">
 		<div class="card-body">
 			<div class="row">
-				<form method="POST" action="{{ path('app_line_admin_create_manager', {id: productLine.name}) }}">
+				<form method="POST" action="{{ path('app_productline_admin_create_manager', {id: productLine.name}) }}">
 					{% include "services/accountservices/create_account.html.twig" %}
 				</form>
 			</div>

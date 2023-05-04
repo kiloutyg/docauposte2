@@ -17,7 +17,7 @@
 	<div class="card border-0 shadow rounded-3 my-5">
 		<div class="card-body">
 			<div class="row">
-				<div class="card border-0 shadow rounded-3 my-5">
+				<div class="card border-0 shadow rounded-3 my-5  bg-secondary">
 					<div class="card-body">
 						<div class="row d-flex align-items-center gy-lg-0 gy-5">
 							<div class="col-md-6">
@@ -51,7 +51,7 @@
 												{{ button.name|capitalize }}
 												<span class="visually-hidden">{{ button.id }}</span>
 											</a>
-											<a href="{{path('app_category_manager_delete_button', {id: button.name})}}" class="btn btn-danger">
+											<a href="{{path('app_category_manager_delete_button', {id: button.name})}}" class="btn btn-danger delete-button">
 												Supprimer
 												<span class="visually-hidden">{{ button.id }}</span>
 											</a>

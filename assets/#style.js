@@ -10,5 +10,9 @@ import "./styles/style.css";
 
 // start the Stimulus application
 import "./bootstrap";
+import "./js/toast.js";
+
+// homegrown javascript
+import "./js/confirmation.js";
 
 console.log("Hello Stimulus!");

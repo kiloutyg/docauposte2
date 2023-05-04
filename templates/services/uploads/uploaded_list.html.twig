@@ -69,7 +69,7 @@
 					{{ upload.filename }}
 					<span class="visually-hidden">{{ upload.id }}</span>
 				</a>
-				<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id }) }}" class="btn btn-danger">
+				<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id }) }}" class="btn btn-danger delete-upload">
 					Supprimer
 					<span class="visually-hidden">{{ upload.id }}</span>
 				</a>

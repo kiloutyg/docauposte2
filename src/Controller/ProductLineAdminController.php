@@ -13,11 +13,11 @@ use App\Service\AccountService;
 
 use App\Entity\Category;
 
-class LineAdminController extends BaseController
+class ProductLineAdminController extends BaseController
 {
 
 
-    #[Route('/line_admin/{id}', name: 'app_line_admin')]
+    #[Route('/productline_admin/{id}', name: 'app_productline_admin')]
 
     public function index(AuthenticationUtils $authenticationUtils, string $id = null): Response
     {
@@ -28,7 +28,7 @@ class LineAdminController extends BaseController
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('line_admin/line_admin_index.html.twig', [
+        return $this->render('productline_admin/productline_admin_index.html.twig', [
             'zone'          => $zone,
             'name'          => $zone->getName(),
             'productLine'   => $productLine,
@@ -44,7 +44,7 @@ class LineAdminController extends BaseController
     }
 
 
-    #[Route('/line_admin/create_manager/{id}', name: 'app_line_admin_create_manager')]
+    #[Route('/productline_admin/create_manager/{id}', name: 'app_productline_admin_create_manager')]
 
     public function createManager(string $id = null, AccountService $accountService, Request $request): Response
     {
@@ -78,7 +78,7 @@ class LineAdminController extends BaseController
     }
 
 
-    #[Route('/line_admin/create_category/{id}', name: 'app_line_admin_create_category')]
+    #[Route('/productline_admin/create_category/{id}', name: 'app_productline_admin_create_category')]
     public function createCategory(Request $request, string $id = null)
     {
         $productLine = $this->productLineRepository->findOneBy(['name' => $id]);
@@ -94,7 +94,7 @@ class LineAdminController extends BaseController
             $category = $this->categoryRepository->findOneBy(['name' => $categoryname]);
             if ($category) {
                 $this->addFlash('danger', 'Category already exists');
-                return $this->redirectToRoute('app_line_admin', [
+                return $this->redirectToRoute('app_productline_admin', [
                     'controller_name'   => 'LineAdminController',
                     'zone'          => $zone,
                     'name'          => $zone->getName(),
@@ -110,7 +110,7 @@ class LineAdminController extends BaseController
                 $this->em->persist($category);
                 $this->em->flush();
                 $this->addFlash('success', 'The Category has been created');
-                return $this->redirectToRoute('app_line_admin', [
+                return $this->redirectToRoute('app_productline_admin', [
                     'controller_name'   => 'LineAdminController',
                     'zone'          => $zone,
                     'name'          => $zone->getName(),
@@ -122,7 +122,7 @@ class LineAdminController extends BaseController
         }
     }
 
-    #[Route('/line_admin/delete_category/{id}', name: 'app_line_admin_delete_category')]
+    #[Route('/productline_admin/delete_category/{id}', name: 'app_productline_admin_delete_category')]
     public function deleteEntity(string $id): Response
     {
         $entityType = 'category';
@@ -135,12 +135,12 @@ class LineAdminController extends BaseController
         if ($entity == true) {
 
             $this->addFlash('success', $entityType . ' has been deleted');
-            return $this->redirectToRoute('app_line_admin', [
+            return $this->redirectToRoute('app_productline_admin', [
                 'id'   => $productLine,
             ]);
         } else {
             $this->addFlash('danger',  $entityType . '  does not exist');
-            return $this->redirectToRoute('app_line_admin', [
+            return $this->redirectToRoute('app_productline_admin', [
                 'id'   => $productLine,
             ]);
         }
