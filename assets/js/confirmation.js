@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("load", () => {
   const deleteZoneButtons = document.querySelectorAll(".delete-zone");
   const deleteProductLineButtons = document.querySelectorAll(
     ".delete-productline"

@@ -9,7 +9,6 @@
 		</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css" integrity="sha512-p0wIO77pxglJp61ES8/3Tq1xC/0JY/LdqI7k8C+OxOJwU6XYyU6Wb8Ov+Ucv7/TjXlZa5D5J5ogdA5y5YN5yQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 		<script src="https://kit.fontawesome.com/a076d05399.js"></script>
 		{% block stylesheets %}
 			{{
@@ -50,7 +49,12 @@
 	<!-- End Main Navigation -->
 	<body>
 		<div class="container">
-
+			{% block javascripts %}
+				{{
+            encore_entry_script_tags("app")
+        }}
+				{{ encore_entry_script_tags('confirmation') }}
+			{% endblock %}
 			{% if users is defined %}
 				{% if users is empty %}
 					<h4 class="my-4">
@@ -110,11 +114,7 @@
 
 			{% endblock body %}
 		</div>
-		{% block javascripts %}
-			{{
-            encore_entry_script_tags("app")
-        }}
-		{% endblock %}
+
 	</body>
 	<!-- Footer -->
 	<footer class="container mt-auto py-3 border-top">
