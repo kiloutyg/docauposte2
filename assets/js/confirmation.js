@@ -1,4 +1,4 @@
-window.addEventListener("load", () => {
+window.addEventListener("turbo:load", () => {
   const deleteZoneButtons = document.querySelectorAll(".delete-zone");
   const deleteProductLineButtons = document.querySelectorAll(
     ".delete-productline"
@@ -10,6 +10,7 @@ window.addEventListener("load", () => {
 
   deleteZoneButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
+      console.log("Zone button clicked"); // Add this line
       const confirmed = confirm(
         "Êtes vous sûr de vouloir supprimer cette Zone?"
       );
