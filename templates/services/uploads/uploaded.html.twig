@@ -15,27 +15,29 @@
 								-{{ upload.filename }}
 								<id={{upload.id}}>></span>
 							</a>
-							<a href="{{path('app_delete_file', {filename:upload.filename, button: button.name, category: button.category.name, id: button.category.productLine.name, name: button.category.productLine.zone.name})}}">
-								<span class="line-details">
-									- Supprimer
-									<id={{upload.id}}>></span>
+							{% if is_granted('ROLE_LINE_ADMIN') %}
+								<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id }) }}" class="btn btn-danger delete-upload">
+									<span class="line-details delete-upload">
+										- Supprimer
+										<id={{upload.id}}></id>
+									</span>
 								</a>
-							</div>
-						{% endfor %}
-					{% else %}
+							{% endif %}
+						</div>
+					{% endfor %}
+				{% else %}
 
-						<div class="card border-0 shadow rounded-3 my-5">
-							<div class="card-body">
-								<div class="row">
-									<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
-										{% include "services/uploads/upload.html.twig" %}
-									</form>
-								</div>
+					<div class="card border-0 shadow rounded-3 my-5">
+						<div class="card-body">
+							<div class="row">
+								<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+									{% include "services/uploads/upload.html.twig" %}
+								</form>
 							</div>
 						</div>
-					{% endif %}
-				</div>
-			</p>
+					</div>
+				{% endif %}
+			</div>
 		</p>
-	</div>
-</p>
+	</p>
+</p></div></p>

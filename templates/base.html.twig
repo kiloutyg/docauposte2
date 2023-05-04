@@ -16,22 +16,9 @@
             encore_entry_link_tags("app")
         }}
 		{% endblock %}
-		{% block javascripts %}
-			{{
-            encore_entry_script_tags("app")
-        }}
-		{% endblock %}
-		{% block script %}
-			<script>
-				var toastElList = [].slice.call(document.querySelectorAll('.toast'))
-var toastList = toastElList.map(function (toastEl) {
-return new bootstrap.Toast(toastEl, {autohide: false})
-})
-toastList.forEach(toast => toast.show()); // This shows them
-			</script>
-			{% include "services/_toasts.html.twig" %}
 
-		{% endblock %}
+
+		{% include "services/_toasts.html.twig" %}
 	</head>
 	<!-- Main Navigation -->
 	<nav class="navbar navbar-expand-lg navbar-dark mb-5" style="background-color: #1f3e52">
@@ -61,69 +48,74 @@ toastList.forEach(toast => toast.show()); // This shows them
 		</div>
 	</nav>
 	<!-- End Main Navigation -->
+	<body>
+		<div class="container">
 
-	<div class="container">
-
-		{% if users is defined %}
-			{% if users is empty %}
-				<h4 class="my-4">
-					<strong>Pour commencer à utiliser l'application, veuillez créer le superadministrateur :
-					</strong>
-				</h4>
-				<div class="card border-0 shadow rounded-3 my-5">
-					<div class="card-body">
-						<div class="row">
-							<form action="{{ path('app_create_super_admin') }}" method="post">
-								{% include "services/accountservices/create_account.html.twig" %}
-							</form>
+			{% if users is defined %}
+				{% if users is empty %}
+					<h4 class="my-4">
+						<strong>Pour commencer à utiliser l'application, veuillez créer le superadministrateur :
+						</strong>
+					</h4>
+					<div class="card border-0 shadow rounded-3 my-5">
+						<div class="card-body">
+							<div class="row">
+								<form action="{{ path('app_create_super_admin') }}" method="post">
+									{% include "services/accountservices/create_account.html.twig" %}
+								</form>
+							</div>
 						</div>
 					</div>
-				</div>
-			{% endif %}
-		{% endif %}
-
-	</div>
-
-	<div class="container">
-
-		{% block body %}
-
-			{% if app.user %}
-				{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
-					<aside class="position-absolute end-0">
-						<a href="{{ path('app_super_admin') }}" class="btn" style="color:white">Centre de Super-Administration</a>
-					</aside>
 				{% endif %}
 			{% endif %}
-			<p>
-				<h1>
-					<strong>
-						Doc Au Poste
-					</strong>
-				</h1>
-			</p>
-			<p>
-				<h3>
-					<strong>
-						Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
-				</h3>
-			</p>
-			<p>
-				<div class="d-flex flex-column ">
-					{% for zone in zones %}
-						<div class="d-flex ps-5 mb-5 mt-5  line-list">
-							<a href="{{path('app_zone', {id: zone.name})}}" <span class="line-details">>
-								{{ zone.name }}
-								<id={{zone.id}}></span>
-							</a>
-						</div>
-					{% endfor %}
-				</div>
-			</p>
 
-		{% endblock body %}
-	</div>
+		</div>
 
+		<div class="container">
+
+			{% block body %}
+
+				{% if app.user %}
+					{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
+						<aside class="position-absolute end-0">
+							<a href="{{ path('app_super_admin') }}" class="btn" style="color:white">Centre de Super-Administration</a>
+						</aside>
+					{% endif %}
+				{% endif %}
+				<p>
+					<h1>
+						<strong>
+							Doc Au Poste
+						</strong>
+					</h1>
+				</p>
+				<p>
+					<h3>
+						<strong>
+							Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
+					</h3>
+				</p>
+				<p>
+					<div class="d-flex flex-column ">
+						{% for zone in zones %}
+							<div class="d-flex ps-5 mb-5 mt-5  line-list">
+								<a href="{{path('app_zone', {id: zone.name})}}" <span class="line-details">>
+									{{ zone.name }}
+									<id={{zone.id}}></span>
+								</a>
+							</div>
+						{% endfor %}
+					</div>
+				</p>
+
+			{% endblock body %}
+		</div>
+		{% block javascripts %}
+			{{
+            encore_entry_script_tags("app")
+        }}
+		{% endblock %}
+	</body>
 	<!-- Footer -->
 	<footer class="container mt-auto py-3 border-top">
 		<div class="d-flex flex-wrap justify-content-between">
