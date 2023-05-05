@@ -20,6 +20,8 @@
         }}
 			{{ encore_entry_script_tags('confirmation') }}
 			{{ encore_entry_script_tags('toast') }}
+			{{ encore_entry_script_tags('cascading-dropdowns') }}
+			{% block javascript_data %}{% endblock %}
 
 		{% endblock %}
 		{% include "services/_toasts.html.twig" %}

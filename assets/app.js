@@ -14,5 +14,6 @@ import "./js/toast.js";
 
 // homegrown javascript
 import "./js/confirmation.js";
+import "./js/cascading-dropdowns.js";
 
 console.log("Hello Stimulus!");

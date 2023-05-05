@@ -25,16 +25,17 @@ class SuperAdminController extends BaseController
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('super_admin/super_admin_index.html.twig', [
-            'buttons'     => $this->buttonRepository->findAll(),
-            'uploads'     => $this->uploadRepository->findAll(),
             'error' => $error,
             'last_username' => $lastUsername,
             'zones' => $this->zoneRepository->findAll(),
-            'productlines' => $this->productLineRepository->findAll(),
+            'productLines' => $this->productLineRepository->findAll(),
             'categories' => $this->categoryRepository->findAll(),
+            'buttons'     => $this->buttonRepository->findAll(),
+            'uploads'     => $this->uploadRepository->findAll(),
             'users' => $this->userRepository->findAll()
         ]);
     }
+
 
     #[Route('/super_admin/create_admin', name: 'app_super_admin_create_admin')]
 
