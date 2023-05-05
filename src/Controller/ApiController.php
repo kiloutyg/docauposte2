@@ -2,23 +2,16 @@
 
 namespace App\Controller;
 
-use App\Repository\ZoneRepository;
-use App\Repository\ProductLineRepository;
-use App\Repository\CategoryRepository;
-use App\Repository\ButtonRepository;
-
-
-use Symfony\Component\HttpFoundation\Response;
+use App\Controller\BaseController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-class CascadingDropdownController extends BaseController
+class ApiController extends BaseController
 {
-
-
-    #[Route('/cascading_dropdowns', name: 'app_cascading_dropdowns')]
-    public function index(): Response
+    #[Route('/api/cascading_dropdown_data', name: 'api_cascading_dropdown_data')]
+    public function getData(): JsonResponse
     {
-
+        // Fetch data as you did in your previous controller
 
         $zones = array_map(function ($zone) {
             return [
@@ -51,11 +44,13 @@ class CascadingDropdownController extends BaseController
             ];
         }, $this->buttonRepository->findAll());
 
-        return $this->render('services/uploads/cascading_dropdowns.html.twig', [
+        $responseData = [
             'zones' => $zones,
             'productLines' => $productLines,
             'categories' => $categories,
             'buttons' => $buttons,
-        ]);
+        ];
+
+        return new JsonResponse($responseData);
     }
 }

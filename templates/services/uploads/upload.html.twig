@@ -31,3 +31,16 @@
 		</div>
 	</div>
 {% endblock %}
+{% block javascripts %}
+
+	{{ encore_entry_script_tags('cascading-dropdowns') }}
+	{% block javascript_data %}
+		<script>
+			const zonesData = {{ zones|json_encode|raw }};
+const productLinesData = {{ productLines|json_encode|raw }};
+const categoriesData = {{ categories|json_encode|raw }};
+const buttonsData = {{ buttons|json_encode|raw }};
+		</script>
+	{% endblock %}
+
+{% endblock %}

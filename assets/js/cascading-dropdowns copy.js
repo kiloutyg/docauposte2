@@ -1,26 +1,3 @@
-// Remove the hardcoded data from your JavaScript file
-let zonesData = [];
-let productLinesData = [];
-let categoriesData = [];
-let buttonsData = [];
-
-// Fetch data from the API endpoint
-fetch("/api/cascading_dropdown_data")
-  .then((response) => response.json())
-  .then((data) => {
-    zonesData = data.zones;
-    productLinesData = data.productLines;
-    categoriesData = data.categories;
-    buttonsData = data.buttons;
-
-    // Call the function that initializes the cascading dropdowns
-    // after the data has been fetched
-    initCascadingDropdowns();
-  })
-  .catch((error) => {
-    console.error("Error fetching cascading dropdown data:", error);
-  });
-
 function filterData(data, key, value) {
   return data.filter((item) => item[key] === value);
 }
@@ -100,20 +77,6 @@ function resetDropdowns() {
 }
 
 document.addEventListener("turbo:load", () => {
-  // Fetch data from the API endpoint on page load
-  fetch("/api/cascading_dropdown_data")
-    .then((response) => response.json())
-    .then((data) => {
-      zonesData = data.zones;
-      productLinesData = data.productLines;
-      categoriesData = data.categories;
-      buttonsData = data.buttons;
-
-      // Initialize the cascading dropdowns and reset them on page load
-      initCascadingDropdowns();
-      resetDropdowns();
-    })
-    .catch((error) => {
-      console.error("Error fetching cascading dropdown data:", error);
-    });
+  initCascadingDropdowns();
+  resetDropdowns();
 });
