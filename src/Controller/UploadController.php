@@ -42,7 +42,6 @@ class UploadController extends FrontController
     public function generic_upload_files(UploadsService $uploadsService, Request $request): Response
     {
         $this->uploadsService = $uploadsService;
-        $this->addFlash('error', 'Shit hit the fan dude');
         // Check if the form is submitted
         if ($request->isMethod('POST')) {
             // Get the button and newFileName values from the submitted form data
@@ -53,7 +52,7 @@ class UploadController extends FrontController
 
             // Use the UploadsService to handle file uploads
             $name = $this->uploadsService->uploadFiles($request, $buttonEntity, $newFileName);
-            $this->addFlash('success', 'The file '  . $name .  'has been uploaded successfully!');
+            $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
 
             return $this->redirectToRoute(
                 'app_base',
@@ -68,7 +67,7 @@ class UploadController extends FrontController
         } else {
             // Show an error message if the form is not submitted
 
-            $this->addFlash('error', 'The form is not submitted correctly.');
+            $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
             return $this->redirectToRoute(
                 'app_base',
                 [

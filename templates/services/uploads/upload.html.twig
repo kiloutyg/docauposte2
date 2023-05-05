@@ -1,27 +1,5 @@
 {% block body %}
-	{# {{dump(app.session)}}
-			{{dump(app.user)}}
-			{% if users is defined %}
-				{{ dump(users) }}
-			{% endif %}
-			{% if app.user is not empty %}
-				{{dump(app.user.roles)}}
-			{% endif %}
-			{% if zone is defined %}
-				{{dump(zone)}}
-			{% endif %}
-			{% if productLine is defined %}
-				{{dump(productLine)}}
-			{% endif %}
-			{% if category is defined %}
-				{{dump(category)}}
-			{% endif %}
-			{% if button is defined %}
-				{{dump(button)}}
-			{% endif %}
-			{% if refererUrl is defined %}
-				{{dump(refererUrl)}}
-			{% endif %} #}
+
 	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
 		<div class="card-body ">
 			<div class="row d-flex align-items-center gy-lg-0 gy-5">
@@ -38,10 +16,55 @@
 								<input type="text" class="form-control" id="newFileName" name="newFileName" placeholder="Entrer un nouveau nom de fichier (optionnel)">
 							</div>
 							<div class="row">
-								<div class="col-md-2 col-sm-2">
+								<div class="col-md-2 col-sm-2 mt-2 mb-2">
+									<label for="zone">Zone :</label>
+								</div>
+								<div class="col-md-10 col-sm-10 mt-2 mb-2">
+									<select name="zone" id="zone" class="form-select" required>
+										<option value="" selected disabled hidden>Choisir une Zone</option>
+										{% if (zone is defined) and (zone is not empty) %}
+											<option value="{{zone.id}}" selected>{{zone.name}}</option>
+										{% else %}
+											{% for zone in zones %}
+												<option value="{{zone.id}}">{{zone.name}}</option>
+											{% endfor %}
+										{% endif %}
+									</select>
+								</div>
+								<div class="col-md-2 col-sm-2 mt-2 mb-2">
+									<label for="productline">Ligne :</label>
+								</div>
+								<div class="col-md-10 col-sm-10 mt-2 mb-2">
+									<select name="productline" id="productline" class="form-select" required>
+										<option value="" selected disabled hidden>Choisir une Ligne</option>
+										{% if (productline is defined) and (productline is not empty) %}
+											<option value="{{productline.id}}" selected>{{productline.name}}</option>
+										{% else %}
+											{% for productline in productlines %}
+												<option value="{{productline.id}}">{{productline.name}}</option>
+											{% endfor %}
+										{% endif %}
+									</select>
+								</div>
+								<div class="col-md-2 col-sm-2 mt-2 mb-2">
+									<label for="category">Categorie :</label>
+								</div>
+								<div class="col-md-10 col-sm-10 mt-2 mb-2">
+									<select name="category" id="category" class="form-select" required>
+										<option value="" selected disabled hidden>Choisir une Catégorie</option>
+										{% if (category is defined) and (category is not empty) %}
+											<option value="{{category.id}}" selected>{{category.name}}</option>
+										{% else %}
+											{% for category in categories %}
+												<option value="{{category.id}}">{{category.name}}</option>
+											{% endfor %}
+										{% endif %}
+									</select>
+								</div>
+								<div class="col-md-2 col-sm-2 mt-2 mb-2">
 									<label for="button">Bouton :</label>
 								</div>
-								<div class="col-md-10 col-sm-10">
+								<div class="col-md-10 col-sm-10 mt-2 mb-2">
 									<select name="button" id="button" class="form-select" required>
 										<option value="" selected disabled hidden>Choisir un bouton</option>
 										{% if (button is defined) and (button is not empty) %}

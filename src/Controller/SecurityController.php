@@ -20,7 +20,7 @@ class SecurityController extends BaseController
     public function login(AuthenticationUtils $authenticationUtils)
     {
         if ($this->getUser()) {
-            $this->addFlash('success', 'You have been logged in');
+            $this->addFlash('success', 'Vous êtes connecté');
             // return $this->redirectToRoute('app_base');
 
             // Fallback to a default route if the previous URL is not set in the session
@@ -41,7 +41,7 @@ class SecurityController extends BaseController
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
-        $this->addFlash('success', 'You have been logged out');
+        $this->addFlash('success', 'Vous êtes déconnecté');
         //throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
@@ -57,7 +57,7 @@ class SecurityController extends BaseController
 
         if ($user instanceof User) {
             $this->authenticateUser($user);
-            $this->addFlash('success', 'Your account has been created');
+            $this->addFlash('success', 'Le compte' . $user->getUsername() . ' a été créé');
 
             return $this->redirectToRoute('app_login');
         }
@@ -83,7 +83,7 @@ class SecurityController extends BaseController
         $id = $request->query->get('id');
         $accountService->deleteUser($id);
 
-        $this->addFlash('success', 'Your account has been deleted');
+        $this->addFlash('success',  'Le compte a été supprimé');
 
         return $this->redirectToRoute('app_login');
     }

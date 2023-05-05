@@ -30,6 +30,8 @@ class SuperAdminController extends BaseController
             'error' => $error,
             'last_username' => $lastUsername,
             'zones' => $this->zoneRepository->findAll(),
+            'productlines' => $this->productLineRepository->findAll(),
+            'categories' => $this->categoryRepository->findAll(),
             'users' => $this->userRepository->findAll()
         ]);
     }

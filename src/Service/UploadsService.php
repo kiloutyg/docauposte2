@@ -39,7 +39,7 @@ class UploadsService extends AbstractController
 
             if (!in_array($extension, $allowedExtensions)) {
                 // throw new \Exception('Le fichier doit être au format PDF');
-                return $this->addFlash('error', 'Shit hit the fan dude');;
+                return $this->addFlash('error', 'Le fichier doit être un pdf');;
             }
 
             $public_dir = $this->projectDir . '/public';
@@ -49,10 +49,14 @@ class UploadsService extends AbstractController
                 $filename   = $file->getClientOriginalName();
             }
 
+            // Add .pdf extension if it is missing
+            if (strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'pdf') {
+                $filename .= '.pdf';
+            }
+
             $path       = $public_dir . '/doc/' . $filename;
             $file->move($public_dir . '/doc/', $filename);
             $name = $filename;
-
 
             $upload = new Upload();
             $upload->setFile(new File($path));

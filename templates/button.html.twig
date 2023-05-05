@@ -15,9 +15,7 @@
 						{{button.name}}
 					</strong>
 				</h2>
-				{% if  is_granted('ROLE_LINE_ADMIN')%}
-					{% include 'services/uploads/uploaded.html.twig' %}
-				{% endif %}
+				{% include 'services/uploads/uploaded.html.twig' %}
 			</div>
 		</div>
 	</div>
