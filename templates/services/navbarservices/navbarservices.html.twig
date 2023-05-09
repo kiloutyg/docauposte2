@@ -55,12 +55,18 @@
 	{% endfor %}
 <nav class="breadcrumb-nav" aria-label="breadcrumb">
   <ol class="breadcrumb">
+  			<li class="breadcrumb-item">
+			<a class=" btn fa fa-arrow-circle-o-left" style="color:gold" href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
+			Retour</a>
+			</li>	
+			
 	{% for item in navbar %}
-		{% if item is not null %}
+		{% if (item is defined) and (item is not null) %}
          <li class="breadcrumb-item">
-			<a style="color:white" href="{{ path('app_' ~ item.varName, params) }}">{{ item.name }}
+			<a class="btn fa" style="color:gold" href="{{ path('app_' ~ item.varName, params) }}">{{ item.name }}
 				</a>
                 </li>	
+
         {% endif %}
 	{% endfor %}
     </ol>

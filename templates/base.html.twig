@@ -27,16 +27,16 @@
 		{% include "services/_toasts.html.twig" %}
 	</head>
 	<!-- Main Navigation -->
-	<nav class="navbar navbar-expand-lg navbar-dark mb-5" style="background-color: #1f3e52">
+	<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1f3e52">
 		<div class="container">
 			<a class="navbar-brand" href="{{ path('app_base') }}">
 				<img class="img-fluid align-center justify-content-center" src="{{ asset('Plastic_Omnium.svg') }}" alt="Logo de PlasticOmnium" role="img" width="125"/></a>
 			<a class="navbar-brand" href="{{ path('app_base') }}">
-				<h1>
+				<h2>
 					<strong>
 						DocAuPoste
 					</strong>
-				</h1>
+				</h2>
 			</a>
 			<div></div>
 			<div class="ms-auto d-flex align-items-center">
@@ -58,8 +58,8 @@
 
 	</nav>
 	<!-- End Main Navigation -->
-	<body>
-		<div class="container">
+	<body class="d-flex flex-column min-vh-100">
+		<div class="container ">
 			{% if users is defined %}
 				{% if users is empty %}
 					<h4 class="my-4">
@@ -138,13 +138,13 @@
 				<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium</a>
 			</div>
 			<div>
-				<a href="#" onclick="event.preventDefault(); window.history.back();">
-					<i class="fa fa-arrow-circle-o-left" aria-hidden="false">Page d'Accueil</i>
+				<a href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
+					<i class="fa fa-arrow-circle-o-left" 'aria-hidden="false"'>Retour</i>
 				</a>
 			</div>
 			<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
 				<li class="ms-3">
-					<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/staging2">
+					<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/main">
 						<i class="fab fa-github"></i>
 					</a>
 				</li>
@@ -152,4 +152,4 @@
 		</div>
 	</footer>
 	<!-- End Footer -->
-</html></html>
+</html>
