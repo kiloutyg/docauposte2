@@ -32,7 +32,7 @@ function populateDropdown(dropdown, data) {
   defaultOption.selected = true;
   defaultOption.disabled = true;
   defaultOption.hidden = true;
-  defaultOption.textContent = "Select an option";
+  defaultOption.textContent = "Selectionner une option";
   dropdown.appendChild(defaultOption);
 
   data.forEach((item) => {
