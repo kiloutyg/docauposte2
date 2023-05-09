@@ -10,22 +10,21 @@
 			{% if  is_granted('ROLE_MANAGER') %}
 				<aside class="position-absolute end-0">
 					<a href="{{ path('app_category_manager', {category: category.name}) }}" class="btn" style="color:white">Centre d'Administration de Catégories</a>
-					<br>
 
 				</aside>
 			{% endif %}
 		{% endif %}
-		<h2 class="mt-5">
+		<h2 class="text-justify mb-2 mt-5">
 			<strong>
 				{{ category.name|capitalize }}
 			</strong>
 		</h2>
 		<p>
-			<div class=" mb-5 mt-5">
-				<h2 class="mb-4 text-justify">Les boutons de la catégorie
+			<div>
+				<h3 class="mb-4 text-justify">Les boutons de la catégorie
 					{{ category.name|capitalize }}
 					:
-				</h2>
+				</h3>
 				{% set matchingButtons = [] %}
 				{% for button in buttons %}
 					{% if button.category.id is same as(category.id)  %}
@@ -39,7 +38,7 @@
 				{% if matchingButtons|length > 0 %}
 					{% for button in matchingButtons %}
 						<div class="d-flex ps-5 mb-5 mt-5 line-list">
-							<a href="{{path('app_button', {button: button.name, category: button.category.name, id: button.category.productLine.name, name: button.category.productLine.zone.name})}}" class="btn" style="color:white">
+							<a class="btn" style="color:white" href="{{path('app_button', {button: button.name, category: button.category.name, productline: button.category.productLine.name, zone: button.category.productLine.zone.name})}}">
 								<span class="line-details text-justify">
 									-{{ button.name }}
 									<id={{button.id}}>>

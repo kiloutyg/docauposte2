@@ -45,6 +45,7 @@
 									{% for productLine in matchingProductLines %}
 										<li class="form-control d-flex justify-content-between align-items-center mb-2">
 											<a href="{{path('app_productline_admin', {id: productLine.name, name: productLine.zone.name})}}" class="btn btn-link">
+												-
 												{{ productLine.name|capitalize }}
 												<span class="visually-hidden">{{ productLine.id }}</span>
 											</a>

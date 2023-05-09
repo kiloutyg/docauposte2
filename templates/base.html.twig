@@ -50,13 +50,16 @@
 						<a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
 					</p>
 				{% endif %}
+
+
 			</div>
+
 		</div>
+
 	</nav>
 	<!-- End Main Navigation -->
 	<body>
 		<div class="container">
-
 			{% if users is defined %}
 				{% if users is empty %}
 					<h4 class="my-4">
@@ -78,43 +81,49 @@
 		</div>
 
 		<div class="container">
+			{% include "services/navbarservices/navbarservices.html.twig" %}
 
 			{% block body %}
 
 				{% if app.user %}
 					{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
 						<aside class="position-absolute end-0">
+							{% include "services/navbarservices/navbarservices.html.twig" %}
+
 							<a href="{{ path('app_super_admin') }}" class="btn" style="color:white">Centre de Super-Administration</a>
 						</aside>
 					{% endif %}
 				{% endif %}
 				<p>
-					<h1>
+					<h1 class="text-justify mb-2 mt-5">
 						<strong>
 							Doc Au Poste
 						</strong>
 					</h1>
 				</p>
 				<p>
-					<h3>
+					<h3 class="mb-4 text-justify">
 						<strong>
 							Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
 					</h3>
 				</p>
 				<p>
-					<div class="d-flex flex-column ">
+					<div>
 						{% for zone in zones %}
 							<div class="d-flex ps-5 mb-5 mt-5  line-list">
-								<a href="{{path('app_zone', {id: zone.name})}}" <span class="line-details">>
-									{{ zone.name }}
-									<id={{zone.id}}></span>
-								</a>
-							</div>
-						{% endfor %}
-					</div>
-				</p>
-
-			{% endblock body %}
+								<a class="btn" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
+									<span class="line-details text-justify">
+										-
+										{{ zone.name }}
+										>
+										<id={{zone.id}}></span>
+									</a>
+								</div>
+							{% endfor %}
+						</div>
+					</p>
+				{% endblock body %}
+			</p>
 		</div>
 
 	</body>
@@ -143,4 +152,4 @@
 		</div>
 	</footer>
 	<!-- End Footer -->
-</html>
+</html></html>

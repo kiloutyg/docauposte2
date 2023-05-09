@@ -17,11 +17,11 @@ class ZoneAdminController extends BaseController
 {
 
 
-    #[Route('/zone_admin/{id}', name: 'app_zone_admin')]
+    #[Route('/zone_admin/{zone}', name: 'app_zone_admin')]
 
-    public function index(AuthenticationUtils $authenticationUtils, string $id = null): Response
+    public function index(AuthenticationUtils $authenticationUtils, string $zone = null): Response
     {
-        $zone = $this->zoneRepository->findOneBy(['name' => $id]);
+        $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
         // Get the error and last username using AuthenticationUtils
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();

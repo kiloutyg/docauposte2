@@ -5,28 +5,26 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-	<div class="container">
-		{% if app.user %}
-			{% if  is_granted('ROLE_LINE_ADMIN', object = null, field = null) %}
-				<aside class="position-absolute end-0">
-					<a href="{{ path('app_productline_admin', {id: productLine.name}) }}" class="btn" style="color:white">Centre d'Administration de Ligne</a>
-					<br>
 
-
-				</aside>
-			{% endif %}
+	{% if app.user %}
+		{% if  is_granted('ROLE_LINE_ADMIN', object = null, field = null) %}
+			<aside class="position-absolute end-0">
+				<a href="{{ path('app_productline_admin', {productline: productLine.name}) }}" class="btn" style="color:white">Centre d'Administration de Ligne</a>
+			</aside>
 		{% endif %}
-		<h2 class="mt-5">
+	{% endif %}
+	<div class="container">
+		<h2 class="text-justify mb-2 mt-5">
 			<strong>
 				{{ productLine.name|capitalize }}
 			</strong>
 		</h2>
 		<p>
-			<div class=" mb-5 mt-5">
-				<h2 class="mb-4 text-justify">Les catégories de la ligne
+			<div>
+				<h3 class="mb-4 text-justify">Les catégories de la ligne
 					{{ productLine.name|capitalize }}
 					:
-				</h2>
+				</h3>
 				{% set matchingCategories = [] %}
 				{% for category in categories %}
 					{% if category.productLine.id is same as(productLine.id)  %}
@@ -40,7 +38,7 @@
 				{% if matchingCategories|length > 0 %}
 					{% for category in matchingCategories %}
 						<div class="d-flex ps-5 mb-5 mt-5 line-list">
-							<a href="{{path('app_category', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}">
+							<a class="btn" href="{{path('app_category', {category: category.name, productline: category.productline.name, zone: category.productline.zone.name} )}}">
 								<span class="line-details text-justify">
 									-{{ category.name }}
 									<id={{category.id}}>>

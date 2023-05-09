@@ -27,6 +27,7 @@ class FrontController extends BaseController
             ]
         );
     }
+
     #[Route('/createSuperAdmin', name: 'create_super_admin')]
     public function createSuperAdmin(AccountService $accountService, Request $request): Response
     {
@@ -34,27 +35,21 @@ class FrontController extends BaseController
         $result = $accountService->createAccount(
             $request,
             $error,
-            // 'app_base', []
         );
-
         if ($result) {
             $this->addFlash('success', 'Account has been created');
-            // return $this->redirectToRoute($result['route'], $result['params']);
         }
-
         if ($error) {
             $this->addFlash('error', $error);
         }
-
         return $this->redirectToRoute('app_base');
     }
 
 
-
-    #[Route('/zone/{id}', name: 'zone')]
-    public function zone(string $id = null): Response
+    #[Route('/zone/{zone}', name: 'zone')]
+    public function zone(string $zone = null): Response
     {
-        $zone = $this->zoneRepository->findOneBy(['name' => $id]);
+        $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
 
         return $this->render(
             'zone.html.twig',
@@ -66,21 +61,19 @@ class FrontController extends BaseController
     }
 
 
-
-    #[Route('/zone/{name}/productline/{id}', name: 'productline')]
-    public function productline(string $id = null): Response
+    #[Route('/zone/{zone}/productline/{productline}', name: 'productline')]
+    public function productline(string $productline = null): Response
     {
 
-        $productLine = $this->productLineRepository->findoneBy(['name' => $id]);
+        $productLine = $this->productLineRepository->findoneBy(['name' => $productline]);
         $zone        = $productLine->getZone();
-
         return $this->render(
             'productline.html.twig',
             [
                 'zone'        => $zone,
                 'name'        => $zone->getName(),
                 'uploads'     => $this->uploadRepository->findAll(),
-                'id' => $productLine->getName(),
+                'id'          => $productLine->getName(),
                 'categories'  => $this->categoryRepository->findAll(),
                 'productLine' => $productLine,
             ]
@@ -88,16 +81,13 @@ class FrontController extends BaseController
     }
 
 
-
-    #[Route('/zone/{name}/productline/{id}/category/{category}', name: 'category')]
+    #[Route('/zone/{zone}/productline/{productline}/category/{category}', name: 'category')]
 
     public function category(string $category = null): Response
     {
         $category    = $this->categoryRepository->findoneBy(['name' => $category]);
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
-
-
         return $this->render(
             'category.html.twig',
             [
@@ -113,14 +103,13 @@ class FrontController extends BaseController
     }
 
 
-    #[Route('/zone/{name}/productline/{id}/category/{category}/button/{button}', name: 'button')]
+    #[Route('/zone/{zone}/productline/{productline}/category/{category}/button/{button}', name: 'button')]
     public function ButtonShowing(string $button = null): Response
     {
         $buttonEntity = $this->buttonRepository->findoneBy(['name' => $button]);
         $category    = $buttonEntity->getCategory();
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
-
 
         return $this->render(
             'button.html.twig',
@@ -133,8 +122,6 @@ class FrontController extends BaseController
                 'categories'  => $this->categoryRepository->findAll(),
                 'button'      => $buttonEntity,
                 'uploads'     => $this->uploadRepository->findAll(),
-
-
 
             ]
         );
