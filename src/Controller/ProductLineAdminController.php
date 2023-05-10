@@ -17,11 +17,11 @@ class ProductLineAdminController extends BaseController
 {
 
 
-    #[Route('/productline_admin/{id}', name: 'app_productline_admin')]
+    #[Route('/productline_admin/{productline}', name: 'app_productline_admin')]
 
-    public function index(AuthenticationUtils $authenticationUtils, string $id = null): Response
+    public function index(AuthenticationUtils $authenticationUtils, string $productline = null): Response
     {
-        $productLine = $this->productLineRepository->findOneBy(['name' => $id]);
+        $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
         $zone = $productLine->getZone();
 
         // Get the error and last username using AuthenticationUtils
