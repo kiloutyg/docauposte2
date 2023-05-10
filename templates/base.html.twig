@@ -51,7 +51,6 @@
 					</p>
 				{% endif %}
 
-
 			</div>
 
 		</div>
@@ -84,72 +83,71 @@
 			{% include "services/navbarservices/navbarservices.html.twig" %}
 
 			{% block body %}
-
-				{% if app.user %}
-					{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
-						<aside class="position-absolute end-0">
-							{% include "services/navbarservices/navbarservices.html.twig" %}
-
-							<a href="{{ path('app_super_admin') }}" class="btn" style="color:white">Centre de Super-Administration</a>
-						</aside>
+				<div class="container">
+					{% if app.user %}
+						{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
+							<aside class="position-absolute end-0">
+								<a href="{{ path('app_super_admin') }}" class="btn" style="color:white">Centre de Super-Administration</a>
+							</aside>
+						{% endif %}
 					{% endif %}
-				{% endif %}
-				<p>
-					<h1 class="text-justify mb-2 mt-5">
-						<strong>
-							Doc Au Poste
-						</strong>
-					</h1>
-				</p>
-				<p>
-					<h3 class="mb-4 text-justify">
-						<strong>
-							Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
-					</h3>
-				</p>
-				<p>
-					<div>
-						{% for zone in zones %}
-							<div class="d-flex ps-5 mb-5 mt-5  line-list">
-								<a class="btn" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
-									<span class="line-details text-justify">
-										-
-										{{ zone.name }}
-										>
-										<id={{zone.id}}></span>
-									</a>
-								</div>
-							{% endfor %}
-						</div>
+					<p>
+						<h1 class="text-justify mb-2 mt-5">
+							<strong>
+								Doc Au Poste
+							</strong>
+						</h1>
 					</p>
-				{% endblock body %}
-			</p>
-		</div>
+					<p>
+						<h3 class="mb-4 text-justify">
+							<strong>
+								Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
+						</h3>
+					</p>
+					<p>
+						<div>
+							{% for zone in zones %}
+								<div class="d-flex ps-5 mb-5 mt-5  line-list">
+									<a class="btn" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
+										<span class="line-details text-justify">
+											-
+											{{ zone.name }}
+											>
+											<id={{zone.id}}></span>
+										</a>
+									</div>
+								{% endfor %}
+							</div>
+						</p>
+					{% endblock body %}
+				</p>
+			</div>
 
-	</body>
-	<!-- Footer -->
-	<footer class="container mt-auto py-3 border-top">
-		<div class="d-flex flex-wrap justify-content-between">
-			<div class="col-md-4 d-flex align-items-center">
-				<span class="me-1" style="color: red">
-					<i class="fas fa-heart"></i>
-				</span>
-				<span class="text-muted me-1">The guys and gals at</span>
-				<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium</a>
-			</div>
-			<div>
-				<a href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
-					<i class="fa fa-arrow-circle-o-left" 'aria-hidden="false"'>Retour</i>
-				</a>
-			</div>
-			<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-				<li class="ms-3">
-					<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/main">
-						<i class="fab fa-github"></i>
+		</body>
+		<!-- Footer -->
+		<footer class="container mt-auto py-3 border-top">
+			<div class="d-flex flex-wrap justify-content-between">
+				<div class="col-md-4 d-flex align-items-center">
+					<span class="me-1" style="color: red">
+						<i class="fas fa-heart"></i>
+					</span>
+					<span class="text-muted me-1">The guys and gals at</span>
+					<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium</a>
+				</div>
+				<div>
+					<a href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
+						<i class="fa fa-arrow-circle-o-left" 'aria-hidden="false"'>Retour</i>
 					</a>
-				</li>
-			</ul>
-		</div>
-	</footer>
-	<!-- End Footer -->
+				</div>
+				<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+					<li class="ms-3">
+						<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/main">
+							<i class="fab fa-github"></i>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</footer>
+		<!-- End Footer -->
+	</body>
 </html>

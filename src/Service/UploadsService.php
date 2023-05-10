@@ -84,4 +84,58 @@ class UploadsService extends AbstractController
         $this->manager->flush();
         return $name;
     }
+
+    public function modifyFile(Request $request, $button, $newFileName = null)
+    {
+        $allowedExtensions = ['pdf'];
+        $files = $request->files->all();
+        $name = null;  // Initialize $name to null
+
+        foreach ($files as $file) {
+
+            $extension = $file->guessExtension();
+
+            if (!in_array($extension, $allowedExtensions)) {
+                // throw new \Exception('Le fichier doit être au format PDF');
+                return $this->addFlash('error', 'Le fichier doit être un pdf');;
+            }
+
+            $public_dir = $this->projectDir . '/public';
+            if ($newFileName) {
+                $filename   = $newFileName;
+            } else {
+                $filename   = $file->getClientOriginalName();
+            }
+
+            // Add .pdf extension if it is missing
+            if (strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'pdf') {
+                $filename .= '.pdf';
+            }
+
+            $path       = $public_dir . '/doc/' . $filename;
+            $file->move($public_dir . '/doc/', $filename);
+            $name = $filename;
+
+            // Find existing upload entity
+            $pastupload = $this->uploadRepository->findOneBy(['filename' => $filename]);
+            $pastbutton = $this->uploadRepository->findOneBy(['button' => $button]);
+
+            // If no existing upload entity, create a new one
+            if (!$pastupload and !$pastbutton) {
+                $upload = new Upload();
+            } else {
+                // get the existing upload to update it
+                $upload = $pastupload;
+            }
+
+            $upload->setFile(new File($path));
+            $upload->setFilename($filename);
+            $upload->setPath($path);
+            $upload->setButton($button);
+            $upload->setUploadedAt(new \DateTime());
+            $this->manager->persist($upload);
+        }
+        $this->manager->flush();
+        return $name;
+    }
 }

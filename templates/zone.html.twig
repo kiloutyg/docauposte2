@@ -5,14 +5,15 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-	{% if app.user %}
-		{% if  is_granted('ROLE_ADMIN') %}
-			<aside class="position-absolute end-0">
-				<a href="{{ path('app_zone_admin', {zone: zone.name}) }}" class="btn" style="color:white">Centre d'Administration de Zone</a>
-			</aside>
-		{% endif %}
-	{% endif %}
 	<div class="container">
+
+		{% if app.user %}
+			{% if  is_granted('ROLE_ADMIN') %}
+				<aside class="position-absolute end-0">
+					<a href="{{ path('app_zone_admin', {zone: zone.name}) }}" class="btn" style="color:white">Centre d'Administration de Zone</a>
+				</aside>
+			{% endif %}
+		{% endif %}
 		<p>
 			<h2 class="text-justify mb-2 mt-5">
 				<strong>

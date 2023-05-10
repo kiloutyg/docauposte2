@@ -6,6 +6,7 @@
 {% endblock %}
 {% block body %}
 	<div class="container">
+
 		{% if app.user %}
 			{% if  is_granted('ROLE_MANAGER') %}
 				<aside class="position-absolute end-0">

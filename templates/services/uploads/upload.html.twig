@@ -10,7 +10,8 @@
 					</p>
 					<form class="form-floating justify-content-center " id="upload-form" action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
 						<div class="fallback">
-							<input name="file" type="file" accept=".pdf" required>
+							<input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
+
 							<div class="mb-3">
 								<label for="newFileName" class="form-label">Nom du fichier :</label>
 								<input type="text" class="form-control" id="newFileName" name="newFileName" placeholder="Entrer un nouveau nom de fichier (optionnel)">

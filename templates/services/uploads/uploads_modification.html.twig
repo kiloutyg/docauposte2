@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{upload.filename}}
+	|
+	{{ parent() }}
+{% endblock %}
+{% block body %}
+
+	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
+		<div class="card-body ">
+			<div class="row d-flex align-items-center gy-lg-0 gy-5">
+
+				<p class="text-white m-0">
+					<h3 style="color:white">
+						Modifications du fichier
+						<strong>{{upload.filename}}</strong>
+						:
+					</h3>
+				</p>
+				<form class="form-floating justify-content-center" id="upload-form" action="{{path('app_modify_file')}}" method="POST" enctype="multipart/form-data">
+					<div class="fallback">
+						<div class="mb-3">
+							<label for="file" class="form-label">Select a file to upload:</label>
+							<input type="file" class="form-control" id="file" name="file">
+						</div>
+
+						<div class="mb-3">
+							<label for="newFileName" class="form-label">Nouveau nom du fichier :</label>
+							<input type="text" class="form-control" id="newFileName" name="newFileName" placeholder="Entrer un nouveau nom de fichier (optionnel)">
+						</div>
+						{% include 'services/uploads/cascading_dropdowns.html.twig' %}
+					</div>
+					<div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
+						<button type="submit" class="btn btn-primary mb-5">Modifier</button>
+					</div>
+					<iframe class="container-fluid" src="{{path('app_download_file', { 'filename': upload.filename })}}" style="height: 100vh"></iframe>
+					{# {% if upload.error %}
+																					<div class="alert alert-danger" role="alert">
+																						{{ upload.error }}
+																					</div>
+																				{% endif %}
+																				{% if upload.success %}
+																					<div class="alert alert-success" role="alert">
+																						{{ upload.success }}
+																					</div>
+																				{% endif %} #}
+				</form>
+
+			</div>
+		</div>
+	</div>
+{% endblock %}
+{% block javascripts %}
+
+	{{ encore_entry_script_tags('cascading-dropdowns') }}
+	{% block javascript_data %}{% endblock %}
+
+{% endblock %}

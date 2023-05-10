@@ -117,4 +117,67 @@ class UploadController extends FrontController
             ]
         );
     }
+
+    // create a route to display the modification page 
+    #[Route('/modify/{upload}', name: 'modify_file_page')]
+
+    public function modify_file_page(string $upload = null): Response
+    {
+        $upload = $this->uploadRepository->findoneBy(['id' => $upload]);
+
+        return $this->render(
+            'services/uploads/uploads_modification.html.twig',
+            [
+                'upload' => $upload,
+            ]
+        );
+    }
+
+    // create a route to modify an existing file
+    #[Route('/modify/', name: 'modify_file')]
+    public function modify_file(UploadsService $uploadsService, Request $request): Response
+    {
+        $this->uploadsService = $uploadsService;
+        // Check if the form is submitted
+        if ($request->isMethod('POST')) {
+            // Get the button and newFileName values from the submitted form data
+            $button = $request->request->get('button');
+            $newFileName = $request->request->get('newFileName');
+
+            $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
+
+            // $uploadsService->modifyFile($filename);
+
+
+            // Use the UploadsService to handle file modification
+            $name = $this->uploadsService->modifyFile($request, $buttonEntity, $newFileName);
+            $this->addFlash('success', 'Le fichier ' . $name . ' a été modifié.');
+
+            return $this->redirectToRoute(
+                'app_base',
+                [
+                    'zones'       => $this->zoneRepository->findAll(),
+                    'productlines' => $this->productLineRepository->findAll(),
+                    'categories'  => $this->categoryRepository->findAll(),
+                    'buttons'     => $this->buttonRepository->findAll(),
+                    'uploads'     => $this->uploadRepository->findAll(),
+                ]
+            );
+        } else {
+            // Show an error message if the form is not submitted
+
+            $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
+            return $this->redirectToRoute(
+                'app_base',
+                [
+                    'zones'       => $this->zoneRepository->findAll(),
+                    'productlines' => $this->productLineRepository->findAll(),
+                    'categories'  => $this->categoryRepository->findAll(),
+                    'buttons'     => $this->buttonRepository->findAll(),
+                    'uploads'     => $this->uploadRepository->findAll(),
+                ]
+            );
+            // Redirect the user to an appropriate page or show an error message
+        }
+    }
 }

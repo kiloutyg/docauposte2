@@ -5,15 +5,15 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-
-	{% if app.user %}
-		{% if  is_granted('ROLE_LINE_ADMIN', object = null, field = null) %}
-			<aside class="position-absolute end-0">
-				<a href="{{ path('app_productline_admin', {productline: productLine.name}) }}" class="btn" style="color:white">Centre d'Administration de Ligne</a>
-			</aside>
-		{% endif %}
-	{% endif %}
 	<div class="container">
+
+		{% if app.user %}
+			{% if  is_granted('ROLE_LINE_ADMIN', object = null, field = null) %}
+				<aside class="position-absolute end-0">
+					<a href="{{ path('app_productline_admin', {productline: productLine.name}) }}" class="btn" style="color:white">Centre d'Administration de Ligne</a>
+				</aside>
+			{% endif %}
+		{% endif %}
 		<h2 class="text-justify mb-2 mt-5">
 			<strong>
 				{{ productLine.name|capitalize }}
