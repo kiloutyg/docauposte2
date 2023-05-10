@@ -47,9 +47,12 @@ class UploadController extends FrontController
         $this->uploadsService = $uploadsService;
         // Check if the form is submitted
         if ($request->isMethod('POST')) {
-            // Get the button and newFileName values from the submitted form data
+            // Get the formData array from the request
+            // $button = $request->request->get('formData')['button'];
+            // $newFileName = $request->request->get('formData')['newFileName'];
             $button = $request->request->get('button');
             $newFileName = $request->request->get('newFileName');
+
 
             $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
 

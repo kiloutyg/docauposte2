@@ -28,11 +28,10 @@ class ProductLineAdminController extends BaseController
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('productline_admin/productline_admin_index.html.twig', [
-            'zone'          => $zone,
-            'name'          => $zone->getName(),
+        return $this->render('productline_admin/productline_admin.html.twig', [
+            'zone'          => $zone->getName(),
             'productLine'   => $productLine,
-            'id'            => $productLine->getName(),
+            'productline'   => $productLine->getName(),
             'categories'    => $this->categoryRepository->findAll(),
             'error'         => $error,
             'last_username' => $lastUsername,
@@ -44,11 +43,11 @@ class ProductLineAdminController extends BaseController
     }
 
 
-    #[Route('/productline_admin/create_manager/{id}', name: 'app_productline_admin_create_manager')]
+    #[Route('/productline_admin/create_manager/{productline}', name: 'app_productline_admin_create_manager')]
 
-    public function createManager(string $id = null, AccountService $accountService, Request $request): Response
+    public function createManager(string $productline = null, AccountService $accountService, Request $request): Response
     {
-        $productLine = $this->productLineRepository->findOneBy(['name' => $id]);
+        $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
         $zone = $productLine->getZone();
 
         $error = null;
@@ -70,7 +69,7 @@ class ProductLineAdminController extends BaseController
             'zone'        => $zone,
             'name'        => $zone->getName(),
             'uploads'     => $this->uploadRepository->findAll(),
-            'id'          => $productLine->getName(),
+            'productline' => $productLine->getName(),
             'categories'  => $this->categoryRepository->findAll(),
             'productLine' => $productLine,
 
@@ -78,10 +77,10 @@ class ProductLineAdminController extends BaseController
     }
 
 
-    #[Route('/productline_admin/create_category/{id}', name: 'app_productline_admin_create_category')]
-    public function createCategory(Request $request, string $id = null)
+    #[Route('/productline_admin/create_category/{productline}', name: 'app_productline_admin_create_category')]
+    public function createCategory(Request $request, string $productline = null)
     {
-        $productLine = $this->productLineRepository->findOneBy(['name' => $id]);
+        $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
         $zone = $productLine->getZone();
 
         // Create a category
@@ -89,7 +88,7 @@ class ProductLineAdminController extends BaseController
 
             $categoryname = $request->request->get('categoryname');
 
-            $productLine = $this->productLineRepository->findOneBy(['name' => $id]);
+            $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
 
             $category = $this->categoryRepository->findOneBy(['name' => $categoryname]);
             if ($category) {
@@ -99,7 +98,7 @@ class ProductLineAdminController extends BaseController
                     'zone'          => $zone,
                     'name'          => $zone->getName(),
                     'productLine'   => $productLine,
-                    'id'            => $productLine->getName(),
+                    'productline'   => $productLine->getName(),
                     'categories'    => $this->categoryRepository->findAll(),
 
                 ]);
@@ -115,18 +114,18 @@ class ProductLineAdminController extends BaseController
                     'zone'          => $zone,
                     'name'          => $zone->getName(),
                     'productLine'   => $productLine,
-                    'id'            => $productLine->getName(),
+                    'productline'   => $productLine->getName(),
                     'categories'    => $this->categoryRepository->findAll(),
                 ]);
             }
         }
     }
 
-    #[Route('/productline_admin/delete_category/{id}', name: 'app_productline_admin_delete_category')]
-    public function deleteEntity(string $id): Response
+    #[Route('/productline_admin/delete_category/{category}', name: 'app_productline_admin_delete_category')]
+    public function deleteEntity(string $category): Response
     {
         $entityType = 'category';
-        $entityid = $this->categoryRepository->findOneBy(['name' => $id]);
+        $entityid = $this->categoryRepository->findOneBy(['name' => $category]);
 
         $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
 
@@ -136,12 +135,12 @@ class ProductLineAdminController extends BaseController
 
             $this->addFlash('success', $entityType . ' has been deleted');
             return $this->redirectToRoute('app_productline_admin', [
-                'id'   => $productLine,
+                'productline'   => $productLine,
             ]);
         } else {
             $this->addFlash('danger',  $entityType . '  does not exist');
             return $this->redirectToRoute('app_productline_admin', [
-                'id'   => $productLine,
+                'productline'   => $productLine,
             ]);
         }
     }

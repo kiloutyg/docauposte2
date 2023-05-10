@@ -67,23 +67,22 @@ class ZoneAdminController extends BaseController
     }
 
 
-    #[Route('/zone_admin/create_productline/{id}', name: 'app_zone_admin_create_productline')]
-    public function createProductLine(Request $request, string $id = null)
+    #[Route('/zone_admin/create_productline/{zone}', name: 'app_zone_admin_create_productline')]
+    public function createProductLine(Request $request, string $zone = null)
     {
-        $zone = $this->zoneRepository->findOneBy(['name' => $id]);
+        $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
 
         // Create a productline
         if ($request->getMethod() == 'POST') {
 
             $productlinename = $request->request->get('productlinename');
-            $zone = $this->zoneRepository->findOneBy(['name' => $id]);
+            $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
             $productline = $this->productLineRepository->findOneBy(['name' => $productlinename]);
 
             if ($productline) {
                 $this->addFlash('danger', 'productline already exists');
                 return $this->redirectToRoute('app_zone_admin', [
-                    'zone'         => $zone,
-                    'id' => $zone->getName(),
+                    'zone' => $zone->getName(),
                     'productLines' => $this->productLineRepository->findAll(),
                 ]);
             } else {
@@ -94,19 +93,18 @@ class ZoneAdminController extends BaseController
                 $this->em->flush();
                 $this->addFlash('success', 'The Product Line has been created');
                 return $this->redirectToRoute('app_zone_admin', [
-                    'zone'         => $zone,
-                    'id' => $zone->getName(),
+                    'zone' => $zone->getName(),
                     'productLines' => $this->productLineRepository->findAll(),
                 ]);
             }
         }
     }
 
-    #[Route('/zone_admin/delete_productline/{id}', name: 'app_zone_admin_delete_productline')]
-    public function deleteEntity(string $id): Response
+    #[Route('/zone_admin/delete_productline/{productline}', name: 'app_zone_admin_delete_productline')]
+    public function deleteEntity(string $productline): Response
     {
         $entityType = 'productline';
-        $entityid = $this->productLineRepository->findOneBy(['name' => $id]);
+        $entityid = $this->productLineRepository->findOneBy(['name' => $productline]);
 
         $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
 
@@ -116,12 +114,12 @@ class ZoneAdminController extends BaseController
 
             $this->addFlash('success', $entityType . ' has been deleted');
             return $this->redirectToRoute('app_zone_admin', [
-                'id' => $zone,
+                'zone' => $zone,
             ]);
         } else {
             $this->addFlash('danger',  $entityType . '  does not exist');
             return $this->redirectToRoute('app_zone_admin', [
-                'id' => $zone,
+                'zone' => $zone,
             ]);
         }
     }
