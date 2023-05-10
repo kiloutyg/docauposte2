@@ -85,74 +85,33 @@ class UploadsService extends AbstractController
         return $name;
     }
 
-    public function modifyFile(Request $request, $button, $newFileName = null, $upload)
+    public function modifyFile(Upload $upload, array $formData)
     {
-        $allowedExtensions = ['pdf'];
-        $files = $request->files->all();
-        $name = null;  // Initialize $name to null
-
-        if ($files) {
-            foreach ($files as $file) {
-
-                $extension = $file->guessExtension();
-
-                if (!in_array($extension, $allowedExtensions)) {
-                    // throw new \Exception('Le fichier doit être au format PDF');
-                    return $this->addFlash('error', 'Le fichier doit être un pdf');;
-                }
-
-                $public_dir = $this->projectDir . '/public';
-                if ($newFileName) {
-                    $filename   = $newFileName;
-                } else {
-                    $filename   = $file->getClientOriginalName();
-                }
-
-                // Add .pdf extension if it is missing
-                if (strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'pdf') {
-                    $filename .= '.pdf';
-                }
-
-                $path       = $public_dir . '/doc/' . $filename;
-                $file->move($public_dir . '/doc/', $filename);
-                $name = $filename;
-
-
-                $upload = new Upload();
-                $upload->setFile(new File($path));
-                $upload->setFilename($filename);
-                $upload->setPath($path);
-                $upload->setButton($button);
-                $upload->setUploadedAt(new \DateTime());
-                $this->manager->persist($upload);
-            }
-        } else {
-
+        // Check if a new file was uploaded
+        if ($formData['file']) {
+            $newFile = $formData['file'];
             $public_dir = $this->projectDir . '/public';
-            if ($newFileName) {
-                $filename   = $newFileName;
-            } else {
-                $filename   = $upload->getfilename();
+
+            $oldFilePath = $upload->getPath();
+            $newFilePath = $public_dir . '/doc/' . $upload->getFilename();
+
+            // Remove old file if it exists
+            if (file_exists($oldFilePath)) {
+                unlink($oldFilePath);
             }
 
-            // Add .pdf extension if it is missing
-            if (strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'pdf') {
-                $filename .= '.pdf';
-            }
+            // Move the new file to the directory
+            $newFile->move($public_dir . '/doc/', $upload->getFilename());
+            $upload->setPath($newFilePath);
 
-            $path       = $public_dir . '/doc/' . $filename;
-            $name = $filename;
+            // Update the filename and button
+            $upload->setFilename($formData['filename']);
+            $upload->setButton($formData['button']);
 
-
-            $upload = new Upload();
-            $upload->setFile(new File($path));
-            $upload->setFilename($filename);
-            $upload->setPath($path);
-            $upload->setButton($button);
+            // Persist changes and flush to the database
             $upload->setUploadedAt(new \DateTime());
             $this->manager->persist($upload);
+            $this->manager->flush();
         }
-        $this->manager->flush();
-        return $name;
     }
 }
