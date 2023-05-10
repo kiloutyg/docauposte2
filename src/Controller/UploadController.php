@@ -134,10 +134,18 @@ class UploadController extends FrontController
     }
 
     // create a route to modify an existing file
-    #[Route('/modify/', name: 'modify_file')]
-    public function modify_file(UploadsService $uploadsService, Request $request): Response
+    #[Route('/modify/{uploadId}', name: 'modify_file')]
+    public function modify_file(UploadsService $uploadsService, Request $request,  int  $uploadId = null): Response
     {
         $this->uploadsService = $uploadsService;
+
+        // Retrieve the current upload entity based on the id
+        $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        if (!$upload) {
+            throw $this->createNotFoundException(
+                'No upload found for id ' . $upload
+            );
+        }
         // Check if the form is submitted
         if ($request->isMethod('POST')) {
             // Get the button and newFileName values from the submitted form data
@@ -150,17 +158,17 @@ class UploadController extends FrontController
 
 
             // Use the UploadsService to handle file modification
-            $name = $this->uploadsService->modifyFile($request, $buttonEntity, $newFileName);
+            $name = $this->uploadsService->modifyFile($request, $buttonEntity, $newFileName, $upload);
             $this->addFlash('success', 'Le fichier ' . $name . ' a été modifié.');
 
             return $this->redirectToRoute(
                 'app_base',
                 [
-                    'zones'       => $this->zoneRepository->findAll(),
+                    'zones'        => $this->zoneRepository->findAll(),
                     'productlines' => $this->productLineRepository->findAll(),
-                    'categories'  => $this->categoryRepository->findAll(),
-                    'buttons'     => $this->buttonRepository->findAll(),
-                    'uploads'     => $this->uploadRepository->findAll(),
+                    'categories'   => $this->categoryRepository->findAll(),
+                    'buttons'      => $this->buttonRepository->findAll(),
+                    'uploads'      => $this->uploadRepository->findAll(),
                 ]
             );
         } else {
