@@ -70,13 +70,14 @@ class ZoneAdminController extends BaseController
     #[Route('/zone_admin/create_productline/{zone}', name: 'app_zone_admin_create_productline')]
     public function createProductLine(Request $request, string $zone = null)
     {
-        $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
+        // 
+        $zone = $this->zoneRepository->findOneBy(['id' => $zone]);
 
         // Create a productline
         if ($request->getMethod() == 'POST') {
 
             $productlinename = $request->request->get('productlinename');
-            $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
+            $zone = $this->zoneRepository->findOneBy(['id' => $zone]);
             $productline = $this->productLineRepository->findOneBy(['name' => $productlinename]);
 
             if ($productline) {
