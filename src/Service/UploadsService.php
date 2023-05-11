@@ -95,21 +95,6 @@ class UploadsService extends AbstractController
         $this->logger->info('Form data: ' . json_encode($formData));
 
         // Check if a new file was uploaded
-        if (!isset($formData['file']) || !$formData['file']) {
-            $this->logger->error('No file was uploaded.');
-        }
-
-        // Check if filename is provided
-        if (!isset($formData['filename']) || !$formData['filename']) {
-            $this->logger->error('No filename was provided.');
-        }
-
-        // Check if button is provided
-        if (!isset($formData['button']) || !$formData['button']) {
-            $this->logger->error('No button was provided.');
-        }
-
-        // Check if a new file was uploaded
         if (isset($formData['file']) && $formData['file']) {
             $newFile = $formData['file'];
             $public_dir = $this->projectDir . '/public';
@@ -131,18 +116,24 @@ class UploadsService extends AbstractController
             }
 
             $upload->setPath($newFilePath);
+        } else {
+            $this->logger->info('No file was uploaded.');
         }
 
         // Check if filename is provided
-        if (isset($formData['filename']) && $formData['filename']) {
+        if (isset($formData['filename']) && !empty($formData['filename'])) {
             // Update the filename
             $upload->setFilename($formData['filename']);
+        } else {
+            $this->logger->info('No filename was provided.');
         }
 
         // Check if button is provided
-        if (isset($formData['button']) && $formData['button']) {
+        if (isset($formData['button']) && !empty($formData['button'])) {
             // Update the button
             $upload->setButton($formData['button']);
+        } else {
+            $this->logger->info('No button was provided.');
         }
 
         // Persist changes and flush to the database

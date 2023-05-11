@@ -155,6 +155,21 @@ class UploadController extends FrontController
         // Create a form to modify the Upload entity
         $form = $this->createForm(UploadType::class, $upload);
 
+
+        // Get form data
+        $formData = $request->request->all();
+
+        // Check if filename and button are set in the form data
+        if (!isset($formData['filename']) || empty($formData['filename'])) {
+            $formData['filename'] = $upload->getFilename();
+        }
+        if (!isset($formData['button']) || empty($formData['button'])) {
+            $formData['button'] = $upload->getButton();
+        }
+
+        // Update the form data
+        $request->request->replace($formData);
+
         // Handle the form data on POST requests
 
         $form->handleRequest($request);
@@ -183,6 +198,9 @@ class UploadController extends FrontController
             foreach ($errors as $error) {
                 $errorMessages[] = $error->getMessage();
             }
+
+            // Print form errors
+            var_dump($errorMessages); // Add this line
 
             // Return the errors in the JSON response
             return new JsonResponse(['error' => 'Invalid form.', 'form_errors' => $errorMessages], 400);
