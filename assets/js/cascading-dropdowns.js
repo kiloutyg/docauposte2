@@ -119,37 +119,34 @@ document.addEventListener("turbo:load", () => {
 });
 // Your existing code...
 document
-  .querySelector("modifyForm")
+  .querySelector("#modifyForm")
   .addEventListener("submit", function (event) {
     event.preventDefault();
 
+    // Create a new FormData object
+    let formData = new FormData();
+
     // Get the file input element
-    let fileInput = document.querySelector("file");
+    let fileInput = document.querySelector("#file");
 
     if (fileInput.files.length > 0) {
       // A file was selected
       let file = fileInput.files[0];
 
-      // Create a new FormData object
-      let formData = new FormData();
-
       // Add the file to formData
-      formData.append("file", file);
-
-      // Rest of your code...
+      formData.append("formData[file]", file);
     } else {
       // No file was selected
       console.error("No file was selected");
     }
-
-    // Create a new FormData object
-    let formData = new FormData();
 
     // Get the dropdown elements
     let zoneDropdown = document.getElementById("zone");
     let productlineDropdown = document.getElementById("productline");
     let categoryDropdown = document.getElementById("category");
     let buttonDropdown = document.getElementById("button");
+    // Get the filename input
+    let filenameInput = document.getElementById("newFileName");
 
     // Get the selected values
     let zoneValue = zoneDropdown.options[zoneDropdown.selectedIndex].value;
@@ -159,12 +156,18 @@ document
       categoryDropdown.options[categoryDropdown.selectedIndex].value;
     let buttonValue =
       buttonDropdown.options[buttonDropdown.selectedIndex].value;
+    // Get the filename value
+    let filenameValue = filenameInput.value;
 
     // Add the values to formData
     // formData.append("zone", zoneValue);
     // formData.append("productline", productlineValue);
     // formData.append("category", categoryValue);
-    formData.append("button", buttonValue);
+    formData.append("formData[button]", buttonValue);
+    // If filenameValue is not empty, append it to formData
+    if (filenameValue) {
+      formData.append("formData[filename]", filenameValue);
+    }
 
     // Log the formData to the console to inspect it
     for (let [key, value] of formData.entries()) {

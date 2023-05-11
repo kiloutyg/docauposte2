@@ -39,6 +39,7 @@ security:
         - { path: ^/zone_admin, roles: ROLE_ADMIN }
         - { path: ^/line_admin, roles: ROLE_LINE_ADMIN }
         - { path: ^/category_manager, roles: ROLE_MANAGER }
+        - { path: ^/modify, roles: ROLE_LINE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

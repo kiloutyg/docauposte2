@@ -152,10 +152,6 @@ class UploadController extends FrontController
         // Retrieve the current upload entity based on the uploadId
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
 
-        if (!$upload) {
-            throw $this->createNotFoundException('No upload found for id ' . $uploadId);
-        }
-
         // Create a form to modify the Upload entity
         $form = $this->createForm(UploadType::class, $upload);
 
