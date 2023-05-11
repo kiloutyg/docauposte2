@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use  \Psr\Log\LoggerInterface;
 
 
 
@@ -55,6 +56,9 @@ class BaseController extends AbstractController
     protected $entitydeletionService;
     protected $accountService;
     protected $uploadsService;
+    protected $logger;
+    protected $loggerInterface;
+
 
 
 
@@ -72,7 +76,9 @@ class BaseController extends AbstractController
         SignatureRepository $signatureRepository,
         EntityDeletionService $entitydeletionService,
         AccountService $accountService,
-        UploadsService $uploadsServices
+        UploadsService $uploadsServices,
+        LoggerInterface $loggerInterface,
+
     ) {
 
         $this->uploadRepository      = $uploadRepository;
@@ -89,6 +95,7 @@ class BaseController extends AbstractController
         $this->entitydeletionService = $entitydeletionService;
         $this->accountService        = $accountService;
         $this->uploadsService        = $uploadsServices;
+        $this->logger                = $loggerInterface;
         $this->request               = $this->requestStack->getCurrentRequest();
         $this->session               = $this->requestStack->getSession();
 

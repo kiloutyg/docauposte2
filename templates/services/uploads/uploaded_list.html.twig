@@ -66,9 +66,11 @@
 				<a href="{{ path('app_download_file', { 'filename': upload.filename }) }}" class="btn btn-link" target="_blank">
 					-
 					{{ upload.filename }}
+					-
+					{{ upload.uploadedAt|date('d/m/Y') }}
 					<span class="visually-hidden">{{ upload.id }}</span>
 				</a>
-				<a href="{{ path('app_modify_file', {'uploadId': upload.id})}}" class="btn btn-modify">
+				<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify">
 					Modifier
 					<span class="visually-hidden">{{ upload.id }}</span>
 				</a>

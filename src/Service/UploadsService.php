@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Psr\Log\LoggerInterface;
 
 
 
@@ -20,12 +21,14 @@ class UploadsService extends AbstractController
     protected $uploadRepository;
     protected $manager;
     protected $projectDir;
+    protected $logger;
 
-    public function __construct(EntityManagerInterface $manager, ParameterBagInterface $params, UploadRepository $uploadRepository)
+    public function __construct(EntityManagerInterface $manager, ParameterBagInterface $params, UploadRepository $uploadRepository, LoggerInterface $logger)
     {
         $this->uploadRepository = $uploadRepository;
         $this->manager = $manager;
         $this->projectDir = $params->get('kernel.project_dir');
+        $this->logger = $logger;
     }
 
     public function uploadFiles(Request $request, $button, $newFileName = null)
@@ -85,10 +88,29 @@ class UploadsService extends AbstractController
         return $name;
     }
 
+
     public function modifyFile(Upload $upload, array $formData)
     {
+        // Log the form data
+        $this->logger->info('Form data: ' . json_encode($formData));
+
         // Check if a new file was uploaded
-        if ($formData['file']) {
+        if (!isset($formData['file']) || !$formData['file']) {
+            $this->logger->error('No file was uploaded.');
+        }
+
+        // Check if filename is provided
+        if (!isset($formData['filename']) || !$formData['filename']) {
+            $this->logger->error('No filename was provided.');
+        }
+
+        // Check if button is provided
+        if (!isset($formData['button']) || !$formData['button']) {
+            $this->logger->error('No button was provided.');
+        }
+
+        // Check if a new file was uploaded
+        if (isset($formData['file']) && $formData['file']) {
             $newFile = $formData['file'];
             $public_dir = $this->projectDir . '/public';
 
@@ -101,17 +123,31 @@ class UploadsService extends AbstractController
             }
 
             // Move the new file to the directory
-            $newFile->move($public_dir . '/doc/', $upload->getFilename());
+            try {
+                $newFile->move($public_dir . '/doc/', $upload->getFilename());
+            } catch (\Exception $e) {
+                $this->logger->error('Failed to move uploaded file: ' . $e->getMessage());
+                throw $e;
+            }
+
             $upload->setPath($newFilePath);
-
-            // Update the filename and button
-            $upload->setFilename($formData['filename']);
-            $upload->setButton($formData['button']);
-
-            // Persist changes and flush to the database
-            $upload->setUploadedAt(new \DateTime());
-            $this->manager->persist($upload);
-            $this->manager->flush();
         }
+
+        // Check if filename is provided
+        if (isset($formData['filename']) && $formData['filename']) {
+            // Update the filename
+            $upload->setFilename($formData['filename']);
+        }
+
+        // Check if button is provided
+        if (isset($formData['button']) && $formData['button']) {
+            // Update the button
+            $upload->setButton($formData['button']);
+        }
+
+        // Persist changes and flush to the database
+        $upload->setUploadedAt(new \DateTime());
+        $this->manager->persist($upload);
+        $this->manager->flush();
     }
 }

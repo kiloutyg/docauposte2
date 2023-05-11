@@ -15,6 +15,6 @@ import "./js/toast.js";
 // homegrown javascript
 import "./js/confirmation.js";
 import "./js/cascading-dropdowns.js";
-import "./js/formdata.js";
+// import "./js/formdata.js";
 
 console.log("Hello Stimulus!");

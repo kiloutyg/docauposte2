@@ -9,10 +9,10 @@
 	{% set lastProductLine = null %}
 	{% set lastCategory = null %}
 	{% set lastButton = null %}
+
 	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
 		<div class="card-body ">
 			<div class="row d-flex align-items-center gy-lg-0 gy-5">
-
 				<p class="text-white m-0">
 					<h3 style="color:white">
 						Modifications du fichier
@@ -20,7 +20,7 @@
 						:
 					</h3>
 				</p>
-				<form class="form-floating justify-content-center" id="upload-form" action="{{path('app_modify_file', {'uploadId': upload.id})}}" method="POST" enctype="multipart/form-data">
+				<form class="form-floating justify-content-center" id="modifyForm" action="{{path('app_modify_file', {'uploadId': upload.id})}}" method="POST" enctype="multipart/form-data">
 					<div class="fallback">
 						<div class="mb-3">
 							<label for="file" class="form-label" style="color:white">Select a file to upload:</label>
@@ -60,17 +60,47 @@
 
 						{% endif %}
 
-						{% include 'services/uploads/cascading_dropdowns.html.twig' %}
+						<div class="row">
+							<div class="col-md-2 col-sm-2 mt-2 mb-2">
+								<label for="zone" style="color:white">Zone :</label>
+							</div>
+							<div class="col-md-10 col-sm-10 mt-2 mb-2">
+								<select name="zone" id="zone" class="form-select" required>
+									<option value="" selected disabled hidden>Choisir une Zone</option>
+								</select>
+							</div>
+							<div class="col-md-2 col-sm-2 mt-2 mb-2">
+								<label for="productline" style="color:white">Ligne :</label>
+							</div>
+							<div class="col-md-10 col-sm-10 mt-2 mb-2">
+								<select name="productline" id="productline" class="form-select" required>
+									<option value="" selected disabled hidden>Choisir une Ligne</option>
+								</select>
+							</div>
+							<div class="col-md-2 col-sm-2 mt-2 mb-2">
+								<label for="category" style="color:white">Categorie :</label>
+							</div>
+							<div class="col-md-10 col-sm-10 mt-2 mb-2">
+								<select name="category" id="category" class="form-select" required>
+									<option value="" selected disabled hidden>Choisir une Catégorie</option>
+								</select>
+							</div>
+							<div class="col-md-2 col-sm-2 mt-2 mb-2">
+								<label for="button" style="color:white">Bouton :</label>
+							</div>
+							<div class="col-md-10 col-sm-10 mt-2 mb-2">
+								<select name="formData[button]" id="button" class="form-select" required>
+									<option value="" selected disabled hidden>Choisir un bouton</option>
+								</select>
+							</div>
+						</div>
 					</div>
 					<div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
 						<button type="submit" class="btn btn-primary mb-5">Modifier</button>
 					</div>
-
 				</form>
-
 			</div>
 		</div>
-
 	</div>
 
 {% endblock %}

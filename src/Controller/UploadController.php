@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\File;
@@ -125,7 +126,7 @@ class UploadController extends FrontController
     }
 
     // create a route to display the modification page 
-    #[Route('/modify/{uploadId}', name: 'modify_file_page')]
+    #[Route('/modifyfile/{uploadId}', name: 'modify_file_page')]
 
     public function modify_file_page(string $uploadId = null): Response
     {
@@ -143,9 +144,9 @@ class UploadController extends FrontController
         );
     }
 
-    // create a route to modify an existing file
 
-    #[Route('/modify/{uploadId}', name: 'modify_file')]
+
+    #[Route('/modify/{uploadId}', name: 'modify_file', methods: ['GET', 'POST'])]
     public function modify_file(Request $request, int $uploadId, UploadsService $uploadsService): Response
     {
         // Retrieve the current upload entity based on the uploadId
@@ -157,21 +158,50 @@ class UploadController extends FrontController
 
         // Create a form to modify the Upload entity
         $form = $this->createForm(UploadType::class, $upload);
+
+        // Handle the form data on POST requests
+
         $form->handleRequest($request);
+
+
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             $uploadsService->modifyFile($upload, $form->getData());
 
-            $this->addFlash('success', 'Le fichier a été modifié.');
+            if ($request->isXmlHttpRequest()) { // if it's an Ajax request
+                return new JsonResponse(['message' => 'Le fichier a été modifié.']);
+            } else {
+                $this->addFlash('success', 'Le fichier a été modifié.');
 
-            return $this->redirectToRoute('app_base');
+                return $this->redirectToRoute('app_base');
+            }
         }
 
+        if ($form->isSubmitted() && !$form->isValid()) {
+            // Get form errors
+            $errors = $form->getErrors(true);
+
+            // Convert the errors to an array
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+
+            // Return the errors in the JSON response
+            return new JsonResponse(['error' => 'Invalid form.', 'form_errors' => $errorMessages], 400);
+        }
+
+
+        // If it's a POST request but the form is not valid or not submitted
+        if ($request->isMethod('POST')) {
+            return new JsonResponse(['error' => 'Invalid form.'], 400); // Return a 400 Bad Request response
+        }
+
+        // If it's a GET request, render the form
         return $this->render('services/uploads/uploads_modification.html.twig', [
             'form' => $form->createView(),
             'upload' => $upload
-
         ]);
     }
 }
