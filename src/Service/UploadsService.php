@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
 
-
+use App\Repository\ButtonRepository;
 
 use App\Repository\UploadRepository;
 
@@ -22,13 +22,15 @@ class UploadsService extends AbstractController
     protected $manager;
     protected $projectDir;
     protected $logger;
+    protected $buttonRepository;
 
-    public function __construct(EntityManagerInterface $manager, ParameterBagInterface $params, UploadRepository $uploadRepository, LoggerInterface $logger)
+    public function __construct(ButtonRepository $buttonRepository, EntityManagerInterface $manager, ParameterBagInterface $params, UploadRepository $uploadRepository, LoggerInterface $logger)
     {
         $this->uploadRepository = $uploadRepository;
         $this->manager = $manager;
         $this->projectDir = $params->get('kernel.project_dir');
         $this->logger = $logger;
+        $this->buttonRepository = $buttonRepository;
     }
 
     public function uploadFiles(Request $request, $button, $newFileName = null)
@@ -130,11 +132,18 @@ class UploadsService extends AbstractController
 
         // Check if button is provided
         if (isset($formData['button']) && !empty($formData['button'])) {
-            // Update the button
-            $upload->setButton($formData['button']);
+            // Fetch the Button entity corresponding to the button ID
+            $button = $formData['button'];
+            if ($button !== null) {
+                // Update the button
+                $upload->setButton($button);
+            } else {
+                $this->logger->info('No Button entity was found for the provided button ID.');
+            }
         } else {
             $this->logger->info('No button was provided.');
         }
+
 
         // Persist changes and flush to the database
         $upload->setUploadedAt(new \DateTime());

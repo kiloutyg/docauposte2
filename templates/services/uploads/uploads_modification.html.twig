@@ -24,12 +24,12 @@
 					<div class="fallback">
 						<div class="mb-3">
 							<label for="file" class="form-label" style="color:white">Select a file to upload:</label>
-							<input type="file" class="form-control" id="file" name="formData[file]">
+							<input type="file" class="form-control" id="file" name="file">
 						</div>
 
 						<div class="mb-3">
 							<label for="newFileName" class="form-label" style="color:white">Nouveau nom du fichier :</label>
-							<input type="text" class="form-control" id="newFileName" name="formData[filename]" placeholder="Entrer un nouveau nom de fichier (optionnel)">
+							<input type="text" class="form-control" id="newFileName" name="filename" placeholder="Entrer un nouveau nom de fichier (optionnel)">
 						</div>
 
 						{# Display the current button hierarchy #}
@@ -89,7 +89,7 @@
 								<label for="button" style="color:white">Bouton :</label>
 							</div>
 							<div class="col-md-10 col-sm-10 mt-2 mb-2">
-								<select name="formData[button]" id="button" class="form-select" required>
+								<select name="button" id="button" class="form-select" required>
 									<option value="" selected disabled hidden>Choisir un bouton</option>
 								</select>
 							</div>

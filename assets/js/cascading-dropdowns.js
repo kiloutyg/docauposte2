@@ -134,39 +134,33 @@ document
       let file = fileInput.files[0];
 
       // Add the file to formData
-      formData.append("formData[file]", file);
+      formData.append("file", file);
     } else {
       // No file was selected
       console.error("No file was selected");
     }
 
     // Get the dropdown elements
-    let zoneDropdown = document.getElementById("zone");
-    let productlineDropdown = document.getElementById("productline");
-    let categoryDropdown = document.getElementById("category");
+
     let buttonDropdown = document.getElementById("button");
     // Get the filename input
     let filenameInput = document.getElementById("newFileName");
 
     // Get the selected values
-    let zoneValue = zoneDropdown.options[zoneDropdown.selectedIndex].value;
-    let productlineValue =
-      productlineDropdown.options[productlineDropdown.selectedIndex].value;
-    let categoryValue =
-      categoryDropdown.options[categoryDropdown.selectedIndex].value;
-    let buttonValue =
-      buttonDropdown.options[buttonDropdown.selectedIndex].value;
+
+    let buttonValue = parseInt(
+      buttonDropdown.options[buttonDropdown.selectedIndex].value,
+      10
+    );
+    console.log(buttonValue); // Add this line
     // Get the filename value
     let filenameValue = filenameInput.value;
 
     // Add the values to formData
-    // formData.append("zone", zoneValue);
-    // formData.append("productline", productlineValue);
-    // formData.append("category", categoryValue);
-    formData.append("formData[button]", buttonValue);
-    // If filenameValue is not empty, append it to formData
+
+    formData.append("button", buttonValue);
     if (filenameValue) {
-      formData.append("formData[filename]", filenameValue);
+      formData.append("filename", filenameValue);
     }
 
     // Log the formData to the console to inspect it

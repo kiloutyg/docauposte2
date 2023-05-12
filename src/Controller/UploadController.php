@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,6 +15,9 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Form\UploadType;
 
 use App\Service\UploadsService;
+
+use App\Repository\ButtonRepository;
+
 
 #[Route('/', name: 'app_')]
 
@@ -131,14 +135,11 @@ class UploadController extends FrontController
     public function modify_file_page(string $uploadId = null): Response
     {
         $upload = $this->uploadRepository->findoneBy(['id' => $uploadId]);
-        $form = $this->createForm(UploadType::class, $upload);
 
         return $this->render(
             'services/uploads/uploads_modification.html.twig',
             [
-                'upload' => $upload,
-
-                'form' => $form->createView(),
+                'upload' => $upload
 
             ]
         );
@@ -146,76 +147,108 @@ class UploadController extends FrontController
 
 
 
-    #[Route('/modify/{uploadId}', name: 'modify_file', methods: ['GET', 'POST'])]
-    public function modify_file(Request $request, int $uploadId, UploadsService $uploadsService): Response
+    // create a route to modify a file
+
+    #[Route('/modify/{uploadId}', name: 'modify_file')]
+    public function modify_file(Request $request, int $uploadId, UploadsService $uploadsService, ButtonRepository $buttonRepository, LoggerInterface $logger): Response
     {
         // Retrieve the current upload entity based on the uploadId
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
 
-        // Create a form to modify the Upload entity
-        $form = $this->createForm(UploadType::class, $upload);
+        if (!$upload) {
+            $logger->error('Upload not found', ['uploadId' => $uploadId]);
+            $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
+            return $this->redirectToRoute('app_modify_file_page'); // or wherever you want to redirect
+        }
 
+        $logger->info('Retrieved Upload entity:', ['upload' => $upload]);
 
         // Get form data
         $formData = $request->request->all();
+
+        if (isset($formData['button']) && !empty($formData['button'])) {
+            // Fetch the Button entity corresponding to the button ID in the form data
+            $button = $formData['button'];
+
+            if ($button !== null) {
+                $button = $buttonRepository->find($formData['button']);
+                $logger->info('Fetched Button entity:', ['button' => $button]);
+                $formData['button'] = $button->getId();
+            } else {
+                // Handle the case where no Button entity was found for the given button ID
+                $logger->error('Button not found', ['buttonId' => $formData['button']]);
+                $this->addFlash('error', 'Le bouton n\'a pas été trouvé.');
+                return $this->redirectToRoute('app_modify_file_page'); // or wherever you want to redirect
+            }
+        } else {
+            $formData['button'] = $upload->getButton()->getId();
+        }
+
+        // Create a form to modify the Upload entity
+        $form = $this->createForm(UploadType::class, $upload);
+
+        $logger->info('Form data before manipulation:', ['formData' => $formData]);
 
         // Check if filename and button are set in the form data
         if (!isset($formData['filename']) || empty($formData['filename'])) {
             $formData['filename'] = $upload->getFilename();
         }
-        if (!isset($formData['button']) || empty($formData['button'])) {
-            $formData['button'] = $upload->getButton();
-        }
+
+        $logger->info('Form data after manipulation:', ['formData' => $formData]);
 
         // Update the form data
         $request->request->replace($formData);
 
         // Handle the form data on POST requests
+        $logger->info('Form data before handleRequest:', ['formData' => $formData]);
 
         $form->handleRequest($request);
 
-
+        $logger->info('Form data after handleRequest:', ['formData' => $form->getData()]);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
-            $uploadsService->modifyFile($upload, $form->getData());
-
-            if ($request->isXmlHttpRequest()) { // if it's an Ajax request
-                return new JsonResponse(['message' => 'Le fichier a été modifié.']);
-            } else {
+            try {
+                $uploadsService->modifyFile($upload, $form->getData());
                 $this->addFlash('success', 'Le fichier a été modifié.');
-
-                return $this->redirectToRoute('app_base');
+                $logger->info('File modified successfully', ['upload' => $upload]);
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur s\'est produite lors de la modification du fichier.');
+                $logger->error('Failed to modify file', ['upload' => $upload, 'error' => $e->getMessage()]);
             }
+
+            return $this->redirectToRoute('app_modify_file_page', ['uploadId' => $uploadId]);
         }
 
+        // Convert the errors to an array
+        $errorMessages = [];
         if ($form->isSubmitted() && !$form->isValid()) {
             // Get form errors
             $errors = $form->getErrors(true);
 
-            // Convert the errors to an array
-            $errorMessages = [];
             foreach ($errors as $error) {
                 $errorMessages[] = $error->getMessage();
             }
 
             // Print form errors
-            var_dump($errorMessages); // Add this line
+            $logger->error('Form validation errors:', ['errors' => $errorMessages]);
 
             // Return the errors in the JSON response
-            return new JsonResponse(['error' => 'Invalid form.', 'form_errors' => $errorMessages], 400);
+            $this->addFlash('error', 'Invalid form. Check the entered data.');
+            return $this->redirectToRoute('app_modify_file_page', ['uploadId' => $uploadId]);
         }
-
 
         // If it's a POST request but the form is not valid or not submitted
         if ($request->isMethod('POST')) {
-            return new JsonResponse(['error' => 'Invalid form.'], 400); // Return a 400 Bad Request response
+            $this->addFlash('error', 'Invalid form. Errors: ' . implode(', ', $errorMessages));
+            $logger->info('Submitted data:', $request->request->all());
+
+            return $this->redirectToRoute('app_modify_file_page', ['uploadId' => $uploadId]); // Return a 400 Bad Request response
         }
 
         // If it's a GET request, render the form
         return $this->render('services/uploads/uploads_modification.html.twig', [
-            'form' => $form->createView(),
-            'upload' => $upload
+            'uploadId' => $uploadId
         ]);
     }
 }

@@ -70,7 +70,7 @@
 					{{ upload.uploadedAt|date('d/m/Y') }}
 					<span class="visually-hidden">{{ upload.id }}</span>
 				</a>
-				<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify">
+				<a href="{{ path('app_modify_file_page', {'uploadId': upload.id}) }}" class="btn btn-modify">
 					Modifier
 					<span class="visually-hidden">{{ upload.id }}</span>
 				</a>
