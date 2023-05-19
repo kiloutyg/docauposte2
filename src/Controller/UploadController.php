@@ -166,22 +166,39 @@ class UploadController extends FrontController
         // Get form data
         $formData = $request->request->all();
 
+        // if (isset($formData['button']) && !empty($formData['button'])) {
+        //     // Fetch the Button entity corresponding to the button ID in the form data
+        //     $button = $formData['button'];
+
+        //     if ($button !== null) {
+        //         $button = $buttonRepository->find($formData['button']);
+        //         $logger->info('Fetched Button entity:', ['button' => $button]);
+        //         $formData['button'] = $button->getId();
+        //     } else {
+        //         // Handle the case where no Button entity was found for the given button ID
+        //         $logger->error('Button not found', ['buttonId' => $formData['button']]);
+        //         $this->addFlash('error', 'Le bouton n\'a pas été trouvé.');
+        //         return $this->redirectToRoute('app_modify_file_page'); // or wherever you want to redirect
+        //     }
+        // } else {
+        //     $formData['button'] = $upload->getButton()->getId();
+        // }
+
         if (isset($formData['button']) && !empty($formData['button'])) {
             // Fetch the Button entity corresponding to the button ID in the form data
-            $button = $formData['button'];
-
+            $button = $buttonRepository->find($formData['button']);
             if ($button !== null) {
-                $button = $buttonRepository->find($formData['button']);
                 $logger->info('Fetched Button entity:', ['button' => $button]);
-                $formData['button'] = $button->getId();
+                // Replace formData['button'] with the Button entity, not the ID
+                $formData['button'] = $button;
             } else {
                 // Handle the case where no Button entity was found for the given button ID
                 $logger->error('Button not found', ['buttonId' => $formData['button']]);
                 $this->addFlash('error', 'Le bouton n\'a pas été trouvé.');
-                return $this->redirectToRoute('app_modify_file_page'); // or wherever you want to redirect
+                return $this->redirectToRoute('app_modify_file_page');
             }
         } else {
-            $formData['button'] = $upload->getButton()->getId();
+            $formData['button'] = $upload->getButton();
         }
 
         // Create a form to modify the Upload entity

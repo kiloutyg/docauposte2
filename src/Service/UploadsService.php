@@ -14,6 +14,7 @@ use App\Repository\ButtonRepository;
 use App\Repository\UploadRepository;
 
 use App\Entity\Upload;
+use App\Entity\Button;
 
 class UploadsService extends AbstractController
 {
@@ -131,17 +132,23 @@ class UploadsService extends AbstractController
         }
 
         // Check if button is provided
-        if (isset($formData['button']) && !empty($formData['button'])) {
-            // Fetch the Button entity corresponding to the button ID
-            $button = $formData['button'];
-            if ($button !== null) {
-                // Update the button
-                $upload->setButton($button);
-            } else {
-                $this->logger->info('No Button entity was found for the provided button ID.');
-            }
+        // if (isset($formData['button']) && !empty($formData['button'])) {
+        //     // Fetch the Button entity corresponding to the button ID
+        //     $button = $formData['button'];
+        //     if ($button !== null) {
+        //         // Update the button
+        //         $upload->setButton($button);
+        //     } else {
+        //         $this->logger->info('No Button entity was found for the provided button ID.');
+        //     }
+        // } else {
+        //     $this->logger->info('No button was provided.');
+        // }
+
+        if (isset($formData['button']) && $formData['button'] instanceof Button) {
+            $upload->setButton($formData['button']);
         } else {
-            $this->logger->info('No button was provided.');
+            $this->logger->info('No button was provided or it\'s not a Button entity.');
         }
 
 
