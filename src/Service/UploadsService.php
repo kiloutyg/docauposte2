@@ -95,11 +95,14 @@ class UploadsService extends AbstractController
     public function modifyFile(Upload $upload, array $formData)
     {
         // Log the form data
-        $this->logger->info('Form data: ' . json_encode($formData));
+        $this->logger->info('original upload state', ['upload' => $upload]);
+
+        $this->logger->info('Form data4: ', ['formData' => $formData]);
+
 
         // Check if a new file was uploaded
-        if (isset($formData['file']) && $formData['file']) {
-            $newFile = $formData['file'];
+        if (isset($formData['upload']['file']) && $formData['upload']['file']) {
+            $newFile = $formData['upload']['file'];
             $public_dir = $this->projectDir . '/public';
 
             $oldFilePath = $upload->getPath();
@@ -123,33 +126,31 @@ class UploadsService extends AbstractController
             $this->logger->info('No file was uploaded.');
         }
 
-        // Check if filename is provided
-        if (isset($formData['filename']) && !empty($formData['filename'])) {
-            // Update the filename
-            $upload->setFilename($formData['filename']);
-        } else {
-            $this->logger->info('No filename was provided.');
-        }
-
-        // Check if button is provided
-        // if (isset($formData['button']) && !empty($formData['button'])) {
-        //     // Fetch the Button entity corresponding to the button ID
-        //     $button = $formData['button'];
-        //     if ($button !== null) {
-        //         // Update the button
-        //         $upload->setButton($button);
-        //     } else {
-        //         $this->logger->info('No Button entity was found for the provided button ID.');
+        // // Check if filename is provided
+        // if (isset($formData['upload']['filename']) && !empty($formData['upload']['filename'])) {
+        //     // Only update the filename if it wasn't already updated by the form
+        //     if ($upload->getFilename() !== $formData['upload']['filename']) {
+        //         // Update the filename
+        //         $upload->setFilename($formData['upload']['filename']);
         //     }
         // } else {
-        //     $this->logger->info('No button was provided.');
+        //     // $this->logger->info('No filename was provided.');
+        //     $this->logger->info('No filename was provided. Keeping the original filename.');
+        //     $formData['upload']['filename'] = $upload->getFilename();
         // }
 
-        if (isset($formData['button']) && $formData['button'] instanceof Button) {
-            $upload->setButton($formData['button']);
-        } else {
-            $this->logger->info('No button was provided or it\'s not a Button entity.');
-        }
+        // if (
+        //     isset($formData['upload']['button']) && !empty($formData['upload']['button'])
+        // ) {
+        //     // instanceof Button
+        //     $newButton = $this->buttonRepository->findOneBy(['id' => $formData['upload']['button']]);
+
+        //     if ($upload->getButton() !== $newButton) {
+        //         $upload->setButton($newButton);
+        //     } else {
+        //         $this->logger->info('No button was provided or it\'s not a Button entity.');
+        //     }
+        // }
 
 
         // Persist changes and flush to the database

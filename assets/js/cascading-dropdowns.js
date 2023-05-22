@@ -84,14 +84,14 @@ function handleProductLineChange(event) {
 function handleCategoryChange(event) {
   const selectedValue = parseInt(event.target.value);
   const filteredButtons = filterData(buttonsData, "category_id", selectedValue);
-  populateDropdown(document.getElementById("button"), filteredButtons);
+  populateDropdown(document.getElementById("upload_button"), filteredButtons);
 }
 
 function resetDropdowns() {
   const zone = document.getElementById("zone");
   const productline = document.getElementById("productline");
   const category = document.getElementById("category");
-  const button = document.getElementById("button");
+  const button = document.getElementById("upload_button");
 
   if (zone) zone.selectedIndex = 0;
   if (productline) productline.selectedIndex = 0;
@@ -117,7 +117,7 @@ document.addEventListener("turbo:load", () => {
   //   console.error("Error fetching cascading dropdown data:", error);
   // });
 });
-// Your existing code...
+
 document
   .querySelector("#modifyForm")
   .addEventListener("submit", function (event) {
@@ -127,24 +127,34 @@ document
     let formData = new FormData();
 
     // Get the file input element
-    let fileInput = document.querySelector("#file");
+    let fileInput = document.querySelector("#upload_file");
+
+    // Get the CSRF token
+    let csrfTokenInput = document.querySelector("#upload__token");
+
+    // Get the CSRF token value
+    let csrfTokenValue = csrfTokenInput.value;
+
+    // Add the CSRF token to formData
+    formData.append("upload[_token]", csrfTokenValue);
 
     if (fileInput.files.length > 0) {
       // A file was selected
       let file = fileInput.files[0];
 
       // Add the file to formData
-      formData.append("file", file);
+      formData.append("upload[file]", file);
     } else {
       // No file was selected
       console.error("No file was selected");
     }
+    console.log(document.forms);
 
     // Get the dropdown elements
 
-    let buttonDropdown = document.getElementById("button");
+    let buttonDropdown = document.getElementById("upload_button");
     // Get the filename input
-    let filenameInput = document.getElementById("newFileName");
+    let filenameInput = document.getElementById("upload_filename");
 
     // Get the selected values
 
@@ -158,9 +168,9 @@ document
 
     // Add the values to formData
 
-    formData.append("button", buttonValue);
+    formData.append("upload[button]", buttonValue);
     if (filenameValue) {
-      formData.append("filename", filenameValue);
+      formData.append("upload[filename]", filenameValue);
     }
 
     // Log the formData to the console to inspect it
@@ -177,9 +187,10 @@ document
       method: "POST",
       body: formData,
     })
-      .then((response) => response.json())
-      .then((data) => console.log(data))
+      .then((response) => response)
       .catch((error) => {
+        then((response) => response.json());
         console.error("Error:", error);
+        // Handle fetch errors here...
       });
   });

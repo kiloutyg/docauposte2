@@ -40,13 +40,22 @@ class UploadType extends AbstractType
             ])
             ->add('filename', TextType::class, [
                 'label' => 'Nouveau nom du fichier:',
+                'required' => false,
+
             ])
-            // ;
-            ->add('button', EntityType::class, [
-                'class' => Button::class,
-                'choice_label' => 'name',
-                'label' => 'Select a button:',
-            ]);
+
+            ->add(
+                'button',
+                EntityType::class,
+                [
+                    'class' => Button::class,
+                    'choice_label' => 'name',
+                    'label' => 'Select a button:',
+                    'placeholder' => 'Choisir un bouton',
+                    'required' => true,
+                    'multiple' => false,
+                ]
+            );
     }
 
     public function configureOptions(OptionsResolver $resolver): void
