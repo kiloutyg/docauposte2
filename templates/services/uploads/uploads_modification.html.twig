@@ -90,7 +90,7 @@
 
 
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
-							{{ form_widget(form.button,{'attr': {'class': 'form-select', 'id': 'button', 'required': true}}) }}
+							{{ form_widget(form.button,{'attr': {'class': 'form-select', 'nam': 'button', 'id': 'upload_button', 'required': true}}) }}
 						</div>
 					</div>
 				</div>
@@ -105,5 +105,12 @@
 {% endblock %}
 {% block javascripts %}
 	{{ encore_entry_script_tags('cascading-dropdowns') }}
+	<script>
+		window.onload = function () {
+let selectElement = document.getElementById('upload_button');
+selectElement.innerHTML = '<option value="" selected disabled hidden>Choisir un bouton</option>';
+}
+	</script>
+
 	{% block javascript_data %}{% endblock %}
 {% endblock %}

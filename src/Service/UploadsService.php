@@ -117,9 +117,8 @@ class UploadsService extends AbstractController
 
         // Move the new file to the directory
         try {
-            if ($newFile) {
-                $newFile->move($public_dir . '/doc/', $upload->getFilename());
-            }
+
+            $newFile->move($public_dir . '/doc/', $upload->getFilename());
         } catch (\Exception $e) {
             $this->logger->error('Failed to move uploaded file: ' . $e->getMessage());
             throw $e;

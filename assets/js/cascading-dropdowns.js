@@ -16,6 +16,7 @@ fetch("/api/cascading_dropdown_data")
     // Call the function that initializes the cascading dropdowns
     // after the data has been fetched
     initCascadingDropdowns();
+    resetDropdowns();
   });
 
 function filterData(data, key, value) {
