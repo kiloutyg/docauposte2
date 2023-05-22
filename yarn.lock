@@ -909,10 +909,10 @@
   resolved "https://registry.npmjs.org/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz"
   integrity sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==
 
-"@fontsource/roboto-condensed@^4.5.9":
-  version "4.5.9"
-  resolved "https://registry.yarnpkg.com/@fontsource/roboto-condensed/-/roboto-condensed-4.5.9.tgz#70582d0d70acf02323bdeb603e108b836030b42e"
-  integrity sha512-ql4sQq+h8puBVildZ5ssjYf8DWDONYDe3PD3Bu/p1ZW9GnRETRNPPcCTs/q62HIl3QimwwkiKWynn6wZhQaetg==
+"@fontsource/roboto-condensed@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@fontsource/roboto-condensed/-/roboto-condensed-5.0.0.tgz#c483327e2821afb88424c2e8274b4e6389cf7bef"
+  integrity sha512-2rgZlJycjGLg6T/MhU2uaeeWOt4Hl2x6JMwWVuQIp7J7gI37VFepJi7YLLvX/DX5mZbTTjKxInvtRbmhxx3Fiw==
 
 "@fortawesome/fontawesome-free@^6.4.0":
   version "6.4.0"
