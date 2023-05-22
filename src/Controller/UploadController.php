@@ -181,29 +181,6 @@ class UploadController extends FrontController
 
 
 
-        // Check if filename is provided
-        if (empty($formData['upload']['filename'])) {
-
-            // $this->logger->info('No filename was provided.');
-            $this->logger->info('No filename was provided. Keeping the original filename.');
-            $formData['upload']['filename'] = $upload->getFilename();
-        }
-
-        // if (
-        //     isset($formData['upload']['button']) && !empty($formData['upload']['button'])
-        // ) {
-        //     // instanceof Button
-        //     $newButton = $this->buttonRepository->findOneBy(['id' => $formData['upload']['button']]);
-
-        //     if ($upload->getButton() !== $newButton) {
-        //         $upload->setButton($newButton);
-        //     } else {
-        //         $this->logger->info('No button was provided or it\'s not a Button entity.');
-        //     }
-        // }
-
-
-
         $form->handleRequest($request);
 
 
@@ -215,8 +192,7 @@ class UploadController extends FrontController
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
-                // $uploadsService->modifyFile($upload, $form->getData());
-                $uploadsService->modifyFile($upload, $formData);
+                $uploadsService->modifyFile($upload);
 
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 $logger->info('File modified successfully', ['upload' => $upload]);

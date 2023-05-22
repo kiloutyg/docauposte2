@@ -16,6 +16,7 @@ class Upload
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+
     private ?int $id = null;
 
     private ?File $file = null;
@@ -86,6 +87,16 @@ class Upload
 
         return $this;
     }
+
+    // #[ORM\PrePersist]
+    // #[ORM\PreUpdate]
+
+    // public function updatePath(): void
+    // {
+    //     // This is just an example, adjust it according to your actual directory structure.
+
+    //     $this->path = '/var/www/public/doc/' . $this->filename;
+    // }
 
     public function getExpiryDate(): ?\DateTimeInterface
     {

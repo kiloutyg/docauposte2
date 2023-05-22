@@ -17,9 +17,6 @@ fetch("/api/cascading_dropdown_data")
     // after the data has been fetched
     initCascadingDropdowns();
   });
-// .catch((error) => {
-//   console.error("Error fetching cascading dropdown data:", error);
-// });
 
 function filterData(data, key, value) {
   return data.filter((item) => item[key] === value);
@@ -113,9 +110,6 @@ document.addEventListener("turbo:load", () => {
       initCascadingDropdowns();
       resetDropdowns();
     });
-  // .catch((error) => {
-  //   console.error("Error fetching cascading dropdown data:", error);
-  // });
 });
 
 document
@@ -144,11 +138,7 @@ document
 
       // Add the file to formData
       formData.append("upload[file]", file);
-    } else {
-      // No file was selected
-      console.error("No file was selected");
     }
-    console.log(document.forms);
 
     // Get the dropdown elements
 
@@ -162,7 +152,7 @@ document
       buttonDropdown.options[buttonDropdown.selectedIndex].value,
       10
     );
-    console.log(buttonValue); // Add this line
+
     // Get the filename value
     let filenameValue = filenameInput.value;
 
@@ -173,10 +163,6 @@ document
       formData.append("upload[filename]", filenameValue);
     }
 
-    // Log the formData to the console to inspect it
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
     // Get the upload ID from the URL
     let form = document.getElementById("modifyForm");
     let actionUrl = form.getAttribute("action");

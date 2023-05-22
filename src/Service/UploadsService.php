@@ -49,6 +49,7 @@ class UploadsService extends AbstractController
             }
 
             $public_dir = $this->projectDir . '/public';
+
             if ($newFileName) {
                 $filename   = $newFileName;
             } else {
@@ -92,65 +93,39 @@ class UploadsService extends AbstractController
     }
 
 
-    public function modifyFile(Upload $upload, array $formData)
+    public function modifyFile(Upload $upload)
     {
         // Log the form data
         $this->logger->info('original upload state', ['upload' => $upload]);
 
-        $this->logger->info('Form data4: ', ['formData' => $formData]);
 
+        // Get the new file directly from the Upload object
+        $newFile = $upload->getFile();
 
-        // Check if a new file was uploaded
-        if (isset($formData['upload']['file']) && $formData['upload']['file']) {
-            $newFile = $formData['upload']['file'];
-            $public_dir = $this->projectDir . '/public';
-
-            $oldFilePath = $upload->getPath();
-            $newFilePath = $public_dir . '/doc/' . $upload->getFilename();
-
-            // Remove old file if it exists
-            if (file_exists($oldFilePath)) {
-                unlink($oldFilePath);
-            }
-
-            // Move the new file to the directory
-            try {
-                $newFile->move($public_dir . '/doc/', $upload->getFilename());
-            } catch (\Exception $e) {
-                $this->logger->error('Failed to move uploaded file: ' . $e->getMessage());
-                throw $e;
-            }
-
-            $upload->setPath($newFilePath);
-        } else {
-            $this->logger->info('No file was uploaded.');
+        // Continue as before...
+        $public_dir = $this->projectDir . '/public';
+        if (!file_exists($public_dir . '/doc/')) {
+            mkdir($public_dir . '/doc/', 0777, true);
+        }
+        $oldFilePath = $upload->getPath();
+        $Path = $public_dir . '/doc/' . $upload->getFilename();
+        // ... and so on
+        // Remove old file if it exists
+        if (file_exists($oldFilePath)) {
+            unlink($oldFilePath);
         }
 
-        // // Check if filename is provided
-        // if (isset($formData['upload']['filename']) && !empty($formData['upload']['filename'])) {
-        //     // Only update the filename if it wasn't already updated by the form
-        //     if ($upload->getFilename() !== $formData['upload']['filename']) {
-        //         // Update the filename
-        //         $upload->setFilename($formData['upload']['filename']);
-        //     }
-        // } else {
-        //     // $this->logger->info('No filename was provided.');
-        //     $this->logger->info('No filename was provided. Keeping the original filename.');
-        //     $formData['upload']['filename'] = $upload->getFilename();
-        // }
+        // Move the new file to the directory
+        try {
+            if ($newFile) {
+                $newFile->move($public_dir . '/doc/', $upload->getFilename());
+            }
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to move uploaded file: ' . $e->getMessage());
+            throw $e;
+        }
 
-        // if (
-        //     isset($formData['upload']['button']) && !empty($formData['upload']['button'])
-        // ) {
-        //     // instanceof Button
-        //     $newButton = $this->buttonRepository->findOneBy(['id' => $formData['upload']['button']]);
-
-        //     if ($upload->getButton() !== $newButton) {
-        //         $upload->setButton($newButton);
-        //     } else {
-        //         $this->logger->info('No button was provided or it\'s not a Button entity.');
-        //     }
-        // }
+        $upload->setPath($Path);
 
 
         // Persist changes and flush to the database

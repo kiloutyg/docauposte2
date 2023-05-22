@@ -18,6 +18,8 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\StringerType;
 use Symfony\Component\Form\CallbackTransformer;
 use App\Repository\ButtonRepository;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 
 class UploadType extends AbstractType
@@ -35,12 +37,13 @@ class UploadType extends AbstractType
         $builder
             ->add('file', FileType::class, [
                 'label' => 'Select a file to upload:',
-                'mapped' => false,
+                'mapped' => true,
                 'required' => false,
             ])
             ->add('filename', TextType::class, [
                 'label' => 'Nouveau nom du fichier:',
                 'required' => false,
+                'empty_data' => null,
 
             ])
 
@@ -56,6 +59,16 @@ class UploadType extends AbstractType
                     'multiple' => false,
                 ]
             );
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $data = $event->getData();
+            $form = $event->getForm();
+            // If no filename was submitted, set it to the original filename
+            if (empty($data['filename'])) {
+                $data['filename'] = $form->getData()->getFilename();
+                $event->setData($data);
+            }
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

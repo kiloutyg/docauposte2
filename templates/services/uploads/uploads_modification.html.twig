@@ -20,7 +20,7 @@
 						:
 					</h3>
 				</p>
-				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm', 'enctype': 'multipart/form-data'}, 'action': path('app_modify_file', {'uploadId': upload.id})}) }}
+				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_modify_file', {'uploadId': upload.id})}) }}
 				<div class="fallback">
 					<div class="mb-3">
 						{{ form_label(form.file, 'Select a file to upload:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
