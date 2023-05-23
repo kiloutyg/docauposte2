@@ -50,6 +50,10 @@ class UploadsService extends AbstractController
 
             $public_dir = $this->projectDir . '/public';
 
+            if (!file_exists($public_dir . '/doc/')) {
+                mkdir($public_dir . '/doc/', 0777, true);
+            }
+
             if ($newFileName) {
                 $filename   = $newFileName;
             } else {
@@ -93,45 +97,7 @@ class UploadsService extends AbstractController
     }
 
 
-    // public function modifyFile(Upload $upload)
-    // {
-    //     // Log the form data
-    //     $this->logger->info('original upload state', ['upload' => $upload]);
 
-
-    //     // Get the new file directly from the Upload object
-    //     $newFile = $upload->getFile();
-
-    //     // Continue as before...
-    //     $public_dir = $this->projectDir . '/public';
-    //     if (!file_exists($public_dir . '/doc/')) {
-    //         mkdir($public_dir . '/doc/', 0777, true);
-    //     }
-    //     $oldFilePath = $upload->getPath();
-    //     $Path = $public_dir . '/doc/' . $upload->getFilename();
-    //     // ... and so on
-    //     // Remove old file if it exists
-    //     if (file_exists($oldFilePath)) {
-    //         unlink($oldFilePath);
-    //     }
-
-    //     // Move the new file to the directory
-    //     try {
-
-    //         $newFile->move($public_dir . '/doc/', $upload->getFilename());
-    //     } catch (\Exception $e) {
-    //         $this->logger->error('Failed to move uploaded file: ' . $e->getMessage());
-    //         throw $e;
-    //     }
-
-    //     $upload->setPath($Path);
-
-
-    //     // Persist changes and flush to the database
-    //     $upload->setUploadedAt(new \DateTime());
-    //     $this->manager->persist($upload);
-    //     $this->manager->flush();
-    // }
     public function modifyFile(Upload $upload)
     {
         // Log the form data

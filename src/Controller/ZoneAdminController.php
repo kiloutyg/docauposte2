@@ -39,11 +39,11 @@ class ZoneAdminController extends BaseController
     }
 
 
-    #[Route('/zone_admin/create_line_admin/{id}', name: 'app_zone_admin_create_line_admin')]
+    #[Route('/zone_admin/create_line_admin/{zone}', name: 'app_zone_admin_create_line_admin')]
 
-    public function createLineAdmin(string $id = null, AccountService $accountService, Request $request): Response
+    public function createLineAdmin(string $zone = null, AccountService $accountService, Request $request): Response
     {
-        $zone = $this->zoneRepository->findOneBy(['name' => $id]);
+        $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
 
         $error = null;
         $result = $accountService->createAccount(
@@ -73,11 +73,17 @@ class ZoneAdminController extends BaseController
         // 
         $zone = $this->zoneRepository->findOneBy(['id' => $zone]);
 
-        // Create a productline
-        if ($request->getMethod() == 'POST') {
+        if (!preg_match("/^[^.]+$/", $request->request->get('productlinename'))) {
+            // Handle the case when productlinne name contains disallowed characters
+            $this->addFlash('danger', 'Nom de ligne de produit invalide');
+            return $this->redirectToRoute('app_zone_admin', [
+                'zone' => $zone->getName(),
+                'productLines' => $this->productLineRepository->findAll(),
+            ]);
+        } else {
+            // Create a productline
 
-            $productlinename = $request->request->get('productlinename');
-            $zone = $this->zoneRepository->findOneBy(['id' => $zone]);
+            $productlinename = $request->request->get('productlinename') . '.' . $zone->getName();
             $productline = $this->productLineRepository->findOneBy(['name' => $productlinename]);
 
             if ($productline) {
@@ -92,6 +98,7 @@ class ZoneAdminController extends BaseController
                 $productline->setZone($zone);
                 $this->em->persist($productline);
                 $this->em->flush();
+
                 $this->addFlash('success', 'The Product Line has been created');
                 return $this->redirectToRoute('app_zone_admin', [
                     'zone' => $zone->getName(),

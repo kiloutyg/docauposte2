@@ -83,14 +83,27 @@ class ProductLineAdminController extends BaseController
         $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
         $zone = $productLine->getZone();
 
-        // Create a category
-        if ($request->getMethod() == 'POST') {
+        if (!preg_match("/^[^.]+$/", $request->request->get('categoryname'))) {
+            // Handle the case when category name contains disallowed characters
+            $this->addFlash('danger', 'Nom de categorie invalide');
+            return $this->redirectToRoute('app_productline_admin', [
+                'controller_name'   => 'LineAdminController',
+                'zone'          => $zone,
+                'name'          => $zone->getName(),
+                'productLine'   => $productLine,
+                'productline'   => $productLine->getName(),
+                'categories'    => $this->categoryRepository->findAll(),
+            ]);
+        } else {
 
-            $categoryname = $request->request->get('categoryname');
 
-            $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
+            // Create a category
+
+            $categoryname = $request->request->get('categoryname') . '.' . $productLine->getName();
+
 
             $category = $this->categoryRepository->findOneBy(['name' => $categoryname]);
+
             if ($category) {
                 $this->addFlash('danger', 'Category already exists');
                 return $this->redirectToRoute('app_productline_admin', [
@@ -108,6 +121,8 @@ class ProductLineAdminController extends BaseController
                 $category->setProductLine($productLine);
                 $this->em->persist($category);
                 $this->em->flush();
+                mkdir($this->public_dir . '/doc/' . $zone->getName() . '/' . $category->getProductLine()->getName() . '/' . $category->getName(), 0777, true);
+
                 $this->addFlash('success', 'The Category has been created');
                 return $this->redirectToRoute('app_productline_admin', [
                     'controller_name'   => 'LineAdminController',

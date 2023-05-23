@@ -69,7 +69,9 @@ class SuperAdminController extends BaseController
         // Create a zone
         if ($request->getMethod() == 'POST') {
             $zonename = $request->request->get('zonename');
-
+            if (!file_exists($this->public_dir . '/doc/')) {
+                mkdir($this->public_dir . '/doc/', 0777, true);
+            }
 
             $zone = $this->zoneRepository->findOneBy(['name' => $zonename]);
             if ($zone) {
@@ -83,6 +85,7 @@ class SuperAdminController extends BaseController
                 $zone->setName($zonename);
                 $this->em->persist($zone);
                 $this->em->flush();
+                $this->folderCreationService->createFolder($zonename);
                 $this->addFlash('success', 'Zone has been created');
                 return $this->redirectToRoute('app_super_admin', [
                     'zones' => $this->zoneRepository->findAll(),

@@ -85,15 +85,23 @@ class CategoryManagerController extends BaseController
     public function createButton(Request $request, string $category = null)
     {
         $categoryentity    = $this->categoryRepository->findoneBy(['name' => $category]);
+        // Check if button name does not contain the disallowed characters
+        if (!preg_match("/^[^.]+$/", $request->request->get('buttonname'))) {
+            // Handle the case when button name contains disallowed characters
+            $this->addFlash('danger', 'Nom de boutton invalide');
+            return $this->redirectToRoute('app_category_manager', [
+                'category' => $category,
+                'buttons' => $this->buttonRepository->findAll(),
+                'uploads' => $this->uploadRepository->findAll(),
+            ]);
+        } else {
+            // Handle the case when button name does not contain disallowed characters
+            // Create a button
 
-        // Create a button
-        if ($request->getMethod() == 'POST') {
-
-            $buttonname = $request->request->get('buttonname');
-
-            $categoryentity   = $this->categoryRepository->findoneBy(['name' => $category]);
+            $buttonname = $request->request->get('buttonname') . '.' . $categoryentity->getName();
 
             $button = $this->buttonRepository->findoneBy(['name' => $buttonname]);
+
             if ($button) {
                 $this->addFlash('danger', 'bouton already exists');
                 return $this->redirectToRoute('app_category_manager', [
@@ -118,11 +126,12 @@ class CategoryManagerController extends BaseController
             }
         }
     }
-    #[Route('/category_manager/delete_button/{id}', name: 'app_category_manager_delete_button')]
-    public function deleteEntity(string $id): Response
+
+    #[Route('/category_manager/delete_button/{buttonid}', name: 'app_category_manager_delete_button')]
+    public function deleteEntity(string $buttonid): Response
     {
         $entityType = 'button';
-        $entityid = $this->buttonRepository->findOneBy(['name' => $id]);
+        $entityid = $this->buttonRepository->findOneBy(['name' => $buttonid]);
 
         $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
 

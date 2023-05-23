@@ -9,6 +9,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use  \Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 
 
@@ -31,6 +32,7 @@ use App\Entity\Signature;
 use App\Service\EntityDeletionService;
 use App\Service\AccountService;
 use App\Service\UploadsService;
+use App\Service\FolderCreationService;
 
 
 
@@ -58,6 +60,10 @@ class BaseController extends AbstractController
     protected $uploadsService;
     protected $logger;
     protected $loggerInterface;
+    protected $projectDir;
+    protected $public_dir;
+    protected $folderCreationService;
+
 
 
 
@@ -78,6 +84,8 @@ class BaseController extends AbstractController
         AccountService $accountService,
         UploadsService $uploadsServices,
         LoggerInterface $loggerInterface,
+        ParameterBagInterface $params,
+        FolderCreationService $folderCreationService,
 
     ) {
 
@@ -98,25 +106,8 @@ class BaseController extends AbstractController
         $this->logger                = $loggerInterface;
         $this->request               = $this->requestStack->getCurrentRequest();
         $this->session               = $this->requestStack->getSession();
-
-
-
-        //     if ($this->session->get('id') == null) {
-        //         $this->session->set('id', uniqid());
-        //     } else {
-        //         // check if user is connected to update session with user
-        //         $user = $this->security->getUser();
-        //         if ($user != null) {
-        //             $user    = $userRepository->findOneBy(['username' => $user->getUserIdentifier()]);
-        //             // $role   = $roleRepository->findOneBy(['id' => $user->getRoles()]);
-        //             $this->session->set('user', $user);
-        //             // $this->session->set('role', $role);
-        //         }
-        //         $user = null;
-        //     }
-        // }
-        // public function redirectToLogin()
-        // {
-        //     return $this->redirectToRoute('app_login');
+        $this->projectDir            = $params->get('kernel.project_dir');
+        $this->public_dir            = $this->projectDir . '/public';
+        $this->folderCreationService = $folderCreationService;
     }
 }
