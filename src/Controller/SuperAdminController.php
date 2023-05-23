@@ -85,7 +85,7 @@ class SuperAdminController extends BaseController
                 $zone->setName($zonename);
                 $this->em->persist($zone);
                 $this->em->flush();
-                $this->folderCreationService->createFolder($zonename);
+                $this->folderCreationService->folderStructure($zonename);
                 $this->addFlash('success', 'Zone has been created');
                 return $this->redirectToRoute('app_super_admin', [
                     'zones' => $this->zoneRepository->findAll(),

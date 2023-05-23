@@ -3,20 +3,18 @@
 namespace App\Service;
 
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-class FolderCreationService extends AbstractController
+class FolderCreationService
 {
-    protected $projectDir;
     protected $public_dir;
 
     public function __construct(
         ParameterBagInterface $params,
     ) {
-        $this->projectDir            = $params->get('kernel.project_dir');
-        $this->public_dir            = $this->projectDir . '/public';
+        $this->public_dir = $params->get('kernel.project_dir') . '/public';
     }
+
     public function folderStructure(string $folderName)
     {
         $parts = explode('.', $folderName);
