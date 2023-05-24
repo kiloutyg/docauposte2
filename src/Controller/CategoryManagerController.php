@@ -95,6 +95,7 @@ class CategoryManagerController extends BaseController
                 'uploads' => $this->uploadRepository->findAll(),
             ]);
         } else {
+
             // Handle the case when button name does not contain disallowed characters
             // Create a button
 
@@ -116,6 +117,8 @@ class CategoryManagerController extends BaseController
                 $button->setCategory($categoryentity);
                 $this->em->persist($button);
                 $this->em->flush();
+                $this->folderCreationService->folderStructure($buttonname);
+
                 $this->addFlash('success', 'The Button has been created');
                 return $this->redirectToRoute('app_category_manager', [
                     'controller_name'   => 'category_managerController',

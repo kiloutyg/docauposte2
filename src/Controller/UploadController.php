@@ -52,9 +52,7 @@ class UploadController extends FrontController
         $this->uploadsService = $uploadsService;
         // Check if the form is submitted
         if ($request->isMethod('POST')) {
-            // Get the formData array from the request
-            // $button = $request->request->get('formData')['button'];
-            // $newFileName = $request->request->get('formData')['newFileName'];
+
             $button = $request->request->get('button');
             $newFileName = $request->request->get('newFileName');
 
@@ -98,9 +96,8 @@ class UploadController extends FrontController
     #[Route('/download/{filename}', name: 'download_file')]
     public function download_file(string $filename = null): Response
     {
-
-        $public_dir = $this->getParameter('kernel.project_dir') . '/public';
-        $path       = $public_dir . '/doc/' . $filename;
+        $file = $this->uploadRepository->findOneBy(['filename' => $filename]);
+        $path = $file->getPath();
         $file       = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }

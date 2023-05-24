@@ -121,8 +121,7 @@ class ProductLineAdminController extends BaseController
                 $category->setProductLine($productLine);
                 $this->em->persist($category);
                 $this->em->flush();
-                mkdir($this->public_dir . '/doc/' . $zone->getName() . '/' . $category->getProductLine()->getName() . '/' . $category->getName(), 0777, true);
-
+                $this->folderCreationService->folderStructure($categoryname);
                 $this->addFlash('success', 'The Category has been created');
                 return $this->redirectToRoute('app_productline_admin', [
                     'controller_name'   => 'LineAdminController',

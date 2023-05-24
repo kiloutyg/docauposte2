@@ -98,7 +98,7 @@ class ZoneAdminController extends BaseController
                 $productline->setZone($zone);
                 $this->em->persist($productline);
                 $this->em->flush();
-
+                $this->folderCreationService->folderStructure($productlinename);
                 $this->addFlash('success', 'The Product Line has been created');
                 return $this->redirectToRoute('app_zone_admin', [
                     'zone' => $zone->getName(),

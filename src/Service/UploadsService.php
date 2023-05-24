@@ -10,11 +10,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
 
 use App\Repository\ButtonRepository;
-
 use App\Repository\UploadRepository;
 
 use App\Entity\Upload;
 use App\Entity\Button;
+
+use App\Service\FolderCreationService;
+
 
 class UploadsService extends AbstractController
 {
@@ -24,35 +26,50 @@ class UploadsService extends AbstractController
     protected $projectDir;
     protected $logger;
     protected $buttonRepository;
+    protected $folderCreationService;
 
-    public function __construct(ButtonRepository $buttonRepository, EntityManagerInterface $manager, ParameterBagInterface $params, UploadRepository $uploadRepository, LoggerInterface $logger)
-    {
+
+    public function __construct(
+        FolderCreationService $folderCreationService,
+        ButtonRepository $buttonRepository,
+        EntityManagerInterface $manager,
+        ParameterBagInterface $params,
+        UploadRepository $uploadRepository,
+        LoggerInterface $logger
+    ) {
         $this->uploadRepository = $uploadRepository;
         $this->manager = $manager;
         $this->projectDir = $params->get('kernel.project_dir');
         $this->logger = $logger;
         $this->buttonRepository = $buttonRepository;
+        $this->folderCreationService = $folderCreationService;
     }
 
     public function uploadFiles(Request $request, $button, $newFileName = null)
     {
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();
+        $public_dir = $this->projectDir . '/public';
 
         foreach ($files as $file) {
 
-            $extension = $file->guessExtension();
 
+            // Dinamyic folder creation and file upload
+            $buttonname = $button->getName();
+            $parts = explode('.', $buttonname);
+            $parts = array_reverse($parts);
+            $folderPath = $public_dir . '/doc';
+
+            foreach ($parts as $part) {
+                $folderPath .= '/' . $part;
+            }
+
+            $extension = $file->guessExtension();
             if (!in_array($extension, $allowedExtensions)) {
                 // throw new \Exception('Le fichier doit être au format PDF');
                 return $this->addFlash('error', 'Le fichier doit être un pdf');;
             }
 
-            $public_dir = $this->projectDir . '/public';
-
-            if (!file_exists($public_dir . '/doc/')) {
-                mkdir($public_dir . '/doc/', 0777, true);
-            }
 
             if ($newFileName) {
                 $filename   = $newFileName;
@@ -65,8 +82,9 @@ class UploadsService extends AbstractController
                 $filename .= '.pdf';
             }
 
-            $path       = $public_dir . '/doc/' . $filename;
-            $file->move($public_dir . '/doc/', $filename);
+            $path       = $folderPath . '/' . $filename;
+            $file->move($folderPath . '/', $filename);
+
             $name = $filename;
 
             $upload = new Upload();
@@ -80,6 +98,7 @@ class UploadsService extends AbstractController
         $this->manager->flush();
         return $name;
     }
+
 
     public function deleteFile($filename, $button)
     {
@@ -109,16 +128,22 @@ class UploadsService extends AbstractController
         // Public directory
         $public_dir = $this->projectDir . '/public';
 
-        // Check if doc folder exists and create if not
-        if (!file_exists($public_dir . '/doc/')) {
-            mkdir($public_dir . '/doc/', 0777, true);
-        }
 
         // Old file path
         $oldFilePath = $upload->getPath();
 
         // New file path
-        $Path = $public_dir . '/doc/' . $upload->getFilename();
+        // Dinamyic folder creation and file upload
+        $buttonname = $upload->getButton()->getName();
+        $parts = explode('.', $buttonname);
+        $parts = array_reverse($parts);
+        $folderPath = $public_dir . '/doc';
+
+        foreach ($parts as $part) {
+            $folderPath .= '/' . $part;
+        }
+
+        $Path = $folderPath . '/' . $upload->getFilename();
 
         // If new file exists, process it and delete the old one
         if ($newFile) {
@@ -129,7 +154,7 @@ class UploadsService extends AbstractController
 
             // Move the new file to the directory
             try {
-                $newFile->move($public_dir . '/doc/', $upload->getFilename());
+                $newFile->move($folderPath . '/doc/', $upload->getFilename());
             } catch (\Exception $e) {
                 $this->logger->error('Failed to move uploaded file: ' . $e->getMessage());
                 throw $e;
