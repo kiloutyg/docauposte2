@@ -110,32 +110,6 @@ class FrontController extends BaseController
     }
 
 
-    // Page de button
-    // #[Route('/zone/{zone}/productline/{productline}/category/{category}/button/{button}', name: 'button')]
-    // public function ButtonShowing(string $button = null): Response
-    // {
-    //     $buttonEntity = $this->buttonRepository->findoneBy(['name' => $button]);
-    //     $category    = $buttonEntity->getCategory();
-    //     $productLine = $category->getProductLine();
-    //     $zone        = $productLine->getZone();
-
-
-    //     return $this->render(
-    //         'button.html.twig',
-    //         [
-    //             'zone'        => $zone,
-    //             'name'        => $zone->getName(),
-    //             'productLine' => $productLine,
-    //             'id'          => $productLine->getName(),
-    //             'category'    => $buttonEntity->getName(),
-    //             'categories'  => $this->categoryRepository->findAll(),
-    //             'button'      => $buttonEntity,
-    //             'uploads'     => $this->uploadRepository->findAll(),
-
-    //         ]
-    //     );
-    // }
-
     #[Route('/zone/{zone}/productline/{productline}/category/{category}/button/{button}', name: 'button')]
     public function ButtonShowing(UploadController $uploadController, string $button = null): Response
     {

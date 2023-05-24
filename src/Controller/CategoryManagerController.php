@@ -51,8 +51,6 @@ class CategoryManagerController extends BaseController
     public function createUser(string $category = null, AccountService $accountService, Request $request): Response
     {
         $category    = $this->categoryRepository->findoneBy(['name' => $category]);
-        $productLine = $category->getProductLine();
-        $zone        = $productLine->getZone();
 
         $error = null;
         $result = $accountService->createAccount(
@@ -68,14 +66,8 @@ class CategoryManagerController extends BaseController
             $this->addFlash('error', $error);
         }
 
-        return $this->redirectToRoute('app_category', [
-            'zone'        => $zone,
-            'name'        => $zone->getName(),
-            'productLine' => $productLine,
-            'id'          => $productLine->getName(),
-            'category'    => $category,
-            'categories'  => $this->categoryRepository->findAll(),
-            'buttons'     => $this->buttonRepository->findAll(),
+        return $this->redirectToRoute('app_category_manager', [
+            'category'    => $category->getName(),
         ]);
     }
 
@@ -90,9 +82,7 @@ class CategoryManagerController extends BaseController
             // Handle the case when button name contains disallowed characters
             $this->addFlash('danger', 'Nom de boutton invalide');
             return $this->redirectToRoute('app_category_manager', [
-                'category' => $category,
-                'buttons' => $this->buttonRepository->findAll(),
-                'uploads' => $this->uploadRepository->findAll(),
+                'category'    => $category,
             ]);
         } else {
 
@@ -106,10 +96,7 @@ class CategoryManagerController extends BaseController
             if ($button) {
                 $this->addFlash('danger', 'bouton already exists');
                 return $this->redirectToRoute('app_category_manager', [
-                    'controller_name'   => 'category_managerController',
                     'category'    => $category,
-                    'buttons'     => $this->buttonRepository->findAll(),
-                    'uploads'     => $this->uploadRepository->findAll(),
                 ]);
             } else {
                 $button = new Button();
@@ -121,10 +108,7 @@ class CategoryManagerController extends BaseController
 
                 $this->addFlash('success', 'The Button has been created');
                 return $this->redirectToRoute('app_category_manager', [
-                    'controller_name'   => 'category_managerController',
                     'category'    => $category,
-                    'buttons'     => $this->buttonRepository->findAll(),
-                    'uploads'     => $this->uploadRepository->findAll(),
                 ]);
             }
         }
