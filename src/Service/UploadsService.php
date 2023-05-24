@@ -66,7 +66,6 @@ class UploadsService extends AbstractController
 
             $extension = $file->guessExtension();
             if (!in_array($extension, $allowedExtensions)) {
-                // throw new \Exception('Le fichier doit être au format PDF');
                 return $this->addFlash('error', 'Le fichier doit être un pdf');;
             }
 
@@ -133,7 +132,7 @@ class UploadsService extends AbstractController
         $oldFilePath = $upload->getPath();
 
         // New file path
-        // Dinamyic folder creation and file upload
+        // Dynamic folder creation and file upload
         $buttonname = $upload->getButton()->getName();
         $parts = explode('.', $buttonname);
         $parts = array_reverse($parts);

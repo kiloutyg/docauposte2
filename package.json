@@ -28,6 +28,6 @@
         "build": "encore production --progress"
     },
     "dependencies": {
-        "@fontsource/roboto-condensed": "^5.0.0"
+        "@fontsource/roboto-condensed": "^5.0.1"
     }
 }
