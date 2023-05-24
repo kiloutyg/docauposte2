@@ -8,10 +8,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 use App\Service\AccountService;
 
+use App\Controller\UploadController;
+
 
 #[Route('/', name: 'app_')]
 class FrontController extends BaseController
 {
+    // Page d'accueil
     #[Route('/', name: 'base')]
     public function base(): Response
     {
@@ -27,6 +30,7 @@ class FrontController extends BaseController
             ]
         );
     }
+
 
     #[Route('/createSuperAdmin', name: 'create_super_admin')]
     public function createSuperAdmin(AccountService $accountService, Request $request): Response
@@ -46,6 +50,7 @@ class FrontController extends BaseController
     }
 
 
+    // Page de zone
     #[Route('/zone/{zone}', name: 'zone')]
     public function zone(string $zone = null): Response
     {
@@ -61,6 +66,7 @@ class FrontController extends BaseController
     }
 
 
+    // Page de productline
     #[Route('/zone/{zone}/productline/{productline}', name: 'productline')]
     public function productline(string $productline = null): Response
     {
@@ -81,6 +87,7 @@ class FrontController extends BaseController
     }
 
 
+    // Page de category
     #[Route('/zone/{zone}/productline/{productline}/category/{category}', name: 'category')]
 
     public function category(string $category = null): Response
@@ -103,27 +110,61 @@ class FrontController extends BaseController
     }
 
 
+    // Page de button
+    // #[Route('/zone/{zone}/productline/{productline}/category/{category}/button/{button}', name: 'button')]
+    // public function ButtonShowing(string $button = null): Response
+    // {
+    //     $buttonEntity = $this->buttonRepository->findoneBy(['name' => $button]);
+    //     $category    = $buttonEntity->getCategory();
+    //     $productLine = $category->getProductLine();
+    //     $zone        = $productLine->getZone();
+
+
+    //     return $this->render(
+    //         'button.html.twig',
+    //         [
+    //             'zone'        => $zone,
+    //             'name'        => $zone->getName(),
+    //             'productLine' => $productLine,
+    //             'id'          => $productLine->getName(),
+    //             'category'    => $buttonEntity->getName(),
+    //             'categories'  => $this->categoryRepository->findAll(),
+    //             'button'      => $buttonEntity,
+    //             'uploads'     => $this->uploadRepository->findAll(),
+
+    //         ]
+    //     );
+    // }
+
     #[Route('/zone/{zone}/productline/{productline}/category/{category}/button/{button}', name: 'button')]
-    public function ButtonShowing(string $button = null): Response
+    public function ButtonShowing(UploadController $uploadController, string $button = null): Response
     {
         $buttonEntity = $this->buttonRepository->findoneBy(['name' => $button]);
         $category    = $buttonEntity->getCategory();
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
+        $uploads = [];
+        $uploads = $this->uploadRepository->findBy(['button' => $buttonEntity->getId()]);
 
-        return $this->render(
-            'button.html.twig',
-            [
-                'zone'        => $zone,
-                'name'        => $zone->getName(),
-                'productLine' => $productLine,
-                'id'          => $productLine->getName(),
-                'category'    => $buttonEntity->getName(),
-                'categories'  => $this->categoryRepository->findAll(),
-                'button'      => $buttonEntity,
-                'uploads'     => $this->uploadRepository->findAll(),
+        if (count($uploads) != 1) {
 
-            ]
-        );
+            return $this->render(
+                'button.html.twig',
+                [
+                    'zone'        => $zone,
+                    'name'        => $zone->getName(),
+                    'productLine' => $productLine,
+                    'id'          => $productLine->getName(),
+                    'category'    => $buttonEntity->getName(),
+                    'categories'  => $this->categoryRepository->findAll(),
+                    'button'      => $buttonEntity,
+                    'uploads'     => $this->uploadRepository->findAll(),
+
+                ]
+            );
+        } else {
+            $filename = $uploads[0]->getFilename();
+            return $uploadController->download_file($filename);
+        }
     }
 }

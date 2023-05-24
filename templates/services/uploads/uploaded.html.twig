@@ -10,23 +10,14 @@
 			{% if matchinguploads|length > 0 %}
 				{% for upload in matchinguploads %}
 					<div class="d-flex ps-5 mb-5 mt-5 line-list">
-						<a href="{{path('app_download_file', {filename:upload.filename, button: button.name, category: button.category.name, id: button.category.productLine.name, name: button.category.productLine.zone.name})}}" target="_blank">
+						<a href="{{path('app_download_file', {filename:upload.filename })}}" target="_blank">
 							<span class="line-details">
 								-{{ upload.filename }}
 								<id={{upload.id}}>></span>
 							</a>
-							{% if is_granted('ROLE_LINE_ADMIN') %}
-								<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id }) }}" class="btn btn-danger delete-upload">
-									<span class="line-details delete-upload">
-										- Supprimer
-										<id={{upload.id}}></id>
-									</span>
-								</a>
-							{% endif %}
 						</div>
 					{% endfor %}
 				{% else %}
-
 					<div class="card border-0 shadow rounded-3 my-5">
 						<div class="card-body">
 							<div class="row">

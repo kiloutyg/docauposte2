@@ -48,7 +48,7 @@
 										<li class="form-control d-flex justify-content-between align-items-center mb-2">
 											<a href="{{path('app_zone_admin', {zone: zone.name})}}" class="btn btn-link">
 												-
-												{{ zone.name|capitalize }}
+												{{ zone.name|split('.')|first|capitalize }}
 												<span class="visually-hidden">{{ zone.id }}</span>
 											</a>
 											<a href="{{path('app_super_admin_delete_zone', {id: zone.name})}}" class="btn btn-danger delete-zone">

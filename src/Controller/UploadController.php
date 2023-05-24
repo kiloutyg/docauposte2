@@ -42,10 +42,7 @@ class UploadController extends FrontController
         );
     }
 
-
-
-
-
+    // create a route to upload a file
     #[Route('/uploading', name: 'generic_upload_files')]
     public function generic_upload_files(UploadsService $uploadsService, Request $request): Response
     {
@@ -103,14 +100,14 @@ class UploadController extends FrontController
     }
 
 
-    // create a route to delete a file. I'll need to refactor of move this function elsewhere
-
+    // create a route to delete a file
     #[Route('/delete/{button}/{filename}', name: 'delete_file')]
+
     public function delete_file(string $filename = null, string $button = null, UploadsService $uploadsService): Response
     {
         $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
 
-
+        // Use the UploadsService to handle file deletion
         $name = $uploadsService->deleteFile($filename, $buttonEntity);
         $this->addFlash('success', 'File ' . $name . ' deleted');
 
@@ -125,6 +122,7 @@ class UploadController extends FrontController
             ]
         );
     }
+
 
     // create a route to display the modification page 
     #[Route('/modifyfile/{uploadId}', name: 'modify_file_page')]
@@ -144,8 +142,7 @@ class UploadController extends FrontController
 
 
 
-    // create a route to modify a file
-
+    // create a route to modify a file and or display the modification page
     #[Route('/modify/{uploadId}', name: 'modify_file')]
     public function modify_file(Request $request, int $uploadId, UploadsService $uploadsService, ButtonRepository $buttonRepository, LoggerInterface $logger): Response
     {
@@ -155,9 +152,7 @@ class UploadController extends FrontController
         if (!$upload) {
             $logger->error('Upload not found', ['uploadId' => $uploadId]);
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
-            // return $this->redirectToRoute('app_modify_file_page'); // or wherever you want to redirect
-            return $this->redirectToRoute('app_base'); // or wherever you want to redirect
-
+            return $this->redirectToRoute('app_base');
         }
 
         $logger->info('Retrieved Upload entity:', ['upload' => $upload]);
@@ -165,8 +160,6 @@ class UploadController extends FrontController
         // Get form data
         $formData = $request->request->all();
         $logger->info('Form data before any manipulation:', ['formData' => $formData]);
-
-
 
         // Create a form to modify the Upload entity
         $form = $this->createForm(UploadType::class, $upload);
@@ -176,13 +169,7 @@ class UploadController extends FrontController
         // Handle the form data on POST requests
         $logger->info('Form data before handleRequest:', ['formData' => $formData]);
 
-
-
         $form->handleRequest($request);
-
-
-
-
 
         $logger->info('Form data after handleRequest:', ['formData' => $form->getData()]);
 
@@ -207,7 +194,6 @@ class UploadController extends FrontController
                 return new JsonResponse($response);
             }
         }
-
 
         // Convert the errors to an array
         $errorMessages = [];

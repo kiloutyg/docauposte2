@@ -103,7 +103,19 @@ class UploadsService extends AbstractController
     {
         $name = $filename;
         $public_dir = $this->projectDir . '/public';
-        $path       = $public_dir . '/doc/' . $filename;
+
+        // Dinamyic folder creation and file upload
+        $buttonname = $button->getName();
+        $parts = explode('.', $buttonname);
+        $parts = array_reverse($parts);
+        $folderPath = $public_dir . '/doc';
+
+        foreach ($parts as $part) {
+            $folderPath .= '/' . $part;
+        }
+
+        $path       = $folderPath . '/' . $filename;
+
         if (file_exists($path)) {
             unlink($path);
         }

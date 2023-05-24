@@ -110,7 +110,7 @@
 									<a class="btn" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
 										<span class="line-details text-justify">
 											-
-											{{ zone.name }}
+											{{ zone.name|split('.')|first|capitalize }}
 											>
 											<id={{zone.id}}></span>
 										</a>

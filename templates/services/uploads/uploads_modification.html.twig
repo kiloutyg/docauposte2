@@ -36,26 +36,26 @@
 					{% if lastZone != upload.button.category.productLine.zone %}
 						{% set lastZone = upload.button.category.productLine.zone %}
 						Zone:
-						{{ lastZone.name }}
+						{{ lastZone.name|split('.')|first|capitalize }}
 						>
 					{% endif %}
 					{% if lastProductLine != upload.button.category.productLine %}
 						{% set lastProductLine = upload.button.category.productLine %}
 						Product Line:
-						{{ lastProductLine.name }}
+						{{ lastProductLine.name|split('.')|first|capitalize }}
 						>
 					{% endif %}
 					{% if lastCategory != upload.button.category %}
 						{% set lastCategory = upload.button.category %}
 						Category:
-						{{ lastCategory.name }}
+						{{ lastCategory.name|split('.')|first|capitalize }}
 						>
 					{% endif %}
 
 					{% if lastButton != upload.button %}
 						{% set lastButton = upload.button %}
 						Button:
-						{{ lastButton.name }}
+						{{ lastButton.name|split('.')|first|capitalize }}
 						:
 					{% endif %}
 
@@ -90,7 +90,7 @@
 
 
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
-							{{ form_widget(form.button,{'attr': {'class': 'form-select', 'nam': 'button', 'id': 'upload_button', 'required': true}}) }}
+							{{ form_widget(form.button,{'attr': {'class': 'form-select', 'name': 'button', 'id': 'upload_button', 'required': true}}) }}
 						</div>
 					</div>
 				</div>

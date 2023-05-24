@@ -6,9 +6,9 @@
 {% block body %}
 	<h1 class="my-4">
 		<strong>Page d'administration de la ligne
-			{{productLine.name|capitalize}}
+			{{productLine.name|split('.')|first|capitalize}}
 			de la Zone
-			{{productLine.zone.name|capitalize }}
+			{{productLine.zone.name|split('.')|first|capitalize }}
 		</strong>
 	</h1>
 	<h2 class="my-4">
@@ -42,7 +42,7 @@
 							<div class="col-md-6">
 								<h5 class="card-title text-center mb-5 fw-light fs-5">
 									<strong>Liste des Catégories de la Ligne
-										{{productLine.name|capitalize}}:</strong>
+										{{productLine.name|split('.')|first|capitalize}}:</strong>
 								</h5>
 								<ul class="list-unstyled">
 									{% set matchingCategories = categories|filter(category => category.productLine.id is same as(productLine.id)) %}
@@ -50,7 +50,7 @@
 										<li class="form-control d-flex justify-content-between align-items-center mb-2">
 											<a href="{{path('app_category_manager', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}" class="btn btn-link">
 												-
-												{{ category.name|capitalize }}
+												{{ category.name|split('.')|first|capitalize }}
 												<span class="visually-hidden">{{ category.id }}</span>
 											</a>
 											<a href="{{path('app_productline_admin_delete_category', {category: category.name})}}" class="btn btn-danger delete-category">

@@ -36,10 +36,19 @@ function populateDropdown(dropdown, data) {
   data.forEach((item) => {
     const option = document.createElement("option");
     option.value = item.id;
-    option.textContent = item.name;
+
+    // Split the item name by '.' and capitalize the first word
+    let nameParts = item.name.split(".");
+    if (nameParts.length > 0) {
+      nameParts[0] =
+        nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
+    }
+    option.textContent = nameParts[0]; // Use only the first part after the split.
+
     dropdown.appendChild(option);
   });
 }
+
 function initCascadingDropdowns() {
   const zone = document.getElementById("zone");
   const productline = document.getElementById("productline");
