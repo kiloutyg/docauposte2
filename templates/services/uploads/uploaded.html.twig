@@ -18,17 +18,22 @@
 						</div>
 					{% endfor %}
 				{% else %}
-					<div class="card border-0 shadow rounded-3 my-5">
-						<div class="card-body">
-							<div class="row">
-								<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
-									{% include "services/uploads/upload.html.twig" %}
-								</form>
+					{% if is_granted('ROLE_LINE_ADMIN') %}
+						<div class="card border-0 shadow rounded-3 my-5">
+							<div class="card-body">
+								<div class="row">
+									<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+										{% include "services/uploads/upload.html.twig" %}
+									</form>
+								</div>
 							</div>
 						</div>
-					</div>
+					{% else %}
+						<a class="btn-warning btn btn-lg fa fa-arrow-circle-o-left" style="color:red" href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
+							Retour</a>
+					{% endif %}
 				{% endif %}
 			</div>
 		</p>
 	</p>
-</p></div></p>
+</p></p></div></p>

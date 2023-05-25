@@ -9,69 +9,69 @@
 		<strong>Page d'administration de la catégorie
 			{{ category.name|split('.')|first|capitalize }}</strong>
 	</h1>
+	{% if is_granted('ROLE_LINE_ADMIN') %}
+		<h2 class="my-4">
+			<strong>Formulaire de création de boutons :</strong>
+		</h2>
 
-	<h2 class="my-4">
-		<strong>Formulaire de création de boutons :</strong>
-	</h2>
+		<div class="card border-0 shadow rounded-3 my-5">
+			<div class="card-body">
+				<div class="row">
+					<div class="card border-0 shadow rounded-3 my-5  bg-secondary">
+						<div class="card-body">
+							<div class="row d-flex align-items-center gy-lg-0 gy-5">
+								<div class="col-md-6">
 
-	<div class="card border-0 shadow rounded-3 my-5">
-		<div class="card-body">
-			<div class="row">
-				<div class="card border-0 shadow rounded-3 my-5  bg-secondary">
-					<div class="card-body">
-						<div class="row d-flex align-items-center gy-lg-0 gy-5">
-							<div class="col-md-6">
+									<h5 class="card-title text-center mb-5 fw-light fs-5">
+										<strong>Creation de Boutons</strong>
+									</h5>
 
-								<h5 class="card-title text-center mb-5 fw-light fs-5">
-									<strong>Creation de Boutons</strong>
-								</h5>
-
-								<form class="form-control" method="POST" action="{{ path('app_category_manager_create_button', {category: category.name, id: category.productline.name, name: category.productline.zone.name}) }}">
-									<div class="mb-3">
-										<label for="buttonname">Nom du Bouton</label>
-										<input type="text" name="buttonname" placeholder="Nom du Bouton" required class="form-control" id="buttonname">
-									</div>
-									<div class="d-grid">
-										<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Valider</button>
-									</div>
-								</form>
+									<form class="form-control" method="POST" action="{{ path('app_category_manager_create_button', {category: category.name, id: category.productline.name, name: category.productline.zone.name}) }}">
+										<div class="mb-3">
+											<label for="buttonname">Nom du Bouton</label>
+											<input type="text" name="buttonname" placeholder="Nom du Bouton" required class="form-control" id="buttonname">
+										</div>
+										<div class="d-grid">
+											<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Valider</button>
+										</div>
+									</form>
+								</div>
+								<div class="col-md-6">
+									<h5 class="card-title text-center mb-5 fw-light fs-5">
+										<strong>Liste des boutons de la Catégorie
+											{{ category.name|split('.')|first|capitalize }}:</strong>
+									</h5>
+									<ul class="list-unstyled">
+										{% set matchingButtons = buttons|filter(button => button.category.id is same as(category.id)) %}
+										{% for button in matchingButtons %}
+											<li class="form-control d-flex justify-content-between align-items-center mb-2">
+												<a href="{{path('app_button', {button: button.name, category: button.category.name, productline: button.category.productLine.name, zone: button.category.productLine.zone.name})}}" class="btn btn-link">
+													{{ button.name|split('.')|first|capitalize }}
+													<span class="visually-hidden">{{ button.id }}</span>
+												</a>
+												<a href="{{path('app_category_manager_delete_button', {buttonid: button.name})}}" class="btn btn-danger delete-button">
+													Supprimer
+													<span class="visually-hidden">{{ button.id }}</span>
+												</a>
+											</li>
+										{% else %}
+											<li class="alert alert-danger">
+												<a href="#" onclick="event.preventDefault(); window.history.back();">
+													Il n'y a pas de boutons dans cette catégorie.
+												</a>
+											</li>
+										{% endfor %}
+									</ul>
+								</div>
 							</div>
-							<div class="col-md-6">
-								<h5 class="card-title text-center mb-5 fw-light fs-5">
-									<strong>Liste des boutons de la Catégorie
-										{{ category.name|split('.')|first|capitalize }}:</strong>
-								</h5>
-								<ul class="list-unstyled">
-									{% set matchingButtons = buttons|filter(button => button.category.id is same as(category.id)) %}
-									{% for button in matchingButtons %}
-										<li class="form-control d-flex justify-content-between align-items-center mb-2">
-											<a href="{{path('app_button', {button: button.name, category: button.category.name, productline: button.category.productLine.name, zone: button.category.productLine.zone.name})}}" class="btn btn-link">
-												{{ button.name|split('.')|first|capitalize }}
-												<span class="visually-hidden">{{ button.id }}</span>
-											</a>
-											<a href="{{path('app_category_manager_delete_button', {buttonid: button.name})}}" class="btn btn-danger delete-button">
-												Supprimer
-												<span class="visually-hidden">{{ button.id }}</span>
-											</a>
-										</li>
-									{% else %}
-										<li class="alert alert-danger">
-											<a href="#" onclick="event.preventDefault(); window.history.back();">
-												Il n'y a pas de boutons dans cette catégorie.
-											</a>
-										</li>
-									{% endfor %}
-								</ul>
-							</div>
+
+							<hr class="my-4">
 						</div>
-
-						<hr class="my-4">
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-
+	{% endif %}
 	<h2 class="my-4">
 		<strong>Formulaire de création de compte utilisateur :</strong>
 	</h2>
@@ -85,19 +85,20 @@
 			</div>
 		</div>
 	</div>
+	{% if is_granted('ROLE_LINE_ADMIN') %}
+		<h2 class="my-4">
+			<strong>Formulaire d'upload :</strong>
+		</h2>
 
-	<h2 class="my-4">
-		<strong>Formulaire d'upload :</strong>
-	</h2>
+		<div class="card border-0 shadow rounded-3 my-5">
+			<div class="card-body">
+				<div class="row">
 
-	<div class="card border-0 shadow rounded-3 my-5">
-		<div class="card-body">
-			<div class="row">
-
-				<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
-					{% include "services/uploads/upload.html.twig" %}
-				</form>
+					<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+						{% include "services/uploads/upload.html.twig" %}
+					</form>
+				</div>
 			</div>
 		</div>
-	</div>
+	{% endif %}
 {% endblock %}

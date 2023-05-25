@@ -95,18 +95,32 @@ class FrontController extends BaseController
         $category    = $this->categoryRepository->findoneBy(['name' => $category]);
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
-        return $this->render(
-            'category.html.twig',
-            [
-                'zone'        => $zone,
-                'name'        => $zone->getName(),
-                'productLine' => $productLine,
-                'id'          => $productLine->getName(),
-                'category'    => $category,
-                'categories'  => $this->categoryRepository->findAll(),
-                'buttons'     => $this->buttonRepository->findAll(),
-            ]
-        );
+        $buttons = [];
+        $buttons = $this->buttonRepository->findBy(['Category' => $category->getId()]);
+
+        if (count($buttons) != 1) {
+
+            return $this->render(
+                'category.html.twig',
+                [
+                    'zone'        => $zone,
+                    'name'        => $zone->getName(),
+                    'productLine' => $productLine,
+                    'id'          => $productLine->getName(),
+                    'category'    => $category,
+                    'categories'  => $this->categoryRepository->findAll(),
+                    'buttons'     => $this->buttonRepository->findAll(),
+                ]
+            );
+        } else {
+            $button = $buttons[0]->getName();
+            return $this->redirectToRoute('app_button', [
+                'zone' => $zone->getName(),
+                'productline' => $productLine->getName(),
+                'category' => $category->getName(),
+                'button' => $button
+            ]);
+        }
     }
 
 
