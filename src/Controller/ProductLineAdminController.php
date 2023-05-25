@@ -10,6 +10,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 use App\Service\AccountService;
+use App\Service\UploadsService;
+
 
 use App\Entity\Category;
 
@@ -19,8 +21,10 @@ class ProductLineAdminController extends BaseController
 
     #[Route('/productline_admin/{productline}', name: 'app_productline_admin')]
 
-    public function index(AuthenticationUtils $authenticationUtils, string $productline = null): Response
+    public function index(UploadsService $uploadsService, AuthenticationUtils $authenticationUtils, string $productline = null): Response
     {
+        $groupedUploads = $uploadsService->groupUploads();
+
         $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
         $zone = $productLine->getZone();
 
@@ -29,6 +33,7 @@ class ProductLineAdminController extends BaseController
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('productline_admin/productline_admin.html.twig', [
+            'groupedUploads' => $groupedUploads,
             'zone'          => $zone->getName(),
             'productLine'   => $productLine,
             'productline'   => $productLine->getName(),

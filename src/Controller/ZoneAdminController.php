@@ -11,6 +11,9 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 
 use App\Service\AccountService;
+use App\Service\UploadsService;
+
+
 use App\Entity\ProductLine;
 
 class ZoneAdminController extends BaseController
@@ -19,14 +22,17 @@ class ZoneAdminController extends BaseController
 
     #[Route('/zone_admin/{zone}', name: 'app_zone_admin')]
 
-    public function index(AuthenticationUtils $authenticationUtils, string $zone = null): Response
+    public function index(UploadsService $uploadsService, AuthenticationUtils $authenticationUtils, string $zone = null): Response
     {
+        $groupedUploads = $uploadsService->groupUploads();
+
         $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
         // Get the error and last username using AuthenticationUtils
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('zone_admin/zone_admin_index.html.twig', [
+            'groupedUploads' => $groupedUploads,
             'zone'         => $zone,
             'productLines' => $this->productLineRepository->findAll(),
             'error' => $error,

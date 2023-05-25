@@ -26,7 +26,7 @@ class UploadController extends FrontController
     #[Route('/upload', name: 'upload')]
     public function index(): Response
     {
-        return $this->render('upload/index.html.twig', [
+        return $this->render('/services/uploads/upload.html.twig', [
             'controller_name' => 'UploadController',
         ]);
     }

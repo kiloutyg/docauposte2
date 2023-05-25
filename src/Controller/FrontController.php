@@ -35,16 +35,25 @@ class FrontController extends BaseController
     #[Route('/createSuperAdmin', name: 'create_super_admin')]
     public function createSuperAdmin(AccountService $accountService, Request $request): Response
     {
-        $error = null;
-        $result = $accountService->createAccount(
-            $request,
-            $error,
-        );
-        if ($result) {
-            $this->addFlash('success', 'Account has been created');
-        }
-        if ($error) {
-            $this->addFlash('error', $error);
+        $users = [];
+        $users  = $this->userRepository->findAll();
+
+        if ($users == null) {
+
+            $error = null;
+            $result = $accountService->createAccount(
+                $request,
+                $error,
+            );
+            if ($result) {
+                $this->addFlash('success', 'Account has been created');
+            }
+            if ($error) {
+                $this->addFlash('error', $error);
+            }
+        } else {
+            $this->addFlash('alert', 'Super Admin already created');
+            return $this->redirectToRoute('app_base');
         }
         return $this->redirectToRoute('app_base');
     }

@@ -9,12 +9,14 @@
 import "./styles/app.css";
 
 // start the Stimulus application
-import "./bootstrap";
+import "./bootstrap.js";
 import "./js/toast.js";
 
 // homegrown javascript
 import "./js/confirmation.js";
 import "./js/cascading-dropdowns.js";
 // import "./js/formdata.js";
+import "bootstrap";
+import "bootstrap/dist/js/bootstrap.bundle";
 
 console.log("Hello Stimulus!");

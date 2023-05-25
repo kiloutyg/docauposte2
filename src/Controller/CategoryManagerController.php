@@ -10,6 +10,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 use App\Service\AccountService;
+use App\Service\UploadsService;
+
 
 use App\Entity\Button;
 
@@ -19,8 +21,10 @@ class CategoryManagerController extends BaseController
 
     #[Route('/category_manager/{category}', name: 'app_category_manager')]
 
-    public function index(AuthenticationUtils $authenticationUtils, string $category = null): Response
+    public function index(UploadsService $uploadsService, AuthenticationUtils $authenticationUtils, string $category = null): Response
     {
+        $groupedUploads = $uploadsService->groupUploads();
+
         $category    = $this->categoryRepository->findoneBy(['name' => $category]);
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
@@ -30,6 +34,7 @@ class CategoryManagerController extends BaseController
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('category_manager/category_manager_index.html.twig', [
+            'groupedUploads' => $groupedUploads,
             'zone'        => $zone,
             'name'        => $zone->getName(),
             'productLine' => $productLine,

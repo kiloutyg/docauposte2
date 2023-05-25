@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-
+use App\Service\UploadsService;
 use App\Service\AccountService;
 
 use App\Entity\Zone;
@@ -18,13 +18,16 @@ class SuperAdminController extends BaseController
 
     #[Route('/super_admin', name: 'app_super_admin')]
 
-    public function index(AuthenticationUtils $authenticationUtils,): Response
+    public function index(UploadsService $uploadsService, AuthenticationUtils $authenticationUtils,): Response
     {
+        $groupedUploads = $uploadsService->groupUploads();
+
         // Get the error and last username using AuthenticationUtils
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('super_admin/super_admin_index.html.twig', [
+            'groupedUploads' => $groupedUploads,
             'error' => $error,
             'last_username' => $lastUsername,
             'zones' => $this->zoneRepository->findAll(),

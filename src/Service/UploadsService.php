@@ -165,7 +165,7 @@ class UploadsService extends AbstractController
 
             // Move the new file to the directory
             try {
-                $newFile->move($folderPath . '/doc/', $upload->getFilename());
+                $newFile->move($folderPath . '/', $upload->getFilename());
             } catch (\Exception $e) {
                 $this->logger->error('Failed to move uploaded file: ' . $e->getMessage());
                 throw $e;
@@ -185,5 +185,41 @@ class UploadsService extends AbstractController
         $upload->setUploadedAt(new \DateTime());
         $this->manager->persist($upload);
         $this->manager->flush();
+    }
+
+
+    public function groupUploads()
+    {
+        $uploads = $this->uploadRepository->findAll();
+
+        $groupedUploads = [];
+
+        // Group uploads by zone, productLine, category, and button
+        foreach ($uploads as $upload) {
+            $zoneName = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
+            $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
+            $categoryName = $upload->getButton()->getCategory()->getName();
+            $buttonName = $upload->getButton()->getName();
+
+            if (!isset($groupedUploads[$zoneName])) {
+                $groupedUploads[$zoneName] = [];
+            }
+
+            if (!isset($groupedUploads[$zoneName][$productLineName])) {
+                $groupedUploads[$zoneName][$productLineName] = [];
+            }
+
+            if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName])) {
+                $groupedUploads[$zoneName][$productLineName][$categoryName] = [];
+            }
+
+            if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
+                $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
+            }
+
+            $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
+        }
+
+        return $groupedUploads;
     }
 }
