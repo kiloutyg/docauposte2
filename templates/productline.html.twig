@@ -5,7 +5,7 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-	<div class="container">
+	<div class="inner-container flex-grow-1 d-flex flex-column">
 
 		{% if app.user %}
 			{% if  is_granted('ROLE_LINE_ADMIN', object = null, field = null) %}
@@ -21,7 +21,7 @@
 		</h2>
 		<p>
 			<div>
-				<h3 class="mb-4 text-justify">Les catégories de la ligne
+				<h3 class="text-justify">Les catégories de la ligne
 					{{ productLine.name|split('.')|first|capitalize }}
 					:
 				</h3>
@@ -31,20 +31,22 @@
 						{% set matchingCategories = matchingCategories|merge([category]) %}
 					{% endif %}
 				{% endfor %}
-			</p>
+			</div>
 		</p>
 		<p>
-			<div>
+			<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
 				{% if matchingCategories|length > 0 %}
-					{% for category in matchingCategories %}
-						<div class="d-flex ps-5 mb-5 mt-5 line-list">
-							<a class="btn btn-primary btn-lg btn-block " role="button" aria-pressed="true" href="{{path('app_category', {category: category.name, productline: category.productline.name, zone: category.productline.zone.name} )}}">
+					<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
+
+						{% for category in matchingCategories %}
+							<a class="btn btn-primary btn-lg m-5" role="button" aria-pressed="true" style="color:white" href="{{path('app_category', {category: category.name, productline: category.productline.name, zone: category.productline.zone.name} )}}">
 								<span class="line-details text-justify">
 									{{ category.name|split('.')|first|capitalize }}
 								</span>
 							</a>
-						</div>
-					{% endfor %}
+						{% endfor %}
+					</div>
+
 				{% else %}
 					<div class="alert alert-danger">
 						<a href="#" onclick="event.preventDefault(); window.history.back();">

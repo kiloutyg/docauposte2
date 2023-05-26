@@ -5,7 +5,7 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-	<div class="container">
+	<div class="inner-container flex-grow-1 d-flex flex-column">
 
 		{% if app.user %}
 			{% if  is_granted('ROLE_ADMIN') %}
@@ -21,39 +21,39 @@
 				</strong>
 			</h2>
 		</p>
-		<p>
-			<div>
-				<h3 class="mb-4 text-justify">Les lignes de la zone
-					{{zone.name|split('.')|first|capitalize}}:
-				</h3>
-				{% set matchingProductLines = [] %}
-				{% for productLine in productLines %}
-					{% if productLine.zone.id is same as(zone.id)  %}
-						{% set matchingProductLines = matchingProductLines|merge([productLine]) %}
-					{% endif %}
-				{% endfor %}
-			</p>
-		</p>
-		<p>
-			<div>
-				{% if matchingProductLines|length > 0 %}
-					{% for productLine in matchingProductLines %}
-						<div class="d-flex ps-5 mb-5 mt-5 line-list">
-							<a class="btn btn-primary btn-lg btn-block " role="button" aria-pressed="true" href="{{path('app_productline', {productline: productLine.name, zone: productLine.zone.name} )}}">
-								<span class="line-details text-justify">
-									{{ productLine.name|split('.')|first|capitalize }}
-								</span>
-							</a>
-						</div>
-					{% endfor %}
-				{% else %}
-					<div class="alert alert-danger">
-						<a href="#" onclick="event.preventDefault(); window.history.back();">
-							Il n'y a pas de lignes dans cette zone.
-						</a>
-					</div>
+
+		<div>
+			<h3 class=" text-justify">Les lignes de la zone
+				{{zone.name|split('.')|first|capitalize}}:
+			</h3>
+			{% set matchingProductLines = [] %}
+			{% for productLine in productLines %}
+				{% if productLine.zone.id is same as(zone.id)  %}
+					{% set matchingProductLines = matchingProductLines|merge([productLine]) %}
 				{% endif %}
-			</div>
-		</p>
+			{% endfor %}
+		</div>
+
+		<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+			{% if matchingProductLines|length > 0 %}
+				<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
+
+					{% for productLine in matchingProductLines %}
+						<a class="btn btn-primary btn-lg m-5" role="button" aria-pressed="true" style="color:white" href="{{path('app_productline', {productline: productLine.name, zone: productLine.zone.name} )}}">
+							<span class="line-details text-justify">
+								{{ productLine.name|split('.')|first|capitalize }}
+							</span>
+						</a>
+					{% endfor %}
+				</div>
+
+			{% else %}
+				<div class="alert alert-danger">
+					<a href="#" onclick="event.preventDefault(); window.history.back();">
+						Il n'y a pas de lignes dans cette zone.
+					</a>
+				</div>
+			{% endif %}
+		</div>
 	</div>
-</p></div>{% endblock %}
+{% endblock %}

@@ -5,7 +5,7 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-	<div class="container">
+	<div class="inner-container flex-grow-1 d-flex flex-column">
 
 		{% if app.user %}
 			{% if  is_granted('ROLE_MANAGER') %}
@@ -22,7 +22,7 @@
 		</h2>
 		<p>
 			<div>
-				<h3 class="mb-4 text-justify">Les boutons de la catégorie
+				<h3 class="text-justify">Les boutons de la catégorie
 					{{ category.name|split('.')|first|capitalize}}
 					:
 				</h3>
@@ -32,12 +32,12 @@
 						{% set matchingButtons = matchingButtons|merge([button]) %}
 					{% endif %}
 				{% endfor %}
-			</p>
+			</div>
 		</p>
 		<p>
-			<div>
+			<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
 				{% if matchingButtons|length > 0 %}
-					<div class="d-flex ps-5 mb-5 mt-5line-list align-items-center justify-content-center flex-wrap">
+					<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 						{% for button in matchingButtons %}
 
 							<a class="btn btn-primary btn-lg m-5" role="button" aria-pressed="true" style="color:white" href="{{path('app_button', {button: button.name, category: button.category.name, productline: button.category.productLine.name, zone: button.category.productLine.zone.name})}}">
@@ -59,4 +59,4 @@
 			</div>
 		</p>
 	</div>
-</p></div>{% endblock %}
+{% endblock %}

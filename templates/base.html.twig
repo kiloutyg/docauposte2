@@ -26,38 +26,40 @@
 		{% endblock %}
 		{% include "services/_toasts.html.twig" %}
 	</head>
-	<!-- Main Navigation -->
-	<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1f3e52">
-		<div class="container">
-			<a class="navbar-brand" href="{{ path('app_base') }}">
-				<img class="img-fluid align-center justify-content-center" src="{{ asset('Plastic_Omnium.svg') }}" alt="Logo de PlasticOmnium" role="img" width="125"/></a>
-			<a class="navbar-brand" href="{{ path('app_base') }}">
-				<h2>
-					<strong>
-						DocAuPoste
-					</strong>
-				</h2>
-			</a>
-			<div></div>
-			<div class="ms-auto d-flex align-items-center">
-				{% if app.user is null %}
-					<a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
-				{% else %}
-					<p>
+	<body
+		class="d-flex flex-column  min-vh-100 ">
+
+		<!-- Main Navigation -->
+		<nav class="navbar navbar-expand-lg navbar-dark flex-shrink-0" style="background-color: #1f3e52">
+			<div class="container">
+				<a class="navbar-brand" href="{{ path('app_base') }}">
+					<img class="img-fluid align-center justify-content-center" src="{{ asset('Plastic_Omnium.svg') }}" alt="Logo de PlasticOmnium" role="img" width="125"/></a>
+				<a class="navbar-brand" href="{{ path('app_base') }}">
+					<h2>
 						<strong>
-							{{ app.user.username|capitalize }}
+							DocAuPoste
 						</strong>
-						<a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
-					</p>
-				{% endif %}
+					</h2>
+				</a>
+				<div></div>
+				<div class="ms-auto d-flex align-items-center">
+					{% if app.user is null %}
+						<a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
+					{% else %}
+						<p>
+							<strong>
+								{{ app.user.username|capitalize }}
+							</strong>
+							<a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
+						</p>
+					{% endif %}
+
+				</div>
 
 			</div>
 
-		</div>
-
-	</nav>
-	<!-- End Main Navigation -->
-	<body class="d-flex flex-column min-vh-100">
+		</nav>
+		<!-- End Main Navigation -->
 		<div class="container ">
 			{% if users is defined %}
 				{% if users is empty %}
@@ -79,11 +81,11 @@
 
 		</div>
 
-		<div class="container">
+		<div class="container flex-grow-1 d-flex flex-column">
 			{% include "services/navbarservices/navbarservices.html.twig" %}
 
 			{% block body %}
-				<div class="container">
+				<div class="inner-container flex-grow-1 d-flex flex-column">
 					{% if app.user %}
 						{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
 							<aside class="position-absolute end-0">
@@ -92,56 +94,59 @@
 						{% endif %}
 					{% endif %}
 					<p>
-						<h1 class="text-justify mb-2 mt-5">
+						<h1 class="text-justify mb-2 mt-5 flex-shrink-0">
 							<strong>
 								Doc Au Poste
 							</strong>
 						</h1>
 					</p>
-					<p>
-						<h3 class="mb-4 text-justify">
-							<strong>
-								Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
-						</h3>
-					</p>
-					<p>
-						<div>
-							{% for zone in zones %}
-								<div class="d-flex ps-5 mb-5 mt-5  line-list">
-									<a class="btn btn-primary btn-lg btn-block " role="button" aria-pressed="true" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
-										<span class="line-details text-justify">
-											{{ zone.name|split('.')|first|capitalize }}
 
-										</span>
-									</a>
-								</div>
+					<h3 class="text-justify flex-shrink-0">
+						<strong>
+							Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
+					</h3>
+
+
+					<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+						<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
+							{% for zone in zones %}
+								<a class="btn btn-primary btn-lg m-5 " role="button" aria-pressed="true" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
+									<span class="line-details text-justify">
+										{{ zone.name|split('.')|first|capitalize }}
+
+									</span>
+								</a>
 							{% endfor %}
 						</div>
-					</p>
-				{% endblock body %}
-			</p>
-		</div>
-	</body>
 
-</html><!-- Footer --><footer class="container mt-auto py-3 border-top">
-	<div class="d-flex flex-wrap justify-content-between">
-		<div class="col-md-4 d-flex align-items-center">
-			<span class="me-1" style="color: red">
-				<i class="fas fa-copyright"></i>
-			</span>
-			<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium Langres</a>
+					</div>
+				</div>
+			{% endblock body %}
 		</div>
-		<div>
-			<a href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
-				<i class="fa fa-arrow-circle-o-left" 'aria-hidden="false"'>Retour</i>
-			</a>
-		</div>
-		<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-			<li class="ms-3">
-				<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/">
-					<i class="fab fa-github"></i>
-				</a>
-			</li>
-		</ul>
-	</div>
-</footer><!-- End Footer --></html></body></html>
+
+		<!-- Footer -->
+		<footer class="container py-3 border-top  flex-shrink-0">
+			<div class="d-flex flex-wrap justify-content-between">
+				<div class="col-md-4 d-flex align-items-center">
+					<span class="me-1" style="color: red">
+						<i class="fas fa-copyright"></i>
+					</span>
+					<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium Langres</a>
+				</div>
+				<div>
+					<a href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
+						<i class="fa fa-arrow-circle-o-left" 'aria-hidden="false"'>Retour</i>
+					</a>
+				</div>
+				<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+					<li class="ms-3">
+						<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/">
+							<i class="fab fa-github"></i>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</footer>
+		<!-- End Footer -->
+	</body>
+</html>
