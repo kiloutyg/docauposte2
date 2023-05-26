@@ -21,7 +21,7 @@ class CategoryManagerController extends BaseController
 
     #[Route('/category_manager/{category}', name: 'app_category_manager')]
 
-    public function index(UploadsService $uploadsService, AuthenticationUtils $authenticationUtils, string $category = null): Response
+    public function index(UploadsService $uploadsService, string $category = null): Response
     {
         $groupedUploads = $uploadsService->groupUploads();
 
@@ -29,23 +29,16 @@ class CategoryManagerController extends BaseController
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
 
-        // Get the error and last username using AuthenticationUtils
-        $error = $authenticationUtils->getLastAuthenticationError();
-        $lastUsername = $authenticationUtils->getLastUsername();
+
 
         return $this->render('category_manager/category_manager_index.html.twig', [
             'groupedUploads' => $groupedUploads,
             'zone'        => $zone,
-            'name'        => $zone->getName(),
             'productLine' => $productLine,
-            'id'          => $productLine->getName(),
             'category'    => $category,
-            'categories'  => $this->categoryRepository->findAll(),
             'buttons'     => $this->buttonRepository->findAll(),
             'uploads'     => $this->uploadRepository->findAll(),
             'users' => $this->userRepository->findAll(),
-            'error'         => $error,
-            'last_username' => $lastUsername,
         ]);
     }
 

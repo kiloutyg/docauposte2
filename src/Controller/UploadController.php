@@ -130,11 +130,18 @@ class UploadController extends FrontController
     public function modify_file_page(string $uploadId = null): Response
     {
         $upload = $this->uploadRepository->findoneBy(['id' => $uploadId]);
+        $boutton = $upload->getButton();
+        $category = $boutton->getCategory();
+        $productLine = $category->getProductLine();
+        $zone = $productLine->getZone();
         $form = $this->createForm(UploadType::class, $upload);
         return $this->render(
             'services/uploads/uploads_modification.html.twig',
             [
                 'upload' => $upload,
+                'zone'        => $zone,
+                'productLine' => $productLine,
+                'category'    => $category,
                 'form' => $form->createView(),
             ]
         );
@@ -148,6 +155,10 @@ class UploadController extends FrontController
     {
         // Retrieve the current upload entity based on the uploadId
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $boutton = $upload->getButton();
+        $category = $boutton->getCategory();
+        $productLine = $category->getProductLine();
+        $zone = $productLine->getZone();
 
         if (!$upload) {
             $logger->error('Upload not found', ['uploadId' => $uploadId]);
@@ -224,7 +235,9 @@ class UploadController extends FrontController
         // If it's a GET request, render the form
         return $this->render('services/uploads/uploads_modification.html.twig', [
             'form' => $form->createView(),
-
+            'zone'        => $zone,
+            'productLine' => $productLine,
+            'category'    => $category,
             'upload' => $upload
         ]);
     }

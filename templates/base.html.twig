@@ -21,8 +21,19 @@
         }}
 			{{ encore_entry_script_tags('confirmation') }}
 			{{ encore_entry_script_tags('toast') }}
-			{% block javascript_data %}{% endblock %}
-
+			<script>
+				{% if productLine is defined %}
+const productLineIdFromServer = parseInt('{{ productLine.getId() }}');
+{% else %}
+const productLineIdFromServer = null;{% endif %}{% if zone is defined %}const zoneIdFromServer = parseInt('{{ zone.getId() }}');
+{% else %}
+const zoneIdFromServer = null;{% endif %}{% if category is defined %}const categoryIdFromServer = parseInt('{{ category.getId() }}');
+{% else %}
+const categoryIdFromServer = null;{% endif %}{% if button is defined %}
+const buttonIdFromServer = parseInt('{{ button.getId() }}');
+{% else %}
+const buttonIdFromServer = null;{% endif %}
+			</script>
 		{% endblock %}
 		{% include "services/_toasts.html.twig" %}
 	</head>

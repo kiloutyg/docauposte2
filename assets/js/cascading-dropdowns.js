@@ -17,13 +17,14 @@ fetch("/api/cascading_dropdown_data")
     // after the data has been fetched
     initCascadingDropdowns();
     resetDropdowns();
+    preselectValues();
   });
 
 function filterData(data, key, value) {
   return data.filter((item) => item[key] === value);
 }
 
-function populateDropdown(dropdown, data) {
+function populateDropdown(dropdown, data, selectedId) {
   dropdown.innerHTML = "";
   const defaultOption = document.createElement("option");
   defaultOption.value = "";
@@ -44,7 +45,10 @@ function populateDropdown(dropdown, data) {
         nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
     }
     option.textContent = nameParts[0]; // Use only the first part after the split.
-
+    // If this option should be selected, set the 'selected' attribute
+    if (item.id === selectedId) {
+      option.selected = true;
+    }
     dropdown.appendChild(option);
   });
 }
@@ -119,8 +123,49 @@ document.addEventListener("turbo:load", () => {
       // Initialize the cascading dropdowns and reset them on page load
       initCascadingDropdowns();
       resetDropdowns();
+      preselectValues();
     });
 });
+
+function preselectValues() {
+  const zoneDropdown = document.getElementById("zone");
+  const productLineDropdown = document.getElementById("productline");
+  const categoryDropdown = document.getElementById("category");
+
+  // Preselect zone
+  if (zoneIdFromServer && zoneDropdown) {
+    const filteredProductLines = filterData(
+      productLinesData,
+      "zone_id",
+      parseInt(zoneIdFromServer)
+    );
+    populateDropdown(zoneDropdown, zonesData, zoneIdFromServer);
+    populateDropdown(
+      productLineDropdown,
+      filteredProductLines,
+      productLineIdFromServer
+    );
+  }
+
+  // Preselect product line
+  if (productLineIdFromServer && productLineDropdown) {
+    const filteredCategories = filterData(
+      categoriesData,
+      "product_line_id",
+      parseInt(productLineIdFromServer)
+    );
+    populateDropdown(
+      categoryDropdown,
+      filteredCategories,
+      categoryIdFromServer
+    );
+  }
+
+  // Preselect category
+  if (categoryIdFromServer && categoryDropdown) {
+    categoryDropdown.value = categoryIdFromServer;
+  }
+}
 
 document
   .querySelector("#modifyForm")

@@ -86,9 +86,6 @@ class FrontController extends BaseController
             'productline.html.twig',
             [
                 'zone'        => $zone,
-                'name'        => $zone->getName(),
-                'uploads'     => $this->uploadRepository->findAll(),
-                'id'          => $productLine->getName(),
                 'categories'  => $this->categoryRepository->findAll(),
                 'productLine' => $productLine,
             ]
@@ -113,9 +110,7 @@ class FrontController extends BaseController
                 'category.html.twig',
                 [
                     'zone'        => $zone,
-                    'name'        => $zone->getName(),
                     'productLine' => $productLine,
-                    'id'          => $productLine->getName(),
                     'category'    => $category,
                     'categories'  => $this->categoryRepository->findAll(),
                     'buttons'     => $this->buttonRepository->findAll(),
@@ -149,10 +144,8 @@ class FrontController extends BaseController
                 'button.html.twig',
                 [
                     'zone'        => $zone,
-                    'name'        => $zone->getName(),
                     'productLine' => $productLine,
-                    'id'          => $productLine->getName(),
-                    'category'    => $buttonEntity->getName(),
+                    'category'    => $category,
                     'categories'  => $this->categoryRepository->findAll(),
                     'button'      => $buttonEntity,
                     'uploads'     => $this->uploadRepository->findAll(),

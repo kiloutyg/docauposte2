@@ -34,9 +34,8 @@ class ProductLineAdminController extends BaseController
 
         return $this->render('productline_admin/productline_admin.html.twig', [
             'groupedUploads' => $groupedUploads,
-            'zone'          => $zone->getName(),
+            'zone'          => $zone,
             'productLine'   => $productLine,
-            'productline'   => $productLine->getName(),
             'categories'    => $this->categoryRepository->findAll(),
             'error'         => $error,
             'last_username' => $lastUsername,
