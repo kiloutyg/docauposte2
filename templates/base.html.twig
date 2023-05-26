@@ -22,15 +22,14 @@
 			{{ encore_entry_script_tags('confirmation') }}
 			{{ encore_entry_script_tags('toast') }}
 			<script>
-				{% if productLine is defined %}
+				{% if zone is defined %}const zoneIdFromServer = parseInt('{{ zone.getId() }}');
+{% else %}
+const zoneIdFromServer = null;{% endif %}{% if productLine is defined %}
 const productLineIdFromServer = parseInt('{{ productLine.getId() }}');
 {% else %}
-const productLineIdFromServer = null;{% endif %}{% if zone is defined %}const zoneIdFromServer = parseInt('{{ zone.getId() }}');
+const productLineIdFromServer = null;{% endif %}{% if category is defined %}const categoryIdFromServer = parseInt('{{ category.getId() }}');
 {% else %}
-const zoneIdFromServer = null;{% endif %}{% if category is defined %}const categoryIdFromServer = parseInt('{{ category.getId() }}');
-{% else %}
-const categoryIdFromServer = null;{% endif %}{% if button is defined %}
-const buttonIdFromServer = parseInt('{{ button.getId() }}');
+const categoryIdFromServer = null;{% endif %}{% if button is defined %}const buttonIdFromServer = parseInt('{{ button.getId() }}');
 {% else %}
 const buttonIdFromServer = null;{% endif %}
 			</script>

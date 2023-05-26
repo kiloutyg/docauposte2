@@ -130,10 +130,12 @@ class UploadController extends FrontController
     public function modify_file_page(string $uploadId = null): Response
     {
         $upload = $this->uploadRepository->findoneBy(['id' => $uploadId]);
-        $boutton = $upload->getButton();
-        $category = $boutton->getCategory();
+        $button = $upload->getButton();
+        $category = $button->getCategory();
         $productLine = $category->getProductLine();
         $zone = $productLine->getZone();
+
+
         $form = $this->createForm(UploadType::class, $upload);
         return $this->render(
             'services/uploads/uploads_modification.html.twig',
@@ -142,6 +144,8 @@ class UploadController extends FrontController
                 'zone'        => $zone,
                 'productLine' => $productLine,
                 'category'    => $category,
+                'button'      => $button,
+
                 'form' => $form->createView(),
             ]
         );
@@ -151,12 +155,12 @@ class UploadController extends FrontController
 
     // create a route to modify a file and or display the modification page
     #[Route('/modify/{uploadId}', name: 'modify_file')]
-    public function modify_file(Request $request, int $uploadId, UploadsService $uploadsService, ButtonRepository $buttonRepository, LoggerInterface $logger): Response
+    public function modify_file(Request $request, int $uploadId, UploadsService $uploadsService, LoggerInterface $logger): Response
     {
         // Retrieve the current upload entity based on the uploadId
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
-        $boutton = $upload->getButton();
-        $category = $boutton->getCategory();
+        $button = $upload->getButton();
+        $category = $button->getCategory();
         $productLine = $category->getProductLine();
         $zone = $productLine->getZone();
 
@@ -238,6 +242,7 @@ class UploadController extends FrontController
             'zone'        => $zone,
             'productLine' => $productLine,
             'category'    => $category,
+            'button'      => $button,
             'upload' => $upload
         ]);
     }

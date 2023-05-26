@@ -45,6 +45,7 @@ function populateDropdown(dropdown, data, selectedId) {
         nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
     }
     option.textContent = nameParts[0]; // Use only the first part after the split.
+
     // If this option should be selected, set the 'selected' attribute
     if (item.id === selectedId) {
       option.selected = true;
@@ -131,6 +132,7 @@ function preselectValues() {
   const zoneDropdown = document.getElementById("zone");
   const productLineDropdown = document.getElementById("productline");
   const categoryDropdown = document.getElementById("category");
+  const buttonDropdown = document.getElementById("upload_button"); // get the button dropdown element
 
   // Preselect zone
   if (zoneIdFromServer && zoneDropdown) {
@@ -163,7 +165,17 @@ function preselectValues() {
 
   // Preselect category
   if (categoryIdFromServer && categoryDropdown) {
-    categoryDropdown.value = categoryIdFromServer;
+    const filteredButtons = filterData(
+      buttonsData,
+      "category_id",
+      parseInt(categoryIdFromServer)
+    );
+    populateDropdown(buttonDropdown, filteredButtons, buttonIdFromServer);
+  }
+
+  // Preselect button
+  if (buttonIdFromServer && buttonDropdown) {
+    buttonDropdown.value = buttonIdFromServer;
   }
 }
 
