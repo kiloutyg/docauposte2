@@ -1,13 +1,15 @@
 // Remove the hardcoded data from your JavaScript file
-let zonesData = [];
-let productLinesData = [];
+let incidentsZonesData = [];
+let incidentsProductLinesData = [];
+let incidentsTypesData = [];
 
 // Fetch data from the API endpoint
-fetch("/api/cascading_dropdown_data")
+fetch("/api/incidents_cascading_dropdown_data")
   .then((response) => response.json())
   .then((data) => {
-    zonesData = data.zones;
-    productLinesData = data.productLines;
+    incidentsZonesData = data.zones;
+    incidentsProductLinesData = data.productLines;
+    incidentsTypesData = data.types;
 
     // Call the function that initializes the cascading dropdowns
     // after the data has been fetched
@@ -15,6 +17,88 @@ fetch("/api/cascading_dropdown_data")
     resetDropdowns();
     preselectValues();
   });
+
+// Existing filterData and populateDropdown functions here...
+
+function initCascadingDropdowns() {
+  const zone = document.getElementById("incidents_zone");
+  const productline = document.getElementById("incidents_productline");
+  const type = document.getElementById("incidents_type");
+
+  if (zone && productline && type) {
+    zone.addEventListener("change", handleIncidentsZoneChange);
+    populateDropdown(type, incidentsTypesData); // Populate 'type' dropdown here
+  } else {
+    console.error("One or more elements not found");
+  }
+  populateDropdown(zone, incidentsZonesData);
+  resetDropdowns();
+}
+
+function handleIncidentsZoneChange(event) {
+  const selectedValue = parseInt(event.target.value);
+  const filteredProductLines = filterData(
+    incidentsProductLinesData,
+    "zone_id",
+    selectedValue
+  );
+  populateDropdown(
+    document.getElementById("incidents_productline"),
+    filteredProductLines
+  );
+}
+
+function resetDropdowns() {
+  const zone = document.getElementById("incidents_zone");
+  const productline = document.getElementById("incidents_productline");
+  const type = document.getElementById("incidents_type");
+
+  if (zone) zone.selectedIndex = 0;
+  if (productline) productline.selectedIndex = 0;
+  if (type) type.selectedIndex = 0;
+}
+
+// Existing turbo:load event listener and preselectValues function here...
+
+document.addEventListener("turbo:load", () => {
+  // Fetch data from the API endpoint on page load
+  fetch("/api/incidents_cascading_dropdown_data")
+    .then((response) => response.json())
+    .then((data) => {
+      incidentsZonesData = data.zones;
+      incidentsProductLinesData = data.productLines;
+
+      // Initialize the cascading dropdowns and reset them on page load
+      initCascadingDropdowns();
+      resetDropdowns();
+      preselectValues();
+    });
+});
+
+function preselectValues() {
+  const zoneDropdown = document.getElementById("incidents_zone");
+  const productLineDropdown = document.getElementById("incidents_productline");
+
+  // Preselect zone
+  if (zoneIdFromServer && zoneDropdown) {
+    const filteredProductLines = filterData(
+      productLinesData,
+      "zone_id",
+      parseInt(zoneIdFromServer)
+    );
+    populateDropdown(zoneDropdown, zonesData, zoneIdFromServer);
+    populateDropdown(
+      productLineDropdown,
+      filteredProductLines,
+      productLineIdFromServer
+    );
+  }
+
+  // Preselect product line
+  if (productLineIdFromServer && productLineDropdown) {
+    productLineDropdown.value = productLineIdFromServer;
+  }
+}
 
 function filterData(data, key, value) {
   return data.filter((item) => item[key] === value);
@@ -48,79 +132,4 @@ function populateDropdown(dropdown, data, selectedId) {
     }
     dropdown.appendChild(option);
   });
-}
-
-function initCascadingDropdowns() {
-  const zone = document.getElementById("zone");
-  const productline = document.getElementById("productline");
-
-  if (zone && productline) {
-    zone.addEventListener("change", handleZoneChange);
-    productline.addEventListener("change", handleProductLineChange);
-  } else {
-    console.error("One or more elements not found");
-  }
-  populateDropdown(zone, zonesData);
-  resetDropdowns();
-}
-
-function handleZoneChange(event) {
-  const selectedValue = parseInt(event.target.value);
-  const filteredProductLines = filterData(
-    productLinesData,
-    "zone_id",
-    selectedValue
-  );
-  populateDropdown(
-    document.getElementById("productline"),
-    filteredProductLines
-  );
-}
-
-function resetDropdowns() {
-  const zone = document.getElementById("zone");
-  const productline = document.getElementById("productline");
-
-  if (zone) zone.selectedIndex = 0;
-  if (productline) productline.selectedIndex = 0;
-}
-
-document.addEventListener("turbo:load", () => {
-  // Fetch data from the API endpoint on page load
-  fetch("/api/cascading_dropdown_data")
-    .then((response) => response.json())
-    .then((data) => {
-      zonesData = data.zones;
-      productLinesData = data.productLines;
-
-      // Initialize the cascading dropdowns and reset them on page load
-      initCascadingDropdowns();
-      resetDropdowns();
-      preselectValues();
-    });
-});
-
-function preselectValues() {
-  const zoneDropdown = document.getElementById("zone");
-  const productLineDropdown = document.getElementById("productline");
-
-  // Preselect zone
-  if (zoneIdFromServer && zoneDropdown) {
-    const filteredProductLines = filterData(
-      productLinesData,
-      "zone_id",
-      parseInt(zoneIdFromServer)
-    );
-    populateDropdown(zoneDropdown, zonesData, zoneIdFromServer);
-    populateDropdown(
-      productLineDropdown,
-      filteredProductLines,
-      productLineIdFromServer
-    );
-  }
-
-  // Preselect product line
-  if (productLineIdFromServer && productLineDropdown) {
-    productLineDropdown.value = productLineIdFromServer;
-  }
 }

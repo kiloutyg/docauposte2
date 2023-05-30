@@ -53,4 +53,49 @@ class ApiController extends BaseController
 
         return new JsonResponse($responseData);
     }
+
+    #[Route('/api/incidents_cascading_dropdown_data', name: 'api_incidents_cascading_dropdown_data')]
+    public function getIncidentData(): JsonResponse
+    {
+        // Fetch data as you did in your previous controller
+
+        $zones = array_map(function ($zone) {
+            return [
+                'id' => $zone->getId(),
+                'name' => $zone->getName()
+            ];
+        }, $this->zoneRepository->findAll());
+
+        $productLines = array_map(function ($productLine) {
+            return [
+                'id' => $productLine->getId(),
+                'name' => $productLine->getName(),
+                'zone_id' => $productLine->getZone()->getId()
+            ];
+        }, $this->productLineRepository->findAll());
+
+        $types = [
+            [
+                'id' => 1,
+                'name' => 'Incident Sécurité',
+            ],
+            [
+                'id' => 2,
+                'name' => 'Incident Client',
+            ],
+            [
+                'id' => 3,
+                'name' => 'Alerte Client',
+            ],
+        ];
+
+
+        $responseData = [
+            'zones' => $zones,
+            'productLines' => $productLines,
+            'types' => $types,
+        ];
+
+        return new JsonResponse($responseData);
+    }
 }

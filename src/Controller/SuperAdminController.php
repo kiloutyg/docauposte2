@@ -12,15 +12,17 @@ use App\Service\UploadsService;
 use App\Service\AccountService;
 
 use App\Entity\Zone;
+use App\Service\IncidentsService;
 
 class SuperAdminController extends BaseController
 {
 
     #[Route('/super_admin', name: 'app_super_admin')]
 
-    public function index(UploadsService $uploadsService, AuthenticationUtils $authenticationUtils,): Response
+    public function index(IncidentsService $incidentsService, UploadsService $uploadsService, AuthenticationUtils $authenticationUtils,): Response
     {
         $groupedUploads = $uploadsService->groupUploads();
+        $groupIncidents = $incidentsService->groupIncidents();
 
         // Get the error and last username using AuthenticationUtils
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -28,6 +30,7 @@ class SuperAdminController extends BaseController
 
         return $this->render('super_admin/super_admin_index.html.twig', [
             'groupedUploads' => $groupedUploads,
+            'groupincidents' => $groupIncidents,
             'error' => $error,
             'last_username' => $lastUsername,
             'zones' => $this->zoneRepository->findAll(),

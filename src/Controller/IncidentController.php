@@ -19,9 +19,11 @@ use App\Repository\IncidentRepository;
 
 use App\Service\IncidentsService;
 
+#[Route('/', name: 'app_')]
+
 class IncidentController extends FrontController
 {
-    #[Route('/incident', name: 'app_incident')]
+    #[Route('/incident', name: 'incident')]
     public function index(): Response
     {
         return $this->render('/services/incidents/incidents.html.twig', []);
@@ -36,14 +38,15 @@ class IncidentController extends FrontController
         // Check if the form is submitted
         if ($request->isMethod('POST')) {
 
-            $productline = $request->request->get('productline');
-            $newname = $request->request->get('newname');
+            $productline = $request->request->get('incidents_productline');
+            $newname = $request->request->get('incidents_newFileName');
+            $type = $request->request->get('incidents_type');
 
 
             $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productline]);
 
             // Use the IncidentsService to handle file Incidents
-            $name = $this->incidentsService->uploadIncidentFiles($request, $productlineEntity, $newname);
+            $name = $this->incidentsService->uploadIncidentFiles($request, $productlineEntity, $newname, $type);
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
 
             return $this->redirectToRoute(
@@ -52,7 +55,6 @@ class IncidentController extends FrontController
                     'zones'       => $this->zoneRepository->findAll(),
                     'productlines' => $this->productLineRepository->findAll(),
                     'categories'  => $this->categoryRepository->findAll(),
-                    'productlines'     => $this->productlineRepository->findAll(),
                     'incidents'     => $this->incidentRepository->findAll(),
                 ]
             );
@@ -66,7 +68,6 @@ class IncidentController extends FrontController
                     'zones'       => $this->zoneRepository->findAll(),
                     'productlines' => $this->productLineRepository->findAll(),
                     'categories'  => $this->categoryRepository->findAll(),
-                    'productlines'     => $this->productlineRepository->findAll(),
                     'incidents'     => $this->incidentRepository->findAll(),
                 ]
             );
@@ -76,7 +77,7 @@ class IncidentController extends FrontController
 
 
     // create a route to download a file
-    #[Route('/download/{name}', name: 'download_file')]
+    #[Route('/download/{name}', name: 'incident_download_file')]
     public function download_file(string $name = null): Response
     {
         $file = $this->incidentRepository->findOneBy(['name' => $name]);
@@ -87,7 +88,7 @@ class IncidentController extends FrontController
 
 
     // create a route to delete a file
-    #[Route('/delete/{productline}/{name}', name: 'delete_file')]
+    #[Route('/delete/{productline}/{name}', name: 'incident_delete_file')]
 
     public function delete_file(string $name = null, string $productline = null, IncidentsService $incidentsService): Response
     {
@@ -109,7 +110,7 @@ class IncidentController extends FrontController
 
 
     // create a route to display the modification page 
-    #[Route('/modifyfile/{incidentId}', name: 'modify_file_page')]
+    #[Route('/modifyfile/{incidentId}', name: 'incident_modify_file_page')]
 
     public function modify_file_page(string $incidentId = null): Response
     {
@@ -134,30 +135,28 @@ class IncidentController extends FrontController
 
 
     // create a route to modify a file and or display the modification page
-    #[Route('/modify/{incidentId}', name: 'modify_file')]
+    #[Route('/modify/{incidentId}', name: 'incident_modify_file')]
     public function modify_file(Request $request, int $incidentId, incidentsService $incidentsService, LoggerInterface $logger): Response
     {
         // Retrieve the current upload entity based on the incidentId
-        $upload = $this->incidentRepository->findOneBy(['id' => $incidentId]);
-        $productline = $upload->getproductline();
-        $category = $productline->getCategory();
-        $productLine = $category->getProductLine();
+        $incident = $this->incidentRepository->findOneBy(['id' => $incidentId]);
+        $productLine = $incident->getproductline();
         $zone = $productLine->getZone();
 
-        if (!$upload) {
+        if (!$incident) {
             $logger->error('Upload not found', ['incidentId' => $incidentId]);
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
             return $this->redirectToRoute('app_base');
         }
 
-        $logger->info('Retrieved Upload entity:', ['upload' => $upload]);
+        $logger->info('Retrieved Incident entity:', ['incident' => $incident]);
 
         // Get form data
         $formData = $request->request->all();
         $logger->info('Form data before any manipulation:', ['formData' => $formData]);
 
         // Create a form to modify the Upload entity
-        $form = $this->createForm(UploadType::class, $upload);
+        $form = $this->createForm(UploadType::class, $incident);
 
         $logger->info('Form data before manipulation:', ['formData' => $formData]);
 
@@ -171,14 +170,14 @@ class IncidentController extends FrontController
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
-                $incidentsService->modifyFile($upload);
+                $incidentsService->modifyIncidentFile($incident);
 
                 $this->addFlash('success', 'Le fichier a été modifié.');
-                $logger->info('File modified successfully', ['upload' => $upload]);
+                $logger->info('File modified successfully', ['upload' => $incident]);
                 return $this->redirectToRoute('app_base');
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Une erreur s\'est produite lors de la modification du fichier.');
-                $logger->error('Failed to modify file', ['upload' => $upload, 'error' => $e->getMessage()]);
+                $logger->error('Failed to modify file', ['upload' => $incident, 'error' => $e->getMessage()]);
 
                 $response = [
                     'status' => 'error',
@@ -223,7 +222,7 @@ class IncidentController extends FrontController
             'productLine' => $productLine,
             'category'    => $category,
             'productline'      => $productline,
-            'upload' => $upload
+            'upload' => $incident
         ]);
     }
 }

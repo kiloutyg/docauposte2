@@ -8,13 +8,13 @@
 					<p class="text-white m-0">
 						Ajouter un fichier :
 					</p>
-					<form class="form-floating justify-content-center " id="upload-form" action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+					<form class="form-floating justify-content-center " id="upload-form" action="{{path('app_generic_upload_incident_files')}}" method="POST" enctype="multipart/form-data">
 						<div class="fallback">
 							<input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
 
 							<div class="mb-3">
-								<label for="newFileName" class="form-label">Nom du fichier :</label>
-								<input type="text" class="form-control" id="newFileName" name="newFileName" placeholder="Entrer un nouveau nom de fichier (optionnel)">
+								<label for="incidents_newFileName" class="form-label">Nom du fichier :</label>
+								<input type="text" class="form-control" id="incidents_newFileName" name="incidents_newFileName" placeholder="Entrer un nouveau nom de fichier (optionnel)">
 							</div>
 							{% include 'services/incidents/cascading_dropdowns_incidents.html.twig' %}
 						</div>

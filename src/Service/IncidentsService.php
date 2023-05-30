@@ -44,7 +44,7 @@ class IncidentsService extends AbstractController
         $this->productlineRepository = $productlineRepository;
         $this->folderCreationService = $folderCreationService;
     }
-    public function uploadIncidentFiles(Request $request, $productline, $newName = null)
+    public function uploadIncidentFiles(Request $request, $productline, $newName = null, $type)
     {
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();
@@ -89,6 +89,7 @@ class IncidentsService extends AbstractController
             $incident->setFile(new File($path));
             $incident->setName($name);
             $incident->setPath($path);
+            $incident->setType($type);
             $incident->setProductLine($productline);
             $incident->setuploadedAt(new \DateTime());
             $this->manager->persist($incident);
@@ -119,7 +120,7 @@ class IncidentsService extends AbstractController
             unlink($path);
         }
 
-        $incident = $this->incidentRepository->findOneBy(['name' => $name, 'productline' => $productline]);
+        $incident = $this->incidentRepository->findOneBy(['name' => $name, 'ProductLine' => $productline]);
         $this->manager->remove($incident);
         $this->manager->flush();
         return $name;
