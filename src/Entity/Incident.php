@@ -3,8 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\IncidentRepository;
+
+use Doctrine\DBAL\Types\Types;
+
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
+
+use Symfony\Component\HttpFoundation\File\File;
+
 
 #[ORM\Entity(repositoryClass: IncidentRepository::class)]
 #[Broadcast]
@@ -15,6 +21,9 @@ class Incident
     #[ORM\Column]
     private ?int $id = null;
 
+    private ?File $file = null;
+
+
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
@@ -22,7 +31,9 @@ class Incident
     private ?string $type = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $uploaded_at = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $uploaded_at = null;
 
     #[ORM\ManyToOne(inversedBy: 'incidents')]
     #[ORM\JoinColumn(nullable: false)]
@@ -31,9 +42,30 @@ class Incident
     #[ORM\Column(nullable: true)]
     private ?bool $active = null;
 
-    #[ORM\ManyToOne(inversedBy: 'incidents')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Upload $Upload = null;
+    #[ORM\Column(length: 255)]
+    private ?string $path = null;
+
+
+
+
+    #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
+
+
+
+
+    public function setFile(?File $file = null): void
+    {
+        $this->file = $file;
+
+        if (null !== $file) {
+            $this->uploaded_at = new \DateTime();
+        }
+    }
+
+    public function getFile(): ?File
+    {
+        return $this->file;
+    }
 
     public function getId(): ?int
     {
@@ -100,14 +132,15 @@ class Incident
         return $this;
     }
 
-    public function getUpload(): ?Upload
+
+    public function getPath(): ?string
     {
-        return $this->Upload;
+        return $this->path;
     }
 
-    public function setUpload(?Upload $Upload): self
+    public function setPath(string $path): self
     {
-        $this->Upload = $Upload;
+        $this->path = $path;
 
         return $this;
     }

@@ -1,0 +1,38 @@
+{% block body %}
+
+	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
+		<div class="card-body ">
+			<div class="row d-flex align-items-center gy-lg-0 gy-5">
+
+				<div class="col-md-6">
+					<p class="text-white m-0">
+						Ajouter un fichier :
+					</p>
+					<form class="form-floating justify-content-center " id="upload-form" action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+						<div class="fallback">
+							<input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
+
+							<div class="mb-3">
+								<label for="newFileName" class="form-label">Nom du fichier :</label>
+								<input type="text" class="form-control" id="newFileName" name="newFileName" placeholder="Entrer un nouveau nom de fichier (optionnel)">
+							</div>
+							{% include 'services/incidents/cascading_dropdowns_incidents.html.twig' %}
+						</div>
+						<div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
+							<button type="submit" class="btn btn-primary">Charger</button>
+						</div>
+					</form>
+				</div>
+
+				<div class="col-md-6">{% include 'services/incidents/incidents_list.html.twig' %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+{% block javascripts %}
+
+	{{ encore_entry_script_tags('cascading-dropdowns') }}
+	{% block javascript_data %}{% endblock %}
+
+{% endblock %}

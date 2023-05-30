@@ -93,4 +93,18 @@
 			</div>
 		</div>
 	</div>
+
+	<h2 class="my-4">
+		<strong>Formulaire d'ajout d'Incident :</strong>
+	</h2>
+	<div class="card border-0 shadow rounded-3 my-5">
+		<div class="card-body">
+			<div class="row">
+
+				<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+					{% include "services/incidents/incidents.html.twig" %}
+				</form>
+			</div>
+		</div>
+	</div>
 {% endblock %}

@@ -39,7 +39,8 @@ class ZoneAdminController extends BaseController
             'last_username' => $lastUsername,
             'buttons'     => $this->buttonRepository->findAll(),
             'uploads'     => $this->uploadRepository->findAll(),
-            'users' => $this->userRepository->findAll()
+            'users' => $this->userRepository->findAll(),
+            'incidents' => $this->incidentRepository->findAll(),
 
         ]);
     }

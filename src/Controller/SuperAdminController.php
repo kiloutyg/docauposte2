@@ -35,7 +35,9 @@ class SuperAdminController extends BaseController
             'categories' => $this->categoryRepository->findAll(),
             'buttons'     => $this->buttonRepository->findAll(),
             'uploads'     => $this->uploadRepository->findAll(),
-            'users' => $this->userRepository->findAll()
+            'users' => $this->userRepository->findAll(),
+            'incidents' => $this->incidentRepository->findAll(),
+
         ]);
     }
 

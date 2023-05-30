@@ -20,6 +20,7 @@ use App\Repository\UploadRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ButtonRepository;
 use App\Repository\SignatureRepository;
+use App\Repository\IncidentRepository;
 
 use App\Entity\Zone;
 use App\Entity\ProductLine;
@@ -28,6 +29,7 @@ use App\Entity\Upload;
 use App\Entity\Category;
 use App\Entity\Button;
 use App\Entity\Signature;
+use App\Entity\Incident;
 
 use App\Service\EntityDeletionService;
 use App\Service\AccountService;
@@ -63,6 +65,7 @@ class BaseController extends AbstractController
     protected $projectDir;
     protected $public_dir;
     protected $folderCreationService;
+    protected $incidentRepository;
 
 
 
@@ -86,6 +89,7 @@ class BaseController extends AbstractController
         LoggerInterface $loggerInterface,
         ParameterBagInterface $params,
         FolderCreationService $folderCreationService,
+        IncidentRepository $incidentRepository,
 
     ) {
 
@@ -109,5 +113,6 @@ class BaseController extends AbstractController
         $this->projectDir            = $params->get('kernel.project_dir');
         $this->public_dir            = $this->projectDir . '/public';
         $this->folderCreationService = $folderCreationService;
+        $this->incidentRepository    = $incidentRepository;
     }
 }

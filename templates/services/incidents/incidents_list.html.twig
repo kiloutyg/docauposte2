@@ -1,0 +1,66 @@
+<div class="  align-items-center  text-white bg-secondary my-5 py-4 text-center mydropzone">
+	<h5>
+		<strong>
+			Liste des documents :
+		</strong>
+	</h5>
+	{% set lastZone = null %}
+	{% set lastProductLine = null %}
+
+
+	{% if (productLine is defined) and (productLine is not empty) %}
+		{# Filter incidents by product line #}
+		{% set matchingincidents = incidents|filter(incident => incident.button.category.productLine.id == productLine.id) %}
+
+	{% elseif (zone is defined) and (zone is not empty) %}
+		{# Filter incidents by zone #}
+		{% set matchingincidents = incidents|filter(incident => incident.button.category.productLine.zone.id == zone.id) %}
+
+	{% else %}
+		{# No filter, display all incidents #}
+		{% set matchingincidents = incidents %}
+
+	{% endif %}
+
+	{% if matchingincidents|length > 0 %}
+
+		{% for zoneName, zone in groupedincidents %}
+			Zone:
+			{{ zoneName|split('.')|first|capitalize }}
+			>
+			{% for productLineName, productLine in zone %}
+				Produit:
+				{{ productLineName|split('.')|first|capitalize }}
+				>
+
+				{% for incidents in productLine %}
+					<li class="form-control shadow d-flex justify-content-between align-items-center mb-3">
+						<a href="{{ path('app_download_file', { 'name': incident.name }) }}" class="btn btn-link" target="_blank">
+							-
+							{{ incident.name }}
+							-
+							{{ incident.uploadedAt|date('d/m/Y') }}
+							<span class="visually-hidden">{{ incident.id }}</span>
+						</a>
+						<a href="{{ path('app_modify_file', {'incidentId': incident.id}) }}" class="btn btn-modify">
+							Modifier
+							<span class="visually-hidden">{{ incident.id }}</span>
+						</a>
+						{% if  is_granted('ROLE_LINE_ADMIN') %}
+							<a href="{{ path('app_delete_file', { name: incident.name, button: incident.productline.id }) }}" class="btn btn-danger delete-incident">
+								Supprimer
+								<span class="visually-hidden">{{ incident.id }}</span>
+							</a>
+						{% endif %}
+					</li>
+				{% endfor %}
+			{% endfor %}
+		{% endfor %}
+	{% else %}
+		<div class="alert alert-danger">
+			<a href="{{path('app_base')}}">
+				Il n'y a pas de documents disponible
+			</a>
+		</div>
+	{% endif %}
+</div>
