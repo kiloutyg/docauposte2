@@ -38,6 +38,14 @@ class Upload
     #[ORM\JoinColumn(nullable: false)]
     private ?Button $button = null;
 
+    #[ORM\OneToMany(mappedBy: 'Upload', targetEntity: Incident::class)]
+    private Collection $incidents;
+
+    public function __construct()
+    {
+        $this->incidents = new ArrayCollection();
+    }
+
 
 
     #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
@@ -131,6 +139,36 @@ class Upload
     public function setButton(?Button $button): self
     {
         $this->button = $button;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Incident>
+     */
+    public function getIncidents(): Collection
+    {
+        return $this->incidents;
+    }
+
+    public function addIncident(Incident $incident): self
+    {
+        if (!$this->incidents->contains($incident)) {
+            $this->incidents->add($incident);
+            $incident->setUpload($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIncident(Incident $incident): self
+    {
+        if ($this->incidents->removeElement($incident)) {
+            // set the owning side to null (unless already changed)
+            if ($incident->getUpload() === $this) {
+                $incident->setUpload(null);
+            }
+        }
 
         return $this;
     }

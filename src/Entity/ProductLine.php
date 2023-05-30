@@ -32,9 +32,13 @@ class ProductLine
     #[ORM\OneToMany(mappedBy: 'ProductLine', targetEntity: Category::class)]
     private Collection $categories;
 
+    #[ORM\OneToMany(mappedBy: 'product_line', targetEntity: Incident::class)]
+    private Collection $incidents;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
+        $this->incidents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -92,6 +96,36 @@ class ProductLine
             // set the owning side to null (unless already changed)
             if ($category->getProductLine() === $this) {
                 $category->setProductLine(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Incident>
+     */
+    public function getIncidents(): Collection
+    {
+        return $this->incidents;
+    }
+
+    public function addIncident(Incident $incident): self
+    {
+        if (!$this->incidents->contains($incident)) {
+            $this->incidents->add($incident);
+            $incident->setProductLine($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIncident(Incident $incident): self
+    {
+        if ($this->incidents->removeElement($incident)) {
+            // set the owning side to null (unless already changed)
+            if ($incident->getProductLine() === $this) {
+                $incident->setProductLine(null);
             }
         }
 

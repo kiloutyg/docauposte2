@@ -11,6 +11,7 @@ use App\Repository\ProductLineRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ButtonRepository;
 use App\Repository\UploadRepository;
+use App\Repository\IncidentRepository;
 
 use App\Service\UploadsService;
 
@@ -23,6 +24,7 @@ class EntityDeletionService
     private $buttonRepository;
     private $uploadRepository;
     private $uploadsService;
+    private $incidentRepository;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -31,6 +33,7 @@ class EntityDeletionService
         CategoryRepository $categoryRepository,
         ButtonRepository $buttonRepository,
         UploadRepository $uploadRepository,
+        IncidentRepository $incidentRepository,
         UploadsService $uploadsService
     ) {
         $this->em = $em;
@@ -40,6 +43,7 @@ class EntityDeletionService
         $this->buttonRepository = $buttonRepository;
         $this->uploadRepository = $uploadRepository;
         $this->uploadsService = $uploadsService;
+        $this->incidentRepository = $incidentRepository;
     }
 
     public function deleteEntity(string $entityType, int $id): bool
@@ -63,6 +67,9 @@ class EntityDeletionService
             case 'upload':
                 $repository = $this->uploadRepository;
                 break;
+            case 'incident':
+                $repository = $this->incidentRepository;
+                break;
         }
 
         if (!$repository) {
@@ -82,6 +89,9 @@ class EntityDeletionService
         } elseif ($entityType === 'productline') {
             foreach ($entity->getCategories() as $category) {
                 $this->deleteEntity('category', $category->getId());
+            }
+            foreach ($entity->getIncidents() as $incident) {
+                $this->deleteEntity('incident', $incident->getId());
             }
         } elseif ($entityType === 'category') {
             foreach ($entity->getButtons() as $button) {
