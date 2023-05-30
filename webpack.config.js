@@ -25,6 +25,10 @@ Encore
   .addEntry("confirmation", "./assets/js/confirmation.js")
   .addEntry("toast", "./assets/js/toast.js")
   .addEntry("cascading-dropdowns", "./assets/js/cascading-dropdowns.js")
+  .addEntry(
+    "incident-cascading-dropdowns",
+    "./assets/js/incident-cascading-dropdowns.js"
+  )
   // .addEntry("formdata", "./assets/js/formdata.js")
 
   // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)

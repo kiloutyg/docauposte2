@@ -30,7 +30,6 @@ class Incident
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
-    #[ORM\Column]
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $uploaded_at = null;
@@ -45,13 +44,7 @@ class Incident
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
-
-
-
     #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
-
-
-
 
     public function setFile(?File $file = null): void
     {
@@ -96,12 +89,12 @@ class Incident
         return $this;
     }
 
-    public function getUploadedAt(): ?\DateTimeImmutable
+    public function getUploadedAt(): ?\DateTimeInterface
     {
         return $this->uploaded_at;
     }
 
-    public function setUploadedAt(\DateTimeImmutable $uploaded_at): self
+    public function setUploadedAt(\DateTimeInterface $uploaded_at): self
     {
         $this->uploaded_at = $uploaded_at;
 

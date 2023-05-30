@@ -35,6 +35,8 @@ use App\Service\EntityDeletionService;
 use App\Service\AccountService;
 use App\Service\UploadsService;
 use App\Service\FolderCreationService;
+use App\Service\IncidentsService;
+
 
 
 
@@ -66,6 +68,7 @@ class BaseController extends AbstractController
     protected $public_dir;
     protected $folderCreationService;
     protected $incidentRepository;
+    protected $incidentsService;
 
 
 
@@ -90,6 +93,7 @@ class BaseController extends AbstractController
         ParameterBagInterface $params,
         FolderCreationService $folderCreationService,
         IncidentRepository $incidentRepository,
+        IncidentsService $incidentsService,
 
     ) {
 
@@ -114,5 +118,6 @@ class BaseController extends AbstractController
         $this->public_dir            = $this->projectDir . '/public';
         $this->folderCreationService = $folderCreationService;
         $this->incidentRepository    = $incidentRepository;
+        $this->incidentsService       = $incidentsService;
     }
 }

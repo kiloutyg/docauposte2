@@ -44,7 +44,7 @@ class IncidentsService extends AbstractController
         $this->productlineRepository = $productlineRepository;
         $this->folderCreationService = $folderCreationService;
     }
-    public function incidentFiles(Request $request, $button, $newFileName = null)
+    public function uploadIncidentFiles(Request $request, $productline, $newName = null)
     {
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();
@@ -54,8 +54,8 @@ class IncidentsService extends AbstractController
 
 
             // Dinamyic folder creation and file incident
-            $buttonname = $button->getName();
-            $parts = explode('.', $buttonname);
+            $productlinename = $productline->getName();
+            $parts = explode('.', $productlinename);
             $parts = array_reverse($parts);
             $folderPath = $public_dir . '/doc';
 
@@ -69,28 +69,28 @@ class IncidentsService extends AbstractController
             }
 
 
-            if ($newFileName) {
-                $filename   = $newFileName;
+            if ($newName) {
+                $name   = $newName;
             } else {
-                $filename   = $file->getClientOriginalName();
+                $name   = $file->getClientOriginalName();
             }
 
             // Add .pdf extension if it is missing
-            if (strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'pdf') {
-                $filename .= '.pdf';
+            if (strtolower(pathinfo($name, PATHINFO_EXTENSION)) !== 'pdf') {
+                $name .= '.pdf';
             }
 
-            $path       = $folderPath . '/' . $filename;
-            $file->move($folderPath . '/', $filename);
+            $path       = $folderPath . '/' . $name;
+            $file->move($folderPath . '/', $name);
 
-            $name = $filename;
+            $name;
 
             $incident = new incident();
             $incident->setFile(new File($path));
-            $incident->setFilename($filename);
+            $incident->setName($name);
             $incident->setPath($path);
-            $incident->setButton($button);
-            $incident->setincidentedAt(new \DateTime());
+            $incident->setProductLine($productline);
+            $incident->setuploadedAt(new \DateTime());
             $this->manager->persist($incident);
         }
         $this->manager->flush();
@@ -98,14 +98,14 @@ class IncidentsService extends AbstractController
     }
 
 
-    public function deleteFile($filename, $button)
+    public function deleteIncidentFile($name, $productline)
     {
-        $name = $filename;
+        // $name;
         $public_dir = $this->projectDir . '/public';
 
         // Dinamyic folder creation and file incident
-        $buttonname = $button->getName();
-        $parts = explode('.', $buttonname);
+        $productlinename = $productline->getName();
+        $parts = explode('.', $productlinename);
         $parts = array_reverse($parts);
         $folderPath = $public_dir . '/doc';
 
@@ -113,13 +113,13 @@ class IncidentsService extends AbstractController
             $folderPath .= '/' . $part;
         }
 
-        $path       = $folderPath . '/' . $filename;
+        $path       = $folderPath . '/' . $name;
 
         if (file_exists($path)) {
             unlink($path);
         }
 
-        $incident = $this->incidentRepository->findOneBy(['filename' => $filename, 'button' => $button]);
+        $incident = $this->incidentRepository->findOneBy(['name' => $name, 'productline' => $productline]);
         $this->manager->remove($incident);
         $this->manager->flush();
         return $name;
@@ -127,7 +127,7 @@ class IncidentsService extends AbstractController
 
 
 
-    public function modifyFile(incident $incident)
+    public function modifyIncidentFile(incident $incident)
     {
         // Log the form data
         $this->logger->info('original incident state', ['incident' => $incident]);
@@ -144,8 +144,8 @@ class IncidentsService extends AbstractController
 
         // New file path
         // Dynamic folder creation and file incident
-        $buttonname = $incident->getProductLine()->getName();
-        $parts = explode('.', $buttonname);
+        $productlinename = $incident->getProductLine()->getName();
+        $parts = explode('.', $productlinename);
         $parts = array_reverse($parts);
         $folderPath = $public_dir . '/doc';
 
@@ -153,7 +153,7 @@ class IncidentsService extends AbstractController
             $folderPath .= '/' . $part;
         }
 
-        $Path = $folderPath . '/' . $incident->getFilename();
+        $Path = $folderPath . '/' . $incident->getName();
 
         // If new file exists, process it and delete the old one
         if ($newFile) {
@@ -164,7 +164,7 @@ class IncidentsService extends AbstractController
 
             // Move the new file to the directory
             try {
-                $newFile->move($folderPath . '/', $incident->getFilename());
+                $newFile->move($folderPath . '/', $incident->getName());
             } catch (\Exception $e) {
                 $this->logger->error('Failed to move incidented file: ' . $e->getMessage());
                 throw $e;
@@ -181,24 +181,23 @@ class IncidentsService extends AbstractController
         }
 
         // Persist changes and flush to the database
-        $incident->setincidentedAt(new \DateTime());
+        $incident->setuploadedAt(new \DateTime());
         $this->manager->persist($incident);
         $this->manager->flush();
     }
 
 
-    public function groupincidents()
+    public function groupIncidents()
     {
         $incidents = $this->incidentRepository->findAll();
 
         $groupedincidents = [];
 
-        // Group incidents by zone, productLine, category, and button
+        // Group incidents by zone, productLine, category, and productline
         foreach ($incidents as $incident) {
-            $zoneName = $incident->getButton()->getCategory()->getProductLine()->getZone()->getName();
-            $productLineName = $incident->getButton()->getCategory()->getProductLine()->getName();
-            $categoryName = $incident->getButton()->getCategory()->getName();
-            $buttonName = $incident->getButton()->getName();
+            $zoneName = $incident->getProductLine()->getZone()->getName();
+
+            $productLineName = $incident->getProductLine()->getName();
 
             if (!isset($groupedincidents[$zoneName])) {
                 $groupedincidents[$zoneName] = [];
@@ -208,15 +207,7 @@ class IncidentsService extends AbstractController
                 $groupedincidents[$zoneName][$productLineName] = [];
             }
 
-            if (!isset($groupedincidents[$zoneName][$productLineName][$categoryName])) {
-                $groupedincidents[$zoneName][$productLineName][$categoryName] = [];
-            }
-
-            if (!isset($groupedincidents[$zoneName][$productLineName][$categoryName][$buttonName])) {
-                $groupedincidents[$zoneName][$productLineName][$categoryName][$buttonName] = [];
-            }
-
-            $groupedincidents[$zoneName][$productLineName][$categoryName][$buttonName][] = $incident;
+            $groupedincidents[$zoneName][$productLineName][] = $incident;
         }
 
         return $groupedincidents;
