@@ -133,3 +133,61 @@ function populateDropdown(dropdown, data, selectedId) {
     dropdown.appendChild(option);
   });
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  let createIncidentTypeButton = document.getElementById(
+    "create_incident_type"
+  );
+
+  if (createIncidentTypeButton) {
+    createIncidentTypeButton.addEventListener("click", function (e) {
+      e.preventDefault();
+
+      let incidentTypeName =
+        document.getElementById("incident_type_name").value;
+
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/incident_type_creation");
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          // Parse the JSON response
+          let response = JSON.parse(xhr.responseText);
+
+          // Check if the operation was successful
+          if (response.success) {
+            // Handle success, e.g. refresh dropdown, show message, etc.
+            console.log(response.message);
+
+            // Show the message to the user
+            alert(response.message);
+
+            // Clear the input field after a successful submission
+            document.getElementById("incident_type_name").value = "";
+
+            // Force a reload of the page
+            location.reload();
+          } else {
+            // Handle failure, e.g. show error message
+            console.error(response.message);
+          }
+        } else {
+          // Handle other HTTP errors
+          console.error("The request failed!");
+        }
+      };
+
+      xhr.onerror = function () {
+        // Handle total failure of the request
+        console.error("The request could not be made!");
+      };
+
+      xhr.send(
+        JSON.stringify({
+          incident_type_name: incidentTypeName,
+        })
+      );
+    });
+  }
+});

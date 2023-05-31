@@ -74,26 +74,18 @@ class ApiController extends BaseController
             ];
         }, $this->productLineRepository->findAll());
 
-        $types = [
-            [
-                'id' => 1,
-                'name' => 'Incident Sécurité',
-            ],
-            [
-                'id' => 2,
-                'name' => 'Incident Client',
-            ],
-            [
-                'id' => 3,
-                'name' => 'Alerte Client',
-            ],
-        ];
+        $incidenttypes = array_map(function ($incidenttype) {
+            return [
+                'id' => $incidenttype->getId(),
+                'name' => $incidenttype->getName(),
+            ];
+        }, $this->incidentTypeRepository->findAll());
 
 
         $responseData = [
             'zones' => $zones,
             'productLines' => $productLines,
-            'types' => $types,
+            'types' => $incidenttypes,
         ];
 
         return new JsonResponse($responseData);

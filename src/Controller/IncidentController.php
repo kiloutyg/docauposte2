@@ -16,8 +16,12 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Repository\ZoneRepository;
 use App\Repository\ProductLineRepository;
 use App\Repository\IncidentRepository;
+use App\Repository\IncidentTypeRepository;
 
 use App\Service\IncidentsService;
+
+use App\Entity\Incident;
+use App\Entity\IncidentType;
 
 #[Route('/', name: 'app_')]
 
@@ -28,6 +32,32 @@ class IncidentController extends FrontController
     {
         return $this->render('/services/incidents/incidents.html.twig', []);
     }
+
+
+    #[Route('/incident_type_creation', name: 'incident_type_creation')]
+    public function incidentTypeCreation(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $incidentTypename = $data['incident_type_name'] ?? null;
+
+        if ($incidentTypename === null) {
+            return new JsonResponse(['success' => false, 'message' => 'Le nom du type d\'incident ne peut pas être vide']);
+        }
+
+        $existingIncidentType = $this->incidentTypeRepository->findOneBy(['name' => $incidentTypename]);
+
+        if ($existingIncidentType) {
+            return new JsonResponse(['success' => false, 'message' => 'Ce type d\'incident existe déjà']);
+        } else {
+            $incidentType = new IncidentType();
+            $incidentType->setName($incidentTypename);
+            $this->em->persist($incidentType);
+            $this->em->flush();
+
+            return new JsonResponse(['success' => true, 'message' => 'Le type d\'incident a été créé']);
+        }
+    }
+
 
 
     // create a route to upload a file
@@ -77,7 +107,7 @@ class IncidentController extends FrontController
 
 
     // create a route to download a file
-    #[Route('/download/{name}', name: 'incident_download_file')]
+    #[Route('/download_incident/{name}', name: 'incident_download_file')]
     public function download_file(string $name = null): Response
     {
         $file = $this->incidentRepository->findOneBy(['name' => $name]);

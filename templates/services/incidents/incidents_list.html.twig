@@ -10,11 +10,11 @@
 
 	{% if (productLine is defined) and (productLine is not empty) %}
 		{# Filter incidents by product line #}
-		{% set matchingincidents = incidents|filter(incident => incident.button.category.productLine.id == productLine.id) %}
+		{% set matchingincidents = incidents|filter(incident => incident.productLine.id == productLine.id) %}
 
 	{% elseif (zone is defined) and (zone is not empty) %}
 		{# Filter incidents by zone #}
-		{% set matchingincidents = incidents|filter(incident => incident.button.category.productLine.zone.id == zone.id) %}
+		{% set matchingincidents = incidents|filter(incident => incident.productLine.zone.id == zone.id) %}
 
 	{% else %}
 		{# No filter, display all incidents #}

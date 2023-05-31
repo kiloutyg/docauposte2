@@ -12,19 +12,21 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 use App\Service\AccountService;
 use App\Service\UploadsService;
+use App\Service\IncidentsService;
 
 
 use App\Entity\ProductLine;
 
 class ZoneAdminController extends BaseController
-{
 
+{
 
     #[Route('/zone_admin/{zone}', name: 'app_zone_admin')]
 
-    public function index(UploadsService $uploadsService, AuthenticationUtils $authenticationUtils, string $zone = null): Response
+    public function index(IncidentsService $incidentsService, UploadsService $uploadsService, AuthenticationUtils $authenticationUtils, string $zone = null): Response
     {
         $groupedUploads = $uploadsService->groupUploads();
+        $groupIncidents = $incidentsService->groupIncidents();
 
         $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
         // Get the error and last username using AuthenticationUtils
@@ -33,6 +35,7 @@ class ZoneAdminController extends BaseController
 
         return $this->render('zone_admin/zone_admin_index.html.twig', [
             'groupedUploads' => $groupedUploads,
+            'groupincidents' => $groupIncidents,
             'zone'         => $zone,
             'productLines' => $this->productLineRepository->findAll(),
             'error' => $error,
@@ -67,8 +70,8 @@ class ZoneAdminController extends BaseController
         }
 
         return $this->redirectToRoute('app_zone', [
-            'zone'         => $zone,
-            'id' => $zone->getName(),
+            'zone'         => $zone->getName(),
+            'id'           => $zone->getId(),
             'productLines' => $this->productLineRepository->findAll(),
         ]);
     }

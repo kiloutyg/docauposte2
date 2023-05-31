@@ -75,23 +75,51 @@ class FrontController extends BaseController
     }
 
 
-    // Page de productline
+    // Productline page
     #[Route('/zone/{zone}/productline/{productline}', name: 'productline')]
     public function productline(string $productline = null): Response
     {
 
         $productLine = $this->productLineRepository->findoneBy(['name' => $productline]);
         $zone        = $productLine->getZone();
+        $incidents = [];
+        $incidents = $this->incidentRepository->findBy(['ProductLine' => $productLine->getId()]);
+
+        if (count($incidents) != 1) {
+
+            return $this->render(
+                'productline.html.twig',
+                [
+                    'zone'        => $zone,
+                    'categories'  => $this->categoryRepository->findAll(),
+                    'productLine' => $productLine,
+                ]
+            );
+        } else {
+            $incident = $incidents[0]->getName();
+            return $this->redirectToRoute('app_mandatory_incident', [
+                'zone' => $zone->getName(),
+                'productline' => $productLine->getName(),
+                'incident' => $incident
+            ]);
+        }
+    }
+
+    // Incident mandatory page
+    #[Route('/zone/{zone}/productline/{productline}/incident/{incident}', name: 'mandatory_incident')]
+    public function mandatoryIncident(string $incident = null): Response
+    {
+        $incident = $this->incidentRepository->findoneBy(['name' => $incident]);
+        $productLine = $incident->getProductLine();
+        $zone        = $productLine->getZone();
+
         return $this->render(
-            'productline.html.twig',
+            '/services/incidents/incidents_view.html.twig',
             [
-                'zone'        => $zone,
-                'categories'  => $this->categoryRepository->findAll(),
-                'productLine' => $productLine,
+                'incident'    => $incident,
             ]
         );
     }
-
 
     // Page de category
     #[Route('/zone/{zone}/productline/{productline}/category/{category}', name: 'category')]

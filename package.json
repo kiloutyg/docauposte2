@@ -11,7 +11,7 @@
         "@symfony/ux-turbo": "file:vendor/symfony/ux-turbo/assets",
         "@symfony/webpack-encore": "^4.3.0",
         "axios": "^1.4.0",
-        "bootstrap": "^5.2.3",
+        "bootstrap": "^5.3.0",
         "core-js": "^3.30.2",
         "encore": "^0.0.30-beta",
         "jquery": "^3.7.0",
