@@ -82,11 +82,11 @@ function preselectValues() {
   // Preselect zone
   if (zoneIdFromServer && zoneDropdown) {
     const filteredProductLines = filterData(
-      productLinesData,
+      incidentsProductLinesData,
       "zone_id",
       parseInt(zoneIdFromServer)
     );
-    populateDropdown(zoneDropdown, zonesData, zoneIdFromServer);
+    populateDropdown(zoneDropdown, incidentsZonesData, zoneIdFromServer);
     populateDropdown(
       productLineDropdown,
       filteredProductLines,
@@ -134,7 +134,7 @@ function populateDropdown(dropdown, data, selectedId) {
   });
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("turbo:load", function () {
   let createIncidentTypeButton = document.getElementById(
     "create_incident_type"
   );

@@ -224,7 +224,6 @@ document
     let filenameValue = filenameInput.value;
 
     // Add the values to formData
-
     formData.append("upload[button]", buttonValue);
     if (filenameValue) {
       formData.append("upload[filename]", filenameValue);

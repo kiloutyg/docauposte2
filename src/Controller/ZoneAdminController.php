@@ -34,16 +34,16 @@ class ZoneAdminController extends BaseController
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('zone_admin/zone_admin_index.html.twig', [
-            'groupedUploads' => $groupedUploads,
-            'groupincidents' => $groupIncidents,
-            'zone'         => $zone,
-            'productLines' => $this->productLineRepository->findAll(),
-            'error' => $error,
-            'last_username' => $lastUsername,
-            'buttons'     => $this->buttonRepository->findAll(),
-            'uploads'     => $this->uploadRepository->findAll(),
-            'users' => $this->userRepository->findAll(),
-            'incidents' => $this->incidentRepository->findAll(),
+            'groupedUploads'    => $groupedUploads,
+            'groupincidents'    => $groupIncidents,
+            'zone'              => $zone,
+            'productLines'      => $this->productLineRepository->findAll(),
+            'error'             => $error,
+            'last_username'     => $lastUsername,
+            'buttons'           => $this->buttonRepository->findAll(),
+            'uploads'           => $this->uploadRepository->findAll(),
+            'users'             => $this->userRepository->findAll(),
+            'incidents'         => $this->incidentRepository->findAll(),
 
         ]);
     }

@@ -27,12 +27,13 @@ class Incident
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $type = null;
-
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $uploaded_at = null;
+
+    #[ORM\ManyToOne(inversedBy: 'incidents')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?IncidentType $IncidentType = null;
 
     #[ORM\ManyToOne(inversedBy: 'incidents')]
     #[ORM\JoinColumn(nullable: false)]
@@ -77,14 +78,14 @@ class Incident
         return $this;
     }
 
-    public function getType(): ?string
+    public function getIncidentType(): ?IncidentType
     {
-        return $this->type;
+        return $this->IncidentType;
     }
 
-    public function setType(string $type): self
+    public function setIncidentType(?IncidentType $IncidentType): self
     {
-        $this->type = $type;
+        $this->IncidentType = $IncidentType;
 
         return $this;
     }

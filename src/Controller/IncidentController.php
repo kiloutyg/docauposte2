@@ -27,10 +27,21 @@ use App\Entity\IncidentType;
 
 class IncidentController extends FrontController
 {
-    #[Route('/incident', name: 'incident')]
-    public function index(): Response
+    // Incident mandatory page
+    #[Route('/zone/{zone}/productline/{productline}/incident/{incident}', name: 'mandatory_incident')]
+    public function mandatoryIncident(string $incident = null): Response
     {
-        return $this->render('/services/incidents/incidents.html.twig', []);
+        $incident = $this->incidentRepository->findoneBy(['name' => $incident]);
+        $productLine = $incident->getProductLine();
+        $zone        = $productLine->getZone();
+
+        return $this->render(
+            '/services/incidents/incidents_view.html.twig',
+            [
+                'incident'    => $incident,
+                'incidenttype' => $incident->getIncidentType(),
+            ]
+        );
     }
 
 
@@ -62,7 +73,7 @@ class IncidentController extends FrontController
 
     // create a route to upload a file
     #[Route('/incident_uploading', name: 'generic_upload_incident_files')]
-    public function generic_upload_files(IncidentsService $incidentsService, Request $request): Response
+    public function generic_upload_incident_files(IncidentsService $incidentsService, Request $request): Response
     {
         $this->incidentsService = $incidentsService;
         // Check if the form is submitted
@@ -71,33 +82,32 @@ class IncidentController extends FrontController
             $productline = $request->request->get('incidents_productline');
             $newname = $request->request->get('incidents_newFileName');
             $type = $request->request->get('incidents_type');
-
+            $IncidentType = $this->incidentTypeRepository->findoneBy(['id' => $type]);
 
             $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productline]);
 
             // Use the IncidentsService to handle file Incidents
-            $name = $this->incidentsService->uploadIncidentFiles($request, $productlineEntity, $newname, $type);
+            $name = $this->incidentsService->uploadIncidentFiles($request, $productlineEntity, $newname, $IncidentType);
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
 
             return $this->redirectToRoute(
                 'app_base',
                 [
-                    'zones'       => $this->zoneRepository->findAll(),
-                    'productlines' => $this->productLineRepository->findAll(),
-                    'categories'  => $this->categoryRepository->findAll(),
+                    'zones'         => $this->zoneRepository->findAll(),
+                    'productlines'  => $this->productLineRepository->findAll(),
+                    'categories'    => $this->categoryRepository->findAll(),
                     'incidents'     => $this->incidentRepository->findAll(),
                 ]
             );
         } else {
             // Show an error message if the form is not submitted
-
             $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
             return $this->redirectToRoute(
                 'app_base',
                 [
-                    'zones'       => $this->zoneRepository->findAll(),
-                    'productlines' => $this->productLineRepository->findAll(),
-                    'categories'  => $this->categoryRepository->findAll(),
+                    'zones'         => $this->zoneRepository->findAll(),
+                    'productlines'  => $this->productLineRepository->findAll(),
+                    'categories'    => $this->categoryRepository->findAll(),
                     'incidents'     => $this->incidentRepository->findAll(),
                 ]
             );

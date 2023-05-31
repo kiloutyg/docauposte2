@@ -105,21 +105,7 @@ class FrontController extends BaseController
         }
     }
 
-    // Incident mandatory page
-    #[Route('/zone/{zone}/productline/{productline}/incident/{incident}', name: 'mandatory_incident')]
-    public function mandatoryIncident(string $incident = null): Response
-    {
-        $incident = $this->incidentRepository->findoneBy(['name' => $incident]);
-        $productLine = $incident->getProductLine();
-        $zone        = $productLine->getZone();
 
-        return $this->render(
-            '/services/incidents/incidents_view.html.twig',
-            [
-                'incident'    => $incident,
-            ]
-        );
-    }
 
     // Page de category
     #[Route('/zone/{zone}/productline/{productline}/category/{category}', name: 'category')]

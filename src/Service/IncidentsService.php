@@ -44,7 +44,7 @@ class IncidentsService extends AbstractController
         $this->productlineRepository = $productlineRepository;
         $this->folderCreationService = $folderCreationService;
     }
-    public function uploadIncidentFiles(Request $request, $productline, $newName = null, $type)
+    public function uploadIncidentFiles(Request $request, $productline, $newName = null, $IncidentType)
     {
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();
@@ -68,7 +68,6 @@ class IncidentsService extends AbstractController
                 return $this->addFlash('error', 'Le fichier doit être un pdf');;
             }
 
-
             if ($newName) {
                 $name   = $newName;
             } else {
@@ -89,7 +88,7 @@ class IncidentsService extends AbstractController
             $incident->setFile(new File($path));
             $incident->setName($name);
             $incident->setPath($path);
-            $incident->setType($type);
+            $incident->setIncidentType($IncidentType);
             $incident->setProductLine($productline);
             $incident->setuploadedAt(new \DateTime());
             $this->manager->persist($incident);
@@ -125,7 +124,6 @@ class IncidentsService extends AbstractController
         $this->manager->flush();
         return $name;
     }
-
 
 
     public function modifyIncidentFile(incident $incident)

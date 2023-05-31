@@ -32,7 +32,7 @@ class ProductLine
     #[ORM\OneToMany(mappedBy: 'ProductLine', targetEntity: Category::class)]
     private Collection $categories;
 
-    #[ORM\OneToMany(mappedBy: 'product_line', targetEntity: Incident::class)]
+    #[ORM\OneToMany(mappedBy: 'ProductLine', targetEntity: Incident::class)]
     private Collection $incidents;
 
     public function __construct()
