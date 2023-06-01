@@ -11,6 +11,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 use App\Service\AccountService;
 use App\Service\UploadsService;
+use App\Service\IncidentsService;
 
 
 use App\Entity\Button;
@@ -21,9 +22,10 @@ class CategoryManagerController extends BaseController
 
     #[Route('/category_manager/{category}', name: 'app_category_manager')]
 
-    public function index(UploadsService $uploadsService, string $category = null): Response
+    public function index(IncidentsService $incidentsService, UploadsService $uploadsService, string $category = null): Response
     {
         $groupedUploads = $uploadsService->groupUploads();
+        $groupIncidents = $incidentsService->groupIncidents();
 
         $category    = $this->categoryRepository->findoneBy(['name' => $category]);
         $productLine = $category->getProductLine();
@@ -32,13 +34,16 @@ class CategoryManagerController extends BaseController
 
 
         return $this->render('category_manager/category_manager_index.html.twig', [
-            'groupedUploads' => $groupedUploads,
-            'zone'        => $zone,
-            'productLine' => $productLine,
-            'category'    => $category,
-            'buttons'     => $this->buttonRepository->findAll(),
-            'uploads'     => $this->uploadRepository->findAll(),
-            'users' => $this->userRepository->findAll(),
+            'groupedUploads'    => $groupedUploads,
+            'groupincidents'    => $groupIncidents,
+            'zone'              => $zone,
+            'productLine'       => $productLine,
+            'category'          => $category,
+            'buttons'           => $this->buttonRepository->findAll(),
+            'uploads'           => $this->uploadRepository->findAll(),
+            'users'             => $this->userRepository->findAll(),
+            'incidents'         => $this->incidentRepository->findAll(),
+
         ]);
     }
 

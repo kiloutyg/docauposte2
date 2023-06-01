@@ -143,8 +143,9 @@ document.addEventListener("turbo:load", function () {
     createIncidentTypeButton.addEventListener("click", function (e) {
       e.preventDefault();
 
-      let incidentTypeName =
-        document.getElementById("incident_type_name").value;
+      let incidentTypeName = document
+        .getElementById("incident_type_name")
+        .value.trim();
 
       let xhr = new XMLHttpRequest();
       xhr.open("POST", "/incident_type_creation");
@@ -155,14 +156,11 @@ document.addEventListener("turbo:load", function () {
           // Parse the JSON response
           let response = JSON.parse(xhr.responseText);
 
+          // Show the message to the user
+          alert(response.message);
+
           // Check if the operation was successful
           if (response.success) {
-            // Handle success, e.g. refresh dropdown, show message, etc.
-            console.log(response.message);
-
-            // Show the message to the user
-            alert(response.message);
-
             // Clear the input field after a successful submission
             document.getElementById("incident_type_name").value = "";
 

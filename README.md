@@ -15,13 +15,52 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
     
 # Latest Version : 
+## Prequesite :
+1 - Install git :
+
+    sudo yum install git
+
+2 - Add docker CE repo : 
+
+    sudo subscription-manager repo-override --repo=PlasticOmnium_Docker_Docker_CE_Stable --add=enabled:1
+
+3 - Install Docker :
+
+    sudo yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine \
+                  podman \
+                  runc
+
+    sudo yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+
+4 - Docker Post-installation Step.
+
+    sudo groupadd docker
+    sudo usermod -aG docker $USER
+
+    newgrp docker
+
+    sudo systemctl start docker
+    sudo systemctl start containerd.service
+    sudo systemctl enable docker.service
+    sudo systemctl enable containerd.service
+
+
+## Stack installation step : 
+
 
 1 - Clone the repo:
 
     git clone git@github.com:kiloutyg/docauposte2
     cd docauposte2
 
-2 - If Docker and Docker compose are installed already, just run (with or without sudo depending of Docker config":
+2 - If Docker and Docker compose are installed already, just run (with or without sudo depending of Docker config):
     
     docker compose up --build
     

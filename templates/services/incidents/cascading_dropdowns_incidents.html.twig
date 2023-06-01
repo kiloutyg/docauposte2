@@ -29,13 +29,15 @@
 	</div>
 </div>
 <br><br>
+{% if is_granted('ROLE_ADMIN') %}
 
-<div class="row mb-3">
-	<label for="incidents_newFileName" class="form-label   ">Nouveau Type d'Incident :</label>
-	<div class="col-sm">
-		<input type="text" class="form-control" id="incident_type_name" name="incident_type_name" placeholder="Entrer un nouveau type d'incident (optionnel)">
+	<div class="row mb-3">
+		<label for="incidents_newFileName" class="form-label   ">Nouveau Type d'Incident :</label>
+		<div class="col-sm">
+			<input type="text" class="form-control" id="incident_type_name" name="incident_type_name" placeholder="Entrer un nouveau type d'incident (optionnel)">
+		</div>
+		<div class="col-sm-auto">
+			<input type="button" id="create_incident_type" class="btn btn-secondary shadow border border-dark-subtle" value="Créer un nouveau type d'incident">
+		</div>
 	</div>
-	<div class="col-sm-auto">
-		<input type="button" id="create_incident_type" class="btn btn-secondary shadow border border-dark-subtle" value="Créer un nouveau type d'incident">
-	</div>
-</div>
+{% endif %}

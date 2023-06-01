@@ -85,7 +85,7 @@ class FrontController extends BaseController
         $incidents = [];
         $incidents = $this->incidentRepository->findBy(['ProductLine' => $productLine->getId()]);
 
-        if (count($incidents) != 1) {
+        if (count($incidents) == 0) {
 
             return $this->render(
                 'productline.html.twig',
@@ -96,11 +96,11 @@ class FrontController extends BaseController
                 ]
             );
         } else {
-            $incident = $incidents[0]->getName();
             return $this->redirectToRoute('app_mandatory_incident', [
                 'zone' => $zone->getName(),
                 'productline' => $productLine->getName(),
-                'incident' => $incident
+                'productLine' => $productLine,
+                'incidents' => $incidents
             ]);
         }
     }

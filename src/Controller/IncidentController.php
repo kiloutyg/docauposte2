@@ -28,18 +28,21 @@ use App\Entity\IncidentType;
 class IncidentController extends FrontController
 {
     // Incident mandatory page
-    #[Route('/zone/{zone}/productline/{productline}/incident/{incident}', name: 'mandatory_incident')]
-    public function mandatoryIncident(string $incident = null): Response
+    #[Route('/zone/{zone}/productline/{productline}/incident', name: 'mandatory_incident')]
+    public function mandatoryIncident(string $productline = null): Response
     {
-        $incident = $this->incidentRepository->findoneBy(['name' => $incident]);
-        $productLine = $incident->getProductLine();
+        $productLine = $this->productLineRepository->findoneBy(['name' => $productline]);
         $zone        = $productLine->getZone();
+        $incidents = [];
+        $incidents = $this->incidentRepository->findBy(['ProductLine' => $productLine->getId()]);
+
 
         return $this->render(
             '/services/incidents/incidents_view.html.twig',
             [
-                'incident'    => $incident,
-                'incidenttype' => $incident->getIncidentType(),
+                'incidents'    => $incidents,
+                'productLine'  => $productLine,
+
             ]
         );
     }
@@ -51,12 +54,11 @@ class IncidentController extends FrontController
         $data = json_decode($request->getContent(), true);
         $incidentTypename = $data['incident_type_name'] ?? null;
 
-        if ($incidentTypename === null) {
-            return new JsonResponse(['success' => false, 'message' => 'Le nom du type d\'incident ne peut pas être vide']);
-        }
-
         $existingIncidentType = $this->incidentTypeRepository->findOneBy(['name' => $incidentTypename]);
 
+        if (empty($incidentTypename)) {
+            return new JsonResponse(['success' => false, 'message' => 'Le nom du type d\'incident ne peut pas être vide']);
+        }
         if ($existingIncidentType) {
             return new JsonResponse(['success' => false, 'message' => 'Ce type d\'incident existe déjà']);
         } else {

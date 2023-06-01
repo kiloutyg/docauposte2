@@ -27,7 +27,7 @@
 									</h5>
 
 									<form class="form-control" method="POST" action="{{ path('app_category_manager_create_button', {category: category.name, id: category.productline.name, name: category.productline.zone.name}) }}">
-										<div class="mb-3">
+										<div class="form-control mb-3">
 											<label for="buttonname">Nom du Bouton</label>
 											<input type="text" name="buttonname" placeholder="Nom du Bouton" required class="form-control" id="buttonname">
 										</div>
@@ -96,6 +96,19 @@
 
 					<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
 						{% include "services/uploads/upload.html.twig" %}
+					</form>
+				</div>
+			</div>
+		</div>
+		<h2 class="my-4">
+			<strong>Formulaire d'ajout d'Incident :</strong>
+		</h2>
+		<div class="card border-0 shadow rounded-3 my-5">
+			<div class="card-body">
+				<div class="row">
+
+					<form action="{{path('app_generic_upload_incident_files')}}" method="POST" enctype="multipart/form-data">
+						{% include "services/incidents/incidents.html.twig" %}
 					</form>
 				</div>
 			</div>

@@ -16,6 +16,7 @@ import "./js/toast.js";
 import "./js/confirmation.js";
 import "./js/cascading-dropdowns.js";
 import "./js/incident-cascading-dropdowns.js";
+import "./js/incident-checkbox-signature.js";
 
 // import "./js/formdata.js";
 import "bootstrap";
