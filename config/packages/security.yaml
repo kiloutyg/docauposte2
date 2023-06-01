@@ -35,8 +35,17 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/master, roles: ROLE_SUPER_ADMIN}
-        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/super_admin, roles: ROLE_SUPER_ADMIN}
+        - { path: ^/zone_admin, roles: ROLE_ADMIN }
+        - { path: ^/line_admin, roles: ROLE_LINE_ADMIN }
+        - { path: ^/category_manager, roles: ROLE_MANAGER }
+        - { path: ^/modify, roles: ROLE_LINE_ADMIN }
+        - { path: ^/delete, roles: ROLE_LINE_ADMIN }
+        - { path: ^/modifyfile, roles: ROLE_LINE_ADMIN }
+        - { path: ^/uploading, roles: ROLE_LINE_ADMIN }
+        - { path: ^/uploaded, roles: ROLE_LINE_ADMIN }
+
+
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

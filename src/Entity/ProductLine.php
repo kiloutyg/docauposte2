@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
 use App\Entity\Zone;
-use App\Entity\Document;
 
 
 #[ORM\Entity(repositoryClass: ProductLineRepository::class)]
@@ -28,16 +27,18 @@ class ProductLine
     #[ORM\JoinColumn(nullable: false)]
     private ?zone $zone = null;
 
-    #[ORM\OneToMany(mappedBy: 'productline', targetEntity: Document::class, orphanRemoval: true)]
-    private Collection $documents;
 
-    #[ORM\OneToMany(mappedBy: 'productline', targetEntity: Upload::class)]
-    private Collection $uploads;
+
+    #[ORM\OneToMany(mappedBy: 'ProductLine', targetEntity: Category::class)]
+    private Collection $categories;
+
+    #[ORM\OneToMany(mappedBy: 'ProductLine', targetEntity: Incident::class)]
+    private Collection $incidents;
 
     public function __construct()
     {
-        $this->documents = new ArrayCollection();
-        $this->uploads = new ArrayCollection();
+        $this->categories = new ArrayCollection();
+        $this->incidents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -70,30 +71,31 @@ class ProductLine
         return $this;
     }
 
+
     /**
-     * @return Collection<int, Document>
+     * @return Collection<int, Category>
      */
-    public function getDocuments(): Collection
+    public function getCategories(): Collection
     {
-        return $this->documents;
+        return $this->categories;
     }
 
-    public function addDocuments(Document $documents): self
+    public function addCategory(Category $category): self
     {
-        if (!$this->documents->contains($documents)) {
-            $this->documents->add($documents);
-            $documents->setProductline($this);
+        if (!$this->categories->contains($category)) {
+            $this->categories->add($category);
+            $category->setProductLine($this);
         }
 
         return $this;
     }
 
-    public function removeDocuments(Document $documents): self
+    public function removeCategory(Category $category): self
     {
-        if ($this->documents->removeElement($documents)) {
+        if ($this->categories->removeElement($category)) {
             // set the owning side to null (unless already changed)
-            if ($documents->getProductline() === $this) {
-                $documents->setProductline(null);
+            if ($category->getProductLine() === $this) {
+                $category->setProductLine(null);
             }
         }
 
@@ -101,29 +103,29 @@ class ProductLine
     }
 
     /**
-     * @return Collection<int, Upload>
+     * @return Collection<int, Incident>
      */
-    public function getUploads(): Collection
+    public function getIncidents(): Collection
     {
-        return $this->uploads;
+        return $this->incidents;
     }
 
-    public function addUpload(Upload $upload): self
+    public function addIncident(Incident $incident): self
     {
-        if (!$this->uploads->contains($upload)) {
-            $this->uploads->add($upload);
-            $upload->setProductline($this);
+        if (!$this->incidents->contains($incident)) {
+            $this->incidents->add($incident);
+            $incident->setProductLine($this);
         }
 
         return $this;
     }
 
-    public function removeUpload(Upload $upload): self
+    public function removeIncident(Incident $incident): self
     {
-        if ($this->uploads->removeElement($upload)) {
+        if ($this->incidents->removeElement($incident)) {
             // set the owning side to null (unless already changed)
-            if ($upload->getProductline() === $this) {
-                $upload->setProductline(null);
+            if ($incident->getProductLine() === $this) {
+                $incident->setProductLine(null);
             }
         }
 

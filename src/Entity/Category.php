@@ -1,0 +1,125 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\CategoryRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: CategoryRepository::class)]
+class Category
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
+    #[ORM\ManyToOne(inversedBy: 'categories')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ProductLine $ProductLine = null;
+
+    #[ORM\OneToMany(mappedBy: 'Category', targetEntity: Button::class)]
+    private Collection $buttons;
+
+    #[ORM\OneToMany(mappedBy: 'Category', targetEntity: Signature::class)]
+    private Collection $signatures;
+
+    public function __construct()
+    {
+        $this->buttons = new ArrayCollection();
+        $this->signatures = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getProductLine(): ?ProductLine
+    {
+        return $this->ProductLine;
+    }
+
+    public function setProductLine(?ProductLine $ProductLine): self
+    {
+        $this->ProductLine = $ProductLine;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Button>
+     */
+    public function getButtons(): Collection
+    {
+        return $this->buttons;
+    }
+
+    public function addButton(Button $button): self
+    {
+        if (!$this->buttons->contains($button)) {
+            $this->buttons->add($button);
+            $button->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeButton(Button $button): self
+    {
+        if ($this->buttons->removeElement($button)) {
+            // set the owning side to null (unless already changed)
+            if ($button->getCategory() === $this) {
+                $button->setCategory(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Signature>
+     */
+    public function getSignatures(): Collection
+    {
+        return $this->signatures;
+    }
+
+    public function addSignature(Signature $signature): self
+    {
+        if (!$this->signatures->contains($signature)) {
+            $this->signatures->add($signature);
+            $signature->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSignature(Signature $signature): self
+    {
+        if ($this->signatures->removeElement($signature)) {
+            // set the owning side to null (unless already changed)
+            if ($signature->getCategory() === $this) {
+                $signature->setCategory(null);
+            }
+        }
+
+        return $this;
+    }
+}

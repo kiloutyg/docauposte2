@@ -29,7 +29,7 @@ services:
       - database
   web:
     # image: kiloutyg/po:docauposteweb
-    build: .
+    build: ./docker/
     entrypoint: "./entrypoint.sh"
     restart: unless-stopped
     volumes:

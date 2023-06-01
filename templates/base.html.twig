@@ -8,9 +8,8 @@
 			{% endblock %}
 		</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css" integrity="sha512-p0wIO77pxglJp61ES8/3Tq1xC/0JY/LdqI7k8C+OxOJwU6XYyU6Wb8Ov+Ucv7/TjXlZa5D5J5ogdA5y5YN5yQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
-		<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+		<link rel="icon" type="image/svg+xml" href="{{ asset('Plastic_Omnium.svg') }}">
+
 		{% block stylesheets %}
 			{{
             encore_entry_link_tags("app")
@@ -20,105 +19,148 @@
 			{{
             encore_entry_script_tags("app")
         }}
+			{{ encore_entry_script_tags('confirmation') }}
+			{{ encore_entry_script_tags('toast') }}
+			<script>
+				{% if zone is defined and zone is not null %}
+const zoneIdFromServer = parseInt('{{ zone.getId() }}');
+{% else %}
+const zoneIdFromServer = null;{% endif %}
+
+{% if productLine is defined and productLine is not null %}
+const productLineIdFromServer = parseInt('{{ productLine.getId() }}');
+{% else %}
+const productLineIdFromServer = null;{% endif %}
+
+{% if category is defined and category is not null %}
+const categoryIdFromServer = parseInt('{{ category.getId() }}');
+{% else %}
+const categoryIdFromServer = null;{% endif %}
+
+{% if button is defined and button is not null %}
+const buttonIdFromServer = parseInt('{{ button.getId() }}');
+{% else %}
+const buttonIdFromServer = null;{% endif %}
+			</script>
+
 		{% endblock %}
+		{% include "services/_toasts.html.twig" %}
 	</head>
-	<body>
+	<body
+		class="d-flex flex-column  min-vh-100 ">
+
 		<!-- Main Navigation -->
-		<nav class="navbar navbar-expand-lg navbar-dark mb-5" style="background-color: #1f3e52">
+		<nav class="navbar navbar-expand-lg navbar-dark flex-shrink-0" style="background-color: #1f3e52">
 			<div class="container">
 				<a class="navbar-brand" href="{{ path('app_base') }}">
 					<img class="img-fluid align-center justify-content-center" src="{{ asset('Plastic_Omnium.svg') }}" alt="Logo de PlasticOmnium" role="img" width="125"/></a>
 				<a class="navbar-brand" href="{{ path('app_base') }}">
-					<h1>
+					<h2>
 						<strong>
 							DocAuPoste
 						</strong>
-					</h1>
+					</h2>
 				</a>
+				<div></div>
 				<div class="ms-auto d-flex align-items-center">
 					{% if app.user is null %}
-						<a class="btn btn-primary" href="{{ path('app_login') }}">Login</a>
+						<a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
 					{% else %}
-						<a class="btn btn-primary" href="{{ path('app_logout') }}">Logout</a>
+						<p>
+							<strong>
+								{{ app.user.username|capitalize }}
+							</strong>
+							<a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
+						</p>
 					{% endif %}
+
 				</div>
+
 			</div>
+
 		</nav>
 		<!-- End Main Navigation -->
+		<div class="container ">
+			{% if users is defined %}
+				{% if users is empty %}
+					<h4 class="my-4">
+						<strong>Pour commencer à utiliser l'application, veuillez créer le superadministrateur :
+						</strong>
+					</h4>
+					<div class="card border-0 shadow rounded-3 my-5">
+						<div class="card-body">
+							<div class="row">
+								<form action="{{ path('app_create_super_admin') }}" method="post">
+									{% include "services/accountservices/create_account.html.twig" %}
+								</form>
+							</div>
+						</div>
+					</div>
+				{% endif %}
+			{% endif %}
 
-		<div class="container">
-			{{dump(app.session)}}
-			{{dump(app.user)}}
-			{% if app.user is not empty %}
-				{{dump(app.user.roles)}}
-			{% endif %}
-			{% if zone is defined %}
-				{{dump(zone)}}
-			{% endif %}
-			{% if productLine is defined %}
-				{{dump(productLine)}}
-			{% endif %}
-			{% if refererUrl is defined %}
-				{{dump(refererUrl)}}
-			{% endif %}
 		</div>
 
-		<div
-			class="container">
-			{# {% include "services/login_out_button.html.twig" %} #}
+		<div class="container flex-grow-1 d-flex flex-column">
+			{% include "services/navbarservices/navbarservices.html.twig" %}
+
 			{% block body %}
-				{% if app.user %}
-					{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
-						<aside>
-							<a href="{{ path('app_master') }}" class="btn" style="color:white">Master Center</a>
-						</aside>
+				<div class="inner-container flex-grow-1 d-flex flex-column">
+					{% if app.user %}
+						{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
+							<aside class="position-absolute end-0">
+								<a href="{{ path('app_super_admin') }}" class="btn" style="color:white">Centre de Super-Administration</a>
+							</aside>
+						{% endif %}
 					{% endif %}
-				{% endif %}
-				<p>
-					<h1>
-						<strong>
-							Doc Au Poste
-						</strong>
-					</h1>
-				</p>
-				<p>
-					<h3>
+					<p>
+						<h1 class="text-justify mb-2 mt-5 flex-shrink-0">
+							<strong>
+								Doc Au Poste
+							</strong>
+						</h1>
+					</p>
+
+					<h3 class="text-justify flex-shrink-0">
 						<strong>
 							Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
 					</h3>
-				</p>
-				<p>
-					<div class="d-flex flex-column ">
-						{% for zone in zones %}
-							<div class="d-flex ps-5 mb-5 mt-5  line-list">
-								<a href="{{path('app_zone', {id: zone.name})}}" <span class="line-details">>
-									{{ zone.name }}
-									<id={{zone.id}}></span>
+
+
+					<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+						<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
+							{% for zone in zones %}
+								<a class="btn btn-primary btn-lg m-5 " role="button" aria-pressed="true" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
+									<span class="line-details text-justify">
+										{{ zone.name|split('.')|first|capitalize }}
+
+									</span>
 								</a>
-							</div>
-						{% endfor %}
+							{% endfor %}
+						</div>
+
 					</div>
-				</p>
-			</div>
-		{% endblock body %}
+				</div>
+			{% endblock body %}
+		</div>
+
 		<!-- Footer -->
-		<footer class="container mt-auto py-3 border-top">
+		<footer class="container py-3 border-top  flex-shrink-0">
 			<div class="d-flex flex-wrap justify-content-between">
 				<div class="col-md-4 d-flex align-items-center">
 					<span class="me-1" style="color: red">
-						<i class="fas fa-heart"></i>
+						<i class="fas fa-copyright"></i>
 					</span>
-					<span class="text-muted me-1">The guys and gals at</span>
-					<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium</a>
+					<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium Langres</a>
 				</div>
 				<div>
-					<a href="../">
-						<i class="fa fa-arrow-circle-o-left" aria-hidden="false">Page d'Accueil</i>
+					<a href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
+						<i class="fa fa-arrow-circle-o-left" 'aria-hidden="false"'>Retour</i>
 					</a>
 				</div>
 				<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
 					<li class="ms-3">
-						<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/DocAuPoste2/tree/staging2">
+						<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/">
 							<i class="fab fa-github"></i>
 						</a>
 					</li>

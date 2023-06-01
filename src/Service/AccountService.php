@@ -45,10 +45,19 @@ class AccountService
                 $this->manager->persist($user);
                 $this->manager->flush();
 
-                return $user;
+                // return  ['user' => $user];
+
+                return  $user;
             }
         }
 
         return null;
+    }
+
+    public function deleteUser($id)
+    {
+        $user = $this->userRepository->find($id);
+        $this->manager->remove($user);
+        $this->manager->flush();
     }
 }

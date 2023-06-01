@@ -16,6 +16,7 @@ class Upload
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+
     private ?int $id = null;
 
     private ?File $file = null;
@@ -32,18 +33,19 @@ class Upload
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $uploaded_at = null;
 
+
     #[ORM\ManyToOne(inversedBy: 'uploads')]
-    private ?ProductLine $productline = null;
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Button $button = null;
+
+
 
 
 
     #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
 
 
-    public function __construct()
-    {
-        $this->downloads = new ArrayCollection();
-    }
+
 
     public function setFile(?File $file = null): void
     {
@@ -88,6 +90,16 @@ class Upload
         return $this;
     }
 
+    // #[ORM\PrePersist]
+    // #[ORM\PreUpdate]
+
+    // public function updatePath(): void
+    // {
+    //     // This is just an example, adjust it according to your actual directory structure.
+
+    //     $this->path = '/var/www/public/doc/' . $this->filename;
+    // }
+
     public function getExpiryDate(): ?\DateTimeInterface
     {
         return $this->expiry_date;
@@ -112,17 +124,46 @@ class Upload
         return $this;
     }
 
-    public function getProductline(): ?ProductLine
+
+    public function getButton(): ?Button
     {
-        return $this->productline;
+        return $this->button;
     }
 
-    public function setProductline(?ProductLine $productline): self
+    public function setButton(?Button $button): self
     {
-        $this->productline = $productline;
+        $this->button = $button;
 
         return $this;
     }
 
+    // /**
+    //  * @return Collection<int, Incident>
+    //  */
+    // public function getIncidents(): Collection
+    // {
+    //     return $this->incidents;
+    // }
 
+    // public function addIncident(Incident $incident): self
+    // {
+    //     if (!$this->incidents->contains($incident)) {
+    //         $this->incidents->add($incident);
+    //         $incident->setUpload($this);
+    //     }
+
+    //     return $this;
+    // }
+
+    // public function removeIncident(Incident $incident): self
+    // {
+    //     if ($this->incidents->removeElement($incident)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($incident->getUpload() === $this) {
+    //             $incident->setUpload(null);
+    //         }
+    //     }
+
+    //     return $this;
+    // }
 }

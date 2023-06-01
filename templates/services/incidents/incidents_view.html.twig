@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{incident.name|split('.')|first|capitalize}}
+	|
+	{{ parent() }}
+{% endblock %}
+{% block body %}
+
+	<h1>{{incident.name|split('.')|first|capitalize}}</h1>
+	<iframe class="inner-container flex-grow-1 h-100" src="{{ path('app_incident_download_file', { 'name': incident.name }) }}" width="100%" height="100%" target="_blank"></iframe>
+
+{% endblock %}

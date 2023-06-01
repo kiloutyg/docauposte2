@@ -6,10 +6,19 @@
  */
 
 // any CSS you import will output into a single css file (app.css in this case)
-import './styles/app.css';
+import "./styles/app.css";
 
 // start the Stimulus application
-import './bootstrap';
-import './toast';
+import "./bootstrap.js";
+import "./js/toast.js";
 
-console.log('Hello Stimulus!');
+// homegrown javascript
+import "./js/confirmation.js";
+import "./js/cascading-dropdowns.js";
+import "./js/incident-cascading-dropdowns.js";
+
+// import "./js/formdata.js";
+import "bootstrap";
+import "bootstrap/dist/js/bootstrap.bundle";
+
+console.log("Hello Stimulus!");

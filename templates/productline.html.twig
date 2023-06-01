@@ -1,47 +1,60 @@
 {% extends 'base.html.twig' %}
 {% block title %}
-	{{productLine.name}}
+	{{productLine.name|split('.')|first|capitalize}}
 	|
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-	<!DOCTYPE html>
-	<html>
-		<body>
-			<div class=" container  align-items-center">
+	<div class="inner-container flex-grow-1 d-flex flex-column">
 
-				<div class="container">
-					{% if app.user %}
-						{% if is_granted('ROLE_ADMIN', object = null, field = null)  %}
-							{# <a href="{{ path('app_productline_edit', {'id': productLine.name, name:productLine.zone.name}) }}" class="btn btn-primary">Edit</a>
-																												{{ include('product_line/_delete_form.html.twig') }} #}
-							<aside>
-								<a href="{{ path('app_productline_upload', {id: productLine.name, name:productLine.zone.name}) }}" class="btn" style="color:white">Upload</a>
-								<br>
-								<a href="{{path('app_upload_files', {id: productLine.name, name: productLine.zone.name})}}" class="btn" style="color:white">
-									Uploaded files
-								</a>
-							</aside>
-						{% endif %}
+		{% if app.user %}
+			{% if  is_granted('ROLE_LINE_ADMIN', object = null, field = null) %}
+				<aside class="position-absolute end-0">
+					<a href="{{ path('app_productline_admin', {productline: productLine.name}) }}" class="btn" style="color:white">Centre d'Administration de Ligne</a>
+				</aside>
+			{% endif %}
+		{% endif %}
+		<h2 class="text-justify mb-2 mt-5">
+			<strong>
+				{{ productLine.name|split('.')|first|capitalize}}
+			</strong>
+		</h2>
+		<p>
+			<div>
+				<h3 class="text-justify">Les catégories de la ligne
+					{{ productLine.name|split('.')|first|capitalize }}
+					:
+				</h3>
+				{% set matchingCategories = [] %}
+				{% for category in categories %}
+					{% if category.productLine.id is same as(productLine.id)  %}
+						{% set matchingCategories = matchingCategories|merge([category]) %}
 					{% endif %}
-
-					<h2>
-						<strong>
-							{{ productLine.name }}
-						</strong>
-					</h2>
-
-
-					<p>
-						<div class="col-12 col-md-8 ps-5 mb-5 mt-5 ">
-							<h2 class="mb-4">{{productLine.name}}</h2>
-							{{ dump(productLine) }}
-							{{ dump(productLine.zone.id) }}
-
-						</div>
-					</p>
-				</div>
+				{% endfor %}
 			</div>
-		</body>
-	</html>
-{% endblock %}
+		</p>
+		<p>
+			<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+				{% if matchingCategories|length > 0 %}
+					<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
+
+						{% for category in matchingCategories %}
+							<a class="btn btn-primary btn-lg m-5" role="button" aria-pressed="true" style="color:white" href="{{path('app_category', {category: category.name, productline: category.productline.name, zone: category.productline.zone.name} )}}">
+								<span class="line-details text-justify">
+									{{ category.name|split('.')|first|capitalize }}
+								</span>
+							</a>
+						{% endfor %}
+					</div>
+
+				{% else %}
+					<div class="alert alert-danger">
+						<a href="#" onclick="event.preventDefault(); window.history.back();">
+							Il n'y a pas de catégories dans cette ligne.
+						</a>
+					</div>
+				{% endif %}
+			</div>
+		</p>
+	</div>
+</p></div>{% endblock %}

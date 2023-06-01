@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	{{category.name|split('.')|first|capitalize}}
+	|
+	{{ parent() }}
+{% endblock %}
+{% block body %}
+	<div class="inner-container flex-grow-1 d-flex flex-column">
+
+		{% if app.user %}
+			{% if  is_granted('ROLE_MANAGER') %}
+				<aside class="position-absolute end-0">
+					<a href="{{ path('app_category_manager', {category: category.name}) }}" class="btn" style="color:white">Centre d'Administration de Catégories</a>
+
+				</aside>
+			{% endif %}
+		{% endif %}
+		<h2 class="text-justify mb-2 mt-5">
+			<strong>
+				{{ category.name|split('.')|first|capitalize}}
+			</strong>
+		</h2>
+		<p>
+			<div>
+				<h3 class="text-justify">Les boutons de la catégorie
+					{{ category.name|split('.')|first|capitalize}}
+					:
+				</h3>
+				{% set matchingButtons = [] %}
+				{% for button in buttons %}
+					{% if button.category.id is same as(category.id)  %}
+						{% set matchingButtons = matchingButtons|merge([button]) %}
+					{% endif %}
+				{% endfor %}
+			</div>
+		</p>
+		<p>
+			<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+				{% if matchingButtons|length > 0 %}
+					<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
+						{% for button in matchingButtons %}
+
+							<a class="btn btn-primary btn-lg m-5" role="button" aria-pressed="true" style="color:white" href="{{path('app_button', {button: button.name, category: button.category.name, productline: button.category.productLine.name, zone: button.category.productLine.zone.name})}}">
+								<span class="line-details text-justify">
+									{{ button.name|split('.')|first|capitalize }}
+
+								</span>
+							</a>
+
+						{% endfor %}
+					</div>
+				{% else %}
+					<div class="alert alert-danger">
+						<a href="#" onclick="event.preventDefault(); window.history.back();">
+							Il n'y a pas de boutons dans cette catégories.
+						</a>
+					</div>
+				{% endif %}
+			</div>
+		</p>
+	</div>
+{% endblock %}

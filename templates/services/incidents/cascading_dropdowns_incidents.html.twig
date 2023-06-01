@@ -1,0 +1,41 @@
+<div class="row">
+
+	<div class="col-md-2 col-sm-2 mt-2 mb-2">
+		<label for="incidents_zone" style="color:white">Zone :</label>
+	</div>
+	<div class="col-md-10 col-sm-10 mt-2 mb-2">
+		<select name="incidents_zone" id="incidents_zone" class="form-select" required>
+			<option value="" selected disabled hidden>Choisir une Zone</option>
+		</select>
+	</div>
+	<div class="col-md-2 col-sm-2 mt-2 mb-2">
+		<label for="incidents_productline" style="color:white">Ligne :</label>
+	</div>
+	<div class="col-md-10 col-sm-10 mt-2 mb-2">
+		<select name="incidents_productline" id="incidents_productline" class="form-select" required>
+			<option value="" selected disabled hidden>Choisir une Ligne</option>
+		</select>
+	</div>
+</div>
+<br>
+<div class="row">
+	<div class="col-md-2 col-sm-2 mt-2 mb-2">
+		<label for="incidents_type" style="color:white">Type d'incident :</label>
+	</div>
+	<div class="col-md-10 col-sm-10 mt-2 mb-2">
+		<select name="incidents_type" id="incidents_type" class="form-select" required>
+			<option value="" selected disabled hidden>Choisir un type d'incident</option>
+		</select>
+	</div>
+</div>
+<br><br>
+
+<div class="row mb-3">
+	<label for="incidents_newFileName" class="form-label   ">Nouveau Type d'Incident :</label>
+	<div class="col-sm">
+		<input type="text" class="form-control" id="incident_type_name" name="incident_type_name" placeholder="Entrer un nouveau type d'incident (optionnel)">
+	</div>
+	<div class="col-sm-auto">
+		<input type="button" id="create_incident_type" class="btn btn-secondary shadow border border-dark-subtle" value="Créer un nouveau type d'incident">
+	</div>
+</div>

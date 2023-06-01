@@ -44,6 +44,8 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
 8 - At this point you can begin to configure the App depending on your need. 
 
+9 - Modify the value of post_max_size  and upload_max_filesize of the correct php.ini in /usr/local/etc/php respectively line 701 and 853 in the dev one, or line 703 and 855 in the production one.
+
 
 ### Run With Docker.
 
