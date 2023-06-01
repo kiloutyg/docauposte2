@@ -25,13 +25,11 @@ class Category
     #[ORM\OneToMany(mappedBy: 'Category', targetEntity: Button::class)]
     private Collection $buttons;
 
-    #[ORM\OneToMany(mappedBy: 'Category', targetEntity: Signature::class)]
-    private Collection $signatures;
+
 
     public function __construct()
     {
         $this->buttons = new ArrayCollection();
-        $this->signatures = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -87,36 +85,6 @@ class Category
             // set the owning side to null (unless already changed)
             if ($button->getCategory() === $this) {
                 $button->setCategory(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Signature>
-     */
-    public function getSignatures(): Collection
-    {
-        return $this->signatures;
-    }
-
-    public function addSignature(Signature $signature): self
-    {
-        if (!$this->signatures->contains($signature)) {
-            $this->signatures->add($signature);
-            $signature->setCategory($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSignature(Signature $signature): self
-    {
-        if ($this->signatures->removeElement($signature)) {
-            // set the owning side to null (unless already changed)
-            if ($signature->getCategory() === $this) {
-                $signature->setCategory(null);
             }
         }
 
