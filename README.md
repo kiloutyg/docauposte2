@@ -13,7 +13,7 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
     3 - Clone the repo locally in the directory of your choosing. 
     4 - Done ! Your ready to go. 
 
-    
+### Run With Docker.    
 # Latest Version : 
 ## Prequesite :
 1 - Install git :
@@ -86,10 +86,10 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 9 - Modify the value of post_max_size  and upload_max_filesize of the correct php.ini in /usr/local/etc/php respectively line 701 and 853 in the dev one, or line 703 and 855 in the production one.
 
 
-### Run With Docker.
 
 
-#### First version, development version. 
+
+#### First version, development version. DO NOT RUN IT LIKE THIS.
 
     1 - After cloning the git repo, create a directory namde database_data
     2 - modify your pass in the DotEnv file
