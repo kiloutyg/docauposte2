@@ -17,28 +17,19 @@
 		{% endblock %}
 		{% block javascripts %}
 			{{
-            encore_entry_script_tags("app")
-        }}
+			            encore_entry_script_tags("app")
+			        }}
 			{{ encore_entry_script_tags('confirmation') }}
 			{{ encore_entry_script_tags('toast') }}
 			<script>
 				{% if zone is defined and zone is not null %}
 const zoneIdFromServer = parseInt('{{ zone.getId() }}');
 {% else %}
-const zoneIdFromServer = null;{% endif %}
-
-{% if productLine is defined and productLine is not null %}
-const productLineIdFromServer = parseInt('{{ productLine.getId() }}');
+const zoneIdFromServer = null;{% endif %}{% if productLine is defined and productLine is not null %}const productLineIdFromServer = parseInt('{{ productLine.getId() }}');
 {% else %}
-const productLineIdFromServer = null;{% endif %}
-
-{% if category is defined and category is not null %}
-const categoryIdFromServer = parseInt('{{ category.getId() }}');
+const productLineIdFromServer = null;{% endif %}{% if category is defined and category is not null %}const categoryIdFromServer = parseInt('{{ category.getId() }}');
 {% else %}
-const categoryIdFromServer = null;{% endif %}
-
-{% if button is defined and button is not null %}
-const buttonIdFromServer = parseInt('{{ button.getId() }}');
+const categoryIdFromServer = null;{% endif %}{% if button is defined and button is not null %}const buttonIdFromServer = parseInt('{{ button.getId() }}');
 {% else %}
 const buttonIdFromServer = null;{% endif %}
 			</script>

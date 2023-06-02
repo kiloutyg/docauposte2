@@ -17,7 +17,6 @@ use App\Repository\UserRepository;
 use App\Repository\UploadRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ButtonRepository;
-use App\Repository\SignatureRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentTypeRepository;
 
@@ -56,7 +55,6 @@ class BaseController extends AbstractController
     protected $session;
     protected $categoryRepository;
     protected $buttonRepository;
-    protected $signatureRepository;
     protected $entitydeletionService;
     protected $accountService;
     protected $uploadsService;
@@ -82,7 +80,6 @@ class BaseController extends AbstractController
         UserPasswordHasherInterface $passwordHasher,
         CategoryRepository          $categoryRepository,
         ButtonRepository            $buttonRepository,
-        SignatureRepository         $signatureRepository,
         EntityDeletionService       $entitydeletionService,
         AccountService              $accountService,
         UploadsService              $uploadsServices,
@@ -101,7 +98,6 @@ class BaseController extends AbstractController
         $this->userRepository         = $userRepository;
         $this->categoryRepository     = $categoryRepository;
         $this->buttonRepository       = $buttonRepository;
-        $this->signatureRepository    = $signatureRepository;
         $this->em                     = $em;
         $this->requestStack           = $requestStack;
         $this->security               = $security;

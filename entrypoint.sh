@@ -10,6 +10,7 @@ composer clear-cache
 chmod 777 . -R -v
 # yarn encore production &
 php bin/console make:migration
+php bin/console doctrine:migrations:migrate -y
 
 exec apache2-foreground  &
 # yarn watch &

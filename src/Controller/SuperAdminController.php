@@ -41,6 +41,7 @@ class SuperAdminController extends BaseController
             'uploads'     => $this->uploadRepository->findAll(),
             'users' => $this->userRepository->findAll(),
             'incidents' => $this->incidentRepository->findAll(),
+            'incidentTypes' => $this->incidentTypeRepository->findAll(),
 
         ]);
     }
@@ -62,11 +63,11 @@ class SuperAdminController extends BaseController
         }
 
         return $this->redirectToRoute('app_super_admin', [
-            'buttons'     => $this->buttonRepository->findAll(),
-            'uploads'     => $this->uploadRepository->findAll(),
-            'error' => $error,
-            'zones' => $this->zoneRepository->findAll(),
-            'users' => $this->userRepository->findAll()
+            'buttons'       => $this->buttonRepository->findAll(),
+            'uploads'       => $this->uploadRepository->findAll(),
+            'error'         => $error,
+            'zones'         => $this->zoneRepository->findAll(),
+            'users'         => $this->userRepository->findAll()
         ]);
     }
 
@@ -77,14 +78,22 @@ class SuperAdminController extends BaseController
     {
         // Create a zone
         if ($request->getMethod() == 'POST') {
-            $zonename = $request->request->get('zonename');
+            $zonename = trim($request->request->get('zonename'));
+            $zone = $this->zoneRepository->findOneBy(['name' => $zonename]);
+            if (empty($zonename)) {
+                $this->addFlash('danger', 'Le nom de la Zone ne peut être vide');
+                return $this->redirectToRoute('app_super_admin', [
+                    'zones' => $this->zoneRepository->findAll(),
+                    'users' => $this->userRepository->findAll()
+                ]);
+            }
+
             if (!file_exists($this->public_dir . '/doc/')) {
                 mkdir($this->public_dir . '/doc/', 0777, true);
             }
 
-            $zone = $this->zoneRepository->findOneBy(['name' => $zonename]);
             if ($zone) {
-                $this->addFlash('danger', 'Zone already exists');
+                $this->addFlash('danger', 'La zone existe déjà');
                 return $this->redirectToRoute('app_super_admin', [
                     'zones' => $this->zoneRepository->findAll(),
                     'users' => $this->userRepository->findAll()
@@ -95,7 +104,7 @@ class SuperAdminController extends BaseController
                 $this->em->persist($zone);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($zonename);
-                $this->addFlash('success', 'Zone has been created');
+                $this->addFlash('success', 'La zone a été créee');
                 return $this->redirectToRoute('app_super_admin', [
                     'zones' => $this->zoneRepository->findAll(),
                     'users' => $this->userRepository->findAll()

@@ -44,6 +44,8 @@ class ZoneAdminController extends BaseController
             'uploads'           => $this->uploadRepository->findAll(),
             'users'             => $this->userRepository->findAll(),
             'incidents'         => $this->incidentRepository->findAll(),
+            'incidentTypes' => $this->incidentTypeRepository->findAll(),
+
 
         ]);
     }

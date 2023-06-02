@@ -7,6 +7,10 @@ window.addEventListener("turbo:load", () => {
   const deleteButtonButtons = document.querySelectorAll(".delete-button");
   const deleteUserButtons = document.querySelectorAll(".delete-user");
   const deleteUploadButtons = document.querySelectorAll(".delete-upload");
+  const deleteIncidentButtons = document.querySelectorAll(".delete-incident");
+  const deleteIncidentTypeButtons = document.querySelectorAll(
+    ".delete-incidentType"
+  );
 
   const confirmationHandler = (event, message) => {
     const confirmed = confirm(message);
@@ -61,6 +65,22 @@ window.addEventListener("turbo:load", () => {
       confirmationHandler(
         event,
         "Êtes vous sûr de vouloir supprimer ce Document?"
+      );
+    });
+  });
+  deleteIncidentButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "Êtes vous sûr de vouloir supprimer cet Incident?"
+      );
+    });
+  });
+  deleteIncidentTypeButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "Êtes vous sûr de vouloir supprimer ce Type d'Incident?"
       );
     });
   });
