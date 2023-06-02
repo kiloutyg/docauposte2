@@ -1,21 +1,30 @@
-{% extends 'base.html.twig' %}
-{% block title %}
-	{{productLine.name|split('.')|first|capitalize}}
-	|
-	{{ parent() }}
+{% block stylesheets %}
+	{{
+            encore_entry_link_tags("app")
+        }}
 {% endblock %}
 {% block body %}
-	{% for incident in incidents %}
-		<div>
-			<h1>{{incident.incidenttype.name|split('.')|first|capitalize}}</h1>
-			<h2>{{incident.name|split('.')|first|capitalize}}</h2>
-			<iframe src="{{ path('app_incident_download_file', { 'name': incident.name }) }}" width="100%" height="970" target="_blank"></iframe>
-			<input class="checkbox-input" type="checkbox" id="checkbox{{ loop.index }}">
+	<div class="d-flex align-items-center  flex-row">
+
+		<iframe src="{{ path('app_incident_download_file', { 'name': incident.name }) }}" width="69%" height="950" target="_blank"></iframe>
+		<div style="width: 7%"></div>
+		<div style="width: 17%" class="text-center">
+
+			<h1>
+				<strong>{{incident.name|split('.')|first|upper}}</strong>
+			</h1>
+			<h3>
+				{{incidentType.name|split('.')|first|upper}}
+
+				<div style="height: 40vh;"></div>
+				<a href="{{ path('app_mandatory_incident', {'incidentid': nextIncidentId, 'zone' : zone , 'productline' : productline})}}" class="btn btn-warning btn-lg">
+					<strong>Ok, J'ai compris</strong>
+				</a>
+				<div style="height: 10vh;"></div>
+				<a href="javascript:void(0)" class="btn btn-secondary" onclick="event.preventDefault(); window.history.back();" style="color:black">Retour
+				</a>
+			</div>
+			<div style="width: 6%"></div>
+
 		</div>
-	{% endfor %}
-	<input class="text-input" type="text" id="inputField" style="display: none;" placeholder="Enter text here...">
-	<button id="nextButton" style="display: none;">Next</button>
-{% endblock %}
-{% block javascript %}
-	{{ encore_entry_script_tags('incident-checkbox-signature') }}
-{% endblock %}
+	{% endblock %}

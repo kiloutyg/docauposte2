@@ -148,7 +148,7 @@ document.addEventListener("turbo:load", function () {
         .value.trim();
 
       let xhr = new XMLHttpRequest();
-      xhr.open("POST", "/incident_type_creation");
+      xhr.open("POST", "/incident/incident_type_creation");
       xhr.setRequestHeader("Content-Type", "application/json");
 
       xhr.onload = function () {

@@ -83,7 +83,13 @@ class FrontController extends BaseController
         $productLine = $this->productLineRepository->findoneBy(['name' => $productline]);
         $zone        = $productLine->getZone();
         $incidents = [];
-        $incidents = $this->incidentRepository->findBy(['ProductLine' => $productLine->getId()]);
+        $incidents = $this->incidentRepository->findBy(
+            ['ProductLine' => $productLine->getId()],
+            ['id' => 'ASC'] // order by id ascending
+        );
+
+        $incidentid = count($incidents) > 0 ? $incidents[0]->getId() : null;
+
 
         if (count($incidents) == 0) {
 
@@ -99,8 +105,7 @@ class FrontController extends BaseController
             return $this->redirectToRoute('app_mandatory_incident', [
                 'zone' => $zone->getName(),
                 'productline' => $productLine->getName(),
-                'productLine' => $productLine,
-                'incidents' => $incidents
+                'incidentid' => $incidentid
             ]);
         }
     }

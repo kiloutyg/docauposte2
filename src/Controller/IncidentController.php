@@ -27,28 +27,67 @@ use App\Entity\IncidentType;
 
 class IncidentController extends FrontController
 {
-    // Incident mandatory page
-    #[Route('/zone/{zone}/productline/{productline}/incident', name: 'mandatory_incident')]
-    public function mandatoryIncident(string $productline = null): Response
+    #[Route('/zone/{zone}/productline/{productline}/incident/{incidentid}', name: 'mandatory_incident')]
+    public function mandatoryIncident(string $productline = null, int $incidentid = null): Response
     {
-        $productLine = $this->productLineRepository->findoneBy(['name' => $productline]);
+        $incidentEntity = $this->incidentRepository->findOneBy(['id' => $incidentid]);
+        if (!$incidentEntity) {
+            $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
+        } else {
+            $productLine = $incidentEntity->getProductLine();
+        }
+
         $zone        = $productLine->getZone();
         $incidents = [];
-        $incidents = $this->incidentRepository->findBy(['ProductLine' => $productLine->getId()]);
 
-
-        return $this->render(
-            '/services/incidents/incidents_view.html.twig',
-            [
-                'incidents'    => $incidents,
-                'productLine'  => $productLine,
-
-            ]
+        $incidents = $this->incidentRepository->findBy(
+            ['ProductLine' => $productLine->getId()],
+            ['id' => 'ASC'] // order by id ascending
         );
+
+        $incidentIds = array_map(function ($incident) {
+            return $incident->getId();
+        }, $incidents);
+
+        $currentIncidentKey = array_search($incidentid, $incidentIds);
+        $incident = $incidents[$currentIncidentKey];
+        if ($currentIncidentKey === false) {
+            $incident = null;
+        }
+
+        $nextIncidentKey = $currentIncidentKey + 1;
+
+        $nextIncident  = isset($incidents[$nextIncidentKey]) ? $incidents[$nextIncidentKey] : null;
+
+        if ($incident) {
+            return $this->render(
+                '/services/incidents/incidents_view.html.twig',
+                [
+                    'incidentid'    => $incident ? $incident->getId() : null,
+                    'incident'      => $incident,
+                    // ? $incident->getName() : null,
+                    'incidentType' => $incident ? $incident->getIncidentType() : null,
+                    'incidents'     => $incidents,
+                    'productline'   => $productLine->getName(),
+                    'zone'          => $zone->getName(),
+                    'nextIncidentId' => $nextIncident ? $nextIncident->getId() : null
+                ]
+
+            );
+        } else {
+            return $this->render(
+                'productline.html.twig',
+                [
+                    'zone'        => $zone,
+                    'categories'  => $this->categoryRepository->findAll(),
+                    'productLine' => $productLine,
+                ]
+            );
+        }
     }
 
 
-    #[Route('/incident_type_creation', name: 'incident_type_creation')]
+    #[Route('/incident/incident_type_creation', name: 'incident_type_creation')]
     public function incidentTypeCreation(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -71,10 +110,28 @@ class IncidentController extends FrontController
         }
     }
 
+    // Create a route for incidentType deletion
+    #[Route('/delete/incident_type_deletion/{incidentType}', name: 'incident_type_deletion')]
+    public function incidentTypeDeletion(string $incidentType): Response
+    {
+        $entityType = "incidentType";
+        $entityid = $this->incidentTypeRepository->findOneBy(['name' => $incidentType]);
+        $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
+
+        if ($entity == true) {
+
+            $this->addFlash('success', $entityType . ' has been deleted');
+            return $this->redirectToRoute('app_super_admin', []);
+        } else {
+            $this->addFlash('danger',  $entityType . '  does not exist');
+            return $this->redirectToRoute('app_super_admin', []);
+        }
+    }
+
 
 
     // create a route to upload a file
-    #[Route('/incident_uploading', name: 'generic_upload_incident_files')]
+    #[Route('/incident/incident_uploading', name: 'generic_upload_incident_files')]
     public function generic_upload_incident_files(IncidentsService $incidentsService, Request $request): Response
     {
         $this->incidentsService = $incidentsService;
@@ -89,7 +146,7 @@ class IncidentController extends FrontController
             $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productline]);
 
             // Use the IncidentsService to handle file Incidents
-            $name = $this->incidentsService->uploadIncidentFiles($request, $productlineEntity, $newname, $IncidentType);
+            $name = $this->incidentsService->uploadIncidentFiles($request, $productlineEntity, $IncidentType, $newname);
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
 
             return $this->redirectToRoute(

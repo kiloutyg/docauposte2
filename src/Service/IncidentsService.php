@@ -44,11 +44,12 @@ class IncidentsService extends AbstractController
         $this->productlineRepository = $productlineRepository;
         $this->folderCreationService = $folderCreationService;
     }
-    public function uploadIncidentFiles(Request $request, $productline, $newName = null, $IncidentType)
+    public function uploadIncidentFiles(Request $request, $productline,  $IncidentType, $newName = null)
     {
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();
         $public_dir = $this->projectDir . '/public';
+        // $IncidentType = $IncidentTypeEntity->getId();
 
         foreach ($files as $file) {
 
@@ -75,9 +76,9 @@ class IncidentsService extends AbstractController
             }
 
             // Add .pdf extension if it is missing
-            if (strtolower(pathinfo($name, PATHINFO_EXTENSION)) !== 'pdf') {
-                $name .= '.pdf';
-            }
+            // if (strtolower(pathinfo($name, PATHINFO_EXTENSION)) !== 'pdf') {
+            //     $name .= '.pdf';
+            // }
 
             $path       = $folderPath . '/' . $name;
             $file->move($folderPath . '/', $name);

@@ -12,8 +12,10 @@ use App\Repository\CategoryRepository;
 use App\Repository\ButtonRepository;
 use App\Repository\UploadRepository;
 use App\Repository\IncidentRepository;
+use App\Repository\IncidentTypeRepository;
 
 use App\Service\UploadsService;
+use App\Service\IncidentsService;
 
 class EntityDeletionService
 {
@@ -25,6 +27,8 @@ class EntityDeletionService
     private $uploadRepository;
     private $uploadsService;
     private $incidentRepository;
+    private $incidentTypeRepository;
+    private $incidentService;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -34,7 +38,9 @@ class EntityDeletionService
         ButtonRepository $buttonRepository,
         UploadRepository $uploadRepository,
         IncidentRepository $incidentRepository,
-        UploadsService $uploadsService
+        UploadsService $uploadsService,
+        IncidentTypeRepository $incidentTypeRepository,
+        IncidentsService $incidentsService,
     ) {
         $this->em = $em;
         $this->zoneRepository = $zoneRepository;
@@ -44,6 +50,8 @@ class EntityDeletionService
         $this->uploadRepository = $uploadRepository;
         $this->uploadsService = $uploadsService;
         $this->incidentRepository = $incidentRepository;
+        $this->incidentTypeRepository = $incidentTypeRepository;
+        $this->incidentService = $incidentsService;
     }
 
     public function deleteEntity(string $entityType, int $id): bool
@@ -69,6 +77,9 @@ class EntityDeletionService
                 break;
             case 'incident':
                 $repository = $this->incidentRepository;
+                break;
+            case 'incidentType':
+                $repository = $this->incidentTypeRepository;
                 break;
         }
 
@@ -101,8 +112,14 @@ class EntityDeletionService
             foreach ($entity->getUploads() as $upload) {
                 $this->deleteEntity('upload', $upload->getId());
             }
+        } elseif ($entityType === 'incidentType') {
+            foreach ($entity->getIncidents() as $incident) {
+                $this->deleteEntity('incident', $incident->getId());
+            }
         } elseif ($entityType === 'upload') {
             $this->uploadsService->deleteFile($entity->getFilename(), $entity->getButton()->getId());
+        } elseif ($entityType === 'incident') {
+            $this->incidentService->deleteIncidentFile($entity->getName(), $entity->getProductLine());
         }
         $this->em->remove($entity);
         $this->em->flush();

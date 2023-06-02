@@ -30,7 +30,6 @@
 </div>
 <br><br>
 {% if is_granted('ROLE_ADMIN') %}
-
 	<div class="row mb-3">
 		<label for="incidents_newFileName" class="form-label   ">Nouveau Type d'Incident :</label>
 		<div class="col-sm">
@@ -40,4 +39,13 @@
 			<input type="button" id="create_incident_type" class="btn btn-secondary shadow border border-dark-subtle" value="Créer un nouveau type d'incident">
 		</div>
 	</div>
+	{% for incidentType in incidentTypes %}
+		<div class="row mb-3">
+			<li class="form-control shadow d-flex justify-content-between align-items-center">
+				{{incidentType.name|split('.')|first|capitalize}}
+				<a href="{{ path('app_incident_type_deletion', {incidentType : incidentType.name}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-incidentType">supprimer</a>
+			</li>
+
+		</div>
+	{% endfor %}
 {% endif %}

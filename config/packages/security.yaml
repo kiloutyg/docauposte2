@@ -41,9 +41,13 @@ security:
         - { path: ^/category_manager, roles: ROLE_MANAGER }
         - { path: ^/modify, roles: ROLE_LINE_ADMIN }
         - { path: ^/delete, roles: ROLE_LINE_ADMIN }
+
         - { path: ^/modifyfile, roles: ROLE_LINE_ADMIN }
         - { path: ^/uploading, roles: ROLE_LINE_ADMIN }
         - { path: ^/uploaded, roles: ROLE_LINE_ADMIN }
+
+        - { path: ^/incident, roles: ROLE_SUPER_ADMIN }
+
 
 
         # - { path: ^/profile, roles: ROLE_USER }
