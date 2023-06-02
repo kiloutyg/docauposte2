@@ -57,8 +57,9 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
 1 - Clone the repo:
 
-    git clone git@github.com:kiloutyg/docauposte2
+    git clone https://github.com/kiloutyg/docauposte2
     cd docauposte2
+
 
 2 - If Docker and Docker compose are installed already, just run (with or without sudo depending of Docker config):
     
