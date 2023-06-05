@@ -46,7 +46,7 @@ class ProductLineAdminController extends BaseController
             'users'             => $this->userRepository->findAll(),
             'buttons'           => $this->buttonRepository->findAll(),
             'incidents'         => $this->incidentRepository->findAll(),
-            'incidentTypes' => $this->incidentTypeRepository->findAll(),
+            'incidentCategories' => $this->incidentCategoryRepository->findAll(),
 
         ]);
     }

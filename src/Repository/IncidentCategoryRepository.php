@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\IncidentType;
+use App\Entity\IncidentCategory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<IncidentType>
+ * @extends ServiceEntityRepository<IncidentCategory>
  *
- * @method IncidentType|null find($id, $lockMode = null, $lockVersion = null)
- * @method IncidentType|null findOneBy(array $criteria, array $orderBy = null)
- * @method IncidentType[]    findAll()
- * @method IncidentType[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method IncidentCategory|null find($id, $lockMode = null, $lockVersion = null)
+ * @method IncidentCategory|null findOneBy(array $criteria, array $orderBy = null)
+ * @method IncidentCategory[]    findAll()
+ * @method IncidentCategory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class IncidentTypeRepository extends ServiceEntityRepository
+class IncidentCategoryRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, IncidentType::class);
+        parent::__construct($registry, IncidentCategory::class);
     }
 
-    public function save(IncidentType $entity, bool $flush = false): void
+    public function save(IncidentCategory $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class IncidentTypeRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(IncidentType $entity, bool $flush = false): void
+    public function remove(IncidentCategory $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class IncidentTypeRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return IncidentType[] Returns an array of IncidentType objects
+//     * @return IncidentCategory[] Returns an array of IncidentCategory objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class IncidentTypeRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?IncidentType
+//    public function findOneBySomeField($value): ?IncidentCategory
 //    {
 //        return $this->createQueryBuilder('i')
 //            ->andWhere('i.exampleField = :val')

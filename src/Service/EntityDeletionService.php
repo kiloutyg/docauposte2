@@ -12,7 +12,7 @@ use App\Repository\CategoryRepository;
 use App\Repository\ButtonRepository;
 use App\Repository\UploadRepository;
 use App\Repository\IncidentRepository;
-use App\Repository\IncidentTypeRepository;
+use App\Repository\IncidentCategoryRepository;
 
 use App\Service\UploadsService;
 use App\Service\IncidentsService;
@@ -27,7 +27,7 @@ class EntityDeletionService
     private $uploadRepository;
     private $uploadsService;
     private $incidentRepository;
-    private $incidentTypeRepository;
+    private $incidentCategoryRepository;
     private $incidentService;
 
     public function __construct(
@@ -39,7 +39,7 @@ class EntityDeletionService
         UploadRepository $uploadRepository,
         IncidentRepository $incidentRepository,
         UploadsService $uploadsService,
-        IncidentTypeRepository $incidentTypeRepository,
+        IncidentCategoryRepository $incidentCategoryRepository,
         IncidentsService $incidentsService,
     ) {
         $this->em = $em;
@@ -50,7 +50,7 @@ class EntityDeletionService
         $this->uploadRepository = $uploadRepository;
         $this->uploadsService = $uploadsService;
         $this->incidentRepository = $incidentRepository;
-        $this->incidentTypeRepository = $incidentTypeRepository;
+        $this->incidentCategoryRepository = $incidentCategoryRepository;
         $this->incidentService = $incidentsService;
     }
 
@@ -78,8 +78,8 @@ class EntityDeletionService
             case 'incident':
                 $repository = $this->incidentRepository;
                 break;
-            case 'incidentType':
-                $repository = $this->incidentTypeRepository;
+            case 'incidentCategory':
+                $repository = $this->incidentCategoryRepository;
                 break;
         }
 
@@ -112,7 +112,7 @@ class EntityDeletionService
             foreach ($entity->getUploads() as $upload) {
                 $this->deleteEntity('upload', $upload->getId());
             }
-        } elseif ($entityType === 'incidentType') {
+        } elseif ($entityType === 'incidentCategory') {
             foreach ($entity->getIncidents() as $incident) {
                 $this->deleteEntity('incident', $incident->getId());
             }

@@ -14,7 +14,7 @@
 				<strong>{{incident.name|split('.')|first|upper}}</strong>
 			</h1>
 			<h3>
-				{{incidentType.name|split('.')|first|upper}}
+				{{incidentCategory.name|split('.')|first|upper}}
 
 				<div style="height: 40vh;"></div>
 				<a href="{{ path('app_mandatory_incident', {'incidentid': nextIncidentId, 'zone' : zone , 'productline' : productline})}}" class="btn btn-warning btn-lg">

@@ -1,7 +1,7 @@
 // Remove the hardcoded data from your JavaScript file
 let incidentsZonesData = [];
 let incidentsProductLinesData = [];
-let incidentsTypesData = [];
+let incidentsCategoriesData = [];
 
 // Fetch data from the API endpoint
 fetch("/api/incidents_cascading_dropdown_data")
@@ -9,7 +9,7 @@ fetch("/api/incidents_cascading_dropdown_data")
   .then((data) => {
     incidentsZonesData = data.zones;
     incidentsProductLinesData = data.productLines;
-    incidentsTypesData = data.types;
+    incidentsCategoriesData = data.categories;
 
     // Call the function that initializes the cascading dropdowns
     // after the data has been fetched
@@ -23,11 +23,11 @@ fetch("/api/incidents_cascading_dropdown_data")
 function initCascadingDropdowns() {
   const zone = document.getElementById("incidents_zone");
   const productline = document.getElementById("incidents_productline");
-  const type = document.getElementById("incidents_type");
+  const category = document.getElementById("incidents_category");
 
-  if (zone && productline && type) {
+  if (zone && productline && category) {
     zone.addEventListener("change", handleIncidentsZoneChange);
-    populateDropdown(type, incidentsTypesData); // Populate 'type' dropdown here
+    populateDropdown(category, incidentsCategoriesData); // Populate 'category' dropdown here
   } else {
     console.error("One or more elements not found");
   }
@@ -51,11 +51,11 @@ function handleIncidentsZoneChange(event) {
 function resetDropdowns() {
   const zone = document.getElementById("incidents_zone");
   const productline = document.getElementById("incidents_productline");
-  const type = document.getElementById("incidents_type");
+  const category = document.getElementById("incidents_category");
 
   if (zone) zone.selectedIndex = 0;
   if (productline) productline.selectedIndex = 0;
-  if (type) type.selectedIndex = 0;
+  if (category) category.selectedIndex = 0;
 }
 
 // Existing turbo:load event listener and preselectValues function here...
@@ -135,20 +135,20 @@ function populateDropdown(dropdown, data, selectedId) {
 }
 
 document.addEventListener("turbo:load", function () {
-  let createIncidentTypeButton = document.getElementById(
-    "create_incident_type"
+  let createIncidentCategoryButton = document.getElementById(
+    "create_incident_category"
   );
 
-  if (createIncidentTypeButton) {
-    createIncidentTypeButton.addEventListener("click", function (e) {
+  if (createIncidentCategoryButton) {
+    createIncidentCategoryButton.addEventListener("click", function (e) {
       e.preventDefault();
 
-      let incidentTypeName = document
-        .getElementById("incident_type_name")
+      let incidentCategoryName = document
+        .getElementById("incident_category_name")
         .value.trim();
 
       let xhr = new XMLHttpRequest();
-      xhr.open("POST", "/incident/incident_type_creation");
+      xhr.open("POST", "/incident/incident_category_creation");
       xhr.setRequestHeader("Content-Type", "application/json");
 
       xhr.onload = function () {
@@ -162,7 +162,7 @@ document.addEventListener("turbo:load", function () {
           // Check if the operation was successful
           if (response.success) {
             // Clear the input field after a successful submission
-            document.getElementById("incident_type_name").value = "";
+            document.getElementById("incident_category_name").value = "";
 
             // Force a reload of the page
             location.reload();
@@ -183,7 +183,7 @@ document.addEventListener("turbo:load", function () {
 
       xhr.send(
         JSON.stringify({
-          incident_type_name: incidentTypeName,
+          incident_category_name: incidentCategoryName,
         })
       );
     });

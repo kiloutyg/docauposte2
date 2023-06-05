@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\IncidentTypeRepository;
+use App\Repository\IncidentCategoryRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-#[ORM\Entity(repositoryClass: IncidentTypeRepository::class)]
-class IncidentType
+#[ORM\Entity(repositoryClass: IncidentCategoryRepository::class)]
+class IncidentCategory
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -18,7 +18,7 @@ class IncidentType
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'IncidentType', targetEntity: Incident::class)]
+    #[ORM\OneToMany(mappedBy: 'IncidentCategory', targetEntity: Incident::class)]
     private Collection $incidents;
     public function __construct()
     {
@@ -54,7 +54,7 @@ class IncidentType
     {
         if (!$this->incidents->contains($incident)) {
             $this->incidents->add($incident);
-            $incident->setIncidentType($this);
+            $incident->setIncidentCategory($this);
         }
 
         return $this;
@@ -64,8 +64,8 @@ class IncidentType
     {
         if ($this->incidents->removeElement($incident)) {
             // set the owning side to null (unless already changed)
-            if ($incident->getIncidentType() === $this) {
-                $incident->setIncidentType(null);
+            if ($incident->getIncidentCategory() === $this) {
+                $incident->setIncidentCategory(null);
             }
         }
 

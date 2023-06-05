@@ -8,8 +8,8 @@ window.addEventListener("turbo:load", () => {
   const deleteUserButtons = document.querySelectorAll(".delete-user");
   const deleteUploadButtons = document.querySelectorAll(".delete-upload");
   const deleteIncidentButtons = document.querySelectorAll(".delete-incident");
-  const deleteIncidentTypeButtons = document.querySelectorAll(
-    ".delete-incidentType"
+  const deleteIncidentCategoryButtons = document.querySelectorAll(
+    ".delete-incidentCategory"
   );
 
   const confirmationHandler = (event, message) => {
@@ -76,7 +76,7 @@ window.addEventListener("turbo:load", () => {
       );
     });
   });
-  deleteIncidentTypeButtons.forEach((button) => {
+  deleteIncidentCategoryButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
       confirmationHandler(
         event,

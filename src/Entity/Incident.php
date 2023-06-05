@@ -33,7 +33,7 @@ class Incident
 
     #[ORM\ManyToOne(inversedBy: 'incidents')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?IncidentType $IncidentType = null;
+    private ?IncidentCategory $IncidentCategory = null;
 
     #[ORM\ManyToOne(inversedBy: 'incidents')]
     #[ORM\JoinColumn(nullable: false)]
@@ -78,14 +78,14 @@ class Incident
         return $this;
     }
 
-    public function getIncidentType(): ?IncidentType
+    public function getIncidentCategory(): ?IncidentCategory
     {
-        return $this->IncidentType;
+        return $this->IncidentCategory;
     }
 
-    public function setIncidentType(?IncidentType $IncidentType): self
+    public function setIncidentCategory(?IncidentCategory $IncidentCategory): self
     {
-        $this->IncidentType = $IncidentType;
+        $this->IncidentCategory = $IncidentCategory;
 
         return $this;
     }

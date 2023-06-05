@@ -77,9 +77,9 @@ class UploadsService extends AbstractController
             }
 
             // Add .pdf extension if it is missing
-            if (strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'pdf') {
-                $filename .= '.pdf';
-            }
+            // if (strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'pdf') {
+            //     $filename .= '.pdf';
+            // }
 
             $path       = $folderPath . '/' . $filename;
             $file->move($folderPath . '/', $filename);

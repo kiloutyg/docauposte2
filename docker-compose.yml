@@ -12,7 +12,7 @@ services:
     - ./database_data:/var/lib/mysql
     networks:
       vpcbr:
-        ipv4_address : 172.20.0.2
+        ipv4_address : 172.21.0.2
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: unless-stopped
@@ -24,7 +24,7 @@ services:
       - "8082:80"
     networks:
       vpcbr:
-        ipv4_address : 172.20.0.3
+        ipv4_address : 172.21.0.3
     depends_on:
       - database
   web:
@@ -42,11 +42,11 @@ services:
       - database
     networks:
       vpcbr:
-        ipv4_address : 172.20.0.4
+        ipv4_address : 172.21.0.4
 networks:
   vpcbr:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/16
-          gateway: 172.20.0.1
+        - subnet: 172.21.0.0/16
+          gateway: 172.21.0.1

@@ -44,12 +44,12 @@ class IncidentsService extends AbstractController
         $this->productlineRepository = $productlineRepository;
         $this->folderCreationService = $folderCreationService;
     }
-    public function uploadIncidentFiles(Request $request, $productline,  $IncidentType, $newName = null)
+    public function uploadIncidentFiles(Request $request, $productline,  $IncidentCategory, $newName = null)
     {
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();
         $public_dir = $this->projectDir . '/public';
-        // $IncidentType = $IncidentTypeEntity->getId();
+        // $IncidentCategory = $IncidentCategoryEntity->getId();
 
         foreach ($files as $file) {
 
@@ -89,7 +89,7 @@ class IncidentsService extends AbstractController
             $incident->setFile(new File($path));
             $incident->setName($name);
             $incident->setPath($path);
-            $incident->setIncidentType($IncidentType);
+            $incident->setIncidentCategory($IncidentCategory);
             $incident->setProductLine($productline);
             $incident->setuploadedAt(new \DateTime());
             $this->manager->persist($incident);

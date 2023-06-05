@@ -18,7 +18,7 @@ use App\Repository\UploadRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ButtonRepository;
 use App\Repository\IncidentRepository;
-use App\Repository\IncidentTypeRepository;
+use App\Repository\IncidentCategoryRepository;
 
 use App\Entity\Zone;
 use App\Entity\ProductLine;
@@ -28,7 +28,7 @@ use App\Entity\Category;
 use App\Entity\Button;
 use App\Entity\Signature;
 use App\Entity\Incident;
-use App\Entity\IncidentType;
+use App\Entity\IncidentCategory;
 
 use App\Service\EntityDeletionService;
 use App\Service\AccountService;
@@ -65,7 +65,7 @@ class BaseController extends AbstractController
     protected $folderCreationService;
     protected $incidentRepository;
     protected $incidentsService;
-    protected $incidentTypeRepository;
+    protected $incidentCategoryRepository;
 
 
 
@@ -88,31 +88,31 @@ class BaseController extends AbstractController
         FolderCreationService       $folderCreationService,
         IncidentRepository          $incidentRepository,
         IncidentsService            $incidentsService,
-        IncidentTypeRepository      $incidentTypeRepository
+        IncidentCategoryRepository      $incidentCategoryRepository
 
     ) {
 
-        $this->uploadRepository       = $uploadRepository;
-        $this->zoneRepository         = $zoneRepository;
-        $this->productLineRepository  = $productLineRepository;
-        $this->userRepository         = $userRepository;
-        $this->categoryRepository     = $categoryRepository;
-        $this->buttonRepository       = $buttonRepository;
-        $this->em                     = $em;
-        $this->requestStack           = $requestStack;
-        $this->security               = $security;
-        $this->passwordHasher         = $passwordHasher;
-        $this->entitydeletionService  = $entitydeletionService;
-        $this->accountService         = $accountService;
-        $this->uploadsService         = $uploadsServices;
-        $this->logger                 = $loggerInterface;
-        $this->request                = $this->requestStack->getCurrentRequest();
-        $this->session                = $this->requestStack->getSession();
-        $this->projectDir             = $params->get('kernel.project_dir');
-        $this->public_dir             = $this->projectDir . '/public';
-        $this->folderCreationService  = $folderCreationService;
-        $this->incidentRepository     = $incidentRepository;
-        $this->incidentsService       = $incidentsService;
-        $this->incidentTypeRepository = $incidentTypeRepository;
+        $this->uploadRepository             = $uploadRepository;
+        $this->zoneRepository               = $zoneRepository;
+        $this->productLineRepository        = $productLineRepository;
+        $this->userRepository               = $userRepository;
+        $this->categoryRepository           = $categoryRepository;
+        $this->buttonRepository             = $buttonRepository;
+        $this->em                           = $em;
+        $this->requestStack                 = $requestStack;
+        $this->security                     = $security;
+        $this->passwordHasher               = $passwordHasher;
+        $this->entitydeletionService        = $entitydeletionService;
+        $this->accountService               = $accountService;
+        $this->uploadsService               = $uploadsServices;
+        $this->logger                       = $loggerInterface;
+        $this->request                      = $this->requestStack->getCurrentRequest();
+        $this->session                      = $this->requestStack->getSession();
+        $this->projectDir                   = $params->get('kernel.project_dir');
+        $this->public_dir                   = $this->projectDir . '/public';
+        $this->folderCreationService        = $folderCreationService;
+        $this->incidentRepository           = $incidentRepository;
+        $this->incidentsService             = $incidentsService;
+        $this->incidentCategoryRepository   = $incidentCategoryRepository;
     }
 }
