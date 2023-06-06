@@ -1,14 +1,17 @@
 # FROM php:8.2-apache-bullseye
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
+# FROM debian:bullseye-slim
 # ENV http_proxy='http://10.0.0.1:80'
 #
 # NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
+# FROM scratch as BASE
+# ADD rootfs.tar.xz /
+# CMD ["bash"]
 
-
-
+# FROM BASE as BUILD
 # prevent Debian's PHP packages from being installed
 # https://github.com/docker-library/php/pull/542
 RUN set -eux; \
