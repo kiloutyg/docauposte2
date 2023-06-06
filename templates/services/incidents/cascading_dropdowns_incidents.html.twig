@@ -20,10 +20,10 @@
 <br>
 <div class="row">
 	<div class="col-md-2 col-sm-2 mt-2 mb-2">
-		<label for="incidents_category" style="color:white">Type d'incident :</label>
+		<label for="incidents_incidentCategory" style="color:white">Type d'incident :</label>
 	</div>
 	<div class="col-md-10 col-sm-10 mt-2 mb-2">
-		<select name="incidents_category" id="incidents_category" class="form-select" required>
+		<select name="incidents_incidentCategory" id="incidents_incidentCategory" class="form-select" required>
 			<option value="" selected disabled hidden>Choisir une catégorie d'incident</option>
 		</select>
 	</div>
@@ -33,17 +33,17 @@
 	<div class="row mb-3">
 		<label for="incidents_newFileName" class="form-label   ">Nouvelle Category d'Incident :</label>
 		<div class="col-sm">
-			<input type="text" class="form-control" id="incident_category_name" name="incident_category_name" placeholder="Entrer une nouvelle categorie d'incident (optionnel)">
+			<input type="text" class="form-control" id="incident_incidentCategory_name" name="incident_incidentCategory_name" placeholder="Entrer une nouvelle categorie d'incident (optionnel)">
 		</div>
 		<div class="col-sm-auto">
-			<input type="button" id="create_incident_category" class="btn btn-secondary shadow border border-dark-subtle" value="Créer une nouvelle categorie d'incident">
+			<input type="button" id="create_incident_incidentCategory" class="btn btn-secondary shadow border border-dark-subtle" value="Créer une nouvelle categorie d'incident">
 		</div>
 	</div>
 	{% for incidentCategory in incidentCategories %}
 		<div class="row mb-3">
 			<li class="form-control shadow d-flex justify-content-between align-items-center">
 				{{incidentCategory.name|split('.')|first|capitalize}}
-				<a href="{{ path('app_incident_category_deletion', {incidentCategory : incidentCategory.name}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-incidentCategory">supprimer</a>
+				<a href="{{ path('app_incident_incidentCategory_deletion', {incidentCategory : incidentCategory.name}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-incidentCategory">supprimer</a>
 			</li>
 
 		</div>

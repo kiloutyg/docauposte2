@@ -9,7 +9,7 @@ fetch("/api/incidents_cascading_dropdown_data")
   .then((data) => {
     incidentsZonesData = data.zones;
     incidentsProductLinesData = data.productLines;
-    incidentsCategoriesData = data.categories;
+    incidentsCategoriesData = data.incidentCategories;
 
     // Call the function that initializes the cascading dropdowns
     // after the data has been fetched
@@ -23,11 +23,13 @@ fetch("/api/incidents_cascading_dropdown_data")
 function initCascadingDropdowns() {
   const zone = document.getElementById("incidents_zone");
   const productline = document.getElementById("incidents_productline");
-  const category = document.getElementById("incidents_category");
+  const incidentCategory = document.getElementById(
+    "incidents_incidentCategory"
+  );
 
-  if (zone && productline && category) {
+  if (zone && productline && incidentCategory) {
     zone.addEventListener("change", handleIncidentsZoneChange);
-    populateDropdown(category, incidentsCategoriesData); // Populate 'category' dropdown here
+    populateDropdown(incidentCategory, incidentsCategoriesData); // Populate 'category' dropdown here
   } else {
     console.error("One or more elements not found");
   }
@@ -51,11 +53,13 @@ function handleIncidentsZoneChange(event) {
 function resetDropdowns() {
   const zone = document.getElementById("incidents_zone");
   const productline = document.getElementById("incidents_productline");
-  const category = document.getElementById("incidents_category");
+  const incidentCategory = document.getElementById(
+    "incidents_incidentCategory"
+  );
 
   if (zone) zone.selectedIndex = 0;
   if (productline) productline.selectedIndex = 0;
-  if (category) category.selectedIndex = 0;
+  if (incidentCategory) incidentCategory.selectedIndex = 0;
 }
 
 // Existing turbo:load event listener and preselectValues function here...
@@ -136,7 +140,7 @@ function populateDropdown(dropdown, data, selectedId) {
 
 document.addEventListener("turbo:load", function () {
   let createIncidentCategoryButton = document.getElementById(
-    "create_incident_category"
+    "create_incident_incidentCategory"
   );
 
   if (createIncidentCategoryButton) {
@@ -144,11 +148,11 @@ document.addEventListener("turbo:load", function () {
       e.preventDefault();
 
       let incidentCategoryName = document
-        .getElementById("incident_category_name")
+        .getElementById("incident_incidentCategory_name")
         .value.trim();
 
       let xhr = new XMLHttpRequest();
-      xhr.open("POST", "/incident/incident_category_creation");
+      xhr.open("POST", "/incident/incident_incidentCategory_creation");
       xhr.setRequestHeader("Content-Type", "application/json");
 
       xhr.onload = function () {
@@ -162,7 +166,8 @@ document.addEventListener("turbo:load", function () {
           // Check if the operation was successful
           if (response.success) {
             // Clear the input field after a successful submission
-            document.getElementById("incident_category_name").value = "";
+            document.getElementById("incident_incidentCategory_name").value =
+              "";
 
             // Force a reload of the page
             location.reload();
@@ -183,7 +188,7 @@ document.addEventListener("turbo:load", function () {
 
       xhr.send(
         JSON.stringify({
-          incident_category_name: incidentCategoryName,
+          incident_incidentCategory_name: incidentCategoryName,
         })
       );
     });

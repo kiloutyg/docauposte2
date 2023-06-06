@@ -87,22 +87,22 @@ class IncidentController extends FrontController
     }
 
 
-    #[Route('/incident/incident_category_creation', name: 'incident_category_creation')]
+    #[Route('/incident/incident_incidentCategory_creation', name: 'incident_incidentCategory_creation')]
     public function incidentCategoryCreation(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $incidentCategoryname = $data['incident_category_name'] ?? null;
+        $incidentCategoryName = $data['incident_incidentCategory_name'] ?? null;
 
-        $existingIncidentCategory = $this->incidentCategoryRepository->findOneBy(['name' => $incidentCategoryname]);
+        $existingIncidentCategory = $this->incidentCategoryRepository->findOneBy(['name' => $incidentCategoryName]);
 
-        if (empty($incidentCategoryname)) {
+        if (empty($incidentCategoryName)) {
             return new JsonResponse(['success' => false, 'message' => 'Le nom du category d\'incident ne peut pas être vide']);
         }
         if ($existingIncidentCategory) {
             return new JsonResponse(['success' => false, 'message' => 'Ce category d\'incident existe déjà']);
         } else {
             $incidentCategory = new IncidentCategory();
-            $incidentCategory->setName($incidentCategoryname);
+            $incidentCategory->setName($incidentCategoryName);
             $this->em->persist($incidentCategory);
             $this->em->flush();
 
@@ -111,7 +111,7 @@ class IncidentController extends FrontController
     }
 
     // Create a route for incidentCategory deletion
-    #[Route('/delete/incident_category_deletion/{incidentCategory}', name: 'incident_category_deletion')]
+    #[Route('/delete/incident_incidentCategory_deletion/{incidentCategory}', name: 'incident_incidentCategory_deletion')]
     public function incidentCategoryDeletion(string $incidentCategory): Response
     {
         $entityType = "incidentCategory";
@@ -140,8 +140,8 @@ class IncidentController extends FrontController
 
             $productline = $request->request->get('incidents_productline');
             $newname = $request->request->get('incidents_newFileName');
-            $type = $request->request->get('incidents_category');
-            $IncidentCategory = $this->incidentCategoryRepository->findoneBy(['id' => $type]);
+            $incidentCategoryId = $request->request->get('incidents_incidentCategory');
+            $IncidentCategory = $this->incidentCategoryRepository->findoneBy(['id' => $incidentCategoryId]);
 
             $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productline]);
 
@@ -234,12 +234,12 @@ class IncidentController extends FrontController
 
 
     // create a route to modify a file and or display the modification page
-    #[Route('/modify/{incidentId}', name: 'incident_modify_file')]
+    #[Route('/modify_incident/{incidentId}', name: 'incident_modify_file')]
     public function modify_incident_file(Request $request, int $incidentId, incidentsService $incidentsService, LoggerInterface $logger): Response
     {
-        // Retrieve the current upload entity based on the incidentId
+        // Retrieve the current incident entity based on the incidentId
         $incident = $this->incidentRepository->findOneBy(['id' => $incidentId]);
-        $productLine = $incident->getproductline();
+        $productLine = $incident->getProductLine();
         $zone = $productLine->getZone();
 
         if (!$incident) {

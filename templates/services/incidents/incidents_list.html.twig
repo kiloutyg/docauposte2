@@ -44,7 +44,6 @@
 						</a>
 						<a href="{{ path('app_incident_modify_file', {'incidentId': incident.id}) }}" class="btn btn-modify">
 							Modifier
-							<span class="visually-hidden">{{ incident.id }}</span>
 						</a>
 						{% if  is_granted('ROLE_LINE_ADMIN') %}
 							<a href="{{ path('app_incident_delete_file', { name: incident.name, productline: incident.productline.id }) }}" class="btn btn-danger delete-incident">
