@@ -87,11 +87,11 @@ class IncidentController extends FrontController
     }
 
 
-    #[Route('/incident/incident_incidentCategory_creation', name: 'incident_incidentCategory_creation')]
+    #[Route('/incident/incident_incidentsCategory_creation', name: 'incident_incidentsCategory_creation')]
     public function incidentCategoryCreation(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $incidentCategoryName = $data['incident_incidentCategory_name'] ?? null;
+        $incidentCategoryName = $data['incident_incidentsCategory_name'] ?? null;
 
         $existingIncidentCategory = $this->incidentCategoryRepository->findOneBy(['name' => $incidentCategoryName]);
 
@@ -111,7 +111,7 @@ class IncidentController extends FrontController
     }
 
     // Create a route for incidentCategory deletion
-    #[Route('/delete/incident_incidentCategory_deletion/{incidentCategory}', name: 'incident_incidentCategory_deletion')]
+    #[Route('/delete/incident_incidentsCategory_deletion/{incidentCategory}', name: 'incident_incidentsCategory_deletion')]
     public function incidentCategoryDeletion(string $incidentCategory): Response
     {
         $entityType = "incidentCategory";

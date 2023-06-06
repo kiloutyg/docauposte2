@@ -74,10 +74,10 @@ class ApiController extends BaseController
             ];
         }, $this->productLineRepository->findAll());
 
-        $incidentCategories = array_map(function ($incidentCategory) {
+        $incidentsCategories = array_map(function ($incidentsCategory) {
             return [
-                'id' => $incidentcategory->getId(),
-                'name' => $incidentcategory->getName(),
+                'id' => $incidentsCategory->getId(),
+                'name' => $incidentsCategory->getName(),
             ];
         }, $this->incidentCategoryRepository->findAll());
 
@@ -85,7 +85,7 @@ class ApiController extends BaseController
         $responseData = [
             'zones' => $zones,
             'productLines' => $productLines,
-            'types' => $incidentCategories,
+            'incidentsCategory' => $incidentsCategories,
         ];
 
         return new JsonResponse($responseData);
