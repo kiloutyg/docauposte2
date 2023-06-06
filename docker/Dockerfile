@@ -1,6 +1,6 @@
 # FROM php:8.2-apache-bullseye
-FROM debian:bookworm-slim
-# FROM debian:bullseye-slim
+# FROM debian:bookworm-slim
+FROM debian:bullseye-slim
 # ENV http_proxy='http://10.0.0.1:80'
 #
 # NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
