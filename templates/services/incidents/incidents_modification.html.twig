@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 {% block title %}
-	{{upload.filename}}
+	{{incident.name}}
 	|
 	{{ parent() }}
 {% endblock %}
@@ -16,11 +16,11 @@
 				<p class="text-white m-0">
 					<h3 style="color:white">
 						Modification du fichier
-						<strong>{{upload.filename}}</strong>
+						<strong>{{incident.name}}</strong>
 						:
 					</h3>
 				</p>
-				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_modify_file', {'uploadId': upload.id})}) }}
+				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_incident_modify_file', {'incidentId': incident.id})}) }}
 				<div class="fallback">
 					<div class="mb-3">
 						{{ form_label(form.file, 'Select a file to upload:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
@@ -28,69 +28,41 @@
 					</div>
 
 					<div class="mb-3">
-						{{ form_label(form.filename, 'Nouveau nom du fichier :', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
-						{{ form_widget(form.filename, {'attr': {'class': 'form-control', 'id': 'filename', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)'}}) }}
+						{{ form_label(form.name, 'Nouveau nom du fichier :', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
+						{{ form_widget(form.name, {'attr': {'class': 'form-control', 'id': 'name', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)'}}) }}
 					</div>
 
 					{# Display the current button hierarchy #}
-					{% if lastZone != upload.button.category.productLine.zone %}
-						{% set lastZone = upload.button.category.productLine.zone %}
+					{% if lastZone != incident.productLine.zone %}
+						{% set lastZone = incident.productLine.zone %}
 						Zone:
 						{{ lastZone.name|split('.')|first|capitalize }}
 						>
 					{% endif %}
-					{% if lastProductLine != upload.button.category.productLine %}
-						{% set lastProductLine = upload.button.category.productLine %}
+					{% if lastProductLine != incident.productLine %}
+						{% set lastProductLine = incident.productLine %}
 						Produit:
 						{{ lastProductLine.name|split('.')|first|capitalize }}
 						>
 					{% endif %}
-					{% if lastCategory != upload.button.category %}
-						{% set lastCategory = upload.button.category %}
-						Categorie:
-						{{ lastCategory.name|split('.')|first|capitalize }}
-						>
-					{% endif %}
 
-					{% if lastButton != upload.button %}
-						{% set lastButton = upload.button %}
-						Bouton:
-						{{ lastButton.name|split('.')|first|capitalize }}
-						:
-					{% endif %}
 
 					<div class="row">
 						<div class="col-md-2 col-sm-2 mt-2 mb-2">
-							<label for="zone" style="color:white">Zone :</label>
+							<label for="incidents_zone" style="color:white">Zone :</label>
 						</div>
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
-							<select name="zone" id="zone" class="form-select" required>
+							<select name="incidents_zone" id="incidents_zone" class="form-select" required>
 								<option value="" selected disabled hidden>Choisir une Zone</option>
 							</select>
 						</div>
 						<div class="col-md-2 col-sm-2 mt-2 mb-2">
-							<label for="productline" style="color:white">Ligne :</label>
-						</div>
-						<div class="col-md-10 col-sm-10 mt-2 mb-2">
-							<select name="productline" id="productline" class="form-select" required>
-								<option value="" selected disabled hidden>Choisir une Ligne</option>
-							</select>
-						</div>
-						<div class="col-md-2 col-sm-2 mt-2 mb-2">
-							<label for="category" style="color:white">Categorie :</label>
-						</div>
-						<div class="col-md-10 col-sm-10 mt-2 mb-2">
-							<select name="category" id="category" class="form-select" required>
-								<option value="" selected disabled hidden>Choisir une Catégorie</option>
-							</select>
-						</div>
-						<div class="col-md-2 col-sm-2 mt-2 mb-2">
-							<label for="button" style="color:white">Bouton :</label>
+							<label for="incidents_productline" style="color:white">Ligne :</label>
 						</div>
 
 
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
-							{{ form_widget(form.button,{'attr': {'class': 'form-select', 'name': 'button', 'id': 'upload_button', 'required': true}}) }}
+							{{ form_widget(form.productline,{'attr': {'class': 'form-select', 'name': 'incidents_productline', 'id': 'incidents_productline', 'required': true}}) }}
 						</div>
 					</div>
 				</div>

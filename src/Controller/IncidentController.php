@@ -23,6 +23,8 @@ use App\Service\IncidentsService;
 use App\Entity\Incident;
 use App\Entity\IncidentCategory;
 
+use App\Form\IncidentType;
+
 #[Route('/', name: 'app_')]
 
 class IncidentController extends FrontController
@@ -316,13 +318,11 @@ class IncidentController extends FrontController
         }
 
         // If it's a GET request, render the form
-        return $this->render('services/uploads/uploads_modification.html.twig', [
+        return $this->render('services/incidents/incidents_modification.html.twig', [
             'form' => $form->createView(),
             'zone'        => $zone,
             'productLine' => $productLine,
-            'category'    => $category,
-            'productline'      => $productline,
-            'upload' => $incident
+            'incident' => $incident
         ]);
     }
 }
