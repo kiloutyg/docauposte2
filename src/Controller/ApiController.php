@@ -85,7 +85,7 @@ class ApiController extends BaseController
         $responseData = [
             'zones' => $zones,
             'productLines' => $productLines,
-            'incidentsCategory' => $incidentsCategories,
+            'incidentsCategories' => $incidentsCategories,
         ];
 
         return new JsonResponse($responseData);

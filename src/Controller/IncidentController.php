@@ -140,13 +140,14 @@ class IncidentController extends FrontController
 
             $productline = $request->request->get('incidents_productline');
             $newname = $request->request->get('incidents_newFileName');
-            $incidentCategoryId = $request->request->get('incidents_incidentCategory');
-            $IncidentCategory = $this->incidentCategoryRepository->findoneBy(['id' => $incidentCategoryId]);
-
+            $IncidentCategoryId = $request->request->get('incidents_incidentsCategory');
+            $IncidentCategory = $this->incidentCategoryRepository->findoneBy(['id' => $IncidentCategoryId]);
             $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productline]);
 
             // Use the IncidentsService to handle file Incidents
+            // $name = $this->incidentsService->uploadIncidentFiles($request, $productlineEntity, $IncidentCategoryId, $newname);
             $name = $this->incidentsService->uploadIncidentFiles($request, $productlineEntity, $IncidentCategory, $newname);
+
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
 
             return $this->redirectToRoute(

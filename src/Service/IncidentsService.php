@@ -11,6 +11,7 @@ use Psr\Log\LoggerInterface;
 
 use App\Repository\ProductLineRepository;
 use App\Repository\IncidentRepository;
+use App\Repository\IncidentCategoryRepository;
 
 use App\Entity\Incident;
 use App\Entity\ProductLine;
@@ -27,6 +28,7 @@ class IncidentsService extends AbstractController
     protected $logger;
     protected $productlineRepository;
     protected $folderCreationService;
+    protected $incidentCategoryRepository;
 
 
     public function __construct(
@@ -35,7 +37,8 @@ class IncidentsService extends AbstractController
         EntityManagerInterface $manager,
         ParameterBagInterface $params,
         IncidentRepository $incidentRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        IncidentCategoryRepository $incidentCategoryRepository,
     ) {
         $this->incidentRepository = $incidentRepository;
         $this->manager = $manager;
@@ -43,13 +46,15 @@ class IncidentsService extends AbstractController
         $this->logger = $logger;
         $this->productlineRepository = $productlineRepository;
         $this->folderCreationService = $folderCreationService;
+        $this->incidentCategoryRepository = $incidentCategoryRepository;
     }
-    public function uploadIncidentFiles(Request $request, $productline,  $IncidentCategory, $newName = null)
+    public function uploadIncidentFiles(Request $request, $productline,  $IncidentCategoryId, $newName = null)
     {
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();
         $public_dir = $this->projectDir . '/public';
         // $IncidentCategory = $IncidentCategoryEntity->getId();
+        $IncidentCategory = $this->incidentCategoryRepository->findoneBy(['id' => $IncidentCategoryId]);
 
         foreach ($files as $file) {
 
