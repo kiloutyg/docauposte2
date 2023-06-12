@@ -25,10 +25,14 @@ class ZoneAdminController extends BaseController
 
     public function index(IncidentsService $incidentsService, UploadsService $uploadsService, AuthenticationUtils $authenticationUtils, string $zone = null): Response
     {
-        $groupedUploads = $uploadsService->groupUploads();
-        $groupIncidents = $incidentsService->groupIncidents();
-
         $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
+        $uploads = $this->entityHeritanceService->uploadsByParentEntity('zone', $zone->getId());
+        $incidents = $this->entityHeritanceService->incidentsByParentEntity('zone', $zone->getId());
+
+        $groupedUploads = $uploadsService->groupUploads($uploads);
+        $groupIncidents = $incidentsService->groupIncidents($incidents);
+
+
         // Get the error and last username using AuthenticationUtils
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();

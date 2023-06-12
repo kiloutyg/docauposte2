@@ -24,11 +24,20 @@ class ProductLineAdminController extends BaseController
 
     public function index(IncidentsService $incidentsService, UploadsService $uploadsService, AuthenticationUtils $authenticationUtils, string $productline = null): Response
     {
-        $groupedUploads = $uploadsService->groupUploads();
-        $groupIncidents = $incidentsService->groupIncidents();
-
         $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
         $zone = $productLine->getZone();
+        $uploads = $this->entityHeritanceService->uploadsByParentEntity(
+            'productline',
+            $productLine->getId()
+        );
+        $incidents = $this->entityHeritanceService->incidentsByParentEntity(
+            'productline',
+            $productLine->getId()
+        );
+        $groupedUploads = $uploadsService->groupUploads($uploads);
+        $groupIncidents = $incidentsService->groupIncidents($incidents);
+
+
 
         // Get the error and last username using AuthenticationUtils
         $error = $authenticationUtils->getLastAuthenticationError();

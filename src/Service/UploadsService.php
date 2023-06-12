@@ -76,11 +76,6 @@ class UploadsService extends AbstractController
                 $filename   = $file->getClientOriginalName();
             }
 
-            // Add .pdf extension if it is missing
-            // if (strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'pdf') {
-            //     $filename .= '.pdf';
-            // }
-
             $path       = $folderPath . '/' . $filename;
             $file->move($folderPath . '/', $filename);
 
@@ -188,9 +183,8 @@ class UploadsService extends AbstractController
     }
 
 
-    public function groupUploads()
+    public function groupUploads($uploads)
     {
-        $uploads = $this->uploadRepository->findAll();
 
         $groupedUploads = [];
 

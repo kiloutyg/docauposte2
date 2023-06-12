@@ -192,9 +192,8 @@ class IncidentsService extends AbstractController
     }
 
 
-    public function groupIncidents()
+    public function groupIncidents($incidents)
     {
-        $incidents = $this->incidentRepository->findAll();
 
         $groupedincidents = [];
 

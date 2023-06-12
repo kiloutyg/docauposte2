@@ -22,26 +22,29 @@ class SuperAdminController extends BaseController
 
     public function index(IncidentsService $incidentsService, UploadsService $uploadsService, AuthenticationUtils $authenticationUtils,): Response
     {
-        $groupedUploads = $uploadsService->groupUploads();
-        $groupIncidents = $incidentsService->groupIncidents();
+        $incidents = [];
+        $uploads = [];
+
+        $groupedUploads = $uploadsService->groupUploads($uploads);
+        $groupIncidents = $incidentsService->groupIncidents($incidents);
 
         // Get the error and last username using AuthenticationUtils
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('super_admin/super_admin_index.html.twig', [
-            'groupedUploads' => $groupedUploads,
-            'groupincidents' => $groupIncidents,
-            'error' => $error,
-            'last_username' => $lastUsername,
-            'zones' => $this->zoneRepository->findAll(),
-            'productLines' => $this->productLineRepository->findAll(),
-            'categories' => $this->categoryRepository->findAll(),
-            'buttons'     => $this->buttonRepository->findAll(),
-            'uploads'     => $this->uploadRepository->findAll(),
-            'users' => $this->userRepository->findAll(),
-            'incidents' => $this->incidentRepository->findAll(),
-            'incidentCategories' => $this->incidentCategoryRepository->findAll(),
+            'groupedUploads'        => $groupedUploads,
+            'groupincidents'        => $groupIncidents,
+            'error'                 => $error,
+            'last_username'         => $lastUsername,
+            'zones'                 => $this->zoneRepository->findAll(),
+            'productLines'          => $this->productLineRepository->findAll(),
+            'categories'            => $this->categoryRepository->findAll(),
+            'buttons'               => $this->buttonRepository->findAll(),
+            'uploads'               => $this->uploadRepository->findAll(),
+            'users'                 => $this->userRepository->findAll(),
+            'incidents'             => $this->incidentRepository->findAll(),
+            'incidentCategories'    => $this->incidentCategoryRepository->findAll(),
 
         ]);
     }

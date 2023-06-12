@@ -24,12 +24,21 @@ class CategoryManagerController extends BaseController
 
     public function index(IncidentsService $incidentsService, UploadsService $uploadsService, string $category = null): Response
     {
-        $groupedUploads = $uploadsService->groupUploads();
-        $groupIncidents = $incidentsService->groupIncidents();
-
         $category    = $this->categoryRepository->findoneBy(['name' => $category]);
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
+        $uploads = $this->entityHeritanceService->uploadsByParentEntity(
+            'category',
+            $category->getId()
+        );
+        $incidents = $this->entityHeritanceService->incidentsByParentEntity(
+            'category',
+            $category->getId()
+        );
+        $groupedUploads = $uploadsService->groupUploads($uploads);
+        $groupIncidents = $incidentsService->groupIncidents($incidents);
+
+
 
 
 
@@ -42,7 +51,7 @@ class CategoryManagerController extends BaseController
             'buttons'           => $this->buttonRepository->findAll(),
             'uploads'           => $this->uploadRepository->findAll(),
             'users'             => $this->userRepository->findAll(),
-            'incidents'         => $this->incidentRepository->findAll(),
+            'incidents'         => $incidents,
             'incidentCategories' => $this->incidentCategoryRepository->findAll(),
 
         ]);

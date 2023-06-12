@@ -4,106 +4,185 @@
 			Liste des documents :
 		</strong>
 	</h5>
-	{% set lastZone = null %}
-	{% set lastProductLine = null %}
-	{% set lastCategory = null %}
-	{% set lastButton = null %}
 
-	{% if (button is defined) and (button is not empty) %}
-		{# Filter uploads by button #}
-		{% set matchinguploads = uploads|filter(upload => upload.button.id == button.id) %}
 
-	{% elseif (category is defined) and (category is not empty) %}
-		{# Filter uploads by category #}
-		{% set matchinguploads = uploads|filter(upload => upload.button.category.id == category.id) %}
-
-	{% elseif (productLine is defined) and (productLine is not empty) %}
-		{# Filter uploads by product line #}
-		{% set matchinguploads = uploads|filter(upload => upload.button.category.productLine.id == productLine.id) %}
-
-	{% elseif (zone is defined) and (zone is not empty) %}
-		{# Filter uploads by zone #}
-		{% set matchinguploads = uploads|filter(upload => upload.button.category.productLine.zone.id == zone.id) %}
-
-	{% else %}
-		{# No filter, display all uploads #}
-		{% set matchinguploads = uploads %}
-
-	{% endif %}
-
-	{% if matchinguploads|length > 0 %}
-		{# {% for zoneName, zone in groupedUploads %}
-					<div class="accordion" id="accordionZone{{ loop.index }}">
-						<div class="accordion-item">
-							<h2 class="accordion-header" id="headingZone{{ loop.index }}">
-								<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone{{ loop.index }}">
-									Zone:
-									{{ zoneName|split('.')|first|capitalize }}
-								</button>
-							</h2>
-							<div id="collapseZone{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="headingZone{{ loop.index }}" data-bs-parent="#accordionZone{{ loop.index }}">
-								<div class="accordion-body">
-									{% for productLineName, productLine in zone %}
-										<div class="accordion-item" id="accordionZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}">
-											<div class="card-header" id="headingZone{{  loop.parent.loop.index ~ '-' ~ loop.index }}">
-												<h2 class="accordion-header, mb-0">
-													<button class="btn btn-secondary accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone{{  loop.parent.loop.index ~ '-' ~ loop.index }}">
-														Produit:
-														{{ productLineName|split('.')|first|capitalize }}
-													</button>
-												</h2>
-											</div>
-		
-											<div id="collapseZone{{  loop.parent.loop.index ~ '-' ~ loop.index }}" class="collapse">
-												{% for categoryName, category in productLine %}
-													<div class="accordion-item" id="accordionZone{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
-														<div class="card-header" id="headingZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}">
-															<h2 class="accordion-header, mb-0">
-																<button class="btn btn-secondary accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}">
-																	Categorie:
-																	{{ categoryName|split('.')|first|capitalize }}
-		
-																</button>
-															</h2>
-														</div>
-		
-														<div id="collapseZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}" class="collapse">
-															<div class="card-body">
-																{% for buttonName, button in category %}
-																	<div class="accordion-item" id="accordionZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}">
-																		<div class="card-header" id="headingZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}">
-																			<h2 class="accordion-header, mb-0">
-																				<button class="accordion-button btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}">
-		
-																					Bouton:
-																					{{ buttonName|split('.')|first|capitalize }}
+	{# {% if (button is defined) and (button is not empty) %}
+							{% set matchinguploads = uploads|filter(upload => upload.button.name == button.name) %}
+					
+						{% elseif (category is defined) and (category is not empty) %}
+							{% set matchinguploads = uploads|filter(upload => upload.button.category.name == category.name) %}
+					
+						{% elseif (productLine is defined) and (productLine is not empty) %}
+							{% set matchinguploads = uploads|filter(upload => upload.button.category.productLine.name == productLine.name) %}
+					
+						{% elseif (zone is defined) and (zone is not empty) %}
+							{% set matchinguploads = uploads|filter(upload => upload.button.category.productLine.zone.name == zone.name) %}
+					
+						{% else %}
+							{% set matchinguploads = uploads %}
+					
+						{% endif %}
+						{% if matchinguploads|length > 0 %} 
+						 {% for zoneName, zone in groupedUploads %}
+							<div class="accordion" id="accordionZone{{ loop.index }}">
+								<div class="accordion-item">
+									<h2 class="accordion-header" id="headingZone{{ loop.index }}">
+										<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone{{ loop.index }}">
+											Zone:
+											{{ zoneName|split('.')|first|capitalize }}
+										</button>
+									</h2>
+									<div id="collapseZone{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="headingZone{{ loop.index }}" data-bs-parent="#accordionZone{{ loop.index }}">
+										<div class="accordion-body">
+											{% for productLineName, productLine in zone %}
+												<div class="accordion-item" id="accordionZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}">
+													<div class="card-header" id="headingZone{{  loop.parent.loop.index ~ '-' ~ loop.index }}">
+														<h2 class="accordion-header, mb-0">
+															<button class="btn btn-secondary accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone{{  loop.parent.loop.index ~ '-' ~ loop.index }}">
+																Produit:
+																{{ productLineName|split('.')|first|capitalize }}
+															</button>
+														</h2>
+													</div>
+							
+													<div id="collapseZone{{  loop.parent.loop.index ~ '-' ~ loop.index }}" class="collapse">
+														{% for categoryName, category in productLine %}
+															<div class="accordion-item" id="accordionZone{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
+																<div class="card-header" id="headingZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}">
+																	<h2 class="accordion-header, mb-0">
+																		<button class="btn btn-secondary accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}">
+																			Categorie:
+																			{{ categoryName|split('.')|first|capitalize }}
+							
+																		</button>
+																	</h2>
+																</div>
+							
+																<div id="collapseZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}" class="collapse">
+																	<div class="card-body">
+																		{% for buttonName, button in category %}
+																			<div class="accordion-item" id="accordionZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}">
+																				<div class="card-header" id="headingZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}">
+																					<h2 class="accordion-header, mb-0">
+																						<button class="accordion-button btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}">
+							
+																							Bouton:
+																							{{ buttonName|split('.')|first|capitalize }}
+																						</button>
+																					</h2>
+																				</div>
+							
+																				<div id="collapseZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}" class="collapse">
+																					<div class="card-body">
+																						{% for upload in button %}
+																							<li class="form-control shadow d-flex justify-content-between align-items-center mb-3">
+																								<a href="{{ path('app_download_file', { 'filename': upload.filename }) }}" class="btn btn-secondary" target="_blank">
+																									-
+																									{{ upload.filename }}
+																									-
+																									{{ upload.uploadedAt|date('d/m/Y') }}
+																									<span class="visually-hidden">{{ upload.id }}</span>
+																								</a>
+																								<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify">
+																									Modifier
+																									<span class="visually-hidden">{{ upload.id }}</span>
+																								</a>
+																								{% if  is_granted('ROLE_LINE_ADMIN') %}
+																									<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id }) }}" class="btn btn-danger delete-upload">
+																										Supprimer
+																										<span class="visually-hidden">{{ upload.id }}</span>
+																									</a>
+																								{% endif %}
+																							</li>
+																						{% endfor %}
+																					</div>
+																				</div>
+																			</div>
+																		{% endfor %}
+																	</div>
+																</div>
+															</div>
+														{% endfor %}
+													</div>
+												</div>
+											{% endfor %}
+										</div>
+									</div>
+								</div>
+							</div>
+							{% endfor %}
+							{% for zoneName, zone in groupedUploads %}
+							<div class="accordion" id="accordionZone{{ loop.index }}">
+								<div class="accordion-item">
+									<h2 class="accordion-header" id="headingZone{{ loop.index }}">
+										<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone{{ loop.index }}" aria-expanded="false" aria-controls="collapseZone{{ loop.index }}">
+											Zone:
+											{{ zoneName|split('.')|first|capitalize }}
+										</button>
+									</h2>
+									<div id="collapseZone{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="headingZone{{ loop.index }}" data-bs-parent="#accordionZone{{ loop.index }}">
+										<div class="accordion-body">
+											{% for productLineName, productLine in zone %}
+												<div class="accordion" id="productLineAccordion{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
+													<div class="accordion-item">
+														<h2 class="accordion-header" id="headingProductLine{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
+															<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProductLine{{ loop.parent.loop.index ~ '-' ~ loop.index }}" aria-expanded="false" aria-controls="collapseProductLine{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
+																Produit:
+																{{ productLineName|split('.')|first|capitalize }}
+															</button>
+														</h2>
+														<div id="collapseProductLine{{ loop.parent.loop.index ~ '-' ~ loop.index }}" class="accordion-collapse collapse" aria-labelledby="headingProductLine{{ loop.parent.loop.index ~ '-' ~ loop.index }}" data-bs-parent="#productLineAccordion{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
+															<div class="accordion-body">
+																{% for categoryName, category in productLine %}
+																	<div class="accordion" id="categoryAccordion{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
+																		<div class="accordion-item">
+																			<h2 class="accordion-header" id="headingCategory{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
+																				<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory{{ loop.parent.loop.index ~ '-' ~ loop.index }}" aria-expanded="false" aria-controls="collapseCategory{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
+																					Categorie:
+																					{{ categoryName|split('.')|first|capitalize }}
 																				</button>
 																			</h2>
-																		</div>
-		
-																		<div id="collapseZone{{  loop.parent.loop.index ~ '-' ~ loop.index  }}" class="collapse">
-																			<div class="card-body">
-																				{% for upload in button %}
-																					<li class="form-control shadow d-flex justify-content-between align-items-center mb-3">
-																						<a href="{{ path('app_download_file', { 'filename': upload.filename }) }}" class="btn btn-secondary" target="_blank">
-																							-
-																							{{ upload.filename }}
-																							-
-																							{{ upload.uploadedAt|date('d/m/Y') }}
-																							<span class="visually-hidden">{{ upload.id }}</span>
-																						</a>
-																						<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify">
-																							Modifier
-																							<span class="visually-hidden">{{ upload.id }}</span>
-																						</a>
-																						{% if  is_granted('ROLE_LINE_ADMIN') %}
-																							<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id }) }}" class="btn btn-danger delete-upload">
-																								Supprimer
-																								<span class="visually-hidden">{{ upload.id }}</span>
-																							</a>
-																						{% endif %}
-																					</li>
-																				{% endfor %}
+																			<div id="collapseCategory{{ loop.parent.loop.index ~ '-' ~ loop.index }}" class="accordion-collapse collapse" aria-labelledby="headingCategory{{ loop.parent.loop.index ~ '-' ~ loop.index }}" data-bs-parent="#categoryAccordion{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
+																				<div class="accordion-body">
+																					{% for buttonName, button in category %}
+																						<div class="accordion" id="buttonAccordion{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
+																							<div class="accordion-item">
+																								<h2 class="accordion-header" id="headingButton{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
+																									<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseButton{{ loop.parent.loop.index ~ '-' ~ loop.index }}" aria-expanded="false" aria-controls="collapseButton{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
+																										Bouton:
+																										{{ buttonName|split('.')|first|capitalize }}
+																									</button>
+																								</h2>
+																								<div id="collapseButton{{ loop.parent.loop.index ~ '-' ~ loop.index }}" class="accordion-collapse collapse" aria-labelledby="headingButton{{ loop.parent.loop.index ~ '-' ~ loop.index }}" data-bs-parent="#buttonAccordion{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
+																									<div class="accordion-body">
+																										{% for upload in button %}
+																											<li class="form-control shadow d-flex justify-content-between align-items-center mb-3">
+																												<a href="{{ path('app_download_file', { 'filename': upload.filename }) }}" class="btn btn-secondary" target="_blank">
+																													-
+																													{{ upload.filename }}
+																													-
+																													{{ upload.uploadedAt|date('d/m/Y') }}
+																													<span class="visually-hidden">{{ upload.id }}</span>
+																												</a>
+																												<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify">
+																													Modifier
+																													<span class="visually-hidden">{{ upload.id }}</span>
+																												</a>
+																												{% if  is_granted('ROLE_LINE_ADMIN') %}
+																													<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id }) }}" class="btn btn-danger delete-upload">
+																														Supprimer
+																														<span class="visually-hidden">{{ upload.id }}</span>
+																													</a>
+																												{% endif %}
+																											</li>
+																											<!-- Repeat the above pattern for category, button, and upload, remembering to make unique IDs for each accordion -->
+																										{% endfor %}
+																									</div>
+																								</div>
+																							</div>
+																						</div>
+																					{% endfor %}
+																				</div>
 																			</div>
 																		</div>
 																	</div>
@@ -111,134 +190,47 @@
 															</div>
 														</div>
 													</div>
-												{% endfor %}
-											</div>
-										</div>
-									{% endfor %}
-								</div>
-							</div>
-						</div>
-					</div>
-				{% endfor %}
-				{% for zoneName, zone in groupedUploads %}
-					<div class="accordion" id="accordionZone{{ loop.index }}">
-						<div class="accordion-item">
-							<h2 class="accordion-header" id="headingZone{{ loop.index }}">
-								<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone{{ loop.index }}" aria-expanded="false" aria-controls="collapseZone{{ loop.index }}">
-									Zone:
-									{{ zoneName|split('.')|first|capitalize }}
-								</button>
-							</h2>
-							<div id="collapseZone{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="headingZone{{ loop.index }}" data-bs-parent="#accordionZone{{ loop.index }}">
-								<div class="accordion-body">
-									{% for productLineName, productLine in zone %}
-										<div class="accordion" id="productLineAccordion{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
-											<div class="accordion-item">
-												<h2 class="accordion-header" id="headingProductLine{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
-													<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProductLine{{ loop.parent.loop.index ~ '-' ~ loop.index }}" aria-expanded="false" aria-controls="collapseProductLine{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
-														Produit:
-														{{ productLineName|split('.')|first|capitalize }}
-													</button>
-												</h2>
-												<div id="collapseProductLine{{ loop.parent.loop.index ~ '-' ~ loop.index }}" class="accordion-collapse collapse" aria-labelledby="headingProductLine{{ loop.parent.loop.index ~ '-' ~ loop.index }}" data-bs-parent="#productLineAccordion{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
-													<div class="accordion-body">
-														{% for categoryName, category in productLine %}
-															<div class="accordion" id="categoryAccordion{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
-																<div class="accordion-item">
-																	<h2 class="accordion-header" id="headingCategory{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
-																		<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory{{ loop.parent.loop.index ~ '-' ~ loop.index }}" aria-expanded="false" aria-controls="collapseCategory{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
-																			Categorie:
-																			{{ categoryName|split('.')|first|capitalize }}
-																		</button>
-																	</h2>
-																	<div id="collapseCategory{{ loop.parent.loop.index ~ '-' ~ loop.index }}" class="accordion-collapse collapse" aria-labelledby="headingCategory{{ loop.parent.loop.index ~ '-' ~ loop.index }}" data-bs-parent="#categoryAccordion{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
-																		<div class="accordion-body">
-																			{% for buttonName, button in category %}
-																				<div class="accordion" id="buttonAccordion{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
-																					<div class="accordion-item">
-																						<h2 class="accordion-header" id="headingButton{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
-																							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseButton{{ loop.parent.loop.index ~ '-' ~ loop.index }}" aria-expanded="false" aria-controls="collapseButton{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
-																								Bouton:
-																								{{ buttonName|split('.')|first|capitalize }}
-																							</button>
-																						</h2>
-																						<div id="collapseButton{{ loop.parent.loop.index ~ '-' ~ loop.index }}" class="accordion-collapse collapse" aria-labelledby="headingButton{{ loop.parent.loop.index ~ '-' ~ loop.index }}" data-bs-parent="#buttonAccordion{{ loop.parent.loop.index ~ '-' ~ loop.index }}">
-																							<div class="accordion-body">
-																								{% for upload in button %}
-																									<li class="form-control shadow d-flex justify-content-between align-items-center mb-3">
-																										<a href="{{ path('app_download_file', { 'filename': upload.filename }) }}" class="btn btn-secondary" target="_blank">
-																											-
-																											{{ upload.filename }}
-																											-
-																											{{ upload.uploadedAt|date('d/m/Y') }}
-																											<span class="visually-hidden">{{ upload.id }}</span>
-																										</a>
-																										<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify">
-																											Modifier
-																											<span class="visually-hidden">{{ upload.id }}</span>
-																										</a>
-																										{% if  is_granted('ROLE_LINE_ADMIN') %}
-																											<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id }) }}" class="btn btn-danger delete-upload">
-																												Supprimer
-																												<span class="visually-hidden">{{ upload.id }}</span>
-																											</a>
-																										{% endif %}
-																									</li>
-																									<!-- Repeat the above pattern for category, button, and upload, remembering to make unique IDs for each accordion -->
-																								{% endfor %}
-																							</div>
-																						</div>
-																					</div>
-																				</div>
-																			{% endfor %}
-																		</div>
-																	</div>
-																</div>
-															</div>
-														{% endfor %}
-													</div>
 												</div>
-											</div>
+											{% endfor %}
 										</div>
-									{% endfor %}
+									</div>
 								</div>
 							</div>
-						</div>
-					</div>
-				{% endfor %} #}
-		{% for zoneName, zone in groupedUploads %}
+							{% endfor %} 	{% endfor %} #}
+	{% if (groupedUploads is defined) and (groupedUploads is not empty ) %}
+		{% for zoneName, zoneKey in groupedUploads %}
+
 			Zone:
 			{{ zoneName|split('.')|first|capitalize }}
 			>
-			{% for productLineName, productLine in zone %}
+			{% for productLineName, productLineKey in zoneKey %}
 				Produit:
 				{{ productLineName|split('.')|first|capitalize }}
 				>
-				{% for categoryName, category in productLine %}
+				{% for categoryName, categoryKey in productLineKey %}
 					Categorie:
 					{{ categoryName|split('.')|first|capitalize }}
 					>
-					{% for buttonName, button in category %}
+					{% for buttonName, buttonKey in categoryKey %}
 						Bouton:
 						{{ buttonName|split('.')|first|capitalize }}
 						>
-						{% for upload in button %}
+						{% for upload in buttonKey %}
+
+
 							<li class="form-control shadow d-flex justify-content-between align-items-center mb-3">
 								<a href="{{ path('app_download_file', { 'filename': upload.filename }) }}" class="btn btn-link" target="_blank">
 									-
 									{{ upload.filename }}
 									-
 									{{ upload.uploadedAt|date('d/m/Y') }}
-									<span class="visually-hidden">{{ upload.id }}</span>
 								</a>
 								<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify">
 									Modifier
-									<span class="visually-hidden">{{ upload.id }}</span>
 								</a>
 								{% if  is_granted('ROLE_LINE_ADMIN') %}
 									<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id }) }}" class="btn btn-danger delete-upload">
 										Supprimer
-										<span class="visually-hidden">{{ upload.id }}</span>
 									</a>
 								{% endif %}
 							</li>
@@ -246,6 +238,7 @@
 					{% endfor %}
 				{% endfor %}
 			{% endfor %}
+
 		{% endfor %}
 
 	{% else %}

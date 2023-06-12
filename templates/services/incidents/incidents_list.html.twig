@@ -4,27 +4,10 @@
 			Liste des documents :
 		</strong>
 	</h5>
-	{% set lastZone = null %}
-	{% set lastProductLine = null %}
-
-
-	{% if (productLine is defined) and (productLine is not empty) %}
-		{# Filter incidents by product line #}
-		{% set matchingincidents = incidents|filter(incident => incident.productLine.id == productLine.id) %}
-
-	{% elseif (zone is defined) and (zone is not empty) %}
-		{# Filter incidents by zone #}
-		{% set matchingincidents = incidents|filter(incident => incident.productLine.zone.id == zone.id) %}
-
-	{% else %}
-		{# No filter, display all incidents #}
-		{% set matchingincidents = incidents %}
-
-	{% endif %}
-
-	{% if matchingincidents|length > 0 %}
+	{% if (groupincidents is defined) and (groupincidents is not empty)  %}
 
 		{% for zoneName, zone in groupincidents %}
+
 			Zone:
 			{{ zoneName|split('.')|first|capitalize }}
 			>

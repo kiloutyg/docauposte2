@@ -35,6 +35,7 @@ use App\Service\AccountService;
 use App\Service\UploadsService;
 use App\Service\FolderCreationService;
 use App\Service\IncidentsService;
+use App\Service\EntityHeritanceService;
 
 
 #[Route('/', name: 'app_')]
@@ -66,6 +67,7 @@ class BaseController extends AbstractController
     protected $incidentRepository;
     protected $incidentsService;
     protected $incidentCategoryRepository;
+    protected $entityHeritanceService;
 
 
 
@@ -88,7 +90,8 @@ class BaseController extends AbstractController
         FolderCreationService       $folderCreationService,
         IncidentRepository          $incidentRepository,
         IncidentsService            $incidentsService,
-        IncidentCategoryRepository      $incidentCategoryRepository
+        IncidentCategoryRepository  $incidentCategoryRepository,
+        EntityHeritanceService      $entityHeritanceService,
 
     ) {
 
@@ -114,5 +117,6 @@ class BaseController extends AbstractController
         $this->incidentRepository           = $incidentRepository;
         $this->incidentsService             = $incidentsService;
         $this->incidentCategoryRepository   = $incidentCategoryRepository;
+        $this->entityHeritanceService       = $entityHeritanceService;
     }
 }
