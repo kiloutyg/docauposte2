@@ -21,5 +21,3 @@ import "./js/incident-checkbox-signature.js";
 // import "./js/formdata.js";
 import "bootstrap";
 import "bootstrap/dist/js/bootstrap.bundle";
-
-console.log("Hello Stimulus!");

@@ -19,91 +19,6 @@ fetch("/api/incidents_cascading_dropdown_data")
   });
 
 // Existing filterData and populateDropdown functions here...
-
-function initCascadingDropdowns() {
-  const zone = document.getElementById("incidents_zone");
-  const productline = document.getElementById("incidents_productline");
-  const incidentsCategory = document.getElementById(
-    "incidents_incidentsCategory"
-  );
-
-  if (zone && productline && incidentsCategory) {
-    zone.addEventListener("change", handleIncidentsZoneChange);
-    populateDropdown(incidentsCategory, incidentsCategoriesData); // Populate 'category' dropdown here
-  } else {
-    console.error("One or more elements not found");
-  }
-  populateDropdown(zone, incidentsZonesData);
-  resetDropdowns();
-}
-
-function handleIncidentsZoneChange(event) {
-  const selectedValue = parseInt(event.target.value);
-  const filteredProductLines = filterData(
-    incidentsProductLinesData,
-    "zone_id",
-    selectedValue
-  );
-  populateDropdown(
-    document.getElementById("incidents_productline"),
-    filteredProductLines
-  );
-}
-
-function resetDropdowns() {
-  const zone = document.getElementById("incidents_zone");
-  const productline = document.getElementById("incidents_productline");
-  const incidentsCategory = document.getElementById(
-    "incidents_incidentsCategory"
-  );
-
-  if (zone) zone.selectedIndex = 0;
-  if (productline) productline.selectedIndex = 0;
-  if (incidentsCategory) incidentsCategory.selectedIndex = 0;
-}
-
-// Existing turbo:load event listener and preselectValues function here...
-
-document.addEventListener("turbo:load", () => {
-  // Fetch data from the API endpoint on page load
-  fetch("/api/incidents_cascading_dropdown_data")
-    .then((response) => response.json())
-    .then((data) => {
-      incidentsZonesData = data.zones;
-      incidentsProductLinesData = data.productLines;
-
-      // Initialize the cascading dropdowns and reset them on page load
-      initCascadingDropdowns();
-      resetDropdowns();
-      preselectValues();
-    });
-});
-
-function preselectValues() {
-  const zoneDropdown = document.getElementById("incidents_zone");
-  const productLineDropdown = document.getElementById("incidents_productline");
-
-  // Preselect zone
-  if (zoneIdFromServer && zoneDropdown) {
-    const filteredProductLines = filterData(
-      incidentsProductLinesData,
-      "zone_id",
-      parseInt(zoneIdFromServer)
-    );
-    populateDropdown(zoneDropdown, incidentsZonesData, zoneIdFromServer);
-    populateDropdown(
-      productLineDropdown,
-      filteredProductLines,
-      productLineIdFromServer
-    );
-  }
-
-  // Preselect product line
-  if (productLineIdFromServer && productLineDropdown) {
-    productLineDropdown.value = productLineIdFromServer;
-  }
-}
-
 function filterData(data, key, value) {
   return data.filter((item) => item[key] === value);
 }
@@ -136,6 +51,90 @@ function populateDropdown(dropdown, data, selectedId) {
     }
     dropdown.appendChild(option);
   });
+}
+
+function initCascadingDropdowns() {
+  const zone = document.getElementById("incidents_zone");
+  const productline = document.getElementById("incident_productline");
+  const incidentsCategory = document.getElementById(
+    "incidents_incidentsCategory"
+  );
+
+  if (zone && productline && incidentsCategory) {
+    zone.addEventListener("change", handleIncidentsZoneChange);
+    populateDropdown(incidentsCategory, incidentsCategoriesData); // Populate 'category' dropdown here
+    populateDropdown(zone, incidentsZonesData);
+    resetDropdowns();
+  }
+}
+
+function handleIncidentsZoneChange(event) {
+  const selectedValue = parseInt(event.target.value);
+  const filteredProductLines = filterData(
+    incidentsProductLinesData,
+    "zone_id",
+    selectedValue
+  );
+  populateDropdown(
+    document.getElementById("incident_productline"),
+    filteredProductLines
+  );
+}
+
+function resetDropdowns() {
+  const zone = document.getElementById("incidents_zone");
+  const productline = document.getElementById("incident_productline");
+  const incidentsCategory = document.getElementById(
+    "incidents_incidentsCategory"
+  );
+
+  if (zone) zone.selectedIndex = 0;
+  if (productline) productline.selectedIndex = 0;
+  if (incidentsCategory) incidentsCategory.selectedIndex = 0;
+}
+
+// Existing turbo:load event listener and preselectValues function here...
+
+document.addEventListener("turbo:load", () => {
+  // Fetch data from the API endpoint on page load
+  fetch("/api/incidents_cascading_dropdown_data")
+    .then((response) => response.json())
+    .then((data) => {
+      incidentsZonesData = data.zones;
+      incidentsProductLinesData = data.productLines;
+
+      // Initialize the cascading dropdowns and reset them on page load
+      initCascadingDropdowns();
+      resetDropdowns();
+      preselectValues();
+    });
+});
+
+function preselectValues() {
+  const zoneDropdown = document.getElementById("incidents_zone");
+  const productLineDropdown = document.getElementById("incident_productline");
+
+  // Preselect zone
+  if (zoneDropdown && zoneIdFromServer) {
+    const filteredProductLines = filterData(
+      incidentsProductLinesData,
+      "zone_id",
+      parseInt(zoneIdFromServer)
+    );
+    populateDropdown(zoneDropdown, incidentsZonesData, zoneIdFromServer);
+    if (productLineDropdown) {
+      populateDropdown(
+        productLineDropdown,
+        filteredProductLines,
+        productLineIdFromServer
+      );
+    }
+  }
+
+  // Preselect product line
+  if (productLineDropdown && productLineIdFromServer) {
+    productLineDropdown.value = productLineIdFromServer;
+  }
 }
 
 document.addEventListener("turbo:load", function () {
@@ -194,3 +193,73 @@ document.addEventListener("turbo:load", function () {
     });
   }
 });
+
+let modifyIncidentForm = document.querySelector("#modifyIncidentForm");
+if (modifyIncidentForm) {
+  modifyIncidentForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    // Create a new FormData object
+    let formData = new FormData();
+
+    // Get the file input element
+    let fileInput = document.querySelector("#incident_file");
+
+    // Get the CSRF token
+    let csrfTokenInput = document.querySelector("#incident__token");
+
+    // Get the CSRF token value
+    let csrfTokenValue = csrfTokenInput.value;
+
+    // Add the CSRF token to formData
+    formData.append("incident[_token]", csrfTokenValue);
+
+    if (fileInput.files.length > 0) {
+      // A file was selected
+      let file = fileInput.files[0];
+
+      // Add the file to formData
+      formData.append("incident[file]", file);
+    }
+
+    // Get the dropdown elements
+
+    let productLineDropdown = document.getElementById("incident_productline");
+    // Get the name input
+    let nameInput = document.getElementById("incident_name");
+
+    // Get the selected values
+    if (productLineDropdown) {
+      let productlineValue = parseInt(
+        productLineDropdown.options[productLineDropdown.selectedIndex].value,
+        10
+      );
+      formData.append("incidents[productline]", productlineValue);
+    }
+
+    // Get the name value
+    let nameValue = nameInput.value;
+
+    // Add the values to formData
+    if (nameValue) {
+      formData.append("incidents[name]", nameValue);
+    }
+
+    // Get the incident ID from the URL
+    let form = document.getElementById("modifyIncidentForm");
+    let actionUrl = form.getAttribute("action");
+    let incidentId = actionUrl.split("/").pop();
+
+    // Send formData to server...
+    fetch(actionUrl, {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response)
+      .catch((error) => {
+        then((response) => response.json());
+        console.error("Error:", error);
+        // Handle fetch errors here...
+      });
+  });
+}

@@ -63,11 +63,9 @@ function initCascadingDropdowns() {
     zone.addEventListener("change", handleZoneChange);
     productline.addEventListener("change", handleProductLineChange);
     category.addEventListener("change", handleCategoryChange);
-  } else {
-    console.error("One or more elements not found");
+    populateDropdown(zone, zonesData);
+    resetDropdowns();
   }
-  populateDropdown(zone, zonesData);
-  resetDropdowns();
 }
 
 function handleZoneChange(event) {
@@ -142,11 +140,13 @@ function preselectValues() {
       parseInt(zoneIdFromServer)
     );
     populateDropdown(zoneDropdown, zonesData, zoneIdFromServer);
-    populateDropdown(
-      productLineDropdown,
-      filteredProductLines,
-      productLineIdFromServer
-    );
+    if (productLineDropdown) {
+      populateDropdown(
+        productLineDropdown,
+        filteredProductLines,
+        productLineIdFromServer
+      );
+    }
   }
 
   // Preselect product line
@@ -156,11 +156,13 @@ function preselectValues() {
       "product_line_id",
       parseInt(productLineIdFromServer)
     );
-    populateDropdown(
-      categoryDropdown,
-      filteredCategories,
-      categoryIdFromServer
-    );
+    if (categoryDropdown) {
+      populateDropdown(
+        categoryDropdown,
+        filteredCategories,
+        categoryIdFromServer
+      );
+    }
   }
 
   // Preselect category
@@ -170,7 +172,9 @@ function preselectValues() {
       "category_id",
       parseInt(categoryIdFromServer)
     );
-    populateDropdown(buttonDropdown, filteredButtons, buttonIdFromServer);
+    if (buttonDropdown) {
+      populateDropdown(buttonDropdown, filteredButtons, buttonIdFromServer);
+    }
   }
 
   // Preselect button
@@ -179,9 +183,9 @@ function preselectValues() {
   }
 }
 
-document
-  .querySelector("#modifyForm")
-  .addEventListener("submit", function (event) {
+let modifyForm = document.querySelector("#modifyForm");
+if (modifyForm) {
+  modifyForm.addEventListener("submit", function (event) {
     event.preventDefault();
 
     // Create a new FormData object
@@ -210,21 +214,21 @@ document
     // Get the dropdown elements
 
     let buttonDropdown = document.getElementById("upload_button");
+    if (buttonDropdown) {
+      let buttonValue = parseInt(
+        buttonDropdown.options[buttonDropdown.selectedIndex].value,
+        10
+      ); // Add the values to formData
+      formData.append("upload[button]", buttonValue);
+    }
     // Get the filename input
     let filenameInput = document.getElementById("upload_filename");
 
     // Get the selected values
 
-    let buttonValue = parseInt(
-      buttonDropdown.options[buttonDropdown.selectedIndex].value,
-      10
-    );
-
     // Get the filename value
     let filenameValue = filenameInput.value;
 
-    // Add the values to formData
-    formData.append("upload[button]", buttonValue);
     if (filenameValue) {
       formData.append("upload[filename]", filenameValue);
     }
@@ -246,3 +250,4 @@ document
         // Handle fetch errors here...
       });
   });
+}

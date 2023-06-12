@@ -65,14 +65,14 @@ class IncidentController extends FrontController
             return $this->render(
                 '/services/incidents/incidents_view.html.twig',
                 [
-                    'incidentid'    => $incident ? $incident->getId() : null,
-                    'incident'      => $incident,
+                    'incidentid'        => $incident ? $incident->getId() : null,
+                    'incident'          => $incident,
                     // ? $incident->getName() : null,
-                    'incidentCategory' => $incident ? $incident->getIncidentCategory() : null,
-                    'incidents'     => $incidents,
-                    'productline'   => $productLine->getName(),
-                    'zone'          => $zone->getName(),
-                    'nextIncidentId' => $nextIncident ? $nextIncident->getId() : null
+                    'incidentCategory'  => $incident ? $incident->getIncidentCategory() : null,
+                    'incidents'         => $incidents,
+                    'productline'       => $productLine->getName(),
+                    'zone'              => $zone->getName(),
+                    'nextIncidentId'    => $nextIncident ? $nextIncident->getId() : null
                 ]
 
             );
@@ -191,7 +191,6 @@ class IncidentController extends FrontController
 
     // create a route to delete a file
     #[Route('/delete/{productline}/{name}', name: 'incident_delete_file')]
-
     public function delete_file(string $name = null, string $productline = null, IncidentsService $incidentsService): Response
     {
         $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productline]);
@@ -203,8 +202,8 @@ class IncidentController extends FrontController
         return $this->redirectToRoute(
             'app_base',
             [
-                'zones'       => $this->zoneRepository->findAll(),
-                'productlines' => $this->productLineRepository->findAll(),
+                'zones'         => $this->zoneRepository->findAll(),
+                'productlines'  => $this->productLineRepository->findAll(),
                 'incidents'     => $this->incidentRepository->findAll(),
             ]
         );
@@ -220,16 +219,14 @@ class IncidentController extends FrontController
         $productLine = $incident->getProductLine();
         $zone = $productLine->getZone();
 
-
         $form = $this->createForm(IncidentType::class, $incident);
         return $this->render(
             'services/uploads/uploads_modification.html.twig',
             [
-                'upload'      => $incident,
-                'zone'        => $zone,
-                'productLine' => $productLine,
-
-                'form' => $form->createView(),
+                'upload'        => $incident,
+                'zone'          => $zone,
+                'productLine'   => $productLine,
+                'form'          => $form->createView(),
             ]
         );
     }
@@ -259,7 +256,6 @@ class IncidentController extends FrontController
 
         // Create a form to modify the Upload entity
         $form = $this->createForm(IncidentType::class, $incident);
-
         $logger->info('Form data before manipulation:', ['formData' => $formData]);
 
         // Handle the form data on POST requests
@@ -282,9 +278,9 @@ class IncidentController extends FrontController
                 $logger->error('Failed to modify file', ['incident' => $incident, 'error' => $e->getMessage()]);
 
                 $response = [
-                    'status' => 'error',
-                    'message' => 'Une erreur s\'est produite lors de la modification du fichier.',
-                    'error' => $e->getMessage(),
+                    'status'    => 'error',
+                    'message'   => 'Une erreur s\'est produite lors de la modification du fichier.',
+                    'error'     => $e->getMessage(),
                 ];
 
                 return new JsonResponse($response);
@@ -319,10 +315,10 @@ class IncidentController extends FrontController
 
         // If it's a GET request, render the form
         return $this->render('services/incidents/incidents_modification.html.twig', [
-            'form' => $form->createView(),
-            'zone'        => $zone,
-            'productLine' => $productLine,
-            'incident' => $incident
+            'form'          => $form->createView(),
+            'zone'          => $zone,
+            'productLine'   => $productLine,
+            'incident'      => $incident
         ]);
     }
 }

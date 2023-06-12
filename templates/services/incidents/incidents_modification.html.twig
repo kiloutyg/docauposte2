@@ -20,7 +20,7 @@
 						:
 					</h3>
 				</p>
-				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_incident_modify_file', {'incidentId': incident.id})}) }}
+				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyIncidentForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_incident_modify_file', {'incidentId': incident.id})}) }}
 				<div class="fallback">
 					<div class="mb-3">
 						{{ form_label(form.file, 'Select a file to upload:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
@@ -43,7 +43,7 @@
 						{% set lastProductLine = incident.productLine %}
 						Produit:
 						{{ lastProductLine.name|split('.')|first|capitalize }}
-						>
+
 					{% endif %}
 
 
@@ -57,12 +57,12 @@
 							</select>
 						</div>
 						<div class="col-md-2 col-sm-2 mt-2 mb-2">
-							<label for="incidents_productline" style="color:white">Ligne :</label>
+							<label for="incident_productline" style="color:white">Ligne :</label>
 						</div>
 
 
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
-							{{ form_widget(form.productline,{'attr': {'class': 'form-select', 'name': 'incidents_productline', 'id': 'incidents_productline', 'required': true}}) }}
+							{{ form_widget(form.productline,{'attr': {'class': 'form-select', 'name': 'incident_productline', 'id': 'incident_productline', 'required': true}}) }}
 						</div>
 					</div>
 				</div>
@@ -76,11 +76,11 @@
 	</div>
 {% endblock %}
 {% block javascripts %}
-	{{ encore_entry_script_tags('cascading-dropdowns') }}
+	{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
 	<script>
 		window.onload = function () {
-let selectElement = document.getElementById('upload_button');
-selectElement.innerHTML = '<option value="" selected disabled hidden>Choisir un bouton</option>';
+let selectElement = document.getElementById('incidents_productline');
+selectElement.innerHTML = '<option value="" selected disabled hidden>Choisir un produit</option>';
 }
 	</script>
 
