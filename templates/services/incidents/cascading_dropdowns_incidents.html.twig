@@ -9,10 +9,10 @@
 		</select>
 	</div>
 	<div class="col-md-2 col-sm-2 mt-2 mb-2">
-		<label for="incidents_productline" style="color:white">Ligne :</label>
+		<label for="incident_productline" style="color:white">Ligne :</label>
 	</div>
 	<div class="col-md-10 col-sm-10 mt-2 mb-2">
-		<select name="incidents_productline" id="incidents_productline" class="form-select" required>
+		<select name="incident_productline" id="incident_productline" class="form-select" required>
 			<option value="" selected disabled hidden>Choisir une Ligne</option>
 		</select>
 	</div>
@@ -31,7 +31,7 @@
 <br><br>
 {% if is_granted('ROLE_ADMIN') %}
 	<div class="row mb-3">
-		<label for="incidents_newFileName" class="form-label   ">Nouvelle Category d'Incident :</label>
+		<label for="incidents_newFileName" class="form-label">Nouvelle Category d'Incident :</label>
 		<div class="col-sm">
 			<input type="text" class="form-control" id="incident_incidentsCategory_name" name="incident_incidentsCategory_name" placeholder="Entrer une nouvelle categorie d'incident (optionnel)">
 		</div>

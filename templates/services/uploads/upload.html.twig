@@ -2,31 +2,36 @@
 
 	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
 		<div class="card-body ">
-			<div class="row d-flex align-items-center gy-lg-0 gy-5">
+			<h4 class="card-title text-white m-0">
+				<strong>Ajouter un fichier :</strong>
+			</h4>
+			<form class="form-floating justify-content-center " id="upload-form" action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
 
-				<div class="col-md-6">
-					<p class="text-white m-0">
-						Ajouter un fichier :
-					</p>
-					<form class="form-floating justify-content-center " id="upload-form" action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
-						<div class="fallback">
-							<input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
+				<div class="row d-flex align-items-center gy-5">
 
-							<div class="mb-3">
-								<label for="newFileName" class="form-label">Nom du fichier :</label>
-								<input type="text" class="form-control" id="newFileName" name="newFileName" placeholder="Entrer un nouveau nom de fichier (optionnel)">
-							</div>
-							{% include 'services/uploads/cascading_dropdowns.html.twig' %}
+
+					<div class="fallback">
+						<input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
+
+						<div class="mb-3">
+							<label for="newFileName" class="form-label">Nom du fichier :</label>
+							<input type="text" class="form-control" id="newFileName" name="newFileName" placeholder="Entrer un nouveau nom de fichier (optionnel)">
 						</div>
-						<div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
-							<button type="submit" class="btn btn-primary">Charger</button>
-						</div>
-					</form>
-				</div>
+						{% include 'services/uploads/cascading_dropdowns.html.twig' %}
+					</div>
 
-				<div class="col-md-6">{% include 'services/uploads/uploaded_list.html.twig' %}
+
 				</div>
-			</div>
+				<div class="row justify-content-center">
+					<div class="col-md-2 "></div>
+					<div class="d-grid col-md-8 ">
+						<button type="submit" class="btn btn-primary text-uppercase fw-bold ">Charger</button>
+					</div>
+				</div>
+				<hr class="my-4">
+			</form>
+
+			{% include 'services/uploads/uploaded_list.html.twig' %}
 		</div>
 	</div>
 {% endblock %}
