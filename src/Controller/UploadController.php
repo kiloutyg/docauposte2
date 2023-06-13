@@ -99,7 +99,7 @@ class UploadController extends FrontController
 
 
     // create a route to delete a file
-    #[Route('/delete/{button}/{filename}', name: 'delete_file')]
+    #[Route('/delete/upload/{button}/{filename}', name: 'delete_file')]
 
     public function delete_file(string $filename = null, string $button = null, UploadsService $uploadsService): Response
     {
