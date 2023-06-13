@@ -36,26 +36,26 @@
 					{% if lastZone != upload.button.category.productLine.zone %}
 						{% set lastZone = upload.button.category.productLine.zone %}
 						Zone:
-						{{ lastZone.name|split('.')|first|capitalize }}
+						{{ lastZone.name|split('.')|first|upper }}
 						>
 					{% endif %}
 					{% if lastProductLine != upload.button.category.productLine %}
 						{% set lastProductLine = upload.button.category.productLine %}
 						Produit:
-						{{ lastProductLine.name|split('.')|first|capitalize }}
+						{{ lastProductLine.name|split('.')|first|upper }}
 						>
 					{% endif %}
 					{% if lastCategory != upload.button.category %}
 						{% set lastCategory = upload.button.category %}
 						Categorie:
-						{{ lastCategory.name|split('.')|first|capitalize }}
+						{{ lastCategory.name|split('.')|first|upper }}
 						>
 					{% endif %}
 
 					{% if lastButton != upload.button %}
 						{% set lastButton = upload.button %}
 						Bouton:
-						{{ lastButton.name|split('.')|first|capitalize }}
+						{{ lastButton.name|split('.')|first|upper }}
 						:
 					{% endif %}
 

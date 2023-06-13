@@ -16,7 +16,7 @@
 		{% endblock %}
 		{% block javascripts %}
 			{{
-			            encore_entry_script_tags("app")
+		 encore_entry_script_tags("app")
 			        }}
 			{{ encore_entry_script_tags('confirmation') }}
 			{{ encore_entry_script_tags('toast') }}
@@ -123,7 +123,7 @@ let buttonIdFromServer = null;{% endif %}
 							{% for zone in zones %}
 								<a class="btn btn-primary btn-lg m-5 " role="button" aria-pressed="true" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
 									<span class="line-details text-justify">
-										{{ zone.name|split('.')|first|capitalize }}
+										{{ zone.name|split('.')|first|upper }}
 
 									</span>
 								</a>

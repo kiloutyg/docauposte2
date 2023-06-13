@@ -36,13 +36,13 @@
 					{% if lastZone != incident.productLine.zone %}
 						{% set lastZone = incident.productLine.zone %}
 						Zone:
-						{{ lastZone.name|split('.')|first|capitalize }}
+						{{ lastZone.name|split('.')|first|upper }}
 						>
 					{% endif %}
 					{% if lastProductLine != incident.productLine %}
 						{% set lastProductLine = incident.productLine %}
 						Produit:
-						{{ lastProductLine.name|split('.')|first|capitalize }}
+						{{ lastProductLine.name|split('.')|first|upper }}
 
 					{% endif %}
 

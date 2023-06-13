@@ -1,4 +1,4 @@
-<div class="flex-column align-items-center  text-white bg-secondary my-5 py-4 text-center ">
+<div class="row flex-column align-items-center  text-white bg-secondary my-5 py-4 text-center ">
 	<h5>
 		<strong>
 			Liste des documents :
@@ -6,85 +6,76 @@
 	</h5>
 
 	{% if (groupedUploads is defined) and (groupedUploads is not empty ) %}
-		<div id="accordion">
-			{% set zoneId = 0 %}
+		<div class="accordion d-grid col-8" id="accordionExample">
+			{% set outerIndex = 0 %}
 			{% for zoneName, zoneKey in groupedUploads %}
-				{% set zoneId = zoneId + 1 %}
-				<div class="card">
-					<div class="card-header" id="zoneHeading{{ zoneId }}">
-						<h5 class="mb-0">
-							<button class="btn btn-link" data-toggle="collapse" data-target="#zoneCollapse{{ zoneId }}" aria-expanded="true" aria-controls="zoneCollapse{{ zoneId }}">
-								Zone:
-								{{ zoneName|split('.')|first|capitalize }}
-							</button>
-						</h5>
-					</div>
-					<div id="zoneCollapse{{ zoneId }}" class="collapse {% if zoneId == 1 %}show{% endif %}" aria-labelledby="zoneHeading{{ zoneId }}" data-parent="#accordion">
-						<div class="card-body">
-							{% set productLineId = 0 %}
+				{% set outerIndex = outerIndex + 1 %}
+				<div class="accordion-item">
+					<h2 class="accordion-header" id="headingZone{{ outerIndex }}">
+						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone{{ outerIndex }}" aria-expanded="false" aria-controls="collapseZone{{ outerIndex }}">
+							Zone:
+							{{ zoneName|split('.')|first|upper }}
+						</button>
+					</h2>
+					<div id="collapseZone{{ outerIndex }}" class="accordion-collapse collapse" aria-labelledby="headingZone{{ outerIndex }}" data-bs-parent="#accordionExample">
+						<div class="accordion-body">
+							{% set middleIndex = 0 %}
 							{% for productLineName, productLineKey in zoneKey %}
-								{% set productLineId = productLineId + 1 %}
-								<div class="card">
-									<div class="card-header" id="productLineHeading{{ zoneId }}-{{ productLineId }}">
-										<h5 class="mb-0">
-											<button class="btn btn-link" data-toggle="collapse" data-target="#productLineCollapse{{ zoneId }}-{{ productLineId }}" aria-expanded="true" aria-controls="productLineCollapse{{ zoneId }}-{{ productLineId }}">
+								{% set middleIndex = middleIndex + 1 %}
+								<div class="accordion" id="productLineAccordion{{ outerIndex }}{{ middleIndex }}">
+									<div class="accordion-item">
+										<h2 class="accordion-header" id="headingProductLine{{ outerIndex }}{{ middleIndex }}">
+											<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProductLine{{ outerIndex }}{{ middleIndex }}" aria-expanded="false" aria-controls="collapseProductLine{{ outerIndex }}{{ middleIndex }}">
 												Produit:
-												{{ productLineName|split('.')|first|capitalize }}
+												{{ productLineName|split('.')|first|upper }}
 											</button>
-										</h5>
-									</div>
-									<div id="productLineCollapse{{ zoneId }}-{{ productLineId }}" class="collapse {% if productLineId == 1 %}show{% endif %}" aria-labelledby="productLineHeading{{ zoneId }}-{{ productLineId }}" data-parent="#zoneCollapse{{ zoneId }}">
-										<div class="card-body">
-											{% set categoryId = 0 %}
-											{% for categoryName, categoryKey in productLineKey %}
-												{% set categoryId = categoryId + 1 %}
-												<div class="card">
-													<div class="card-header" id="categoryHeading{{ zoneId }}-{{ productLineId }}-{{ categoryId }}">
-														<h5 class="mb-0">
-															<button class="btn btn-link" data-toggle="collapse" data-target="#categoryCollapse{{ zoneId }}-{{ productLineId }}-{{ categoryId }}" aria-expanded="true" aria-controls="categoryCollapse{{ zoneId }}-{{ productLineId }}-{{ categoryId }}">
-																Categorie:
-																{{ categoryName|split('.')|first|capitalize }}
-															</button>
-														</h5>
-													</div>
-													<div id="categoryCollapse{{ zoneId }}-{{ productLineId }}-{{ categoryId }}" class="collapse {% if categoryId == 1 %}show{% endif %}" aria-labelledby="categoryHeading{{ zoneId }}-{{ productLineId }}-{{ categoryId }}" data-parent="#productLineCollapse{{ zoneId }}-{{ productLineId }}">
-														<div class="card-body">
-															{% for buttonName, buttonKey in categoryKey %}
+										</h2>
+										<div id="collapseProductLine{{ outerIndex }}{{ middleIndex }}" class="accordion-collapse collapse" aria-labelledby="headingProductLine{{ outerIndex }}{{ middleIndex }}" data-bs-parent="#productLineAccordion{{ outerIndex }}{{ middleIndex }}">
+											<div class="accordion-body">
+												{% set innerIndex = 0 %}
+												{% for categoryName, categoryKey in productLineKey %}
+													{% set innerIndex = innerIndex + 1 %}
+													<div class="accordion" id="categoryAccordion{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
+														<div class="accordion-item">
+															<h2 class="accordion-header" id="headingCategory{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
+																<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}" aria-expanded="false" aria-controls="collapseCategory{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
+																	Categorie:
+																	{{ categoryName|split('.')|first|upper }}
+																</button>
+															</h2>
+															<div id="collapseCategory{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}" class="accordion-collapse collapse" aria-labelledby="headingCategory{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}" data-bs-parent="#categoryAccordion{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
+																<div class="accordion-body">
+																	{% for buttonName, buttonKey in categoryKey %}
+																		<strong>Bouton:</strong>
+																		{{ buttonName|split('.')|first|upper }}
+																		{% for upload in buttonKey %}
+																			<li class="list-group-item d-flex justify-content-between align-items-center mb-3 shadow-lg">
+																				<a href="{{ path('app_download_file', { 'filename': upload.filename }) }}" class="btn btn-link" target="_blank">
+																					-
+																					{{ upload.filename|upper }}
 
-
-																Bouton:
-																{{ buttonName|split('.')|first|capitalize }}
-																>
-																{% for upload in buttonKey %}
-
-
-																	<li class=" form-control shadow d-flex justify-content-between align-items-center mb-3">
-																		<a href="{{ path('app_download_file', { 'filename': upload.filename }) }}" class="btn btn-link" target="_blank">
-																			-
-																			{{ upload.filename }}
-																			-
-																			{{ upload.uploadedAt|date('d/m/Y') }}
-																		</a>
-																		{% if  is_granted('ROLE_LINE_ADMIN') %}
-																			<div>
-																				<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify shadow ">
-																					Modifier
 																				</a>
+																				{% if  is_granted('ROLE_LINE_ADMIN') %}
+																					<div>
+																						{{ upload.uploadedAt|date('d/m/Y') }}
+																						<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify shadow ">
+																							Modifier
+																						</a>
 
-																				<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id }) }}" class="btn btn-danger delete-upload">
-																					Supprimer
-																				</a>
-																			</div>
-																		{% endif %}
-																	</li>
-
-
-																{% endfor %}
-															{% endfor %}
+																						<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id }) }}" class="btn btn-danger delete-upload shadow">
+																							Supprimer
+																						</a>
+																					</div>
+																				{% endif %}
+																			</li>
+																		{% endfor %}
+																	{% endfor %}
+																</div>
+															</div>
 														</div>
 													</div>
-												</div>
-											{% endfor %}
+												{% endfor %}
+											</div>
 										</div>
 									</div>
 								</div>
@@ -94,6 +85,7 @@
 				</div>
 			{% endfor %}
 		</div>
+
 	{% else %}
 		<div class="alert alert-danger">
 			<a href="{{path('app_base')}}">

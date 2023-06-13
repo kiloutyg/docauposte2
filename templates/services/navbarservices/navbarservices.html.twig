@@ -63,7 +63,7 @@
 	{% for item in navbar %}
 		{% if (item is defined) and (item is not null) %}
          <li class="breadcrumb-item">
-			<a class="btn fa" style="color:white" href="{{ path('app_' ~ item.varName, params) }}">{{ item.name|split('.')|first|capitalize }}
+			<a class="btn fa" style="color:white" href="{{ path('app_' ~ item.varName, params) }}">{{ item.name|split('.')|first|upper }}
 				</a>
                 </li>	
 

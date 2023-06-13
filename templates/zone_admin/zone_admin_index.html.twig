@@ -6,7 +6,7 @@
 {% block body %}
 	<h1 class="my-4">
 		<strong>Page d'administration des Lignes de la Zone
-			{{zone.name|split('.')|first|capitalize}}</strong>
+			{{zone.name|split('.')|first|upper}}</strong>
 	</h1>
 	<h2 class="my-4">
 		<strong>Formulaire de creation de Ligne</strong>
@@ -28,7 +28,7 @@
 										<input type="text" name="productlinename" placeholder="Nom de la Ligne" required class="form-control" id="productlinename">
 									</div>
 									<div class="d-grid">
-										<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Valider</button>
+										<button class="btn btn-primary btn-login text-first|uppercase fw-bold" type="submit">Valider</button>
 									</div>
 
 								</form>
@@ -38,7 +38,7 @@
 							<div class="col-md-6">
 								<h5 class="card-title text-center mb-5 fw-light fs-5">
 									<strong>Liste des Lignes de la zone
-										{{zone.name|split('.')|first|capitalize}}:</strong>
+										{{zone.name|split('.')|first|upper}}:</strong>
 								</h5>
 								<ul class="list-unstyled">
 									{% set matchingProductLines = productLines|filter(productLine => productLine.zone.id is same as(zone.id)) %}
@@ -46,7 +46,7 @@
 										<li class="form-control d-flex justify-content-between align-items-center mb-2">
 											<a href="{{path('app_productline_admin', {productline: productLine.name, name: productLine.zone.name})}}" class="btn btn-link">
 												-
-												{{ productLine.name|split('.')|first|capitalize}}
+												{{ productLine.name|split('.')|first|upper}}
 												<span class="visually-hidden">{{ productLine.id }}</span>
 											</a>
 											<a href="{{path('app_zone_admin_delete_productline', {productline: productLine.name})}}" class="btn btn-danger delete-productline">

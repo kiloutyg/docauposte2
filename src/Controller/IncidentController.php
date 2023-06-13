@@ -140,7 +140,7 @@ class IncidentController extends FrontController
         // Check if the form is submitted
         if ($request->isMethod('POST')) {
 
-            $productline = $request->request->get('incidents_productline');
+            $productline = $request->request->get('incident_productline');
             $newname = $request->request->get('incidents_newFileName');
             $IncidentCategoryId = $request->request->get('incidents_incidentsCategory');
             $IncidentCategory = $this->incidentCategoryRepository->findoneBy(['id' => $IncidentCategoryId]);

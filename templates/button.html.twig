@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block title %}
 	Upload pour
-	{{button.name|split('.')|first|capitalize}}
+	{{button.name|split('.')|first|upper}}
 	|
 	{{ parent() }}
 {% endblock %}
@@ -19,7 +19,7 @@
 					<h2>
 						<strong>
 							Upload pour
-							{{button.name|split('.')|first|capitalize}}
+							{{button.name|split('.')|first|upper}}
 						</strong>
 					</h2>
 					{% include 'services/uploads/uploaded.html.twig' %}

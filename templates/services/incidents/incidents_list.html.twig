@@ -9,11 +9,11 @@
 		{% for zoneName, zone in groupincidents %}
 
 			Zone:
-			{{ zoneName|split('.')|first|capitalize }}
+			{{ zoneName|split('.')|first|upper }}
 			>
 			{% for productLineName, productLine in zone %}
 				Produit:
-				{{ productLineName|split('.')|first|capitalize }}
+				{{ productLineName|split('.')|first|upper }}
 				>
 
 				{% for incident in productLine %}

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 {% block title %}
-	{{zone.name|split('.')|first|capitalize}}
+	{{zone.name|split('.')|first|upper}}
 	|
 	{{ parent() }}
 {% endblock %}
@@ -17,14 +17,14 @@
 		<p>
 			<h2 class="text-justify mb-2 mt-5">
 				<strong>
-					{{ zone.name|split('.')|first|capitalize }}
+					{{ zone.name|split('.')|first|upper }}
 				</strong>
 			</h2>
 		</p>
 
 		<div>
 			<h3 class=" text-justify">Les lignes de la zone
-				{{zone.name|split('.')|first|capitalize}}:
+				{{zone.name|split('.')|first|upper}}:
 			</h3>
 			{% set matchingProductLines = [] %}
 			{% for productLine in productLines %}
@@ -41,7 +41,7 @@
 					{% for productLine in matchingProductLines %}
 						<a class="btn btn-primary btn-lg m-5" role="button" aria-pressed="true" style="color:white" href="{{path('app_productline', {productline: productLine.name, zone: productLine.zone.name} )}}">
 							<span class="line-details text-justify">
-								{{ productLine.name|split('.')|first|capitalize }}
+								{{ productLine.name|split('.')|first|upper }}
 							</span>
 						</a>
 					{% endfor %}

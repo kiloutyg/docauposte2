@@ -1,17 +1,14 @@
-@import "~bootstrap";
+
+
+@import "custom";
+@import "~bootstrap/scss/bootstrap";
+@import '~bootstrap';
+@import "~@fontsource/roboto-condensed/index.css";
+@import "~@fortawesome/fontawesome-free/scss/fontawesome";
+@import "~@fortawesome/fontawesome-free/scss/regular";
+@import "~@fortawesome/fontawesome-free/scss/solid";
+@import "~@fortawesome/fontawesome-free/scss/brands";
 @import "~@fortawesome/fontawesome-free/css/all.css";
-@import "~@fontsource/roboto-condensed";
-
-/* body {
-    background-color: lightgray;
-    color: #fff;
-    font-family: 'Roboto Condensed', sans-serif;
-} */
-
-
-/* body {
-    background-color: rgb(12, 24, 179);
-} */
 
 body {
     background-color: #2c5066;

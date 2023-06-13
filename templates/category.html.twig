@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 {% block title %}
-	{{category.name|split('.')|first|capitalize}}
+	{{category.name|split('.')|first|upper}}
 	|
 	{{ parent() }}
 {% endblock %}
@@ -18,13 +18,13 @@
 		<p>
 			<h2 class="text-justify mb-2 mt-5">
 				<strong>
-					{{ category.name|split('.')|first|capitalize}}
+					{{ category.name|split('.')|first|upper}}
 				</strong>
 			</h2>
 		</p>
 		<div>
 			<h3 class="text-justify">Les boutons de la catégorie
-				{{ category.name|split('.')|first|capitalize}}
+				{{ category.name|split('.')|first|upper}}
 				:
 			</h3>
 			{% set matchingButtons = [] %}
@@ -43,7 +43,7 @@
 
 						<a class="btn btn-primary btn-lg m-5" role="button" aria-pressed="true" style="color:white" href="{{path('app_button', {button: button.name, category: button.category.name, productline: button.category.productLine.name, zone: button.category.productLine.zone.name})}}">
 							<span class="line-details text-justify">
-								{{ button.name|split('.')|first|capitalize }}
+								{{ button.name|split('.')|first|upper}}
 
 							</span>
 						</a>
