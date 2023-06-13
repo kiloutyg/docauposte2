@@ -22,8 +22,8 @@ class SuperAdminController extends BaseController
 
     public function index(IncidentsService $incidentsService, UploadsService $uploadsService, AuthenticationUtils $authenticationUtils,): Response
     {
-        $incidents = [];
-        $uploads = [];
+        $incidents = $this->incidentRepository->findAll();
+        $uploads = $this->uploadRepository->findAll();
 
         $groupedUploads = $uploadsService->groupUploads($uploads);
         $groupIncidents = $incidentsService->groupIncidents($incidents);

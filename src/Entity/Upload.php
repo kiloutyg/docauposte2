@@ -38,6 +38,9 @@ class Upload
     #[ORM\JoinColumn(nullable: false)]
     private ?Button $button = null;
 
+    #[ORM\ManyToOne(inversedBy: 'uploads')]
+    private ?DiplayOption $displayOption = null;
+
 
 
 
@@ -166,4 +169,16 @@ class Upload
 
     //     return $this;
     // }
+
+    public function getDisplayOption(): ?DiplayOption
+    {
+        return $this->displayOption;
+    }
+
+    public function setDisplayOption(?DiplayOption $displayOption): static
+    {
+        $this->displayOption = $displayOption;
+
+        return $this;
+    }
 }
