@@ -6,15 +6,15 @@
 {% block body %}
 
 	<script>
-		{% if zone is defined and zone is not null %}
-zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}
-{% if productLine is defined and productLine is not null %}
-productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}
-{% if category is defined and category is not null %}
-categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}
-{% if button is defined and button is not null %}
-buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
+		let zoneIdFromServer = null;
+let productLineIdFromServer = null;
+let categoryIdFromServer = null;
+let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}
+{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}
+{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}
+{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
 	</script>
+
 
 	<h1 class="my-4">
 		<strong>Page de Super-Administration</strong>

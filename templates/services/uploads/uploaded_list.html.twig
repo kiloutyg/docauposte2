@@ -56,7 +56,7 @@
 
 																				</a>
 																				{% if  is_granted('ROLE_LINE_ADMIN') %}
-																					<div>
+																					<div class="ml-auto">
 																						{{ upload.uploadedAt|date('d/m/Y') }}
 																						<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify shadow ">
 																							Modifier
