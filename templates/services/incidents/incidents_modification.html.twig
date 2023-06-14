@@ -4,6 +4,16 @@
 	|
 	{{ parent() }}
 {% endblock %}
+{% block javascripts %}
+	{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
+	<script>
+		window.onload = function () {
+let selectElement = document.getElementById('incident_productline');
+selectElement.innerHTML = '<option value="" selected disabled hidden>Choisir un produit</option>';
+}
+	</script>
+
+{% endblock %}
 {% block body %}
 	{% set lastZone = null %}
 	{% set lastProductLine = null %}
@@ -20,6 +30,7 @@
 						:
 					</h3>
 				</p>
+
 				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyIncidentForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_incident_modify_file', {'incidentId': incident.id})}) }}
 				<div class="fallback">
 					<div class="mb-3">
@@ -49,10 +60,10 @@
 
 					<div class="row">
 						<div class="col-md-2 col-sm-2 mt-2 mb-2">
-							<label for="incidents_zone" style="color:white">Zone :</label>
+							<label for="incident_zone" style="color:white">Zone :</label>
 						</div>
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
-							<select name="incidents_zone" id="incidents_zone" class="form-select" required>
+							<select name="incident_zone" id="incident_zone" class="form-select" required>
 								<option value="" selected disabled hidden>Choisir une Zone</option>
 							</select>
 						</div>
@@ -74,15 +85,4 @@
 			</div>
 		</div>
 	</div>
-{% endblock %}
-{% block javascripts %}
-	{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
-	<script>
-		window.onload = function () {
-let selectElement = document.getElementById('incident_productline');
-selectElement.innerHTML = '<option value="" selected disabled hidden>Choisir un produit</option>';
-}
-	</script>
-
-	{% block javascript_data %}{% endblock %}
 {% endblock %}

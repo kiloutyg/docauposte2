@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\File;
@@ -101,7 +102,7 @@ class UploadController extends FrontController
     // create a route to delete a file
     #[Route('/delete/upload/{button}/{filename}', name: 'delete_file')]
 
-    public function delete_file(string $filename = null, string $button = null, UploadsService $uploadsService): Response
+    public function delete_file(string $filename = null, string $button = null, UploadsService $uploadsService): RedirectResponse
     {
         $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
 

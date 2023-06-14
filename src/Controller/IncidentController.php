@@ -67,7 +67,6 @@ class IncidentController extends FrontController
                 [
                     'incidentid'        => $incident ? $incident->getId() : null,
                     'incident'          => $incident,
-                    // ? $incident->getName() : null,
                     'incidentCategory'  => $incident ? $incident->getIncidentCategory() : null,
                     'incidents'         => $incidents,
                     'productline'       => $productLine->getName(),
@@ -221,12 +220,12 @@ class IncidentController extends FrontController
 
         $form = $this->createForm(IncidentType::class, $incident);
         return $this->render(
-            'services/uploads/uploads_modification.html.twig',
+            'services/incidents/incidents_modification.html.twig',
             [
-                'upload'        => $incident,
+                'form'          => $form->createView(),
                 'zone'          => $zone,
                 'productLine'   => $productLine,
-                'form'          => $form->createView(),
+                'incident'      => $incident
             ]
         );
     }
@@ -243,27 +242,16 @@ class IncidentController extends FrontController
         $zone = $productLine->getZone();
 
         if (!$incident) {
-            $logger->error('Upload not found', ['incidentId' => $incidentId]);
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
             return $this->redirectToRoute('app_base');
         }
 
-        $logger->info('Retrieved Incident entity:', ['incident' => $incident]);
-
-        // Get form data
-        $formData = $request->request->all();
-        $logger->info('Form data before any manipulation:', ['formData' => $formData]);
-
         // Create a form to modify the Upload entity
         $form = $this->createForm(IncidentType::class, $incident);
-        $logger->info('Form data before manipulation:', ['formData' => $formData]);
 
         // Handle the form data on POST requests
-        $logger->info('Form data before handleRequest:', ['formData' => $formData]);
-
         $form->handleRequest($request);
 
-        $logger->info('Form data after handleRequest:', ['formData' => $form->getData()]);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
@@ -271,18 +259,14 @@ class IncidentController extends FrontController
                 $incidentsService->modifyIncidentFile($incident);
 
                 $this->addFlash('success', 'Le fichier a été modifié.');
-                $logger->info('File modified successfully', ['incident' => $incident]);
                 return $this->redirectToRoute('app_base');
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Une erreur s\'est produite lors de la modification du fichier.');
-                $logger->error('Failed to modify file', ['incident' => $incident, 'error' => $e->getMessage()]);
-
                 $response = [
                     'status'    => 'error',
                     'message'   => 'Une erreur s\'est produite lors de la modification du fichier.',
                     'error'     => $e->getMessage(),
                 ];
-
                 return new JsonResponse($response);
             }
         }
@@ -297,9 +281,6 @@ class IncidentController extends FrontController
                 $errorMessages[] = $error->getMessage();
             }
 
-            // Print form errors
-            $logger->error('Form validation errors:', ['errors' => $errorMessages]);
-
             // Return the errors in the JSON response
             $this->addFlash('error', 'Invalid form. Check the entered data.');
             return $this->redirectToRoute('app_base', ['incidentId' => $incidentId]);
@@ -308,8 +289,6 @@ class IncidentController extends FrontController
         // If it's a POST request but the form is not valid or not submitted
         if ($request->isMethod('POST')) {
             $this->addFlash('error', 'Invalid form. Errors: ' . implode(', ', $errorMessages));
-            $logger->info('Submitted data:', $request->request->all());
-
             return $this->redirectToRoute('app_base', ['incidentId' => $incidentId]); // Return a 400 Bad Request response
         }
 

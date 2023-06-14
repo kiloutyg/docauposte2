@@ -30,25 +30,25 @@ class ApiController extends BaseController
 
         $categories = array_map(function ($category) {
             return [
-                'id' => $category->getId(),
-                'name' => $category->getName(),
-                'product_line_id' => $category->getProductLine()->getId()
+                'id'                => $category->getId(),
+                'name'              => $category->getName(),
+                'product_line_id'   => $category->getProductLine()->getId()
             ];
         }, $this->categoryRepository->findAll());
 
         $buttons = array_map(function ($button) {
             return [
-                'id' => $button->getId(),
-                'name' => $button->getName(),
-                'category_id' => $button->getCategory()->getId()
+                'id'            => $button->getId(),
+                'name'          => $button->getName(),
+                'category_id'   => $button->getCategory()->getId()
             ];
         }, $this->buttonRepository->findAll());
 
         $responseData = [
-            'zones' => $zones,
-            'productLines' => $productLines,
-            'categories' => $categories,
-            'buttons' => $buttons,
+            'zones'         => $zones,
+            'productLines'  => $productLines,
+            'categories'    => $categories,
+            'buttons'       => $buttons,
         ];
 
         return new JsonResponse($responseData);
@@ -61,31 +61,31 @@ class ApiController extends BaseController
 
         $zones = array_map(function ($zone) {
             return [
-                'id' => $zone->getId(),
-                'name' => $zone->getName()
+                'id'        => $zone->getId(),
+                'name'      => $zone->getName()
             ];
         }, $this->zoneRepository->findAll());
 
         $productLines = array_map(function ($productLine) {
             return [
-                'id' => $productLine->getId(),
-                'name' => $productLine->getName(),
-                'zone_id' => $productLine->getZone()->getId()
+                'id'        => $productLine->getId(),
+                'name'      => $productLine->getName(),
+                'zone_id'   => $productLine->getZone()->getId()
             ];
         }, $this->productLineRepository->findAll());
 
         $incidentsCategories = array_map(function ($incidentsCategory) {
             return [
-                'id' => $incidentsCategory->getId(),
-                'name' => $incidentsCategory->getName(),
+                'id'    => $incidentsCategory->getId(),
+                'name'  => $incidentsCategory->getName(),
             ];
         }, $this->incidentCategoryRepository->findAll());
 
 
         $responseData = [
-            'zones' => $zones,
-            'productLines' => $productLines,
-            'incidentsCategories' => $incidentsCategories,
+            'zones'                 => $zones,
+            'productLines'          => $productLines,
+            'incidentsCategories'   => $incidentsCategories,
         ];
 
         return new JsonResponse($responseData);

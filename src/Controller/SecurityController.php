@@ -17,14 +17,18 @@ class SecurityController extends BaseController
 
 
     #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils)
+    public function login(AuthenticationUtils $authenticationUtils, Request $request)
     {
-        if ($this->getUser()) {
-            $this->addFlash('success', 'Vous êtes connecté');
-            // return $this->redirectToRoute('app_base');
+        // if ($this->getUser()) {
+        //     $this->addFlash('success', 'Vous êtes connecté');
+        //     return $this->redirectToRoute('app_base');
+        // }
+        if ($request->isMethod('POST')) {
 
-            // Fallback to a default route if the previous URL is not set in the session
-            return $this->redirectToRoute('app_base');
+            if ($this->getUser()) {
+                $this->addFlash('success', 'Vous êtes connecté');
+                return $this->redirectToRoute('app_base');
+            }
         }
 
         $error        = $authenticationUtils->getLastAuthenticationError(); // last username entered by the user
@@ -39,10 +43,9 @@ class SecurityController extends BaseController
     }
 
     #[Route(path: '/logout', name: 'app_logout')]
-    public function logout(): response
+    public function logout(): void
     {
         $this->addFlash('success', 'Vous êtes déconnecté');
-        return $this->redirectToRoute('app_base');
         //throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 

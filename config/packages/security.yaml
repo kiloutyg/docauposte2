@@ -48,7 +48,7 @@ security:
 
         - { path: ^/incident, roles: ROLE_ADMIN }
 
-        - { path: ^/api, roles: ROLE_LINE_ADMIN }
+        # - { path: ^/api, roles: ROLE_LINE_ADMIN }
 
 
 

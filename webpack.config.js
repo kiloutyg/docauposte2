@@ -21,7 +21,6 @@ Encore
    * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
    */
   .addEntry("app", "./assets/app.js")
-  // .addEntry("style", "./assets/style.js")
   .addEntry("confirmation", "./assets/js/confirmation.js")
   .addEntry("toast", "./assets/js/toast.js")
   .addEntry("cascading-dropdowns", "./assets/js/cascading-dropdowns.js")
@@ -82,6 +81,6 @@ Encore.enableSassLoader();
 //.enableIntegrityHashes(Encore.isProduction())
 
 // uncomment if you're having problems with a jQuery plugin
-//.autoProvidejQuery()
+// Encore.autoProvidejQuery();
 
 module.exports = Encore.getWebpackConfig();

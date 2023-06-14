@@ -1,14 +1,14 @@
 // Remove the hardcoded data from your JavaScript file
-let incidentsZonesData = [];
-let incidentsProductLinesData = [];
+let incidentZoneData = [];
+let incidentProductLinesData = [];
 let incidentsCategoriesData = [];
 
 // Fetch data from the API endpoint
 fetch("/api/incidents_cascading_dropdown_data")
   .then((response) => response.json())
   .then((data) => {
-    incidentsZonesData = data.zones;
-    incidentsProductLinesData = data.productLines;
+    incidentZoneData = data.zones;
+    incidentProductLinesData = data.productLines;
     incidentsCategoriesData = data.incidentsCategories;
 
     // Call the function that initializes the cascading dropdowns
@@ -54,7 +54,7 @@ function populateDropdown(dropdown, data, selectedId) {
 }
 
 function initCascadingDropdowns() {
-  const zone = document.getElementById("incidents_zone");
+  const zone = document.getElementById("incident_zone");
   const productline = document.getElementById("incident_productline");
   const incidentsCategory = document.getElementById(
     "incidents_incidentsCategory"
@@ -63,7 +63,7 @@ function initCascadingDropdowns() {
   if (zone && productline && incidentsCategory) {
     zone.addEventListener("change", handleIncidentsZoneChange);
     populateDropdown(incidentsCategory, incidentsCategoriesData); // Populate 'category' dropdown here
-    populateDropdown(zone, incidentsZonesData);
+    populateDropdown(zone, incidentZoneData);
     resetDropdowns();
   }
 }
@@ -71,7 +71,7 @@ function initCascadingDropdowns() {
 function handleIncidentsZoneChange(event) {
   const selectedValue = parseInt(event.target.value);
   const filteredProductLines = filterData(
-    incidentsProductLinesData,
+    incidentProductLinesData,
     "zone_id",
     selectedValue
   );
@@ -82,7 +82,7 @@ function handleIncidentsZoneChange(event) {
 }
 
 function resetDropdowns() {
-  const zone = document.getElementById("incidents_zone");
+  const zone = document.getElementById("incident_zone");
   const productline = document.getElementById("incident_productline");
   const incidentsCategory = document.getElementById(
     "incidents_incidentsCategory"
@@ -100,8 +100,8 @@ document.addEventListener("turbo:load", () => {
   fetch("/api/incidents_cascading_dropdown_data")
     .then((response) => response.json())
     .then((data) => {
-      incidentsZonesData = data.zones;
-      incidentsProductLinesData = data.productLines;
+      incidentZoneData = data.zones;
+      incidentProductLinesData = data.productLines;
 
       // Initialize the cascading dropdowns and reset them on page load
       initCascadingDropdowns();
@@ -111,20 +111,22 @@ document.addEventListener("turbo:load", () => {
 });
 
 function preselectValues() {
-  const zoneDropdown = document.getElementById("incidents_zone");
-  const productLineDropdown = document.getElementById("incident_productline");
+  const incidentZoneDropdown = document.getElementById("incident_zone");
+  const incidentProductLineDropdown = document.getElementById(
+    "incident_productline"
+  );
 
   // Preselect zone
-  if (zoneDropdown && zoneIdFromServer) {
+  if (zoneIdFromServer && incidentZoneDropdown) {
     const filteredProductLines = filterData(
-      incidentsProductLinesData,
+      incidentProductLinesData,
       "zone_id",
       parseInt(zoneIdFromServer)
     );
-    populateDropdown(zoneDropdown, incidentsZonesData, zoneIdFromServer);
-    if (productLineDropdown) {
+    populateDropdown(incidentZoneDropdown, incidentZoneData, zoneIdFromServer);
+    if (incidentProductLineDropdown) {
       populateDropdown(
-        productLineDropdown,
+        incidentProductLineDropdown,
         filteredProductLines,
         productLineIdFromServer
       );
@@ -132,8 +134,8 @@ function preselectValues() {
   }
 
   // Preselect product line
-  if (productLineDropdown && productLineIdFromServer) {
-    productLineDropdown.value = productLineIdFromServer;
+  if (incidentProductLineDropdown && productLineIdFromServer) {
+    incidentProductLineDropdown.value = productLineIdFromServer;
   }
 }
 
@@ -224,17 +226,21 @@ if (modifyIncidentForm) {
 
     // Get the dropdown elements
 
-    let productLineDropdown = document.getElementById("incident_productline");
+    let incidentProductLineDropdown = document.getElementById(
+      "incident_productline"
+    );
     // Get the name input
     let nameInput = document.getElementById("incident_name");
 
     // Get the selected values
-    if (productLineDropdown) {
+    if (incidentProductLineDropdown) {
       let productlineValue = parseInt(
-        productLineDropdown.options[productLineDropdown.selectedIndex].value,
+        incidentProductLineDropdown.options[
+          incidentProductLineDropdown.selectedIndex
+        ].value,
         10
       );
-      formData.append("incidents[productline]", productlineValue);
+      formData.append("incident[productline]", productlineValue);
     }
 
     // Get the name value
@@ -242,7 +248,7 @@ if (modifyIncidentForm) {
 
     // Add the values to formData
     if (nameValue) {
-      formData.append("incidents[name]", nameValue);
+      formData.append("incident[name]", nameValue);
     }
 
     // Get the incident ID from the URL

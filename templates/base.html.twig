@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="UTF-8"/>
@@ -15,11 +14,13 @@
         }}
 		{% endblock %}
 		{% block javascripts %}
-			{{
-		 encore_entry_script_tags("app")
-			        }}
+
+			{{ encore_entry_script_tags('app') }}
 			{{ encore_entry_script_tags('confirmation') }}
 			{{ encore_entry_script_tags('toast') }}
+			{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
+			{{ encore_entry_script_tags('cascading-dropdowns') }}
+
 			<script>
 				{% if zone is defined and zone is not null %}
 let zoneIdFromServer = parseInt('{{ zone.getId() }}');
@@ -100,7 +101,9 @@ let buttonIdFromServer = null;{% endif %}
 					{% if app.user %}
 						{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
 							<aside class="position-absolute end-0">
-								<a href="{{ path('app_super_admin') }}" class="btn" style="color:white">Centre de Super-Administration</a>
+								<a href="{{ path('app_super_admin') }}" class="btn shadow" style="color:white;">
+									<strong>Centre de Super-Administration</strong>
+								</a>
 							</aside>
 						{% endif %}
 					{% endif %}

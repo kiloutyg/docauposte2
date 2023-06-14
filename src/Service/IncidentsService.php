@@ -53,11 +53,9 @@ class IncidentsService extends AbstractController
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();
         $public_dir = $this->projectDir . '/public';
-        // $IncidentCategory = $IncidentCategoryEntity->getId();
         $IncidentCategory = $this->incidentCategoryRepository->findoneBy(['id' => $IncidentCategoryId]);
 
         foreach ($files as $file) {
-
 
             // Dinamyic folder creation and file incident
             $productlinename = $productline->getName();
@@ -79,11 +77,6 @@ class IncidentsService extends AbstractController
             } else {
                 $name   = $file->getClientOriginalName();
             }
-
-            // Add .pdf extension if it is missing
-            // if (strtolower(pathinfo($name, PATHINFO_EXTENSION)) !== 'pdf') {
-            //     $name .= '.pdf';
-            // }
 
             $path       = $folderPath . '/' . $name;
             $file->move($folderPath . '/', $name);
@@ -142,7 +135,6 @@ class IncidentsService extends AbstractController
 
         // Public directory
         $public_dir = $this->projectDir . '/public';
-
 
         // Old file path
         $oldFilePath = $incident->getPath();
