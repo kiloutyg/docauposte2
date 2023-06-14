@@ -3,6 +3,11 @@ let incidentsZonesData = [];
 let incidentsProductLinesData = [];
 let incidentsCategoriesData = [];
 
+let zoneIdFromServer = null;
+let productLineIdFromServer = null;
+let categoryIdFromServer = null;
+let buttonIdFromServer = null;
+
 // Fetch data from the API endpoint
 fetch("/api/incidents_cascading_dropdown_data")
   .then((response) => response.json())
