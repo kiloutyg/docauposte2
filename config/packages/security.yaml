@@ -37,16 +37,18 @@ security:
     access_control:
         - { path: ^/super_admin, roles: ROLE_SUPER_ADMIN}
         - { path: ^/zone_admin, roles: ROLE_ADMIN }
-        - { path: ^/line_admin, roles: ROLE_LINE_ADMIN }
+        - { path: ^/productline_admin, roles: ROLE_LINE_ADMIN }
         - { path: ^/category_manager, roles: ROLE_MANAGER }
+
         - { path: ^/modify, roles: ROLE_LINE_ADMIN }
         - { path: ^/delete, roles: ROLE_LINE_ADMIN }
-
         - { path: ^/modifyfile, roles: ROLE_LINE_ADMIN }
         - { path: ^/uploading, roles: ROLE_LINE_ADMIN }
         - { path: ^/uploaded, roles: ROLE_LINE_ADMIN }
 
-        - { path: ^/incident, roles: ROLE_SUPER_ADMIN }
+        - { path: ^/incident, roles: ROLE_ZONE_ADMIN }
+
+        - { path: ^/api, roles: ROLE_LINE_ADMIN }
 
 
 

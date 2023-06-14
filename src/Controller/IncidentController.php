@@ -113,7 +113,7 @@ class IncidentController extends FrontController
     }
 
     // Create a route for incidentCategory deletion
-    #[Route('/delete/incident_incidentsCategory_deletion/{incidentCategory}', name: 'incident_incidentsCategory_deletion')]
+    #[Route('/incident/delete/incident_incidentsCategory_deletion/{incidentCategory}', name: 'incident_incidentsCategory_deletion')]
     public function incidentCategoryDeletion(string $incidentCategory): Response
     {
         $entityType = "incidentCategory";
@@ -190,7 +190,7 @@ class IncidentController extends FrontController
 
 
     // create a route to delete a file
-    #[Route('/delete/{productline}/{name}', name: 'incident_delete_file')]
+    #[Route('/incident/delete/{productline}/{name}', name: 'incident_delete_file')]
     public function delete_file(string $name = null, string $productline = null, IncidentsService $incidentsService): Response
     {
         $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productline]);
@@ -211,7 +211,7 @@ class IncidentController extends FrontController
 
 
     // create a route to display the modification page 
-    #[Route('/modifyfile/{incidentId}', name: 'incident_modify_file_page')]
+    #[Route('/incident/modifyfile/{incidentId}', name: 'incident_modify_file_page')]
 
     public function modify_file_page(string $incidentId = null): Response
     {
