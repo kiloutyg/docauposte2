@@ -1,17 +1,15 @@
-<div class="  align-items-center  text-white bg-secondary my-5 py-4 text-center mydropzone">
+<div class="align-items-center text-white bg-secondary my-5 py-4 text-center ">
 	<h5>
 		<strong>
 			Liste des documents :
 		</strong>
 	</h5>
-	{% if (groupincidents is defined) and (groupincidents is not empty)  %}
+	{% if (groupincidents is defined) and (groupincidents is not empty) %}
 		<div class="accordion" id="accordionExample">
 			{% set outerIndex = 0 %}
-
 			{% for zoneName, zone in groupincidents %}
 				{% set outerIndex = outerIndex + 1 %}
 				<div class="accordion-item">
-
 					<h2 class="accordion-header" id="headingZone{{ outerIndex }}">
 						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone{{ outerIndex }}" aria-expanded="false" aria-controls="collapseZone{{ outerIndex }}">
 							Zone:
@@ -22,15 +20,16 @@
 						<div class="accordion-body">
 							{% set middleIndex = 0 %}
 							{% for productLineName, productLine in zone %}
-								<div class="accordion" id="productLineAccordion{{ outerIndex }}{{ middleIndex }}">
+								{% set middleIndex = middleIndex + 1 %}
+								<div class="accordion" id="productLineAccordion{{ outerIndex }}-{{ middleIndex }}">
 									<div class="accordion-item">
-										<h2 class="accordion-header" id="headingProductLine{{ outerIndex }}{{ middleIndex }}">
-											<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProductLine{{ outerIndex }}{{ middleIndex }}" aria-expanded="false" aria-controls="collapseProductLine{{ outerIndex }}{{ middleIndex }}">
+										<h2 class="accordion-header" id="headingProductLine{{ outerIndex }}-{{ middleIndex }}">
+											<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProductLine{{ outerIndex }}-{{ middleIndex }}" aria-expanded="false" aria-controls="collapseProductLine{{ outerIndex }}-{{ middleIndex }}">
 												Produit:
 												{{ productLineName|split('.')|first|upper }}
 											</button>
 										</h2>
-										<div id="collapseProductLine{{ outerIndex }}{{ middleIndex }}" class="accordion-collapse collapse" aria-labelledby="headingProductLine{{ outerIndex }}{{ middleIndex }}" data-bs-parent="#productLineAccordion{{ outerIndex }}{{ middleIndex }}">
+										<div id="collapseProductLine{{ outerIndex }}-{{ middleIndex }}" class="accordion-collapse collapse" aria-labelledby="headingProductLine{{ outerIndex }}-{{ middleIndex }}" data-bs-parent="#productLineAccordion{{ outerIndex }}-{{ middleIndex }}">
 											<div class="accordion-body">
 												{% for incident in productLine %}
 													<li class="form-control shadow d-flex justify-content-between align-items-center mb-3 shadow-lg">
@@ -38,19 +37,16 @@
 															-
 															{{ incident.name|upper }}
 														</a>
-														{% if  is_granted('ROLE_LINE_ADMIN') %}
-															<div>
+														{% if is_granted('ROLE_LINE_ADMIN') %}
+															<div class="ml-auto">
 																{{ incident.uploadedAt|date('d/m/Y') }}
-
 																<a href="{{ path('app_incident_modify_file', {'incidentId': incident.id}) }}" class="btn btn-modify shadow">
 																	Modifier
 																</a>
-
 																<a href="{{ path('app_incident_delete_file', { name: incident.name, productline: incident.productline.id }) }}" class="btn btn-danger shadow delete-incident">
 																	Supprimer
 																</a>
 															</div>
-
 														{% endif %}
 													</li>
 												{% endfor %}
@@ -64,10 +60,9 @@
 				</div>
 			{% endfor %}
 		</div>
-
 	{% else %}
 		<div class="alert alert-danger">
-			<a href="{{path('app_base')}}">
+			<a href="{{ path('app_base') }}">
 				Il n'y a pas de documents disponible
 			</a>
 		</div>

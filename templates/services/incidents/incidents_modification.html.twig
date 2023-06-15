@@ -4,21 +4,17 @@
 	|
 	{{ parent() }}
 {% endblock %}
-{% block javascripts %}
-	{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
-	<script>
-		window.onload = function () {
-let selectElement = document.getElementById('incident_productline');
-selectElement.innerHTML = '<option value="" selected disabled hidden>Choisir un produit</option>';
-}
-	</script>
 
-{% endblock %}
 {% block body %}
 	{% set lastZone = null %}
 	{% set lastProductLine = null %}
 	{% set lastCategory = null %}
 	{% set lastButton = null %}
+	<script>
+		{% if zone is defined and zone is not null %}
+zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
+	</script>
+
 
 	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
 		<div class="card-body ">
@@ -85,4 +81,15 @@ selectElement.innerHTML = '<option value="" selected disabled hidden>Choisir un 
 			</div>
 		</div>
 	</div>
+{% endblock %}
+
+{% block javascripts %}
+
+	{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
+	<script>
+		window.onload = function () {
+let selectElement = document.getElementById('incident_productline');
+selectElement.innerHTML = '<option value="" selected disabled hidden>Choisir un produit</option>';
+}
+	</script>
 {% endblock %}

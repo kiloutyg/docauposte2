@@ -23,6 +23,7 @@ Encore
   .addEntry("app", "./assets/app.js")
   .addEntry("confirmation", "./assets/js/confirmation.js")
   .addEntry("toast", "./assets/js/toast.js")
+  .addEntry("server-variable", "./assets/js/server-variable.js")
   .addEntry("cascading-dropdowns", "./assets/js/cascading-dropdowns.js")
   .addEntry(
     "incident-cascading-dropdowns",

@@ -19,17 +19,11 @@ class SecurityController extends BaseController
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils, Request $request)
     {
-        // if ($this->getUser()) {
-        //     $this->addFlash('success', 'Vous êtes connecté');
-        //     return $this->redirectToRoute('app_base');
-        // }
-        if ($request->isMethod('POST')) {
-
-            if ($this->getUser()) {
-                $this->addFlash('success', 'Vous êtes connecté');
-                return $this->redirectToRoute('app_base');
-            }
+        if ($this->getUser()) {
+            $this->addFlash('success', 'Vous êtes connecté');
+            return $this->redirectToRoute('app_base');
         }
+
 
         $error        = $authenticationUtils->getLastAuthenticationError(); // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();

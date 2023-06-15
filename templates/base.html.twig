@@ -10,11 +10,10 @@
 
 		{% block stylesheets %}
 			{{
-            encore_entry_link_tags("app")
+            encore_entry_link_tags('app')
         }}
 		{% endblock %}
 		{% block javascripts %}
-
 			{{ encore_entry_script_tags('app') }}
 			{{ encore_entry_script_tags('confirmation') }}
 			{{ encore_entry_script_tags('toast') }}
@@ -22,18 +21,10 @@
 			{{ encore_entry_script_tags('cascading-dropdowns') }}
 
 			<script>
-				{% if zone is defined and zone is not null %}
-let zoneIdFromServer = parseInt('{{ zone.getId() }}');
-{% else %}
-let zoneIdFromServer = null;{% endif %}{% if productLine is defined and productLine is not null %}let productLineIdFromServer = parseInt('{{ productLine.getId() }}');
-{% else %}
-let productLineIdFromServer = null;{% endif %}{% if category is defined and category is not null %}let categoryIdFromServer = parseInt('{{ category.getId() }}');
-{% else %}
-let categoryIdFromServer = null;{% endif %}{% if button is defined and button is not null %}let buttonIdFromServer = parseInt('{{ button.getId() }}');
-{% else %}
-let buttonIdFromServer = null;{% endif %}
-			</script>
 
+				{% if zone is defined and zone is not null %}
+zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
+			</script>
 
 		{% endblock %}
 		{% include "services/_toasts.html.twig" %}
