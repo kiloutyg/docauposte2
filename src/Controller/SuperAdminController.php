@@ -116,11 +116,11 @@ class SuperAdminController extends BaseController
         }
     }
 
-    #[Route('/super_admin/delete_zone/{id}', name: 'app_super_admin_delete_zone')]
-    public function deleteEntity(string $id): Response
+    #[Route('/super_admin/delete_zone/{zone}', name: 'app_super_admin_delete_zone')]
+    public function deleteEntity(string $zone): Response
     {
         $entityType = 'zone';
-        $entityid = $this->zoneRepository->findOneBy(['name' => $id]);
+        $entityid = $this->zoneRepository->findOneBy(['name' => $zone]);
 
         $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
 

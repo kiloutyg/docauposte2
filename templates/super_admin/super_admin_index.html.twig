@@ -9,10 +9,7 @@
 		let zoneIdFromServer = null;
 let productLineIdFromServer = null;
 let categoryIdFromServer = null;
-let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}
-{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}
-{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}
-{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
+let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
 	</script>
 
 
@@ -60,11 +57,9 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 											<a href="{{path('app_zone_admin', {zone: zone.name})}}" class="btn btn-link">
 												-
 												{{ zone.name|split('.')|first|upper }}
-												<span class="visually-hidden">{{ zone.id }}</span>
 											</a>
-											<a href="{{path('app_super_admin_delete_zone', {id: zone.name})}}" class="btn btn-danger delete-zone">
+											<a href="{{path('app_super_admin_delete_zone', {zone: zone.name})}}" class="btn btn-danger delete-zone">
 												Supprimer
-												<span class="visually-hidden">{{ zone.id }}</span>
 											</a>
 										</li>
 									{% endfor %}

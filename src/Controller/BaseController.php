@@ -2,13 +2,15 @@
 
 namespace App\Controller;
 
+use  \Psr\Log\LoggerInterface;
+
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use  \Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 use App\Repository\ZoneRepository;
@@ -68,6 +70,7 @@ class BaseController extends AbstractController
     protected $incidentsService;
     protected $incidentCategoryRepository;
     protected $entityHeritanceService;
+    protected $authChecker;
 
 
 
@@ -92,6 +95,7 @@ class BaseController extends AbstractController
         IncidentsService            $incidentsService,
         IncidentCategoryRepository  $incidentCategoryRepository,
         EntityHeritanceService      $entityHeritanceService,
+        AuthorizationCheckerInterface $authChecker
 
     ) {
 
@@ -118,5 +122,6 @@ class BaseController extends AbstractController
         $this->incidentsService             = $incidentsService;
         $this->incidentCategoryRepository   = $incidentCategoryRepository;
         $this->entityHeritanceService       = $entityHeritanceService;
+        $this->authChecker                  = $authChecker;
     }
 }

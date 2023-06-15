@@ -127,11 +127,11 @@ class CategoryManagerController extends BaseController
         }
     }
 
-    #[Route('/category_manager/delete_button/{buttonid}', name: 'app_category_manager_delete_button')]
-    public function deleteEntity(string $buttonid): Response
+    #[Route('/category_manager/delete_button/{button}', name: 'app_category_manager_delete_button')]
+    public function deleteEntity(string $button): Response
     {
         $entityType = 'button';
-        $entityid = $this->buttonRepository->findOneBy(['name' => $buttonid]);
+        $entityid = $this->buttonRepository->findOneBy(['name' => $button]);
 
         $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
 

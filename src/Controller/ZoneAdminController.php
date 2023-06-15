@@ -87,7 +87,7 @@ class ZoneAdminController extends BaseController
     public function createProductLine(Request $request, string $zone = null)
     {
         // 
-        $zone = $this->zoneRepository->findOneBy(['id' => $zone]);
+        $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
 
         if (!preg_match("/^[^.]+$/", $request->request->get('productlinename'))) {
             // Handle the case when productlinne name contains disallowed characters
