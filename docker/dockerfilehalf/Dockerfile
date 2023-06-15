@@ -1,6 +1,6 @@
 FROM php:8.2-apache-bullseye
 
-ENV http_proxy='http://10.0.0.1:80'
+#ENV http_proxy='http://10.0.0.1:80'
 #COPY php.ini /usr/local/etc/php/php.ini
 COPY docker/dockerfilehalf/php.ini /usr/local/etc/php/php.ini
 
