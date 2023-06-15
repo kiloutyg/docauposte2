@@ -2,25 +2,17 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Psr\Log\LoggerInterface;
+
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 
-use App\Repository\ZoneRepository;
-use App\Repository\ProductLineRepository;
-use App\Repository\IncidentRepository;
-use App\Repository\IncidentCategoryRepository;
-
 use App\Service\IncidentsService;
 
-use App\Entity\Incident;
 use App\Entity\IncidentCategory;
 
 use App\Form\IncidentType;

@@ -8,10 +8,7 @@
 		let zoneIdFromServer = null;
 let productLineIdFromServer = null;
 let categoryIdFromServer = null;
-let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}
-{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}
-{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}
-{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
+let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
 	</script>
 
 	<h1 class="my-4">
@@ -27,57 +24,60 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 	<div class="card border-0 shadow rounded-3 my-5">
 		<div class="card-body">
 			<div class="row">
-				<div class="card border-0 shadow rounded-3 my-5  bg-secondary">
-					<div class="card-body">
-						<div class="row d-flex align-items-center gy-lg-0 gy-5">
-							<div class="col-md-6">
+				<form method="POST" action="{{ path('app_productline_admin_create_category', {productline: productLine.name}) }}">
 
-								<h5 class="card-title text-center mb-5 fw-light fs-5">
-									<strong>Creation de Catégories</strong>
-								</h5>
-								<form class="form-control" method="POST" action="{{ path('app_productline_admin_create_category', {productline: productLine.name}) }}">
-									<div class="form-control mb-3">
-										<label for="categoryname">Nom de la Catégorie</label>
-										<input type="text" name="categoryname" placeholder="Nom de la Catégorie" required class="form-control" id="categoryname">
-									</div>
-									<div class="d-grid">
-										<button class="btn btn-primary btn-login text-first|uppercase fw-bold" type="submit">Valider</button>
-									</div>
+					<div class="card border-0 shadow rounded-3 my-5  bg-secondary">
+						<div class="card-body">
+							<div class="row d-flex align-items-center gy-lg-0 gy-5">
+								<div class="col-md-6">
+
+									<h5 class="card-title text-center mb-5 fw-light fs-5">
+										<strong>Creation de Catégories</strong>
+									</h5>
+									<form class="form-floating" method='POST'>
+										<div class="form-control mb-3">
+											<label for="categoryname">Nom de la Catégorie</label>
+											<input type="text" name="categoryname" placeholder="Nom de la Catégorie" required class="form-control" id="categoryname">
+										</div>
+										<div class="d-grid">
+											<button class="btn btn-primary btn-login text-first|uppercase fw-bold" type="submit">Valider</button>
+										</div>
 
 
-								</form>
-								<hr class="my-4">
-							</div>
+									</form>
+									<hr class="my-4">
+								</div>
 
-							<div class="col-md-6">
-								<h5 class="card-title text-center mb-5 fw-light fs-5">
-									<strong>Liste des Catégories de la Ligne
-										{{productLine.name|split('.')|first|upper}}:</strong>
-								</h5>
-								<ul class="list-unstyled">
-									{% set matchingCategories = categories|filter(category => category.productLine.id is same as(productLine.id)) %}
-									{% for category in matchingCategories %}
-										<li class="form-control d-flex justify-content-between align-items-center mb-2">
-											<a href="{{path('app_category_manager', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}" class="btn btn-link">
-												-
-												{{ category.name|split('.')|first|upper }}
-												<span class="visually-hidden">{{ category.id }}</span>
-											</a>
-											<a href="{{path('app_productline_admin_delete_category', {category: category.name})}}" class="btn btn-danger delete-category">
-												Supprimer
-												<span class="visually-hidden">{{ category.id }}</span>
-											</a>
-										</li>
-									{% else %}
-										<li class="alert alert-danger">
-											<a href="{{path('app_base')}}">Il n'y a pas de catégories dans cette ligne.</a>
-										</li>
-									{% endfor %}
-								</ul>
+								<div class="col-md-6">
+									<h5 class="card-title text-center mb-5 fw-light fs-5">
+										<strong>Liste des Catégories de la Ligne
+											{{productLine.name|split('.')|first|upper}}:</strong>
+									</h5>
+									<ul class="list-unstyled">
+										{% set matchingCategories = categories|filter(category => category.productLine.id is same as(productLine.id)) %}
+										{% for category in matchingCategories %}
+											<li class="form-control d-flex justify-content-between align-items-center mb-2">
+												<a href="{{path('app_category_manager', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}" class="btn btn-link">
+													-
+													{{ category.name|split('.')|first|upper }}
+													<span class="visually-hidden">{{ category.id }}</span>
+												</a>
+												<a href="{{path('app_productline_admin_delete_category', {category: category.name})}}" class="btn btn-danger delete-category">
+													Supprimer
+													<span class="visually-hidden">{{ category.id }}</span>
+												</a>
+											</li>
+										{% else %}
+											<li class="alert alert-danger">
+												<a href="{{path('app_base')}}">Il n'y a pas de catégories dans cette ligne.</a>
+											</li>
+										{% endfor %}
+									</ul>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+				</form>
 			</div>
 		</div>
 	</div>

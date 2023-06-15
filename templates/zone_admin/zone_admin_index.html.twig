@@ -22,54 +22,57 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 	<div class="card border-0 shadow rounded-3 my-5">
 		<div class="card-body">
 			<div class="row">
-				<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
-					<div class="card-body">
-						<div class="row d-flex align-items-center gy-lg-0 gy-5 ">
-							<div class="col-md-6">
+				<form method="POST" action="{{ path('app_zone_admin_create_productline', {zone: zone.name}) }}">
 
-								<h5 class="card-title text-center mb-5 fw-light fs-5">
-									<strong>Creation de Lignes</strong>
-								</h5>
-								<form class="form-control" method="POST" action="{{ path('app_zone_admin_create_productline', {zone: zone.name}) }}">
-									<div class="form-control mb-3">
-										<label for="productlinename">Nom de la Ligne</label>
-										<input type="text" name="productlinename" placeholder="Nom de la Ligne" required class="form-control" id="productlinename">
-									</div>
-									<div class="d-grid">
-										<button class="btn btn-primary btn-login text-first|uppercase fw-bold" type="submit">Valider</button>
-									</div>
+					<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
+						<div class="card-body">
+							<div class="row d-flex align-items-center gy-lg-0 gy-5 ">
+								<div class="col-md-6">
 
-								</form>
-								<hr class="my-4">
+									<h5 class="card-title text-center mb-5 fw-light fs-5">
+										<strong>Creation de Lignes</strong>
+									</h5>
+									<form class="form-floating" method='POST'>
+										<div class="form-control mb-3">
+											<label for="productlinename">Nom de la Ligne</label>
+											<input type="text" name="productlinename" placeholder="Nom de la Ligne" required class="form-control" id="productlinename">
+										</div>
+										<div class="d-grid">
+											<button class="btn btn-primary btn-login text-first|uppercase fw-bold" type="submit">Valider</button>
+										</div>
 
-							</div>
-							<div class="col-md-6">
-								<h5 class="card-title text-center mb-5 fw-light fs-5">
-									<strong>Liste des Lignes de la zone
-										{{zone.name|split('.')|first|upper}}:</strong>
-								</h5>
-								<ul class="list-unstyled">
-									{% set matchingProductLines = productLines|filter(productLine => productLine.zone.id is same as(zone.id)) %}
-									{% for productLine in matchingProductLines %}
-										<li class="form-control d-flex justify-content-between align-items-center mb-2">
-											<a href="{{path('app_productline_admin', {productline: productLine.name, name: productLine.zone.name})}}" class="btn btn-link">
-												-
-												{{ productLine.name|split('.')|first|upper}}
-											</a>
-											<a href="{{path('app_zone_admin_delete_productline', {productline: productLine.name})}}" class="btn btn-danger delete-productline">
-												Supprimer
-											</a>
-										</li>
-									{% else %}
-										<li class="alert alert-danger">
-											<a href="{{path('app_base')}}">Il n'y a pas de lignes dans cette zone.</a>
-										</li>
-									{% endfor %}
-								</ul>
+									</form>
+									<hr class="my-4">
+
+								</div>
+								<div class="col-md-6">
+									<h5 class="card-title text-center mb-5 fw-light fs-5">
+										<strong>Liste des Lignes de la zone
+											{{zone.name|split('.')|first|upper}}:</strong>
+									</h5>
+									<ul class="list-unstyled">
+										{% set matchingProductLines = productLines|filter(productLine => productLine.zone.id is same as(zone.id)) %}
+										{% for productLine in matchingProductLines %}
+											<li class="form-control d-flex justify-content-between align-items-center mb-2">
+												<a href="{{path('app_productline_admin', {productline: productLine.name, name: productLine.zone.name})}}" class="btn btn-link">
+													-
+													{{ productLine.name|split('.')|first|upper}}
+												</a>
+												<a href="{{path('app_zone_admin_delete_productline', {productline: productLine.name})}}" class="btn btn-danger delete-productline">
+													Supprimer
+												</a>
+											</li>
+										{% else %}
+											<li class="alert alert-danger">
+												<a href="{{path('app_base')}}">Il n'y a pas de lignes dans cette zone.</a>
+											</li>
+										{% endfor %}
+									</ul>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+				</form>
 			</div>
 		</div>
 	</div>
