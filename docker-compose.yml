@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   database:
-    image: mariadb:latest
+    image: mariadb:lts
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -36,9 +36,10 @@ services:
     volumes:
       - ./:/var/www
     ports:
-      - "8000:80"
-      - "9000:8000"
-      - "9080:8080"
+      - "80:80"
+      # - "8000:80"
+      # - "9000:8000"
+      # - "9080:8080"
     depends_on :
       - database
     networks:

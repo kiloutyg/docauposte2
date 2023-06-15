@@ -1,4 +1,4 @@
-FROM php:8.2-apache-bullseye
+FROM php:8.2-apache-bookworm
 
 ENV http_proxy='http://10.0.0.1:80'
 COPY php.ini /usr/local/etc/php/php.ini
@@ -23,7 +23,7 @@ WORKDIR /var/www
 RUN sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/sites-available/000-default.conf
 
 # install nodejs 
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get install -y nodejs \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
