@@ -99,4 +99,4 @@ php bin/console make:migration
 php bin/console doctrine:migrations:migrate 
 
 exec apache2-foreground  &
-yarn encore production 
+yarn encore dev --watch
