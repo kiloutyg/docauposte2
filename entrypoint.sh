@@ -1,7 +1,7 @@
 #!/bin/sh
 mkdir -p ./public/doc 
 export http_proxy='http://10.0.0.1:80'
-composer require --no-dev    symfony/maker-bundle \
+composer require --dev    symfony/maker-bundle \
                         symfony/orm-pack \
                         symfony/asset \
                         symfony/apache-pack \
@@ -63,7 +63,7 @@ composer require --no-dev    symfony/maker-bundle \
                         symfony/web-profiler-bundle
         
 
-yarn add  bootstrap \
+yarn add --dev bootstrap \
                 jquery \
                 @popperjs/core \
                 sass-loader \
@@ -89,8 +89,8 @@ yarn add  bootstrap \
                 node-sass
                 
 
-composer install
-composer update 
+composer install &&
+composer update  &&
 yarn install
 yarn upgrade
 composer clear-cache
