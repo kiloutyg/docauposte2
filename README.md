@@ -20,23 +20,23 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 1 - Install git :
 
     A - Install git foss utility :
-
+```
         sudo yum install git
-
+```
     B - Create your ssh key pair follow the instruction and default option, I STRONGLY ADVISE TO PUT A PASSWORD but it is optional:
-
+```
         ssh-keygen -t ed25519 -C "any_comment_you_wish_to_add"
-
+```
     C - Copy the key in your clipboard :
 
         a - From a command prompt on a linux desktop environment :
-
+```
             xclip -sel clip < ~/.ssh/id_ed25519.pub
-
+```
         b - From a remote connection to a server from a windows computer for example, print it and then copy it with your mouse or CTRL+C or CTRL+SHIFT+C : 
-
+```
             cat ~/.ssh/id_ed25519.pub 
-
+```
     D - Paste the key in your github account : 
 
         - Go to your account settings
@@ -52,14 +52,14 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
         - Select the type of key it is, most of the time it will be an Authentication Key
 
         - Once everything is done click on "Add SSH key" 
-        
+
 
 2 - Add docker CE repo : 
-
+```
     sudo subscription-manager repo-override --repo=PlasticOmnium_Docker_Docker_CE_Stable --add=enabled:1
-
+```
 3 - Install Docker :
-
+```
     sudo yum remove docker \
                   docker-client \
                   docker-client-latest \
@@ -70,47 +70,51 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
                   docker-engine \
                   podman \
                   runc
-
+```
+```
     sudo yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
-
+```
 4 - Docker Post-installation Step.
-
+```
     sudo groupadd docker
     sudo usermod -aG docker $USER
-
+```
+```
     newgrp docker
-
+```
+```
     sudo systemctl start docker
     sudo systemctl start containerd.service
     sudo systemctl enable docker.service
     sudo systemctl enable containerd.service
-
+```
 
 ## Stack installation step : 
 
 
 1 - Clone the repo:
-
+```
     git clone https://github.com/kiloutyg/docauposte2
     cd docauposte2
-
+```
 2 - Run the DotEnv creation script : 
+```
     sudo chmod +x env_create.sh
     ./env_create.sh
-
+```
 3 - If Docker and Docker compose are installed already, just run (with or without sudo depending of Docker config):
-    
+    ```
     docker compose up --build
-    
+   ``` 
 4 - Once the containers are ready and running enter the "web"(yes, it is its name) one : 
-    
+    ```
     docker compose exec -ti web bash
-    
+    ```
 5 - IF AN ERROR ABOUT SQL POP when connecting to the app in your web browser : Then prepare Doctrine migration and then migrate : 
-
+```
     php bin/console make:migration
     php bin/console doctrine:migrations:migrate
-    
+   ``` 
 6 - Run a CHMOD command on the app folder to be sure to stay in control of every file. 
 
 7 - At this point you can begin to configure the App depending on your need. 
