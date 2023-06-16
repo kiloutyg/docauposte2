@@ -94,7 +94,7 @@ b - From a remote connection to a server from a windows computer for example, pr
 
 #### 1 - Clone the repo:
 ```
-    git clone https://github.com/kiloutyg/docauposte2
+    git clone -b develop https://github.com/kiloutyg/docauposte2
     cd docauposte2
 ```
 #### 2 - Run the DotEnv (to build .env and .env.local, they are similar at this stage) creation script : 
