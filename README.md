@@ -17,7 +17,7 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 ## Prerequesite :
 
 
-1 - Install git :
+### 1 - Install git :
 
 A - Install git utility (you can use an other one if you wish to like gh or gitflow):
 ```
@@ -54,11 +54,11 @@ D - Paste the key in your github account :
 - Once everything is done click on "Add SSH key" 
 
 
-2 - Add docker CE repo : 
+### 2 - Add docker CE repo : 
 ```
     sudo subscription-manager repo-override --repo=PlasticOmnium_Docker_Docker_CE_Stable --add=enabled:1
 ```
-3 - Install Docker :
+### 3 - Install Docker :
 ```
     sudo yum remove docker \
                   docker-client \
@@ -74,7 +74,7 @@ D - Paste the key in your github account :
 ```
     sudo yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
 ```
-4 - Docker Post-installation Step.
+### 4 - Docker Post-installation Step.
 ```
     sudo groupadd docker
     sudo usermod -aG docker $USER
@@ -92,34 +92,34 @@ D - Paste the key in your github account :
 ## Stack installation step : 
 
 
-1 - Clone the repo:
+### 1 - Clone the repo:
 ```
     git clone https://github.com/kiloutyg/docauposte2
     cd docauposte2
 ```
-2 - Run the DotEnv creation script : 
+### 2 - Run the DotEnv creation script : 
 ```
     sudo chmod +x env_create.sh
     ./env_create.sh
 ```
-3 - If Docker and Docker compose are installed already, just run (with or without sudo depending of Docker config):
+### 3 - If Docker and Docker compose are installed already, just run (with or without sudo depending of Docker config):
 ```
     docker compose up --build
 ``` 
-4 - Once the containers are ready and running enter the "web"(yes, it is its name) one : 
+### 4 - Once the containers are ready and running enter the "web"(yes, it is its name) one : 
 ```
     docker compose exec -ti web bash
 ```
-5 - IF AN ERROR ABOUT SQL POP when connecting to the app in your web browser : Then prepare Doctrine migration and then migrate : 
+#### 5 - IF AN ERROR ABOUT SQL POP when connecting to the app in your web browser : Then prepare Doctrine migration and then migrate : 
 ```
     php bin/console make:migration
     php bin/console doctrine:migrations:migrate
 ``` 
-6 - Run a CHMOD command on the app folder to be sure to stay in control of every file. 
+#### 6 - Run a CHMOD command on the app folder to be sure to stay in control of every file. 
 
-7 - At this point you can begin to configure the App depending on your need. 
+#### 7 - At this point you can begin to configure the App depending on your need. 
 
-8 - IF NEEDED : Modify the value of post_max_size  and upload_max_filesize of the correct php.ini in /usr/local/etc/php respectively line 701 and 853 in the dev one, or line 703 and 855 in the production one.
+#### 8 - IF NEEDED : Modify the value of post_max_size  and upload_max_filesize of the correct php.ini in /usr/local/etc/php respectively line 701 and 853 in the dev one, or line 703 and 855 in the production one.
 
 
 
