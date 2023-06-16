@@ -18,7 +18,6 @@ MYSQL_PASSWORD=${MYSQL_PASSWORD}
 ###> symfony/framework-bundle ###
 APP_ENV=prod
 APP_SECRET=${APP_SECRET}
-SYMFONY_DEPRECATIONS_HELPER=weak
 ###< symfony/framework-bundle ###
 
 ###> symfony/webapp-pack ###

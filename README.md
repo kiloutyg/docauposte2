@@ -97,29 +97,65 @@ b - From a remote connection to a server from a windows computer for example, pr
     git clone https://github.com/kiloutyg/docauposte2
     cd docauposte2
 ```
-#### 2 - Run the DotEnv creation script : 
+#### 2 - Run the DotEnv (to build .env and .env.local, they are similar at this stage) creation script : 
 ```
     sudo chmod +x env_create.sh
     ./env_create.sh
 ```
 #### 3 - If Docker and Docker compose are installed already, just run (with or without sudo depending of Docker config):
 ```
-    docker compose up --build
+    docker compose up --build -d
 ``` 
-#### 4 - Once the containers are ready and running enter the "web"(yes, it is its name) one : 
+#### 4 - Once the app launched and IF AN ERROR ABOUT SQL POP when connecting to the app in your web browser : Then prepare Doctrine migration and then migrate : 
+A - Stop the docker compose stack : 
+    docker compose stop
+or
+    CTRL+C
+
+B - Append the .env and .env.local from APP_ENV=prod to APP_ENV=dev :
+```
+    sed -i 's/prod/dev/' .env
+    sed -i 's/prod/dev/' .env.local
+
+    sed -i 's/--no-dev/--dev/' entrypoint.sh
+    sed -i 's/add/add -D/' entrypoint.sh
+
+    sed -i 's/yarn encore production/yarn encore dev --watch/' entrypoint.sh
+```
+C - Re-run the building command :
+``` 
+    docker compose up --build -d
+```
+D - Enter the app container and use the bash command prompt :
 ```
     docker compose exec -ti web bash
 ```
-#### 5 - IF AN ERROR ABOUT SQL POP when connecting to the app in your web browser : Then prepare Doctrine migration and then migrate : 
+E - Run the command to build the database :
 ```
     php bin/console make:migration
     php bin/console doctrine:migrations:migrate
 ``` 
-#### 6 - Run a CHMOD command on the app folder to be sure to stay in control of every file. 
+F - Exit the container : 
+```
+    exit
+```
+G - Once you confirm that the app work as intended and display the superadmin creation interface repeat the action from A to C but with using these command instead of the ones present in B :
+```
+    sed -i 's/dev/prod/' .env
+    sed -i 's/dev/prod/' .env.local
 
-#### 7 - At this point you can begin to configure the App depending on your need. 
+    sed -i 's/--dev/--no-dev/' entrypoint.sh
+    sed -i 's/add -D/add/' entrypoint.sh
 
-#### 8 - IF NEEDED : Modify the value of post_max_size  and upload_max_filesize of the correct php.ini in /usr/local/etc/php respectively line 701 and 853 in the dev one, or line 703 and 855 in the production one.
+    sed -i 's/yarn encore dev --watch/yarn encore production/' entrypoint.sh
+```
+
+
+#### 5 - Run a CHMOD command on the app folder to be sure to stay in control of every file. 
+
+#### 6 - At this point you can begin to configure the App depending on your need. 
+
+#### 7 - IF NEEDED : Modify the value of post_max_size  and upload_max_filesize of the correct php.ini in /usr/local/etc/php respectively line 701 and 853 in the dev one, or line 703 and 855 in the production one.
 
 
 
