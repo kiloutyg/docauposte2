@@ -3,17 +3,7 @@ Created from scratch with Docker, PHP8 and Symfony.
 
 Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
-### Git usage basics.
 
-    1 - Create a Github account.
-    2 - Add your SSH key to your account folowing this documentation from GitLab : https://docs.gitlab.com/ee/user/ssh.html .
-        Quick follow through : 
-        a - Create your key pair.
-        b - Copy your Pubkey to your account. ( In your profile setting, SSH - GPG keys, new key, then validate)
-    3 - Clone the repo locally in the directory of your choosing. 
-    4 - Done ! Your ready to go. 
-
-# Latest Version : 
 ## Prerequesite :
 
 
@@ -58,7 +48,11 @@ b - From a remote connection to a server from a windows computer for example, pr
 ```
     sudo subscription-manager repo-override --repo=PlasticOmnium_Docker_Docker_CE_Stable --add=enabled:1
 ```
-#### 3 - Install Docker :
+#### 3 - Update package manager repository : 
+```
+    sudo yum update
+```
+#### 4 - Uninstall any present Docker app :
 ```
     sudo yum remove docker \
                   docker-client \
@@ -71,10 +65,11 @@ b - From a remote connection to a server from a windows computer for example, pr
                   podman \
                   runc
 ```
+#### 5 - Install docker :
 ```
     sudo yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
 ```
-#### 4 - Docker Post-installation Step.
+#### 6 - Docker Post-installation Step.
 ```
     sudo groupadd docker
     sudo usermod -aG docker $USER
@@ -94,7 +89,7 @@ b - From a remote connection to a server from a windows computer for example, pr
 
 #### 1 - Clone the repo:
 ```
-    git clone -b develop https://github.com/kiloutyg/docauposte2
+    git clone -b develop git@github.com:kiloutyg/docauposte2
     cd docauposte2
 ```
 #### 2 - Run the DotEnv (to build .env and .env.local, they are similar at this stage) creation script : 
