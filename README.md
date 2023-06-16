@@ -19,7 +19,7 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
 1 - Install git :
 
-A - Install git foss utility :
+A - Install git utility (you can use an other one if you wish to like gh or gitflow):
 ```
     sudo yum install git
 ```
