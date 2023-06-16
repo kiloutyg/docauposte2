@@ -21,21 +21,21 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
 A - Install git foss utility :
 ```
-        sudo yum install git
+    sudo yum install git
 ```
 B - Create your ssh key pair follow the instruction and default option, I STRONGLY ADVISE TO PUT A PASSWORD but it is optional:
 ```
-        ssh-keygen -t ed25519 -C "any_comment_you_wish_to_add"
+    ssh-keygen -t ed25519 -C "any_comment_you_wish_to_add"
 ```
 C - Copy the key in your clipboard :
 
 a - From a command prompt on a linux desktop environment :
 ```
-            xclip -sel clip < ~/.ssh/id_ed25519.pub
+    xclip -sel clip < ~/.ssh/id_ed25519.pub
 ```
 b - From a remote connection to a server from a windows computer for example, print it and then copy it with your mouse or CTRL+C or CTRL+SHIFT+C : 
 ```
-            cat ~/.ssh/id_ed25519.pub 
+    cat ~/.ssh/id_ed25519.pub 
 ```
 D - Paste the key in your github account : 
 
@@ -103,18 +103,18 @@ D - Paste the key in your github account :
     ./env_create.sh
 ```
 3 - If Docker and Docker compose are installed already, just run (with or without sudo depending of Docker config):
-    ```
+```
     docker compose up --build
-   ``` 
+``` 
 4 - Once the containers are ready and running enter the "web"(yes, it is its name) one : 
-    ```
+```
     docker compose exec -ti web bash
-    ```
+```
 5 - IF AN ERROR ABOUT SQL POP when connecting to the app in your web browser : Then prepare Doctrine migration and then migrate : 
 ```
     php bin/console make:migration
     php bin/console doctrine:migrations:migrate
-   ``` 
+``` 
 6 - Run a CHMOD command on the app folder to be sure to stay in control of every file. 
 
 7 - At this point you can begin to configure the App depending on your need. 
