@@ -16,6 +16,7 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 # Latest Version : 
 ## Prerequesite :
 
+
 1 - Install git :
     A - Install git foss utility :
         sudo yum install git
@@ -27,7 +28,7 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
         a - From a command prompt on a linux desktop environment :
             xclip -sel clip < ~/.ssh/id_ed25519.pub
 
-        b - From a remote connection to a server, print it and then copy it with your mouse or CTRL+C or CTRL+SHIFT+C : 
+        b - From a remote connection to a server from a windows computer for example, print it and then copy it with your mouse or CTRL+C or CTRL+SHIFT+C : 
             cat ~/.ssh/id_ed25519.pub 
 
     D - Paste the key in your github account : 
@@ -79,25 +80,28 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
     git clone https://github.com/kiloutyg/docauposte2
     cd docauposte2
 
+2 - Run the DotEnv creation script : 
+    sudo chmod +x env_create.sh
+    ./env_create.sh
 
-2 - If Docker and Docker compose are installed already, just run (with or without sudo depending of Docker config):
+3 - If Docker and Docker compose are installed already, just run (with or without sudo depending of Docker config):
     
     docker compose up --build
     
-3 - Once the containers are ready and running enter the "web"(yes, it is its name) one : 
+4 - Once the containers are ready and running enter the "web"(yes, it is its name) one : 
     
     docker compose exec -ti web bash
     
-4 - IF AN ERROR ABOUT SQL POP when connecting to the app in your web browser : Then prepare Doctrine migration and then migrate : 
+5 - IF AN ERROR ABOUT SQL POP when connecting to the app in your web browser : Then prepare Doctrine migration and then migrate : 
 
     php bin/console make:migration
     php bin/console doctrine:migrations:migrate
     
-5 - Run a CHMOD command on the app folder to be sure to stay in control of every file. 
+6 - Run a CHMOD command on the app folder to be sure to stay in control of every file. 
 
-6 - At this point you can begin to configure the App depending on your need. 
+7 - At this point you can begin to configure the App depending on your need. 
 
-7 - IF NEEDED : Modify the value of post_max_size  and upload_max_filesize of the correct php.ini in /usr/local/etc/php respectively line 701 and 853 in the dev one, or line 703 and 855 in the production one.
+8 - IF NEEDED : Modify the value of post_max_size  and upload_max_filesize of the correct php.ini in /usr/local/etc/php respectively line 701 and 853 in the dev one, or line 703 and 855 in the production one.
 
 
 
