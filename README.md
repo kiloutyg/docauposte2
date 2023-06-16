@@ -14,10 +14,30 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
     4 - Done ! Your ready to go. 
 
 # Latest Version : 
-## Prequesite :
-1 - Install git :
+## Prerequesite :
 
-    sudo yum install git
+1 - Install git :
+    A - Install git foss utility :
+        sudo yum install git
+
+    B - Create your ssh key pair follow the instruction and default option, I STRONGLY ADVISE TO PUT A PASSWORD but it is optional:
+        ssh-keygen -t ed25519 -C "any_comment_you_wish_to_add"
+
+    C - Copy the key in your clipboard :
+        a - From a command prompt on a linux desktop environment :
+            xclip -sel clip < ~/.ssh/id_ed25519.pub
+
+        b - From a remote connection to a server, print it and then copy it with your mouse or CTRL+C or CTRL+SHIFT+C : 
+            cat ~/.ssh/id_ed25519.pub 
+
+    D - Paste the key in your github account : 
+        - Go to your account settings
+        - In the access area of the summary select SSH and GPG keys
+        - Click on the button up right "New SSH key"
+        - Paste the key in the "key" input
+        - Be nice and give it a name
+        - Select the type of key it is, most of the time it will be an Authentication Key
+        - Once everything is done click on "Add SSH key" 
 
 2 - Add docker CE repo : 
 
@@ -68,7 +88,7 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
     
     docker compose exec -ti web bash
     
-4 - IF AN ERROR ABOUT SQL POP : Then prepare Doctrine migration and then migrate : 
+4 - IF AN ERROR ABOUT SQL POP when connecting to the app in your web browser : Then prepare Doctrine migration and then migrate : 
 
     php bin/console make:migration
     php bin/console doctrine:migrations:migrate
