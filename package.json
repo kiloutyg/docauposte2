@@ -1,7 +1,16 @@
 {
-    "devDependencies": {
+    "license": "UNLICENSED",
+    "private": true,
+    "scripts": {
+        "dev-server": "encore dev-server",
+        "dev": "encore dev",
+        "watch": "encore dev --watch",
+        "build": "encore production --progress"
+    },
+    "dependencies": {
         "@babel/core": "^7.17.0",
         "@babel/preset-env": "^7.16.0",
+        "@fontsource/roboto-condensed": "^5.0.3",
         "@fortawesome/fontawesome-free": "^6.4.0",
         "@hotwired/stimulus": "^3.0.0",
         "@hotwired/turbo": "^7.0.1",
@@ -16,24 +25,12 @@
         "encore": "^0.0.30-beta",
         "favicon": "^0.0.2",
         "jquery": "^3.7.0",
+        "node-sass": "^9.0.0",
         "regenerator-runtime": "^0.13.9",
-        "sass": "^1.63.4",
+        "sass": "^1.63.6",
         "sass-loader": "^13.3.2",
-        "webpack": "^5.87.0",
+        "webpack": "^5.88.1",
         "webpack-cli": "^5.1.4",
         "webpack-notifier": "^1.15.0"
-    },
-    "license": "UNLICENSED",
-    "private": true,
-    "scripts": {
-        "dev-server": "encore dev-server",
-        "dev": "encore dev",
-        "watch": "encore dev --watch",
-        "build": "encore production --progress"
-    },
-    "dependencies": {
-        "@babel/core": "^7.17.0",
-        "@babel/preset-env": "^7.16.0"
-
     }
 }

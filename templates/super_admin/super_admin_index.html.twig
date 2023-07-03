@@ -16,6 +16,18 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 	<h1 class="my-4">
 		<strong>Page de Super-Administration</strong>
 	</h1>
+	<h2 class="my-4">
+		<strong>Formulaire de creation de compte utilisateur :</strong>
+	</h2>
+	<div class="card border-0 shadow rounded-3 my-5">
+		<div class="card-body">
+			<div class="row">
+				<form method="POST" action="{{ path('app_super_admin_create_admin') }}">
+					{% include "services/accountservices/create_account.html.twig" %}
+				</form>
+			</div>
+		</div>
+	</div>
 
 	<h2 class="my-4">
 		<strong>Formulaire de creation de zones :</strong>
@@ -70,19 +82,6 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 							</div>
 						</div>
 					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-
-	<h2 class="my-4">
-		<strong>Formulaire de creation de compte utilisateur :</strong>
-	</h2>
-	<div class="card border-0 shadow rounded-3 my-5">
-		<div class="card-body">
-			<div class="row">
-				<form method="POST" action="{{ path('app_super_admin_create_admin') }}">
-					{% include "services/accountservices/create_account.html.twig" %}
 				</form>
 			</div>
 		</div>

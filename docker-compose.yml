@@ -10,6 +10,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes :
     - ./database_data:/var/lib/mysql
+    ports:
+      - "3306"
     networks:
       vpcbr:
         ipv4_address : 172.21.0.2
@@ -28,7 +30,6 @@ services:
     depends_on:
       - database
   web:
-    # image: kiloutyg/po:docauposteweb
     build: ./docker/dockerfilehalf/
     # build: ./docker/
     entrypoint: "./entrypoint.sh"
@@ -36,15 +37,27 @@ services:
     volumes:
       - ./:/var/www
     ports:
-      - "80:80"
-      # - "8000:80"
-      # - "9000:8000"
-      # - "9080:8080"
+      # - "80:80"
+      - "8000:80"
     depends_on :
       - database
     networks:
       vpcbr:
         ipv4_address : 172.21.0.4
+
+###> doctrine/doctrine-bundle ###
+  database:
+    image: postgres:${POSTGRES_VERSION:-15}-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      # You should definitely change the password in production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/postgresql/data:rw
+###< doctrine/doctrine-bundle ###
 networks:
   vpcbr:
     driver: bridge
@@ -52,3 +65,9 @@ networks:
       config:
         - subnet: 172.21.0.0/16
           gateway: 172.21.0.1
+
+
+volumes:
+###> doctrine/doctrine-bundle ###
+  database_data:
+###< doctrine/doctrine-bundle ###
