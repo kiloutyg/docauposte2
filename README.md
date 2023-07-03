@@ -77,7 +77,7 @@ It will create a folder automatically :
     docker compose up --build
     
     
-##  IF AN ERROR ABOUT SQL APPEARS : 
+###  IF AN ERROR ABOUT SQL APPEARS : 
 
 1 - Once the containers are ready and running enter the "web"(yes, it is its name) one : 
     
@@ -91,7 +91,8 @@ It will create a folder automatically :
 
 4 - At this point you can begin to configure the App depending on your need. 
 
-5 - IF NEEDED : Modify the value of post_max_size  and upload_max_filesize of the correct php.ini in /usr/local/etc/php respectively line 701 and 853 in the dev one, or line 703 and 855 in the production one.
+### IF NEEDED : 
+Modify the value of post_max_size  and upload_max_filesize of the correct php.ini in /usr/local/etc/php respectively line 701 and 853 in the dev one, or line 703 and 855 in the production one.
 
 
 
