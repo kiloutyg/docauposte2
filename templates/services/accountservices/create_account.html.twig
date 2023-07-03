@@ -1,70 +1,72 @@
 {% block body %}
+	{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
 
-	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
-		<div class="card-body ">
-			<div class="row d-flex align-items-center gy-lg-0 gy-5">
+		<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
+			<div class="card-body ">
+				<div class="row d-flex align-items-center gy-lg-0 gy-5">
 
-				<div class="col-md-6">
+					<div class="col-md-6">
 
-					<h3 class="card-title text-center mb-5">
-						<strong>Creation de compte</strong>
-					</h3>
-					<form class="form-floating" method="post">
-						{% if error is defined %}
-							{% if error %}
-								<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+						<h3 class="card-title text-center mb-5">
+							<strong>Creation de compte</strong>
+						</h3>
+						<form class="form-floating" method="post">
+							{% if error is defined %}
+								{% if error %}
+									<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+								{% endif %}
 							{% endif %}
-						{% endif %}
 
-						<div class="form-control mb-3">
-							<label for="username">Nom d'utilisateur</label>
-							<input type="text" name="username" placeholder="Nom d'utilisateur" required class="form-control" id="username">
+							<div class="form-control mb-3">
+								<label for="username">Nom d'utilisateur</label>
+								<input type="text" name="username" placeholder="Nom d'utilisateur" required class="form-control" id="username">
 
-						</div>
-						<div class="form-control mb-3">
-							<label for="floatingPassword">Mot de passe</label>
-							<input type="password" id="floatingPassword" placeholder="Mot de passe" name="password" required class="form-control">
+							</div>
+							<div class="form-control mb-3">
+								<label for="floatingPassword">Mot de passe</label>
+								<input type="password" id="floatingPassword" placeholder="Mot de passe" name="password" required class="form-control">
 
+							</div>
+							<div class="form-control mb-3">
+								{% include 'services/accountservices/role_affectation.html.twig' %}
+							</div>
+							<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+							<div class="d-grid">
+								<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Création du compte</button>
+							</div>
+							<hr class="my-4">
+						</form>
+					</div>
+					<div class="col-md-6">
+						<div class="form-control">
+							<table class="table table-striped text-center">
+								<thead>
+									<tr>
+										<th scope="col">Nom d'utilisateur</th>
+										<th scope="col">Role</th>
+										<th scope="col">Supprimer</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for user in users %}
+										{% if app.user.id != user.id and compare_roles(app.user.roles, user.roles) %}
+											<tr>
+												<td>{{ user.username }}</td>
+												<td>{{ user.roles|json_encode|convert_encoding('UTF-8', 'UTF-8') }}</td>
+												<td>
+													<a href="{{path('app_delete_account', {id: user.id})}}" class="btn btn-danger delete-user">
+														Supprimer
+													</a>
+												</td>
+											</tr>
+										{% endif %}
+									{% endfor %}
+								</tbody>
+							</table>
 						</div>
-						<div class="form-control mb-3">
-							{% include 'services/accountservices/role_affectation.html.twig' %}
-						</div>
-						<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-						<div class="d-grid">
-							<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Création du compte</button>
-						</div>
-						<hr class="my-4">
-					</form>
-				</div>
-				<div class="col-md-6">
-					<div class="form-control">
-						<table class="table table-striped text-center">
-							<thead>
-								<tr>
-									<th scope="col">Nom d'utilisateur</th>
-									<th scope="col">Role</th>
-									<th scope="col">Supprimer</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for user in users %}
-									{% if app.user.id != user.id and compare_roles(app.user.roles, user.roles) %}
-										<tr>
-											<td>{{ user.username }}</td>
-											<td>{{ user.roles|json_encode|convert_encoding('UTF-8', 'UTF-8') }}</td>
-											<td>
-												<a href="{{path('app_delete_account', {id: user.id})}}" class="btn btn-danger delete-user">
-													Supprimer
-												</a>
-											</td>
-										</tr>
-									{% endif %}
-								{% endfor %}
-							</tbody>
-						</table>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+	{% endif %}
 {% endblock %}
