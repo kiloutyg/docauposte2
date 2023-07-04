@@ -19,5 +19,5 @@ php bin/console doctrine:migrations:migrate;
 
 exec apache2-foreground  &
 # yarn watch &
-yarn encore dev --watch
-# yarn run encore production --progress
+# yarn encore dev --watch
+yarn run encore production --progress
