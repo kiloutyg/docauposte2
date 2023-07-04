@@ -9,6 +9,9 @@ fi
 
 if [ "${ANSWER}" == "yes" ]
 then 
+    sudo yum install -y git
+    
+    bash ./prerequisites.sh
     bash ./env_create.sh
     docker compose up --build
 else 

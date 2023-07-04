@@ -5,7 +5,16 @@ read -p "Please enter your MySQL root password: " MYSQL_ROOT_PASSWORD
 read -p "Please enter your MySQL username: " MYSQL_USER
 read -p "Please enter your MySQL password: " MYSQL_PASSWORD
 read -p "Please enter your database name: " MYSQL_DATABASE
-read -p "Please enter the app context (prod/dev): " APP_CONTEXT
+while true; do
+    read -p "Please enter your app context (prod or dev): " APP_CONTEXT
+    if [ "$APP_CONTEXT" == "prod" ] || [ "$APP_CONTEXT" == "dev" ]; then
+        # If the context is valid, break the loop and continue with the rest of your script
+        break
+    else
+        echo "Invalid app context. Please enter either prod or dev."
+        # Don't need 'exit' here, the loop will automatically continue
+    fi
+done
 # APP_SECRET=96ae0f3daef954cfbcb61ad63652ca85
 APP_SECRET=$(openssl rand -hex 16)
 
