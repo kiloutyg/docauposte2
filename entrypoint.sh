@@ -1,9 +1,9 @@
 #!/bin/sh
 
 export http_proxy='http://10.0.0.1:80';
-composer require --dev symfony/asset symfony/apache-pack symfony/error-handler symfony/templating symfony/ux-turbo symfony/profiler-pack symfony/var-dumper symfony/webpack-encore-bundle  symfony/ux-turbo;
+# composer require --dev symfony/asset symfony/apache-pack symfony/error-handler symfony/templating symfony/ux-turbo symfony/profiler-pack symfony/var-dumper symfony/webpack-encore-bundle  symfony/ux-turbo;
 # composer require symfony/asset symfony/apache-pack symfony/error-handler symfony/templating symfony/ux-turbo symfony/profiler-pack symfony/var-dumper symfony/webpack-encore-bundle  symfony/ux-turbo;
-yarn add bootstrap jquery @popperjs/core sass-loader  sass @fontsource/roboto-condensed @fortawesome/fontawesome-free axios core-js webpack encore webpack-cli webpack-notifier @symfony/webpack-encore favicon --dev;
+# yarn add bootstrap jquery @popperjs/core sass-loader  sass @fontsource/roboto-condensed @fortawesome/fontawesome-free axios core-js webpack encore webpack-cli webpack-notifier @symfony/webpack-encore favicon --dev;
 # yarn add bootstrap jquery @popperjs/core sass-loader  sass @fontsource/roboto-condensed @fortawesome/fontawesome-free axios core-js webpack encore webpack-cli webpack-notifier @symfony/webpack-encore favicon;
 # composer install --no-dev --optimize-autoloader;
 

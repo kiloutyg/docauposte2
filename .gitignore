@@ -37,8 +37,8 @@ yarn-error.log
 .vscode
 ###> VSC stuff ###
 temp
-composer.lock
-symfony.lock
-yarn.lock
+# composer.lock
+# symfony.lock
+# yarn.lock
 docker-compose.override.yml
 ```
