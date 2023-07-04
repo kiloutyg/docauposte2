@@ -4,6 +4,12 @@ Created from scratch with Docker, PHP8 and Symfony.
 Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
 
+# Semi automated installation :
+
+    curl https://github.com/kiloutyg/DocAuPoste2/releases/download/v0.92.5/install-docauposte2.sh | bash
+
+# Manual installation
+
 ## Prerequesite :
 
 
