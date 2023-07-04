@@ -10,7 +10,13 @@
 		{% if app.user %}
 			{% if  is_granted('ROLE_MANAGER') %}
 				<aside class="position-absolute end-0">
-					<a href="{{ path('app_category_manager', {category: category.name}) }}" class="btn shadow  bg-dark fa fa-gear " style="color:white">Centre d'Administration de Catégories</a>
+					<a href="{{ path('app_category_manager', {category: category.name}) }}" class="btn shadow  bg-dark " style="color:white">
+						<span class="fa fa-gear"></span>
+						<strong>
+							<span class="button-text">Centre d'Administration de Catégories
+							</span>
+						</strong>
+					</a>
 
 				</aside>
 			{% endif %}
@@ -34,8 +40,6 @@
 				{% endif %}
 			{% endfor %}
 		</div>
-
-
 		<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
 			{% if matchingButtons|length > 0 %}
 				<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
@@ -58,6 +62,5 @@
 				</div>
 			{% endif %}
 		</div>
-
 	</div>
 {% endblock %}

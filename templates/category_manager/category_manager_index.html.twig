@@ -16,54 +16,10 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 		<strong>Page d'administration de la catégorie
 			{{ category.name|split('.')|first|upper }}</strong>
 	</h1>
+
 	{% if is_granted('ROLE_LINE_ADMIN') %}
 		<div class="accordion" id="accordionCategory">
 
-
-			<div class="accordion-item">
-				<h2 class="accordion-header" id="headingUpload">
-					<button class="accordion-button fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUpload" aria-expanded="true" aria-controls="collapseUpload">
-						<strong>Formulaire d'upload :</strong>
-					</button>
-				</h2>
-				<div id="collapseUpload" class="accordion-collapse collapse show" aria-labelledby="headingUpload" data-bs-parent="#accordionCategory">
-					<div class="accordion-body accordion-bg shadow shadow-inset">
-						<div class="card border-0 shadow rounded-3 my-5">
-							<div class="card-body">
-								<div class="row">
-
-									<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
-										{% include "services/uploads/upload.html.twig" %}
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="accordion-item">
-				<h2 class="accordion-header" id="headingIncident">
-					<button class="accordion-button fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIncident" aria-expanded="true" aria-controls="collapseIncident">
-
-						<strong>Formulaire d'ajout d'Incident :</strong>
-					</button>
-				</h2>
-				<div id="collapseIncident" class="accordion-collapse collapse" aria-labelledby="headingIncident" data-bs-parent="#accordionCategory">
-					<div class="accordion-body accordion-bg shadow shadow-inset">
-						<div class="card border-0 shadow rounded-3 my-5">
-							<div class="card-body">
-								<div class="row">
-
-									<form action="{{path('app_generic_upload_incident_files')}}" method="POST" enctype="multipart/form-data">
-										{% include "services/incidents/incidents.html.twig" %}
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
 			<div class="accordion-item">
 
 				<h2 class="accordion-header" id="headingCategory">
@@ -129,6 +85,52 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 												<hr class="my-4">
 											</div>
 										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="headingUpload">
+					<button class="accordion-button fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUpload" aria-expanded="true" aria-controls="collapseUpload">
+						<strong>Formulaire de chargement de fichier :</strong>
+					</button>
+				</h2>
+				<div id="collapseUpload" class="accordion-collapse collapse" aria-labelledby="headingUpload" data-bs-parent="#accordionCategory">
+					<div class="accordion-body accordion-bg shadow shadow-inset">
+						<div class="card border-0 shadow rounded-3 my-5">
+							<div class="card-body">
+								<div class="row">
+
+									<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+										{% include "services/uploads/upload.html.twig" %}
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="headingIncident">
+					<button class="accordion-button fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIncident" aria-expanded="true" aria-controls="collapseIncident">
+
+						<strong>Formulaire d'ajout d'Incident :</strong>
+					</button>
+				</h2>
+				<div id="collapseIncident" class="accordion-collapse collapse" aria-labelledby="headingIncident" data-bs-parent="#accordionCategory">
+					<div class="accordion-body accordion-bg shadow shadow-inset">
+						<div class="card border-0 shadow rounded-3 my-5">
+							<div class="card-body">
+								<div class="row">
+
+									<form action="{{path('app_generic_upload_incident_files')}}" method="POST" enctype="multipart/form-data">
+										{% include "services/incidents/incidents.html.twig" %}
 									</form>
 								</div>
 							</div>

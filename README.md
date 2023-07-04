@@ -5,9 +5,15 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
 
 # Semi automated installation :
-
-    curl https://github.com/kiloutyg/DocAuPoste2/releases/download/v0.92.6/install-docauposte2.sh | bash
-
+```
+    wget https://github.com/kiloutyg/DocAuPoste2/releases/download/v0.92.6/install-docauposte2.sh 
+```
+```   
+    sudo chmod +x install-docauposte2.sh
+```
+```
+    bash install-docauposte2.git
+```
 # Manual installation
 
 ## Prerequesite :
@@ -43,10 +49,6 @@ b - From a remote connection to a server from a windows computer for example, pr
 
 - Paste the key in the "key" input
 
-<<<<<<< HEAD
-First uninstall every present Docker component :
-
-=======
 - Be nice and give it a name
 
 - Select the type of key it is, most of the time it will be an Authentication Key
@@ -64,7 +66,6 @@ First uninstall every present Docker component :
 ```
 #### 4 - Uninstall any present Docker app :
 ```
->>>>>>> origin/staging
     sudo yum remove docker \
                   docker-client \
                   docker-client-latest \
@@ -75,26 +76,6 @@ First uninstall every present Docker component :
                   docker-engine \
                   podman \
                   runc
-<<<<<<< HEAD
-
-Then install those component : 
-
-    sudo yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
-
-4 - Docker Post-installation Step.
-
-Create and add the USER to the docker group : 
-
-    sudo groupadd docker
-    sudo usermod -aG docker $USER
-
-Log in the new group :
-
-    newgrp docker
-
-Start and Enable auto-start of the necessary process : 
-
-=======
 ```
 #### 5 - Install docker :
 ```
@@ -109,7 +90,6 @@ Start and Enable auto-start of the necessary process :
     newgrp docker
 ```
 ```
->>>>>>> origin/staging
     sudo systemctl start docker
     sudo systemctl start containerd.service
     sudo systemctl enable docker.service
@@ -119,37 +99,6 @@ Start and Enable auto-start of the necessary process :
 ## Stack installation step : 
 
 
-<<<<<<< HEAD
-1 - Clone the repo:
-
-It will create a folder automatically : 
-
-    git clone https://github.com/kiloutyg/docauposte2
-    cd docauposte2
-
-
-2 - If everything is set as asked in the prerequesite, run :
-    
-    docker compose up --build
-    
-    
-###  IF AN ERROR ABOUT SQL APPEARS : 
-
-1 - Once the containers are ready and running enter the "web"(yes, it is its name) one : 
-    
-    docker compose exec -ti web bash
-2 - Prepare Doctrine migration and then migrate : 
-
-    php bin/console make:migration
-    php bin/console doctrine:migrations:migrate
-    
-3 - Run a CHMOD command on the app folder to be sure to stay in control of every file. 
-
-4 - At this point you can begin to configure the App depending on your need. 
-
-### IF NEEDED : 
-Modify the value of post_max_size  and upload_max_filesize of the correct php.ini in /usr/local/etc/php respectively line 701 and 853 in the dev one, or line 703 and 855 in the production one.
-=======
 #### 1 - Clone the repo:
 ```
     git clone -b develop git@github.com:kiloutyg/docauposte2
@@ -214,7 +163,6 @@ G - Once you confirm that the app work as intended and display the superadmin cr
 #### 6 - At this point you can begin to configure the App depending on your need. 
 
 #### 7 - IF NEEDED : Modify the value of post_max_size  and upload_max_filesize of the correct php.ini in /usr/local/etc/php respectively line 701 and 853 in the dev one, or line 703 and 855 in the production one.
->>>>>>> origin/staging
 
 
 
