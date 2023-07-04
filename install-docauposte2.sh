@@ -10,7 +10,9 @@ fi
 if [ "${ANSWER}" == "yes" ]
 then 
     sudo yum install -y git
-    
+    read -p "Are you running the app for the first Time ?(yes/no) " GIT_ADDRESS
+    git clone ${GIT_ADDRESS}
+    cd docauposte2
     bash ./prerequisites.sh
     bash ./env_create.sh
     docker compose up --build
