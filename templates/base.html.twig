@@ -9,11 +9,15 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
 		{% block stylesheets %}
+			{{ encore_entry_link_tags('app') }}
+			{{ encore_entry_link_tags('app') }}
 			{{
             encore_entry_link_tags('app')
         }}
 		{% endblock %}
 		{% block javascripts %}
+			{{ encore_entry_script_tags('app') }}
+			{{ encore_entry_script_tags('app') }}
 			{{ encore_entry_script_tags('app') }}
 			{{ encore_entry_script_tags('confirmation') }}
 			{{ encore_entry_script_tags('toast') }}
@@ -92,11 +96,14 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					{% if app.user %}
 						{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
 							<aside class="position-absolute end-0">
-								<a href="{{ path('app_super_admin') }}" class="btn shadow" style="color:white;">
-
-									<strong>Centre de Super-Administration</strong>
+								<a href="{{ path('app_super_admin') }}" class="btn shadow bg-dark" style="color:white;">
+									<span class="fa fa-gear"></span>
+									<strong>
+										<span class="button-text">Centre de Super-Administration</span>
+									</strong>
 								</a>
 							</aside>
+
 						{% endif %}
 					{% endif %}
 					<p>

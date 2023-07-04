@@ -40,7 +40,6 @@ class SecurityController extends BaseController
     public function logout(): void
     {
         $this->addFlash('success', 'Vous êtes déconnecté');
-        //throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
 
