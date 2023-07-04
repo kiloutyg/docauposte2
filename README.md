@@ -5,15 +5,25 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
 
 # Semi automated installation :
+
+1 - Download the installation script :
+
 ```
     wget https://github.com/kiloutyg/DocAuPoste2/releases/download/v0.92.6/install-docauposte2.sh 
 ```
+
+2 - Render the script executable : 
+
 ```   
     sudo chmod +x install-docauposte2.sh
 ```
+
+3 - Run the script : 
+
 ```
     bash install-docauposte2.git
 ```
+
 # Manual installation
 
 ## Prerequesite :
