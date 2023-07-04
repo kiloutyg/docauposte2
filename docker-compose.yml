@@ -8,11 +8,13 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    volumes :
-    - ./database_data:/var/lib/mysql
+    volumes:
+      - ./database_data:/var/lib/mysql
+    ports:
+      - "3306"
     networks:
       vpcbr:
-        ipv4_address : 172.21.0.2
+        ipv4_address: 172.21.0.2
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: unless-stopped
@@ -24,11 +26,10 @@ services:
       - "8082:80"
     networks:
       vpcbr:
-        ipv4_address : 172.21.0.3
+        ipv4_address: 172.21.0.3
     depends_on:
       - database
   web:
-    # image: kiloutyg/po:docauposteweb
     build: ./docker/dockerfilehalf/
     # build: ./docker/
     entrypoint: "./entrypoint.sh"
@@ -36,15 +37,13 @@ services:
     volumes:
       - ./:/var/www
     ports:
-      - "80:80"
-      # - "8000:80"
-      # - "9000:8000"
-      # - "9080:8080"
-    depends_on :
+      # - "80:80"
+      - "8000:80"
+    depends_on:
       - database
     networks:
       vpcbr:
-        ipv4_address : 172.21.0.4
+        ipv4_address: 172.21.0.4
 networks:
   vpcbr:
     driver: bridge

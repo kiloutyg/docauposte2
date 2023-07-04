@@ -1,5 +1,4 @@
 FROM php:8.2-apache-bookworm
-# FROM php:8.2-apache-bullseye
 
 ENV http_proxy='http://10.0.0.1:80'
 COPY php.ini /usr/local/etc/php/php.ini
@@ -15,8 +14,8 @@ RUN pecl install xdebug imagick \
   && docker-php-ext-enable imagick xdebug mysqli pdo_mysql pdo zip opcache xsl
 
 # fix git author
-RUN git config --global user.email "symfo@symfo"
-RUN git config --global user.name "symfo"
+RUN git config --global user.email "floriandkhissi@gmail.com"
+RUN git config --global user.name "Florian Dkhissi"
 RUN git config --global --add safe.directory /var/www
 
 # set default vhost to target /symfony/app/public
