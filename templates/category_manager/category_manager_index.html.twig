@@ -17,116 +17,150 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 			{{ category.name|split('.')|first|upper }}</strong>
 	</h1>
 	{% if is_granted('ROLE_LINE_ADMIN') %}
-		<h2 class="my-4">
-			<strong>Formulaire de création de boutons :</strong>
-		</h2>
+		<div class="accordion" id="accordionCategory">
 
-		<div class="card border-0 shadow rounded-3 my-5">
-			<div class="card-body">
-				<div class="row">
-					<form class="form-control" method="POST" action="{{ path('app_category_manager_create_button', {category: category.name, id: category.productline.name, name: category.productline.zone.name}) }}">
 
-						<div class="card border-0 shadow rounded-3 my-5  bg-secondary">
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="headingUpload">
+					<button class="accordion-button fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUpload" aria-expanded="true" aria-controls="collapseUpload">
+						<strong>Formulaire d'upload :</strong>
+					</button>
+				</h2>
+				<div id="collapseUpload" class="accordion-collapse collapse show" aria-labelledby="headingUpload" data-bs-parent="#accordionCategory">
+					<div class="accordion-body accordion-bg shadow shadow-inset">
+						<div class="card border-0 shadow rounded-3 my-5">
 							<div class="card-body">
-								<div class="row d-flex align-items-center gy-lg-0 gy-5">
-									<div class="col-md-6">
+								<div class="row">
 
-										<h5 class="card-title text-center mb-5 fw-light fs-5">
-											<strong>Creation de Boutons</strong>
-										</h5>
-
-										<form class="form-floating" method="POST">
-											<div class="form-control mb-3">
-												<label for="buttonname">Nom du Bouton</label>
-												<input type="text" name="buttonname" placeholder="Nom du Bouton" required class="form-control" id="buttonname">
-											</div>
-											<div class="d-grid">
-												<button class="btn btn-primary btn-login text-first|uppercase fw-bold" type="submit">Valider</button>
-											</div>
-										</form>
-									</div>
-									<div class="col-md-6">
-										<h5 class="card-title text-center mb-5 fw-light fs-5">
-											<strong>Liste des boutons de la Catégorie
-												{{ category.name|split('.')|first|upper }}:</strong>
-										</h5>
-										<ul class="list-unstyled">
-											{% set matchingButtons = buttons|filter(button => button.category.id is same as(category.id)) %}
-											{% for button in matchingButtons %}
-												<li class="form-control d-flex justify-content-between align-items-center mb-2">
-													<a href="{{path('app_button', {button: button.name, category: button.category.name, productline: button.category.productLine.name, zone: button.category.productLine.zone.name})}}" class="btn btn-link">
-														{{ button.name|split('.')|first|upper }}
-														<span class="visually-hidden">{{ button.id }}</span>
-													</a>
-													<a href="{{path('app_category_manager_delete_button', {button: button.name})}}" class="btn btn-danger delete-button">
-														Supprimer
-														<span class="visually-hidden">{{ button.id }}</span>
-													</a>
-												</li>
-											{% else %}
-												<li class="alert alert-danger">
-													<a href="#" onclick="event.preventDefault(); window.history.back();">
-														Il n'y a pas de boutons dans cette catégorie.
-													</a>
-												</li>
-											{% endfor %}
-										</ul>
-									</div>
+									<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+										{% include "services/uploads/upload.html.twig" %}
+									</form>
 								</div>
-
-								<hr class="my-4">
 							</div>
 						</div>
-					</form>
+					</div>
 				</div>
 			</div>
+
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="headingIncident">
+					<button class="accordion-button fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIncident" aria-expanded="true" aria-controls="collapseIncident">
+
+						<strong>Formulaire d'ajout d'Incident :</strong>
+					</button>
+				</h2>
+				<div id="collapseIncident" class="accordion-collapse collapse" aria-labelledby="headingIncident" data-bs-parent="#accordionCategory">
+					<div class="accordion-body accordion-bg shadow shadow-inset">
+						<div class="card border-0 shadow rounded-3 my-5">
+							<div class="card-body">
+								<div class="row">
+
+									<form action="{{path('app_generic_upload_incident_files')}}" method="POST" enctype="multipart/form-data">
+										{% include "services/incidents/incidents.html.twig" %}
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="accordion-item">
+
+				<h2 class="accordion-header" id="headingCategory">
+					<button class="accordion-button fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategory" aria-expanded="true" aria-controls="collapseCategory">
+						<strong>Formulaire de création de boutons :</strong>
+					</button>
+				</h2>
+				<div id="collapseCategory" class="accordion-collapse collapse" aria-labelledby="headingCategory" data-bs-parent="#accordionCategory">
+					<div class="accordion-body accordion-bg shadow shadow-inset">
+						<div class="card border-0 shadow rounded-3 my-5">
+							<div class="card-body">
+								<div class="row">
+									<form class="form-control" method="POST" action="{{ path('app_category_manager_create_button', {category: category.name, id: category.productline.name, name: category.productline.zone.name}) }}">
+
+										<div class="card border-0 shadow rounded-3 my-5  bg-secondary">
+											<div class="card-body">
+												<div class="row d-flex align-items-center gy-lg-0 gy-5">
+													<div class="col-md-6">
+
+														<h5 class="card-title text-center mb-5 fw-light fs-5">
+															<strong>Creation de Boutons</strong>
+														</h5>
+
+														<form class="form-floating" method="POST">
+															<div class="form-control mb-3">
+																<label for="buttonname">Nom du Bouton</label>
+																<input type="text" name="buttonname" placeholder="Nom du Bouton" required class="form-control" id="buttonname">
+															</div>
+															<div class="d-grid">
+																<button class="btn btn-primary btn-login text-first|uppercase fw-bold" type="submit">Valider</button>
+															</div>
+														</form>
+													</div>
+													<div class="col-md-6">
+														<h5 class="card-title text-center mb-5 fw-light fs-5">
+															<strong>Liste des boutons de la Catégorie
+																{{ category.name|split('.')|first|upper }}:</strong>
+														</h5>
+														<ul class="list-unstyled">
+															{% set matchingButtons = buttons|filter(button => button.category.id is same as(category.id)) %}
+															{% for button in matchingButtons %}
+																<li class="form-control d-flex justify-content-between align-items-center mb-2">
+																	<a href="{{path('app_button', {button: button.name, category: button.category.name, productline: button.category.productLine.name, zone: button.category.productLine.zone.name})}}" class="btn btn-link">
+																		{{ button.name|split('.')|first|upper }}
+																		<span class="visually-hidden">{{ button.id }}</span>
+																	</a>
+																	<a href="{{path('app_category_manager_delete_button', {button: button.name})}}" class="btn btn-danger delete-button">
+																		Supprimer
+																		<span class="visually-hidden">{{ button.id }}</span>
+																	</a>
+																</li>
+															{% else %}
+																<li class="alert alert-danger">
+																	<a href="#" onclick="event.preventDefault(); window.history.back();">
+																		Il n'y a pas de boutons dans cette catégorie.
+																	</a>
+																</li>
+															{% endfor %}
+														</ul>
+													</div>
+												</div>
+
+												<hr class="my-4">
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
+				<div class="accordion-item">
+
+					<h2 class="accordion-header" id="headingAccountcreation">
+						<button class="accordion-button fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAccountcreation" aria-expanded="true" aria-controls="collapseAccountcreation">
+							<strong>Formulaire de creation de compte utilisateur :</strong>
+						</button>
+					</h2>
+					<div id="collapseAccountcreation" class="accordion-collapse collapse" aria-labelledby="headingAccountcreation" data-bs-parent="#accordionCategory">
+						<div class="accordion-body accordion-bg shadow shadow-inset">
+							<div class="card border-0 shadow rounded-3 my-5">
+								<div class="card-body">
+									<div class="row">
+										<form method="POST" action="{{ path('app_zone_admin_create_line_admin', {zone: zone.name}) }}">
+											{% include "services/accountservices/create_account.html.twig" %}
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			{% endif %}
 		</div>
 	{% endif %}
-	{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
-		<h2 class="my-4">
-			<strong>Formulaire de création de compte utilisateur :</strong>
-		</h2>
 
-		<div class="card border-0 shadow rounded-3 my-5">
-			<div class="card-body">
-				<div class="row">
-					<form method="POST" action="{{ path('app_category_manager_create_user', {category: category.name}) }}">
-						{% include "services/accountservices/create_account.html.twig" %}
-					</form>
-				</div>
-			</div>
-		</div>
-	{% endif %}
-
-	{% if is_granted('ROLE_LINE_ADMIN') %}
-
-		<h2 class="my-4">
-			<strong>Formulaire d'upload :</strong>
-		</h2>
-
-		<div class="card border-0 shadow rounded-3 my-5">
-			<div class="card-body">
-				<div class="row">
-
-					<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
-						{% include "services/uploads/upload.html.twig" %}
-					</form>
-				</div>
-			</div>
-		</div>
-
-		<h2 class="my-4">
-			<strong>Formulaire d'ajout d'Incident :</strong>
-		</h2>
-		<div class="card border-0 shadow rounded-3 my-5">
-			<div class="card-body">
-				<div class="row">
-
-					<form action="{{path('app_generic_upload_incident_files')}}" method="POST" enctype="multipart/form-data">
-						{% include "services/incidents/incidents.html.twig" %}
-					</form>
-				</div>
-			</div>
-		</div>
-	{% endif %}
 {% endblock %}
