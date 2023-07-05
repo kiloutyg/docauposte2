@@ -37,8 +37,8 @@ services:
     volumes:
       - ./:/var/www
     ports:
-      # - "80:80"
-      - "8000:80"
+      - "80:80"
+      # - "8000:80"
     depends_on:
       - database
     networks:
