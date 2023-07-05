@@ -45,7 +45,30 @@ class AccountService
                 $this->manager->persist($user);
                 $this->manager->flush();
 
-                // return  ['user' => $user];
+                return  $user;
+            }
+        }
+
+        return null;
+    }
+
+    public function modifyAccount($request, $error)
+    {
+        if ($request->getMethod() == 'POST') {
+            $name = $request->request->get('username');
+            $password = $request->request->get('password');
+            $role = $request->request->get('role');
+
+            // check if the username is already in use
+            $user = $this->userRepository->findOneBy(['username' => $name]);
+            if ($user) {
+                // create the user
+                $password = $this->passwordHasher->hashPassword($user, $password);
+                $user->setUsername($name);
+                $user->setPassword($password);
+                $user->setRoles([$role]);
+                $this->manager->persist($user);
+                $this->manager->flush();
 
                 return  $user;
             }

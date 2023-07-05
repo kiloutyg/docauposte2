@@ -94,12 +94,13 @@ class UploadsService extends AbstractController
     }
 
 
-    public function deleteFile($filename, $button)
+    public function deleteFile($filename, $buttonEntity)
     {
         $name = $filename;
         $public_dir = $this->projectDir . '/public';
+        $button = $this->buttonRepository->findoneBy(['id' => $buttonEntity]);
 
-        // Dynamic folder creation and file upload
+        // Dynamic folder and file deletion
         $buttonname = $button->getName();
         $parts = explode('.', $buttonname);
         $parts = array_reverse($parts);
@@ -125,15 +126,11 @@ class UploadsService extends AbstractController
 
     public function modifyFile(Upload $upload)
     {
-        // Log the form data
-        $this->logger->info('original upload state', ['upload' => $upload]);
-
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
 
         // Public directory
         $public_dir = $this->projectDir . '/public';
-
 
         // Old file path
         $oldFilePath = $upload->getPath();
@@ -162,7 +159,6 @@ class UploadsService extends AbstractController
             try {
                 $newFile->move($folderPath . '/', $upload->getFilename());
             } catch (\Exception $e) {
-                $this->logger->error('Failed to move uploaded file: ' . $e->getMessage());
                 throw $e;
             }
 

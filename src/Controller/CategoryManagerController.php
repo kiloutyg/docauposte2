@@ -134,6 +134,7 @@ class CategoryManagerController extends BaseController
 
         $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
 
+
         $category = $entityid->getCategory()->getName();
 
         if ($entity == true) {

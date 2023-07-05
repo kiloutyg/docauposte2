@@ -66,6 +66,27 @@ class SecurityController extends BaseController
         ]);
     }
 
+    public function modify_account(AccountService $accountService, AuthenticationUtils $authenticationUtils, Request $request): Response
+    {
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        $user = $accountService->modifyAccount($request, $error);
+
+        if ($user instanceof User) {
+            $this->authenticateUser($user);
+            $this->addFlash('success', 'Le compte' . $user->getUsername() . ' a été modifié');
+
+            return $this->redirectToRoute('app_login');
+        }
+
+        return $this->render('services/modify_account.html.twig', [
+            'last_username' => $lastUsername,
+            'error'         => $error,
+            'user'          => $this->getUser(),
+        ]);
+    }
+
     private function authenticateUser(User $user)
     {
         $providerKey = 'secured_area'; // your firewall name
