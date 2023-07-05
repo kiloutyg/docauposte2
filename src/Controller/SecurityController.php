@@ -7,8 +7,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 use App\Entity\User;
+
+use App\Repository\UserRepository;
 
 use App\Service\AccountService;
 
@@ -43,48 +46,30 @@ class SecurityController extends BaseController
     }
 
 
-    public function create_account(AccountService $accountService, AuthenticationUtils $authenticationUtils, Request $request): Response
+
+    #[Route(path: '/modify_account_view/{userid}', name: 'app_modify_account_view')]
+    public function modify_account_view(int $userid, AuthenticationUtils $authenticationUtils): Response
     {
-        // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
-        // last username entered by the user
-        $lastUsername = $authenticationUtils->getLastUsername();
+        $user = $this->userRepository->findOneBy(['id' => $userid]);
 
-        $user = $accountService->createAccount($request, $error);
-
-        if ($user instanceof User) {
-            $this->authenticateUser($user);
-            $this->addFlash('success', 'Le compte' . $user->getUsername() . ' a été créé');
-
-            return $this->redirectToRoute('app_login');
-        }
-
-        return $this->render('services/create_account.html.twig', [
-            'last_username' => $lastUsername,
+        return $this->render('services/accountservices/modify_account_view.html.twig', [
+            'user'          => $user,
             'error'         => $error,
-            'user'          => $this->getUser(),
         ]);
     }
 
-    public function modify_account(AccountService $accountService, AuthenticationUtils $authenticationUtils, Request $request): Response
+    #[Route(path: '/modify_account', name: 'app_modify_account')]
+    public function modify_account(AccountService $accountService, UserInterface $currentUser, AuthenticationUtils $authenticationUtils, Request $request)
     {
         $error = $authenticationUtils->getLastAuthenticationError();
-        $lastUsername = $authenticationUtils->getLastUsername();
+        $usermod = $accountService->modifyAccount($request, $currentUser);
 
-        $user = $accountService->modifyAccount($request, $error);
-
-        if ($user instanceof User) {
-            $this->authenticateUser($user);
-            $this->addFlash('success', 'Le compte' . $user->getUsername() . ' a été modifié');
-
-            return $this->redirectToRoute('app_login');
-        }
-
-        return $this->render('services/modify_account.html.twig', [
-            'last_username' => $lastUsername,
-            'error'         => $error,
-            'user'          => $this->getUser(),
-        ]);
+        if ($usermod instanceof User) {
+            $this->addFlash('success', 'Le compte' . $usermod->getUsername() . ' a été modifié');
+            return $this->redirectToRoute('app_super_admin');
+        };
+        return $this->redirectToRoute('app_super_admin');
     }
 
     private function authenticateUser(User $user)

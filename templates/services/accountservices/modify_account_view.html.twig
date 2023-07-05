@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	Upload pour
+	{{user.username|split('.')|first|upper}}
+	|
+	{{ parent() }}
+{% endblock %}
+{% block body %}
+
+	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
+		<div class="card-body ">
+			<div class="row d-flex align-items-center gy-lg-0 gy-5">
+
+
+				<h3 class="card-title text-center mb-5">
+					<strong>Modification de compte de
+						{{user.username}}</strong>
+				</h3>
+				<form class="form-floating" method="post" action="{{ path('app_modify_account') }}">
+					<input type="hidden" name="current_username" value="{{ user.username }}">
+
+					<div class=" mb-3">
+						<label for="username">Nom d'utilisateur</label>
+						<input type="text" name="username" placeholder="Nom d'utilisateur" required class="form-control" id="username">
+
+					</div>
+					<div class=" mb-3">
+						<label for="Password">Mot de passe</label>
+						<input type="password" id="Password" placeholder="Mot de passe" name="password" required class="form-control">
+
+					</div>
+					<div class=" mb-3">
+						{% include 'services/accountservices/role_affectation.html.twig' %}
+					</div>
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+					<div class="d-grid">
+						<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">modification du compte</button>
+					</div>
+					<hr class="my-4">
+				</form>
+
+			</div>
+		</div>
+	</div>
+{% endblock %}
