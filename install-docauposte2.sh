@@ -32,7 +32,7 @@ then
     sudo systemctl enable docker.service;
     sudo systemctl enable containerd.service;
 
-    read -p "Are you running the app for the first Time ?(yes/no) " GIT_ADDRESS;
+    read -p "Address of the git repository (ssh or http ) :  " GIT_ADDRESS;
     git clone ${GIT_ADDRESS};
     cd docauposte2;
 
