@@ -31,7 +31,7 @@
 						</div>
 						<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 						<div class="d-grid">
-							<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Création du compte</button>
+							<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Modification du compte</button>
 						</div>
 						<hr class="my-4">
 					</form>
@@ -55,6 +55,11 @@
 											<td>
 												<a href="{{path('app_delete_account', {id: user.id})}}" class="btn btn-danger delete-user">
 													Supprimer
+												</a>
+											</td>
+											<td>
+												<a href="{{path('app_modify_account_view', {userid: user.id})}}" class="btn btn-danger">
+													modifier
 												</a>
 											</td>
 										</tr>

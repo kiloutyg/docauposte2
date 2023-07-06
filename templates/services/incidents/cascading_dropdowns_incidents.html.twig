@@ -24,14 +24,14 @@
 	</div>
 	<div class="col-md-10 col-sm-10 mt-2 mb-2">
 		<select name="incidents_incidentsCategory" id="incidents_incidentsCategory" class="form-select" required>
-			<option value="" selected disabled hidden>Choisir une catégorie d'incident</option>
+			<option value="" selected disabled hidden>Choisir un type d'incident</option>
 		</select>
 	</div>
 </div>
 <br><br>
 {% if is_granted('ROLE_ADMIN') %}
 	<div class="row mb-3">
-		<label for="incidents_newFileName" class="form-label">Nouvelle Category d'Incident :</label>
+		<label for="incidents_newFileName" class="form-label">Nouveau Type d'Incident :</label>
 		<div class="col-sm">
 			<input type="text" class="form-control" id="incident_incidentsCategory_name" name="incident_incidentsCategory_name" placeholder="Entrer une nouvelle categorie d'incident (optionnel)">
 		</div>

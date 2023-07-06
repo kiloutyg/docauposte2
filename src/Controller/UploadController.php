@@ -85,7 +85,7 @@ class UploadController extends FrontController
 
     public function delete_file(string $filename = null, string $button = null, UploadsService $uploadsService, Request $request): RedirectResponse
     {
-        $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
+        $buttonEntity = $this->buttonRepository->findoneBy(['name' => $button]);
         $originUrl = $request->headers->get('Referer');
 
         // Use the UploadsService to handle file deletion

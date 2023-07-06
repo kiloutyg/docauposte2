@@ -20,8 +20,8 @@ services:
     restart: unless-stopped
     environment:
       PMA_HOST: database
-      PMA_USER: ${MYSQL_USER}
-      PMA_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
     ports:
       - "8082:80"
     networks:
@@ -31,14 +31,12 @@ services:
       - database
   web:
     build: ./docker/dockerfilehalf/
-    # build: ./docker/
     entrypoint: "./entrypoint.sh"
     restart: unless-stopped
     volumes:
       - ./:/var/www
     ports:
       - "80:80"
-      # - "8000:80"
     depends_on:
       - database
     networks:
