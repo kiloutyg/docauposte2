@@ -48,7 +48,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						</strong>
 					</h2>
 				</a>
-				<div></div>
+
 				<div class="ms-auto d-flex align-items-center">
 					{% if app.user is null %}
 						<a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
@@ -59,7 +59,11 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 							</strong>
 							<a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
 						</p>
+						<p>
+							<a class="btn btn-outline-info" href="{{path('app_tutorial')}}">TUTO</a>
+						</p>
 					{% endif %}
+
 
 				</div>
 
@@ -144,7 +148,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					<span class="me-1" style="color: red">
 						<i class="fas fa-copyright"></i>
 					</span>
-					<a target="_blank" href="https://www.plasticomnium.com/en/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium Langres</a>
+					<a target="_blank" href="http://topnet.corp.ponet/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium Langres</a>
 				</div>
 				<div>
 					<a href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">

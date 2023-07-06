@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	Tutoriel DocAuPoste2
+{% endblock %}
+{% block body %}
+	<div class="inner-container inner-container flex-grow-1 d-flex flex-column">
+		<div>
+			<h1>
+				<strong>Tutoriel</strong>
+			</h1>
+			<p>Vous trouverez ici un tutoriel pour vous aider à utiliser DocAuPoste2.
+				<br>Si vous avez des questions, n'hésitez pas à contacter
+				<strong>Kevin LAPOIRIE</strong>
+			</p>
+		</div>
+		<div style="height: 5vh;"></div>
+		<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+			<div class="accordion" id="accordionTuto">
+				<div class="accordion-item">
+
+					<h4 class="accordion-header" id="headingFirstStep">
+						<button class="accordion-button fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFirstStep" aria-expanded="true" aria-controls="collapseFirstStep">
+							<strong>1. Prise en Main</strong>
+						</button>
+					</h4>
+					<div id="collapseFirstStep" class="accordion-collapse collapse " aria-labelledby="headingFirstStep" data-bs-parent="#accordionTuto">
+						<div class="accordion-body accordion-bg shadow shadow-inset">
+							<img src="{{ asset('/TutoImage/AccueilPostConnexion.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+							Capture d'écran d'accueil après connexion
+						</img>
+						<li class="black-text">A : Bouton d'accès rapide à l'accueil (Page présentée sur la capture d'écran).</li>
+						<li class="black-text">B : Bouton de retour à la page précédente.</li>
+						<li class="black-text">C : Bouton de navigation, ici pour accéder à une zone.</li>
+						<li class="black-text">D : Notification. Verte : Bonne nouvelle // Rouge : Mauvaise nouvelle // Blanche : N'a pas compris</li>
+						<li class="black-text">E : Bouton de déconnexion.</li>
+						<li class="black-text">F : Bouton de navigation, ici, pour accéder au tutoriel.</li>
+						<div style="height: 5vh;"></div>
+						<img src="{{ asset('/TutoImage/ZoneConnexionAdmin.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+							<em class="black-text">
+								Capture d'ecran de la page d'une zone</em>
+						</img>
+						<li class="black-text">A : Bouton d'accès au menu d'administration, ici, de Zone.</li>
+						<li class="black-text">B : Bouton de navigation, ici pour accéder à un Produit.</li>
+					</div>
+				</div>
+				<div class="accordion-item ">
+
+					<h4 class="accordion-header" id="headingSecondStep">
+						<button class="accordion-button fs-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSecondStep" aria-expanded="true" aria-controls="collapseSecondStep">
+							<strong>2. Création d'une entité d'organisation (Zone/Produit/Catégorie/Bouton)
+							</strong>
+						</button>
+					</h4>
+					<div id="collapseSecondStep" class="accordion-collapse collapse " aria-labelledby="headingSecondStep" data-bs-parent="#accordionTuto">
+						<div class="accordion-body accordion-bg shadow shadow-inset">
+							<img src="{{ asset('/TutoImage/FormulaireCreationEntite.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+							Capture d'écran du formulaire de création d'une zone
+						</img>
+						<li class="black-text">A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.</li>
+						<li class="black-text">B : Formulaire de création de l'entité. Entrer le nom de la Ligne/Produit puis valider sa création.</li>
+						<li class="black-text">C : Bouton de navigation, ici pour accéder aux Lignes/Produits qui ont été crée.</li>
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+{% endblock %}
