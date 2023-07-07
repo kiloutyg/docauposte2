@@ -9,7 +9,7 @@ composer install --no-dev --optimize-autoloader;
 
 #composer install;
 #composer update ;
-#yarn install --production;
+yarn install --production;
 #yarn upgrade;
 composer clear-cache;
 chmod 777 . -R -v;
@@ -22,5 +22,5 @@ php bin/console doctrine:migrations:migrate;
 #exec apache2-foreground &
 # yarn watch &
 #yarn encore dev --watch
-yarn run encore production --progress;
+yarn run production --progress;
 exec apache2-foreground;
