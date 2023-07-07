@@ -37,7 +37,9 @@ then
     cd docauposte2;
 
     bash ./env_create.sh;
-    docker compose up --build;
+
+    
+    sudo docker compose up --build;
 else 
-    docker compose up;
+   sudo docker compose up;
 fi
