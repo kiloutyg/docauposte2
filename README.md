@@ -50,7 +50,7 @@ From a remote connection to a server from a windows computer for example, print 
 1 - Download the installation script :
 
 ```
-    wget [https://github.com/polangres/DocAuPoste2/releases/download/v1.0/install-docauposte2.sh ](https://github.com/polangres/DocAuPoste2/releases/download/v1.0/install-docauposte2.sh)
+    wget https://github.com/polangres/DocAuPoste2/releases/download/v1.0/install-docauposte2.sh
 ```
 
 2 - Render the script executable : 
