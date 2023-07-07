@@ -4,37 +4,11 @@ Created from scratch with Docker, PHP8 and Symfony.
 Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
 
-# Semi automated installation :
-
-1 - Download the installation script :
-
-```
-    wget https://github.com/kiloutyg/DocAuPoste2/releases/download/v0.92.6/install-docauposte2.sh 
-```
-
-2 - Render the script executable : 
-
-```   
-    sudo chmod +x install-docauposte2.sh
-```
-
-3 - Run the script : 
-
-```
-    bash install-docauposte2.git
-```
-
-# Manual installation
-
 ## Prerequesite :
 
 
-#### 1 - Install git :
+#### Install git :
 
-##### A - Install git utility (you can use an other one if you wish to like gh or gitflow):
-```
-    sudo yum install git
-```
 ##### B - Create your ssh key pair follow the instruction and default option, I STRONGLY ADVISE TO PUT A PASSWORD but it is optional:
 ```
     ssh-keygen -t ed25519 -C "any_comment_you_wish_to_add"
@@ -42,8 +16,14 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 ##### C - Copy the key in your clipboard :
 
 a - From a command prompt on a linux desktop environment :
+
+If xclip can be installed : 
 ```
     xclip -sel clip < ~/.ssh/id_ed25519.pub
+```
+Otherwise use cat : 
+```
+    cat ~/.ssh/id_ed25519.pub
 ```
 b - From a remote connection to a server from a windows computer for example, print it and then copy it with your mouse or CTRL+C or CTRL+SHIFT+C : 
 ```
@@ -65,6 +45,37 @@ b - From a remote connection to a server from a windows computer for example, pr
 
 - Once everything is done click on "Add SSH key" 
 
+
+
+# Semi automated installation :
+
+1 - Download the installation script :
+
+```
+    wget https://github.com/kiloutyg/DocAuPoste2/releases/download/v0.96/install-docauposte2.sh 
+```
+
+2 - Render the script executable : 
+
+```   
+    sudo chmod +x install-docauposte2.sh
+```
+
+3 - Run the script : 
+
+```
+    bash install-docauposte2.sh
+```
+
+
+
+# Manual installation
+
+
+#### 1 - Install git utility (you can use an other one if you wish to like gh or gitflow):
+```
+    sudo yum install git
+```
 
 #### 2 - Add docker CE repo : 
 ```
