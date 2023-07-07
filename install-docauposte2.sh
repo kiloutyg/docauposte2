@@ -38,8 +38,7 @@ then
 
     bash ./env_create.sh;
 
-    
-    sudo docker compose up --build;
+    sg docker -c "docker compose up --build"
 else 
-   sudo docker compose up;
+   sg docker -c "docker compose up"
 fi
