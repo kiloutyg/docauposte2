@@ -9,7 +9,7 @@ composer install --no-dev --optimize-autoloader;
 
 #composer install;
 #composer update ;
-#yarn install --production;
+yarn install --production;
 #yarn upgrade;
 composer clear-cache;
 chmod 777 . -R -v;
