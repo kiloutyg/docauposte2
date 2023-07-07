@@ -68,7 +68,7 @@ class ZoneAdminController extends BaseController
         );
 
         if ($result) {
-            $this->addFlash('success', 'Account has been created');
+            $this->addFlash('success', 'Le compte a été créé');
         }
 
         if ($error) {
@@ -103,7 +103,7 @@ class ZoneAdminController extends BaseController
             $productline = $this->productLineRepository->findOneBy(['name' => $productlinename]);
 
             if ($productline) {
-                $this->addFlash('danger', 'productline already exists');
+                $this->addFlash('danger', 'La ligne de produit existe déjà');
                 return $this->redirectToRoute('app_zone_admin', [
                     'zone' => $zone->getName(),
                     'productLines' => $this->productLineRepository->findAll(),
@@ -136,12 +136,12 @@ class ZoneAdminController extends BaseController
 
         if ($entity == true) {
 
-            $this->addFlash('success', $entityType . ' has been deleted');
+            $this->addFlash('success', 'La ligne de produit ' . $entityType . ' a été supprimée');
             return $this->redirectToRoute('app_zone_admin', [
                 'zone' => $zone,
             ]);
         } else {
-            $this->addFlash('danger',  $entityType . '  does not exist');
+            $this->addFlash('danger', 'La ligne de produit ' . $entityType . ' n\'existe pas');
             return $this->redirectToRoute('app_zone_admin', [
                 'zone' => $zone,
             ]);

@@ -71,7 +71,7 @@ class CategoryManagerController extends BaseController
         );
 
         if ($result) {
-            $this->addFlash('success', 'Account has been created');
+            $this->addFlash('success', 'Le compte a été créé');
         }
 
         if ($error) {
@@ -92,7 +92,7 @@ class CategoryManagerController extends BaseController
         // Check if button name does not contain the disallowed characters
         if (!preg_match("/^[^.]+$/", $request->request->get('buttonname'))) {
             // Handle the case when button name contains disallowed characters
-            $this->addFlash('danger', 'Nom de boutton invalide');
+            $this->addFlash('danger', 'Nom de bouton invalide');
             return $this->redirectToRoute('app_category_manager', [
                 'category'    => $category,
             ]);
@@ -106,7 +106,7 @@ class CategoryManagerController extends BaseController
             $button = $this->buttonRepository->findoneBy(['name' => $buttonname]);
 
             if ($button) {
-                $this->addFlash('danger', 'bouton already exists');
+                $this->addFlash('danger', 'Le boutton existe déjà');
                 return $this->redirectToRoute('app_category_manager', [
                     'category'    => $category,
                 ]);
@@ -118,7 +118,7 @@ class CategoryManagerController extends BaseController
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($buttonname);
 
-                $this->addFlash('success', 'The Button has been created');
+                $this->addFlash('success', 'Le boutton a été créé');
                 return $this->redirectToRoute('app_category_manager', [
                     'category'    => $category,
                 ]);
@@ -139,12 +139,12 @@ class CategoryManagerController extends BaseController
 
         if ($entity == true) {
 
-            $this->addFlash('success', $entityType . ' has been deleted');
+            $this->addFlash('success', 'Le bouton ' . $entityType . ' a été supprimé');
             return $this->redirectToRoute('app_category_manager', [
                 'category'    => $category,
             ]);
         } else {
-            $this->addFlash('danger',  $entityType . '  does not exist');
+            $this->addFlash('danger', 'Le bouton ' . $entityType . ' n\'existe pas.');
             return $this->redirectToRoute('app_category_manager', [
                 'category'    => $category,
             ]);

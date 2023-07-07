@@ -46,13 +46,13 @@ class FrontController extends BaseController
                 $error,
             );
             if ($result) {
-                $this->addFlash('success', 'Account has been created');
+                $this->addFlash('success', 'Le compte de Super-Administrateur a bien été créé.');
             }
             if ($error) {
                 $this->addFlash('error', $error);
             }
         } else {
-            $this->addFlash('alert', 'Super Admin already created');
+            $this->addFlash('alert', 'Le compte de Super-Administrateur existe déjà.');
             return $this->redirectToRoute('app_base');
         }
         return $this->redirectToRoute('app_base');

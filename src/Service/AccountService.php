@@ -37,7 +37,7 @@ class AccountService
             // check if the username is already in use
             $user = $this->userRepository->findOneBy(['username' => $name]);
             if ($user) {
-                $error = 'This username is already in use';
+                $error = 'Ce nom d\'utilisateur est déja utilisé.';
             } else {
                 // create the user
                 $user = new User();
