@@ -9,10 +9,6 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
 #### Install git :
 
-##### A - Install git utility (you can use an other one if you wish to like gh or gitflow):
-```
-    sudo yum install git
-```
 ##### B - Create your ssh key pair follow the instruction and default option, I STRONGLY ADVISE TO PUT A PASSWORD but it is optional:
 ```
     ssh-keygen -t ed25519 -C "any_comment_you_wish_to_add"
@@ -44,6 +40,7 @@ b - From a remote connection to a server from a windows computer for example, pr
 - Once everything is done click on "Add SSH key" 
 
 
+
 # Semi automated installation :
 
 1 - Download the installation script :
@@ -64,18 +61,25 @@ b - From a remote connection to a server from a windows computer for example, pr
     bash install-docauposte2.git
 ```
 
+
+
 # Manual installation
 
 
-#### 1- Add docker CE repo : 
+#### 1 - Install git utility (you can use an other one if you wish to like gh or gitflow):
+```
+    sudo yum install git
+```
+
+#### 2 - Add docker CE repo : 
 ```
     sudo subscription-manager repo-override --repo=PlasticOmnium_Docker_Docker_CE_Stable --add=enabled:1
 ```
-#### 2 - Update package manager repository : 
+#### 3 - Update package manager repository : 
 ```
     sudo yum update
 ```
-#### 3 - Uninstall any present Docker app :
+#### 4 - Uninstall any present Docker app :
 ```
     sudo yum remove docker \
                   docker-client \
@@ -88,11 +92,11 @@ b - From a remote connection to a server from a windows computer for example, pr
                   podman \
                   runc
 ```
-#### 4 - Install docker :
+#### 5 - Install docker :
 ```
     sudo yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
 ```
-#### 5 - Docker Post-installation Step.
+#### 6 - Docker Post-installation Step.
 ```
     sudo groupadd docker
     sudo usermod -aG docker $USER
