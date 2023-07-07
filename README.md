@@ -16,8 +16,14 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 ##### C - Copy the key in your clipboard :
 
 a - From a command prompt on a linux desktop environment :
+
+If xclip can be installed : 
 ```
     xclip -sel clip < ~/.ssh/id_ed25519.pub
+```
+Otherwise use cat : 
+```
+    cat ~/.ssh/id_ed25519.pub
 ```
 b - From a remote connection to a server from a windows computer for example, print it and then copy it with your mouse or CTRL+C or CTRL+SHIFT+C : 
 ```
