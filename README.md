@@ -7,15 +7,13 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 ## Prerequesite :
 
 
-#### Install git :
-
-##### B - Create your ssh key pair follow the instruction and default option, I STRONGLY ADVISE TO PUT A PASSWORD but it is optional:
+##### A - Create your ssh key pair follow the instruction and default option, I STRONGLY ADVISE TO PUT A PASSWORD but it is optional:
 ```
     ssh-keygen -t ed25519 -C "any_comment_you_wish_to_add"
 ```
-##### C - Copy the key in your clipboard :
+##### B - Copy the key in your clipboard :
 
-a - From a command prompt on a linux desktop environment :
+From a command prompt on a linux desktop environment :
 
 If xclip can be installed : 
 ```
@@ -25,11 +23,11 @@ Otherwise use cat :
 ```
     cat ~/.ssh/id_ed25519.pub
 ```
-b - From a remote connection to a server from a windows computer for example, print it and then copy it with your mouse or CTRL+C or CTRL+SHIFT+C : 
+From a remote connection to a server from a windows computer for example, print it and then copy it with your mouse or CTRL+C or CTRL+SHIFT+C : 
 ```
     cat ~/.ssh/id_ed25519.pub 
 ```
-##### D - Paste the key in your github account : 
+##### C - Paste the key in your github account : 
 
 - Go to your account settings
 
