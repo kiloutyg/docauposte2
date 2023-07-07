@@ -58,7 +58,7 @@ class SuperAdminController extends BaseController
         $result = $accountService->createAccount($request, $error);
 
         if ($result) {
-            $this->addFlash('success', 'Account has been created');
+            $this->addFlash('success', 'Le compte a été créé');
         }
 
         if ($error) {

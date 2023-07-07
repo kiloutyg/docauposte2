@@ -25,12 +25,14 @@ then
 
     sudo yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y;
 
+    sudo groupadd docker;
     sudo usermod -aG docker $USER;
 
-    sudo systemctl start docker;
-    sudo systemctl start containerd.service;
-    sudo systemctl enable docker.service;
-    sudo systemctl enable containerd.service;
+sg docker -c "
+    sudo systemctl start docker \
+    sudo systemctl start containerd.service \
+    sudo systemctl enable docker.service \
+    sudo systemctl enable containerd.service;"
 
     read -p "Address of the git repository (ssh or http ) :  " GIT_ADDRESS;
     git clone ${GIT_ADDRESS};
@@ -38,7 +40,9 @@ then
 
     bash ./env_create.sh;
 
+    
     sg docker -c "docker compose up --build"
-else 
-   sg docker -c "docker compose up"
+else
+    cd docauposte2;
+    sg docker -c "docker compose up"
 fi

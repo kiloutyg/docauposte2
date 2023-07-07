@@ -76,7 +76,7 @@ class ProductLineAdminController extends BaseController
         );
 
         if ($result) {
-            $this->addFlash('success', 'Account has been created');
+            $this->addFlash('success', 'Le compte a été créé');
         }
 
         if ($error) {
@@ -103,7 +103,7 @@ class ProductLineAdminController extends BaseController
 
         if (!preg_match("/^[^.]+$/", $request->request->get('categoryname'))) {
             // Handle the case when category name contains disallowed characters
-            $this->addFlash('danger', 'Nom de categorie invalide');
+            $this->addFlash('danger', 'Nom de catégorie invalide');
             return $this->redirectToRoute('app_productline_admin', [
                 'controller_name'   => 'LineAdminController',
                 'zone'          => $zone,
@@ -123,7 +123,7 @@ class ProductLineAdminController extends BaseController
             $category = $this->categoryRepository->findOneBy(['name' => $categoryname]);
 
             if ($category) {
-                $this->addFlash('danger', 'Category already exists');
+                $this->addFlash('danger', 'La catégorie existe deja');
                 return $this->redirectToRoute('app_productline_admin', [
                     'controller_name'   => 'LineAdminController',
                     'zone'          => $zone,
@@ -140,7 +140,7 @@ class ProductLineAdminController extends BaseController
                 $this->em->persist($category);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($categoryname);
-                $this->addFlash('success', 'The Category has been created');
+                $this->addFlash('success', 'La catégorie a été créée');
                 return $this->redirectToRoute('app_productline_admin', [
                     'controller_name'   => 'LineAdminController',
                     'zone'          => $zone,
@@ -165,12 +165,12 @@ class ProductLineAdminController extends BaseController
 
         if ($entity == true) {
 
-            $this->addFlash('success', $entityType . ' has been deleted');
+            $this->addFlash('success', 'La catégorie ' . $entityType . ' a été supprimée');
             return $this->redirectToRoute('app_productline_admin', [
                 'productline'   => $productLine,
             ]);
         } else {
-            $this->addFlash('danger',  $entityType . '  does not exist');
+            $this->addFlash('danger', 'La catégorie ' . $entityType . ' n\'existe pas');
             return $this->redirectToRoute('app_productline_admin', [
                 'productline'   => $productLine,
             ]);
