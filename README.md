@@ -58,7 +58,7 @@ b - From a remote connection to a server from a windows computer for example, pr
 3 - Run the script : 
 
 ```
-    bash install-docauposte2.git
+    bash install-docauposte2.sh
 ```
 
 
