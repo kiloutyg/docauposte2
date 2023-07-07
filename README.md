@@ -4,32 +4,10 @@ Created from scratch with Docker, PHP8 and Symfony.
 Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
 
-# Semi automated installation :
-
-1 - Download the installation script :
-
-```
-    wget https://github.com/kiloutyg/DocAuPoste2/releases/download/v0.92.6/install-docauposte2.sh 
-```
-
-2 - Render the script executable : 
-
-```   
-    sudo chmod +x install-docauposte2.sh
-```
-
-3 - Run the script : 
-
-```
-    bash install-docauposte2.git
-```
-
-# Manual installation
-
 ## Prerequesite :
 
 
-#### 1 - Install git :
+#### Install git :
 
 ##### A - Install git utility (you can use an other one if you wish to like gh or gitflow):
 ```
@@ -66,15 +44,38 @@ b - From a remote connection to a server from a windows computer for example, pr
 - Once everything is done click on "Add SSH key" 
 
 
-#### 2 - Add docker CE repo : 
+# Semi automated installation :
+
+1 - Download the installation script :
+
+```
+    wget https://github.com/kiloutyg/DocAuPoste2/releases/download/v0.92.6/install-docauposte2.sh 
+```
+
+2 - Render the script executable : 
+
+```   
+    sudo chmod +x install-docauposte2.sh
+```
+
+3 - Run the script : 
+
+```
+    bash install-docauposte2.git
+```
+
+# Manual installation
+
+
+#### 1- Add docker CE repo : 
 ```
     sudo subscription-manager repo-override --repo=PlasticOmnium_Docker_Docker_CE_Stable --add=enabled:1
 ```
-#### 3 - Update package manager repository : 
+#### 2 - Update package manager repository : 
 ```
     sudo yum update
 ```
-#### 4 - Uninstall any present Docker app :
+#### 3 - Uninstall any present Docker app :
 ```
     sudo yum remove docker \
                   docker-client \
@@ -87,11 +88,11 @@ b - From a remote connection to a server from a windows computer for example, pr
                   podman \
                   runc
 ```
-#### 5 - Install docker :
+#### 4 - Install docker :
 ```
     sudo yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
 ```
-#### 6 - Docker Post-installation Step.
+#### 5 - Docker Post-installation Step.
 ```
     sudo groupadd docker
     sudo usermod -aG docker $USER
