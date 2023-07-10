@@ -2,7 +2,7 @@
 
 export http_proxy='http://10.0.0.1:80';
 composer install --no-dev --optimize-autoloader;
-yarn install;
+yarn install --production;
 composer clear-cache;
 chmod 777 . -R -v;
 php bin/console cache:clear --no-warmup --env=prod;
