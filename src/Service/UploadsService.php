@@ -50,6 +50,7 @@ class UploadsService extends AbstractController
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();
         $public_dir = $this->projectDir . '/public';
+        // $conflictFile = '';
 
         foreach ($files as $file) {
 
@@ -68,14 +69,16 @@ class UploadsService extends AbstractController
             if (!in_array($extension, $allowedExtensions)) {
                 return $this->addFlash('error', 'Le fichier doit être un pdf');;
             }
-
-
+            $filename = '';
             if ($newFileName) {
                 $filename   = $newFileName;
             } else {
                 $filename   = $file->getClientOriginalName();
             }
-
+            // $conflictFile = $this->uploadRepository->findOneBy(['filename' => $filename, 'button' => $button]);
+            // if ($conflictFile) {
+            //     return $this->addFlash('error', 'Le fichier existe déjà');
+            // } else {
             $path       = $folderPath . '/' . $filename;
             $file->move($folderPath . '/', $filename);
 
@@ -88,6 +91,7 @@ class UploadsService extends AbstractController
             $upload->setButton($button);
             $upload->setUploadedAt(new \DateTime());
             $this->manager->persist($upload);
+            // }
         }
         $this->manager->flush();
         return $name;

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}LineAdmin!
+{% block title %}LineAdminCenter
 {% endblock %}
 
 {% block body %}
@@ -97,7 +97,7 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 							<strong>Formulaire de création de compte utilisateur :</strong>
 						</button>
 					</h2>
-					<div id="collapseAccountcreation" class="accordion-collapse collapse" aria-labelledby="headingAccountcreation" data-bs-parent="#accordionAdmin">
+					<div id="collapseAccountcreation" class="accordion-collapse collapse" aria-labelledby="headingAccountcreation" data-bs-parent="#accordionLineAdmin">
 						<div class="accordion-body accordion-bg shadow shadow-inset">
 							<div class="card border-0 shadow rounded-3 my-5">
 								<div class="card-body">
@@ -118,7 +118,7 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 						<strong>Formulaire de chargement de fichier :</strong>
 					</button>
 				</h2>
-				<div id="collapseUpload" class="accordion-collapse collapse" aria-labelledby="headingUpload" data-bs-parent="#accordionAdmin">
+				<div id="collapseUpload" class="accordion-collapse collapse" aria-labelledby="headingUpload" data-bs-parent="#accordionLineAdmin">
 					<div class="accordion-body accordion-bg shadow shadow-inset">
 						<div class="card border-0 shadow rounded-3 my-5">
 							<div class="card-body">
@@ -141,7 +141,7 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 						<strong>Formulaire d'ajout d'Incident :</strong>
 					</button>
 				</h2>
-				<div id="collapseIncident" class="accordion-collapse collapse" aria-labelledby="headingIncident" data-bs-parent="#accordionAdmin">
+				<div id="collapseIncident" class="accordion-collapse collapse" aria-labelledby="headingIncident" data-bs-parent="#accordionLineAdmin">
 					<div class="accordion-body accordion-bg shadow shadow-inset">
 						<div class="card border-0 shadow rounded-3 my-5">
 							<div class="card-body">
@@ -157,4 +157,5 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 				</div>
 			</div>
 		</div>
-	{% endblock %}
+	</div>
+{% endblock %}
