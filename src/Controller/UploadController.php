@@ -51,7 +51,6 @@ class UploadController extends FrontController
 
             $button = $request->request->get('button');
             $newFileName = $request->request->get('newFileName');
-
             $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
 
             // Use the UploadsService to handle file uploads
@@ -61,7 +60,6 @@ class UploadController extends FrontController
             return $this->redirect($originUrl);
         } else {
             // Show an error message if the form is not submitted
-
             $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
             return $this->redirect($originUrl);
             // Redirect the user to an appropriate page or show an error message
