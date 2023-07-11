@@ -46,23 +46,34 @@ class UploadController extends FrontController
 
         $originUrl = $request->headers->get('Referer');
 
-        // Check if the form is submitted
-        if ($request->isMethod('POST')) {
+        $button = $request->request->get('button');
+        $newFileName = $request->request->get('newFileName');
+        $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
 
-            $button = $request->request->get('button');
-            $newFileName = $request->request->get('newFileName');
-            $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
+        // Check if the file already exists
+        $conflictFile = '';
+        $filename = '';
+        $file = $request->files->get('file');
+        if ($newFileName) {
+            $filename   = $newFileName;
+        } else {
+            $filename   = $file->getClientOriginalName();
+        }
+        $conflictFile = $this->uploadRepository->findOneBy(['button' => $buttonEntity, 'filename' => $filename]);
+        if ($conflictFile) {
+            $this->addFlash('error', 'Le fichier ' . $filename . ' existe déjà.');
+            return $this->redirect($originUrl);
+
+            // if it does not exist pass the request to the service 
+        } else if ($request->isMethod('POST')) {
 
             // Use the UploadsService to handle file uploads
             $name = $this->uploadsService->uploadFiles($request, $buttonEntity, $newFileName);
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
-
             return $this->redirect($originUrl);
         } else {
-            // Show an error message if the form is not submitted
             $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
             return $this->redirect($originUrl);
-            // Redirect the user to an appropriate page or show an error message
         }
     }
 
@@ -88,7 +99,7 @@ class UploadController extends FrontController
 
         // Use the UploadsService to handle file deletion
         $name = $uploadsService->deleteFile($filename, $buttonEntity);
-        $this->addFlash('success', 'File ' . $name . ' deleted');
+        $this->addFlash('success', 'Le fichier  ' . $name . ' a été supprimé.');
 
         return $this->redirect($originUrl);
     }

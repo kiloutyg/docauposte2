@@ -53,7 +53,6 @@ class UploadsService extends AbstractController
 
         foreach ($files as $file) {
 
-
             // Dinamyic folder creation and file upload
             $buttonname = $button->getName();
             $parts = explode('.', $buttonname);
@@ -68,8 +67,7 @@ class UploadsService extends AbstractController
             if (!in_array($extension, $allowedExtensions)) {
                 return $this->addFlash('error', 'Le fichier doit être un pdf');;
             }
-
-
+            $filename = '';
             if ($newFileName) {
                 $filename   = $newFileName;
             } else {

@@ -33,17 +33,12 @@ class ZoneAdminController extends BaseController
         $groupIncidents = $incidentsService->groupIncidents($incidents);
 
 
-        // Get the error and last username using AuthenticationUtils
-        $error = $authenticationUtils->getLastAuthenticationError();
-        $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('zone_admin/zone_admin_index.html.twig', [
             'groupedUploads'    => $groupedUploads,
             'groupincidents'    => $groupIncidents,
             'zone'              => $zone,
             'productLines'      => $this->productLineRepository->findAll(),
-            'error'             => $error,
-            'last_username'     => $lastUsername,
             'buttons'           => $this->buttonRepository->findAll(),
             'uploads'           => $this->uploadRepository->findAll(),
             'users'             => $this->userRepository->findAll(),
