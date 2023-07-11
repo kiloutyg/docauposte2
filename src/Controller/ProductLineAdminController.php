@@ -39,18 +39,12 @@ class ProductLineAdminController extends BaseController
 
 
 
-        // Get the error and last username using AuthenticationUtils
-        $error = $authenticationUtils->getLastAuthenticationError();
-        $lastUsername = $authenticationUtils->getLastUsername();
-
         return $this->render('productline_admin/productline_admin.html.twig', [
             'groupedUploads'    => $groupedUploads,
             'groupincidents'    => $groupIncidents,
             'zone'              => $zone,
             'productLine'       => $productLine,
             'categories'        => $this->categoryRepository->findAll(),
-            'error'             => $error,
-            'last_username'     => $lastUsername,
             'uploads'           => $this->uploadRepository->findAll(),
             'users'             => $this->userRepository->findAll(),
             'buttons'           => $this->buttonRepository->findAll(),

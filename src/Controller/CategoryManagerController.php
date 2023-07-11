@@ -106,7 +106,7 @@ class CategoryManagerController extends BaseController
             $button = $this->buttonRepository->findoneBy(['name' => $buttonname]);
 
             if ($button) {
-                $this->addFlash('danger', 'Le boutton existe déjà');
+                $this->addFlash('danger', 'Le bouton existe déjà');
                 return $this->redirectToRoute('app_category_manager', [
                     'category'    => $category,
                 ]);
@@ -118,7 +118,7 @@ class CategoryManagerController extends BaseController
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($buttonname);
 
-                $this->addFlash('success', 'Le boutton a été créé');
+                $this->addFlash('success', 'Le bouton a été créé');
                 return $this->redirectToRoute('app_category_manager', [
                     'category'    => $category,
                 ]);
