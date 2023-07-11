@@ -62,7 +62,7 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 														{% set matchingProductLines = productLines|filter(productLine => productLine.zone.id is same as(zone.id)) %}
 														{% for productLine in matchingProductLines %}
 															<li class="form-control d-flex justify-content-between align-items-center mb-2">
-																<a href="{{path('app_productline_admin', {productline: productLine.name, name: productLine.zone.name})}}" class="btn btn-link">
+																<a href="{{path('app_productline_admin', {productline: productLine.name})}}" class="btn btn-link">
 																	-
 																	{{ productLine.name|split('.')|first|upper}}
 																</a>

@@ -48,25 +48,24 @@ class UploadController extends FrontController
         $conflictFile = '';
         $filename = '';
 
-        // Check if the form is submitted
-        if ($request->isMethod('POST')) {
+        $button = $request->request->get('button');
+        $newFileName = $request->request->get('newFileName');
+        $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
 
-            $button = $request->request->get('button');
-            $newFileName = $request->request->get('newFileName');
-            $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
-            $file = $request->files->get('file');
+        $file = $request->files->get('file');
 
-            if ($newFileName) {
-                $filename   = $newFileName;
-            } else {
-                $filename   = $file->getClientOriginalName();
-            }
-            $conflictFile = $this->uploadRepository->findOneBy(['button' => $buttonEntity, 'filename' => $filename]);
+        if ($newFileName) {
+            $filename   = $newFileName;
+        } else {
+            $filename   = $file->getClientOriginalName();
+        }
 
-            if ($conflictFile) {
-                $this->addFlash('error', 'Le fichier ' . $filename . ' existe déjà.');
-                return $this->redirect($originUrl);
-            }
+        $conflictFile = $this->uploadRepository->findOneBy(['button' => $buttonEntity, 'filename' => $filename]);
+
+        if ($conflictFile) {
+            $this->addFlash('error', 'Le fichier ' . $filename . ' existe déjà.');
+            return $this->redirect($originUrl);
+        } else if ($request->isMethod('POST')) {
 
             // Use the UploadsService to handle file uploads
             $name = $this->uploadsService->uploadFiles($request, $buttonEntity, $newFileName);

@@ -77,7 +77,7 @@ class UploadsService extends AbstractController
             }
             // $conflictFile = $this->uploadRepository->findOneBy(['filename' => $filename, 'button' => $button]);
             // if ($conflictFile) {
-            //     return $this->addFlash('error', 'Le fichier existe déjà');
+            //     return $this->addFlash('error', 'Le fichier ' . $filename . ' existe déjà.');
             // } else {
             $path       = $folderPath . '/' . $filename;
             $file->move($folderPath . '/', $filename);
