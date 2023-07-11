@@ -39,7 +39,7 @@ class Upload
     private ?Button $button = null;
 
     #[ORM\ManyToOne(inversedBy: 'uploads')]
-    private ?DiplayOption $displayOption = null;
+    private ?DisplayOption $displayOption = null;
 
 
 
@@ -170,12 +170,12 @@ class Upload
     //     return $this;
     // }
 
-    public function getDisplayOption(): ?DiplayOption
+    public function getDisplayOption(): ?DisplayOption
     {
         return $this->displayOption;
     }
 
-    public function setDisplayOption(?DiplayOption $displayOption): static
+    public function setDisplayOption(?DisplayOption $displayOption): static
     {
         $this->displayOption = $displayOption;
 
