@@ -45,26 +45,26 @@ class UploadController extends FrontController
         $this->uploadsService = $uploadsService;
 
         $originUrl = $request->headers->get('Referer');
-        $conflictFile = '';
-        $filename = '';
 
         $button = $request->request->get('button');
         $newFileName = $request->request->get('newFileName');
         $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
 
+        // Check if the file already exists
+        $conflictFile = '';
+        $filename = '';
         $file = $request->files->get('file');
-
         if ($newFileName) {
             $filename   = $newFileName;
         } else {
             $filename   = $file->getClientOriginalName();
         }
-
         $conflictFile = $this->uploadRepository->findOneBy(['button' => $buttonEntity, 'filename' => $filename]);
-
         if ($conflictFile) {
             $this->addFlash('error', 'Le fichier ' . $filename . ' existe déjà.');
             return $this->redirect($originUrl);
+
+            // if it does not exist pass the request to the service 
         } else if ($request->isMethod('POST')) {
 
             // Use the UploadsService to handle file uploads
