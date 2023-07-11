@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230704090242 extends AbstractMigration
+final class Version20230711162709 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -22,7 +22,7 @@ final class Version20230704090242 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE button (id INT AUTO_INCREMENT NOT NULL, category_id INT NOT NULL, name VARCHAR(255) NOT NULL, INDEX IDX_3A06AC3D12469DE2 (category_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE category (id INT AUTO_INCREMENT NOT NULL, product_line_id INT NOT NULL, name VARCHAR(255) NOT NULL, INDEX IDX_64C19C19CA26EF2 (product_line_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE diplay_option (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE display_option (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE incident (id INT AUTO_INCREMENT NOT NULL, incident_category_id INT NOT NULL, product_line_id INT NOT NULL, name VARCHAR(255) NOT NULL, uploaded_at DATETIME NOT NULL, active TINYINT(1) DEFAULT NULL, path VARCHAR(255) NOT NULL, INDEX IDX_3D03A11AAE6ED38F (incident_category_id), INDEX IDX_3D03A11A9CA26EF2 (product_line_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE incident_category (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE product_line (id INT AUTO_INCREMENT NOT NULL, zone_id INT NOT NULL, name VARCHAR(255) NOT NULL, INDEX IDX_5CFC96579F2C3FAB (zone_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -36,7 +36,7 @@ final class Version20230704090242 extends AbstractMigration
         $this->addSql('ALTER TABLE incident ADD CONSTRAINT FK_3D03A11A9CA26EF2 FOREIGN KEY (product_line_id) REFERENCES product_line (id)');
         $this->addSql('ALTER TABLE product_line ADD CONSTRAINT FK_5CFC96579F2C3FAB FOREIGN KEY (zone_id) REFERENCES zone (id)');
         $this->addSql('ALTER TABLE upload ADD CONSTRAINT FK_17BDE61FA123E519 FOREIGN KEY (button_id) REFERENCES button (id)');
-        $this->addSql('ALTER TABLE upload ADD CONSTRAINT FK_17BDE61F7B75FA05 FOREIGN KEY (display_option_id) REFERENCES diplay_option (id)');
+        $this->addSql('ALTER TABLE upload ADD CONSTRAINT FK_17BDE61F7B75FA05 FOREIGN KEY (display_option_id) REFERENCES display_option (id)');
     }
 
     public function down(Schema $schema): void
@@ -51,7 +51,7 @@ final class Version20230704090242 extends AbstractMigration
         $this->addSql('ALTER TABLE upload DROP FOREIGN KEY FK_17BDE61F7B75FA05');
         $this->addSql('DROP TABLE button');
         $this->addSql('DROP TABLE category');
-        $this->addSql('DROP TABLE diplay_option');
+        $this->addSql('DROP TABLE display_option');
         $this->addSql('DROP TABLE incident');
         $this->addSql('DROP TABLE incident_category');
         $this->addSql('DROP TABLE product_line');
