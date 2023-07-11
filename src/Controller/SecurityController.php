@@ -66,7 +66,7 @@ class SecurityController extends BaseController
         $usermod = $accountService->modifyAccount($request, $currentUser);
 
         if ($usermod instanceof User) {
-            $this->addFlash('success', 'Le compte' . $usermod->getUsername() . ' a été modifié');
+            $this->addFlash('success', 'Le compte ' . $usermod->getUsername() . ' a été modifié');
             return $this->redirectToRoute('app_super_admin');
         };
         return $this->redirectToRoute('app_super_admin');

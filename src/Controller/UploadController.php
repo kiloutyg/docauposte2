@@ -51,7 +51,6 @@ class UploadController extends FrontController
 
             $button = $request->request->get('button');
             $newFileName = $request->request->get('newFileName');
-
             $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
 
             // Use the UploadsService to handle file uploads
@@ -61,7 +60,6 @@ class UploadController extends FrontController
             return $this->redirect($originUrl);
         } else {
             // Show an error message if the form is not submitted
-
             $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
             return $this->redirect($originUrl);
             // Redirect the user to an appropriate page or show an error message
@@ -83,9 +81,9 @@ class UploadController extends FrontController
     // create a route to delete a file
     #[Route('/delete/upload/{button}/{filename}', name: 'delete_file')]
 
-    public function delete_file(string $filename = null, string $button = null, UploadsService $uploadsService, Request $request): RedirectResponse
+    public function delete_file(string $filename = null, int $button = null, UploadsService $uploadsService, Request $request): RedirectResponse
     {
-        $buttonEntity = $this->buttonRepository->findoneBy(['name' => $button]);
+        $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
         $originUrl = $request->headers->get('Referer');
 
         // Use the UploadsService to handle file deletion
