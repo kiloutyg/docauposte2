@@ -31,7 +31,7 @@ services:
       - database
   web:
     build: ./docker/dockerfilehalf/
-    entrypoint: "./entrypoint.sh"
+    entrypoint: "./dev-entrypoint.sh"
     restart: unless-stopped
     volumes:
       - ./:/var/www
