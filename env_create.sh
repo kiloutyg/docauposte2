@@ -18,6 +18,26 @@ done
 # APP_SECRET=96ae0f3daef954cfbcb61ad63652ca85
 APP_SECRET=$(openssl rand -hex 16)
 
+# Create docker-compose.override.yml file to use the good entrypoint
+if ["$APP_CONTEXT" == "prod"]; then
+cat > docker-compose.override.yml <<EOL
+version: '3.8'
+
+services:
+  web:
+    entrypoint: "./entrypoint.sh"
+EOL
+else
+cat > docker-compose.override.yml <<EOL
+version: '3.8'
+
+services:
+  web:
+    entrypoint: "./dev-entrypoint.sh"
+EOL
+fi
+
+
 # Create .env file
 cat > .env <<EOL
 MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
