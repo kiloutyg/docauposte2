@@ -12,7 +12,6 @@ while true; do
         break
     else
         echo "Invalid app context. Please enter either prod or dev."
-        # Don't need 'exit' here, the loop will automatically continue
     fi
 done
 # APP_SECRET=96ae0f3daef954cfbcb61ad63652ca85
