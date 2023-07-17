@@ -6,12 +6,14 @@ use App\Controller\BaseController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
+# This controller is responsible for fetching data from the database and returning it as JSON
+
 class ApiController extends BaseController
 {
     #[Route('/api/cascading_dropdown_data', name: 'api_cascading_dropdown_data')]
     public function getData(): JsonResponse
     {
-        // Fetch data as you did in your previous controller
+        // Fetch entity categories data to let the cascading dropdown access it
 
         $zones = array_map(function ($zone) {
             return [
@@ -57,7 +59,7 @@ class ApiController extends BaseController
     #[Route('/api/incidents_cascading_dropdown_data', name: 'api_incidents_cascading_dropdown_data')]
     public function getIncidentData(): JsonResponse
     {
-        // Fetch data as you did in your previous controller
+        // Fetch entity categories data to let the cascading dropdown access it
 
         $zones = array_map(function ($zone) {
             return [

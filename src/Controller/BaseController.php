@@ -42,7 +42,7 @@ use App\Service\EntityHeritanceService;
 
 #[Route('/', name: 'app_')]
 
-
+# This controller is extended to make it easier to access routes
 
 class BaseController extends AbstractController
 {

@@ -15,12 +15,14 @@ use App\Service\IncidentsService;
 
 use App\Entity\Button;
 
+# This controller manage the logic of the category's admin interface
 
 class CategoryManagerController extends BaseController
 {
 
     #[Route('/category_manager/{category}', name: 'app_category_manager')]
 
+    # This function is responsible for rendering the category's admin interface
     public function index(IncidentsService $incidentsService, UploadsService $uploadsService, string $category = null): Response
     {
         $category    = $this->categoryRepository->findoneBy(['name' => $category]);
@@ -60,6 +62,7 @@ class CategoryManagerController extends BaseController
 
     #[Route('/category_manager/create_user/{category}', name: 'app_category_manager_create_user')]
 
+    # This function is responsible for creating a new user, it's access is restricted on the frontend
     public function createUser(string $category = null, AccountService $accountService, Request $request): Response
     {
         $category    = $this->categoryRepository->findoneBy(['name' => $category]);
@@ -86,6 +89,7 @@ class CategoryManagerController extends BaseController
 
     #[Route('/category_manager/create_button/{category}', name: 'app_category_manager_create_button')]
 
+    # This function is used to create a new button to which is attached the uploads.
     public function createButton(Request $request, string $category = null)
     {
         $categoryentity    = $this->categoryRepository->findoneBy(['name' => $category]);
@@ -127,6 +131,8 @@ class CategoryManagerController extends BaseController
     }
 
     #[Route('/category_manager/delete_button/{button}', name: 'app_category_manager_delete_button')]
+
+    # This function is used to delete a button and all the uploads attached to it.
     public function deleteEntity(string $button): Response
     {
         $entityType = 'button';
