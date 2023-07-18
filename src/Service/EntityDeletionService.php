@@ -4,6 +4,7 @@
 
 namespace App\Service;
 
+use App\Controller\BaseController;
 use Doctrine\ORM\EntityManagerInterface;
 
 use App\Repository\ZoneRepository;
@@ -18,6 +19,8 @@ use App\Service\UploadsService;
 use App\Service\IncidentsService;
 use App\Service\FolderCreationService;
 
+// This class is responsible for managing the deletion of entities, their related entities from the database
+// It also refer to the logic for deleting the folder and files from the server filesystem
 class EntityDeletionService
 {
     private $em;
@@ -58,9 +61,10 @@ class EntityDeletionService
         $this->folderCreationService = $folderCreationService;
     }
 
+    // This function is responsible for deleting an entity and its related entities from the database and the server filesystem
     public function deleteEntity(string $entityType, int $id): bool
     {
-
+        // Get the repository for the entity type
         $repository = null;
         switch ($entityType) {
             case 'zone':
@@ -69,7 +73,6 @@ class EntityDeletionService
             case 'productline':
                 $repository = $this->productLineRepository;
                 break;
-                // Add other cases for other entity types
             case 'category':
                 $repository = $this->categoryRepository;
                 break;
@@ -86,31 +89,32 @@ class EntityDeletionService
                 $repository = $this->incidentCategoryRepository;
                 break;
         }
-
+        // If the repository is not found or the entity is not found in the database, return false
         if (!$repository) {
             return false;
         }
-
+        // Get the entity from the database
         $entity = $repository->find($id);
         if (!$entity) {
             return false;
         }
 
-        // Add deletion logic for related entities
+        // Deletion logic for related entities, folder and files
         if ($entityType === 'zone') {
             foreach ($entity->getProductLines() as $productLine) {
                 $this->deleteEntity('productline', $productLine->getId());
             }
             $this->folderCreationService->deleteFolderStructure($entity->getName());
         } elseif ($entityType === 'productline') {
+
             foreach ($entity->getCategories() as $category) {
                 $this->deleteEntity('category', $category->getId());
             }
-            $this->folderCreationService->deleteFolderStructure($entity->getName());
 
             foreach ($entity->getIncidents() as $incident) {
                 $this->deleteEntity('incident', $incident->getId());
             }
+
             $this->folderCreationService->deleteFolderStructure($entity->getName());
         } elseif ($entityType === 'category') {
             foreach ($entity->getButtons() as $button) {

@@ -11,6 +11,7 @@ use App\Entity\User;
 
 use App\Repository\UserRepository;
 
+// This class is responsible for managing the user accounts logic
 class AccountService
 {
     private $passwordHasher;
@@ -27,6 +28,7 @@ class AccountService
         $this->manager = $manager;
     }
 
+    // This function is responsible for creating a new user account and persisting it to the database
     public function createAccount(Request $request, $error)
     {
         if ($request->getMethod() == 'POST') {
@@ -51,10 +53,10 @@ class AccountService
                 return  $user;
             }
         }
-
         return null;
     }
 
+    // This function is responsible for modifying a user account and persisting the modification to the database
     public function modifyAccount(Request $request, UserInterface $currentUser)
     {
         if ($request->getMethod() == 'POST') {
@@ -88,7 +90,7 @@ class AccountService
         return null;
     }
 
-
+    // This function is responsible for deleting a user account from the database
     public function deleteUser($id)
     {
         $user = $this->userRepository->find($id);
