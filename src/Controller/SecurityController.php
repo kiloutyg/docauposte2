@@ -15,10 +15,11 @@ use App\Repository\UserRepository;
 
 use App\Service\AccountService;
 
+// This controller manage the logic of the security interface
 class SecurityController extends BaseController
 {
 
-
+    // This function is responsible for rendering the login interface 
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils, Request $request)
     {
@@ -26,7 +27,6 @@ class SecurityController extends BaseController
             $this->addFlash('success', 'Vous êtes connecté');
             return $this->redirectToRoute('app_base');
         }
-
 
         $error        = $authenticationUtils->getLastAuthenticationError(); // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
@@ -39,14 +39,14 @@ class SecurityController extends BaseController
         ]);
     }
 
+    // This function is responsible for rendering the logout interface
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
         $this->addFlash('success', 'Vous êtes déconnecté');
     }
 
-
-
+    // This function is responsible for rendering the account modifiying interface destined to the super admin
     #[Route(path: '/modify_account_view/{userid}', name: 'app_modify_account_view')]
     public function modify_account_view(int $userid, AuthenticationUtils $authenticationUtils): Response
     {
@@ -59,6 +59,7 @@ class SecurityController extends BaseController
         ]);
     }
 
+    // This function manage the logic of the account modifiying
     #[Route(path: '/modify_account', name: 'app_modify_account')]
     public function modify_account(AccountService $accountService, UserInterface $currentUser, AuthenticationUtils $authenticationUtils, Request $request)
     {
@@ -72,6 +73,7 @@ class SecurityController extends BaseController
         return $this->redirectToRoute('app_super_admin');
     }
 
+    // This function is managing the logic of authentication
     private function authenticateUser(User $user)
     {
         $providerKey = 'secured_area'; // your firewall name
@@ -80,6 +82,7 @@ class SecurityController extends BaseController
         $this->container->get('security.token_storage')->setToken($token);
     }
 
+    // This function is responsible for managing the logic of the account deletion
     #[Route(path: '/delete_account', name: 'app_delete_account')]
     public function delete_account(AccountService $accountService, Request $request): Response
     {

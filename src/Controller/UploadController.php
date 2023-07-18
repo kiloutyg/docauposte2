@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\File;
+
 use Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -16,19 +17,18 @@ use App\Form\UploadType;
 use App\Service\UploadsService;
 
 
-
+// This controlle is responsible for managing the logic of the upload interface
 #[Route('/', name: 'app_')]
-
 class UploadController extends FrontController
 {
+    // This function is responsible for rendering the upload interface
     #[Route('/upload', name: 'upload')]
     public function index(): Response
     {
         return $this->render('/services/uploads/upload.html.twig', []);
     }
 
-
-
+    // This function is responsible for rendering the uploaded files interface
     #[Route('/uploaded', name: 'uploaded_files')]
     public function uploaded_files(): Response
     {
@@ -38,7 +38,7 @@ class UploadController extends FrontController
         );
     }
 
-    // create a route to upload a file
+    // Create a route to upload a file, and pass the request to the UploadsService to handle the file upload
     #[Route('/uploading', name: 'generic_upload_files')]
     public function generic_upload_files(UploadsService $uploadsService, Request $request): Response
     {
@@ -50,7 +50,7 @@ class UploadController extends FrontController
         $newFileName = $request->request->get('newFileName');
         $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
 
-        // Check if the file already exists
+        // Check if the file already exists by comparing the filename and the button
         $conflictFile = '';
         $filename = '';
         $file = $request->files->get('file');
@@ -60,6 +60,7 @@ class UploadController extends FrontController
             $filename   = $file->getClientOriginalName();
         }
         $conflictFile = $this->uploadRepository->findOneBy(['button' => $buttonEntity, 'filename' => $filename]);
+        // if it exists, return an error message
         if ($conflictFile) {
             $this->addFlash('error', 'Le fichier ' . $filename . ' existe déjà.');
             return $this->redirect($originUrl);
@@ -78,7 +79,7 @@ class UploadController extends FrontController
     }
 
 
-    // create a route to download a file
+    // create a route to download a file in more simple terms to display the file
     #[Route('/download/{filename}', name: 'download_file')]
     public function download_file(string $filename = null): Response
     {
@@ -116,8 +117,10 @@ class UploadController extends FrontController
         $category = $button->getCategory();
         $productLine = $category->getProductLine();
         $zone = $productLine->getZone();
+
         $originUrl = $request->headers->get('Referer');
 
+        // Check if there is a file to modify
         if (!$upload) {
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
             return $this->redirect($originUrl);
@@ -131,19 +134,12 @@ class UploadController extends FrontController
             // Process the form data and modify the Upload entity
             try {
                 $uploadsService->modifyFile($upload);
-
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirect($originUrl);
             } catch (\Exception $e) {
-                $this->addFlash('error', 'Une erreur s\'est produite lors de la modification du fichier.');
+                $this->addFlash('error', $e->getMessage());
 
-                $response = [
-                    'status' => 'error',
-                    'message' => 'Une erreur s\'est produite lors de la modification du fichier.',
-                    'error' => $e->getMessage(),
-                ];
-
-                return new JsonResponse($response);
+                return $this->redirect($originUrl);
             }
         }
 

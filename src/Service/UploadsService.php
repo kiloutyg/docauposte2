@@ -18,6 +18,7 @@ use App\Entity\Button;
 use App\Service\FolderCreationService;
 
 
+// This class is used to manage the uploads files and logic
 class UploadsService extends AbstractController
 {
 
@@ -45,6 +46,7 @@ class UploadsService extends AbstractController
         $this->folderCreationService = $folderCreationService;
     }
 
+    // This function is responsible for the logic of uploading the uploads files
     public function uploadFiles(Request $request, $button, $newFileName = null)
     {
         $allowedExtensions = ['pdf'];
@@ -53,7 +55,7 @@ class UploadsService extends AbstractController
 
         foreach ($files as $file) {
 
-            // Dinamyic folder creation and file upload
+            // Dynamic folder creation and file upload
             $buttonname = $button->getName();
             $parts = explode('.', $buttonname);
             $parts = array_reverse($parts);
@@ -63,10 +65,16 @@ class UploadsService extends AbstractController
                 $folderPath .= '/' . $part;
             }
 
+            // Check if the file is of the right type
             $extension = $file->guessExtension();
             if (!in_array($extension, $allowedExtensions)) {
                 return $this->addFlash('error', 'Le fichier doit être un pdf');;
             }
+            if ($file->getMimeType() != 'application/pdf') {
+                return $this->addFlash('error', 'Le fichier doit être un pdf');;
+            }
+
+            // Check if the user changed the file name or not and process it accordingly 
             $filename = '';
             if ($newFileName) {
                 $filename   = $newFileName;
@@ -92,6 +100,7 @@ class UploadsService extends AbstractController
     }
 
 
+    // This function is responsible for the logic of deleting the uploads files
     public function deleteFile($filename, $buttonEntity)
     {
         $name = $filename;
@@ -121,7 +130,7 @@ class UploadsService extends AbstractController
     }
 
 
-
+    // This function is responsible for the logic of modifying the uploads files
     public function modifyFile(Upload $upload)
     {
         // Get the new file directly from the Upload object
@@ -145,6 +154,12 @@ class UploadsService extends AbstractController
         }
 
         $Path = $folderPath . '/' . $upload->getFilename();
+
+        // Check if the file is of the right type
+
+        if ($newFile->getMimeType() != 'application/pdf') {
+            throw new \Exception('Le fichier doit être un pdf');
+        }
 
         // If new file exists, process it and delete the old one
         if ($newFile) {
@@ -177,6 +192,7 @@ class UploadsService extends AbstractController
     }
 
 
+    // This function is responsible for the logic of grouping the uploads files by parent entities
     public function groupUploads($uploads)
     {
 

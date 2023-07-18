@@ -36,9 +36,9 @@ then
 
 # Start docker and enable it inside a prompt with the docker group
 sg docker -c "
-    sudo systemctl start docker \
-    sudo systemctl start containerd.service \
-    sudo systemctl enable docker.service \
+    sudo systemctl start docker;
+    sudo systemctl start containerd.service;
+    sudo systemctl enable docker.service;
     sudo systemctl enable containerd.service;"
 
 # Ask the user for the git repository address either in ssh or http

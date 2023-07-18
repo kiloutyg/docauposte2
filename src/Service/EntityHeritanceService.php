@@ -17,6 +17,8 @@ use App\Repository\IncidentCategoryRepository;
 use App\Service\UploadsService;
 use App\Service\IncidentsService;
 
+
+// This class is responsible for the logic of getting the related entities of a given entity
 class EntityHeritanceService
 {
     private $em;
@@ -54,11 +56,12 @@ class EntityHeritanceService
         $this->incidentService = $incidentsService;
     }
 
-
+    // This function returns an array of all the related uploads entities of a given entity
     public function uploadsByParentEntity($entityType, $id)
     {
         $uploads = [];
 
+        // Get the repository of the entity type
         $repository = null;
         switch ($entityType) {
             case 'zone':
@@ -67,7 +70,6 @@ class EntityHeritanceService
             case 'productline':
                 $repository = $this->productLineRepository;
                 break;
-                // Add other cases for other entity types
             case 'category':
                 $repository = $this->categoryRepository;
                 break;
@@ -75,15 +77,16 @@ class EntityHeritanceService
                 $repository = $this->buttonRepository;
                 break;
         }
+        // If the entity type is not valid, return an empty array
         if (!$repository) {
             return [];
         }
-
+        // Get the entity from the database and return an empty array if it doesn't exist
         $entity = $repository->find($id);
         if (!$entity) {
             return [];
         }
-
+        // Depending on the entity type, get the related entities
         if ($entityType === 'zone') {
             foreach ($entity->getProductLines() as $productLine) {
                 $uploads = array_merge($uploads, $this->uploadsByParentEntity('productline', $productLine->getId()));
@@ -105,10 +108,12 @@ class EntityHeritanceService
         return $uploads;
     }
 
+    // This function returns an array of all the related incidents entities of a given entity
     public function incidentsByParentEntity($entityType, $id)
     {
         $incidents = [];
 
+        // Get the repository of the entity type
         $repository = null;
         switch ($entityType) {
             case 'zone':
@@ -117,7 +122,6 @@ class EntityHeritanceService
             case 'productline':
                 $repository = $this->productLineRepository;
                 break;
-                // Add other cases for other entity types
             case 'category':
                 $repository = $this->categoryRepository;
                 break;
@@ -134,15 +138,16 @@ class EntityHeritanceService
                 $repository = $this->incidentCategoryRepository;
                 break;
         }
+        // If the entity type is not valid, return an empty array
         if (!$repository) {
             return [];
         }
-
+        // Get the entity from the database and return an empty array if it doesn't exist
         $entity = $repository->find($id);
         if (!$entity) {
             return [];
         }
-
+        // Depending on the entity type, get the related entities
         if ($entityType === 'zone') {
             foreach ($entity->getProductLines() as $productLine) {
                 $incidents = array_merge($incidents, $this->incidentsByParentEntity('productline', $productLine->getId()));
