@@ -33,6 +33,7 @@ Encore
     "incident-checkbox-signature",
     "./assets/js/incident-checkbox-signature.js"
   )
+  .addEntry("department-creation", "./assets/js/department-creation.js")
 
   // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
   .enableStimulusBridge("./assets/controllers.json")

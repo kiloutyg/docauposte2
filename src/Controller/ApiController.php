@@ -92,4 +92,22 @@ class ApiController extends BaseController
 
         return new JsonResponse($responseData);
     }
+
+    #[Route('/api/department_data', name: 'api_department_data')]
+    public function getDepartmentData(): JsonResponse
+    {
+        $departments = array_map(function ($department) {
+            return [
+                'id'    => $department->getId(),
+                'name'  => $department->getName(),
+            ];
+        }, $this->departmentRepository->findAll());
+
+        $responseData = [
+
+            'departments'   => $departments,
+        ];
+
+        return new JsonResponse($responseData);
+    }
 }

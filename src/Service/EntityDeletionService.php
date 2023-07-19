@@ -14,6 +14,8 @@ use App\Repository\ButtonRepository;
 use App\Repository\UploadRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
+use App\Repository\DepartmentRepository;
+use App\Repository\UserRepository;
 
 use App\Service\UploadsService;
 use App\Service\IncidentsService;
@@ -34,6 +36,8 @@ class EntityDeletionService
     private $incidentCategoryRepository;
     private $incidentService;
     private $folderCreationService;
+    private $departmentRepository;
+    private $userRepository;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -46,7 +50,9 @@ class EntityDeletionService
         UploadsService $uploadsService,
         IncidentCategoryRepository $incidentCategoryRepository,
         IncidentsService $incidentsService,
-        FolderCreationService $folderCreationService
+        FolderCreationService $folderCreationService,
+        DepartmentRepository $departmentRepository,
+        UserRepository $userRepository
     ) {
         $this->em = $em;
         $this->zoneRepository = $zoneRepository;
@@ -59,6 +65,8 @@ class EntityDeletionService
         $this->incidentCategoryRepository = $incidentCategoryRepository;
         $this->incidentService = $incidentsService;
         $this->folderCreationService = $folderCreationService;
+        $this->departmentRepository = $departmentRepository;
+        $this->userRepository = $userRepository;
     }
 
     // This function is responsible for deleting an entity and its related entities from the database and the server filesystem
@@ -87,6 +95,9 @@ class EntityDeletionService
                 break;
             case 'incidentCategory':
                 $repository = $this->incidentCategoryRepository;
+                break;
+            case 'department':
+                $repository = $this->departmentRepository;
                 break;
         }
         // If the repository is not found or the entity is not found in the database, return false
@@ -134,7 +145,12 @@ class EntityDeletionService
             $this->uploadsService->deleteFile($entity->getFilename(), $entity->getButton()->getId());
         } elseif ($entityType === 'incident') {
             $this->incidentService->deleteIncidentFile($entity->getName(), $entity->getProductLine());
+        } elseif ($entityType === 'department') {
+            foreach ($entity->getUsers() as $user) {
+                $entity->removeUser($user);
+            }
         }
+
 
         $this->em->remove($entity);
         $this->em->flush();

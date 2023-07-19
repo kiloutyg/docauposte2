@@ -32,13 +32,42 @@
 					<div class=" mb-3">
 						{% include 'services/accountservices/role_affectation.html.twig' %}
 					</div>
+					<div class="mb-3">
+						<div>
+							<label for="department">Service :</label>
+						</div>
+						<div>
+							<select name="department" id="department" class="form-select" required>
+								<option value="" selected disabled hidden>Choisir un Service</option>
+							</select>
+						</div>
+					</div>
 					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 					<div class="d-grid">
 						<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">modification du compte</button>
 					</div>
 					<hr class="my-4">
 				</form>
+				{% if is_granted('ROLE_SUPER_ADMIN') %}
+					<div class="row mb-3">
+						<label for="department_Name" class="form-label">Nouveau Service :</label>
+						<div class="col-sm">
+							<input type="text" class="form-control" id="department_name" name="department_name" placeholder="Nom du nouveau Service">
+						</div>
+						<div class="col-sm-auto">
+							<input type="button" id="create_department" class="btn btn-secondary shadow border border-dark-subtle" value="Ajouter un nouveau service">
+						</div>
+					</div>
+					{% for department in departments %}
+						<div class="row mb-3">
+							<li class="form-control shadow d-flex justify-content-between align-items-center">
+								{{department.name|split('.')|first|upper}}
+								{# <a href="{{ path('app_department_deletion', {department : department.name}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-incidentCategory">supprimer</a> #}
+							</li>
 
+						</div>
+					{% endfor %}
+				{% endif %}
 			</div>
 		</div>
 	</div>

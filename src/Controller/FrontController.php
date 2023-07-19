@@ -23,12 +23,16 @@ class FrontController extends BaseController
         return $this->render(
             'base.html.twig',
             [
-                'categories'    => $this->categoryRepository->findAll(),
-                'buttons'       => $this->buttonRepository->findAll(),
-                'zones'         => $this->zoneRepository->findAll(),
-                'productLines'  => $this->productLineRepository->findAll(),
-                'users'         => $this->userRepository->findAll(),
-                'user'          => $this->getUser(),
+                'zones'                 => $this->zones,
+                'productLines'          => $this->productLines,
+                'categories'            => $this->categories,
+                'buttons'               => $this->buttons,
+                'uploads'               => $this->uploads,
+                'users'                 => $this->users,
+                'incidents'             => $this->incidents,
+                'incidentCategories'    => $this->incidentCategories,
+                'departments'           => $this->departments,
+                'user'                  => $this->getUser(),
             ]
         );
     }

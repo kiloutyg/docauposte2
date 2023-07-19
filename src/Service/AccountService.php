@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\User;
 
 use App\Repository\UserRepository;
+use App\Repository\DepartmentRepository;
 
 // This class is responsible for managing the user accounts logic
 class AccountService
@@ -17,15 +18,18 @@ class AccountService
     private $passwordHasher;
     private $userRepository;
     private $manager;
+    private $departmentRepository;
 
     public function __construct(
         UserPasswordHasherInterface $passwordHasher,
         UserRepository $userRepository,
-        EntityManagerInterface $manager
+        EntityManagerInterface $manager,
+        DepartmentRepository $departmentRepository
     ) {
         $this->passwordHasher = $passwordHasher;
         $this->userRepository = $userRepository;
         $this->manager = $manager;
+        $this->departmentRepository = $departmentRepository;
     }
 
     // This function is responsible for creating a new user account and persisting it to the database
@@ -35,6 +39,8 @@ class AccountService
             $name = $request->request->get('username');
             $password = $request->request->get('password');
             $role = $request->request->get('role');
+            $departmentId = $request->request->get('department');
+            $department = $this->departmentRepository->findOneBy(['id' => $departmentId]);
 
             // check if the username is already in use
             $user = $this->userRepository->findOneBy(['username' => $name]);
@@ -47,6 +53,7 @@ class AccountService
                 $user->setUsername($name);
                 $user->setPassword($password);
                 $user->setRoles([$role]);
+                $user->setDepartment($department);
                 $this->manager->persist($user);
                 $this->manager->flush();
 
@@ -64,6 +71,8 @@ class AccountService
             $newName = $request->request->get('username');
             $password = $request->request->get('password');
             $role = $request->request->get('role');
+            $departmentId = $request->request->get('department');
+            $department = $this->departmentRepository->findOneBy(['id' => $departmentId]);
 
             // Check if the username is already in use
             $user = $this->userRepository->findOneBy(['username' => $name]); // Look up the user by the current_username
@@ -79,6 +88,7 @@ class AccountService
                     $user->setUsername($newName); // Set the new username
                     $user->setPassword($password);
                     $user->setRoles([$role]);
+                    $user->setDepartment($department);
                     $this->manager->persist($user);
                     $this->manager->flush();
 
