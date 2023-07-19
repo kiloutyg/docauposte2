@@ -15,16 +15,18 @@ use App\Service\IncidentsService;
 
 use App\Entity\Zone;
 
+// This controller is responsible for rendering the super admin interface an managing the logic of the super admin interface
 class SuperAdminController extends BaseController
 {
 
+    // This function is responsible for rendering the super admin interface
     #[Route('/super_admin', name: 'app_super_admin')]
-
     public function index(IncidentsService $incidentsService, UploadsService $uploadsService, AuthenticationUtils $authenticationUtils,): Response
     {
         $incidents = $this->incidentRepository->findAll();
         $uploads = $this->uploadRepository->findAll();
 
+        // Group the uploads and incidents by parent entity
         $groupedUploads = $uploadsService->groupUploads($uploads);
         $groupIncidents = $incidentsService->groupIncidents($incidents);
 
@@ -49,9 +51,8 @@ class SuperAdminController extends BaseController
         ]);
     }
 
-
+    // Creation of new user account destined to the super admin
     #[Route('/super_admin/create_admin', name: 'app_super_admin_create_admin')]
-
     public function createAdmin(AccountService $accountService, Request $request): Response
     {
         $error = null;
@@ -74,8 +75,7 @@ class SuperAdminController extends BaseController
         ]);
     }
 
-
-
+    // Zone creation logic destined to the super admin, it also creates the folder structure for the zone
     #[Route('/super_admin/create_zone', name: 'app_super_admin_create_zone')]
     public function createZone(Request $request)
     {
@@ -116,6 +116,7 @@ class SuperAdminController extends BaseController
         }
     }
 
+    // Zone deletion logic destined to the super admin, it also deletes the folder structure for the zone
     #[Route('/super_admin/delete_zone/{zone}', name: 'app_super_admin_delete_zone')]
     public function deleteEntity(string $zone): Response
     {

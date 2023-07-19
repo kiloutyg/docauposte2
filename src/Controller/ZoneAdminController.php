@@ -17,22 +17,20 @@ use App\Service\IncidentsService;
 
 use App\Entity\ProductLine;
 
+// This controller is responsible for rendering the zone admin interface an managing the logic of the zone admin interface
 class ZoneAdminController extends BaseController
-
 {
-
+    // This function is responsible for rendering the zone admin interface
     #[Route('/zone_admin/{zone}', name: 'app_zone_admin')]
-
     public function index(IncidentsService $incidentsService, UploadsService $uploadsService, AuthenticationUtils $authenticationUtils, string $zone = null): Response
     {
         $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
         $uploads = $this->entityHeritanceService->uploadsByParentEntity('zone', $zone->getId());
         $incidents = $this->entityHeritanceService->incidentsByParentEntity('zone', $zone->getId());
 
+        // Group the uploads and incidents by parent entity
         $groupedUploads = $uploadsService->groupUploads($uploads);
         $groupIncidents = $incidentsService->groupIncidents($incidents);
-
-
 
         return $this->render('zone_admin/zone_admin_index.html.twig', [
             'groupedUploads'    => $groupedUploads,
@@ -49,9 +47,8 @@ class ZoneAdminController extends BaseController
         ]);
     }
 
-
+    // Creation of new user account destined to the zone admin but only accessible by the super admin
     #[Route('/zone_admin/create_line_admin/{zone}', name: 'app_zone_admin_create_line_admin')]
-
     public function createLineAdmin(string $zone = null, AccountService $accountService, Request $request): Response
     {
         $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
@@ -77,7 +74,7 @@ class ZoneAdminController extends BaseController
         ]);
     }
 
-
+    // Creation of new productline
     #[Route('/zone_admin/create_productline/{zone}', name: 'app_zone_admin_create_productline')]
     public function createProductLine(Request $request, string $zone = null)
     {
@@ -92,8 +89,7 @@ class ZoneAdminController extends BaseController
                 'productLines' => $this->productLineRepository->findAll(),
             ]);
         } else {
-            // Create a productline
-
+            // Check if the productline already exists by comparing the productline name and the zone
             $productlinename = $request->request->get('productlinename') . '.' . $zone->getName();
             $productline = $this->productLineRepository->findOneBy(['name' => $productlinename]);
 
@@ -103,6 +99,8 @@ class ZoneAdminController extends BaseController
                     'zone' => $zone->getName(),
                     'productLines' => $this->productLineRepository->findAll(),
                 ]);
+                // Create a productline
+
             } else {
                 $productline = new ProductLine();
                 $productline->setName($productlinename);
@@ -119,6 +117,7 @@ class ZoneAdminController extends BaseController
         }
     }
 
+    // Delete a productline and all its children entities, it depends on the entitydeletionService
     #[Route('/zone_admin/delete_productline/{productline}', name: 'app_zone_admin_delete_productline')]
     public function deleteEntity(string $productline): Response
     {

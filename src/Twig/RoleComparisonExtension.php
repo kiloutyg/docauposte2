@@ -5,6 +5,9 @@ namespace App\Twig;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
+
+// This class is used to compare the roles of two users in twig files to serve the right content in a select box
+// Finally is not useful because user creation is a monopol and only the super admin can create users
 class RoleComparisonExtension extends AbstractExtension
 {
     public function getFunctions()

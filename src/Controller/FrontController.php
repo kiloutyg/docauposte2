@@ -10,28 +10,31 @@ use App\Service\AccountService;
 
 use App\Controller\UploadController;
 
+// This controller manage the logic of the front interface, it is the main controller of the application and is responsible for rendering the front interface.
+// It is also responsible for creating the super-admin account.
 
 #[Route('/', name: 'app_')]
 class FrontController extends BaseController
 {
-    // Page d'accueil
+    // Render the base page
     #[Route('/', name: 'base')]
     public function base(): Response
     {
         return $this->render(
             'base.html.twig',
             [
-                'categories'  => $this->categoryRepository->findAll(),
-                'buttons' => $this->buttonRepository->findAll(),
-                'zones'        => $this->zoneRepository->findAll(),
-                'productLines' => $this->productLineRepository->findAll(),
-                'users'        => $this->userRepository->findAll(),
-                'user'         => $this->getUser(),
+                'categories'    => $this->categoryRepository->findAll(),
+                'buttons'       => $this->buttonRepository->findAll(),
+                'zones'         => $this->zoneRepository->findAll(),
+                'productLines'  => $this->productLineRepository->findAll(),
+                'users'         => $this->userRepository->findAll(),
+                'user'          => $this->getUser(),
             ]
         );
     }
 
 
+    // This function is responsible for creating the super-admin account at the first connection of the application.
     #[Route('/createSuperAdmin', name: 'create_super_admin')]
     public function createSuperAdmin(AccountService $accountService, Request $request): Response
     {
@@ -59,7 +62,7 @@ class FrontController extends BaseController
     }
 
 
-    // Page de zone
+    // Render the zone page
     #[Route('/zone/{zone}', name: 'zone')]
     public function zone(string $zone = null): Response
     {
@@ -75,13 +78,14 @@ class FrontController extends BaseController
     }
 
 
-    // Productline page
+    // Render the productline page and redirect to the mandatory incident page if there is one
     #[Route('/zone/{zone}/productline/{productline}', name: 'productline')]
     public function productline(string $productline = null): Response
     {
 
         $productLine = $this->productLineRepository->findoneBy(['name' => $productline]);
         $zone        = $productLine->getZone();
+
         $incidents = [];
         $incidents = $this->incidentRepository->findBy(
             ['ProductLine' => $productLine->getId()],
@@ -89,7 +93,6 @@ class FrontController extends BaseController
         );
 
         $incidentid = count($incidents) > 0 ? $incidents[0]->getId() : null;
-
 
         if (count($incidents) == 0) {
 
@@ -112,7 +115,7 @@ class FrontController extends BaseController
 
 
 
-    // Page de category
+    // Render the category page and redirect to the button page if there is only one button in the category
     #[Route('/zone/{zone}/productline/{productline}/category/{category}', name: 'category')]
 
     public function category(string $category = null): Response
@@ -147,6 +150,7 @@ class FrontController extends BaseController
     }
 
 
+    // Render the button page and redirect to the upload page if there is only one upload in the button
     #[Route('/zone/{zone}/productline/{productline}/category/{category}/button/{button}', name: 'button')]
     public function ButtonShowing(UploadController $uploadController, string $button = null): Response
     {

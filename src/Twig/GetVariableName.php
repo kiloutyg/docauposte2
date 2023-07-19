@@ -5,6 +5,8 @@ namespace App\Twig;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
+
+// This class is used to get the name of a variable in twig files 
 class GetVariableName extends AbstractExtension
 {
     public function getFunctions()
@@ -15,7 +17,6 @@ class GetVariableName extends AbstractExtension
         ];
     }
 
-    // Not in use yet
     public function GetVariableName($var, $context)
     {
         foreach ($context as $varName => $value) {

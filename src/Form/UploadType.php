@@ -21,7 +21,8 @@ use App\Repository\ButtonRepository;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-
+// This class is responsible for creating the form for the upload entity and transforming the data to be used by the controller and the entities.
+// It also contains the logic for the form validation and the form submission.
 class UploadType extends AbstractType
 {
     private $buttonRepository;
@@ -44,9 +45,7 @@ class UploadType extends AbstractType
                 'label' => 'Nouveau nom du fichier:',
                 'required' => false,
                 'empty_data' => null,
-
             ])
-
             ->add(
                 'button',
                 EntityType::class,

@@ -22,7 +22,8 @@ use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-
+// This class is responsible for creating the form for the incident entity and transforming the data to be used by the controller and the entit. 
+// It also contains the logic for the form validation and the form submission.
 class IncidentType extends AbstractType
 {
     private $productLineRepository;
@@ -45,9 +46,7 @@ class IncidentType extends AbstractType
                 'label' => 'Nouveau nom du fichier d\'incident:',
                 'required' => false,
                 'empty_data' => null,
-
             ])
-
             ->add(
                 'productline',
                 EntityType::class,
