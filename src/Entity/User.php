@@ -30,6 +30,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne(inversedBy: 'users')]
     private ?Department $department = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $emailAddress = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -108,6 +111,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDepartment(?Department $department): static
     {
         $this->department = $department;
+
+        return $this;
+    }
+
+    public function getEmailAddress(): ?string
+    {
+        return $this->emailAddress;
+    }
+
+    public function setEmailAddress(?string $emailAddress): static
+    {
+        $this->emailAddress = $emailAddress;
 
         return $this;
     }

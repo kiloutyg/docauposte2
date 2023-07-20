@@ -11,6 +11,9 @@ window.addEventListener("turbo:load", () => {
   const deleteIncidentCategoryButtons = document.querySelectorAll(
     ".delete-incidentCategory"
   );
+  const deleteDepartmentButtons = document.querySelectorAll(
+    ".delete-department"
+  );
 
   const confirmationHandler = (event, message) => {
     const confirmed = confirm(message);
@@ -81,6 +84,14 @@ window.addEventListener("turbo:load", () => {
       confirmationHandler(
         event,
         "Êtes vous sûr de vouloir supprimer ce Type d'Incident?"
+      );
+    });
+  });
+  deleteDepartmentButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "Êtes vous sûr de vouloir supprimer ce Service?"
       );
     });
   });

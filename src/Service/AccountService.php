@@ -41,6 +41,8 @@ class AccountService
             $role = $request->request->get('role');
             $departmentId = $request->request->get('department');
             $department = $this->departmentRepository->findOneBy(['id' => $departmentId]);
+            $emailAddress = $request->request->get('emailAddress');
+
 
             // check if the username is already in use
             $user = $this->userRepository->findOneBy(['username' => $name]);
@@ -54,6 +56,7 @@ class AccountService
                 $user->setPassword($password);
                 $user->setRoles([$role]);
                 $user->setDepartment($department);
+                $user->setEmailAddress($emailAddress);
                 $this->manager->persist($user);
                 $this->manager->flush();
 
@@ -73,6 +76,7 @@ class AccountService
             $role = $request->request->get('role');
             $departmentId = $request->request->get('department');
             $department = $this->departmentRepository->findOneBy(['id' => $departmentId]);
+            $emailAddress = $request->request->get('emailAddress');
 
             // Check if the username is already in use
             $user = $this->userRepository->findOneBy(['username' => $name]); // Look up the user by the current_username
@@ -89,6 +93,7 @@ class AccountService
                     $user->setPassword($password);
                     $user->setRoles([$role]);
                     $user->setDepartment($department);
+                    $user->setEmailAddress($emailAddress);
                     $this->manager->persist($user);
                     $this->manager->flush();
 

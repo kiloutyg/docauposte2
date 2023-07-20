@@ -2,9 +2,10 @@
 
 	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
 		<div class="card-body ">
-			<div class="row d-flex align-items-center gy-lg-0 gy-5">
+			<div class=" row d-flex align-items-center gy-lg-0 gy-5">
 
-				<div class="col-md-6">
+				<div class="col-1"></div>
+				<div class="col-10">
 
 					<h3 class="card-title text-center mb-5">
 						<strong>Création de compte</strong>
@@ -25,6 +26,10 @@
 							<label for="floatingPassword">Mot de passe</label>
 							<input type="password" id="floatingPassword" placeholder="Mot de passe" name="password" required class="form-control">
 
+						</div>
+						<div class="form-control mb-3">
+							<label for="emailAddress">Adresse Mail</label>
+							<input type="email" id="emailAddress" placeholder="Adresse Mail" name="emailAddress" required class="form-control">
 						</div>
 						<div class="form-control mb-3">
 							{% include 'services/accountservices/role_affectation.html.twig' %}
@@ -59,14 +64,20 @@
 							<div class="row mb-3">
 								<li class="form-control shadow d-flex justify-content-between align-items-center">
 									{{department.name|split('.')|first|upper}}
-									<a href="{{ path('app_department_deletion', {department : department.name}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-incidentCategory">supprimer</a>
+									<a href="{{ path('app_department_deletion', {department : department.name}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-department">supprimer</a>
 								</li>
 
 							</div>
 						{% endfor %}
 					{% endif %}
+					<hr class="my-4">
 				</div>
-				<div class="col-md-6">
+				<div class="col-1"></div>
+
+			</div>
+			<div class=" row d-flex align-items-center gy-lg-0 gy-5">
+				<div class="col-2"></div>
+				<div class="col-8">
 					<div class="form-control">
 						<table class="table table-striped text-center">
 							<thead>
@@ -74,6 +85,7 @@
 									<th scope="col">Nom d'utilisateur</th>
 									<th scope="col">Role</th>
 									<th scope="col">service</th>
+									<th scope="col">Email</th>
 									<th scope="col">Supprimer</th>
 									<th scope="col">Modifier</th>
 								</tr>
@@ -86,7 +98,12 @@
 											<td>{{ user.roles|json_encode|convert_encoding('UTF-8', 'UTF-8') }}</td>
 											<td>
 												{% if user.department.name is defined%}
-													{{ user.department.name }}{% else %}Null
+													{{ user.department.name }}{% else %}inconnu
+												{% endif %}
+											</td>
+											<td>
+												{% if user.emailAddress %}
+													{{ user.emailAddress }}{% else %}inconnu
 												{% endif %}
 											</td>
 											<td>
@@ -106,6 +123,7 @@
 						</table>
 					</div>
 				</div>
+				<div class="col-2"></div>
 			</div>
 		</div>
 	</div>
