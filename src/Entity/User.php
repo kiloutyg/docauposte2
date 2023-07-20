@@ -41,10 +41,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Validation::class, mappedBy: 'validator')]
     private Collection $validations;
 
+    #[ORM\OneToMany(mappedBy: 'Uploader', targetEntity: Incident::class)]
+    private Collection $incidents;
+
     public function __construct()
     {
         $this->uploads = new ArrayCollection();
         $this->validations = new ArrayCollection();
+        $this->incidents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -193,6 +197,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->validations->removeElement($validation)) {
             $validation->removeValidator($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Incident>
+     */
+    public function getIncidents(): Collection
+    {
+        return $this->incidents;
+    }
+
+    public function addIncident(Incident $incident): static
+    {
+        if (!$this->incidents->contains($incident)) {
+            $this->incidents->add($incident);
+            $incident->setUploader($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIncident(Incident $incident): static
+    {
+        if ($this->incidents->removeElement($incident)) {
+            // set the owning side to null (unless already changed)
+            if ($incident->getUploader() === $this) {
+                $incident->setUploader(null);
+            }
         }
 
         return $this;

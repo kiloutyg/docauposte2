@@ -46,6 +46,10 @@ class UploadController extends FrontController
 
         $originUrl = $request->headers->get('Referer');
 
+        // Retrieve the User object
+        $user = $this->getUser();
+
+        // Retrieve the button and the newFileName from the request
         $button = $request->request->get('button');
         $newFileName = $request->request->get('newFileName');
         $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
@@ -69,7 +73,7 @@ class UploadController extends FrontController
         } else if ($request->isMethod('POST')) {
 
             // Use the UploadsService to handle file uploads
-            $name = $this->uploadsService->uploadFiles($request, $buttonEntity, $newFileName);
+            $name = $this->uploadsService->uploadFiles($request, $buttonEntity, $newFileName, $user);
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
             return $this->redirect($originUrl);
         } else {
@@ -118,7 +122,11 @@ class UploadController extends FrontController
         $productLine = $category->getProductLine();
         $zone = $productLine->getZone();
 
+        // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
+
+        // Retrieve the User object
+        $user = $this->getUser();
 
         // Check if there is a file to modify
         if (!$upload) {
@@ -133,7 +141,7 @@ class UploadController extends FrontController
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
-                $uploadsService->modifyFile($upload);
+                $uploadsService->modifyFile($upload, $user);
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirect($originUrl);
             } catch (\Exception $e) {
