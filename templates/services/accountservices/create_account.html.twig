@@ -4,8 +4,7 @@
 		<div class="card-body ">
 			<div class=" row d-flex align-items-center gy-lg-0 gy-5">
 
-				<div class="col-1"></div>
-				<div class="col-10">
+				<div class="col-8 mx-auto">
 
 					<h3 class="card-title text-center mb-5">
 						<strong>Création de compte</strong>
@@ -45,7 +44,7 @@
 							</div>
 						</div>
 						<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-						<div class="d-grid">
+						<div class="d-grid col-6 mx-auto">
 							<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Création du compte</button>
 						</div>
 						<hr class="my-4">
@@ -60,24 +59,27 @@
 								<input type="button" id="create_department" class="btn btn-secondary shadow border border-dark-subtle" value="Ajouter un nouveau service">
 							</div>
 						</div>
+
 						{% for department in departments %}
-							<div class="row mb-3">
+
+							<div class="col-6 mx-auto mb-3">
 								<li class="form-control shadow d-flex justify-content-between align-items-center">
 									{{department.name|split('.')|first|upper}}
 									<a href="{{ path('app_department_deletion', {department : department.name}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-department">supprimer</a>
 								</li>
 
 							</div>
+
 						{% endfor %}
+
 					{% endif %}
 					<hr class="my-4">
 				</div>
-				<div class="col-1"></div>
 
 			</div>
 			<div class=" row d-flex align-items-center gy-lg-0 gy-5">
-				<div class="col-2"></div>
-				<div class="col-8">
+
+				<div class="col-10 mx-auto">
 					<div class="form-control">
 						<table class="table table-striped text-center">
 							<thead>
@@ -123,7 +125,6 @@
 						</table>
 					</div>
 				</div>
-				<div class="col-2"></div>
 			</div>
 		</div>
 	</div>
