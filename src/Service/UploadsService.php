@@ -14,6 +14,7 @@ use App\Repository\UploadRepository;
 
 use App\Entity\Upload;
 use App\Entity\Button;
+use App\Entity\User;
 
 use App\Service\FolderCreationService;
 
@@ -21,7 +22,6 @@ use App\Service\FolderCreationService;
 // This class is used to manage the uploads files and logic
 class UploadsService extends AbstractController
 {
-
     protected $uploadRepository;
     protected $manager;
     protected $projectDir;
@@ -47,7 +47,7 @@ class UploadsService extends AbstractController
     }
 
     // This function is responsible for the logic of uploading the uploads files
-    public function uploadFiles(Request $request, $button, $newFileName = null)
+    public function uploadFiles(Request $request, $button, $newFileName = null, User $user)
     {
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();
@@ -92,6 +92,7 @@ class UploadsService extends AbstractController
             $upload->setFilename($filename);
             $upload->setPath($path);
             $upload->setButton($button);
+            $upload->setUploader($user);
             $upload->setUploadedAt(new \DateTime());
             $this->manager->persist($upload);
         }
@@ -131,7 +132,7 @@ class UploadsService extends AbstractController
 
 
     // This function is responsible for the logic of modifying the uploads files
-    public function modifyFile(Upload $upload)
+    public function modifyFile(Upload $upload, User $user)
     {
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
@@ -179,11 +180,15 @@ class UploadsService extends AbstractController
 
             // Update the file path in the upload object
             $upload->setPath($Path);
+            // Update the uploader in the upload object
+            $upload->setUploader($user);
         } else {
             // If no new file is uploaded, just rename the old one if necessary
             if ($oldFilePath != $Path) {
                 rename($oldFilePath, $Path);
                 $upload->setPath($Path);
+                // Update the uploader in the upload object
+                $upload->setUploader($user);
             }
         }
 
