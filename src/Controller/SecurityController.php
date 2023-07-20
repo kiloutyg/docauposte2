@@ -9,9 +9,10 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use App\Entity\User;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
-use App\Repository\UserRepository;
+use App\Entity\User;
+use App\Entity\Department;
 
 use App\Service\AccountService;
 
@@ -88,9 +89,58 @@ class SecurityController extends BaseController
     {
         $id = $request->query->get('id');
         $accountService->deleteUser($id);
-
+        // $originUrl = $request->headers->get('referer');
         $this->addFlash('success',  'Le compte a été supprimé');
 
-        return $this->redirectToRoute('app_login');
+        return $this->redirectToRoute('app_super_admin');
+    }
+
+    // Logic to create a new department and display a message
+    #[Route('/department/department_creation', name: 'department_creation')]
+    public function departmentCreation(Request $request): JsonResponse
+    {
+        // Get the data from the request
+        $data = json_decode($request->getContent(), true);
+
+        // Get the name of the department 
+        $departmentName = $data['department_name'] ?? null;
+
+        // Get the existing department name
+        $existingDepartment = $this->departmentRepository->findOneBy(['name' => $departmentName]);
+
+        // Check if the department name is empty or if the department already exists
+        if (empty($departmentName)) {
+            return new JsonResponse(['success' => false, 'message' => 'Le nom du service ne peut pas être vide']);
+        }
+        if ($existingDepartment) {
+            return new JsonResponse(['success' => false, 'message' => 'Ce service existe déjà']);
+            // If the department does not exist, we create it
+        } else {
+            $Department = new Department();
+            $Department->setName($departmentName);
+            $this->em->persist($Department);
+            $this->em->flush();
+
+            return new JsonResponse(['success' => true, 'message' => 'Le service a été créé']);
+        }
+    }
+
+    // Create a route for department deletion. It depends on the entitydeletionService.
+    #[Route('/department/department_deletion/{department}', name: 'app_department_deletion')]
+    public function departmentDeletion(string $department, Request $request): Response
+    {
+        $entityType = "department";
+        $entityid = $this->departmentRepository->findOneBy(['name' => $department]);
+        $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
+        $originUrl = $request->headers->get('referer');
+
+        if ($entity == true) {
+
+            $this->addFlash('success', $entityType . ' has been deleted');
+            return $this->redirect($originUrl);
+        } else {
+            $this->addFlash('danger',  $entityType . '  does not exist');
+            return $this->redirect($originUrl);
+        }
     }
 }

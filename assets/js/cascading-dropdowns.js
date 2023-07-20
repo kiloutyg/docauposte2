@@ -1,12 +1,12 @@
 // Remove the hardcoded data from your JavaScript file
-let zonesData = [];
-let productLinesData = [];
-let categoriesData = [];
-let buttonsData = [];
+let zonesData = []; // array to store zone data fetched from API
+let productLinesData = []; // array to store product line data fetched from API
+let categoriesData = []; // array to store category data fetched from API
+let buttonsData = []; // array to store button data fetched from API
 
-// Fetch data from the API endpoint
+// Fetch data from the API endpoint and populate the respective arrays
 fetch("/api/cascading_dropdown_data")
-  .then((response) => response.json())
+  .then((response) => response.json()) // parse the JSON response
   .then((data) => {
     zonesData = data.zones;
     productLinesData = data.productLines;
@@ -20,12 +20,16 @@ fetch("/api/cascading_dropdown_data")
     preselectValues();
   });
 
+// Function to filter data based on key-value pair
 function filterData(data, key, value) {
   return data.filter((item) => item[key] === value);
 }
 
+// Function to populate a dropdown with data
 function populateDropdown(dropdown, data, selectedId) {
-  dropdown.innerHTML = "";
+  dropdown.innerHTML = ""; // clear the dropdown options first
+
+  // Create a default option and set its attributes
   const defaultOption = document.createElement("option");
   defaultOption.value = "";
   defaultOption.selected = true;
@@ -34,6 +38,7 @@ function populateDropdown(dropdown, data, selectedId) {
   defaultOption.textContent = "Selectionner une option";
   dropdown.appendChild(defaultOption);
 
+  // Iterate over the data and create options for each item
   data.forEach((item) => {
     const option = document.createElement("option");
     option.value = item.id;
@@ -54,6 +59,7 @@ function populateDropdown(dropdown, data, selectedId) {
   });
 }
 
+// Function to initialize the cascading dropdowns
 function initCascadingDropdowns() {
   const zone = document.getElementById("zone");
   const productline = document.getElementById("productline");
@@ -68,6 +74,7 @@ function initCascadingDropdowns() {
   }
 }
 
+// Event handler for Zone dropdown change event
 function handleZoneChange(event) {
   const selectedValue = parseInt(event.target.value);
   const filteredProductLines = filterData(
@@ -81,6 +88,7 @@ function handleZoneChange(event) {
   );
 }
 
+// Event handler for Product Line dropdown change event
 function handleProductLineChange(event) {
   const selectedValue = parseInt(event.target.value);
   const filteredCategories = filterData(
@@ -91,12 +99,14 @@ function handleProductLineChange(event) {
   populateDropdown(document.getElementById("category"), filteredCategories);
 }
 
+// Event handler for Category dropdown change event
 function handleCategoryChange(event) {
   const selectedValue = parseInt(event.target.value);
   const filteredButtons = filterData(buttonsData, "category_id", selectedValue);
   populateDropdown(document.getElementById("upload_button"), filteredButtons);
 }
 
+// Function to reset all dropdowns to their default state
 function resetDropdowns() {
   const zone = document.getElementById("zone");
   const productline = document.getElementById("productline");
@@ -109,10 +119,11 @@ function resetDropdowns() {
   if (button) button.selectedIndex = 0;
 }
 
+// Event listener for Turbo-Links page load event
 document.addEventListener("turbo:load", () => {
   // Fetch data from the API endpoint on page load
   fetch("/api/cascading_dropdown_data")
-    .then((response) => response.json())
+    .then((response) => response.json()) // parse the JSON response
     .then((data) => {
       zonesData = data.zones;
       productLinesData = data.productLines;
@@ -126,13 +137,14 @@ document.addEventListener("turbo:load", () => {
     });
 });
 
+// Function to preselect values in the dropdowns based on server-side data
 function preselectValues() {
   const zoneDropdown = document.getElementById("zone");
   const productLineDropdown = document.getElementById("productline");
   const categoryDropdown = document.getElementById("category");
   const buttonDropdown = document.getElementById("upload_button"); // get the button dropdown element
 
-  // Preselect zone
+  // Preselect zone based on server-side data
   if (zoneIdFromServer && zoneDropdown) {
     const filteredProductLines = filterData(
       productLinesData,
@@ -149,7 +161,7 @@ function preselectValues() {
     }
   }
 
-  // Preselect product line
+  // Preselect product line based on server-side data
   if (productLineIdFromServer && productLineDropdown) {
     const filteredCategories = filterData(
       categoriesData,
@@ -165,7 +177,7 @@ function preselectValues() {
     }
   }
 
-  // Preselect category
+  // Preselect category based on server-side data
   if (categoryIdFromServer && categoryDropdown) {
     const filteredButtons = filterData(
       buttonsData,
@@ -177,12 +189,13 @@ function preselectValues() {
     }
   }
 
-  // Preselect button
+  // Preselect button based on server-side data
   if (buttonIdFromServer && buttonDropdown) {
     buttonDropdown.value = buttonIdFromServer;
   }
 }
 
+// Event listener for form submit event
 let modifyForm = document.querySelector("#modifyForm");
 if (modifyForm) {
   modifyForm.addEventListener("submit", function (event) {

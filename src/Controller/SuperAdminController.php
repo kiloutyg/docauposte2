@@ -23,8 +23,8 @@ class SuperAdminController extends BaseController
     #[Route('/super_admin', name: 'app_super_admin')]
     public function index(IncidentsService $incidentsService, UploadsService $uploadsService, AuthenticationUtils $authenticationUtils,): Response
     {
-        $incidents = $this->incidentRepository->findAll();
-        $uploads = $this->uploadRepository->findAll();
+        $incidents = $this->incidents;
+        $uploads = $this->uploads;
 
         // Group the uploads and incidents by parent entity
         $groupedUploads = $uploadsService->groupUploads($uploads);
@@ -39,14 +39,15 @@ class SuperAdminController extends BaseController
             'groupincidents'        => $groupIncidents,
             'error'                 => $error,
             'last_username'         => $lastUsername,
-            'zones'                 => $this->zoneRepository->findAll(),
-            'productLines'          => $this->productLineRepository->findAll(),
-            'categories'            => $this->categoryRepository->findAll(),
-            'buttons'               => $this->buttonRepository->findAll(),
-            'uploads'               => $this->uploadRepository->findAll(),
-            'users'                 => $this->userRepository->findAll(),
-            'incidents'             => $this->incidentRepository->findAll(),
-            'incidentCategories'    => $this->incidentCategoryRepository->findAll(),
+            'zones'                 => $this->zones,
+            'productLines'          => $this->productLines,
+            'categories'            => $this->categories,
+            'buttons'               => $this->buttons,
+            'uploads'               => $this->uploads,
+            'users'                 => $this->users,
+            'incidents'             => $this->incidents,
+            'incidentCategories'    => $this->incidentCategories,
+            'departments'           => $this->departments,
 
         ]);
     }
