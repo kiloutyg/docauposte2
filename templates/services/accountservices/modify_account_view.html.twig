@@ -1,73 +1,93 @@
 {% extends 'base.html.twig' %}
 {% block title %}
-	Upload pour
+	Modifcation du compte de
 	{{user.username|split('.')|first|upper}}
 	|
 	{{ parent() }}
 {% endblock %}
 {% block body %}
+	<div class="card border-0 shadow rounded-3 my-5">
+		<div class="card-body">
+			<div class="row">
+				<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
+					<div class="card-body ">
+						<div class=" row d-flex align-items-center gy-lg-0 gy-5">
 
-	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
-		<div class="card-body ">
-			<div class="row d-flex align-items-center gy-lg-0 gy-5">
 
+							<div class="col-1"></div>
+							<div class="col-10">
 
-				<h3 class="card-title text-center mb-5">
-					<strong>Modification de compte de
-						{{user.username}}</strong>
-				</h3>
-				<form class="form-floating" method="post" action="{{ path('app_modify_account') }}">
-					<input type="hidden" name="current_username" value="{{ user.username }}">
+								<h3 class="card-title text-center mb-5">
+									<strong>Modification de compte de
+										{{user.username}}</strong>
+								</h3>
+								<form class="form row" method="post" action="{{ path('app_modify_account') }}">
+									{% if error is defined %}
+										{% if error %}
+											<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+										{% endif %}
+									{% endif %}
 
-					<div class=" mb-3">
-						<label for="username">Nom d'utilisateur</label>
-						<input type="text" name="username" placeholder="Nom d'utilisateur" required class="form-control" id="username">
+									<div class="form-control mb-3">
+										<label for="username">Nom d'utilisateur</label>
+										<input type="text" name="username" placeholder="Nom d'utilisateur" required class="form-control" id="username">
 
-					</div>
-					<div class=" mb-3">
-						<label for="Password">Mot de passe</label>
-						<input type="password" id="Password" placeholder="Mot de passe" name="password" required class="form-control">
+									</div>
+									<div class="form-control mb-3">
+										<label for="floatingPassword">Mot de passe</label>
+										<input type="password" id="floatingPassword" placeholder="Mot de passe" name="password" required class="form-control">
 
-					</div>
-					<div class=" mb-3">
-						{% include 'services/accountservices/role_affectation.html.twig' %}
-					</div>
-					<div class="mb-3">
-						<div>
-							<label for="department">Service :</label>
+									</div>
+									<div class="form-control mb-3">
+										<label for="emailAddress">Adresse Mail</label>
+										<input type="email" id="emailAddress" placeholder="Adresse Mail" name="emailAddress" required class="form-control">
+									</div>
+									<div class="form-control mb-3">
+										{% include 'services/accountservices/role_affectation.html.twig' %}
+									</div>
+									<div class="form-control mb-3">
+										<div>
+											<label for="department" style="color:black">Service :</label>
+										</div>
+										<div>
+											<select name="department" id="department" class="form-select">
+												<option value="" selected disabled hidden>Choisir un Service</option>
+											</select>
+										</div>
+									</div>
+									<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+									<div class="d-grid">
+										<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Création du compte</button>
+									</div>
+									<hr class="my-4">
+								</form>
+								{% if is_granted('ROLE_SUPER_ADMIN') %}
+									<div class="row mb-3">
+										<label for="department_Name" class="form-label">Nouveau Service :</label>
+										<div class="col-sm">
+											<input type="text" class="form-control" id="department_name" name="department_name" placeholder="Nom du nouveau Service">
+										</div>
+										<div class="col-sm-auto">
+											<input type="button" id="create_department" class="btn btn-secondary shadow border border-dark-subtle" value="Ajouter un nouveau service">
+										</div>
+									</div>
+									{% for department in departments %}
+										<div class="row mb-3">
+											<li class="form-control shadow d-flex justify-content-between align-items-center">
+												{{department.name|split('.')|first|upper}}
+												<a href="{{ path('app_department_deletion', {department : department.name}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-department">supprimer</a>
+											</li>
+
+										</div>
+									{% endfor %}
+								{% endif %}
+								<hr class="my-4">
+							</div>
+
+							<div class="col-1"></div>
 						</div>
-						<div>
-							<select name="department" id="department" class="form-select" required>
-								<option value="" selected disabled hidden>Choisir un Service</option>
-							</select>
-						</div>
 					</div>
-					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-					<div class="d-grid">
-						<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">modification du compte</button>
-					</div>
-					<hr class="my-4">
-				</form>
-				{% if is_granted('ROLE_SUPER_ADMIN') %}
-					<div class="row mb-3">
-						<label for="department_Name" class="form-label">Nouveau Service :</label>
-						<div class="col-sm">
-							<input type="text" class="form-control" id="department_name" name="department_name" placeholder="Nom du nouveau Service">
-						</div>
-						<div class="col-sm-auto">
-							<input type="button" id="create_department" class="btn btn-secondary shadow border border-dark-subtle" value="Ajouter un nouveau service">
-						</div>
-					</div>
-					{% for department in departments %}
-						<div class="row mb-3">
-							<li class="form-control shadow d-flex justify-content-between align-items-center">
-								{{department.name|split('.')|first|upper}}
-								{# <a href="{{ path('app_department_deletion', {department : department.name}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-incidentCategory">supprimer</a> #}
-							</li>
-
-						</div>
-					{% endfor %}
-				{% endif %}
+				</div>
 			</div>
 		</div>
 	</div>
