@@ -31,7 +31,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 				<div class="fallback">
 					<div class="mb-3">
 						{{ form_label(form.file, 'Select a file to upload:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
-						{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file'}}) }}
+						{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}) }}
 					</div>
 
 					<div class="mb-3">

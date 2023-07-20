@@ -158,14 +158,15 @@ class IncidentsService extends AbstractController
 
         $Path = $folderPath . '/' . $incident->getName();
 
-        // Check if the file is of the right type
 
-        if ($newFile->getMimeType() != 'application/pdf') {
-            throw new \Exception('Le fichier doit être un pdf');
-        }
 
         // If new file exists, process it and delete the old one
         if ($newFile) {
+            // Check if the file is of the right type
+            if ($newFile->getMimeType() != 'application/pdf') {
+                throw new \Exception('Le fichier doit être un pdf');
+            }
+
             // Remove old file if it exists
             if (file_exists($oldFilePath)) {
                 unlink($oldFilePath);
