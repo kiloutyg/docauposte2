@@ -41,6 +41,15 @@ class Upload
     #[ORM\ManyToOne(inversedBy: 'uploads')]
     private ?DisplayOption $displayOption = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $validated = null;
+
+    #[ORM\OneToOne(mappedBy: 'Upload', cascade: ['persist', 'remove'])]
+    private ?Validation $validation = null;
+
+    #[ORM\ManyToOne(inversedBy: 'uploads')]
+    private ?User $uploader = null;
+
 
 
 
@@ -178,6 +187,47 @@ class Upload
     public function setDisplayOption(?DisplayOption $displayOption): static
     {
         $this->displayOption = $displayOption;
+
+        return $this;
+    }
+
+    public function isValidated(): ?bool
+    {
+        return $this->validated;
+    }
+
+    public function setValidated(?bool $validated): static
+    {
+        $this->validated = $validated;
+
+        return $this;
+    }
+
+    public function getValidation(): ?Validation
+    {
+        return $this->validation;
+    }
+
+    public function setValidation(Validation $validation): static
+    {
+        // set the owning side of the relation if necessary
+        if ($validation->getUpload() !== $this) {
+            $validation->setUpload($this);
+        }
+
+        $this->validation = $validation;
+
+        return $this;
+    }
+
+    public function getUploader(): ?User
+    {
+        return $this->uploader;
+    }
+
+    public function setUploader(?User $uploader): static
+    {
+        $this->uploader = $uploader;
 
         return $this;
     }
