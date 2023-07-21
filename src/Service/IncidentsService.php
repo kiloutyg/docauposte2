@@ -52,7 +52,7 @@ class IncidentsService extends AbstractController
     }
 
     // This function is responsible for the logic of uploading the incidents files
-    public function uploadIncidentFiles(Request $request, $productline,  $IncidentCategoryId, $newName = null, User $user)
+    public function uploadIncidentFiles(Request $request, $productline,  $IncidentCategoryId, User $user, $newName = null)
     {
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();

@@ -166,7 +166,7 @@ class IncidentController extends FrontController
             $user = $this->getUser();
 
             // Use the IncidentsService to handle the upload of the Incidents files
-            $name = $this->incidentsService->uploadIncidentFiles($request, $productlineEntity, $IncidentCategory, $newname, $user);
+            $name = $this->incidentsService->uploadIncidentFiles($request, $productlineEntity, $IncidentCategory, $user, $newname);
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
             return $this->redirect($originUrl);
         } else {

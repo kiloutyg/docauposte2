@@ -64,6 +64,7 @@ class UploadController extends FrontController
             $filename   = $file->getClientOriginalName();
         }
         $conflictFile = $this->uploadRepository->findOneBy(['button' => $buttonEntity, 'filename' => $filename]);
+
         // if it exists, return an error message
         if ($conflictFile) {
             $this->addFlash('error', 'Le fichier ' . $filename . ' existe déjà.');
@@ -73,7 +74,7 @@ class UploadController extends FrontController
         } else if ($request->isMethod('POST')) {
 
             // Use the UploadsService to handle file uploads
-            $name = $this->uploadsService->uploadFiles($request, $buttonEntity, $newFileName, $user);
+            $name = $this->uploadsService->uploadFiles($request, $buttonEntity, $user, $newFileName);
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
             return $this->redirect($originUrl);
         } else {

@@ -154,3 +154,60 @@ document.addEventListener("turbo:load", function () {
       console.log('Error fetching data:', error);
     });
 });
+
+
+document.getElementById('validation_department').addEventListener('change', function(e) {
+  if (e.target.classList.contains('departmentSelect') && e.target.value !== '') {
+    var newSelect = document.createElement('select');
+    newSelect.classList.add('departmentSelect');
+    newSelect.innerHTML = '<option value="">Select a department...</option>';
+
+    const department = document.getElementById("department");
+
+    if (department) {
+      // Populate the department dropdown with data
+      populateDropdown(department, departmentsData);
+  
+      // Reset dropdowns
+      resetDropdowns();
+    }
+    options.forEach(function(option) {
+      if (!selectedOptions.includes(option)) {
+        newSelect.innerHTML += '<option value="' + option + '">' + option + '</option>';
+      }
+    });
+
+    document.getElementById('departmentsContainer').appendChild(newSelect);
+  }
+});
+
+  // Add an event listener to the container that holds the selects
+  document.getElementById('departmentsContainer').addEventListener('change', function(e) {
+    // If the event was triggered by a select and it has a value (i.e., not the default 'Select a department...' option)
+    if (e.target.classList.contains('departmentSelect') && e.target.value !== '') {
+      // Create a new select element
+      var newSelect = document.createElement('select');
+      // Give it the class 'departmentSelect' so the event listener will work on it too
+      newSelect.classList.add('departmentSelect');
+      // Add the default option
+      newSelect.innerHTML = '<option value="">Select a department...</option>';
+
+      // The options that will be available in each new select
+      var options = ['department1', 'department2', 'department3'];
+      // Get all the already selected options in other selects
+      var selectedOptions = Array.from(document.querySelectorAll('.departmentSelect')).map(sel => sel.value);
+      
+      // For each possible option
+      options.forEach(function(option) {
+        // If it hasn't been selected yet
+        if (!selectedOptions.includes(option)) {
+          // Add it as an option in the new select
+          newSelect.innerHTML += '<option value="' + option + '">' + option + '</option>';
+        }
+      });
+
+      // Add the new select to the container
+      document.getElementById('departmentsContainer').appendChild(newSelect);
+    }
+  }
+  );

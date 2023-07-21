@@ -47,7 +47,7 @@ class UploadsService extends AbstractController
     }
 
     // This function is responsible for the logic of uploading the uploads files
-    public function uploadFiles(Request $request, $button, $newFileName = null, User $user)
+    public function uploadFiles(Request $request, $button, User $user, $newFileName = null)
     {
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();
