@@ -1,22 +1,7 @@
 // Declaring variable 
 let departmentsData;
 
-// Fetch data from the API endpoint
-fetch("/api/department_data")
-  .then((response) => response.json())
-  .then((data) => {
-    departmentsData = data.departments;
-
-    // Call the function that initializes the cascading dropdowns
-    // after the data has been fetched
-    initCascadingDropdowns();
-    resetDropdowns();
-  }
-) 
-.catch((error) => {
-  console.log('Error fetching data:', error);
-});
-
+// This line declares a variable named departmentsData without assigning it a value.
 
 /**
  * Populates a dropdown with options based on the given data and selected id
@@ -52,6 +37,12 @@ function populateDropdown(dropdown, data, selectedId) {
   });
 }
 
+// This is a function named populateDropdown that takes three parameters: dropdown, data, and selectedId. 
+// It populates the given dropdown element with options based on the provided data array. 
+// It clears the dropdown before populating it, creates a default "Select" option, and adds it to the dropdown. 
+// Then, for each item in the data array, it creates an option element with the item's id and name as its value and text content respectively. 
+// If the item's id matches the selectedId, it sets the selected attribute of the option element.
+// Finally, it appends the option element to the dropdown.
 
 /**
  * Initializes the cascading dropdowns
@@ -66,8 +57,21 @@ function initCascadingDropdowns() {
     // Reset dropdowns
     resetDropdowns();
   }
+  const validatorDepartment = document.getElementById("validator_department");
+
+  if (validatorDepartment) {
+    // Populate the department dropdown with data
+    populateDropdown(validatorDepartment, departmentsData);
+
+    // Reset dropdowns
+    resetDropdowns();
+  }
 }
 
+// This is a function named initCascadingDropdowns that initializes the cascading dropdowns. 
+// It first gets the dropdown element with the id "department". 
+// If the dropdown exists, it calls the populateDropdown() function to populate the department dropdown with the departmentsData. 
+// Then it calls the resetDropdowns() function.
 
 /**
  * Resets the dropdown to its default value
@@ -78,8 +82,14 @@ function resetDropdowns() {
   if (department) {
     department.selectedIndex = 0;
   }
+  const validatorDepartment = document.getElementById("validator_department");
+
+  if (validatorDepartment) {
+    department.selectedIndex = 0;
+  }
 }
 
+// This is a function named resetDropdowns that resets the dropdown with the id "department" to its default value by setting the selectedIndex property to 0.
 
 // Function to create a new department
 document.addEventListener("turbo:load", function () {
@@ -138,7 +148,7 @@ document.addEventListener("turbo:load", function () {
 });
 
 
-// Event listener to fetch department data and initialize cascading dropdowns
+// // Event listener to fetch department data and initialize cascading dropdowns
 document.addEventListener("turbo:load", function () {
   fetch("/api/department_data")
     .then((response) => response.json())
@@ -149,65 +159,63 @@ document.addEventListener("turbo:load", function () {
       // after the data has been fetched
       initCascadingDropdowns();
       resetDropdowns();
+      
     })
     .catch((error) => {
       console.log('Error fetching data:', error);
     });
 });
 
+// This code adds an event listener to the document object for the "turbo:load" event. 
+// When the event is triggered, it fetches department data from the API endpoint /api/department_data. 
+// Once the data is successfully received, it assigns the departments property of the data to the departmentsData variable. 
+// Then, it calls two functions: initCascadingDropdowns() and resetDropdowns(). 
+// If there is an error during the fetch request, an error message will be logged to the console.
 
-document.getElementById('validation_department').addEventListener('change', function(e) {
-  if (e.target.classList.contains('departmentSelect') && e.target.value !== '') {
-    var newSelect = document.createElement('select');
-    newSelect.classList.add('departmentSelect');
-    newSelect.innerHTML = '<option value="">Select a department...</option>';
 
-    const department = document.getElementById("department");
-
-    if (department) {
-      // Populate the department dropdown with data
-      populateDropdown(department, departmentsData);
-  
-      // Reset dropdowns
-      resetDropdowns();
-    }
-    options.forEach(function(option) {
-      if (!selectedOptions.includes(option)) {
-        newSelect.innerHTML += '<option value="' + option + '">' + option + '</option>';
-      }
+document.addEventListener('turbo:load', function() {
+  const validatorDepartment = document.getElementById('validator_department');
+  if (validatorDepartment) {
+    validatorDepartment.addEventListener('change', function(e) {
+      createNewSelect(e.target.value);
     });
-
-    document.getElementById('departmentsContainer').appendChild(newSelect);
   }
 });
 
-  // Add an event listener to the container that holds the selects
-  document.getElementById('departmentsContainer').addEventListener('change', function(e) {
-    // If the event was triggered by a select and it has a value (i.e., not the default 'Select a department...' option)
-    if (e.target.classList.contains('departmentSelect') && e.target.value !== '') {
-      // Create a new select element
-      var newSelect = document.createElement('select');
-      // Give it the class 'departmentSelect' so the event listener will work on it too
-      newSelect.classList.add('departmentSelect');
-      // Add the default option
-      newSelect.innerHTML = '<option value="">Select a department...</option>';
+function createNewSelect(selectedValue) {
+  // Check if the selected value is not empty
+  if (selectedValue !== '') {
+    var newSelect = document.createElement('select');
+    newSelect.classList.add('departmentSelect');
 
-      // The options that will be available in each new select
-      var options = ['department1', 'department2', 'department3'];
-      // Get all the already selected options in other selects
-      var selectedOptions = Array.from(document.querySelectorAll('.departmentSelect')).map(sel => sel.value);
-      
-      // For each possible option
-      options.forEach(function(option) {
-        // If it hasn't been selected yet
-        if (!selectedOptions.includes(option)) {
-          // Add it as an option in the new select
-          newSelect.innerHTML += '<option value="' + option + '">' + option + '</option>';
-        }
-      });
+    // Add the default option
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = "Selectionner un Service";
+    newSelect.appendChild(defaultOption);
 
-      // Add the new select to the container
-      document.getElementById('departmentsContainer').appendChild(newSelect);
-    }
+    // Get all the already selected options in other selects
+    var selectedOptions = Array.from(document.querySelectorAll('.departmentSelect')).map(sel => sel.value);
+    
+    // For each possible option in departmentsData
+    departmentsData.forEach(function(department) {
+      // If it hasn't been selected yet
+      if (!selectedOptions.includes(department.id)) {
+        // Add it as an option in the new select
+        const newOption = document.createElement('option');
+        newOption.value = department.id;
+        newOption.textContent = department.name;
+        newSelect.appendChild(newOption);
+      }
+    });
+
+    // Add the new select to the container
+    document.getElementById('departmentsContainer').appendChild(newSelect);
+
+    // Add an event listener to the new select
+    newSelect.addEventListener('change', function(e) {
+      createNewSelect(e.target.value);
+    });
   }
-  );
+}
+

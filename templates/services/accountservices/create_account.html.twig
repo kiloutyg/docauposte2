@@ -50,11 +50,13 @@
 						<hr class="my-4">
 					</form>
 					{% if is_granted('ROLE_SUPER_ADMIN') %}
+
 						<div class="row mb-3">
 							<label for="department_Name" class="form-label">Nouveau Service :</label>
 							<div class="col-sm">
 								<input type="text" class="form-control" id="department_name" name="department_name" placeholder="Nom du nouveau Service">
 							</div>
+
 							<div class="col-sm-auto">
 								<input type="button" id="create_department" class="btn btn-secondary shadow border border-dark-subtle" value="Ajouter un nouveau service">
 							</div>
@@ -67,7 +69,6 @@
 									{{department.name|split('.')|first|upper}}
 									<a href="{{ path('app_department_deletion', {department : department.name}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-department">supprimer</a>
 								</li>
-
 							</div>
 
 						{% endfor %}
