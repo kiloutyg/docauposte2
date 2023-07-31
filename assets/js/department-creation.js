@@ -57,7 +57,7 @@ function initCascadingDropdowns() {
     // Reset dropdowns
     resetDropdowns();
   }
-  const validatorDepartment = document.getElementById("validator_department");
+  const validatorDepartment = document.getElementById("validator_department0");
 
   if (validatorDepartment) {
     // Populate the department dropdown with data
@@ -82,7 +82,7 @@ function resetDropdowns() {
   if (department) {
     department.selectedIndex = 0;
   }
-  const validatorDepartment = document.getElementById("validator_department");
+  const validatorDepartment = document.getElementById("validator_department0");
 
   if (validatorDepartment) {
     department.selectedIndex = 0;
@@ -113,7 +113,7 @@ document.addEventListener("turbo:load", function () {
           // Parse the JSON response
           let response = JSON.parse(xhr.responseText);
 
-          // Show the message to the user
+          // Show the message to the department
           alert(response.message);
 
           // Check if the operation was successful
@@ -159,7 +159,7 @@ document.addEventListener("turbo:load", function () {
       // after the data has been fetched
       initCascadingDropdowns();
       resetDropdowns();
-      
+
     })
     .catch((error) => {
       console.log('Error fetching data:', error);
@@ -172,50 +172,96 @@ document.addEventListener("turbo:load", function () {
 // Then, it calls two functions: initCascadingDropdowns() and resetDropdowns(). 
 // If there is an error during the fetch request, an error message will be logged to the console.
 
-
-document.addEventListener('turbo:load', function() {
+document.addEventListener('turbo:load', function () {
+  // Get the element with the id 'validator_department'
   const validatorDepartment = document.getElementById('validator_department');
+
+  // Check if the element exists
   if (validatorDepartment) {
-    validatorDepartment.addEventListener('change', function(e) {
-      createNewSelect(e.target.value);
+    // Change the id and name attributes to match the desired structure
+    validatorDepartment.id = 'validator_department0';
+    validatorDepartment.name = 'validator_department0';
+    // Add an event listener to the element when it changes
+    validatorDepartment.addEventListener('change', function (e) {
+      // Remove all the select elements except the first one
+      const departmentSelects = Array.from(document.querySelectorAll('.departmentSelect'));
+      departmentSelects.forEach((select, index) => {
+        if (index !== 0) select.remove();
+      });
+
+      // Call the createNewSelect function
+      createNewSelect(e.target.value, e.target.id);
     });
   }
 });
 
-function createNewSelect(selectedValue) {
+function createNewSelect(selectedValue, selectId) {
   // Check if the selected value is not empty
   if (selectedValue !== '') {
-    var newSelect = document.createElement('select');
-    newSelect.classList.add('departmentSelect');
+    // Get all the selected options from other select elements
+    var lastSelectId = document.querySelectorAll('.departmentSelect:last-child')[0].id;
 
-    // Add the default option
-    const defaultOption = document.createElement('option');
-    defaultOption.value = '';
-    defaultOption.textContent = "Selectionner un Service";
-    newSelect.appendChild(defaultOption);
+    // If it wasn't the last select element that was changed, remove all select elements after it
+    if (selectId !== lastSelectId) {
+      const departmentSelects = Array.from(document.querySelectorAll('.departmentSelect'));
+      const changedSelectIndex = departmentSelects.findIndex(select => select.id === selectId);
+      departmentSelects.forEach((select, index) => {
+        if (index > changedSelectIndex) select.remove();
+      });
+    }
 
-    // Get all the already selected options in other selects
-    var selectedOptions = Array.from(document.querySelectorAll('.departmentSelect')).map(sel => sel.value);
-    
-    // For each possible option in departmentsData
-    departmentsData.forEach(function(department) {
-      // If it hasn't been selected yet
-      if (!selectedOptions.includes(department.id)) {
-        // Add it as an option in the new select
-        const newOption = document.createElement('option');
-        newOption.value = department.id;
-        newOption.textContent = department.name;
-        newSelect.appendChild(newOption);
-      }
-    });
-
-    // Add the new select to the container
-    document.getElementById('departmentsContainer').appendChild(newSelect);
-
-    // Add an event listener to the new select
-    newSelect.addEventListener('change', function(e) {
-      createNewSelect(e.target.value);
-    });
+    // If there is room to create more select elements
+    if (document.querySelectorAll('.departmentSelect').length < departmentsData.length) {
+      createSelectElement();
+    }
   }
 }
 
+function createSelectElement() {
+  // Create a new select element
+  var newSelect = document.createElement('select');
+
+  // Add classes to the new select element
+  newSelect.classList.add('mt-2', 'mb-2', 'form-select', 'departmentSelect');
+
+  // Generate a unique id for the new select element
+  var newSelectId = "validator_department" + document.querySelectorAll('.departmentSelect').length;
+
+  // Set the id and name attributes of the new select element
+  newSelect.id = newSelectId;
+  newSelect.name = newSelectId;
+
+  // Create a default option for the new select element
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = 'Selectionner un Valideur';
+
+  // Append the default option to the new select element
+  newSelect.appendChild(defaultOption);
+
+  // Get all the selected options from other select elements
+  var selectedOptions = Array.from(document.querySelectorAll('.departmentSelect')).map(sel => parseInt(sel.value));
+
+  // Iterate over each department in the departmentsData array
+  departmentsData.forEach(function (department) {
+    // Check if the department has not been selected yet
+    if (!selectedOptions.includes(department.id)) {
+      // Create a new option for the new select element
+      const newOption = document.createElement('option');
+      newOption.value = department.id;
+      newOption.textContent = department.name;
+
+      // Append the new option to the new select element
+      newSelect.appendChild(newOption);
+    }
+  });
+
+  // Add the new select element to the container with the id 'departmentsContainer'
+  document.getElementById('departmentsContainer').appendChild(newSelect);
+
+  // Add an event listener to the new select element when it changes
+  newSelect.addEventListener('change', function (e) {
+    // Call the createNewSelect function and pass in the value of the changed element
+    createNewSelect(e.target.value, e.target.id);
+  });
+}
