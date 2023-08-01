@@ -163,9 +163,10 @@ class IncidentController extends FrontController
             $IncidentCategoryId = $request->request->get('incidents_incidentsCategory');
             $IncidentCategory = $this->incidentCategoryRepository->findoneBy(['id' => $IncidentCategoryId]);
             $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productline]);
+            $user = $this->getUser();
 
             // Use the IncidentsService to handle the upload of the Incidents files
-            $name = $this->incidentsService->uploadIncidentFiles($request, $productlineEntity, $IncidentCategory, $newname);
+            $name = $this->incidentsService->uploadIncidentFiles($request, $productlineEntity, $IncidentCategory, $user, $newname);
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
             return $this->redirect($originUrl);
         } else {
@@ -211,6 +212,7 @@ class IncidentController extends FrontController
         $productLine = $incident->getProductLine();
         $zone = $productLine->getZone();
         $originUrl = $request->headers->get('referer');
+        $user = $this->getUser();
 
         if (!$incident) {
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
@@ -226,7 +228,7 @@ class IncidentController extends FrontController
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
-                $incidentsService->modifyIncidentFile($incident);
+                $incidentsService->modifyIncidentFile($incident, $user);
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirect($originUrl);
             } catch (\Exception $e) {

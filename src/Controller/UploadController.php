@@ -44,10 +44,20 @@ class UploadController extends FrontController
     {
         $this->uploadsService = $uploadsService;
 
+        $this->logger->info("request:" . json_encode($request->request->all()));
+
+
+        // Get the URL of the page from which the request originated
         $originUrl = $request->headers->get('Referer');
 
+        // Retrieve the User object
+        $user = $this->getUser();
+
+        // Retrieve the button and the newFileName from the request
         $button = $request->request->get('button');
         $newFileName = $request->request->get('newFileName');
+
+        // Find the Button entity in the repository based on its ID
         $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
 
         // Check if the file already exists by comparing the filename and the button
@@ -60,30 +70,40 @@ class UploadController extends FrontController
             $filename   = $file->getClientOriginalName();
         }
         $conflictFile = $this->uploadRepository->findOneBy(['button' => $buttonEntity, 'filename' => $filename]);
-        // if it exists, return an error message
+
+        // If the file already exists, return an error message
         if ($conflictFile) {
             $this->addFlash('error', 'Le fichier ' . $filename . ' existe déjà.');
             return $this->redirect($originUrl);
 
-            // if it does not exist pass the request to the service 
+            // If the request is POST and the file does not exist, pass the request to the service 
         } else if ($request->isMethod('POST')) {
-
             // Use the UploadsService to handle file uploads
-            $name = $this->uploadsService->uploadFiles($request, $buttonEntity, $newFileName);
+            $name = $this->uploadsService->uploadFiles($request, $buttonEntity, $user, $newFileName);
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
             return $this->redirect($originUrl);
+
+            // If the request is not POST, return an error message
         } else {
-            $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
+            $this->addFlash('error', 'Le fichier n\'a pas été posté correctement.');
             return $this->redirect($originUrl);
         }
     }
 
 
+
     // create a route to download a file in more simple terms to display the file
     #[Route('/download/{filename}', name: 'download_file')]
-    public function download_file(string $filename = null): Response
+    public function download_file(string $filename = null, Request $request): Response
     {
+        // Retrieve the origin URL
+        $originUrl = $request->headers->get('Referer');
+
         $file = $this->uploadRepository->findOneBy(['filename' => $filename]);
+        if (($file->isValidated()) === false) {
+            $this->addFlash('error', 'Le fichier n\'a pas été validé.');
+            return $this->redirect($originUrl);
+        }
         $path = $file->getPath();
         $file       = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
@@ -118,7 +138,11 @@ class UploadController extends FrontController
         $productLine = $category->getProductLine();
         $zone = $productLine->getZone();
 
+        // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
+
+        // Retrieve the User object
+        $user = $this->getUser();
 
         // Check if there is a file to modify
         if (!$upload) {
@@ -133,7 +157,7 @@ class UploadController extends FrontController
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
-                $uploadsService->modifyFile($upload);
+                $uploadsService->modifyFile($upload, $user);
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirect($originUrl);
             } catch (\Exception $e) {

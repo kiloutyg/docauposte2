@@ -45,6 +45,9 @@ class Incident
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
+    #[ORM\ManyToOne(inversedBy: 'incidents')]
+    private ?User $Uploader = null;
+
     #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
 
     public function setFile(?File $file = null): void
@@ -135,6 +138,18 @@ class Incident
     public function setPath(string $path): self
     {
         $this->path = $path;
+
+        return $this;
+    }
+
+    public function getUploader(): ?User
+    {
+        return $this->Uploader;
+    }
+
+    public function setUploader(?User $Uploader): static
+    {
+        $this->Uploader = $Uploader;
 
         return $this;
     }
