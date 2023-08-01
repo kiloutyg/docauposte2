@@ -17,16 +17,16 @@ class ApiController extends BaseController
 
         $zones = array_map(function ($zone) {
             return [
-                'id' => $zone->getId(),
-                'name' => $zone->getName()
+                'id'    => $zone->getId(),
+                'name'  => $zone->getName()
             ];
         }, $this->zoneRepository->findAll());
 
         $productLines = array_map(function ($productLine) {
             return [
-                'id' => $productLine->getId(),
-                'name' => $productLine->getName(),
-                'zone_id' => $productLine->getZone()->getId()
+                'id'        => $productLine->getId(),
+                'name'      => $productLine->getName(),
+                'zone_id'   => $productLine->getZone()->getId()
             ];
         }, $this->productLineRepository->findAll());
 
@@ -106,6 +106,28 @@ class ApiController extends BaseController
         $responseData = [
 
             'departments'   => $departments,
+        ];
+
+        return new JsonResponse($responseData);
+    }
+
+    #[Route('/api/user_data', name: 'api_user_data')]
+    public function getUserData(): JsonResponse
+    {
+        $filteredUsers = [];
+        $allUsers = $this->userRepository->findAll();
+
+        foreach ($allUsers as $user) {
+            if (!in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+                $filteredUsers[] = [
+                    'id'        => $user->getId(),
+                    'username'  => $user->getUsername(),
+                ];
+            }
+        }
+
+        $responseData = [
+            'users'   => $filteredUsers,
         ];
 
         return new JsonResponse($responseData);

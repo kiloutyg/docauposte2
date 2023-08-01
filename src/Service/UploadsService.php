@@ -6,8 +6,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Repository\ButtonRepository;
 use App\Repository\UploadRepository;
@@ -17,6 +17,7 @@ use App\Entity\Button;
 use App\Entity\User;
 
 use App\Service\FolderCreationService;
+use App\Service\ValidationService;
 
 
 // This class is used to manage the uploads files and logic
@@ -28,6 +29,7 @@ class UploadsService extends AbstractController
     protected $logger;
     protected $buttonRepository;
     protected $folderCreationService;
+    protected $validationService;
 
 
     public function __construct(
@@ -36,7 +38,8 @@ class UploadsService extends AbstractController
         EntityManagerInterface $manager,
         ParameterBagInterface $params,
         UploadRepository $uploadRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        validationService $validationService
     ) {
         $this->uploadRepository = $uploadRepository;
         $this->manager = $manager;
@@ -44,59 +47,127 @@ class UploadsService extends AbstractController
         $this->logger = $logger;
         $this->buttonRepository = $buttonRepository;
         $this->folderCreationService = $folderCreationService;
+        $this->validationService = $validationService;
     }
 
     // This function is responsible for the logic of uploading the uploads files
-    public function uploadFiles(Request $request, $button, $newFileName = null, User $user)
+    public function uploadFiles(Request $request, $button, User $user, $newFileName = null)
     {
+        // Define the allowed file extensions
         $allowedExtensions = ['pdf'];
+
+        // Get all the files from the request
         $files = $request->files->all();
+
+        // Set the path to the 'public' directory
         $public_dir = $this->projectDir . '/public';
 
+        // Iterate over each file
         foreach ($files as $file) {
 
+            // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
+            foreach ($request->request->keys() as $key) {
+                if (strpos($key, 'validator_department') !== false) {
+                    $validator = true;
+                } elseif (strpos($key, 'validator_user') !== false) {
+                    $validator = true;
+                } else {
+                    $validator = false;
+                }
+            }
+
             // Dynamic folder creation and file upload
+
+            // Get the name of the button
             $buttonname = $button->getName();
+
+            // Split the button name into parts using '.'
             $parts = explode('.', $buttonname);
+
+            // Reverse the order of the parts
             $parts = array_reverse($parts);
+
+            // Create the base folder path
             $folderPath = $public_dir . '/doc';
 
+            // Append the parts to the folder path
             foreach ($parts as $part) {
                 $folderPath .= '/' . $part;
             }
 
             // Check if the file is of the right type
+
+            // Get the file extension
             $extension = $file->guessExtension();
+
+            // Check if the extension is in the list of allowed extensions
             if (!in_array($extension, $allowedExtensions)) {
-                return $this->addFlash('error', 'Le fichier doit être un pdf');;
+                return $this->addFlash('error', 'Le fichier doit être un pdf');
             }
+
+            // Check the MIME type of the file
             if ($file->getMimeType() != 'application/pdf') {
-                return $this->addFlash('error', 'Le fichier doit être un pdf');;
+                return $this->addFlash('error', 'Le fichier doit être un pdf');
             }
 
             // Check if the user changed the file name or not and process it accordingly 
+
+            // Initialize the filename variable
             $filename = '';
+
+            // Check if a new filename is provided
             if ($newFileName) {
                 $filename   = $newFileName;
             } else {
+                // Use the original filename of the file
                 $filename   = $file->getClientOriginalName();
             }
 
+            // Construct the full path of the file
             $path       = $folderPath . '/' . $filename;
+
+            // Move the file to the specified folder
             $file->move($folderPath . '/', $filename);
 
+            // Store the filename for return value
             $name = $filename;
 
+            // Create a new Upload object
             $upload = new Upload();
+
+            // Set the file property using the path
             $upload->setFile(new File($path));
+
+            // Set the filename property
             $upload->setFilename($filename);
+
+            // Set the path property
             $upload->setPath($path);
+
+            // Set the button property
             $upload->setButton($button);
+
+            // Set the uploader property
             $upload->setUploader($user);
+
+            // Set the uploadedAt property to the current date and time
             $upload->setUploadedAt(new \DateTime());
+
+            // Set the validated boolean property
+            $upload->setValidated($validator);
+
+            // Persist the upload object
             $this->manager->persist($upload);
         }
+
+        // Save the changes to the database
         $this->manager->flush();
+
+        $uploadEntity = $this->uploadRepository->findOneBy(['filename' => $filename, 'button' => $button]);
+        if ($validator === true) {
+            $this->validationService->createValidation($uploadEntity, $request, $user);
+        }
+        // Return the name of the last uploaded file
         return $name;
     }
 
