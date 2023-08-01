@@ -68,11 +68,11 @@ class UploadsService extends AbstractController
             // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
             foreach ($request->request->keys() as $key) {
                 if (strpos($key, 'validator_department') !== false) {
-                    $validator = true;
+                    $validated = false;
                 } elseif (strpos($key, 'validator_user') !== false) {
-                    $validator = true;
+                    $validated = false;
                 } else {
-                    $validator = false;
+                    $validated = true;
                 }
             }
 
@@ -154,7 +154,7 @@ class UploadsService extends AbstractController
             $upload->setUploadedAt(new \DateTime());
 
             // Set the validated boolean property
-            $upload->setValidated($validator);
+            $upload->setValidated($validated);
 
             // Persist the upload object
             $this->manager->persist($upload);
@@ -164,8 +164,8 @@ class UploadsService extends AbstractController
         $this->manager->flush();
 
         $uploadEntity = $this->uploadRepository->findOneBy(['filename' => $filename, 'button' => $button]);
-        if ($validator === true) {
-            $this->validationService->createValidation($uploadEntity, $request, $user);
+        if ($validated === false) {
+            $this->validationService->createValidation($uploadEntity, $request);
         }
         // Return the name of the last uploaded file
         return $name;

@@ -156,14 +156,19 @@ class FrontController extends BaseController
 
     // Render the button page and redirect to the upload page if there is only one upload in the button
     #[Route('/zone/{zone}/productline/{productline}/category/{category}/button/{button}', name: 'button')]
-    public function ButtonShowing(UploadController $uploadController, string $button = null): Response
+    public function ButtonShowing(UploadController $uploadController, string $button = null, Request $request): Response
     {
         $buttonEntity = $this->buttonRepository->findoneBy(['name' => $button]);
         $category    = $buttonEntity->getCategory();
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
         $uploads = [];
-        $uploads = $this->uploadRepository->findBy(['button' => $buttonEntity->getId()]);
+        $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonEntity->getId()]);
+        foreach ($buttonUploads as $buttonUpload) {
+            if ($buttonUpload->isValidated()) {
+                $uploads[] = $buttonUpload;
+            }
+        }
 
         if (count($uploads) != 1) {
 
@@ -181,7 +186,7 @@ class FrontController extends BaseController
             );
         } else {
             $filename = $uploads[0]->getFilename();
-            return $uploadController->download_file($filename);
+            return $uploadController->download_file($filename, $request);
         }
     }
 }

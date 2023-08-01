@@ -94,9 +94,16 @@ class UploadController extends FrontController
 
     // create a route to download a file in more simple terms to display the file
     #[Route('/download/{filename}', name: 'download_file')]
-    public function download_file(string $filename = null): Response
+    public function download_file(string $filename = null, Request $request): Response
     {
+        // Retrieve the origin URL
+        $originUrl = $request->headers->get('Referer');
+
         $file = $this->uploadRepository->findOneBy(['filename' => $filename]);
+        if (($file->isValidated()) === false) {
+            $this->addFlash('error', 'Le fichier n\'a pas été validé.');
+            return $this->redirect($originUrl);
+        }
         $path = $file->getPath();
         $file       = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
