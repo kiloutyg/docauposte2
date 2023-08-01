@@ -6,7 +6,7 @@
 
 				<div class="col-8 mx-auto">
 
-					<h3 class="card-title text-center mb-5">
+					<h3 class="card-title text-center mb-5" style="color:white">
 						<strong>Création de compte</strong>
 					</h3>
 					<form class="form-floating" method="post">
@@ -52,7 +52,7 @@
 					{% if is_granted('ROLE_SUPER_ADMIN') %}
 
 						<div class="row mb-3">
-							<label for="department_Name" class="form-label">Nouveau Service :</label>
+							<label for="department_Name" class="form-label" style="color:white">Nouveau Service :</label>
 							<div class="col-sm">
 								<input type="text" class="form-control" id="department_name" name="department_name" placeholder="Nom du nouveau Service">
 							</div>
@@ -64,7 +64,7 @@
 
 						{% for department in departments %}
 
-							<div class="col-6 mx-auto mb-3">
+							<div class="col-10 mx-auto mb-3">
 								<li class="form-control shadow d-flex justify-content-between align-items-center">
 									{{department.name|split('.')|first|upper}}
 									<a href="{{ path('app_department_deletion', {department : department.name}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-department">supprimer</a>

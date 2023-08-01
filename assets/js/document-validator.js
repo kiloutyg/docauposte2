@@ -2,6 +2,8 @@
 let usersData;
 // This line declares a variable named usersData without assigning it a value.
 
+// This code is a JavaScript program that includes various functions to populate, 
+// reset, and create cascading dropdowns based on user data.
 
 /**
  * Populates a dropdown with options based on the given data and selected id
@@ -37,6 +39,14 @@ function populateDropdown(dropdown, data, selectedId) {
   });
 }
 
+// The populateDropdown function takes three parameters: 
+// dropdown (an HTMLElement representing the dropdown element), 
+// data (an array of data used to populate the dropdown options), 
+// and selectedId (a string representing the id of the option to be selected by default). 
+// It clears the dropdown element, creates a default "Select" option, adds it to the dropdown, 
+// and then iterates over each item in the data array to create options and add them to the dropdown. 
+// If an item's id matches the selectedId, the option is set as selected.
+
 // // Event listener to fetch user data and initialize cascading dropdowns
 document.addEventListener("turbo:load", function () {
   fetch("/api/user_data")
@@ -55,9 +65,10 @@ document.addEventListener("turbo:load", function () {
     });
 });
 
-
-
-
+// The code also includes an event listener attached to the document's 
+// "turbo:load" event. When the event is triggered, the code fetches user data from 
+// "/api/user_data", stores it in the usersData variable, 
+// and then calls the initCascadingDropdowns and resetDropdowns functions.
 
 /**
  * Initializes the cascading dropdowns
@@ -73,6 +84,9 @@ function initCascadingDropdowns() {
   }
 }
 
+// The initCascadingDropdowns function gets the element with the id "validator_user0" 
+// and populates it using the populateDropdown function. 
+// It then calls the resetDropdowns function.
 
 /**
 * Resets the dropdown to its default value
@@ -84,6 +98,8 @@ function resetDropdowns() {
   }
 }
 
+// The resetDropdowns function gets the element with the id "user" and sets its selectedIndex to 0, 
+// effectively resetting the dropdown to its default value.
 
 document.addEventListener('turbo:load', function () {
   // Get the element with the id 'validator_user'
@@ -108,6 +124,13 @@ document.addEventListener('turbo:load', function () {
   }
 });
 
+// There is another event listener attached to the document's 
+// "turbo:load" event. This event listener checks if the element with the id "validator_user" exists. 
+// If it does, it changes the id and name attributes to match the desired structure and attaches 
+// an event listener for the "change" event. When the "change" event is triggered, it removes all select 
+// elements except the first one, 
+// and then calls the createNewSelect function.
+
 function createNewSelect(selectedValue, selectId) {
   // Check if the selected value is not empty
   if (selectedValue !== '') {
@@ -129,6 +152,13 @@ function createNewSelect(selectedValue, selectId) {
     }
   }
 }
+
+// The createNewSelect function takes two parameters: selectedValue 
+// (a string representing the selected value) and selectId 
+// (a string representing the id of the select element that triggered the change event). 
+// It checks if the selected value is not empty and removes any select elements after the one 
+// that triggered the change event. If there is room to create more select elements 
+// (up to the number of users in the usersData array), it calls the createSelectElement function.
 
 function createSelectElement() {
   // Create a new select element
@@ -178,3 +208,14 @@ function createSelectElement() {
     createNewSelect(e.target.value, e.target.id);
   });
 }
+
+
+// The createSelectElement function creates a new select element, 
+// adds classes and unique id and name attributes to it, 
+// and creates a default option. It then iterates over each user in the usersData array, 
+// checks if the user has not been selected yet, creates a new option for the select element,
+// and appends it. The new select element is appended to a container with the id "usersContainer", 
+// and an event listener is attached to it for the "change" event. When the "change" event is triggered, 
+// it calls the createNewSelect function.
+
+// Overall, this code handles the population, reset, and creation of cascading dropdowns based on user data.

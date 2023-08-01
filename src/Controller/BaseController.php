@@ -42,6 +42,7 @@ use App\Service\UploadsService;
 use App\Service\FolderCreationService;
 use App\Service\IncidentsService;
 use App\Service\EntityHeritanceService;
+use App\Service\ValidationService;
 
 
 #[Route('/', name: 'app_')]
@@ -76,6 +77,7 @@ class BaseController extends AbstractController
     protected $entityHeritanceService;
     protected $authChecker;
     protected $departmentRepository;
+    protected $validationService;
 
     // Variables used in the twig templates to display all the entities
     protected $departments;
@@ -112,7 +114,8 @@ class BaseController extends AbstractController
         IncidentCategoryRepository      $incidentCategoryRepository,
         EntityHeritanceService          $entityHeritanceService,
         AuthorizationCheckerInterface   $authChecker,
-        DepartmentRepository            $departmentRepository
+        DepartmentRepository            $departmentRepository,
+        ValidationService               $validationService
 
     ) {
 
@@ -141,6 +144,7 @@ class BaseController extends AbstractController
         $this->entityHeritanceService       = $entityHeritanceService;
         $this->authChecker                  = $authChecker;
         $this->departmentRepository         = $departmentRepository;
+        $this->validationService            = $validationService;
         // Variables used in the twig templates to display all the entities
         $this->zones                        = $this->zoneRepository->findAll();
         $this->productLines                 = $this->productLineRepository->findAll();
