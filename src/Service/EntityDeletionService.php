@@ -16,6 +16,7 @@ use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
 use App\Repository\DepartmentRepository;
 use App\Repository\UserRepository;
+use App\Repository\ValidationRepository;
 
 use App\Service\UploadsService;
 use App\Service\IncidentsService;
@@ -38,6 +39,8 @@ class EntityDeletionService
     private $folderCreationService;
     private $departmentRepository;
     private $userRepository;
+    private $validationRepository;
+
 
     public function __construct(
         EntityManagerInterface $em,
@@ -52,7 +55,8 @@ class EntityDeletionService
         IncidentsService $incidentsService,
         FolderCreationService $folderCreationService,
         DepartmentRepository $departmentRepository,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        ValidationRepository $validationRepository
     ) {
         $this->em = $em;
         $this->zoneRepository = $zoneRepository;
@@ -67,6 +71,7 @@ class EntityDeletionService
         $this->folderCreationService = $folderCreationService;
         $this->departmentRepository = $departmentRepository;
         $this->userRepository = $userRepository;
+        $this->validationRepository = $validationRepository;
     }
 
     // This function is responsible for deleting an entity and its related entities from the database and the server filesystem
@@ -98,6 +103,9 @@ class EntityDeletionService
                 break;
             case 'department':
                 $repository = $this->departmentRepository;
+                break;
+            case 'validation':
+                $repository = $this->validationRepository;
                 break;
         }
         // If the repository is not found or the entity is not found in the database, return false
@@ -142,7 +150,11 @@ class EntityDeletionService
                 $this->deleteEntity('incident', $incident->getId());
             }
         } elseif ($entityType === 'upload') {
+            $this->deleteEntity('validation', $entity->getValidation()->getId());
             $this->uploadsService->deleteFile($entity->getFilename(), $entity->getButton()->getId());
+        } elseif ($entityType === 'validation') {
+            $this->validationRepository->removeDepartment($entity->getDepartment());
+            $this->validationRepository->removeValidator($entity->getValidator());
         } elseif ($entityType === 'incident') {
             $this->incidentService->deleteIncidentFile($entity->getName(), $entity->getProductLine());
         } elseif ($entityType === 'department') {

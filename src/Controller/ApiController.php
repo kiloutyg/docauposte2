@@ -114,16 +114,20 @@ class ApiController extends BaseController
     #[Route('/api/user_data', name: 'api_user_data')]
     public function getUserData(): JsonResponse
     {
-        $users = array_map(function ($user) {
-            return [
-                'id'        => $user->getId(),
-                'username'  => $user->getUsername(),
-            ];
-        }, $this->userRepository->findAll());
+        $filteredUsers = [];
+        $allUsers = $this->userRepository->findAll();
+
+        foreach ($allUsers as $user) {
+            if (!in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+                $filteredUsers[] = [
+                    'id'        => $user->getId(),
+                    'username'  => $user->getUsername(),
+                ];
+            }
+        }
 
         $responseData = [
-
-            'users'   => $users,
+            'users'   => $filteredUsers,
         ];
 
         return new JsonResponse($responseData);
