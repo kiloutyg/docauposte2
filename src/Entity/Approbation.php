@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ApprobationRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ApprobationRepository::class)]
@@ -25,6 +26,9 @@ class Approbation
 
     #[ORM\Column(nullable: true)]
     private ?bool $Approval = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $Comment = null;
 
     public function getId(): ?int
     {
@@ -75,6 +79,18 @@ class Approbation
     public function setApproval(?bool $Approval): static
     {
         $this->Approval = $Approval;
+
+        return $this;
+    }
+
+    public function getComment(): ?string
+    {
+        return $this->Comment;
+    }
+
+    public function setComment(?string $Comment): static
+    {
+        $this->Comment = $Comment;
 
         return $this;
     }

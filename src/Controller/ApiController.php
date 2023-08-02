@@ -116,9 +116,10 @@ class ApiController extends BaseController
     {
         $filteredUsers = [];
         $allUsers = $this->userRepository->findAll();
+        $currentUser = $this->getUser();
 
         foreach ($allUsers as $user) {
-            if (!in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            if ((!in_array('ROLE_SUPER_ADMIN', $user->getRoles())) && ($user !== $currentUser)) {
                 $filteredUsers[] = [
                     'id'        => $user->getId(),
                     'username'  => $user->getUsername(),
