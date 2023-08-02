@@ -170,9 +170,6 @@ class EntityDeletionService
         } elseif ($entityType === 'upload') {
             $this->deleteEntity('validation', $entity->getValidation()->getId());
             $this->uploadsService->deleteFile($entity->getId());
-            // } elseif ($entityType === 'validation') {
-            //     $this->validation->removeDepartment($entity->getDepartment());
-            //     $this->validation->removeValidator($entity->getValidator());
         } elseif ($entityType === 'incident') {
             $this->incidentService->deleteIncidentFile($entity->getName(), $entity->getProductLine());
         } elseif ($entityType === 'department') {
