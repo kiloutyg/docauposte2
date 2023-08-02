@@ -25,13 +25,19 @@ class Validation
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'validations')]
     private Collection $validator;
 
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
+
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $Status = null;
+
+    #[ORM\OneToMany(mappedBy: 'Validation', targetEntity: Approbation::class, orphanRemoval: true)]
+    private Collection $approbations;
 
     public function __construct()
     {
         $this->department = new ArrayCollection();
         $this->validator = new ArrayCollection();
+        $this->approbations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -99,14 +105,46 @@ class Validation
         return $this;
     }
 
-    public function getStatus(): ?string
+
+
+    public function isStatus(): ?bool
     {
-        return $this->status;
+        return $this->Status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(?bool $Status): static
     {
-        $this->status = $status;
+        $this->Status = $Status;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Approbation>
+     */
+    public function getApprobations(): Collection
+    {
+        return $this->approbations;
+    }
+
+    public function addApprobation(Approbation $approbation): static
+    {
+        if (!$this->approbations->contains($approbation)) {
+            $this->approbations->add($approbation);
+            $approbation->setValidation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApprobation(Approbation $approbation): static
+    {
+        if ($this->approbations->removeElement($approbation)) {
+            // set the owning side to null (unless already changed)
+            if ($approbation->getValidation() === $this) {
+                $approbation->setValidation(null);
+            }
+        }
 
         return $this;
     }

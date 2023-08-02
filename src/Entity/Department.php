@@ -24,10 +24,15 @@ class Department
     #[ORM\ManyToMany(targetEntity: Validation::class, mappedBy: 'department')]
     private Collection $validations;
 
+    #[ORM\OneToMany(mappedBy: 'DepartmentApprobator', targetEntity: Approbation::class)]
+    private Collection $approbations;
+
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->validations = new ArrayCollection();
+        $this->approbations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -99,6 +104,36 @@ class Department
     {
         if ($this->validations->removeElement($validation)) {
             $validation->removeDepartment($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Approbation>
+     */
+    public function getApprobations(): Collection
+    {
+        return $this->approbations;
+    }
+
+    public function addApprobation(Approbation $approbation): static
+    {
+        if (!$this->approbations->contains($approbation)) {
+            $this->approbations->add($approbation);
+            $approbation->setDepartmentApprobator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApprobation(Approbation $approbation): static
+    {
+        if ($this->approbations->removeElement($approbation)) {
+            // set the owning side to null (unless already changed)
+            if ($approbation->getDepartmentApprobator() === $this) {
+                $approbation->setDepartmentApprobator(null);
+            }
         }
 
         return $this;
