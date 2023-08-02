@@ -84,16 +84,35 @@ class SecurityController extends BaseController
     }
 
     // This function is responsible for managing the logic of the account deletion
+    #[Route(path: '/delete_account/basic', name: 'app_delete_account_basic')]
+    public function delete_account_basic(AccountService $accountService, Request $request): Response
+    {
+        $id = $request->query->get('id');
+        $user = $this->userRepository->findOneBy(['id' => $id]);
+
+        if ($user->getIncidents()->isEmpty() && $user->getUploads()->isEmpty() && $user->getValidations()->isEmpty() && $user->getApprobations()->isEmpty()) {
+            $accountService->deleteUser($id);
+            $this->addFlash('success',  'Le compte a été supprimé');
+        } else {
+            $this->addFlash('danger',  'Le compte ne peut pas être supprimé car il est lié à des incidents, des uploads, des validations ou des approbations. Il a été bloqué');
+            $accountService->blockUser($id);
+        }
+
+        return $this->redirectToRoute('app_super_admin');
+    }
+
+    // This function is responsible for managing the logic of the account deletion
     #[Route(path: '/delete_account', name: 'app_delete_account')]
     public function delete_account(AccountService $accountService, Request $request): Response
     {
         $id = $request->query->get('id');
+
         $accountService->deleteUser($id);
-        // $originUrl = $request->headers->get('referer');
         $this->addFlash('success',  'Le compte a été supprimé');
 
         return $this->redirectToRoute('app_super_admin');
     }
+
 
     // Logic to create a new department and display a message
     #[Route('/department/department_creation', name: 'department_creation')]

@@ -81,16 +81,19 @@ class ValidationService extends AbstractController
 
         foreach ($validator_department_values as $validator_department_value) {
             $validator_department = $this->departmentRepository->find($validator_department_value);
-            $validation->addDepartment($validator_department);
+            if ($validator_department !== null) {
+                $validation->addDepartment($validator_department);
+            }
             $this->createApprobationProcess($validation, $validator_user, $validator_department);
         }
 
-        $validator_user = null;
         $validator_department = null;
 
         foreach ($validator_user_values as $validator_user_value) {
             $validator_user = $this->userRepository->find($validator_user_value);
-            $validation->addValidator($validator_user);
+            if ($validator_user !== null) {
+                $validation->addValidator($validator_user);
+            }
             $this->createApprobationProcess($validation, $validator_user, $validator_department);
         }
 

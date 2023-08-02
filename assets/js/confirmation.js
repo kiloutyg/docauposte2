@@ -6,6 +6,7 @@ window.addEventListener("turbo:load", () => {
   const deleteCategoryButtons = document.querySelectorAll(".delete-category");
   const deleteButtonButtons = document.querySelectorAll(".delete-button");
   const deleteUserButtons = document.querySelectorAll(".delete-user");
+  const deleteUserButtonsDefinitively = document.querySelectorAll(".definitively-delete-user");
   const deleteUploadButtons = document.querySelectorAll(".delete-upload");
   const deleteIncidentButtons = document.querySelectorAll(".delete-incident");
   const deleteIncidentCategoryButtons = document.querySelectorAll(
@@ -60,6 +61,14 @@ window.addEventListener("turbo:load", () => {
       confirmationHandler(
         event,
         "Êtes vous sûr de vouloir supprimer cet Utilisateur?"
+      );
+    });
+  });
+  deleteUserButtonsDefinitively.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "Êtes vous sûr de vouloir supprimer cet Utilisateur? Celà supprimera également tous les incidents et documents liés à cet utilisateur."
       );
     });
   });
