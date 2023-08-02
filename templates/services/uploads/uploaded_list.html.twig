@@ -58,22 +58,30 @@
 																				{% if  is_granted('ROLE_LINE_ADMIN') %}
 																					<div class="ml-auto">
 																						{{upload.uploader.username}}|
-																						{{upload.validated ? 'Validé' : 'Non validé'}}|
-																						{{ upload.uploadedAt|date('d/m/Y') }}
-																						<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify shadow ">
-																							Modifier
-																						</a>
+																						{% if upload.validated is same as(false) %}
+																							<a href="{{path('app_validation', {'uploadId' : upload.id} )}}">{{upload.validated ? 'Validé' : 'Non validé'}}<a>
+																									|
+																								{% else  %}
+																									{{upload.validated ? 'Validé' : 'Non validé'}}
+																									|
+																								{% endif %}
+																								{{ upload.uploadedAt|date('d/m/Y') }}
+																								<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify shadow ">
+																									Modifier
+																								</a>
 
-																						<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id, originUrl : app.request.uri }) }}" class="btn btn-danger delete-upload shadow">
-																							Supprimer
-																						</a>
-																					</div>
-																				{% endif %}
-																			</li>
-																		{% endfor %}
-																	{% endfor %}
+																								<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id, originUrl : app.request.uri }) }}" class="btn btn-danger delete-upload shadow">
+																									Supprimer
+																								</a>
+																							</div>
+																						{% endif %}
+																					</li>
+																				{% endfor %}
+																			{% endfor %}
+																		</div>
+																	</li>
 																</div>
-															</div>
+															</li>
 														</div>
 													</div>
 												{% endfor %}
