@@ -111,15 +111,14 @@ class UploadController extends FrontController
 
 
     // create a route to delete a file
-    #[Route('/delete/upload/{button}/{filename}', name: 'delete_file')]
+    #[Route('/delete/upload/{uploadId}', name: 'delete_file')]
 
-    public function delete_file(string $filename = null, int $button = null, UploadsService $uploadsService, Request $request): RedirectResponse
+    public function delete_file(int $uploadId = null, UploadsService $uploadsService, Request $request): RedirectResponse
     {
-        $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
         $originUrl = $request->headers->get('Referer');
 
         // Use the UploadsService to handle file deletion
-        $name = $uploadsService->deleteFile($filename, $buttonEntity);
+        $name = $uploadsService->deleteFile($uploadId);
         $this->addFlash('success', 'Le fichier  ' . $name . ' a été supprimé.');
 
         return $this->redirect($originUrl);

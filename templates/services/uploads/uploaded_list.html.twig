@@ -70,7 +70,7 @@
 																									Modifier
 																								</a>
 
-																								<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id, originUrl : app.request.uri }) }}" class="btn btn-danger delete-upload shadow">
+																								<a href="{{ path('app_delete_file', { uploadId: upload.id }) }}" class="btn btn-danger delete-upload shadow">
 																									Supprimer
 																								</a>
 																							</div>

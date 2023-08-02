@@ -14,12 +14,13 @@ use App\Repository\UploadRepository;
 use App\Repository\DepartmentRepository;
 use App\Repository\UserRepository;
 use App\Repository\ValidationRepository;
+use App\Repository\ApprobationRepository;
 
 use App\Entity\Upload;
 use App\Entity\Department;
 use App\Entity\User;
 use App\Entity\Validation;
-
+use App\Entity\Approbation;
 
 
 class ValidationService extends AbstractController
@@ -31,6 +32,7 @@ class ValidationService extends AbstractController
     protected $departmentRepository;
     protected $userRepository;
     protected $validationRepository;
+    protected $approbationRepository;
 
     public function __construct(
         LoggerInterface         $logger,
@@ -38,7 +40,8 @@ class ValidationService extends AbstractController
         UploadRepository        $uploadRepository,
         DepartmentRepository    $departmentRepository,
         UserRepository          $userRepository,
-        ValidationRepository    $validationRepository
+        ValidationRepository    $validationRepository,
+        ApprobationRepository   $approbationRepository
     ) {
         $this->logger               = $logger;
         $this->em                   = $em;
@@ -46,7 +49,9 @@ class ValidationService extends AbstractController
         $this->departmentRepository = $departmentRepository;
         $this->userRepository       = $userRepository;
         $this->validationRepository = $validationRepository;
+        $this->approbationRepository = $approbationRepository;
     }
+
     public function createValidation(Upload $upload, Request $request)
     {
 
@@ -65,22 +70,46 @@ class ValidationService extends AbstractController
 
         $validation->setUpload($upload);
 
-        $validation->setStatus('Pending');
-
-        foreach ($validator_department_values as $validator_department_value) {
-            $validator_department = $this->departmentRepository->find($validator_department_value);
-            $validation->addDepartment($validator_department);
-        }
-
-        foreach ($validator_user_values as $validator_user_value) {
-            $validator_user = $this->userRepository->find($validator_user_value);
-            $validation->addValidator($validator_user);
-        }
+        $validation->setStatus(false);
 
         $this->em->persist($validation);
 
         $this->em->flush();
 
+        $validator_user = null;
+        $validator_department = null;
+
+        foreach ($validator_department_values as $validator_department_value) {
+            $validator_department = $this->departmentRepository->find($validator_department_value);
+            $validation->addDepartment($validator_department);
+            $this->createApprobationProcess($validation, $validator_user, $validator_department);
+        }
+
+        $validator_user = null;
+        $validator_department = null;
+
+        foreach ($validator_user_values as $validator_user_value) {
+            $validator_user = $this->userRepository->find($validator_user_value);
+            $validation->addValidator($validator_user);
+            $this->createApprobationProcess($validation, $validator_user, $validator_department);
+        }
+
+
         return $validation;
+    }
+
+    public function createApprobationProcess($validation, User $validator_user = null, Department $validator_department = null)
+    {
+        $approbation = new Approbation();
+        $approbation->setValidation($validation);
+        $approbation->setUserApprobator($validator_user);
+        $approbation->setDepartmentApprobator($validator_department);
+        $approbation->setApproval(false);
+
+        $this->em->persist($approbation);
+
+        $this->em->flush();
+
+        return $approbation;
     }
 }
