@@ -44,9 +44,6 @@ class UploadController extends FrontController
     {
         $this->uploadsService = $uploadsService;
 
-        $this->logger->info("request:" . json_encode($request->request->all()));
-
-
         // Get the URL of the page from which the request originated
         $originUrl = $request->headers->get('Referer');
 
