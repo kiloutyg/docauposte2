@@ -12,6 +12,8 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Repository\DepartmentRepository;
 
+use App\Service\EntityDeletionService;
+
 // This class is responsible for managing the user accounts logic
 class AccountService
 {
@@ -19,17 +21,20 @@ class AccountService
     private $userRepository;
     private $manager;
     private $departmentRepository;
+    private $entityDeletionService;
 
     public function __construct(
         UserPasswordHasherInterface $passwordHasher,
         UserRepository $userRepository,
         EntityManagerInterface $manager,
-        DepartmentRepository $departmentRepository
+        DepartmentRepository $departmentRepository,
+        EntityDeletionService $entityDeletionService
     ) {
         $this->passwordHasher = $passwordHasher;
         $this->userRepository = $userRepository;
         $this->manager = $manager;
         $this->departmentRepository = $departmentRepository;
+        $this->entityDeletionService = $entityDeletionService;
     }
 
     // This function is responsible for creating a new user account and persisting it to the database
@@ -109,7 +114,21 @@ class AccountService
     public function deleteUser($id)
     {
         $user = $this->userRepository->find($id);
+        $this->entityDeletionService->deleteEntity('user', $id);
+
         $this->manager->remove($user);
+        $this->manager->flush();
+    }
+
+    // This function is responsible for blocking a user account
+
+    public function blockUser($id)
+    {
+        $user = $this->userRepository->find($id);
+        $user->setBlocked(true);
+        $user->setPassword('');
+        $user->setRoles(['ROLE_USER']);
+        $this->manager->persist($user);
         $this->manager->flush();
     }
 }

@@ -47,6 +47,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'UserApprobator', targetEntity: Approbation::class)]
     private Collection $approbations;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $blocked = null;
+
 
     public function __construct()
     {
@@ -263,6 +266,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $approbation->setUserApprobator(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isBlocked(): ?bool
+    {
+        return $this->blocked;
+    }
+
+    public function setBlocked(?bool $blocked): static
+    {
+        $this->blocked = $blocked;
 
         return $this;
     }
