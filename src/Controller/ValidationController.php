@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Validator\Constraints\All;
 
+use App\Form\UploadType;
 
 
 class ValidationController extends FrontController
@@ -101,13 +102,19 @@ class ValidationController extends FrontController
 
     public function disapprovedValidationModification(int $approbationId = null): Response
     {
-        $validation = $this->validationRepository->findOneBy(['id' => $approbationId]);
+        $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
+        $validation = $approbation->getValidation();
         $upload = $validation->getUpload();
 
-        return $this->render('services/validation/disapprovedModification.html.twig', [
+        $form = $this->createForm(UploadType::class, $upload);
 
+
+        return $this->render('services/validation/disapprovedModification.html.twig', [
+            'approbation'           => $approbation,
             'upload'                => $upload,
             'user'                  => $this->getUser(),
+            'form'                  => $form->createView(),
+
         ]);
     }
 }

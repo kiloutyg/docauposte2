@@ -76,7 +76,7 @@ class RedirectSubscriber implements EventSubscriberInterface
 
             foreach ($disapprovedUploadsbyUser as $upload) {
                 $validationId = $upload->getValidation()->getId();
-                $disapprovalId = $this->approbationRepository->findOneBy(['validation' => $validationId, 'approval' => false])->getId();
+                $disapprovalId = $this->approbationRepository->findOneBy(['Validation' => $validationId, 'Approval' => false])->getId();
 
                 $event->setResponse(new RedirectResponse($this->router->generate('app_validation_disapproved_modify', [
                     'approbationId' => $disapprovalId,
@@ -93,9 +93,10 @@ class RedirectSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST =>
-            ['approbationOnKernelRequest', 0],
-            ['reviseApprobationOnKernelRequest', 0]
+            KernelEvents::REQUEST => [
+                ['approbationOnKernelRequest', 0],
+                ['reviseApprobationOnKernelRequest', 1]
+            ],
         ];
     }
 }
