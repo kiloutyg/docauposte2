@@ -24,6 +24,8 @@ use App\Repository\ButtonRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
 use App\Repository\DepartmentRepository;
+use App\Repository\ValidationRepository;
+use App\Repository\ApprobationRepository;
 
 // use App\Entity\Zone;
 // use App\Entity\ProductLine;
@@ -78,6 +80,8 @@ class BaseController extends AbstractController
     protected $authChecker;
     protected $departmentRepository;
     protected $validationService;
+    protected $approbationRepository;
+    protected $validationRepository;
 
     // Variables used in the twig templates to display all the entities
     protected $departments;
@@ -115,7 +119,9 @@ class BaseController extends AbstractController
         EntityHeritanceService          $entityHeritanceService,
         AuthorizationCheckerInterface   $authChecker,
         DepartmentRepository            $departmentRepository,
-        ValidationService               $validationService
+        ValidationService               $validationService,
+        ApprobationRepository           $approbationRepository,
+        ValidationRepository            $validationRepository
 
     ) {
 
@@ -145,6 +151,8 @@ class BaseController extends AbstractController
         $this->authChecker                  = $authChecker;
         $this->departmentRepository         = $departmentRepository;
         $this->validationService            = $validationService;
+        $this->approbationRepository        = $approbationRepository;
+        $this->validationRepository         = $validationRepository;
         // Variables used in the twig templates to display all the entities
         $this->zones                        = $this->zoneRepository->findAll();
         $this->productLines                 = $this->productLineRepository->findAll();

@@ -8,10 +8,10 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Repository\ApprobationRepository;
 use App\Repository\UserRepository;
+use App\Repository\UploadRepository;
 
 
 class RedirectSubscriber implements EventSubscriberInterface
@@ -20,39 +20,82 @@ class RedirectSubscriber implements EventSubscriberInterface
     private $security;
     private $approbationRepository;
     private $userRepository;
+    private $uploadRepository;
 
     public function __construct(
         RouterInterface $router,
         Security $security,
         ApprobationRepository $approbationRepository,
         UserRepository $userRepository,
+        UploadRepository $uploadRepository
     ) {
         $this->router = $router;
         $this->security = $security;
         $this->approbationRepository = $approbationRepository;
         $this->userRepository = $userRepository;
+        $this->uploadRepository = $uploadRepository;
     }
-    public function onKernelRequest(RequestEvent $event): void
+    public function approbationOnKernelRequest(RequestEvent $event): void
     {
         $currentUser = $this->security->getUser();
         $currentApprobation = [];
 
-        if ($currentUser) {
+        $request = $event->getRequest();
+        $currentRoute = $request->get('_route');
+
+
+        if ($currentUser && $currentRoute !== 'app_validation' && $currentRoute == 'app_base') {
             $user = $this->userRepository->find($currentUser);
             $currentApprobation = $user->getApprobations();
-            if (count($currentApprobation) > 0) {
-                foreach ($currentApprobation as $approbation) {
 
-                    $event->setResponse(new RedirectResponse($this->router->generate('app_validation', ['uploadId' => $approbation->getId()])));
+            if (count($currentApprobation) !== null) {
+                foreach ($currentApprobation as $approbation) {
+                    if ($approbation->isApproval() === null) {
+                        $event->setResponse(new RedirectResponse($this->router->generate('app_validation_approbation', [
+                            'approbationId' => $approbation->getId(),
+                        ])));
+                        return;
+                    }
                 }
+            }
+            if ($currentRoute !== 'app_base') {
+                $event->setResponse(new RedirectResponse($this->router->generate('app_base')));
+            }
+        }
+    }
+    public function reviseApprobationOnKernelRequest(RequestEvent $event): void
+    {
+        $currentUser = $this->security->getUser();
+
+        $request = $event->getRequest();
+        $currentRoute = $request->get('_route');
+
+        // Skip redirection if the current route is for approbation revision
+        if ($currentUser && $currentRoute !== 'app_validation_disapproved_modify' && $currentRoute == 'app_base') {
+            $disapprovedUploadsbyUser = $this->uploadRepository->findBy(['uploader' => $currentUser, 'validated' => false]);
+
+            foreach ($disapprovedUploadsbyUser as $upload) {
+                $validationId = $upload->getValidation()->getId();
+                $disapprovalId = $this->approbationRepository->findOneBy(['validation' => $validationId, 'approval' => false])->getId();
+
+                $event->setResponse(new RedirectResponse($this->router->generate('app_validation_disapproved_modify', [
+                    'approbationId' => $disapprovalId,
+                ])));
+                return;
+            }
+            if ($currentRoute !== 'app_base') {
+                $event->setResponse(new RedirectResponse($this->router->generate('app_base')));
             }
         }
     }
 
+
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST => 'onKernelRequest',
+            KernelEvents::REQUEST =>
+            ['approbationOnKernelRequest', 0],
+            ['reviseApprobationOnKernelRequest', 0]
         ];
     }
 }

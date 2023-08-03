@@ -68,9 +68,9 @@ class UploadsService extends AbstractController
             // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
             foreach ($request->request->keys() as $key) {
                 if (strpos($key, 'validator_department') !== false) {
-                    $validated = false;
+                    $validated = null;
                 } elseif (strpos($key, 'validator_user') !== false) {
-                    $validated = false;
+                    $validated = null;
                 } else {
                     $validated = true;
                 }
@@ -128,34 +128,24 @@ class UploadsService extends AbstractController
 
             // Move the file to the specified folder
             $file->move($folderPath . '/', $filename);
-
             // Store the filename for return value
             $name = $filename;
-
             // Create a new Upload object
             $upload = new Upload();
-
             // Set the file property using the path
             $upload->setFile(new File($path));
-
             // Set the filename property
             $upload->setFilename($filename);
-
             // Set the path property
             $upload->setPath($path);
-
             // Set the button property
             $upload->setButton($button);
-
             // Set the uploader property
             $upload->setUploader($user);
-
             // Set the uploadedAt property to the current date and time
             $upload->setUploadedAt(new \DateTime());
-
             // Set the validated boolean property
             $upload->setValidated($validated);
-
             // Persist the upload object
             $this->manager->persist($upload);
         }
@@ -164,7 +154,7 @@ class UploadsService extends AbstractController
         $this->manager->flush();
 
         $uploadEntity = $this->uploadRepository->findOneBy(['filename' => $filename, 'button' => $button]);
-        if ($validated === false) {
+        if ($validated === null) {
             $this->validationService->createValidation($uploadEntity, $request);
         }
         // Return the name of the last uploaded file

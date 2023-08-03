@@ -54,65 +54,165 @@ class ValidationService extends AbstractController
 
     public function createValidation(Upload $upload, Request $request)
     {
-
+        // Create empty arrays to store values for validator_department and validator_user
         $validator_department_values = [];
         $validator_user_values = [];
 
+        // Iterate through the keys in the request
         foreach ($request->request->keys() as $key) {
+            // If the key contains 'validator_department', add its value to the validator_department_values array
             if (strpos($key, 'validator_department') !== false) {
                 $validator_department_values[] = $request->request->get($key);
-            } elseif (strpos($key, 'validator_user') !== false) {
+            }
+            // If the key contains 'validator_user', add its value to the validator_user_values array
+            elseif (strpos($key, 'validator_user') !== false) {
                 $validator_user_values[] = $request->request->get($key);
             }
         }
 
+        // Create a new Validation instance
         $validation = new Validation();
 
+        // Set the Upload object on the Validation instance
         $validation->setUpload($upload);
 
+        // Set the status of the Validation instance to false
         $validation->setStatus(false);
 
+        // Persist the Validation instance to the database
         $this->em->persist($validation);
 
+        // Flush changes to the database
         $this->em->flush();
 
+        // Initialize variables for validator_user and validator_department
         $validator_user = null;
         $validator_department = null;
 
+        // Loop through each validator_department value
         foreach ($validator_department_values as $validator_department_value) {
+            // Find the Department entity using the repository and the validator_department value
             $validator_department = $this->departmentRepository->find($validator_department_value);
+            // If the Department entity exists, add it to the Validation instance
             if ($validator_department !== null) {
                 $validation->addDepartment($validator_department);
             }
+            // Call the createApprobationProcess method to create an Approbation process
             $this->createApprobationProcess($validation, $validator_user, $validator_department);
         }
 
+        // Reset the validator_department variable to null
         $validator_department = null;
 
+        // Loop through each validator_user value
         foreach ($validator_user_values as $validator_user_value) {
+            // Find the User entity using the repository and the validator_user value
             $validator_user = $this->userRepository->find($validator_user_value);
+            // If the User entity exists, add it to the Validation instance
             if ($validator_user !== null) {
                 $validation->addValidator($validator_user);
             }
+            // Call the createApprobationProcess method to create an Approbation process
             $this->createApprobationProcess($validation, $validator_user, $validator_department);
         }
 
-
+        // Return the Validation instance
         return $validation;
     }
 
     public function createApprobationProcess($validation, User $validator_user = null, Department $validator_department = null)
     {
+        // Create a new Approbation instance
         $approbation = new Approbation();
+        // Set the Validation object on the Approbation instance
         $approbation->setValidation($validation);
+        // Set the UserApprobator object on the Approbation instance
         $approbation->setUserApprobator($validator_user);
+        // Set the DepartmentApprobator object on the Approbation instance
         $approbation->setDepartmentApprobator($validator_department);
-        $approbation->setApproval(false);
+        // Set the Approval property of the Approbation instance to null
+        $approbation->setApproval(null);
 
+        // Persist the Approbation instance to the database
         $this->em->persist($approbation);
 
+        // Flush changes to the database
         $this->em->flush();
 
+        // Return the Approbation instance
         return $approbation;
+    }
+
+    public function validationApproval(Approbation $approbation, Request $request)
+    {
+        // Get the value of the 'approvalRadio' input from the request
+        $approvalStr = $request->request->get('approvalRadio');
+        // Convert the value to a boolean
+        $approval = filter_var($approvalStr, FILTER_VALIDATE_BOOLEAN);
+        // Get the value of the 'approbationComment' input from the request
+        $comment = $request->request->get('approbationComment');
+
+        // Set the Approval property of the Approbation instance
+        $approbation->setApproval($approval);
+        // Set the Comment property of the Approbation instance
+        $approbation->setComment($comment);
+
+        // Persist the Approbation instance to the database
+        $this->em->persist($approbation);
+
+        // Flush changes to the database
+        $this->em->flush();
+
+        // Get the Validation object associated with the Approbation instance
+        $validation = $approbation->getValidation();
+
+        // Call the approbationCheck method to check if all approbations are approved
+        $this->approbationCheck($validation);
+
+        // No need to return anything
+        return;
+    }
+
+
+    public function approbationCheck(Validation $validation)
+    {
+        // Get the ID of the Validation instance
+        $validationId = $validation->getId();
+        // Create an empty array to store Approbation instances
+        $approbations = [];
+        // Find all Approbation instances associated with the Validation ID
+        $approbations = $this->approbationRepository->findBy(['Validation' => $validationId]);
+        // Loop through each Approbation instance
+        foreach ($approbations as $approbation) {
+            // If the Approbation is not approved or the Approval property is null
+            if ($approbation->isApproval() == false || $approbation->isApproval() == null) {
+                // Set the status of the Validation instance to false
+                $validation->setStatus(false);
+                // Persist the Validation instance to the database
+                $this->em->persist($validation);
+                // Flush changes to the database
+                $this->em->flush();
+                $upload = $validation->getUpload();
+                $upload->setValidated(false);
+                $this->em->persist($upload);
+                $this->em->flush();
+                // Return early
+                return;
+            }
+        }
+        // If all Approbations are approved, set the status of the Validation instance to true
+        $validation->setStatus(true);
+        // Persist the Validation instance to the database
+        $this->em->persist($validation);
+        // Flush changes to the database
+        $this->em->flush();
+
+        $upload = $validation->getUpload();
+        $upload->setValidated(true);
+        $this->em->persist($upload);
+        $this->em->flush();
+
+        // Return early
+        return;
     }
 }

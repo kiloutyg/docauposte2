@@ -15,15 +15,14 @@
 			</h1>
 			<h3>
 				{{incidentCategory.name|split('.')|first|upper}}
-
-				<div style="height: 40vh;"></div>
-				<a href="{{ path('app_mandatory_incident', {'incidentid': nextIncidentId, 'zone' : zone , 'productline' : productline})}}" class="btn btn-warning btn-lg">
-					<strong>Ok, J'ai compris</strong>
-				</a>
-				<div style="height: 10vh;"></div>
-				<a href="javascript:void(0)" class="btn btn-secondary" onclick="event.preventDefault(); window.history.back();" style="color:black">Retour
-				</a>
-			</div>
+			</h3>
+			<div style="height: 40vh;"></div>
+			<a href="{{ path('app_mandatory_incident', {'incidentid': nextIncidentId, 'zone' : zone , 'productline' : productline})}}" class="btn btn-warning btn-lg">
+				<strong>Ok, J'ai compris</strong>
+			</a>
+			<div style="height: 10vh;"></div>
+			<a href="javascript:void(0)" class="btn btn-secondary" onclick="event.preventDefault(); window.history.back();" style="color:black">Retour
+			</a>
 			<div style="width: 5%"></div>
 
 		</div>

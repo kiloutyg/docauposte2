@@ -158,11 +158,12 @@ class FrontController extends BaseController
     #[Route('/zone/{zone}/productline/{productline}/category/{category}/button/{button}', name: 'button')]
     public function ButtonShowing(UploadController $uploadController, string $button = null, Request $request): Response
     {
-        $buttonEntity = $this->buttonRepository->findoneBy(['name' => $button]);
+        $buttonEntity = $this->buttonRepository->findOneBy(['name' => $button]);
         $category    = $buttonEntity->getCategory();
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
         $uploads = [];
+
         $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonEntity->getId()]);
         foreach ($buttonUploads as $buttonUpload) {
             if ($buttonUpload->isValidated()) {
@@ -171,7 +172,6 @@ class FrontController extends BaseController
         }
 
         if (count($uploads) != 1) {
-
             return $this->render(
                 'button.html.twig',
                 [
@@ -180,13 +180,12 @@ class FrontController extends BaseController
                     'category'    => $category,
                     'categories'  => $this->categoryRepository->findAll(),
                     'button'      => $buttonEntity,
-                    'uploads'     => $this->uploadRepository->findAll(),
-
+                    'uploads'     => $uploads,
                 ]
             );
         } else {
-            $filename = $uploads[0]->getFilename();
-            return $uploadController->download_file($filename, $request);
+            $uploadId = $uploads[0]->getId();
+            return $uploadController->download_file($uploadId, $request);
         }
     }
 }

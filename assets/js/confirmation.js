@@ -15,6 +15,9 @@ window.addEventListener("turbo:load", () => {
   const deleteDepartmentButtons = document.querySelectorAll(
     ".delete-department"
   );
+  const submitApprovalButtons = document.querySelectorAll(
+    ".submit-approval"
+  );
 
   const confirmationHandler = (event, message) => {
     const confirmed = confirm(message);
@@ -101,6 +104,14 @@ window.addEventListener("turbo:load", () => {
       confirmationHandler(
         event,
         "Êtes vous sûr de vouloir supprimer ce Service?"
+      );
+    });
+  });
+  submitApprovalButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "Êtes vous sûr de vouloir soumettre ce formulaire de validation?"
       );
     });
   });

@@ -1,33 +1,43 @@
 {% block stylesheets %}
 	{{
-            encore_entry_link_tags("app")
+		encore_entry_link_tags("app")
         }}
+{% endblock %}
+
+{% block javascripts %}
+	{{
+		 encore_entry_script_tags('confirmation') 
+		 }}
 {% endblock %}
 
 
 {% block body %}
 	<div class="d-flex align-items-center  flex-row">
 
-		<iframe src="{{ path('app_validation_download_file', { 'uploadId': upload.id }) }}" width="69%" height="950" target="_blank"></iframe>
-		{# <div style="width: 6%"></div> #}
+		<iframe src="{{ path('app_validation_view_file', { 'uploadId': upload.id }) }}" width="69%" height="950" target="_blank"></iframe>
 		<div style="width: 31%" class="text-center">
-			{% block title %}Validation Page
+			{% block title %}Document
+				{{upload.validated ? 'Validé' : 'Non validé'}}
+
 			{% endblock %}
 			<h2 style="text-align: center;">
 				<strong>{{upload.filename|split('.')|first|upper}}</strong>
 			</h2>
+
 			<h3 style="text-align: center;">
 				{{upload.button.name|split('.')|first|upper}}
+			</h3>
 
-				<div style="height: 40vh;"></div>
-				<a style="text-align: center;" href="" class="btn btn-warning btn-lg">
-					<strong>Ok, J'ai compris</strong>
-				</a>
-				<div style="height: 10vh;"></div>
-				<a href="javascript:void(0)" class="btn btn-secondary" onclick="event.preventDefault(); window.history.back();" style="color:black">Retour
-				</a>
-			</div>
-			{# <div style="width: 5%"></div> #}
+			<div style="height: 40vh;"></div>
+			<a href="{{ path('app_mandatory_incident', {'incidentid': nextIncidentId, 'zone' : zone , 'productline' : productline})}}" class="btn btn-warning btn-lg">
+				<strong>Ok, J'ai compris</strong>
+			</a>
+			<div style="height: 10vh;"></div>
+			<a href="javascript:void(0)" class="btn btn-secondary" onclick="event.preventDefault(); window.history.back();" style="color:black">Retour
+			</a>
+
+			<div style="height: 5vh;"></div>
+
 
 		</div>
 	</div>

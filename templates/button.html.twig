@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 {% block title %}
-	Upload pour
+	Document pour
 	{{button.name|split('.')|first|upper}}
 	|
 	{{ parent() }}
@@ -13,15 +13,20 @@
 				{% set matchinguploads = matchinguploads|merge([upload]) %}
 			{% endif %}
 		{% endfor %}
-		<p>
-			{% if matchinguploads|length > 1 or matchinguploads|length < 1 %}
+		{% if matchinguploads|length > 1 or matchinguploads|length < 1 %}
+			<div>
 				<div class="justify-content-between align-items-center ">
 					<h2>
 						<strong>
-							Upload pour
+							Document pour
 							{{button.name|split('.')|first|upper}}
 						</strong>
 					</h2>
+					<p>
+						<strong>
+							Aucun upload pour ce bouton
+						</strong>
+					</p>
 					{% include 'services/uploads/uploaded.html.twig' %}
 				</div>
 			</div>
@@ -29,8 +34,8 @@
 			<div class="justify-content-between align-items-center ">
 				<h2>
 					<strong>
-						Upload pour
-						{{button.name}}
+						Document pour
+						{{button.name|split('.')|first|upper}}
 					</strong>
 				</h2>
 				<p>
@@ -38,6 +43,8 @@
 						Aucun upload pour ce bouton
 					</strong>
 				</p>
+				{% include 'services/uploads/uploaded.html.twig' %}
+
 			</div>
 		{% endif %}
 	</div>
