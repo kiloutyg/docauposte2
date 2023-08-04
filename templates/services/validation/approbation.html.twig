@@ -28,23 +28,25 @@
 			</h3>
 
 			<div style="height: 5vh;"></div>
-			<form class=" d-grid mx-auto " method="post" action="{{ path('app_validation_approval', { 'approbationId': approbation.id }) }}" enctype="multipart/form-data">
+			<div class="d-flex justify-content-center align-items-center">
+				<form class="d-grid" method="post" action="{{ path('app_validation_approval', { 'approbationId': approbation.id }) }}" enctype="multipart/form-data">
 
-				<input type="radio" class="btn-check" name="approvalRadio" id="success-outlined" autocomplete="off" value="true" checked>
-				<label class="btn btn-outline-success" for="success-outlined">Approuver</label>
+					<input type="radio" class="btn-check" name="approvalRadio" id="success-outlined" autocomplete="off" value="true" checked>
+					<label class="btn btn-outline-success" for="success-outlined">Approuver</label>
 
-				<input type="radio" class="btn-check" name="approvalRadio" id="danger-outlined" autocomplete="off" value="false">
-				<label class="btn btn-outline-danger" for="danger-outlined">Désapprouver</label>
-				<div class="input-group ">
-					<div class="input-group-prepend">
-						<span class="input-group-text">Commentaire</span>
+					<input type="radio" class="btn-check" name="approvalRadio" id="danger-outlined" autocomplete="off" value="false">
+					<label class="btn btn-outline-danger" for="danger-outlined">Désapprouver</label>
+					<div class="input-group  justify-content-center">
+						<div class="input-group-prepend">
+							<span class="input-group-text">Commentaire</span>
 
-						<textarea class="form-control" name="approbationComment" aria-label="With textarea"></textarea>
+							<textarea class="form-control  " name="approbationComment" aria-label="With textarea"></textarea>
+						</div>
 					</div>
-				</div>
-				<button type="submit" class="btn btn-primary btn-lg submit-approval">Envoyer</button>
-			</form>
-
+						<div style="height: 5vh;"></div>
+					<button type="submit" class="btn btn-primary btn-lg submit-approval">Envoyer</button>
+				</form>
+			</div>
 			<div style="height: 5vh;"></div>
 
 

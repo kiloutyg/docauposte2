@@ -28,7 +28,9 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 				</p>
 				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_modify_file', {'uploadId': upload.id})}) }}
 				<div class="fallback">
-					<div class="mb-3">
+					<iframe src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" width="100%" height="750" target="_blank"></iframe>
+
+					<div class="mb-3 mt-3">
 						{{ form_label(form.file, 'Choisissez un ficher à ajouter :', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
 						{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}) }}
 					</div>
@@ -97,6 +99,25 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
 							{{ form_widget(form.button,{'attr': {'class': 'form-select', 'name': 'button', 'id': 'upload_button', 'required': true}}) }}
+						</div>
+					</div>
+				</div>
+
+				<div class="accordion d-grid justify-content-center" id="accordionValidator">
+					<div class="accordion-item ">
+						<div class="accordion-header" id="validatorNeeded-header">
+							<input type="checkbox" class="btn-check" id="validatorRequired" autocomplete="off" value="true">
+							<label class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary" for="validatorRequired" data-bs-toggle="collapse" data-bs-target="#validatorNeeded" aria-expanded="false" aria-controls="validatorNeeded" id="validatorSelect">Validation du Document</label>
+						</div>
+						<div id="validatorNeeded" aria-labelledby="validatorNeeded" data-bs-parent="#accordionValidator" class="accordion-collapse collapse ">
+							<div class="accordion-body row ">
+								<div class="col-3 col-3">
+									<label for="validator_user" style="color:black">Valideur:</label>
+								</div>
+								<div id="usersContainer" class="col-9 col-9">
+									<select class="form-select userSelect" name="validator_user" id="validator_user"></select>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
