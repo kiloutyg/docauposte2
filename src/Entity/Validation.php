@@ -19,14 +19,6 @@ class Validation
     #[ORM\JoinColumn(nullable: false)]
     private ?Upload $Upload = null;
 
-    #[ORM\ManyToMany(targetEntity: Department::class, inversedBy: 'validations')]
-    private Collection $department;
-
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'validations')]
-    private Collection $validator;
-
-
-
     #[ORM\Column(nullable: true)]
     private ?bool $Status = null;
 
@@ -35,8 +27,6 @@ class Validation
 
     public function __construct()
     {
-        $this->department = new ArrayCollection();
-        $this->validator = new ArrayCollection();
         $this->approbations = new ArrayCollection();
     }
 
@@ -56,56 +46,6 @@ class Validation
 
         return $this;
     }
-
-    /**
-     * @return Collection<int, Department>
-     */
-    public function getDepartment(): Collection
-    {
-        return $this->department;
-    }
-
-    public function addDepartment(Department $department): static
-    {
-        if (!$this->department->contains($department)) {
-            $this->department->add($department);
-        }
-
-        return $this;
-    }
-
-    public function removeDepartment(Department $department): static
-    {
-        $this->department->removeElement($department);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, User>
-     */
-    public function getValidator(): Collection
-    {
-        return $this->validator;
-    }
-
-    public function addValidator(User $validator): static
-    {
-        if (!$this->validator->contains($validator)) {
-            $this->validator->add($validator);
-        }
-
-        return $this;
-    }
-
-    public function removeValidator(User $validator): static
-    {
-        $this->validator->removeElement($validator);
-
-        return $this;
-    }
-
-
 
     public function isStatus(): ?bool
     {

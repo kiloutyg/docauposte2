@@ -90,7 +90,7 @@ class SecurityController extends BaseController
         $id = $request->query->get('id');
         $user = $this->userRepository->findOneBy(['id' => $id]);
 
-        if ($user->getIncidents()->isEmpty() && $user->getUploads()->isEmpty() && $user->getValidations()->isEmpty() && $user->getApprobations()->isEmpty()) {
+        if ($user->getIncidents()->isEmpty() && $user->getUploads()->isEmpty() && $user->getApprobations()->isEmpty()) {
             $accountService->deleteUser($id);
             $this->addFlash('success',  'Le compte a été supprimé');
         } else {

@@ -160,9 +160,9 @@ class EntityDeletionService
             foreach ($entity->getIncidents() as $incident) {
                 $this->deleteEntity('incident', $incident->getId());
             }
-            foreach ($entity->getValidations() as $validation) {
-                $this->deleteEntity('validation', $validation->getId());
-            }
+            // foreach ($entity->getValidations() as $validation) {
+            //     $this->deleteEntity('validation', $validation->getId());
+            // }
         } elseif ($entityType === 'incidentCategory') {
             foreach ($entity->getIncidents() as $incident) {
                 $this->deleteEntity('incident', $incident->getId());

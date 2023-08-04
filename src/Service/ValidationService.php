@@ -61,11 +61,12 @@ class ValidationService extends AbstractController
         // Iterate through the keys in the request
         foreach ($request->request->keys() as $key) {
             // If the key contains 'validator_department', add its value to the validator_department_values array
-            if (strpos($key, 'validator_department') !== false) {
-                $validator_department_values[] = $request->request->get($key);
-            }
+            // if (strpos($key, 'validator_department') !== false && $request->request->get($key) !== null) {
+            //     $validator_department_values[] = $request->request->get($key);
+            // }
             // If the key contains 'validator_user', add its value to the validator_user_values array
-            elseif (strpos($key, 'validator_user') !== false) {
+            // else
+            if (strpos($key, 'validator_user') !== false && $request->request->get($key) !== null) {
                 $validator_user_values[] = $request->request->get($key);
             }
         }
@@ -90,48 +91,56 @@ class ValidationService extends AbstractController
         $validator_department = null;
 
         // Loop through each validator_department value
-        foreach ($validator_department_values as $validator_department_value) {
-            // Find the Department entity using the repository and the validator_department value
-            $validator_department = $this->departmentRepository->find($validator_department_value);
-            // If the Department entity exists, add it to the Validation instance
-            if ($validator_department !== null) {
-                $validation->addDepartment($validator_department);
-            }
-            // Call the createApprobationProcess method to create an Approbation process
-            $this->createApprobationProcess($validation, $validator_user, $validator_department);
-        }
+        // foreach ($validator_department_values as $validator_department_value) {
+        //     // If the validator_department value is not null
+        //     if ($validator_department_value !== null || $validator_department_value !== '') {
+        //         // Find the Department entity using the repository and the validator_department value
+        //         $validator_department = $this->departmentRepository->find($validator_department_value);
+        //     }
+        //     $this->logger->info('validator_department_value: ' . $validator_department_value);
+        //     // Call the createApprobationProcess method to create an Approbation process
+        //     $this->createApprobationProcess($validation, $validator_user, $validator_department);
+        // }
 
         // Reset the validator_department variable to null
         $validator_department = null;
 
         // Loop through each validator_user value
         foreach ($validator_user_values as $validator_user_value) {
-            // Find the User entity using the repository and the validator_user value
-            $validator_user = $this->userRepository->find($validator_user_value);
-            // If the User entity exists, add it to the Validation instance
-            if ($validator_user !== null) {
-                $validation->addValidator($validator_user);
+            // If the validator_user value is not null
+            if ($validator_user_value !== null || $validator_user_value !== '') {
+                // Find the User entity using the repository and the validator_user value
+                $validator_user = $this->userRepository->find($validator_user_value);
             }
+            $this->logger->info('validator_user_value: ' . $validator_user_value);
             // Call the createApprobationProcess method to create an Approbation process
-            $this->createApprobationProcess($validation, $validator_user, $validator_department);
+            $this->createApprobationProcess(
+                $validation,
+                $validator_user,
+                // $validator_department
+            );
         }
-
         // Return the Validation instance
         return $validation;
     }
 
-    public function createApprobationProcess($validation, User $validator_user = null, Department $validator_department = null)
-    {
+    public function createApprobationProcess(
+        $validation,
+        User $validator_user = null,
+        // Department $validator_department = null
+    ) {
         // Create a new Approbation instance
         $approbation = new Approbation();
         // Set the Validation object on the Approbation instance
         $approbation->setValidation($validation);
         // Set the UserApprobator object on the Approbation instance
-        $approbation->setUserApprobator($validator_user);
-        // Set the DepartmentApprobator object on the Approbation instance
-        $approbation->setDepartmentApprobator($validator_department);
-        // Set the Approval property of the Approbation instance to null
-        $approbation->setApproval(null);
+        if ($validator_user !== null || $validator_user !== '') {
+            $approbation->setUserApprobator($validator_user);
+        }
+        // if ($validator_department !== null || $validator_department !== '') {
+        //     // Set the DepartmentApprobator object on the Approbation instance
+        //     $approbation->setDepartmentApprobator($validator_department);
+        // }
 
         // Persist the Approbation instance to the database
         $this->em->persist($approbation);

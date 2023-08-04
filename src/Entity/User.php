@@ -38,9 +38,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'uploader', targetEntity: Upload::class)]
     private Collection $uploads;
 
-    #[ORM\ManyToMany(targetEntity: Validation::class, mappedBy: 'validator')]
-    private Collection $validations;
-
     #[ORM\OneToMany(mappedBy: 'Uploader', targetEntity: Incident::class)]
     private Collection $incidents;
 
@@ -54,7 +51,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->uploads = new ArrayCollection();
-        $this->validations = new ArrayCollection();
         $this->incidents = new ArrayCollection();
         $this->approbations = new ArrayCollection();
     }
@@ -183,32 +179,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Validation>
-     */
-    public function getValidations(): Collection
-    {
-        return $this->validations;
-    }
-
-    public function addValidation(Validation $validation): static
-    {
-        if (!$this->validations->contains($validation)) {
-            $this->validations->add($validation);
-            $validation->addValidator($this);
-        }
-
-        return $this;
-    }
-
-    public function removeValidation(Validation $validation): static
-    {
-        if ($this->validations->removeElement($validation)) {
-            $validation->removeValidator($this);
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Incident>

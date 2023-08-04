@@ -21,8 +21,6 @@ class Department
     #[ORM\OneToMany(mappedBy: 'department', targetEntity: User::class)]
     private Collection $users;
 
-    #[ORM\ManyToMany(targetEntity: Validation::class, mappedBy: 'department')]
-    private Collection $validations;
 
     #[ORM\OneToMany(mappedBy: 'DepartmentApprobator', targetEntity: Approbation::class)]
     private Collection $approbations;
@@ -31,7 +29,6 @@ class Department
     public function __construct()
     {
         $this->users = new ArrayCollection();
-        $this->validations = new ArrayCollection();
         $this->approbations = new ArrayCollection();
     }
 
@@ -77,33 +74,6 @@ class Department
             if ($user->getDepartment() === $this) {
                 $user->setDepartment(null);
             }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Validation>
-     */
-    public function getValidations(): Collection
-    {
-        return $this->validations;
-    }
-
-    public function addValidation(Validation $validation): static
-    {
-        if (!$this->validations->contains($validation)) {
-            $this->validations->add($validation);
-            $validation->addDepartment($this);
-        }
-
-        return $this;
-    }
-
-    public function removeValidation(Validation $validation): static
-    {
-        if ($this->validations->removeElement($validation)) {
-            $validation->removeDepartment($this);
         }
 
         return $this;
