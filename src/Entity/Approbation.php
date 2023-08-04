@@ -21,9 +21,6 @@ class Approbation
     #[ORM\ManyToOne(inversedBy: 'approbations')]
     private ?User $UserApprobator = null;
 
-    #[ORM\ManyToOne(inversedBy: 'approbations')]
-    private ?Department $DepartmentApprobator = null;
-
     #[ORM\Column(nullable: true)]
     private ?bool $Approval = null;
 
@@ -55,18 +52,6 @@ class Approbation
     public function setUserApprobator(?User $UserApprobator): static
     {
         $this->UserApprobator = $UserApprobator;
-
-        return $this;
-    }
-
-    public function getDepartmentApprobator(): ?Department
-    {
-        return $this->DepartmentApprobator;
-    }
-
-    public function setDepartmentApprobator(?Department $DepartmentApprobator): static
-    {
-        $this->DepartmentApprobator = $DepartmentApprobator;
 
         return $this;
     }
