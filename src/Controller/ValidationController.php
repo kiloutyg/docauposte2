@@ -66,23 +66,25 @@ class ValidationController extends FrontController
 
 
     #[Route('/validation/download/{uploadId}', name: 'app_validation_view_file')]
-    public function validationFileView(int $UploadId = null, Request $request): Response
+    public function validationFileView(int $uploadId = null, Request $request): Response
     {
+        $this->logger->info('uploadID' . $uploadId);
 
-        $file = $this->uploadRepository->findOneBy(['id' => $UploadId]);
+        $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
 
         // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
+        $this->logger->info('file' . json_encode($file));
 
         if (($file->isValidated()) === true) {
-            $this->addFlash('error', 'Le fichier n\'a pas été validé.');
+            $this->addFlash('error', 'Le fichier a été validé.');
             return $this->redirect($originUrl);
+        } else {
+            $path = $file->getPath();
+            $file       = new File($path);
+            return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
         }
-        $path = $file->getPath();
-        $file       = new File($path);
-        return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
-
 
     #[Route('/validation/approval/{approbationId}', name: 'app_validation_approval')]
 
