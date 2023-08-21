@@ -11,7 +11,13 @@
 	{% set lastButton = null %}
 
 	<script>
-		{% if zone is defined and zone is not null %}
+		{% if upload is defined and upload is not null %}
+{% set button = upload.button %}
+{% set category = button.category %}
+{% set productLine = category.productLine %}
+{% set zone = productLine.zone %}
+{% endif %}
+{% if zone is defined and zone is not null %}
 zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
 	</script>
 
@@ -26,7 +32,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						:
 					</h3>
 				</p>
-				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_modify_file', {'uploadId': upload.id})}) }}
+				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_validation_disapproved_modify', {'approbationId': approbation.id})}) }}
 				<div class="fallback">
 
 					<div></div>
@@ -115,15 +121,16 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					<div class="accordion-item ">
 						<div class="accordion-header" id="validatorNeeded-header">
 							<input type="checkbox" class="btn-check" id="validatorRequired" autocomplete="off" value="true">
-							<label class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary" for="validatorRequired" data-bs-toggle="collapse" data-bs-target="#validatorNeeded" aria-expanded="false" aria-controls="validatorNeeded" id="validatorSelect">Validation du Document</label>
+							<label class="accordion-button m-0 mt-0 mb-0 mr-1 btn btn-outline-primary" for="validatorRequired" data-bs-toggle="collapse" data-bs-target="#validatorNeeded" aria-expanded="false" aria-controls="validatorNeeded" id="validatorSelect">Validation du Document</label>
 						</div>
 						<div id="validatorNeeded" aria-labelledby="validatorNeeded" data-bs-parent="#accordionValidator" class="accordion-collapse collapse ">
-							<div class="accordion-body row ">
-								<div class="col-3 col-3">
-									<label for="validator_user" style="color:black">Valideur:</label>
-								</div>
-								<div id="usersContainer" class="col-9 col-9">
-									<select class="form-select userSelect" name="validator_user" id="validator_user"></select>
+							<div class="accordion-body ">
+
+								<div id="usersContainer ">
+									<div class="">
+										<label for="validator_user" style="color:black">Valideur:</label>
+									</div>
+									{{ form_widget(form.validator_user,{'attr': {'style': 'width: 100%', 'class': 'select2-enable ','name': 'validator_user', 'id': 'validator_user', 'required': true}}) }}
 								</div>
 							</div>
 						</div>

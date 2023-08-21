@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Validator\Constraints\All;
 
 use App\Form\UploadType;
-
+use App\Service\UploadsService;
 
 class ValidationController extends FrontController
 {
@@ -102,14 +102,44 @@ class ValidationController extends FrontController
 
     #[Route('/validation/disapproved/modify/{approbationId}', name: 'app_validation_disapproved_modify')]
 
-    public function disapprovedValidationModification(int $approbationId = null): Response
+    public function disapprovedValidationModification(int $approbationId = null, UploadsService $uploadsService, Request $request): Response
     {
         $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
         $validation = $approbation->getValidation();
         $upload = $validation->getUpload();
 
-        $form = $this->createForm(UploadType::class, $upload);
+        $currentUser = $this->getUser();
+        $user = $this->userRepository->find($currentUser);
 
+        // Retrieve the origin URL
+        $originUrl = $request->headers->get('Referer');
+
+
+        $form = $this->createForm(UploadType::class, $upload, [
+            'current_user_id' => $user->getId(),
+            'current_upload_id' => $upload->getId(),
+        ]);
+
+        $form->handleRequest($request);
+        $this->logger->info('form' . json_encode($form->getData()));
+        $this->logger->info('form' . json_encode($form->getErrors()));
+        $this->logger->info('request' . json_encode($request->request->all()));
+        $this->logger->info('result' . json_encode($form->isSubmitted()));
+        if ($form->isSubmitted()) {
+            $this->logger->info('result' . json_encode($form->isValid()));
+        }
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Process the form data and modify the Upload entity
+            try {
+                $uploadsService->modifyDisapprovedFile($upload, $user, $request);
+                $this->addFlash('success', 'Le fichier a été modifié.');
+                return $this->redirectToRoute('app_base');
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+
+                return $this->redirectToRoute('app_base');
+            }
+        }
 
         return $this->render('services/validation/disapprovedModification.html.twig', [
             'approbation'           => $approbation,

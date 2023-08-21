@@ -11,11 +11,8 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-// use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-// use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-// use Symfony\Component\Form\Extension\Core\Type\StringerType;
-// use Symfony\Component\Form\CallbackTransformer;
-// use Symfony\Component\Form\Exception\TransformationFailedException;
+
+use Doctrine\ORM\EntityRepository;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
@@ -44,6 +41,9 @@ class UploadType extends AbstractType
     }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $currentUserId = $options['current_user_id'];
+        $currentUploadId = $options['current_upload_id'];
+
         $builder
             ->add(
                 'file',
@@ -80,6 +80,14 @@ class UploadType extends AbstractType
                 EntityType::class,
                 [
                     'class' => User::class, // Adjust this to match your User entity namespace
+                    'query_builder' => function (EntityRepository $er) use ($currentUserId) {
+                        return $er->createQueryBuilder('u')
+                            ->where('u.roles NOT LIKE :role')
+                            ->andWhere('u.id != :currentUserId')
+                            ->setParameter('role', '%ROLE_SUPER_ADMIN%')
+                            ->setParameter('currentUserId', $currentUserId)
+                            ->orderBy('u.username', 'ASC');
+                    },
                     'choice_label' => 'username', // Assuming your user entity has a 'username' property
                     'label' => 'Select approbators:',
                     'required' => false,
@@ -103,6 +111,8 @@ class UploadType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Upload::class,
+            'current_user_id' => null,
+            'current_upload_id' => null,
         ]);
     }
 }

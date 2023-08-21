@@ -42,13 +42,13 @@ class ValidationService extends AbstractController
         ValidationRepository    $validationRepository,
         ApprobationRepository   $approbationRepository
     ) {
-        $this->logger               = $logger;
-        $this->em                   = $em;
-        $this->uploadRepository     = $uploadRepository;
-        $this->departmentRepository = $departmentRepository;
-        $this->userRepository       = $userRepository;
-        $this->validationRepository = $validationRepository;
-        $this->approbationRepository = $approbationRepository;
+        $this->logger                   = $logger;
+        $this->em                       = $em;
+        $this->uploadRepository         = $uploadRepository;
+        $this->departmentRepository     = $departmentRepository;
+        $this->userRepository           = $userRepository;
+        $this->validationRepository     = $validationRepository;
+        $this->approbationRepository    = $approbationRepository;
     }
 
     public function createValidation(Upload $upload, Request $request)
@@ -193,6 +193,41 @@ class ValidationService extends AbstractController
         $this->em->persist($upload);
         $this->em->flush();
 
+        // Return early
+        return;
+    }
+
+    public function resetApprobation(Upload $upload)
+    {
+        // Get the ID of the validation instance
+        $validation = $upload->getValidation();
+
+        // Remove the Validation instance from the database
+        $validation->setStatus(null);
+
+        // Persist the Validation instance to the database
+        $this->em->persist($validation);
+
+        // Flush changes to the database
+        $this->em->flush();
+        // Create an empty array to store Approbation instances
+        $approbations = [];
+
+        // Get the ID of the Validation instance
+        $approbations = $validation->getApprobations();
+
+        // Loop through each Approbation instance
+        foreach ($approbations as $approbation) {
+            // Remove the Approbation instance from the database
+            $approbation->setApproval(null);
+            $approbation->setComment(null);
+        }
+
+        // Persist the Approbation instance to the database
+        $this->em->persist($approbation);
+
+        // Flush changes to the database
+        $this->em->flush();
         // Return early
         return;
     }

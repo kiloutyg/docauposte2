@@ -132,8 +132,10 @@ document.addEventListener('turbo:load', function () {
 // and then calls the createNewSelect function.
 
 function createNewSelect(selectedValue, selectId) {
+  console.log('createNewSelect called');
   // Check if the selected value is not empty
   if (selectedValue !== '') {
+    console.log('Creating a new select');  // Debug line
     // Get all the selected options from other select elements
     var lastSelectId = document.querySelectorAll('.userSelect:last-child')[0].id;
 
@@ -161,6 +163,7 @@ function createNewSelect(selectedValue, selectId) {
 // (up to the number of users in the usersData array), it calls the createSelectElement function.
 
 function createSelectElement() {
+  console.log('Creating a new select element');  // Debug line
   // Create a new select element
   var newSelect = document.createElement('select');
 
@@ -204,9 +207,13 @@ function createSelectElement() {
 
   // Add an event listener to the new select element when it changes
   newSelect.addEventListener('change', function (e) {
+    console.log('Select element changed');  // Debug line
     // Call the createNewSelect function and pass in the value of the changed element
     createNewSelect(e.target.value, e.target.id);
   });
+
+  // Initialize Select2 on the newly created select
+  // $(newSelect).select2();
 }
 
 

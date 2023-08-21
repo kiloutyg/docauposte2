@@ -186,12 +186,12 @@ class UploadController extends FrontController
 
         // If it's a GET request, render the form
         return $this->render('services/uploads/uploads_modification.html.twig', [
-            'form' => $form->createView(),
-            'zone'        => $zone,
-            'productLine' => $productLine,
-            'category'    => $category,
-            'button'      => $button,
-            'upload' => $upload
+            'form'          => $form->createView(),
+            'zone'          => $zone,
+            'productLine'   => $productLine,
+            'category'      => $category,
+            'button'        => $button,
+            'upload'        => $upload
         ]);
     }
 }
