@@ -108,35 +108,36 @@ class ValidationController extends FrontController
         $validation = $approbation->getValidation();
         $upload = $validation->getUpload();
 
+        $approbations = [];
+        $approbations = $validation->getApprobations(['Approval' => false]);
+
         $currentUser = $this->getUser();
         $user = $this->userRepository->find($currentUser);
 
         // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
 
-
         $form = $this->createForm(UploadType::class, $upload, [
             'current_user_id' => $user->getId(),
             'current_upload_id' => $upload->getId(),
+            'current_approbation_id' => $approbationId,
         ]);
 
-        $form->handleRequest($request);
-        $this->logger->info('form' . json_encode($form->getData()));
-        $this->logger->info('form' . json_encode($form->getErrors()));
-        $this->logger->info('request' . json_encode($request->request->all()));
-        $this->logger->info('result' . json_encode($form->isSubmitted()));
-        if ($form->isSubmitted()) {
-            $this->logger->info('result' . json_encode($form->isValid()));
-        }
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Process the form data and modify the Upload entity
-            try {
+        $form->remove('approbator');
+        $form->remove('modificationType');
+
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
+            $this->logger->info('form' . json_encode($form->getData()));
+            $this->logger->info('form' . json_encode($form->getErrors()));
+            $this->logger->info('request' . json_encode($request->request->all()));
+            $this->logger->info('result' . json_encode($form->isSubmitted()));
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $this->logger->info('result' . json_encode($form->isValid()));
+
                 $uploadsService->modifyDisapprovedFile($upload, $user, $request);
                 $this->addFlash('success', 'Le fichier a été modifié.');
-                return $this->redirectToRoute('app_base');
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-
                 return $this->redirectToRoute('app_base');
             }
         }
@@ -146,6 +147,7 @@ class ValidationController extends FrontController
             'upload'                => $upload,
             'user'                  => $this->getUser(),
             'form'                  => $form->createView(),
+            'approbations'          => $approbations,
 
         ]);
     }

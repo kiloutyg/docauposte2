@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
@@ -42,7 +43,7 @@ class UploadType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $currentUserId = $options['current_user_id'];
-        $currentUploadId = $options['current_upload_id'];
+        $currentApprobationId = $options['current_approbation_id'];
 
         $builder
             ->add(
@@ -76,16 +77,19 @@ class UploadType extends AbstractType
                 ]
             )
             ->add(
-                'validator_user',
+                'approbator',
                 EntityType::class,
                 [
                     'class' => User::class, // Adjust this to match your User entity namespace
-                    'query_builder' => function (EntityRepository $er) use ($currentUserId) {
+                    'query_builder' => function (EntityRepository $er) use ($currentUserId, $currentApprobationId) {
                         return $er->createQueryBuilder('u')
+                            ->leftJoin('u.approbations', 'a') // Assuming 'approbations' is a relationship in your User entity
                             ->where('u.roles NOT LIKE :role')
+                            ->andWhere('a.id = :currentApprobationId')
                             ->andWhere('u.id != :currentUserId')
                             ->setParameter('role', '%ROLE_SUPER_ADMIN%')
                             ->setParameter('currentUserId', $currentUserId)
+                            ->setParameter('currentApprobationId', $currentApprobationId)
                             ->orderBy('u.username', 'ASC');
                     },
                     'choice_label' => 'username', // Assuming your user entity has a 'username' property
@@ -94,7 +98,14 @@ class UploadType extends AbstractType
                     'multiple' => true, // Now the form can accept multiple approbators
                     'mapped' => false // This is the important part
                 ]
-            );
+            )
+            ->add('modificationType', ChoiceType::class, [
+                'mapped' => false,  // this tells Symfony not to expect the `modificationType` property on the entity
+                'choices' => [
+                    'Modification Mineure' => 'light-modification',
+                    'Modification Majeure' => 'heavy-modification',
+                ],
+            ]);
 
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             $data = $event->getData();
@@ -113,6 +124,7 @@ class UploadType extends AbstractType
             'data_class' => Upload::class,
             'current_user_id' => null,
             'current_upload_id' => null,
+            'current_approbation_id' => null,
         ]);
     }
 }

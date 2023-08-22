@@ -194,7 +194,7 @@ class UploadsService extends AbstractController
 
 
     // This function is responsible for the logic of modifying the uploads files
-    public function modifyFile(Upload $upload, User $user)
+    public function modifyFile(Upload $upload, User $user, Request $request)
     {
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
@@ -214,6 +214,17 @@ class UploadsService extends AbstractController
             $folderPath .= '/' . $part;
         }
         $Path = $folderPath . '/' . $upload->getFilename();
+
+        // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
+        foreach ($request->request->keys() as $key) {
+            if (strpos($key, 'validator_department') !== false) {
+                $validated = null;
+            } elseif (strpos($key, 'validator_user') !== false) {
+                $validated = null;
+            } else {
+                $validated = true;
+            }
+        }
 
         // If new file exists, process it and delete the old one
         if ($newFile) {
@@ -346,6 +357,6 @@ class UploadsService extends AbstractController
         $this->manager->persist($upload);
         $this->manager->flush();
 
-        $this->validationService->resetApprobation($upload);
+        $this->validationService->resetApprobation($upload, $request);
     }
 }

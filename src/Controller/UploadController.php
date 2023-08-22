@@ -32,7 +32,6 @@ class UploadController extends FrontController
     #[Route('/uploaded', name: 'uploaded_files')]
     public function uploaded_files(): Response
     {
-
         return $this->render(
             'services/uploads/uploaded.html.twig'
         );
@@ -87,8 +86,6 @@ class UploadController extends FrontController
         }
     }
 
-
-
     // create a route to download a file in more simple terms to display the file
     #[Route('/download/{uploadId}', name: 'download_file')]
     public function download_file(int $uploadId = null, Request $request): Response
@@ -123,7 +120,6 @@ class UploadController extends FrontController
     }
 
 
-
     // create a route to modify a file and or display the modification page
     #[Route('/modify/{uploadId}', name: 'modify_file')]
     public function modify_file(Request $request, int $uploadId, UploadsService $uploadsService): Response
@@ -149,12 +145,16 @@ class UploadController extends FrontController
 
         // Create a form to modify the Upload entity
         $form = $this->createForm(UploadType::class, $upload);
+
+        $form->remove('approbator');
+        $form->remove('modificationType');
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
-                $uploadsService->modifyFile($upload, $user);
+                $uploadsService->modifyFile($upload, $user, $request);
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirect($originUrl);
             } catch (\Exception $e) {

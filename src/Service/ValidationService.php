@@ -197,7 +197,7 @@ class ValidationService extends AbstractController
         return;
     }
 
-    public function resetApprobation(Upload $upload)
+    public function resetApprobation(Upload $upload, Request $request)
     {
         // Get the ID of the validation instance
         $validation = $upload->getValidation();
@@ -218,9 +218,18 @@ class ValidationService extends AbstractController
 
         // Loop through each Approbation instance
         foreach ($approbations as $approbation) {
-            // Remove the Approbation instance from the database
-            $approbation->setApproval(null);
-            $approbation->setComment(null);
+            //If it's a major modification reset all approbations
+            if ($request->request->get('modification-outlined') == 'heavy-modification') {
+                // Remove the Approbation instance from the database
+                $approbation->setApproval(null);
+                $approbation->setComment(null);
+            }
+            // If the Approbation is not approved or the Approval property is null
+            elseif ($approbation->isApproval() == false) {
+                // Remove the Approbation instance from the database
+                $approbation->setApproval(null);
+                $approbation->setComment(null);
+            }
         }
 
         // Persist the Approbation instance to the database

@@ -18,6 +18,8 @@ window.addEventListener("turbo:load", () => {
   const submitApprovalButtons = document.querySelectorAll(
     ".submit-approval"
   );
+  const submitDisapprovalModifcationButtons = document.querySelectorAll(
+    ".submit-disapproval-modification");
 
   const confirmationHandler = (event, message) => {
     const confirmed = confirm(message);
@@ -112,6 +114,14 @@ window.addEventListener("turbo:load", () => {
       confirmationHandler(
         event,
         "Êtes vous sûr de vouloir soumettre ce formulaire de validation?"
+      );
+    });
+  });
+  submitDisapprovalModifcationButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "Êtes vous sûr de vouloir soumettre ces modifications?"
       );
     });
   });
