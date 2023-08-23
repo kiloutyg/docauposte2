@@ -6,8 +6,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 
-use App\Service\AccountService;
-
 use App\Controller\UploadController;
 
 // This controller manage the logic of the front interface, it is the main controller of the application and is responsible for rendering the front interface.
@@ -40,7 +38,7 @@ class FrontController extends BaseController
 
     // This function is responsible for creating the super-admin account at the first connection of the application.
     #[Route('/createSuperAdmin', name: 'create_super_admin')]
-    public function createSuperAdmin(AccountService $accountService, Request $request): Response
+    public function createSuperAdmin(Request $request): Response
     {
         $users = [];
         $users  = $this->userRepository->findAll();
@@ -48,7 +46,7 @@ class FrontController extends BaseController
         if ($users == null) {
 
             $error = null;
-            $result = $accountService->createAccount(
+            $result = $this->accountService->createAccount(
                 $request,
                 $error,
             );

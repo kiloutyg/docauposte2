@@ -15,7 +15,7 @@ use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
 
 use App\Service\UploadService;
-use App\Service\IncidentsService;
+use App\Service\IncidentService;
 
 
 // This class is responsible for the logic of getting the related entities of a given entity
@@ -42,7 +42,7 @@ class EntityHeritanceService
         IncidentRepository $incidentRepository,
         UploadService $uploadService,
         IncidentCategoryRepository $incidentCategoryRepository,
-        IncidentsService $incidentsService,
+        IncidentService $incidentService,
     ) {
         $this->em = $em;
         $this->zoneRepository = $zoneRepository;
@@ -53,7 +53,7 @@ class EntityHeritanceService
         $this->uploadService = $uploadService;
         $this->incidentRepository = $incidentRepository;
         $this->incidentCategoryRepository = $incidentCategoryRepository;
-        $this->incidentService = $incidentsService;
+        $this->incidentService = $incidentService;
     }
 
     // This function returns an array of all the related uploads entities of a given entity

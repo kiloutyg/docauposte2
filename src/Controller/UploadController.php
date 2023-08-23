@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,7 +13,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 use App\Form\UploadType;
 
-use App\Service\UploadService;
 
 
 // This controlle is responsible for managing the logic of the upload interface
@@ -39,9 +37,8 @@ class UploadController extends FrontController
 
     // Create a route to upload a file, and pass the request to the UploadService to handle the file upload
     #[Route('/uploading', name: 'generic_upload_files')]
-    public function generic_upload_files(UploadService $uploadService, Request $request): Response
+    public function generic_upload_files(Request $request): Response
     {
-        $this->uploadService = $uploadService;
 
         // Get the URL of the page from which the request originated
         $originUrl = $request->headers->get('Referer');
@@ -108,12 +105,12 @@ class UploadController extends FrontController
     // create a route to delete a file
     #[Route('/delete/upload/{uploadId}', name: 'delete_file')]
 
-    public function delete_file(int $uploadId = null, UploadService $uploadService, Request $request): RedirectResponse
+    public function delete_file(int $uploadId = null, Request $request): RedirectResponse
     {
         $originUrl = $request->headers->get('Referer');
 
         // Use the UploadService to handle file deletion
-        $name = $uploadService->deleteFile($uploadId);
+        $name = $this->uploadService->deleteFile($uploadId);
         $this->addFlash('success', 'Le fichier  ' . $name . ' a été supprimé.');
 
         return $this->redirect($originUrl);
@@ -122,7 +119,7 @@ class UploadController extends FrontController
 
     // create a route to modify a file and or display the modification page
     #[Route('/modify/{uploadId}', name: 'modify_file')]
-    public function modify_file(Request $request, int $uploadId, UploadService $uploadService): Response
+    public function modify_file(Request $request, int $uploadId): Response
     {
         // Retrieve the current upload entity based on the uploadId
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
@@ -154,7 +151,7 @@ class UploadController extends FrontController
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
-                $uploadService->modifyFile($upload, $user, $request);
+                $this->uploadService->modifyFile($upload, $user, $request);
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirect($originUrl);
             } catch (\Exception $e) {

@@ -13,7 +13,6 @@ use App\Repository\ButtonRepository;
 use App\Repository\UploadRepository;
 
 use App\Entity\Upload;
-use App\Entity\Button;
 use App\Entity\User;
 
 use App\Service\FolderCreationService;

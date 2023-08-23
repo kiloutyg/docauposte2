@@ -42,7 +42,7 @@ use App\Service\EntityDeletionService;
 use App\Service\AccountService;
 use App\Service\UploadService;
 use App\Service\FolderCreationService;
-use App\Service\IncidentsService;
+use App\Service\IncidentService;
 use App\Service\EntityHeritanceService;
 use App\Service\ValidationService;
 
@@ -74,7 +74,7 @@ class BaseController extends AbstractController
     protected $public_dir;
     protected $folderCreationService;
     protected $incidentRepository;
-    protected $incidentsService;
+    protected $incidentService;
     protected $incidentCategoryRepository;
     protected $entityHeritanceService;
     protected $authChecker;
@@ -114,7 +114,7 @@ class BaseController extends AbstractController
         ParameterBagInterface           $params,
         FolderCreationService           $folderCreationService,
         IncidentRepository              $incidentRepository,
-        IncidentsService                $incidentsService,
+        IncidentService                $incidentService,
         IncidentCategoryRepository      $incidentCategoryRepository,
         EntityHeritanceService          $entityHeritanceService,
         AuthorizationCheckerInterface   $authChecker,
@@ -145,7 +145,7 @@ class BaseController extends AbstractController
         $this->public_dir                   = $this->projectDir . '/public';
         $this->folderCreationService        = $folderCreationService;
         $this->incidentRepository           = $incidentRepository;
-        $this->incidentsService             = $incidentsService;
+        $this->incidentService             = $incidentService;
         $this->incidentCategoryRepository   = $incidentCategoryRepository;
         $this->entityHeritanceService       = $entityHeritanceService;
         $this->authChecker                  = $authChecker;

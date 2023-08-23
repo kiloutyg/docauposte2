@@ -37,9 +37,9 @@ class CategoryManagerController extends BaseController
             $category->getId()
         );
 
-        // These functions are responsible for grouping the uploads and incidents by button and parent entity, it depends on the UploadsService and IncidentsService classes.
-        $groupedUploads = $this->uploadsService->groupUploads($uploads);
-        $groupIncidents = $this->incidentsService->groupIncidents($incidents);
+        // These functions are responsible for grouping the uploads and incidents by button and parent entity, it depends on the UploadService and IncidentService classes.
+        $groupedUploads = $this->uploadService->groupUploads($uploads);
+        $groupIncidents = $this->incidentService->groupIncidents($incidents);
 
         return $this->render('category_manager/category_manager_index.html.twig', [
             'groupedUploads'        => $groupedUploads,

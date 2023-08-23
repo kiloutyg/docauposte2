@@ -19,7 +19,7 @@ use App\Repository\UserRepository;
 use App\Repository\ValidationRepository;
 
 use App\Service\UploadService;
-use App\Service\IncidentsService;
+use App\Service\IncidentService;
 use App\Service\FolderCreationService;
 
 // use App\Entity\Validation;
@@ -55,7 +55,7 @@ class EntityDeletionService
         IncidentRepository $incidentRepository,
         UploadService $uploadService,
         IncidentCategoryRepository $incidentCategoryRepository,
-        IncidentsService $incidentsService,
+        IncidentService $incidentService,
         FolderCreationService $folderCreationService,
         DepartmentRepository $departmentRepository,
         UserRepository $userRepository,
@@ -71,7 +71,7 @@ class EntityDeletionService
         $this->uploadService = $uploadService;
         $this->incidentRepository = $incidentRepository;
         $this->incidentCategoryRepository = $incidentCategoryRepository;
-        $this->incidentService = $incidentsService;
+        $this->incidentService = $incidentService;
         $this->folderCreationService = $folderCreationService;
         $this->departmentRepository = $departmentRepository;
         $this->userRepository = $userRepository;

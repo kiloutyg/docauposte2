@@ -7,10 +7,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Validator\Constraints\All;
 
 use App\Form\UploadType;
-use App\Service\UploadsService;
 
 class ValidationController extends FrontController
 {
@@ -102,7 +100,7 @@ class ValidationController extends FrontController
 
     #[Route('/validation/disapproved/modify/{approbationId}', name: 'app_validation_disapproved_modify')]
 
-    public function disapprovedValidationModification(int $approbationId = null, UploadsService $uploadsService, Request $request): Response
+    public function disapprovedValidationModification(int $approbationId = null, Request $request): Response
     {
         $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
         $validation = $approbation->getValidation();
@@ -136,7 +134,7 @@ class ValidationController extends FrontController
             if ($form->isSubmitted() && $form->isValid()) {
                 $this->logger->info('result' . json_encode($form->isValid()));
 
-                $uploadsService->modifyDisapprovedFile($upload, $user, $request);
+                $this->uploadService->modifyDisapprovedFile($upload, $user, $request);
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirectToRoute('app_base');
             }
