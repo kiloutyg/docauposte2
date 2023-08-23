@@ -21,7 +21,7 @@ use App\Service\ValidationService;
 
 
 // This class is used to manage the uploads files and logic
-class UploadsService extends AbstractController
+class UploadService extends AbstractController
 {
     protected $uploadRepository;
     protected $manager;

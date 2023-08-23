@@ -14,7 +14,7 @@ use App\Repository\UploadRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
 
-use App\Service\UploadsService;
+use App\Service\UploadService;
 use App\Service\IncidentsService;
 
 
@@ -27,7 +27,7 @@ class EntityHeritanceService
     private $categoryRepository;
     private $buttonRepository;
     private $uploadRepository;
-    private $uploadsService;
+    private $uploadService;
     private $incidentRepository;
     private $incidentCategoryRepository;
     private $incidentService;
@@ -40,7 +40,7 @@ class EntityHeritanceService
         ButtonRepository $buttonRepository,
         UploadRepository $uploadRepository,
         IncidentRepository $incidentRepository,
-        UploadsService $uploadsService,
+        UploadService $uploadService,
         IncidentCategoryRepository $incidentCategoryRepository,
         IncidentsService $incidentsService,
     ) {
@@ -50,7 +50,7 @@ class EntityHeritanceService
         $this->categoryRepository = $categoryRepository;
         $this->buttonRepository = $buttonRepository;
         $this->uploadRepository = $uploadRepository;
-        $this->uploadsService = $uploadsService;
+        $this->uploadService = $uploadService;
         $this->incidentRepository = $incidentRepository;
         $this->incidentCategoryRepository = $incidentCategoryRepository;
         $this->incidentService = $incidentsService;

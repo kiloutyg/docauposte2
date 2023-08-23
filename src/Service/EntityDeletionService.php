@@ -18,7 +18,7 @@ use App\Repository\DepartmentRepository;
 use App\Repository\UserRepository;
 use App\Repository\ValidationRepository;
 
-use App\Service\UploadsService;
+use App\Service\UploadService;
 use App\Service\IncidentsService;
 use App\Service\FolderCreationService;
 
@@ -34,7 +34,7 @@ class EntityDeletionService
     private $categoryRepository;
     private $buttonRepository;
     private $uploadRepository;
-    private $uploadsService;
+    private $uploadService;
     private $incidentRepository;
     private $incidentCategoryRepository;
     private $incidentService;
@@ -53,7 +53,7 @@ class EntityDeletionService
         ButtonRepository $buttonRepository,
         UploadRepository $uploadRepository,
         IncidentRepository $incidentRepository,
-        UploadsService $uploadsService,
+        UploadService $uploadService,
         IncidentCategoryRepository $incidentCategoryRepository,
         IncidentsService $incidentsService,
         FolderCreationService $folderCreationService,
@@ -68,7 +68,7 @@ class EntityDeletionService
         $this->categoryRepository = $categoryRepository;
         $this->buttonRepository = $buttonRepository;
         $this->uploadRepository = $uploadRepository;
-        $this->uploadsService = $uploadsService;
+        $this->uploadService = $uploadService;
         $this->incidentRepository = $incidentRepository;
         $this->incidentCategoryRepository = $incidentCategoryRepository;
         $this->incidentService = $incidentsService;
@@ -169,7 +169,7 @@ class EntityDeletionService
             }
         } elseif ($entityType === 'upload') {
             $this->deleteEntity('validation', $entity->getValidation()->getId());
-            $this->uploadsService->deleteFile($entity->getId());
+            $this->uploadService->deleteFile($entity->getId());
         } elseif ($entityType === 'incident') {
             $this->incidentService->deleteIncidentFile($entity->getName(), $entity->getProductLine());
         } elseif ($entityType === 'department') {

@@ -40,7 +40,7 @@ use App\Repository\ApprobationRepository;
 
 use App\Service\EntityDeletionService;
 use App\Service\AccountService;
-use App\Service\UploadsService;
+use App\Service\UploadService;
 use App\Service\FolderCreationService;
 use App\Service\IncidentsService;
 use App\Service\EntityHeritanceService;
@@ -67,7 +67,7 @@ class BaseController extends AbstractController
     protected $buttonRepository;
     protected $entitydeletionService;
     protected $accountService;
-    protected $uploadsService;
+    protected $uploadService;
     protected $logger;
     protected $loggerInterface;
     protected $projectDir;
@@ -109,7 +109,7 @@ class BaseController extends AbstractController
         ButtonRepository                $buttonRepository,
         EntityDeletionService           $entitydeletionService,
         AccountService                  $accountService,
-        UploadsService                  $uploadsServices,
+        UploadService                  $uploadServices,
         LoggerInterface                 $loggerInterface,
         ParameterBagInterface           $params,
         FolderCreationService           $folderCreationService,
@@ -137,7 +137,7 @@ class BaseController extends AbstractController
         $this->passwordHasher               = $passwordHasher;
         $this->entitydeletionService        = $entitydeletionService;
         $this->accountService               = $accountService;
-        $this->uploadsService               = $uploadsServices;
+        $this->uploadService               = $uploadServices;
         $this->logger                       = $loggerInterface;
         $this->request                      = $this->requestStack->getCurrentRequest();
         $this->session                      = $this->requestStack->getSession();
