@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Category;
 
 // This controller manage the logic of the productline admin interface
-class ProductLineAdminController extends BaseController
+class ProductLineAdminController extends FrontController
 {
     #[Route('/productline_admin/{productline}', name: 'app_productline_admin')]
 

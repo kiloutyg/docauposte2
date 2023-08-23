@@ -16,7 +16,7 @@ use App\Entity\Department;
 
 
 // This controller manage the logic of the security interface
-class SecurityController extends BaseController
+class SecurityController extends FrontController
 {
 
     // This function is responsible for rendering the login interface 

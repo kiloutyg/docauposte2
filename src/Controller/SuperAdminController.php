@@ -12,7 +12,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use App\Entity\Zone;
 
 // This controller is responsible for rendering the super admin interface an managing the logic of the super admin interface
-class SuperAdminController extends BaseController
+class SuperAdminController extends FrontController
 {
 
     // This function is responsible for rendering the super admin interface

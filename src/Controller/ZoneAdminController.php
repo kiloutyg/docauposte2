@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\ProductLine;
 
 // This controller is responsible for rendering the zone admin interface an managing the logic of the zone admin interface
-class ZoneAdminController extends BaseController
+class ZoneAdminController extends FrontController
 {
     // This function is responsible for rendering the zone admin interface
     #[Route('/zone_admin/{zone}', name: 'app_zone_admin')]
