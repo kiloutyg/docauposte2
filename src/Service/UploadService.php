@@ -245,6 +245,10 @@ class UploadService extends AbstractController
             $upload->setPath($Path);
             // Update the uploader in the upload object
             $upload->setUploader($user);
+            // Reset the validation and approbation property
+            $request->request->set('modification-outlined', 'heavy-modification');
+
+            $this->validationService->resetApprobation($upload, $request);
         } else {
             // If no new file is uploaded, just rename the old one if necessary
             if ($oldFilePath != $Path) {

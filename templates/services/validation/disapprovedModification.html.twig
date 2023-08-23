@@ -33,6 +33,25 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						:
 					</h3>
 				</p>
+				{% set toBeCorrected = [] %}
+				{% for upload in app.user.uploads %}
+					{% if upload.isValidated is same as false %}
+						{% set toBeCorrected = toBeCorrected|merge([upload]) %}
+					{% endif %}
+				{% endfor %}
+				{% if toBeCorrected|length - 1 > 0  %}
+					<div class=" alert alert-danger m-0 justify-content-center">
+						<h5>
+							<strong>
+								Il reste
+								<span class="badge bg-danger rounded-pill">
+									{{toBeCorrected|length - 1}}
+								</span>
+								document(s) à valider
+							</strong>
+						</h5>
+					</div>
+				{% endif %}
 				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyDisapprovedForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_validation_disapproved_modify', {'approbationId': approbation.id})}) }}
 				<div class="fallback">
 
@@ -137,25 +156,6 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						</div>
 					</div>
 				</div>
-				{# <div class="accordion d-grid justify-content-center" id="accordionValidator">
-																																	<div class="accordion-item ">
-																																		<div class="accordion-header" id="validatorNeeded-header">
-																																			<input type="checkbox" class="btn-check" id="validatorRequired" autocomplete="off" value="true">
-																																			<label class="accordion-button m-0 mt-0 mb-0 mr-1 btn btn-outline-primary" for="validatorRequired" data-bs-toggle="collapse" data-bs-target="#validatorNeeded" aria-expanded="false" aria-controls="validatorNeeded" id="validatorSelect">Validation du Document</label>
-																																		</div>
-																																		<div id="validatorNeeded" aria-labelledby="validatorNeeded" data-bs-parent="#accordionValidator" class="accordion-collapse collapse ">
-																																			<div class="accordion-body ">
-																												
-																																				<div id="usersContainer ">
-																																					<div class="">
-																																						<label for="approbator" style="color:black">Valideur:</label>
-																																					</div>
-																																					{{ form_widget(form.approbator,{'attr': {'style': 'width: 100%', 'class': 'select2-enable ','name': 'approbator', 'id': 'approbator', 'required': true}}) }}
-																																				</div>
-																																			</div>
-																																		</div>
-																																	</div>
-																																</div> #}
 
 				<div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
 					<button type="submit" class="btn btn-primary mb-5 submit-disapproval-modification">Modifier</button>

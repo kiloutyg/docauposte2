@@ -101,6 +101,20 @@ class UploadController extends FrontController
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
+    // create a route to download a file in more simple terms to display the file
+    #[Route('/download/invalidation/{uploadId}', name: 'download_invalidation_file')]
+    public function download_invalidation_file(int $uploadId = null, Request $request): Response
+    {
+        // Retrieve the origin URL
+        $originUrl = $request->headers->get('Referer');
+
+        $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+
+        $path = $file->getPath();
+        $file       = new File($path);
+        return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
+    }
+
 
     // create a route to delete a file
     #[Route('/delete/upload/{uploadId}', name: 'delete_file')]
@@ -127,6 +141,7 @@ class UploadController extends FrontController
         $category = $button->getCategory();
         $productLine = $category->getProductLine();
         $zone = $productLine->getZone();
+
 
         // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');

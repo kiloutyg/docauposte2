@@ -197,23 +197,23 @@ class ValidationService extends AbstractController
 
     public function resetApprobation(Upload $upload, Request $request)
     {
+        if ($upload->getValidation() == null) {
+            return;
+        }
+        // Set the validated property of the Upload instance to null
+        $upload->setValidated(null);
         // Get the ID of the validation instance
         $validation = $upload->getValidation();
-
         // Remove the Validation instance from the database
         $validation->setStatus(null);
-
         // Persist the Validation instance to the database
         $this->em->persist($validation);
-
         // Flush changes to the database
         $this->em->flush();
         // Create an empty array to store Approbation instances
         $approbations = [];
-
         // Get the ID of the Validation instance
         $approbations = $validation->getApprobations();
-
         // Loop through each Approbation instance
         foreach ($approbations as $approbation) {
             //If it's a major modification reset all approbations

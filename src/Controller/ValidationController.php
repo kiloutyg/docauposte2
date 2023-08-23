@@ -12,6 +12,8 @@ use App\Form\UploadType;
 
 class ValidationController extends FrontController
 {
+
+    // Is not currently in use, but might get useful for the operator side validation. 
     #[Route('/validation/{uploadId}', name: 'app_validation')]
     public function validationViewBasePage(
         int $uploadId = null,

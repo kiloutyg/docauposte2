@@ -12,12 +12,26 @@
 
 
 {% block body %}
-	<div class="d-flex align-items-center  flex-row">
+	<div class="  d-flex align-items-center  flex-row">
 
 		<iframe src="{{ path('app_validation_approbation_file', { 'approbationId': approbation.id }) }}" width="69%" height="950" target="_blank"></iframe>
-		<div style="width: 31%" class="text-center">
-			{% block title %}Validation Page par
-				{{user.username}}
+		<div style="width: 31%" class="text-center card-body">
+
+			{% block title %}Page de validation de document par
+				<u>{{user.username}}</u><br>
+				{% set toBeValidated = [] %}
+				{% for approbation in app.user.approbations %}
+					{% if approbation.approval is same as null %}
+						{% set toBeValidated = toBeValidated|merge([approbation]) %}
+					{% endif %}
+				{% endfor %}
+				{% if toBeValidated|length - 1 > 0  %}
+					Il reste
+					<span class="badge bg-danger rounded-pill">
+						{{toBeValidated|length - 1}}
+					</span>
+					document(s) à valider
+				{% endif %}
 			{% endblock %}
 			<h2 style="text-align: center;">
 				<strong>{{approbation.validation.upload.filename|split('.')|first|upper}}</strong>
@@ -43,11 +57,12 @@
 							<textarea class="form-control  " name="approbationComment" aria-label="With textarea"></textarea>
 						</div>
 					</div>
-						<div style="height: 5vh;"></div>
+					<div style="height: 5vh;"></div>
 					<button type="submit" class="btn btn-primary btn-lg submit-approval">Envoyer</button>
 				</form>
 			</div>
 			<div style="height: 5vh;"></div>
+			<a class="btn btn-dark" href="{{ path('app_logout') }}">Déconnexion</a>
 
 
 		</div>
