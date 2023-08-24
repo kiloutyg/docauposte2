@@ -47,7 +47,7 @@ class UploadController extends FrontController
         $user = $this->getUser();
 
         // Retrieve the button and the newFileName from the request
-        $button = $request->request->get('button');
+        $button      = $request->request->get('button');
         $newFileName = $request->request->get('newFileName');
 
         // Find the Button entity in the repository based on its ID
@@ -55,12 +55,12 @@ class UploadController extends FrontController
 
         // Check if the file already exists by comparing the filename and the button
         $conflictFile = '';
-        $filename = '';
-        $file = $request->files->get('file');
+        $filename     = '';
+        $file         = $request->files->get('file');
         if ($newFileName) {
-            $filename   = $newFileName;
+            $filename = $newFileName;
         } else {
-            $filename   = $file->getClientOriginalName();
+            $filename = $file->getClientOriginalName();
         }
         $conflictFile = $this->uploadRepository->findOneBy(['button' => $buttonEntity, 'filename' => $filename]);
 
@@ -69,17 +69,12 @@ class UploadController extends FrontController
             $this->addFlash('error', 'Le fichier ' . $filename . ' existe déjà.');
             return $this->redirect($originUrl);
 
-            // If the request is POST and the file does not exist, pass the request to the service 
-        } else if ($request->isMethod('POST')) {
+        } else {
             // Use the UploadService to handle file uploads
             $name = $this->uploadService->uploadFiles($request, $buttonEntity, $user, $newFileName);
-            $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
+            $this->addFlash('success', 'Le document ' . $name . ' a été correctement chargé');
             return $this->redirect($originUrl);
 
-            // If the request is not POST, return an error message
-        } else {
-            $this->addFlash('error', 'Le fichier n\'a pas été posté correctement.');
-            return $this->redirect($originUrl);
         }
     }
 
@@ -97,7 +92,7 @@ class UploadController extends FrontController
             return $this->redirect($originUrl);
         }
         $path = $file->getPath();
-        $file       = new File($path);
+        $file = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
@@ -111,7 +106,7 @@ class UploadController extends FrontController
         $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
 
         $path = $file->getPath();
-        $file       = new File($path);
+        $file = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
@@ -136,11 +131,11 @@ class UploadController extends FrontController
     public function modify_file(Request $request, int $uploadId): Response
     {
         // Retrieve the current upload entity based on the uploadId
-        $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
-        $button = $upload->getButton();
-        $category = $button->getCategory();
+        $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $button      = $upload->getButton();
+        $category    = $button->getCategory();
         $productLine = $category->getProductLine();
-        $zone = $productLine->getZone();
+        $zone        = $productLine->getZone();
 
 
         // Retrieve the origin URL
@@ -198,12 +193,12 @@ class UploadController extends FrontController
 
         // If it's a GET request, render the form
         return $this->render('services/uploads/uploads_modification.html.twig', [
-            'form'          => $form->createView(),
-            'zone'          => $zone,
-            'productLine'   => $productLine,
-            'category'      => $category,
-            'button'        => $button,
-            'upload'        => $upload
+            'form'        => $form->createView(),
+            'zone'        => $zone,
+            'productLine' => $productLine,
+            'category'    => $category,
+            'button'      => $button,
+            'upload'      => $upload
         ]);
     }
 }

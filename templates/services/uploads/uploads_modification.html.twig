@@ -39,8 +39,9 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						<br>
 						<ul>
 							{% for approbation in upload.validation.approbations %}
-							<li>
-									{{ approbation.userapprobator.username }}{{ approbation.approval ? ' à valider' : ' n\'a pas rendu son avis'}}.
+								<li>
+									{{ approbation.userapprobator.username }}
+									{{ approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé' : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}
 								{% if approbation.comment is not empty %}
 									<ul>
 										<li>{{ approbation.comment }}
@@ -146,4 +147,4 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 		</div>
 	</div>
 </div>
-{% endblock %}
+{% endblock %} 

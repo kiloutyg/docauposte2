@@ -40,13 +40,13 @@ class UploadService extends AbstractController
         LoggerInterface $logger,
         validationService $validationService
     ) {
-        $this->uploadRepository = $uploadRepository;
-        $this->manager = $manager;
-        $this->projectDir = $params->get('kernel.project_dir');
-        $this->logger = $logger;
-        $this->buttonRepository = $buttonRepository;
+        $this->uploadRepository      = $uploadRepository;
+        $this->manager               = $manager;
+        $this->projectDir            = $params->get('kernel.project_dir');
+        $this->logger                = $logger;
+        $this->buttonRepository      = $buttonRepository;
         $this->folderCreationService = $folderCreationService;
-        $this->validationService = $validationService;
+        $this->validationService     = $validationService;
     }
 
     // This function is responsible for the logic of uploading the uploads files
@@ -65,15 +65,20 @@ class UploadService extends AbstractController
         foreach ($files as $file) {
 
             // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
-            foreach ($request->request->keys() as $key) {
-                if (strpos($key, 'validator_department') !== false) {
-                    $validated = null;
-                } elseif (strpos($key, 'validator_user') !== false) {
-                    $validated = null;
-                } else {
-                    $validated = true;
+            if ($request->request->get('validatorRequired') == 'true') {
+                foreach ($request->request->keys() as $key) {
+                    if (strpos($key, 'validator_department') !== false) {
+                        $validated = null;
+                    } elseif (strpos($key, 'validator_user') !== false) {
+                        $validated = null;
+                    } else {
+                        $validated = true;
+                    }
                 }
+            } else {
+                $validated = true;
             }
+            ;
 
             // Dynamic folder creation and file upload
 
@@ -116,14 +121,14 @@ class UploadService extends AbstractController
 
             // Check if a new filename is provided
             if ($newFileName) {
-                $filename   = $newFileName;
+                $filename = $newFileName;
             } else {
                 // Use the original filename of the file
-                $filename   = $file->getClientOriginalName();
+                $filename = $file->getClientOriginalName();
             }
 
             // Construct the full path of the file
-            $path       = $folderPath . '/' . $filename;
+            $path = $folderPath . '/' . $filename;
 
             // Move the file to the specified folder
             $file->move($folderPath . '/', $filename);
@@ -164,23 +169,23 @@ class UploadService extends AbstractController
     // This function is responsible for the logic of deleting the uploads files
     public function deleteFile(int $uploadId)
     {
-        $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
-        $filename = $upload->getFilename();
-        $name = $filename;
+        $upload     = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $filename   = $upload->getFilename();
+        $name       = $filename;
         $public_dir = $this->projectDir . '/public';
-        $button = $upload->getButton();
+        $button     = $upload->getButton();
 
         // Dynamic folder and file deletion
         $buttonname = $button->getName();
-        $parts = explode('.', $buttonname);
-        $parts = array_reverse($parts);
+        $parts      = explode('.', $buttonname);
+        $parts      = array_reverse($parts);
         $folderPath = $public_dir . '/doc';
 
         foreach ($parts as $part) {
             $folderPath .= '/' . $part;
         }
 
-        $path       = $folderPath . '/' . $filename;
+        $path = $folderPath . '/' . $filename;
 
         if (file_exists($path)) {
             unlink($path);
@@ -206,8 +211,8 @@ class UploadService extends AbstractController
         // New file path
         // Dynamic folder creation and file upload
         $buttonname = $upload->getButton()->getName();
-        $parts = explode('.', $buttonname);
-        $parts = array_reverse($parts);
+        $parts      = explode('.', $buttonname);
+        $parts      = array_reverse($parts);
         $folderPath = $public_dir . '/doc';
         foreach ($parts as $part) {
             $folderPath .= '/' . $part;
@@ -273,10 +278,10 @@ class UploadService extends AbstractController
 
         // Group uploads by zone, productLine, category, and button
         foreach ($uploads as $upload) {
-            $zoneName = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
+            $zoneName        = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
             $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
-            $categoryName = $upload->getButton()->getCategory()->getName();
-            $buttonName = $upload->getButton()->getName();
+            $categoryName    = $upload->getButton()->getCategory()->getName();
+            $buttonName      = $upload->getButton()->getName();
 
             if (!isset($groupedUploads[$zoneName])) {
                 $groupedUploads[$zoneName] = [];
@@ -315,8 +320,8 @@ class UploadService extends AbstractController
         // New file path
         // Dynamic folder creation and file upload
         $buttonname = $upload->getButton()->getName();
-        $parts = explode('.', $buttonname);
-        $parts = array_reverse($parts);
+        $parts      = explode('.', $buttonname);
+        $parts      = array_reverse($parts);
         $folderPath = $public_dir . '/doc';
         foreach ($parts as $part) {
             $folderPath .= '/' . $part;

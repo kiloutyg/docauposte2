@@ -30,8 +30,8 @@ class ValidationController extends FrontController
 
         return $this->render('services/validation/validation.html.twig', [
 
-            'upload'                => $upload,
-            'user'                  => $this->getUser(),
+            'upload' => $upload,
+            'user'   => $this->getUser(),
         ]);
     }
 
@@ -45,8 +45,8 @@ class ValidationController extends FrontController
 
         return $this->render('services/validation/approbation.html.twig', [
 
-            'approbation'           => $approbation,
-            'user'                  => $this->getUser(),
+            'approbation' => $approbation,
+            'user'        => $this->getUser(),
         ]);
     }
 
@@ -56,11 +56,11 @@ class ValidationController extends FrontController
     {
 
         $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
-        $validation = $approbation->getValidation();
-        $file = $validation->getUpload();
+        $validation  = $approbation->getValidation();
+        $file        = $validation->getUpload();
 
         $path = $file->getPath();
-        $file       = new File($path);
+        $file = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
@@ -81,7 +81,7 @@ class ValidationController extends FrontController
             return $this->redirect($originUrl);
         } else {
             $path = $file->getPath();
-            $file       = new File($path);
+            $file = new File($path);
             return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
         }
     }
@@ -100,26 +100,28 @@ class ValidationController extends FrontController
         return $this->redirectToRoute('app_base');
     }
 
+
+
     #[Route('/validation/disapproved/modify/{approbationId}', name: 'app_validation_disapproved_modify')]
 
     public function disapprovedValidationModification(int $approbationId = null, Request $request): Response
     {
         $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
-        $validation = $approbation->getValidation();
-        $upload = $validation->getUpload();
+        $validation  = $approbation->getValidation();
+        $upload      = $validation->getUpload();
 
         $approbations = [];
         $approbations = $validation->getApprobations(['Approval' => false]);
 
         $currentUser = $this->getUser();
-        $user = $this->userRepository->find($currentUser);
+        $user        = $this->userRepository->find($currentUser);
 
         // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
 
         $form = $this->createForm(UploadType::class, $upload, [
-            'current_user_id' => $user->getId(),
-            'current_upload_id' => $upload->getId(),
+            'current_user_id'        => $user->getId(),
+            'current_upload_id'      => $upload->getId(),
             'current_approbation_id' => $approbationId,
         ]);
 
@@ -143,11 +145,11 @@ class ValidationController extends FrontController
         }
 
         return $this->render('services/validation/disapprovedModification.html.twig', [
-            'approbation'           => $approbation,
-            'upload'                => $upload,
-            'user'                  => $this->getUser(),
-            'form'                  => $form->createView(),
-            'approbations'          => $approbations,
+            'approbation'  => $approbation,
+            'upload'       => $upload,
+            'user'         => $this->getUser(),
+            'form'         => $form->createView(),
+            'approbations' => $approbations,
 
         ]);
     }

@@ -21,7 +21,6 @@ use App\Entity\Approbation;
 
 
 class ValidationService extends AbstractController
-
 {
     protected $logger;
     protected $em;
@@ -32,21 +31,21 @@ class ValidationService extends AbstractController
     protected $approbationRepository;
 
     public function __construct(
-        LoggerInterface         $logger,
-        EntityManagerInterface  $em,
-        UploadRepository        $uploadRepository,
-        DepartmentRepository    $departmentRepository,
-        UserRepository          $userRepository,
-        ValidationRepository    $validationRepository,
-        ApprobationRepository   $approbationRepository
+        LoggerInterface $logger,
+        EntityManagerInterface $em,
+        UploadRepository $uploadRepository,
+        DepartmentRepository $departmentRepository,
+        UserRepository $userRepository,
+        ValidationRepository $validationRepository,
+        ApprobationRepository $approbationRepository
     ) {
-        $this->logger                   = $logger;
-        $this->em                       = $em;
-        $this->uploadRepository         = $uploadRepository;
-        $this->departmentRepository     = $departmentRepository;
-        $this->userRepository           = $userRepository;
-        $this->validationRepository     = $validationRepository;
-        $this->approbationRepository    = $approbationRepository;
+        $this->logger                = $logger;
+        $this->em                    = $em;
+        $this->uploadRepository      = $uploadRepository;
+        $this->departmentRepository  = $departmentRepository;
+        $this->userRepository        = $userRepository;
+        $this->validationRepository  = $validationRepository;
+        $this->approbationRepository = $approbationRepository;
     }
 
     public function createValidation(Upload $upload, Request $request)
@@ -69,7 +68,7 @@ class ValidationService extends AbstractController
         $validation->setUpload($upload);
 
         // Set the status of the Validation instance to false
-        $validation->setStatus(false);
+        $validation->setStatus(null);
 
         // Persist the Validation instance to the database
         $this->em->persist($validation);
@@ -161,36 +160,42 @@ class ValidationService extends AbstractController
         $approbations = [];
         // Find all Approbation instances associated with the Validation ID
         $approbations = $this->approbationRepository->findBy(['Validation' => $validationId]);
+        $status       = null;
         // Loop through each Approbation instance
         foreach ($approbations as $approbation) {
             // If the Approbation is not approved or the Approval property is null
-            if ($approbation->isApproval() == false || $approbation->isApproval() == null) {
-                // Set the status of the Validation instance to false
-                $validation->setStatus(false);
-                // Persist the Validation instance to the database
-                $this->em->persist($validation);
-                // Flush changes to the database
-                $this->em->flush();
-                $upload = $validation->getUpload();
-                $upload->setValidated(false);
-                $this->em->persist($upload);
-                $this->em->flush();
-                // Return early
+            if ($approbation->isApproval() === false) {
+                $status = false;
+                $this->updateValidationAndUploadStatus($validation, $status);
+                return;
+
+            } else if ($approbation->isApproval() === true) {
+                $status = true;
+
+            } else if ($approbation->isApproval() === null) {
+                $status = null;
                 return;
             }
         }
-        // If all Approbations are approved, set the status of the Validation instance to true
-        $validation->setStatus(true);
+        $this->updateValidationAndUploadStatus($validation, $status);
+        return;
+
+    }
+
+    public function updateValidationAndUploadStatus(Validation $validation, ?bool $status)
+    {
+        if ($validation->isStatus() === false) {
+            return;
+        }
+        $validation->setStatus($status);
         // Persist the Validation instance to the database
         $this->em->persist($validation);
         // Flush changes to the database
         $this->em->flush();
-
         $upload = $validation->getUpload();
-        $upload->setValidated(true);
+        $upload->setValidated($status);
         $this->em->persist($upload);
         $this->em->flush();
-
         // Return early
         return;
     }
