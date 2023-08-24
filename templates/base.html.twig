@@ -84,7 +84,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 									Documents refusés
 								</button>
 								<ul class="dropdown-menu dropdown-menu-start shadow shadow-inset" aria-labelledby="dropdownMenuButton1">
-									{% for upload in app.user.uploads %}
+									{% for upload in DisapprovedFile %}
 										{% for approbation in upload.validation.approbations %}
 											{% if approbation.isApproval is same as(false) %}
 												<li>

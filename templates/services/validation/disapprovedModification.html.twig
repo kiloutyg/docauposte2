@@ -58,17 +58,17 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					{% for approbation in approbations %}
 						{% if approbation.comment is not empty and approbation.approval is same as false %}
 							<blockquote class="blockquote text-center">
+								<cite title="Source Title" style="color:black">Commentaire de refus</cite>
 								<p class="mb-2">{{approbation.comment}}</p>
 								<footer class="blockquote-footer" style="color:black">{{approbation.UserApprobator.username}}
-									<cite title="Source Title" style="color:black">Commentaire de refus</cite>
 								</footer>
 							</blockquote>
 						{% endif %}
 						{% if approbation.comment is not empty and approbation.approval is same as true %}
 							<blockquote class="blockquote text-center">
+								<cite title="Source Title" style="color:black">Commentaire de Validation</cite>
 								<p class="mb-2">{{approbation.comment}}</p>
 								<footer class="blockquote-footer" style="color:black">{{approbation.UserApprobator.username}}
-									<cite title="Source Title" style="color:black">Commentaire de Validation</cite>
 								</footer>
 							</blockquote>
 						{% endif %}

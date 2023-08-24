@@ -12,34 +12,54 @@
 
 
 {% block body %}
-	<div class="  d-flex align-items-center  flex-row">
+<div class="  d-flex align-items-center  flex-row">
 
-		<iframe src="{{ path('app_validation_approbation_file', { 'approbationId': approbation.id }) }}" width="69%" height="950" target="_blank"></iframe>
-		<div style="width: 31%" class="text-center card-body">
+	<iframe src="{{ path('app_validation_approbation_file', { 'approbationId': approbation.id }) }}" width="69%" height="950" target="_blank"></iframe>
+	<div style="width: 31%" class="text-center card-body">
 
-			{% block title %}Page de validation de document par
-				<u>{{user.username}}</u><br>
-				{% set toBeValidated = [] %}
-				{% for approbation in app.user.approbations %}
-					{% if approbation.approval is same as null %}
-						{% set toBeValidated = toBeValidated|merge([approbation]) %}
-					{% endif %}
-				{% endfor %}
-				{% if toBeValidated|length - 1 > 0  %}
-					Il reste
-					<span class="badge bg-danger rounded-pill">
-						{{toBeValidated|length - 1}}
-					</span>
-					document(s) à valider
+		{% block title %}Page de validation de document par
+			<u>{{user.username}}</u><br>
+			{% set toBeValidated = [] %}
+			{% for approbation in app.user.approbations %}
+				{% if approbation.approval is same as null %}
+					{% set toBeValidated = toBeValidated|merge([approbation]) %}
 				{% endif %}
-			{% endblock %}
-			<h2 style="text-align: center;">
-				<strong>{{approbation.validation.upload.filename|split('.')|first|upper}}</strong>
-			</h2>
+			{% endfor %}
+			{% if toBeValidated|length - 1 > 0  %}
+				Il reste
+				<span class="badge bg-danger rounded-pill">
+					{{toBeValidated|length - 1}}
+				</span>
+				document(s) à valider
+			{% endif %}
+		{% endblock %}
+		<h2 style="text-align: center;">
+			<strong>{{approbation.validation.upload.filename|split('.')|first|upper}}</strong>
+		</h2>
 
-			<h3 style="text-align: center;">
-				{{approbation.validation.upload.button.name|split('.')|first|upper}}
-			</h3>
+		<h3 style="text-align: center;">
+			{{approbation.validation.upload.button.name|split('.')|first|upper}}
+		</h3>
+
+		{% set validation = approbation.validation %}
+		{% set approbations = validation.approbations %}
+		{% for approbation in approbations %}
+			<ul>
+				{% if app.user != approbation.userapprobator  %}
+					<u>{{ approbation.userapprobator.username|capitalize }}</u>
+					{{ approbation.approval ? ' à valider' : ' n\'a pas rendu son avis'}}.
+					
+					{% if approbation.comment is not empty %}
+					
+						<ul>
+						En commentant :
+						<br>
+							- {{ approbation.comment }}
+						</ul>
+					{% endif %}
+				{% endif %}
+			</ul>
+    	{% endfor %}
 
 			<div style="height: 5vh;"></div>
 			<div class="d-flex justify-content-center align-items-center">
