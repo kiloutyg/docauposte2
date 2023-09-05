@@ -72,7 +72,7 @@ DATABASE_URL=mysql://root:\${MYSQL_ROOT_PASSWORD}@database/\${MYSQL_DATABASE}?se
 ###< symfony/messenger ###
 
 ###> symfony/mailer ###
-# MAILER_DSN=null://null
+MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0
 ###< symfony/mailer ###
 EOL
 

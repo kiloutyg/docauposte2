@@ -36,7 +36,6 @@ services:
       - ./:/var/www
     ports:
       - "80:80"
-      - "25:25"
     depends_on:
       - database
     networks:
