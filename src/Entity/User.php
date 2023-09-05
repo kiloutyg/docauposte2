@@ -38,17 +38,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'uploader', targetEntity: Upload::class)]
     private Collection $uploads;
 
-    #[ORM\ManyToMany(targetEntity: Validation::class, mappedBy: 'validator')]
-    private Collection $validations;
-
     #[ORM\OneToMany(mappedBy: 'Uploader', targetEntity: Incident::class)]
     private Collection $incidents;
+
+    #[ORM\OneToMany(mappedBy: 'UserApprobator', targetEntity: Approbation::class)]
+    private Collection $approbations;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $blocked = null;
+
 
     public function __construct()
     {
         $this->uploads = new ArrayCollection();
-        $this->validations = new ArrayCollection();
         $this->incidents = new ArrayCollection();
+        $this->approbations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -175,32 +179,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Validation>
-     */
-    public function getValidations(): Collection
-    {
-        return $this->validations;
-    }
-
-    public function addValidation(Validation $validation): static
-    {
-        if (!$this->validations->contains($validation)) {
-            $this->validations->add($validation);
-            $validation->addValidator($this);
-        }
-
-        return $this;
-    }
-
-    public function removeValidation(Validation $validation): static
-    {
-        if ($this->validations->removeElement($validation)) {
-            $validation->removeValidator($this);
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Incident>
@@ -228,6 +206,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $incident->setUploader(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Approbation>
+     */
+    public function getApprobations(): Collection
+    {
+        return $this->approbations;
+    }
+
+    public function addApprobation(Approbation $approbation): static
+    {
+        if (!$this->approbations->contains($approbation)) {
+            $this->approbations->add($approbation);
+            $approbation->setUserApprobator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApprobation(Approbation $approbation): static
+    {
+        if ($this->approbations->removeElement($approbation)) {
+            // set the owning side to null (unless already changed)
+            if ($approbation->getUserApprobator() === $this) {
+                $approbation->setUserApprobator(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isBlocked(): ?bool
+    {
+        return $this->blocked;
+    }
+
+    public function setBlocked(?bool $blocked): static
+    {
+        $this->blocked = $blocked;
 
         return $this;
     }

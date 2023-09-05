@@ -6,6 +6,7 @@ use App\Repository\ProductLineRepository;
 
 use App\Entity\Incident;
 use App\Entity\ProductLine;
+use App\Entity\IncidentCategory;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\AbstractType;
@@ -56,6 +57,18 @@ class IncidentType extends AbstractType
                     'label' => 'Select a productline:',
                     'placeholder' => 'Choisir un Produit',
                     'required' => true,
+                    'multiple' => false,
+                ]
+            )
+            ->add(
+                'incidentCategory',
+                EntityType::class,
+                [
+                    'class' => IncidentCategory::class,
+                    'choice_label' => 'name',
+                    'label' => 'Select an incident category:',
+                    'placeholder' => 'Choisir un type d\'incident',
+                    'required' => false,
                     'multiple' => false,
                 ]
             );

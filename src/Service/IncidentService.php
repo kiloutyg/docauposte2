@@ -14,14 +14,13 @@ use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
 
 use App\Entity\Incident;
-use App\Entity\ProductLine;
 use App\Entity\User;
 
 use App\Service\FolderCreationService;
 
 
 // This class is responsible for the logic of managing the incidents files
-class IncidentsService extends AbstractController
+class IncidentService extends AbstractController
 {
 
     protected $incidentRepository;
@@ -40,7 +39,7 @@ class IncidentsService extends AbstractController
         ParameterBagInterface $params,
         IncidentRepository $incidentRepository,
         LoggerInterface $logger,
-        IncidentCategoryRepository $incidentCategoryRepository,
+        IncidentCategoryRepository $incidentCategoryRepository
     ) {
         $this->incidentRepository = $incidentRepository;
         $this->manager = $manager;

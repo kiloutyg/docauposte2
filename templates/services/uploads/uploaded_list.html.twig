@@ -50,7 +50,7 @@
 																		{{ buttonName|split('.')|first|upper }}
 																		{% for upload in buttonKey %}
 																			<li class="list-group-item d-flex justify-content-between align-items-center mb-3 shadow-lg">
-																				<a href="{{ path('app_download_file', { 'filename': upload.filename }) }}" class="btn btn-link" target="_blank">
+																				<a href="{{ path('app_download_file', { 'uploadId': upload.id }) }}" class="btn btn-link" target="_blank">
 																					-
 																					{{ upload.filename|upper }}
 
@@ -70,7 +70,7 @@
 																									Modifier
 																								</a>
 
-																								<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id, originUrl : app.request.uri }) }}" class="btn btn-danger delete-upload shadow">
+																								<a href="{{ path('app_delete_file', { uploadId: upload.id }) }}" class="btn btn-danger delete-upload shadow">
 																									Supprimer
 																								</a>
 																							</div>

@@ -24,6 +24,8 @@ use App\Repository\ButtonRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
 use App\Repository\DepartmentRepository;
+use App\Repository\ValidationRepository;
+use App\Repository\ApprobationRepository;
 
 // use App\Entity\Zone;
 // use App\Entity\ProductLine;
@@ -38,9 +40,9 @@ use App\Repository\DepartmentRepository;
 
 use App\Service\EntityDeletionService;
 use App\Service\AccountService;
-use App\Service\UploadsService;
+use App\Service\UploadService;
 use App\Service\FolderCreationService;
-use App\Service\IncidentsService;
+use App\Service\IncidentService;
 use App\Service\EntityHeritanceService;
 use App\Service\ValidationService;
 
@@ -65,19 +67,21 @@ class BaseController extends AbstractController
     protected $buttonRepository;
     protected $entitydeletionService;
     protected $accountService;
-    protected $uploadsService;
+    protected $uploadService;
     protected $logger;
     protected $loggerInterface;
     protected $projectDir;
     protected $public_dir;
     protected $folderCreationService;
     protected $incidentRepository;
-    protected $incidentsService;
+    protected $incidentService;
     protected $incidentCategoryRepository;
     protected $entityHeritanceService;
     protected $authChecker;
     protected $departmentRepository;
     protected $validationService;
+    protected $approbationRepository;
+    protected $validationRepository;
 
     // Variables used in the twig templates to display all the entities
     protected $departments;
@@ -105,17 +109,19 @@ class BaseController extends AbstractController
         ButtonRepository                $buttonRepository,
         EntityDeletionService           $entitydeletionService,
         AccountService                  $accountService,
-        UploadsService                  $uploadsServices,
+        UploadService                  $uploadServices,
         LoggerInterface                 $loggerInterface,
         ParameterBagInterface           $params,
         FolderCreationService           $folderCreationService,
         IncidentRepository              $incidentRepository,
-        IncidentsService                $incidentsService,
+        IncidentService                $incidentService,
         IncidentCategoryRepository      $incidentCategoryRepository,
         EntityHeritanceService          $entityHeritanceService,
         AuthorizationCheckerInterface   $authChecker,
         DepartmentRepository            $departmentRepository,
-        ValidationService               $validationService
+        ValidationService               $validationService,
+        ApprobationRepository           $approbationRepository,
+        ValidationRepository            $validationRepository
 
     ) {
 
@@ -131,7 +137,7 @@ class BaseController extends AbstractController
         $this->passwordHasher               = $passwordHasher;
         $this->entitydeletionService        = $entitydeletionService;
         $this->accountService               = $accountService;
-        $this->uploadsService               = $uploadsServices;
+        $this->uploadService               = $uploadServices;
         $this->logger                       = $loggerInterface;
         $this->request                      = $this->requestStack->getCurrentRequest();
         $this->session                      = $this->requestStack->getSession();
@@ -139,12 +145,14 @@ class BaseController extends AbstractController
         $this->public_dir                   = $this->projectDir . '/public';
         $this->folderCreationService        = $folderCreationService;
         $this->incidentRepository           = $incidentRepository;
-        $this->incidentsService             = $incidentsService;
+        $this->incidentService             = $incidentService;
         $this->incidentCategoryRepository   = $incidentCategoryRepository;
         $this->entityHeritanceService       = $entityHeritanceService;
         $this->authChecker                  = $authChecker;
         $this->departmentRepository         = $departmentRepository;
         $this->validationService            = $validationService;
+        $this->approbationRepository        = $approbationRepository;
+        $this->validationRepository         = $validationRepository;
         // Variables used in the twig templates to display all the entities
         $this->zones                        = $this->zoneRepository->findAll();
         $this->productLines                 = $this->productLineRepository->findAll();

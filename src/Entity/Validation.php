@@ -19,19 +19,15 @@ class Validation
     #[ORM\JoinColumn(nullable: false)]
     private ?Upload $Upload = null;
 
-    #[ORM\ManyToMany(targetEntity: Department::class, inversedBy: 'validations')]
-    private Collection $department;
+    #[ORM\Column(nullable: true)]
+    private ?bool $Status = null;
 
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'validations')]
-    private Collection $validator;
-
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
+    #[ORM\OneToMany(mappedBy: 'Validation', targetEntity: Approbation::class, orphanRemoval: true)]
+    private Collection $approbations;
 
     public function __construct()
     {
-        $this->department = new ArrayCollection();
-        $this->validator = new ArrayCollection();
+        $this->approbations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -51,62 +47,44 @@ class Validation
         return $this;
     }
 
-    /**
-     * @return Collection<int, Department>
-     */
-    public function getDepartment(): Collection
+    public function isStatus(): ?bool
     {
-        return $this->department;
+        return $this->Status;
     }
 
-    public function addDepartment(Department $department): static
+    public function setStatus(?bool $Status): static
     {
-        if (!$this->department->contains($department)) {
-            $this->department->add($department);
-        }
-
-        return $this;
-    }
-
-    public function removeDepartment(Department $department): static
-    {
-        $this->department->removeElement($department);
+        $this->Status = $Status;
 
         return $this;
     }
 
     /**
-     * @return Collection<int, User>
+     * @return Collection<int, Approbation>
      */
-    public function getValidator(): Collection
+    public function getApprobations(): Collection
     {
-        return $this->validator;
+        return $this->approbations;
     }
 
-    public function addValidator(User $validator): static
+    public function addApprobation(Approbation $approbation): static
     {
-        if (!$this->validator->contains($validator)) {
-            $this->validator->add($validator);
+        if (!$this->approbations->contains($approbation)) {
+            $this->approbations->add($approbation);
+            $approbation->setValidation($this);
         }
 
         return $this;
     }
 
-    public function removeValidator(User $validator): static
+    public function removeApprobation(Approbation $approbation): static
     {
-        $this->validator->removeElement($validator);
-
-        return $this;
-    }
-
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): static
-    {
-        $this->status = $status;
+        if ($this->approbations->removeElement($approbation)) {
+            // set the owning side to null (unless already changed)
+            if ($approbation->getValidation() === $this) {
+                $approbation->setValidation(null);
+            }
+        }
 
         return $this;
     }

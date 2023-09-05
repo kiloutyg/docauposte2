@@ -14,10 +14,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Entity\User;
 use App\Entity\Department;
 
-use App\Service\AccountService;
 
 // This controller manage the logic of the security interface
-class SecurityController extends BaseController
+class SecurityController extends FrontController
 {
 
     // This function is responsible for rendering the login interface 
@@ -62,10 +61,10 @@ class SecurityController extends BaseController
 
     // This function manage the logic of the account modifiying
     #[Route(path: '/modify_account', name: 'app_modify_account')]
-    public function modify_account(AccountService $accountService, UserInterface $currentUser, AuthenticationUtils $authenticationUtils, Request $request)
+    public function modify_account(UserInterface $currentUser, AuthenticationUtils $authenticationUtils, Request $request)
     {
         $error = $authenticationUtils->getLastAuthenticationError();
-        $usermod = $accountService->modifyAccount($request, $currentUser);
+        $usermod = $this->accountService->modifyAccount($request, $currentUser);
 
         if ($usermod instanceof User) {
             $this->addFlash('success', 'Le compte ' . $usermod->getUsername() . ' a été modifié');
@@ -84,16 +83,35 @@ class SecurityController extends BaseController
     }
 
     // This function is responsible for managing the logic of the account deletion
-    #[Route(path: '/delete_account', name: 'app_delete_account')]
-    public function delete_account(AccountService $accountService, Request $request): Response
+    #[Route(path: '/delete_account/basic', name: 'app_delete_account_basic')]
+    public function delete_account_basic(Request $request): Response
     {
         $id = $request->query->get('id');
-        $accountService->deleteUser($id);
-        // $originUrl = $request->headers->get('referer');
+        $user = $this->userRepository->findOneBy(['id' => $id]);
+
+        if ($user->getIncidents()->isEmpty() && $user->getUploads()->isEmpty() && $user->getApprobations()->isEmpty()) {
+            $this->accountService->deleteUser($id);
+            $this->addFlash('success',  'Le compte a été supprimé');
+        } else {
+            $this->addFlash('danger',  'Le compte ne peut pas être supprimé car il est lié à des incidents, des uploads, des validations ou des approbations. Il a été bloqué');
+            $this->accountService->blockUser($id);
+        }
+
+        return $this->redirectToRoute('app_super_admin');
+    }
+
+    // This function is responsible for managing the logic of the account deletion
+    #[Route(path: '/delete_account', name: 'app_delete_account')]
+    public function delete_account(Request $request): Response
+    {
+        $id = $request->query->get('id');
+
+        $this->accountService->deleteUser($id);
         $this->addFlash('success',  'Le compte a été supprimé');
 
         return $this->redirectToRoute('app_super_admin');
     }
+
 
     // Logic to create a new department and display a message
     #[Route('/department/department_creation', name: 'department_creation')]

@@ -8,14 +8,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-use App\Service\AccountService;
-
 
 use App\Entity\Button;
 
 // This controller manage the logic of the category's admin interface
 
-class CategoryManagerController extends BaseController
+class CategoryManagerController extends FrontController
 {
 
     #[Route('/category_manager/{category}', name: 'app_category_manager')]
@@ -37,9 +35,9 @@ class CategoryManagerController extends BaseController
             $category->getId()
         );
 
-        // These functions are responsible for grouping the uploads and incidents by button and parent entity, it depends on the UploadsService and IncidentsService classes.
-        $groupedUploads = $this->uploadsService->groupUploads($uploads);
-        $groupIncidents = $this->incidentsService->groupIncidents($incidents);
+        // These functions are responsible for grouping the uploads and incidents by button and parent entity, it depends on the UploadService and IncidentService classes.
+        $groupedUploads = $this->uploadService->groupUploads($uploads);
+        $groupIncidents = $this->incidentService->groupIncidents($incidents);
 
         return $this->render('category_manager/category_manager_index.html.twig', [
             'groupedUploads'        => $groupedUploads,
@@ -61,13 +59,13 @@ class CategoryManagerController extends BaseController
     #[Route('/category_manager/create_user/{category}', name: 'app_category_manager_create_user')]
 
     // This function is responsible for creating a new user, it's access is restricted on the frontend
-    public function createUser(string $category = null, AccountService $accountService, Request $request): Response
+    public function createUser(string $category = null, Request $request): Response
     {
         $category    = $this->categoryRepository->findoneBy(['name' => $category]);
 
         $error = null;
         // This function is responsible for creating a new user, it depends on the AccountService class.
-        $result = $accountService->createAccount(
+        $result = $this->accountService->createAccount(
             $request,
             $error,
         );
