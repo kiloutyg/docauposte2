@@ -10,6 +10,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\User;
 
 use App\Repository\UserRepository;
+use App\Repository\DepartmentRepository;
+
+use App\Service\EntityDeletionService;
 
 // This class is responsible for managing the user accounts logic
 class AccountService
@@ -17,15 +20,21 @@ class AccountService
     private $passwordHasher;
     private $userRepository;
     private $manager;
+    private $departmentRepository;
+    private $entityDeletionService;
 
     public function __construct(
         UserPasswordHasherInterface $passwordHasher,
         UserRepository $userRepository,
-        EntityManagerInterface $manager
+        EntityManagerInterface $manager,
+        DepartmentRepository $departmentRepository,
+        EntityDeletionService $entityDeletionService
     ) {
         $this->passwordHasher = $passwordHasher;
         $this->userRepository = $userRepository;
         $this->manager = $manager;
+        $this->departmentRepository = $departmentRepository;
+        $this->entityDeletionService = $entityDeletionService;
     }
 
     // This function is responsible for creating a new user account and persisting it to the database
@@ -35,6 +44,10 @@ class AccountService
             $name = $request->request->get('username');
             $password = $request->request->get('password');
             $role = $request->request->get('role');
+            $departmentId = $request->request->get('department');
+            $department = $this->departmentRepository->findOneBy(['id' => $departmentId]);
+            $emailAddress = $request->request->get('emailAddress');
+
 
             // check if the username is already in use
             $user = $this->userRepository->findOneBy(['username' => $name]);
@@ -47,6 +60,8 @@ class AccountService
                 $user->setUsername($name);
                 $user->setPassword($password);
                 $user->setRoles([$role]);
+                $user->setDepartment($department);
+                $user->setEmailAddress($emailAddress);
                 $this->manager->persist($user);
                 $this->manager->flush();
 
@@ -64,6 +79,9 @@ class AccountService
             $newName = $request->request->get('username');
             $password = $request->request->get('password');
             $role = $request->request->get('role');
+            $departmentId = $request->request->get('department');
+            $department = $this->departmentRepository->findOneBy(['id' => $departmentId]);
+            $emailAddress = $request->request->get('emailAddress');
 
             // Check if the username is already in use
             $user = $this->userRepository->findOneBy(['username' => $name]); // Look up the user by the current_username
@@ -79,6 +97,8 @@ class AccountService
                     $user->setUsername($newName); // Set the new username
                     $user->setPassword($password);
                     $user->setRoles([$role]);
+                    $user->setDepartment($department);
+                    $user->setEmailAddress($emailAddress);
                     $this->manager->persist($user);
                     $this->manager->flush();
 
@@ -94,7 +114,21 @@ class AccountService
     public function deleteUser($id)
     {
         $user = $this->userRepository->find($id);
+        $this->entityDeletionService->deleteEntity('user', $id);
+
         $this->manager->remove($user);
+        $this->manager->flush();
+    }
+
+    // This function is responsible for blocking a user account
+
+    public function blockUser($id)
+    {
+        $user = $this->userRepository->find($id);
+        $user->setBlocked(true);
+        $user->setPassword('');
+        $user->setRoles(['ROLE_USER']);
+        $this->manager->persist($user);
         $this->manager->flush();
     }
 }

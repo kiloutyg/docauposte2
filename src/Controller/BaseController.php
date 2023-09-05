@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
+use Symfony\Component\HttpFoundation\Response;
+
 use App\Repository\ZoneRepository;
 use App\Repository\ProductLineRepository;
 use App\Repository\UserRepository;
@@ -21,23 +23,28 @@ use App\Repository\CategoryRepository;
 use App\Repository\ButtonRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
+use App\Repository\DepartmentRepository;
+use App\Repository\ValidationRepository;
+use App\Repository\ApprobationRepository;
 
-use App\Entity\Zone;
-use App\Entity\ProductLine;
-use App\Entity\User;
-use App\Entity\Upload;
-use App\Entity\Category;
-use App\Entity\Button;
-use App\Entity\Signature;
-use App\Entity\Incident;
-use App\Entity\IncidentCategory;
+// use App\Entity\Zone;
+// use App\Entity\ProductLine;
+// use App\Entity\User;
+// use App\Entity\Upload;
+// use App\Entity\Category;
+// use App\Entity\Button;
+// use App\Entity\Signature;
+// use App\Entity\Incident;
+// use App\Entity\IncidentCategory;
+// use App\Entity\Service;
 
 use App\Service\EntityDeletionService;
 use App\Service\AccountService;
-use App\Service\UploadsService;
+use App\Service\UploadService;
 use App\Service\FolderCreationService;
-use App\Service\IncidentsService;
+use App\Service\IncidentService;
 use App\Service\EntityHeritanceService;
+use App\Service\ValidationService;
 
 
 #[Route('/', name: 'app_')]
@@ -60,42 +67,61 @@ class BaseController extends AbstractController
     protected $buttonRepository;
     protected $entitydeletionService;
     protected $accountService;
-    protected $uploadsService;
+    protected $uploadService;
     protected $logger;
     protected $loggerInterface;
     protected $projectDir;
     protected $public_dir;
     protected $folderCreationService;
     protected $incidentRepository;
-    protected $incidentsService;
+    protected $incidentService;
     protected $incidentCategoryRepository;
     protected $entityHeritanceService;
     protected $authChecker;
+    protected $departmentRepository;
+    protected $validationService;
+    protected $approbationRepository;
+    protected $validationRepository;
+
+    // Variables used in the twig templates to display all the entities
+    protected $departments;
+    protected $zones;
+    protected $productLines;
+    protected $users;
+    protected $uploads;
+    protected $categories;
+    protected $buttons;
+    protected $incidents;
+    protected $incidentCategories;
 
 
 
     public function __construct(
-        UploadRepository            $uploadRepository,
-        ZoneRepository              $zoneRepository,
-        ProductLineRepository       $productLineRepository,
-        UserRepository              $userRepository,
-        EntityManagerInterface      $em,
-        RequestStack                $requestStack,
-        Security                    $security,
-        UserPasswordHasherInterface $passwordHasher,
-        CategoryRepository          $categoryRepository,
-        ButtonRepository            $buttonRepository,
-        EntityDeletionService       $entitydeletionService,
-        AccountService              $accountService,
-        UploadsService              $uploadsServices,
-        LoggerInterface             $loggerInterface,
-        ParameterBagInterface       $params,
-        FolderCreationService       $folderCreationService,
-        IncidentRepository          $incidentRepository,
-        IncidentsService            $incidentsService,
-        IncidentCategoryRepository  $incidentCategoryRepository,
-        EntityHeritanceService      $entityHeritanceService,
-        AuthorizationCheckerInterface $authChecker
+        UploadRepository                $uploadRepository,
+        ZoneRepository                  $zoneRepository,
+        ProductLineRepository           $productLineRepository,
+        UserRepository                  $userRepository,
+        EntityManagerInterface          $em,
+        RequestStack                    $requestStack,
+        Security                        $security,
+        UserPasswordHasherInterface     $passwordHasher,
+        CategoryRepository              $categoryRepository,
+        ButtonRepository                $buttonRepository,
+        EntityDeletionService           $entitydeletionService,
+        AccountService                  $accountService,
+        UploadService                  $uploadServices,
+        LoggerInterface                 $loggerInterface,
+        ParameterBagInterface           $params,
+        FolderCreationService           $folderCreationService,
+        IncidentRepository              $incidentRepository,
+        IncidentService                $incidentService,
+        IncidentCategoryRepository      $incidentCategoryRepository,
+        EntityHeritanceService          $entityHeritanceService,
+        AuthorizationCheckerInterface   $authChecker,
+        DepartmentRepository            $departmentRepository,
+        ValidationService               $validationService,
+        ApprobationRepository           $approbationRepository,
+        ValidationRepository            $validationRepository
 
     ) {
 
@@ -111,7 +137,7 @@ class BaseController extends AbstractController
         $this->passwordHasher               = $passwordHasher;
         $this->entitydeletionService        = $entitydeletionService;
         $this->accountService               = $accountService;
-        $this->uploadsService               = $uploadsServices;
+        $this->uploadService               = $uploadServices;
         $this->logger                       = $loggerInterface;
         $this->request                      = $this->requestStack->getCurrentRequest();
         $this->session                      = $this->requestStack->getSession();
@@ -119,9 +145,42 @@ class BaseController extends AbstractController
         $this->public_dir                   = $this->projectDir . '/public';
         $this->folderCreationService        = $folderCreationService;
         $this->incidentRepository           = $incidentRepository;
-        $this->incidentsService             = $incidentsService;
+        $this->incidentService             = $incidentService;
         $this->incidentCategoryRepository   = $incidentCategoryRepository;
         $this->entityHeritanceService       = $entityHeritanceService;
         $this->authChecker                  = $authChecker;
+        $this->departmentRepository         = $departmentRepository;
+        $this->validationService            = $validationService;
+        $this->approbationRepository        = $approbationRepository;
+        $this->validationRepository         = $validationRepository;
+        // Variables used in the twig templates to display all the entities
+        $this->zones                        = $this->zoneRepository->findAll();
+        $this->productLines                 = $this->productLineRepository->findAll();
+        $this->users                        = $this->userRepository->findAll();
+        $this->uploads                      = $this->uploadRepository->findAll();
+        $this->categories                   = $this->categoryRepository->findAll();
+        $this->buttons                      = $this->buttonRepository->findAll();
+        $this->incidents                    = $this->incidentRepository->findAll();
+        $this->incidentCategories           = $this->incidentCategoryRepository->findAll();
+        $this->departments                  = $this->departmentRepository->findAll();
+    }
+
+    protected function render(string $view, array $parameters = [], Response $response = null): Response
+    {
+        $commonParameters = [
+            'zones'                 => $this->zones,
+            'productLines'          => $this->productLines,
+            'categories'            => $this->categories,
+            'buttons'               => $this->buttons,
+            'uploads'               => $this->uploads,
+            'users'                 => $this->users,
+            'incidents'             => $this->incidents,
+            'incidentCategories'    => $this->incidentCategories,
+            'departments'           => $this->departments,
+        ];
+
+        $parameters = array_merge($commonParameters, $parameters);
+
+        return parent::render($view, $parameters, $response);
     }
 }

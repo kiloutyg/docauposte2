@@ -6,7 +6,7 @@
 	</h5>
 
 	{% if (groupedUploads is defined) and (groupedUploads is not empty ) %}
-		<div class="accordion d-grid col-lg-8 col-sm-12" id="accordionExample">
+		<div class="accordion d-grid col-lg-10 col-sm-12" id="accordionExample">
 			{% set outerIndex = 0 %}
 			{% for zoneName, zoneKey in groupedUploads %}
 				{% set outerIndex = outerIndex + 1 %}
@@ -50,28 +50,38 @@
 																		{{ buttonName|split('.')|first|upper }}
 																		{% for upload in buttonKey %}
 																			<li class="list-group-item d-flex justify-content-between align-items-center mb-3 shadow-lg">
-																				<a href="{{ path('app_download_file', { 'filename': upload.filename }) }}" class="btn btn-link" target="_blank">
+																				<a href="{{ path('app_download_file', { 'uploadId': upload.id }) }}" class="btn btn-link" target="_blank">
 																					-
 																					{{ upload.filename|upper }}
 
 																				</a>
 																				{% if  is_granted('ROLE_LINE_ADMIN') %}
 																					<div class="ml-auto">
-																						{{ upload.uploadedAt|date('d/m/Y') }}
-																						<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify shadow ">
-																							Modifier
-																						</a>
+																						{{upload.uploader.username}}|
+																						{% if upload.validated is same as(false) %}
+																							<a href="{{path('app_validation', {'uploadId' : upload.id} )}}">{{upload.validated ? 'Validé' : 'Non validé'}}<a>
+																									|
+																								{% else  %}
+																									{{upload.validated ? 'Validé' : 'Non validé'}}
+																									|
+																								{% endif %}
+																								{{ upload.uploadedAt|date('d/m/Y') }}
+																								<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify shadow ">
+																									Modifier
+																								</a>
 
-																						<a href="{{ path('app_delete_file', { filename: upload.filename, button: upload.button.id, originUrl : app.request.uri }) }}" class="btn btn-danger delete-upload shadow">
-																							Supprimer
-																						</a>
-																					</div>
-																				{% endif %}
-																			</li>
-																		{% endfor %}
-																	{% endfor %}
+																								<a href="{{ path('app_delete_file', { uploadId: upload.id }) }}" class="btn btn-danger delete-upload shadow">
+																									Supprimer
+																								</a>
+																							</div>
+																						{% endif %}
+																					</li>
+																				{% endfor %}
+																			{% endfor %}
+																		</div>
+																	</li>
 																</div>
-															</div>
+															</li>
 														</div>
 													</div>
 												{% endfor %}

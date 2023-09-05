@@ -6,8 +6,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 
-use App\Service\AccountService;
-
 use App\Controller\UploadController;
 
 // This controller manage the logic of the front interface, it is the main controller of the application and is responsible for rendering the front interface.
@@ -23,12 +21,16 @@ class FrontController extends BaseController
         return $this->render(
             'base.html.twig',
             [
-                'categories'    => $this->categoryRepository->findAll(),
-                'buttons'       => $this->buttonRepository->findAll(),
-                'zones'         => $this->zoneRepository->findAll(),
-                'productLines'  => $this->productLineRepository->findAll(),
-                'users'         => $this->userRepository->findAll(),
-                'user'          => $this->getUser(),
+                'zones'                 => $this->zones,
+                'productLines'          => $this->productLines,
+                'categories'            => $this->categories,
+                'buttons'               => $this->buttons,
+                'uploads'               => $this->uploads,
+                'users'                 => $this->users,
+                'incidents'             => $this->incidents,
+                'incidentCategories'    => $this->incidentCategories,
+                'departments'           => $this->departments,
+                'user'                  => $this->getUser(),
             ]
         );
     }
@@ -36,7 +38,7 @@ class FrontController extends BaseController
 
     // This function is responsible for creating the super-admin account at the first connection of the application.
     #[Route('/createSuperAdmin', name: 'create_super_admin')]
-    public function createSuperAdmin(AccountService $accountService, Request $request): Response
+    public function createSuperAdmin(Request $request): Response
     {
         $users = [];
         $users  = $this->userRepository->findAll();
@@ -44,7 +46,7 @@ class FrontController extends BaseController
         if ($users == null) {
 
             $error = null;
-            $result = $accountService->createAccount(
+            $result = $this->accountService->createAccount(
                 $request,
                 $error,
             );
@@ -152,17 +154,22 @@ class FrontController extends BaseController
 
     // Render the button page and redirect to the upload page if there is only one upload in the button
     #[Route('/zone/{zone}/productline/{productline}/category/{category}/button/{button}', name: 'button')]
-    public function ButtonShowing(UploadController $uploadController, string $button = null): Response
+    public function ButtonShowing(UploadController $uploadController, string $button = null, Request $request): Response
     {
-        $buttonEntity = $this->buttonRepository->findoneBy(['name' => $button]);
+        $buttonEntity = $this->buttonRepository->findOneBy(['name' => $button]);
         $category    = $buttonEntity->getCategory();
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
         $uploads = [];
-        $uploads = $this->uploadRepository->findBy(['button' => $buttonEntity->getId()]);
+
+        $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonEntity->getId()]);
+        foreach ($buttonUploads as $buttonUpload) {
+            if ($buttonUpload->isValidated()) {
+                $uploads[] = $buttonUpload;
+            }
+        }
 
         if (count($uploads) != 1) {
-
             return $this->render(
                 'button.html.twig',
                 [
@@ -171,13 +178,12 @@ class FrontController extends BaseController
                     'category'    => $category,
                     'categories'  => $this->categoryRepository->findAll(),
                     'button'      => $buttonEntity,
-                    'uploads'     => $this->uploadRepository->findAll(),
-
+                    'uploads'     => $uploads,
                 ]
             );
         } else {
-            $filename = $uploads[0]->getFilename();
-            return $uploadController->download_file($filename);
+            $uploadId = $uploads[0]->getId();
+            return $uploadController->download_file($uploadId, $request);
         }
     }
 }

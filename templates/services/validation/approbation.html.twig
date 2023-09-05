@@ -1,0 +1,122 @@
+{% block stylesheets %}
+	{{
+		encore_entry_link_tags("app")
+        }}
+{% endblock %}
+
+{% block javascripts %}
+{# <script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Get the radio button and the textarea
+  const radioDisapprove = document.getElementById('danger-outlined');
+  const textareaComment = document.querySelector('textarea[name="approbationComment"]');
+  console.log(textareaComment);
+  console.log(radioDisapprove);
+  // Listen for changes on the radio button
+  radioDisapprove.addEventListener('change', function () {
+    if (this.checked) {
+      // Make the textarea required if "Désapprouver" is checked
+      textareaComment.required = true;
+      console.log('required');
+    }
+  });
+  // You'll also want to listen for changes on the "Approuver" radio button to remove the 'required' attribute
+  const radioApprove = document.getElementById('success-outlined');
+  radioApprove.addEventListener('change', function () {
+    if (this.checked) {
+      // Remove the 'required' attribute when "Approuver" is checked
+      textareaComment.required = false;
+      console.log('not required');
+    }
+  });
+});
+</script> #}
+			{{ encore_entry_script_tags('app') }}
+			{{ encore_entry_script_tags('document-validator') }}
+			{{ encore_entry_script_tags('confirmation') }}
+			{{ encore_entry_script_tags('toast') }}
+			{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
+			{{ encore_entry_script_tags('cascading-dropdowns') }}
+			{{ encore_entry_script_tags('department-creation') }}
+{% endblock %}
+
+
+{% block body %}
+
+<div class=" d-flex align-items-center  flex-row">
+
+	<iframe src="{{ path('app_validation_approbation_file', { 'approbationId': approbation.id }) }}" width="69%" height="950" target="_blank"></iframe>
+	<div style="width: 31%" class="text-center card-body">
+
+		{% block title %}Page de validation de document par
+			<u>{{user.username}}</u><br>
+			{% set toBeValidated = [] %}
+			{% for approbation in app.user.approbations %}
+				{% if approbation.approval is same as null %}
+					{% set toBeValidated = toBeValidated|merge([approbation]) %}
+				{% endif %}
+			{% endfor %}
+			{% if toBeValidated|length - 1 > 0  %}
+				Il reste
+				<span class="badge bg-danger rounded-pill">
+					{{toBeValidated|length - 1}}
+				</span>
+				document(s) à valider
+			{% endif %}
+		{% endblock %}
+		<h2 style="text-align: center;">
+			<strong>{{approbation.validation.upload.filename|split('.')|first|upper}}</strong>
+		</h2>
+
+		<h3 style="text-align: center;">
+			{{approbation.validation.upload.button.name|split('.')|first|upper}}
+		</h3>
+
+		{% set validation = approbation.validation %}
+		{% set approbations = validation.approbations %}
+		{% for approbation in approbations %}
+			<ul>
+				{% if app.user != approbation.userapprobator  %}
+					<u>{{ approbation.userapprobator.username|capitalize }}</u>
+					{{ approbation.approval ? ' à valider' : ' n\'a pas rendu son avis'}}.
+					
+					{% if approbation.comment is not empty %}
+					
+						<ul>
+						En commentant :
+						<br>
+							- {{ approbation.comment }}
+						</ul>
+					{% endif %}
+				{% endif %}
+			</ul>
+    	{% endfor %}
+
+			<div style="height: 5vh;"></div>
+			<div class="d-flex justify-content-center align-items-center">
+				<form class="d-grid" method="post" action="{{ path('app_validation_approval', { 'approbationId': approbation.id }) }}" enctype="multipart/form-data">
+
+					<input type="radio" class="btn-check" name="approvalRadio" id="success-outlined" autocomplete="off" value="true" checked>
+					<label class="btn btn-outline-success" for="success-outlined">Approuver</label>
+
+					<input type="radio" class="btn-check" name="approvalRadio" id="danger-outlined" autocomplete="off" value="false">
+					<label class="btn btn-outline-danger" for="danger-outlined">Désapprouver</label>
+					<div class="input-group  justify-content-center">
+						<div class="input-group-prepend">
+							<span class="input-group-text">Commentaire</span>
+
+							<textarea class="form-control  " name="approbationComment" aria-label="With textarea"></textarea>
+						</div>
+					</div>
+					<div style="height: 5vh;"></div>
+					<button type="submit" class="btn btn-primary btn-lg submit-approval">Envoyer</button>
+				</form>
+			</div>
+			<div style="height: 5vh;"></div>
+			<a class="btn btn-dark" href="{{ path('app_logout') }}">Déconnexion</a>
+
+
+		</div>
+	</div>
+	
+{% endblock %}

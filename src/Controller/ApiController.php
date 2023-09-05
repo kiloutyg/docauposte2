@@ -17,16 +17,16 @@ class ApiController extends BaseController
 
         $zones = array_map(function ($zone) {
             return [
-                'id' => $zone->getId(),
-                'name' => $zone->getName()
+                'id'    => $zone->getId(),
+                'name'  => $zone->getName()
             ];
         }, $this->zoneRepository->findAll());
 
         $productLines = array_map(function ($productLine) {
             return [
-                'id' => $productLine->getId(),
-                'name' => $productLine->getName(),
-                'zone_id' => $productLine->getZone()->getId()
+                'id'        => $productLine->getId(),
+                'name'      => $productLine->getName(),
+                'zone_id'   => $productLine->getZone()->getId()
             ];
         }, $this->productLineRepository->findAll());
 
@@ -88,6 +88,47 @@ class ApiController extends BaseController
             'zones'                 => $zones,
             'productLines'          => $productLines,
             'incidentsCategories'   => $incidentsCategories,
+        ];
+
+        return new JsonResponse($responseData);
+    }
+
+    #[Route('/api/department_data', name: 'api_department_data')]
+    public function getDepartmentData(): JsonResponse
+    {
+        $departments = array_map(function ($department) {
+            return [
+                'id'    => $department->getId(),
+                'name'  => $department->getName(),
+            ];
+        }, $this->departmentRepository->findAll());
+
+        $responseData = [
+
+            'departments'   => $departments,
+        ];
+
+        return new JsonResponse($responseData);
+    }
+
+    #[Route('/api/user_data', name: 'api_user_data')]
+    public function getUserData(): JsonResponse
+    {
+        $filteredUsers = [];
+        $allUsers = $this->userRepository->findAll();
+        $currentUser = $this->getUser();
+
+        foreach ($allUsers as $user) {
+            if ((!in_array('ROLE_SUPER_ADMIN', $user->getRoles())) && ($user !== $currentUser)) {
+                $filteredUsers[] = [
+                    'id'        => $user->getId(),
+                    'username'  => $user->getUsername(),
+                ];
+            }
+        }
+
+        $responseData = [
+            'users'   => $filteredUsers,
         ];
 
         return new JsonResponse($responseData);

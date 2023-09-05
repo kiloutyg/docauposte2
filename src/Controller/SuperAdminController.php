@@ -8,27 +8,23 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-use App\Service\UploadsService;
-use App\Service\AccountService;
-use App\Service\IncidentsService;
-
 
 use App\Entity\Zone;
 
 // This controller is responsible for rendering the super admin interface an managing the logic of the super admin interface
-class SuperAdminController extends BaseController
+class SuperAdminController extends FrontController
 {
 
     // This function is responsible for rendering the super admin interface
     #[Route('/super_admin', name: 'app_super_admin')]
-    public function index(IncidentsService $incidentsService, UploadsService $uploadsService, AuthenticationUtils $authenticationUtils,): Response
+    public function index(AuthenticationUtils $authenticationUtils): Response
     {
-        $incidents = $this->incidentRepository->findAll();
-        $uploads = $this->uploadRepository->findAll();
+        $incidents = $this->incidents;
+        $uploads = $this->uploads;
 
         // Group the uploads and incidents by parent entity
-        $groupedUploads = $uploadsService->groupUploads($uploads);
-        $groupIncidents = $incidentsService->groupIncidents($incidents);
+        $groupedUploads = $this->uploadService->groupUploads($uploads);
+        $groupIncidents = $this->incidentService->groupIncidents($incidents);
 
         // Get the error and last username using AuthenticationUtils
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -39,24 +35,25 @@ class SuperAdminController extends BaseController
             'groupincidents'        => $groupIncidents,
             'error'                 => $error,
             'last_username'         => $lastUsername,
-            'zones'                 => $this->zoneRepository->findAll(),
-            'productLines'          => $this->productLineRepository->findAll(),
-            'categories'            => $this->categoryRepository->findAll(),
-            'buttons'               => $this->buttonRepository->findAll(),
-            'uploads'               => $this->uploadRepository->findAll(),
-            'users'                 => $this->userRepository->findAll(),
-            'incidents'             => $this->incidentRepository->findAll(),
-            'incidentCategories'    => $this->incidentCategoryRepository->findAll(),
+            'zones'                 => $this->zones,
+            'productLines'          => $this->productLines,
+            'categories'            => $this->categories,
+            'buttons'               => $this->buttons,
+            'uploads'               => $this->uploads,
+            'users'                 => $this->users,
+            'incidents'             => $this->incidents,
+            'incidentCategories'    => $this->incidentCategories,
+            'departments'           => $this->departments,
 
         ]);
     }
 
     // Creation of new user account destined to the super admin
     #[Route('/super_admin/create_admin', name: 'app_super_admin_create_admin')]
-    public function createAdmin(AccountService $accountService, Request $request): Response
+    public function createAdmin(Request $request): Response
     {
         $error = null;
-        $result = $accountService->createAccount($request, $error);
+        $result = $this->accountService->createAccount($request, $error);
 
         if ($result) {
             $this->addFlash('success', 'Le compte a été créé');

@@ -11,8 +11,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 
-use App\Service\IncidentsService;
-
 use App\Entity\IncidentCategory;
 
 use App\Form\IncidentType;
@@ -147,11 +145,10 @@ class IncidentController extends FrontController
 
 
 
-    // Create a route to upload an incident file. It depends on the IncidentsService.
+    // Create a route to upload an incident file. It depends on the IncidentService.
     #[Route('/incident/incident_uploading', name: 'generic_upload_incident_files')]
-    public function generic_upload_incident_files(IncidentsService $incidentsService, Request $request): Response
+    public function generic_upload_incident_files(Request $request): Response
     {
-        $this->incidentsService = $incidentsService;
 
         $originUrl = $request->headers->get('referer');
 
@@ -163,9 +160,10 @@ class IncidentController extends FrontController
             $IncidentCategoryId = $request->request->get('incidents_incidentsCategory');
             $IncidentCategory = $this->incidentCategoryRepository->findoneBy(['id' => $IncidentCategoryId]);
             $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productline]);
+            $user = $this->getUser();
 
-            // Use the IncidentsService to handle the upload of the Incidents files
-            $name = $this->incidentsService->uploadIncidentFiles($request, $productlineEntity, $IncidentCategory, $newname);
+            // Use the IncidentService to handle the upload of the Incidents files
+            $name = $this->incidentService->uploadIncidentFiles($request, $productlineEntity, $IncidentCategory, $user, $newname);
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
             return $this->redirect($originUrl);
         } else {
@@ -180,22 +178,32 @@ class IncidentController extends FrontController
     #[Route('/download_incident/{name}', name: 'incident_download_file')]
     public function download_file(string $name = null): Response
     {
-        $file = $this->incidentRepository->findOneBy(['name' => $name]);
-        $path = $file->getPath();
+        $file       = $this->incidentRepository->findOneBy(['name' => $name]);
+        $path       = $file->getPath();
         $file       = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
 
+    // Create a route to visualize the file in the modifcation view.
+    #[Route('/modify_download_incident/{id}', name: 'modify_incident_download_file')]
+    public function modify_download_file(int $id = null): Response
+    {
+        $file       = $this->incidentRepository->findOneBy(['id' => $id]);
+        $path       = $file->getPath();
+        $file       = new File($path);
+        return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
+    }
+
     // Create a route to delete a file
     #[Route('/incident/delete/{productline}/{name}', name: 'incident_delete_file')]
-    public function delete_file(string $name = null, string $productline = null, IncidentsService $incidentsService, Request $request): Response
+    public function delete_file(string $name = null, string $productline = null, Request $request): Response
     {
         $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productline]);
         $originUrl = $request->headers->get('referer');
 
-        // Use the incidentsService to handle file deletion
-        $name = $incidentsService->deleteIncidentFile($name, $productlineEntity);
+        // Use the incidentService to handle file deletion
+        $name = $this->incidentService->deleteIncidentFile($name, $productlineEntity);
         $this->addFlash('success', 'File ' . $name . ' deleted');
 
         return $this->redirect($originUrl);
@@ -204,13 +212,14 @@ class IncidentController extends FrontController
 
     // Create a route to modify a file and or display the modification page
     #[Route('/modify_incident/{incidentId}', name: 'incident_modify_file')]
-    public function modify_incident_file(Request $request, int $incidentId, incidentsService $incidentsService): Response
+    public function modify_incident_file(Request $request, int $incidentId): Response
     {
         // Retrieve the current incident entity based on the incidentId
         $incident = $this->incidentRepository->findOneBy(['id' => $incidentId]);
         $productLine = $incident->getProductLine();
         $zone = $productLine->getZone();
         $originUrl = $request->headers->get('referer');
+        $user = $this->getUser();
 
         if (!$incident) {
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
@@ -226,7 +235,7 @@ class IncidentController extends FrontController
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
-                $incidentsService->modifyIncidentFile($incident);
+                $this->incidentService->modifyIncidentFile($incident, $user);
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirect($originUrl);
             } catch (\Exception $e) {

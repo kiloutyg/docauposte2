@@ -9,21 +9,19 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
 		{% block stylesheets %}
-			{{ encore_entry_link_tags('app') }}
-			{{ encore_entry_link_tags('app') }}
+
 			{{
             encore_entry_link_tags('app')
         }}
 		{% endblock %}
 		{% block javascripts %}
 			{{ encore_entry_script_tags('app') }}
-			{{ encore_entry_script_tags('app') }}
-			{{ encore_entry_script_tags('app') }}
 			{{ encore_entry_script_tags('confirmation') }}
 			{{ encore_entry_script_tags('toast') }}
 			{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
 			{{ encore_entry_script_tags('cascading-dropdowns') }}
-
+			{{encore_entry_script_tags('department-creation') }}
+			{{encore_entry_script_tags('document-validator') }}
 			<script>
 
 				{% if zone is defined and zone is not null %}
@@ -35,12 +33,12 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 	</head>
 	<body
 		class="d-flex flex-column  min-vh-100 ">
-
 		<!-- Main Navigation -->
 		<nav class="navbar navbar-expand-lg navbar-dark flex-shrink-0" style="background-color: #1f3e52">
 			<div class="container">
 				<a class="navbar-brand" href="{{ path('app_base') }}">
-					<img class="img-fluid align-center justify-content-center" src="{{ asset('Plastic_Omnium.svg') }}" alt="Logo de PlasticOmnium" role="img" width="125"/></a>
+					<img class="img-fluid align-center justify-content-center" src="{{ asset('Plastic_Omnium.svg') }}" alt="Logo de PlasticOmnium" role="img" width="125"/>
+				</a>
 				<a class="navbar-brand" href="{{ path('app_base') }}">
 					<h2>
 						<strong>
@@ -48,7 +46,59 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						</strong>
 					</h2>
 				</a>
-
+				{% if app.user is not null %}
+					<div class="ms-auto d-flex align-items-center ">
+						<div class="dropdown">
+							{% set inValidations = [] %}
+							{% set DisapprovedFile = [] %}
+							{% for upload in app.user.uploads %}
+								{% if upload.isValidated is same as(null) %}
+									{% set inValidations = inValidations|merge([upload]) %}
+								{% endif %}
+								{% if upload.isValidated is same as(false) %}
+									{% set DisapprovedFile = DisapprovedFile|merge([upload]) %}
+								{% endif %}
+							{% endfor %}
+							{% if inValidations|length > 0 %}
+								<button class="btn dropdown-toggle" style="background-color:#007AFF; color:white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+									<span class="badge bg-danger rounded-pill">{{ inValidations|length }}</span>
+									Documents en cours de validation
+								</button>
+								<ul class="dropdown-menu dropdown-menu-start shadow shadow-inset" aria-labelledby="dropdownMenuButton1">
+									{% for upload in inValidations %}
+										{% if upload.isValidated is same as(null) %}
+											<li>
+												<a href="{{ path('app_modify_file', {'uploadId': upload.id})}}" class="dropdown-item shadow ">
+													{{ upload.filename|upper }}
+												</a>
+											</li>
+										{% endif %}
+									{% endfor %}
+								</ul>
+							{% endif %}
+							{% if DisapprovedFile|length > 0 %}
+								<button class="btn dropdown-toggle" style="background-color:#007AFF; color:white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+									<span class="badge bg-danger rounded-pill">{{ DisapprovedFile|length }}</span>
+									Documents refusés
+								</button>
+								<ul class="dropdown-menu dropdown-menu-start shadow shadow-inset" aria-labelledby="dropdownMenuButton1">
+									{% for upload in DisapprovedFile %}
+										{% for approbation in upload.validation.approbations %}
+											{% if approbation.isApproval is same as(false) %}
+												<li>
+													<a href="{{ path('app_validation_disapproved_modify', {'approbationId': approbation.id})}}" class="dropdown-item shadow ">
+														{{ upload.filename|upper }}
+													</a>
+												</li>
+											{% endif %}
+										{% endfor %}
+									{% endfor %}
+								</ul>
+							{% endif %}
+						</div>
+					</div>
+				{% endif %}
+				<div></div>
 				<div class="ms-auto d-flex align-items-center">
 					{% if app.user is null %}
 						<a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
@@ -64,12 +114,8 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 							<a class="btn btn-outline-info" href="{{path('app_tutorial')}}">TUTO</a>
 						</p>
 					{% endif %}
-
-
 				</div>
-
 			</div>
-
 		</nav>
 		<!-- End Main Navigation -->
 		<div class="container ">
@@ -90,12 +136,8 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					</div>
 				{% endif %}
 			{% endif %}
-
 		</div>
-
-		<div class="container flex-grow-1 d-flex flex-column">
-			{% include "services/navbarservices/navbarservices.html.twig" %}
-
+		<div class="container flex-grow-1 d-flex flex-column">{% include "services/navbarservices/navbarservices.html.twig" %}
 			{% block body %}
 				<div class="inner-container flex-grow-1 d-flex flex-column">
 					{% if app.user %}
@@ -118,13 +160,10 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 							</strong>
 						</h1>
 					</p>
-
 					<h3 class="text-justify flex-shrink-0">
 						<strong>
 							Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
 					</h3>
-
-
 					<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
 						<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 							{% for zone in zones %}
@@ -136,14 +175,10 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 								</a>
 							{% endfor %}
 						</div>
-
 					</div>
 				</div>
 			{% endblock body %}
-		</div>
-
-		<!-- Footer -->
-		<footer class="container py-3 border-top  flex-shrink-0">
+		</div><!-- Footer --><footer class="container py-3 border-top  flex-shrink-0">
 			<div class="d-flex flex-wrap justify-content-between">
 				<div class="col-md-4 d-flex align-items-center">
 					<span class="me-1" style="color: red">
