@@ -178,12 +178,22 @@ class IncidentController extends FrontController
     #[Route('/download_incident/{name}', name: 'incident_download_file')]
     public function download_file(string $name = null): Response
     {
-        $file = $this->incidentRepository->findOneBy(['name' => $name]);
-        $path = $file->getPath();
+        $file       = $this->incidentRepository->findOneBy(['name' => $name]);
+        $path       = $file->getPath();
         $file       = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
+
+    // Create a route to visualize the file in the modifcation view.
+    #[Route('/modify_download_incident/{id}', name: 'modify_incident_download_file')]
+    public function modify_download_file(int $id = null): Response
+    {
+        $file       = $this->incidentRepository->findOneBy(['id' => $id]);
+        $path       = $file->getPath();
+        $file       = new File($path);
+        return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
+    }
 
     // Create a route to delete a file
     #[Route('/incident/delete/{productline}/{name}', name: 'incident_delete_file')]

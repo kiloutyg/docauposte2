@@ -48,7 +48,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 										</li>
 									</ul>
 								{% endif %}
-							</li>
+								</li>
 							{% endfor %}
 						</ul>
 					</div>
@@ -68,15 +68,16 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						<iframe src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" width="100%" height="750" target="_blank"></iframe>
 				{% endif %}
 					<div class="mb-3 mt-3">
-						{{ form_label(form.file, 'Choisissez un ficher à ajouter :', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
+						{{ form_label(form.file, 'Choisissez un nouveau ficher:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
 						{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}) }}
 					</div>
 
 					<div class="mb-3">
-						{{ form_label(form.filename, 'Nouveau nom du fichier :', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
+						{{ form_label(form.filename, 'Nouveau nom du fichier:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
 						{{ form_widget(form.filename, {'attr': {'class': 'form-control', 'id': 'filename', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)'}}) }}
 					</div>
-
+					<div style='color:white'>
+					
 					{# Display the current button hierarchy #}
 					{% if lastZone != upload.button.category.productLine.zone %}
 						{% set lastZone = upload.button.category.productLine.zone %}
@@ -103,7 +104,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						{{ lastButton.name|split('.')|first|upper }}
 						:
 					{% endif %}
-
+					</div>
 					<div class="row">
 						<div class="col-md-2 col-sm-2 mt-2 mb-2">
 							<label for="zone" style="color:white">Zone :</label>
@@ -140,11 +141,11 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					</div>
 				</div>
 				<div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
-					<button type="submit" class="btn btn-primary mb-5">Modifier</button>
+					<button type="submit" class="btn btn-primary mb-5 submit-upload-modification">Modifier</button>
 				</div>
 			
 			{{ form_end(form) }}
 		</div>
 	</div>
 </div>
-{% endblock %} 
+{% endblock %}  

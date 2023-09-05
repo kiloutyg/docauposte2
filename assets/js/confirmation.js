@@ -20,6 +20,10 @@ window.addEventListener("turbo:load", () => {
   );
   const submitDisapprovalModifcationButtons = document.querySelectorAll(
     ".submit-disapproval-modification");
+  const submitUploadModifcationButtons = document.querySelectorAll(
+    ".submit-upload-modification");
+  const submitIncidentModifcationButtons = document.querySelectorAll(
+    ".submit-incident-modification");
 
   const confirmationHandler = (event, message) => {
     const confirmed = confirm(message);
@@ -118,6 +122,22 @@ window.addEventListener("turbo:load", () => {
     });
   });
   submitDisapprovalModifcationButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "Êtes vous sûr de vouloir soumettre ces modifications?"
+      );
+    });
+  });
+  submitUploadModifcationButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "Êtes vous sûr de vouloir soumettre ces modifications?"
+      );
+    });
+  });
+  submitIncidentModifcationButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
       confirmationHandler(
         event,

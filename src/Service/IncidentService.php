@@ -39,7 +39,7 @@ class IncidentService extends AbstractController
         ParameterBagInterface $params,
         IncidentRepository $incidentRepository,
         LoggerInterface $logger,
-        IncidentCategoryRepository $incidentCategoryRepository,
+        IncidentCategoryRepository $incidentCategoryRepository
     ) {
         $this->incidentRepository = $incidentRepository;
         $this->manager = $manager;

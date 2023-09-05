@@ -6,25 +6,27 @@
 
 				<div class="col-md-6">
 					<p class="text-white m-0">
-						Ajouter un fichier :
+						Ajouter un fichier:
 					</p>
 					<form class="form-floating justify-content-center " id="upload-form" action="{{path('app_generic_upload_incident_files')}}" method="POST" enctype="multipart/form-data">
 						<div class="fallback">
 							<input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
 
 							<div class="mb-3">
-								<label for="incidents_newFileName" class="form-label">Nom du fichier :</label>
+								<label for="incidents_newFileName" style="color:white" class="form-label">Nom du fichier:</label>
+
 								<input type="text" class="form-control" id="incidents_newFileName" name="incidents_newFileName" placeholder="Entrer un nouveau nom de fichier (optionnel)">
 							</div>
 							{% include 'services/incidents/cascading_dropdowns_incidents.html.twig' %}
 						</div>
-						<div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
+						<div class="d-grid gap-2 d-md-flex justify-content-md-center mt-2 mb-5">
 							<button type="submit" class="btn btn-primary">Charger</button>
 						</div>
 					</form>
+					<hr>
 					{% if is_granted('ROLE_ADMIN') %}
-						<div class="row mb-3">
-							<label for="incidents_newFileName" class="form-label">Nouveau Type d'Incident :</label>
+						<div class="row mt-5 mb-3">
+							<label for="incidents_newFileName" style="color:white" class="form-label">Nouveau Type d'Incident:</label>
 							<div class="col-sm">
 								<input type="text" class="form-control" id="incident_incidentsCategory_name" name="incident_incidentsCategory_name" placeholder="Entrer un nouveau type d'incident">
 							</div>
