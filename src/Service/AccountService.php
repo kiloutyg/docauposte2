@@ -72,33 +72,49 @@ class AccountService
     }
 
     // This function is responsible for modifying a user account and persisting the modification to the database
-    public function modifyAccount(Request $request, UserInterface $currentUser)
+    public function modifyAccount(Request $request, UserInterface $currentUser, User $user)
     {
         if ($request->getMethod() == 'POST') {
-            $name = $request->request->get('current_username'); // Change 'username' to 'current_username'
-            $newName = $request->request->get('username');
-            $password = $request->request->get('password');
-            $role = $request->request->get('role');
+
             $departmentId = $request->request->get('department');
             $department = $this->departmentRepository->findOneBy(['id' => $departmentId]);
             $emailAddress = $request->request->get('emailAddress');
-
-            // Check if the username is already in use
-            $user = $this->userRepository->findOneBy(['username' => $name]); // Look up the user by the current_username
 
             // Check if the current user is a super admin
             if (in_array('ROLE_SUPER_ADMIN', $currentUser->getRoles())) {
 
                 // Get the user to be modified
-                $user = $this->userRepository->findOneBy(['username' => $name]);
                 if ($user) {
-                    // Update the user details
-                    $password = $this->passwordHasher->hashPassword($user, $password);
-                    $user->setUsername($newName); // Set the new username
-                    $user->setPassword($password);
-                    $user->setRoles([$role]);
-                    $user->setDepartment($department);
-                    $user->setEmailAddress($emailAddress);
+                    if ($request->request->get('username') != '') {
+                        $newName = $request->request->get('username');
+
+                        if ($this->userRepository->findOneBy(['username' => $newName])) {
+                            return 'Ce nom d\'utilisateur est déja utilisé.';
+                        } else {
+                            $password = $user->getPassword();
+                            $password = $this->passwordHasher->hashPassword($user, $password);
+                            $user->setUsername($newName); // Set the new username
+                            $user->setPassword($password);
+                        }
+                    };
+                    if ($request->request->get('password') != '') {
+                        $password = $request->request->get('password');
+                        $password = $this->passwordHasher->hashPassword($user, $password);
+                        $user->setPassword($password);
+                    };
+                    if ($request->request->get('role') != '') {
+                        $role = $request->request->get('role');
+                        $user->setRoles([$role]);
+                    };
+                    if ($request->request->get('department') != '') {
+                        $department = $this->departmentRepository->findOneBy(['id' => $request->request->get('department')]);
+                        $user->setDepartment($department);
+                    };
+                    if ($request->request->get('emailAddress') != '') {
+                        $emailAddress = $request->request->get('emailAddress');
+                        $user->setEmailAddress($emailAddress);
+                    };
+
                     $this->manager->persist($user);
                     $this->manager->flush();
 

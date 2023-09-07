@@ -21,7 +21,7 @@
 									<strong>Modification de compte de
 										{{user.username}}</strong>
 								</h3>
-								<form class="form row" method="post" action="{{ path('app_modify_account') }}">
+								<form class="form row" method="post" action="{{path('app_modify_account', {userid: user.id})}}">
 									{% if error is defined %}
 										{% if error %}
 											<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -30,20 +30,20 @@
 
 									<div class="form-control mb-3">
 										<label for="username">Nom d'utilisateur</label>
-										<input type="text" name="username" placeholder="Nom d'utilisateur" required class="form-control" id="username">
+										<input type="text" name="username" placeholder="Nom d'utilisateur"  class="form-control" id="username">
 
 									</div>
 									<div class="form-control mb-3">
 										<label for="floatingPassword">Mot de passe</label>
-										<input type="password" id="floatingPassword" placeholder="Mot de passe" name="password" required class="form-control">
+										<input type="password" id="floatingPassword" placeholder="Mot de passe" name="password"  class="form-control">
 
 									</div>
 									<div class="form-control mb-3">
 										<label for="emailAddress">Adresse Mail</label>
-										<input type="email" id="emailAddress" placeholder="Adresse Mail" name="emailAddress" required class="form-control">
+										<input type="email" id="emailAddress" placeholder="Adresse Mail" name="emailAddress"  class="form-control">
 									</div>
 									<div class="form-control mb-3">
-										{% include 'services/accountservices/role_affectation.html.twig' %}
+										{% include 'services/accountservices/role_affectation_modification.html.twig' %}
 									</div>
 									<div class="form-control mb-3">
 										<div>

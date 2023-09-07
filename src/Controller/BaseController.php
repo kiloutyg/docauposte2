@@ -45,6 +45,7 @@ use App\Service\FolderCreationService;
 use App\Service\IncidentService;
 use App\Service\EntityHeritanceService;
 use App\Service\ValidationService;
+use App\Service\MailerService;
 
 
 #[Route('/', name: 'app_')]
@@ -53,35 +54,40 @@ use App\Service\ValidationService;
 
 class BaseController extends AbstractController
 {
-    protected $zoneRepository;
-    protected $productLineRepository;
-    protected $userRepository;
     protected $em;
     protected $request;
     protected $security;
     protected $passwordHasher;
     protected $requestStack;
-    protected $uploadRepository;
     protected $session;
-    protected $categoryRepository;
-    protected $buttonRepository;
-    protected $entitydeletionService;
-    protected $accountService;
-    protected $uploadService;
     protected $logger;
     protected $loggerInterface;
     protected $projectDir;
     protected $public_dir;
-    protected $folderCreationService;
-    protected $incidentRepository;
-    protected $incidentService;
-    protected $incidentCategoryRepository;
-    protected $entityHeritanceService;
     protected $authChecker;
+
+    // Repository methods
     protected $departmentRepository;
-    protected $validationService;
     protected $approbationRepository;
     protected $validationRepository;
+    protected $incidentRepository;
+    protected $incidentCategoryRepository;
+    protected $categoryRepository;
+    protected $buttonRepository;
+    protected $uploadRepository;
+    protected $zoneRepository;
+    protected $productLineRepository;
+    protected $userRepository;
+
+    // Services methods
+    protected $validationService;
+    protected $incidentService;
+    protected $folderCreationService;
+    protected $entityHeritanceService;
+    protected $mailerService;
+    protected $entitydeletionService;
+    protected $accountService;
+    protected $uploadService;
 
     // Variables used in the twig templates to display all the entities
     protected $departments;
@@ -97,31 +103,37 @@ class BaseController extends AbstractController
 
 
     public function __construct(
-        UploadRepository                $uploadRepository,
-        ZoneRepository                  $zoneRepository,
-        ProductLineRepository           $productLineRepository,
-        UserRepository                  $userRepository,
+
         EntityManagerInterface          $em,
         RequestStack                    $requestStack,
         Security                        $security,
         UserPasswordHasherInterface     $passwordHasher,
-        CategoryRepository              $categoryRepository,
-        ButtonRepository                $buttonRepository,
-        EntityDeletionService           $entitydeletionService,
-        AccountService                  $accountService,
-        UploadService                  $uploadServices,
         LoggerInterface                 $loggerInterface,
         ParameterBagInterface           $params,
-        FolderCreationService           $folderCreationService,
         IncidentRepository              $incidentRepository,
-        IncidentService                $incidentService,
-        IncidentCategoryRepository      $incidentCategoryRepository,
-        EntityHeritanceService          $entityHeritanceService,
         AuthorizationCheckerInterface   $authChecker,
-        DepartmentRepository            $departmentRepository,
-        ValidationService               $validationService,
+
+        // Repository methods
         ApprobationRepository           $approbationRepository,
-        ValidationRepository            $validationRepository
+        ValidationRepository            $validationRepository,
+        DepartmentRepository            $departmentRepository,
+        IncidentCategoryRepository      $incidentCategoryRepository,
+        CategoryRepository              $categoryRepository,
+        ButtonRepository                $buttonRepository,
+        UploadRepository                $uploadRepository,
+        ZoneRepository                  $zoneRepository,
+        ProductLineRepository           $productLineRepository,
+        UserRepository                  $userRepository,
+
+        // Services methods
+        ValidationService               $validationService,
+        IncidentService                 $incidentService,
+        EntityHeritanceService          $entityHeritanceService,
+        FolderCreationService           $folderCreationService,
+        EntityDeletionService           $entitydeletionService,
+        AccountService                  $accountService,
+        UploadService                   $uploadService,
+        MailerService                   $mailerService
 
     ) {
 
@@ -137,7 +149,7 @@ class BaseController extends AbstractController
         $this->passwordHasher               = $passwordHasher;
         $this->entitydeletionService        = $entitydeletionService;
         $this->accountService               = $accountService;
-        $this->uploadService               = $uploadServices;
+        $this->uploadService                = $uploadService;
         $this->logger                       = $loggerInterface;
         $this->request                      = $this->requestStack->getCurrentRequest();
         $this->session                      = $this->requestStack->getSession();
@@ -145,7 +157,7 @@ class BaseController extends AbstractController
         $this->public_dir                   = $this->projectDir . '/public';
         $this->folderCreationService        = $folderCreationService;
         $this->incidentRepository           = $incidentRepository;
-        $this->incidentService             = $incidentService;
+        $this->incidentService              = $incidentService;
         $this->incidentCategoryRepository   = $incidentCategoryRepository;
         $this->entityHeritanceService       = $entityHeritanceService;
         $this->authChecker                  = $authChecker;
@@ -153,6 +165,8 @@ class BaseController extends AbstractController
         $this->validationService            = $validationService;
         $this->approbationRepository        = $approbationRepository;
         $this->validationRepository         = $validationRepository;
+        $this->mailerService                = $mailerService;
+
         // Variables used in the twig templates to display all the entities
         $this->zones                        = $this->zoneRepository->findAll();
         $this->productLines                 = $this->productLineRepository->findAll();
