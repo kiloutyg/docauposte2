@@ -5,32 +5,7 @@
 {% endblock %}
 
 {% block javascripts %}
-{# <script>
-document.addEventListener("DOMContentLoaded", function () {
-  // Get the radio button and the textarea
-  const radioDisapprove = document.getElementById('danger-outlined');
-  const textareaComment = document.querySelector('textarea[name="approbationComment"]');
-  console.log(textareaComment);
-  console.log(radioDisapprove);
-  // Listen for changes on the radio button
-  radioDisapprove.addEventListener('change', function () {
-    if (this.checked) {
-      // Make the textarea required if "Désapprouver" is checked
-      textareaComment.required = true;
-      console.log('required');
-    }
-  });
-  // You'll also want to listen for changes on the "Approuver" radio button to remove the 'required' attribute
-  const radioApprove = document.getElementById('success-outlined');
-  radioApprove.addEventListener('change', function () {
-    if (this.checked) {
-      // Remove the 'required' attribute when "Approuver" is checked
-      textareaComment.required = false;
-      console.log('not required');
-    }
-  });
-});
-</script> #}
+
 			{{ encore_entry_script_tags('app') }}
 			{{ encore_entry_script_tags('document-validator') }}
 			{{ encore_entry_script_tags('confirmation') }}
@@ -78,8 +53,11 @@ document.addEventListener("DOMContentLoaded", function () {
 			<ul>
 				{% if app.user != approbation.userapprobator  %}
 					<u>{{ approbation.userapprobator.username|capitalize }}</u>
-					{{ approbation.approval ? ' à valider' : ' n\'a pas rendu son avis'}}.
-					
+					{% if approbation.approval is not null %}
+					{{ approbation.approval ? ' a validé le document' : ' a refusé de validé le document'}}.
+					{% else %}
+					{{ ' n\'a pas encore rendu son avis.' }}
+					{% endif %}
 					{% if approbation.comment is not empty %}
 					
 						<ul>

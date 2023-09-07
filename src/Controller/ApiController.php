@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 # This controller is responsible for fetching data from the database and returning it as JSON
 
-class ApiController extends BaseController
+class ApiController extends FrontController
 {
     #[Route('/api/cascading_dropdown_data', name: 'api_cascading_dropdown_data')]
     public function getData(): JsonResponse

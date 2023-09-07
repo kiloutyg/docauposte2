@@ -19,6 +19,7 @@ use App\Entity\User;
 use App\Entity\Validation;
 use App\Entity\Approbation;
 
+use App\Service\MailerService;
 
 class ValidationService extends AbstractController
 {
@@ -29,6 +30,7 @@ class ValidationService extends AbstractController
     protected $userRepository;
     protected $validationRepository;
     protected $approbationRepository;
+    protected $mailerService;
 
     public function __construct(
         LoggerInterface $logger,
@@ -37,7 +39,8 @@ class ValidationService extends AbstractController
         DepartmentRepository $departmentRepository,
         UserRepository $userRepository,
         ValidationRepository $validationRepository,
-        ApprobationRepository $approbationRepository
+        ApprobationRepository $approbationRepository,
+        MailerService $mailerService
     ) {
         $this->logger                = $logger;
         $this->em                    = $em;
@@ -46,6 +49,7 @@ class ValidationService extends AbstractController
         $this->userRepository        = $userRepository;
         $this->validationRepository  = $validationRepository;
         $this->approbationRepository = $approbationRepository;
+        $this->mailerService         = $mailerService;
     }
 
     public function createValidation(Upload $upload, Request $request)
@@ -90,7 +94,7 @@ class ValidationService extends AbstractController
             // Call the createApprobationProcess method to create an Approbation process
             $this->createApprobationProcess(
                 $validation,
-                $validator_user,
+                $validator_user
             );
             $validator_user = null;
         }
@@ -98,9 +102,10 @@ class ValidationService extends AbstractController
         return $validation;
     }
 
+
     public function createApprobationProcess(
         $validation,
-        User $validator_user = null,
+        User $validator_user = null
     ) {
         // Create a new Approbation instance
         $approbation = new Approbation();
@@ -110,6 +115,9 @@ class ValidationService extends AbstractController
         if ($validator_user !== null || $validator_user !== '') {
             $approbation->setUserApprobator($validator_user);
         }
+        // Send a notification email to the validator
+
+        $this->approbationEmail($validation, $validator_user);
 
         // Persist the Approbation instance to the database
         $this->em->persist($approbation);
@@ -120,6 +128,7 @@ class ValidationService extends AbstractController
         // Return the Approbation instance
         return $approbation;
     }
+
 
     public function validationApproval(Approbation $approbation, Request $request)
     {
@@ -167,11 +176,10 @@ class ValidationService extends AbstractController
             if ($approbation->isApproval() === false) {
                 $status = false;
                 $this->updateValidationAndUploadStatus($validation, $status);
+                $this->disapprobationEmail($validation, $approbation->getUserApprobator(), $approbation->getComment());
                 return;
-
             } else if ($approbation->isApproval() === true) {
                 $status = true;
-
             } else if ($approbation->isApproval() === null) {
                 $status = null;
                 return;
@@ -179,9 +187,9 @@ class ValidationService extends AbstractController
         }
         $this->updateValidationAndUploadStatus($validation, $status);
         return;
-
     }
 
+    // This method will also activate the notification email to the uploader
     public function updateValidationAndUploadStatus(Validation $validation, ?bool $status)
     {
         if ($validation->isStatus() === false) {
@@ -242,5 +250,47 @@ class ValidationService extends AbstractController
         $this->em->flush();
         // Return early
         return;
+    }
+
+
+    public function approbationEmail(Validation $validation, User $user, string $comment = null)
+    {
+        $upload = $validation->getUpload();
+        $filename = $upload->getFilename();
+        $uploader = $upload->getUploader();
+        $uploaderName = $uploader->getUsername();
+
+
+        $subject = 'Docauposte - Nouvelle validation à effectuer du document ' . $filename;
+        $html = "<p> Bonjour, </p>
+        <p> Vous avez une nouvelle validation à effectuer du document '  $filename  ' qui a été uploadé par '  $uploaderName  '.</p>
+        <p> Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant : <a class='btn-info' href='http://slanlp0033/login'>Page de connexion</a></p>
+        <p> Cordialement, </p>";
+
+        $this->mailerService->sendEmail($user, $subject, $html);
+    }
+
+    public function disapprobationEmail(Validation $validation, User $user, string $comment = null)
+    {
+        $upload = $validation->getUpload();
+        $filename = $upload->getFilename();
+        $approbatorName = $user->getUsername();
+        $recipient = $upload->getUploader();
+
+
+        $subject = 'Docauposte - Le document ' . $filename . ' a été refusé par ' . $approbatorName . '.';
+        if ($comment !== null) {
+            $html = "<p> Bonjour, </p>
+                    <p> Votre document ' $filename ' a été refusé par ' $approbatorName '.'</p>
+                    <p> Avec le commentaire de refus suivant : ' . $comment . '</p>
+                    <p> Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant : <a class='btn-info' href='http://slanlp0033/login'>Page de connexion</a></p>
+                    <p> Cordialement, </p>";
+        }
+        $html = "<p> Bonjour, </p>
+        <p> Votre document ' . $filename . ' a été refusé par ' . $approbatorName . '.'</p>
+        <p> Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant : <a class='btn-info' href='http://slanlp0033/login'>Page de connexion</a></p>
+        <p> Cordialement, </p>";
+
+        $this->mailerService->sendEmail($recipient, $subject, $html);
     }
 }

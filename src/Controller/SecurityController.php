@@ -47,31 +47,34 @@ class SecurityController extends FrontController
     }
 
     // This function is responsible for rendering the account modifiying interface destined to the super admin
-    #[Route(path: '/modify_account_view/{userid}', name: 'app_modify_account_view')]
-    public function modify_account_view(int $userid, AuthenticationUtils $authenticationUtils): Response
+    #[Route(path: '/modify_account/{userid}', name: 'app_modify_account')]
+    public function modify_account(UserInterface $currentUser, int $userid, AuthenticationUtils $authenticationUtils, Request $request): Response
     {
         $error = $authenticationUtils->getLastAuthenticationError();
         $user = $this->userRepository->findOneBy(['id' => $userid]);
 
-        return $this->render('services/accountservices/modify_account_view.html.twig', [
-            'user'          => $user,
-            'error'         => $error,
-        ]);
-    }
+        if ($request->isMethod('GET')) {
+            if (in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+                $this->addFlash('danger', 'Le compte ne peut être modifié');
+                return $this->redirectToRoute('app_base');
+            }
+            return $this->render('services/accountservices/modify_account_view.html.twig', [
+                'user'          => $user,
+                'error'         => $error,
+            ]);
+        } else if ($request->isMethod('POST')) {
 
-    // This function manage the logic of the account modifiying
-    #[Route(path: '/modify_account', name: 'app_modify_account')]
-    public function modify_account(UserInterface $currentUser, AuthenticationUtils $authenticationUtils, Request $request)
-    {
-        $error = $authenticationUtils->getLastAuthenticationError();
-        $usermod = $this->accountService->modifyAccount($request, $currentUser);
+            $error = $authenticationUtils->getLastAuthenticationError();
+            $usermod = $this->accountService->modifyAccount($request, $currentUser, $user);
 
-        if ($usermod instanceof User) {
-            $this->addFlash('success', 'Le compte ' . $usermod->getUsername() . ' a été modifié');
+            if ($usermod instanceof User) {
+                $this->addFlash('success', 'Le compte ' . $usermod->getUsername() . ' a été modifié');
+                return $this->redirectToRoute('app_super_admin');
+            };
             return $this->redirectToRoute('app_super_admin');
-        };
-        return $this->redirectToRoute('app_super_admin');
+        }
     }
+
 
     // This function is managing the logic of authentication
     private function authenticateUser(User $user)
