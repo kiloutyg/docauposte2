@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
 
-
 use App\Repository\UploadRepository;
 use App\Repository\DepartmentRepository;
 use App\Repository\UserRepository;
@@ -90,7 +89,6 @@ class ValidationService extends AbstractController
                 // Find the User entity using the repository and the validator_user value
                 $validator_user = $this->userRepository->find($validator_user_value);
             }
-            $this->logger->info('validator_user_value: ' . $validator_user_value);
             // Call the createApprobationProcess method to create an Approbation process
             $this->createApprobationProcess(
                 $validation,
@@ -98,6 +96,8 @@ class ValidationService extends AbstractController
             );
             $validator_user = null;
         }
+
+
         // Return the Validation instance
         return $validation;
     }
@@ -115,13 +115,11 @@ class ValidationService extends AbstractController
         if ($validator_user !== null || $validator_user !== '') {
             $approbation->setUserApprobator($validator_user);
         }
-        // Send a notification email to the validator
-
-        $this->approbationEmail($validation, $validator_user);
 
         // Persist the Approbation instance to the database
         $this->em->persist($approbation);
-
+        // Send a notification email to the validator
+        $this->approbationEmail($approbation);
         // Flush changes to the database
         $this->em->flush();
 
@@ -204,6 +202,7 @@ class ValidationService extends AbstractController
         $upload->setValidated($status);
         $this->em->persist($upload);
         $this->em->flush();
+        $this->approvalEmail($validation);
         // Return early
         return;
     }
@@ -234,12 +233,16 @@ class ValidationService extends AbstractController
                 // Remove the Approbation instance from the database
                 $approbation->setApproval(null);
                 $approbation->setComment(null);
+                $approbator = $approbation->getUserApprobator();
+                $this->disapprovedModifiedEmail($validation, $approbator);
             }
             // If the Approbation is not approved or the Approval property is null
             elseif ($approbation->isApproval() == false) {
                 // Remove the Approbation instance from the database
                 $approbation->setApproval(null);
                 $approbation->setComment(null);
+                $approbator = $approbation->getUserApprobator();
+                $this->disapprovedModifiedEmail($validation, $approbator);
             }
         }
 
@@ -253,22 +256,31 @@ class ValidationService extends AbstractController
     }
 
 
-    public function approbationEmail(Validation $validation, User $user, string $comment = null)
+    // public function approbationEmail(Validation $validation, User $user)
+    // {
+    //     $upload = $validation->getUpload();
+    //     $filename = $upload->getFilename();
+    //     $uploader = $upload->getUploader();
+    //     $uploaderName = $uploader->getUsername();
+
+    //     $subject = 'Docauposte - Nouvelle validation à effectuer du document ' . $filename;
+    //     $html = "<p> Bonjour, </p>
+    //     <p> Vous avez une nouvelle validation à effectuer du document $filename qui a été uploadé par $uploaderName.</p>
+    //     <p> Le document doit être validé par "{% for approbation in upload.validation.approbations %} {{ approbation.userapprobator.username }}, {% endfor %}".</p>
+    //     <p> Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant : <a class='btn-info' href='http://slanlp0033/login'>Page de connexion</a></p>
+    //     <p> Cordialement </p>";
+
+
+    //     $this->mailerService->sendEmail($user, $subject, $html);
+    // }
+
+    public function approbationEmail(Approbation $approbation)
     {
-        $upload = $validation->getUpload();
-        $filename = $upload->getFilename();
-        $uploader = $upload->getUploader();
-        $uploaderName = $uploader->getUsername();
 
 
-        $subject = 'Docauposte - Nouvelle validation à effectuer du document ' . $filename;
-        $html = "<p> Bonjour, </p>
-        <p> Vous avez une nouvelle validation à effectuer du document '  $filename  ' qui a été uploadé par '  $uploaderName  '.</p>
-        <p> Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant : <a class='btn-info' href='http://slanlp0033/login'>Page de connexion</a></p>
-        <p> Cordialement, </p>";
-
-        $this->mailerService->sendEmail($user, $subject, $html);
+        $this->mailerService->sendApprobationEmail($approbation);
     }
+
 
     public function disapprobationEmail(Validation $validation, User $user, string $comment = null)
     {
@@ -277,20 +289,52 @@ class ValidationService extends AbstractController
         $approbatorName = $user->getUsername();
         $recipient = $upload->getUploader();
 
-
         $subject = 'Docauposte - Le document ' . $filename . ' a été refusé par ' . $approbatorName . '.';
         if ($comment !== null) {
             $html = "<p> Bonjour, </p>
-                    <p> Votre document ' $filename ' a été refusé par ' $approbatorName '.'</p>
-                    <p> Avec le commentaire de refus suivant : ' . $comment . '</p>
+                    <p> Votre document $filename a été refusé par $approbatorName.'</p>
+                    <p> Avec le commentaire de refus suivant : ' $comment '</p>
                     <p> Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant : <a class='btn-info' href='http://slanlp0033/login'>Page de connexion</a></p>
                     <p> Cordialement, </p>";
         }
         $html = "<p> Bonjour, </p>
-        <p> Votre document ' . $filename . ' a été refusé par ' . $approbatorName . '.'</p>
+        <p> Votre document $filename a été refusé par $approbatorName.'</p>
         <p> Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant : <a class='btn-info' href='http://slanlp0033/login'>Page de connexion</a></p>
-        <p> Cordialement, </p>";
+        <p> Cordialement </p>";
 
         $this->mailerService->sendEmail($recipient, $subject, $html);
+    }
+
+
+    public function disapprovedModifiedEmail(Validation $validation, User $user)
+    {
+        $upload = $validation->getUpload();
+        $filename = $upload->getFilename();
+        $uploader = $upload->getUploader();
+        $uploaderName = $uploader->getUsername();
+
+        $subject = 'Docauposte - Validation suite à modification ' . $filename;
+        $html = "<p> Bonjour, </p>
+        <p> Vous avez une validation à effectuer d'une nouvelle version du document $filename qui a été uploadé par $uploaderName consécutivement à votre refus.</p>
+        <p> Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant : <a class='btn-info' href='http://slanlp0033/login'>Page de connexion</a></p>
+        <p> Cordialement </p>";
+
+        $this->mailerService->sendEmail($user, $subject, $html);
+    }
+
+
+    public function approvalEmail(Validation $validation)
+    {
+        $upload = $validation->getUpload();
+        $filename = $upload->getFilename();
+        $uploader = $upload->getUploader();
+
+        $subject = 'Docauposte - Le document ' . $filename . ' a été validé';
+        $html = "<p> Bonjour, </p>
+        <p> Le document $filename a été accepté par les valideurs. Il est désormais disponible à la consultation publique. </p>
+        <p> Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant : <a class='btn-info' href='http://slanlp0033/login'>Page de connexion</a></p>
+        <p> Cordialement </p>";
+
+        $this->mailerService->sendEmail($uploader, $subject, $html);
     }
 }
