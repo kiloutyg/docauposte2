@@ -17,6 +17,9 @@ php bin/console cache:clear --no-warmup --env=dev;
 # Warm up the cache
 php bin/console cache:warmup --env=dev;
 
+# Create the migrations directory
+mkdir -p migrations;
+
 # Create the database and run the migrations
 php bin/console make:migration;
 php bin/console doctrine:migrations:migrate;
