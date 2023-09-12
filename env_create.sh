@@ -18,7 +18,7 @@ done
 APP_SECRET=$(openssl rand -hex 16)
 
 # Create docker-compose.override.yml file to use the good entrypoint
-if ["$APP_CONTEXT" == "prod"]; then
+if [ "$APP_CONTEXT" == "prod" ]; then
 cat > docker-compose.override.yml <<EOL
 version: '3.8'
 
