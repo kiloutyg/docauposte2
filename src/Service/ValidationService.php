@@ -97,6 +97,8 @@ class ValidationService extends AbstractController
             $validator_user = null;
         }
 
+        // Send a notification email to the validator
+        $this->approbationEmail($validation);
 
         // Return the Validation instance
         return $validation;
@@ -118,10 +120,11 @@ class ValidationService extends AbstractController
 
         // Persist the Approbation instance to the database
         $this->em->persist($approbation);
-        // Send a notification email to the validator
-        $this->approbationEmail($approbation);
+
         // Flush changes to the database
         $this->em->flush();
+
+
 
         // Return the Approbation instance
         return $approbation;
@@ -256,29 +259,16 @@ class ValidationService extends AbstractController
     }
 
 
-    // public function approbationEmail(Validation $validation, User $user)
-    // {
-    //     $upload = $validation->getUpload();
-    //     $filename = $upload->getFilename();
-    //     $uploader = $upload->getUploader();
-    //     $uploaderName = $uploader->getUsername();
 
-    //     $subject = 'Docauposte - Nouvelle validation à effectuer du document ' . $filename;
-    //     $html = "<p> Bonjour, </p>
-    //     <p> Vous avez une nouvelle validation à effectuer du document $filename qui a été uploadé par $uploaderName.</p>
-    //     <p> Le document doit être validé par "{% for approbation in upload.validation.approbations %} {{ approbation.userapprobator.username }}, {% endfor %}".</p>
-    //     <p> Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant : <a class='btn-info' href='http://slanlp0033/login'>Page de connexion</a></p>
-    //     <p> Cordialement </p>";
-
-
-    //     $this->mailerService->sendEmail($user, $subject, $html);
-    // }
-
-    public function approbationEmail(Approbation $approbation)
+    public function approbationEmail(Validation $validation)
     {
 
-
-        $this->mailerService->sendApprobationEmail($approbation);
+        $approbations = [];
+        $approbations = $this->approbationRepository->findBy(['Validation' => $validation]);
+        foreach ($approbations as $approbation) {
+            $approbationId = $approbation->getId();
+            $this->mailerService->sendApprobationEmail($approbationId);
+        }
     }
 
 

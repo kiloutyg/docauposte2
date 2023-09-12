@@ -18,6 +18,7 @@ use App\Entity\Validation;
 use App\Entity\User;
 use App\Entity\Upload;
 use App\Entity\Approbation;
+use App\Repository\ApprobationRepository;
 
 class MailerService extends AbstractController
 {
@@ -26,19 +27,22 @@ class MailerService extends AbstractController
     private $mailer;
     private $validationRepository;
     private $logger;
+    private $approbationRepository;
 
     public function __construct(
         Security $security,
         UserRepository $userRepository,
         MailerInterface $mailer,
         ValidationRepository $validationRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ApprobationRepository $approbationRepository
     ) {
         $this->security             = $security;
         $this->userRepository       = $userRepository;
         $this->mailer               = $mailer;
         $this->validationRepository = $validationRepository;
         $this->logger               = $logger;
+        $this->approbationRepository = $approbationRepository;
     }
 
     public function sendEmail(User $recipient, string $subject, string $html)
@@ -62,24 +66,31 @@ class MailerService extends AbstractController
         }
     }
 
-    public function sendApprobationEmail(Approbation $approbation)
+    public function sendApprobationEmail(int $approbationId)
     {
-        $sender = $this->security->getUser();
-        $senderEmail = $sender->getEmailAddress();
 
-        $emailRecipientsAddress = $approbation->getUserApprobator()->getEmailAddress();
+        $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
+
+        $senderEmail = 'lan.docauposte@plasticomnium.com';
+
+        $approbator = $approbation->getUserApprobator();
+        $emailRecipientsAddress = $approbator->getEmailAddress();
 
         $validation = $approbation->getValidation();
+
         $upload = $validation->getUpload();
+
         $filename = $upload->getFilename();
 
+        $approbations = [];
+        $approbations = $this->approbationRepository->findBy(['Validation' => $validation]);
+
         $approbators = [];
-
-        $approbations = $validation->getApprobations();
-        foreach ($approbations as $approbation) {
-            $approbators[] = $approbation->getUserApprobator();
+        foreach ($approbations as $soleApprobation) {
+            if ($soleApprobation->getUserApprobator() != $approbator) {
+                $approbators[] = $soleApprobation->getUserApprobator();
+            }
         }
-
 
         $email = (new TemplatedEmail())
             ->from($senderEmail)
@@ -87,10 +98,14 @@ class MailerService extends AbstractController
             ->subject('Docauposte - Nouvelle validation à effectuer du document ' . $filename)
             ->htmlTemplate('email_templates/approbationEmail.html.twig')
             ->context([
-                'upload' => $upload,
-                'validation' => $validation,
-                'approbations' => $approbations,
-                'approbators' => $approbators,
+                'upload'                    => $upload,
+                'validation'                => $validation,
+                'approbation'               => $approbation,
+                'approbator'                => $approbator,
+                'approbators'               => $approbators,
+                'filename'                  => $filename,
+                'senderEmail'               => $senderEmail,
+                'emailRecipientsAddress'    => $emailRecipientsAddress,
             ]);
 
         try {
