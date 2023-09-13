@@ -68,13 +68,11 @@ class UploadController extends FrontController
         if ($conflictFile) {
             $this->addFlash('error', 'Le fichier ' . $filename . ' existe déjà.');
             return $this->redirect($originUrl);
-
         } else {
             // Use the UploadService to handle file uploads
             $name = $this->uploadService->uploadFiles($request, $buttonEntity, $user, $newFileName);
             $this->addFlash('success', 'Le document ' . $name . ' a été correctement chargé');
             return $this->redirect($originUrl);
-
         }
     }
 
@@ -191,14 +189,21 @@ class UploadController extends FrontController
             return $this->redirect($originUrl); // Return a 400 Bad Request response
         }
 
+        $currentUser = $this->security->getUser();
+        $uploader = $upload->getUploader();
         // If it's a GET request, render the form
-        return $this->render('services/uploads/uploads_modification.html.twig', [
-            'form'        => $form->createView(),
-            'zone'        => $zone,
-            'productLine' => $productLine,
-            'category'    => $category,
-            'button'      => $button,
-            'upload'      => $upload
-        ]);
+        if ($request->isMethod('GET') && $currentUser === $uploader) {
+            return $this->render('services/uploads/uploads_modification.html.twig', [
+                'form'        => $form->createView(),
+                'zone'        => $zone,
+                'productLine' => $productLine,
+                'category'    => $category,
+                'button'      => $button,
+                'upload'      => $upload
+            ]);
+        } else {
+            $this->addFlash('error', 'Vous n\'avez pas les droits pour modifier ce fichier.');
+            return $this->redirectToRoute('app_base');
+        }
     }
 }

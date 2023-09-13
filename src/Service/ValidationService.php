@@ -142,6 +142,10 @@ class ValidationService extends AbstractController
 
         // Set the Approval property of the Approbation instance
         $approbation->setApproval($approval);
+
+        // Set the Approval Date property of the Approbation instance
+        $approbation->setApprovedAt(new \DateTime());
+
         // Set the Comment property of the Approbation instance
         $approbation->setComment($comment);
 
@@ -196,7 +200,10 @@ class ValidationService extends AbstractController
         if ($validation->isStatus() === false) {
             return;
         }
+        // Set the status of the Validation instance to true
         $validation->setStatus($status);
+        // Set the Validated Date property of the Validation instance
+        $validation->setValidatedAt(new \DateTime());
         // Persist the Validation instance to the database
         $this->em->persist($validation);
         // Flush changes to the database
@@ -235,6 +242,7 @@ class ValidationService extends AbstractController
             if ($request->request->get('modification-outlined') == 'heavy-modification') {
                 // Remove the Approbation instance from the database
                 $approbation->setApproval(null);
+                $approbation->setApprovedAt(null);
                 $approbation->setComment(null);
                 $approbator = $approbation->getUserApprobator();
                 $this->disapprovedModifiedEmail($validation, $approbator);
@@ -243,6 +251,7 @@ class ValidationService extends AbstractController
             elseif ($approbation->isApproval() == false) {
                 // Remove the Approbation instance from the database
                 $approbation->setApproval(null);
+                $approbation->setApprovedAt(null);
                 $approbation->setComment(null);
                 $approbator = $approbation->getUserApprobator();
                 $this->disapprovedModifiedEmail($validation, $approbator);
@@ -257,8 +266,6 @@ class ValidationService extends AbstractController
         // Return early
         return;
     }
-
-
 
     public function approbationEmail(Validation $validation)
     {

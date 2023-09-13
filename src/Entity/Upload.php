@@ -102,15 +102,6 @@ class Upload
         return $this;
     }
 
-    // #[ORM\PrePersist]
-    // #[ORM\PreUpdate]
-
-    // public function updatePath(): void
-    // {
-    //     // This is just an example, adjust it according to your actual directory structure.
-
-    //     $this->path = '/var/www/public/doc/' . $this->filename;
-    // }
 
     public function getExpiryDate(): ?\DateTimeInterface
     {
@@ -149,35 +140,6 @@ class Upload
         return $this;
     }
 
-    // /**
-    //  * @return Collection<int, Incident>
-    //  */
-    // public function getIncidents(): Collection
-    // {
-    //     return $this->incidents;
-    // }
-
-    // public function addIncident(Incident $incident): self
-    // {
-    //     if (!$this->incidents->contains($incident)) {
-    //         $this->incidents->add($incident);
-    //         $incident->setUpload($this);
-    //     }
-
-    //     return $this;
-    // }
-
-    // public function removeIncident(Incident $incident): self
-    // {
-    //     if ($this->incidents->removeElement($incident)) {
-    //         // set the owning side to null (unless already changed)
-    //         if ($incident->getUpload() === $this) {
-    //             $incident->setUpload(null);
-    //         }
-    //     }
-
-    //     return $this;
-    // }
 
     public function getDisplayOption(): ?DisplayOption
     {
