@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ValidationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ValidationRepository::class)]
@@ -24,6 +25,9 @@ class Validation
 
     #[ORM\OneToMany(mappedBy: 'Validation', targetEntity: Approbation::class, orphanRemoval: true)]
     private Collection $approbations;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $validated_at = null;
 
     public function __construct()
     {
@@ -85,6 +89,18 @@ class Validation
                 $approbation->setValidation(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getValidatedAt(): ?\DateTimeInterface
+    {
+        return $this->validated_at;
+    }
+
+    public function setValidatedAt(?\DateTimeInterface $validated_at): static
+    {
+        $this->validated_at = $validated_at;
 
         return $this;
     }

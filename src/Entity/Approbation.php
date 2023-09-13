@@ -27,6 +27,9 @@ class Approbation
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $Comment = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $Approved_at = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -76,6 +79,18 @@ class Approbation
     public function setComment(?string $Comment): static
     {
         $this->Comment = $Comment;
+
+        return $this;
+    }
+
+    public function getApprovedAt(): ?\DateTimeInterface
+    {
+        return $this->Approved_at;
+    }
+
+    public function setApprovedAt(?\DateTimeInterface $Approved_at): static
+    {
+        $this->Approved_at = $Approved_at;
 
         return $this;
     }
