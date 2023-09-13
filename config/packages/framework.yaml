@@ -17,9 +17,7 @@ framework:
     #fragments: true
     php_errors:
         log: true
-    date:
-        # https://php.net/manual/en/timezones.php
-        timezone: Europe/Paris
+
 
 when@test:
     framework:

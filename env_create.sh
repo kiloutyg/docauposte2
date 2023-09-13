@@ -47,6 +47,7 @@ MYSQL_PASSWORD=${MYSQL_PASSWORD}
 ###> symfony/framework-bundle ###
 APP_ENV=${APP_CONTEXT}
 APP_SECRET=${APP_SECRET}
+APP_TIMEZONE=Europe/Paris
 ###< symfony/framework-bundle ###
 
 ###> symfony/webapp-pack ###
