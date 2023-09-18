@@ -26,6 +26,7 @@ class UploadController extends FrontController
         return $this->render('/services/uploads/upload.html.twig', []);
     }
 
+
     // This function is responsible for rendering the uploaded files interface
     #[Route('/uploaded', name: 'uploaded_files')]
     public function uploaded_files(): Response
@@ -35,24 +36,20 @@ class UploadController extends FrontController
         );
     }
 
+
     // Create a route to upload a file, and pass the request to the UploadService to handle the file upload
     #[Route('/uploading', name: 'generic_upload_files')]
     public function generic_upload_files(Request $request): Response
     {
-
         // Get the URL of the page from which the request originated
         $originUrl = $request->headers->get('Referer');
-
         // Retrieve the User object
         $user = $this->getUser();
-
         // Retrieve the button and the newFileName from the request
         $button      = $request->request->get('button');
         $newFileName = $request->request->get('newFileName');
-
         // Find the Button entity in the repository based on its ID
         $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
-
         // Check if the file already exists by comparing the filename and the button
         $conflictFile = '';
         $filename     = '';
@@ -63,7 +60,6 @@ class UploadController extends FrontController
             $filename = $file->getClientOriginalName();
         }
         $conflictFile = $this->uploadRepository->findOneBy(['button' => $buttonEntity, 'filename' => $filename]);
-
         // If the file already exists, return an error message
         if ($conflictFile) {
             $this->addFlash('error', 'Le fichier ' . $filename . ' existe déjà.');
@@ -76,15 +72,14 @@ class UploadController extends FrontController
         }
     }
 
+
     // create a route to download a file in more simple terms to display the file
     #[Route('/download/{uploadId}', name: 'download_file')]
     public function download_file(int $uploadId = null, Request $request): Response
     {
         // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
-
         $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
-
         if (!$file->isValidated()) {
             $this->addFlash('error', 'Le fichier n\'a pas été validé.');
             return $this->redirect($originUrl);
@@ -94,15 +89,14 @@ class UploadController extends FrontController
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
+
     // create a route to download a file in more simple terms to display the file
     #[Route('/download/invalidation/{uploadId}', name: 'download_invalidation_file')]
     public function download_invalidation_file(int $uploadId = null, Request $request): Response
     {
         // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
-
         $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
-
         $path = $file->getPath();
         $file = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
@@ -135,7 +129,6 @@ class UploadController extends FrontController
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
 
-
         // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
 
@@ -151,8 +144,8 @@ class UploadController extends FrontController
         // Create a form to modify the Upload entity
         $form = $this->createForm(UploadType::class, $upload);
 
-        $form->remove('approbator');
-        $form->remove('modificationType');
+        // $form->remove('approbator');
+        // $form->remove('modificationType');
 
         $form->handleRequest($request);
 
@@ -164,7 +157,6 @@ class UploadController extends FrontController
                 return $this->redirect($originUrl);
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
-
                 return $this->redirect($originUrl);
             }
         }

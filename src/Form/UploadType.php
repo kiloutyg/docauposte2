@@ -32,6 +32,7 @@ use App\Entity\Approbation;
 // It also contains the logic for the form validation and the form submission.
 class UploadType extends AbstractType
 {
+    // Dependency injection of ButtonRepository and LoggerInterface
     private $buttonRepository;
     private $logger;
 
@@ -40,12 +41,15 @@ class UploadType extends AbstractType
         $this->buttonRepository = $buttonRepository;
         $this->logger = $logger;
     }
+
+    // Builds the form using FormBuilderInterface
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $currentUserId = $options['current_user_id'];
         $currentApprobationId = $options['current_approbation_id'];
 
         $builder
+            // Adds a file input field to the form
             ->add(
                 'file',
                 FileType::class,
@@ -55,6 +59,7 @@ class UploadType extends AbstractType
                     'required' => false,
                 ]
             )
+            // Adds a text input field for the filename to the form
             ->add(
                 'filename',
                 TextType::class,
@@ -64,6 +69,7 @@ class UploadType extends AbstractType
                     'empty_data' => null,
                 ]
             )
+            // Adds an entity field for selecting a button to the form
             ->add(
                 'button',
                 EntityType::class,
@@ -76,37 +82,41 @@ class UploadType extends AbstractType
                     'multiple' => false,
                 ]
             )
-            ->add(
-                'approbator',
-                EntityType::class,
-                [
-                    'class' => User::class, // Adjust this to match your User entity namespace
-                    'query_builder' => function (EntityRepository $er) use ($currentUserId, $currentApprobationId) {
-                        return $er->createQueryBuilder('u')
-                            ->leftJoin('u.approbations', 'a') // Assuming 'approbations' is a relationship in your User entity
-                            ->where('u.roles NOT LIKE :role')
-                            ->andWhere('a.id = :currentApprobationId')
-                            ->andWhere('u.id != :currentUserId')
-                            ->setParameter('role', '%ROLE_SUPER_ADMIN%')
-                            ->setParameter('currentUserId', $currentUserId)
-                            ->setParameter('currentApprobationId', $currentApprobationId)
-                            ->orderBy('u.username', 'ASC');
-                    },
-                    'choice_label' => 'username', // Assuming your user entity has a 'username' property
-                    'label' => 'Select approbators:',
-                    'required' => false,
-                    'multiple' => true, // Now the form can accept multiple approbators
-                    'mapped' => false // This is the important part
-                ]
-            )
-            ->add('modificationType', ChoiceType::class, [
-                'mapped' => false,  // this tells Symfony not to expect the `modificationType` property on the entity
-                'choices' => [
-                    'Modification Mineure' => 'light-modification',
-                    'Modification Majeure' => 'heavy-modification',
-                ],
-            ]);
+            // // Adds an entity field for selecting approbators to the form
+            // ->add(
+            //     'approbator',
+            //     EntityType::class,
+            //     [
+            //         'class' => User::class, // Adjust this to match your User entity namespace
+            //         'query_builder' => function (EntityRepository $er) use ($currentUserId, $currentApprobationId) {
+            //             return $er->createQueryBuilder('u')
+            //                 ->leftJoin('u.approbations', 'a') // Assuming 'approbations' is a relationship in your User entity
+            //                 ->where('u.roles NOT LIKE :role')
+            //                 ->andWhere('a.id = :currentApprobationId')
+            //                 ->andWhere('u.id != :currentUserId')
+            //                 ->setParameter('role', '%ROLE_SUPER_ADMIN%')
+            //                 ->setParameter('currentUserId', $currentUserId)
+            //                 ->setParameter('currentApprobationId', $currentApprobationId)
+            //                 ->orderBy('u.username', 'ASC');
+            //         },
+            //         'choice_label' => 'username', // Assuming your user entity has a 'username' property
+            //         'label' => 'Select approbators:',
+            //         'required' => false,
+            //         'multiple' => true, // Now the form can accept multiple approbators
+            //         'mapped' => false // This is the important part
+            //     ]
+            // )
+            // // Adds a choice field for selecting the modification type to the form
+            // ->add('modificationType', ChoiceType::class, [
+            //     'mapped' => false,  // this tells Symfony not to expect the `modificationType` property on the entity
+            //     'choices' => [
+            //         'Modification Mineure' => 'light-modification',
+            //         'Modification Majeure' => 'heavy-modification',
+            //     ],
+            // ])
+        ;
 
+        // Event listener triggered before form submission 
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             $data = $event->getData();
             $form = $event->getForm();
@@ -118,6 +128,7 @@ class UploadType extends AbstractType
         });
     }
 
+    // Configures the options for the form
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
