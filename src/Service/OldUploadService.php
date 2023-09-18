@@ -51,22 +51,22 @@ class OldUploadService extends AbstractController
             $filename           = $upload->getFilename();
             $oldFilename        = $filename . '_Old.pdf';
 
-            // // New file path
-            // $buttonname = $button->getName();
-            // $parts      = explode('.', $buttonname);
-            // $parts      = array_reverse($parts);
-            // $public_dir = $this->projectDir . '/public';
-            // $folderPath = $public_dir . '/doc';
-            // foreach ($parts as $part) {
-            //     $folderPath .= '/' . $part;
-            // }
-            // $originalFile       = $upload->getFile();
-            // $originalFile->move($folderPath . '/', $oldFilename);
-            // $oldPath = $folderPath . '/' . $oldFilename;
+            // New file path
+            $buttonname = $button->getName();
+            $parts      = explode('.', $buttonname);
+            $parts      = array_reverse($parts);
+            $public_dir = $this->projectDir . '/public';
+            $folderPath = $public_dir . '/doc';
+            foreach ($parts as $part) {
+                $folderPath .= '/' . $part;
+            }
+
+            $oldPath = $folderPath . '/' . $oldFilename;
+            $path = $folderPath . '/' . $filename;
 
 
-            $path               = $upload->getPath();
-            $oldPath            = $path . '_Old';
+            // $path               = $upload->getPath();
+            // $oldPath            = $path . '_Old';
 
             // Copy the file with the new name
             if (copy($path, $oldPath)) {

@@ -49,39 +49,39 @@ class EntityDeletionService
 
 
     public function __construct(
-        EntityManagerInterface $em,
-        ZoneRepository $zoneRepository,
-        ProductLineRepository $productLineRepository,
-        CategoryRepository $categoryRepository,
-        ButtonRepository $buttonRepository,
-        UploadRepository $uploadRepository,
-        IncidentRepository $incidentRepository,
-        UploadService $uploadService,
-        IncidentCategoryRepository $incidentCategoryRepository,
-        IncidentService $incidentService,
-        FolderCreationService $folderCreationService,
-        DepartmentRepository $departmentRepository,
-        UserRepository $userRepository,
-        ValidationRepository $validationRepository,
-        OldUploadRepository $OldUploadRepository,
-        OldUploadService $oldUploadService
+        EntityManagerInterface          $em,
+        ZoneRepository                  $zoneRepository,
+        ProductLineRepository           $productLineRepository,
+        CategoryRepository              $categoryRepository,
+        ButtonRepository                $buttonRepository,
+        UploadRepository                $uploadRepository,
+        IncidentRepository              $incidentRepository,
+        UploadService                   $uploadService,
+        IncidentCategoryRepository      $incidentCategoryRepository,
+        IncidentService                 $incidentService,
+        FolderCreationService           $folderCreationService,
+        DepartmentRepository            $departmentRepository,
+        UserRepository                  $userRepository,
+        ValidationRepository            $validationRepository,
+        OldUploadRepository             $OldUploadRepository,
+        OldUploadService                $oldUploadService
     ) {
-        $this->em = $em;
-        $this->zoneRepository = $zoneRepository;
-        $this->productLineRepository = $productLineRepository;
-        $this->categoryRepository = $categoryRepository;
-        $this->buttonRepository = $buttonRepository;
-        $this->uploadRepository = $uploadRepository;
-        $this->uploadService = $uploadService;
-        $this->incidentRepository = $incidentRepository;
-        $this->incidentCategoryRepository = $incidentCategoryRepository;
-        $this->incidentService = $incidentService;
-        $this->folderCreationService = $folderCreationService;
-        $this->departmentRepository = $departmentRepository;
-        $this->userRepository = $userRepository;
-        $this->validationRepository = $validationRepository;
-        $this->OldUploadRepository = $OldUploadRepository;
-        $this->oldUploadService = $oldUploadService;
+        $this->em                           = $em;
+        $this->zoneRepository               = $zoneRepository;
+        $this->productLineRepository        = $productLineRepository;
+        $this->categoryRepository           = $categoryRepository;
+        $this->buttonRepository             = $buttonRepository;
+        $this->uploadRepository             = $uploadRepository;
+        $this->uploadService                = $uploadService;
+        $this->incidentRepository           = $incidentRepository;
+        $this->incidentCategoryRepository   = $incidentCategoryRepository;
+        $this->incidentService              = $incidentService;
+        $this->folderCreationService        = $folderCreationService;
+        $this->departmentRepository         = $departmentRepository;
+        $this->userRepository               = $userRepository;
+        $this->validationRepository         = $validationRepository;
+        $this->OldUploadRepository          = $OldUploadRepository;
+        $this->oldUploadService             = $oldUploadService;
     }
 
     // This function is responsible for deleting an entity and its related entities from the database and the server filesystem
@@ -174,7 +174,6 @@ class EntityDeletionService
             }
         } elseif ($entityType === 'upload') {
             $this->deleteEntity('validation', $entity->getValidation()->getId());
-            $this->deleteEntity('oldUpload', $entity->getOldUpload()->getId());
             $this->uploadService->deleteFile($entity->getId());
         } elseif ($entityType === 'incident') {
             $this->incidentService->deleteIncidentFile($entity->getName(), $entity->getProductLine());
@@ -182,9 +181,10 @@ class EntityDeletionService
             foreach ($entity->getUsers() as $user) {
                 $entity->removeUser($user);
             }
-        } elseif ($entityType === 'oldUpload') {
-            $this->oldUploadService->deleteOldFile($entity->getId());
         }
+        // elseif ($entityType === 'oldUpload') {
+        //     $this->oldUploadService->deleteOldFile($entity->getId());
+        // }
 
 
         $this->em->remove($entity);

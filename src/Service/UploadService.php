@@ -159,6 +159,10 @@ class UploadService extends AbstractController
     public function deleteFile(int $uploadId)
     {
         $upload     = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        if ($upload->getOldUpload() != null) {
+            $oldUploadId = $upload->getOldUpload()->getId();
+            $this->oldUploadService->deleteoldFile($oldUploadId);
+        }
         $filename   = $upload->getFilename();
         $name       = $filename;
         $public_dir = $this->projectDir . '/public';
