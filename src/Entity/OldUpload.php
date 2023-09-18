@@ -31,7 +31,7 @@ class OldUpload
     private ?\DateTimeInterface $expiry_date = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $Olduploaded_at = null;
+    private ?\DateTimeInterface $olduploaded_at = null;
 
 
     #[ORM\ManyToOne(inversedBy: 'olduploads')]
@@ -44,11 +44,8 @@ class OldUpload
     #[ORM\Column(nullable: true)]
     private ?bool $validated = null;
 
-    #[ORM\OneToOne(mappedBy: 'oldUpload', cascade: ['persist', 'remove'])]
-    private ?Validation $validation = null;
-
     #[ORM\ManyToOne(inversedBy: 'olduploads')]
-    private ?User $Olduploader = null;
+    private ?User $olduploader = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $revision = null;
@@ -57,12 +54,7 @@ class OldUpload
     private ?Upload $upload = null;
 
 
-
-
-
     #[ORM\OneToOne(inversedBy: 'oldupload', cascade: ['persist', 'remove'])]
-
-
 
 
     public function setFile(?File $file = null): void
@@ -70,7 +62,7 @@ class OldUpload
         $this->file = $file;
 
         if (null !== $file) {
-            $this->Olduploaded_at = new \DateTime();
+            $this->olduploaded_at = new \DateTime();
         }
     }
 
@@ -123,12 +115,12 @@ class OldUpload
 
     public function getOldUploadedAt(): ?\DateTimeInterface
     {
-        return $this->Olduploaded_at;
+        return $this->olduploaded_at;
     }
 
-    public function setOldUploadedAt(\DateTimeInterface $Olduploaded_at): self
+    public function setOldUploadedAt(\DateTimeInterface $olduploaded_at): self
     {
-        $this->Olduploaded_at = $Olduploaded_at;
+        $this->olduploaded_at = $olduploaded_at;
 
         return $this;
     }
@@ -174,12 +166,12 @@ class OldUpload
 
     public function getOldUploader(): ?User
     {
-        return $this->Olduploader;
+        return $this->olduploader;
     }
 
-    public function setOldUploader(?User $Olduploader): static
+    public function setOldUploader(?User $olduploader): static
     {
-        $this->Olduploader = $Olduploader;
+        $this->olduploader = $olduploader;
 
         return $this;
     }

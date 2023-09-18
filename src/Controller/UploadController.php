@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 use App\Form\UploadType;
 
+use App\Entity\Upload;
+
 
 
 // This controlle is responsible for managing the logic of the upload interface
@@ -75,13 +77,22 @@ class UploadController extends FrontController
 
     // create a route to download a file in more simple terms to display the file
     #[Route('/download/{uploadId}', name: 'download_file')]
-    public function download_file(int $uploadId = null, Request $request): Response
+    public function download_file(int $uploadId, Request $request): Response
     {
         // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
-        $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $file = $upload;
         if (!$file->isValidated()) {
             $this->addFlash('error', 'Le fichier n\'a pas été validé.');
+            if ($file->getOldUpload() != null) {
+                $oldUploadId = $file->getOldUpload()->getId();
+                $oldUpload = $this->oldUploadRepository->findOneBy(['id' => $oldUploadId]);
+                $path = $oldUpload->getPath();
+                $file = new File($path);
+                return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
+            }
+
             return $this->redirect($originUrl);
         }
         $path = $file->getPath();
@@ -144,14 +155,12 @@ class UploadController extends FrontController
         // Create a form to modify the Upload entity
         $form = $this->createForm(UploadType::class, $upload);
 
-        // $form->remove('approbator');
-        // $form->remove('modificationType');
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
+                $this->oldUploadService->retireOldUpload($upload);
                 $this->uploadService->modifyFile($upload, $user, $request);
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirect($originUrl);

@@ -164,7 +164,7 @@ class FrontController extends BaseController
 
         $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonEntity->getId()]);
         foreach ($buttonUploads as $buttonUpload) {
-            if ($buttonUpload->isValidated()) {
+            if ($buttonUpload->isValidated() || $buttonUpload->getOldUpload() != null) {
                 $uploads[] = $buttonUpload;
             }
         }
@@ -183,6 +183,7 @@ class FrontController extends BaseController
             );
         } else {
             $uploadId = $uploads[0]->getId();
+            $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
             return $uploadController->download_file($uploadId, $request);
         }
     }

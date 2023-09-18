@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\File;
@@ -14,10 +15,11 @@ use App\Repository\UploadRepository;
 
 use App\Entity\Upload;
 use App\Entity\User;
+use App\Entity\OldUpload;
 
 use App\Service\FolderCreationService;
 use App\Service\ValidationService;
-
+use App\Service\OldUploadService;
 
 // This class is used to manage the uploads files and logic
 class UploadService extends AbstractController
@@ -29,6 +31,7 @@ class UploadService extends AbstractController
     protected $buttonRepository;
     protected $folderCreationService;
     protected $validationService;
+    protected $oldUploadService;
 
 
     public function __construct(
@@ -38,7 +41,8 @@ class UploadService extends AbstractController
         ParameterBagInterface $params,
         UploadRepository $uploadRepository,
         LoggerInterface $logger,
-        validationService $validationService
+        ValidationService $validationService,
+        OldUploadService $oldUploadService
     ) {
         $this->uploadRepository      = $uploadRepository;
         $this->manager               = $manager;
@@ -47,6 +51,7 @@ class UploadService extends AbstractController
         $this->buttonRepository      = $buttonRepository;
         $this->folderCreationService = $folderCreationService;
         $this->validationService     = $validationService;
+        $this->oldUploadService      = $oldUploadService;
     }
 
     // This function is responsible for the logic of uploading the uploads files
@@ -355,24 +360,5 @@ class UploadService extends AbstractController
         $this->manager->flush();
 
         $this->validationService->resetApprobation($upload, $request);
-    }
-
-    public function retireOldUpload(Upload $upload)
-    {
-        $button = $upload->getButton();
-        $displayOption = $button->getDisplayOption();
-        $uploader = $upload->getUploader();
-        $filename = $upload->getFilename();
-        $path = $upload->getPath();
-        $expiry_date = $button->getExpiryDate();
-        $uploadedAt = $upload->getUploadedAt();
-        $validated = $upload->getValidated();
-        $revision = $upload->getRevision();
-
-
-        $upload->setValidated();
-        $upload->setUploadedAt(new \DateTime());
-        $this->manager->persist($upload);
-        $this->manager->flush();
     }
 }
