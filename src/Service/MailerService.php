@@ -115,4 +115,90 @@ class MailerService extends AbstractController
             return $e->getMessage();
         }
     }
+
+    public function sendDisapprobationEmail(Validation $validation)
+    {
+
+        $upload = $validation->getUpload();
+
+        $approbations = [];
+        $approbators = [];
+
+        $approbations = $this->approbationRepository->findBy(['Validation' => $validation, 'Approval' => false]);
+        foreach ($approbations as $approbation) {
+            $approbators[] = $approbation->getUserApprobator();
+        }
+
+        $senderEmail = 'lan.docauposte@plasticomnium.com';
+        $emailRecipientsAddress = $upload->getUploader()->getEmailAddress();
+
+        $email = (new TemplatedEmail())
+            ->from($senderEmail)
+            ->to($emailRecipientsAddress)
+            ->subject('Docauposte - Le document ' . $$upload->getFilename() . ' a été refusé.')
+            ->htmlTemplate('email_templates/disapprobationEmail.html.twig')
+            ->context([
+                'upload'                    => $upload,
+                'approbations'              => $approbations
+            ]);
+
+        try {
+            $this->mailer->send($email);
+            return true;
+        } catch (TransportExceptionInterface $e) {
+            return $e->getMessage();
+        }
+    }
+
+
+    public function sendDisapprovedModifiedEmail(Validation $validation, User $user)
+    {
+        $senderEmail = 'lan.docauposte@plasticomnium.com';
+        $upload = $validation->getUpload();
+        $filename = $upload->getFilename();
+
+        $emailRecipientsAddress = $user->getEmailAddress();
+
+        $email = (new TemplatedEmail())
+            ->from($senderEmail)
+            ->to($emailRecipientsAddress)
+            ->subject('Docauposte - Le document ' . $filename . ' a été refusé.')
+            ->htmlTemplate('email_templates/disapprovedModifiedEmail.html.twig')
+            ->context([
+                'upload'                    => $upload,
+                'filename'                  => $filename
+            ]);
+
+        try {
+            $this->mailer->send($email);
+            return true;
+        } catch (TransportExceptionInterface $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function sendApprovalEmail(Validation $validation)
+    {
+        $upload = $validation->getUpload();
+        $senderEmail = 'lan.docauposte@plasticomnium.com';
+        $emailRecipientsAddress = $upload->getUploader()->getEmailAddress();
+        $filename = $upload->getFilename();
+
+
+        $email = (new TemplatedEmail())
+            ->from($senderEmail)
+            ->to($emailRecipientsAddress)
+            ->subject('Docauposte - Le document ' . $filename . ' a été refusé.')
+            ->htmlTemplate('email_templates/approvalEmail.html.twig')
+            ->context([
+                'upload'                    => $upload
+            ]);
+
+        try {
+            $this->mailer->send($email);
+            return true;
+        } catch (TransportExceptionInterface $e) {
+            return $e->getMessage();
+        }
+    }
 }

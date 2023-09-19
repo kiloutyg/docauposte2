@@ -1,10 +1,10 @@
 <p> Bonjour, </p>
-<p> Vous avez une nouvelle validation à effectuer du document {{upload.filename}} qui a été uploadé par {{upload.uploader.username|capitalize}}.</p>
+<p> Vous avez une nouvelle validation à effectuer du document {{upload.filename}} qui a été uploadé par <strong>{{upload.uploader.username|capitalize|split('.')|first}} {{upload.uploader.username|upper|split('.')|last }}</strong>.</p>
 <p> Le document doit aussi être validé par 
 {% for soleApprobator in approbators %}
 {% if soleApprobator is same as(approbator) %}
 {% else %}
-{{ soleApprobator.username|capitalize|split('.')|first }} {{ soleApprobator.username|upper|split('.')|last }}
+<strong>{{ soleApprobator.username|capitalize|split('.')|first }} {{ soleApprobator.username|upper|split('.')|last }}</strong>
 {% if not loop.last %}, {% elseif loop.revindex0 == 1 %} et {% else %}
 {% endif %}
 {% endif %}
