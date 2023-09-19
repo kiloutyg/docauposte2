@@ -56,7 +56,9 @@
 																				</a>
 																				{% if  is_granted('ROLE_LINE_ADMIN') %}
 																					<div class="ml-auto">
-																						{{upload.uploader.username}}|
+																						<strong>{{upload.uploader.username|capitalize|split('.')|first }} {{upload.uploader.username|upper|split('.')|last }}</strong>|
+																						Rev. {{upload.revision}}
+																						|
 																						{% if upload.validated is same as(false) %}
 																						<a href="{{path('app_validation', {'uploadId' : upload.id} )}}">{{upload.validated ? 'Validé' : 'Non validé'}}
 																						<a>
@@ -163,7 +165,8 @@
 																				</a>
 																				{% if  is_granted('ROLE_LINE_ADMIN') %}
 																					<div class="ml-auto">
-																						Mis en ligne par: <strong>{{upload.uploader.username|capitalize|split('.')|first }} {{upload.uploader.username|upper|split('.')|last }}</strong> le {{ upload.uploadedAt|date('d/m/Y') }}
+																						Mis en ligne de la Rev. {{upload.revision}}
+																						 par: <strong>{{upload.uploader.username|capitalize|split('.')|first }} {{upload.uploader.username|upper|split('.')|last }}</strong> le {{ upload.uploadedAt|date('d/m/Y') }}
 																						<br>
 																						{% if upload.validated is same as(true) %}
 																							{% if upload.validation is not empty %}

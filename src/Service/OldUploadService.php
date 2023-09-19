@@ -55,7 +55,6 @@ class OldUploadService extends AbstractController
 
             $path = $OldFilePath;
 
-
             // New file path
             $buttonname = $button->getName();
             $parts      = explode('.', $buttonname);
@@ -68,7 +67,6 @@ class OldUploadService extends AbstractController
             // $path = $folderPath . '/' . $filename;
             $oldPath = $folderPath . '/' . $oldFilename;
 
-
             // Copy the file with the new name
             if (copy($path, $oldPath)) {
                 // The file has been copied to $oldPath
@@ -77,12 +75,9 @@ class OldUploadService extends AbstractController
                 throw new \Exception("File could not be copied.");
             }
 
-
-            $expiry_date        = $upload->getExpiryDate();
             $uploadedAt         = $upload->getUploadedAt();
             $validated          = $upload->isValidated();
             $revision           = $upload->getRevision();
-
 
             $oldUpload = new OldUpload();
             $oldUpload->setFile(new File($oldPath));
@@ -90,7 +85,6 @@ class OldUploadService extends AbstractController
             $oldUpload->setOldUploader($uploader);
             $oldUpload->setFilename($oldFilename);
             $oldUpload->setPath($oldPath);
-            $oldUpload->setExpiryDate($expiry_date);
             $oldUpload->setValidated($validated);
             $oldUpload->setOldUploadedAt($uploadedAt);
             $oldUpload->setRevision($revision);
@@ -107,29 +101,13 @@ class OldUploadService extends AbstractController
     {
 
         $oldUpload      = $this->oldUploadRepository->findOneBy(['id' => $oldUploadId]);
-        // $upload         = $this->uploadRepository->findOneBy(['OldUpload' => $oldUpload]);
-        $filename       = $oldUpload->getFilename();
-        // $public_dir     = $this->projectDir . '/public';
-        // $button         = $oldUpload->getButton();
 
-        // // Dynamic folder and file deletion
-        // $buttonname     = $button->getName();
-        // $parts          = explode('.', $buttonname);
-        // $parts          = array_reverse($parts);
-        // $folderPath     = $public_dir . '/doc';
-
-        // foreach ($parts as $part) {
-        //     $folderPath .= '/' . $part;
-        // }
-
-        // $path = $folderPath . '/' . $filename;
         $path = $oldUpload->getPath();
         if (file_exists($path)) {
             unlink($path);
         }
-        // $upload->setOldUpload(null);
         $this->manager->remove($oldUpload);
-        // $this->manager->flush();
-        return $filename;
+        $this->manager->flush();
+        return;
     }
 }

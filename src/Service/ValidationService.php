@@ -217,12 +217,19 @@ class ValidationService extends AbstractController
         $upload->setValidated($status);
         // Delete the previously retired file if it exists
         if ($upload->getOldUpload() !== null) {
-            $oldUpload = $upload->getOldUpload()->getId();
-            $this->oldUploadService->deleteOldFile($oldUpload);
+            $oldUpload = $upload->getOldUpload();
         }
         $upload->setOldUpload(null);
         $this->em->persist($upload);
         $this->em->flush();
+        if (!$oldUpload == false) {
+            $path = $oldUpload->getPath();
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+        $this->em->remove($oldUpload);
+        $this->em->flush($oldUpload);
 
         $this->approvalEmail($validation);
         // Return early
