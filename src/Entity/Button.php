@@ -25,9 +25,13 @@ class Button
     #[ORM\OneToMany(mappedBy: 'button', targetEntity: Upload::class, orphanRemoval: true)]
     private Collection $uploads;
 
+    #[ORM\OneToMany(mappedBy: 'button', targetEntity: OldUpload::class, orphanRemoval: true)]
+    private Collection $olduploads;
+
     public function __construct()
     {
         $this->uploads = new ArrayCollection();
+        $this->olduploads = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -83,6 +87,37 @@ class Button
             // set the owning side to null (unless already changed)
             if ($upload->getButton() === $this) {
                 $upload->setButton(null);
+            }
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @return Collection<int, Upload>
+     */
+    public function getOldUploads(): Collection
+    {
+        return $this->olduploads;
+    }
+
+    public function addOldUpload(OldUpload $oldupload): self
+    {
+        if (!$this->olduploads->contains($oldupload)) {
+            $this->olduploads->add($oldupload);
+            $oldupload->setButton($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOldUpload(OldUpload $oldupload): self
+    {
+        if ($this->olduploads->removeElement($oldupload)) {
+            // set the owning side to null (unless already changed)
+            if ($oldupload->getButton() === $this) {
+                $oldupload->setButton(null);
             }
         }
 

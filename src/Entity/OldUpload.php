@@ -2,20 +2,16 @@
 
 namespace App\Entity;
 
-use App\Repository\UploadRepository;
 use App\Repository\OldUploadRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
-
-use App\Entity\OldUpload;
-
 use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\HttpFoundation\File\File;
 
-#[ORM\Entity(repositoryClass: UploadRepository::class)]
-class Upload
+#[ORM\Entity(repositoryClass: OldUploadRepository::class)]
+class OldUpload
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -32,29 +28,26 @@ class Upload
     private ?string $path = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $uploaded_at = null;
+    private ?\DateTimeInterface $olduploaded_at = null;
 
-    #[ORM\ManyToOne(inversedBy: 'uploads')]
+    #[ORM\ManyToOne(inversedBy: 'olduploads')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Button $button = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $validated = null;
 
-    #[ORM\OneToOne(mappedBy: 'Upload', cascade: ['persist', 'remove'])]
-    private ?Validation $validation = null;
-
-    #[ORM\ManyToOne(inversedBy: 'uploads')]
-    private ?User $uploader = null;
+    #[ORM\ManyToOne(inversedBy: 'olduploads')]
+    private ?User $olduploader = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $revision = null;
 
-    #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
-    private ?OldUpload $OldUpload = null;
+    #[ORM\OneToOne(mappedBy: 'OldUpload', cascade: ['persist', 'remove'])]
+    private ?Upload $upload = null;
 
 
-    #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'oldupload', cascade: ['persist', 'remove'])]
 
 
     public function setFile(?File $file = null): void
@@ -62,7 +55,7 @@ class Upload
         $this->file = $file;
 
         if (null !== $file) {
-            $this->uploaded_at = new \DateTime();
+            $this->olduploaded_at = new \DateTime();
         }
     }
 
@@ -100,17 +93,18 @@ class Upload
         return $this;
     }
 
-    public function getUploadedAt(): ?\DateTimeInterface
+    public function getOldUploadedAt(): ?\DateTimeInterface
     {
-        return $this->uploaded_at;
+        return $this->olduploaded_at;
     }
 
-    public function setUploadedAt(\DateTimeInterface $uploaded_at): self
+    public function setOldUploadedAt(\DateTimeInterface $olduploaded_at): self
     {
-        $this->uploaded_at = $uploaded_at;
+        $this->olduploaded_at = $olduploaded_at;
 
         return $this;
     }
+
 
     public function getButton(): ?Button
     {
@@ -136,31 +130,15 @@ class Upload
         return $this;
     }
 
-    public function getValidation(): ?Validation
+
+    public function getOldUploader(): ?User
     {
-        return $this->validation;
+        return $this->olduploader;
     }
 
-    public function setValidation(Validation $validation): static
+    public function setOldUploader(?User $olduploader): static
     {
-        // set the owning side of the relation if necessary
-        if ($validation->getUpload() !== $this) {
-            $validation->setUpload($this);
-        }
-
-        $this->validation = $validation;
-
-        return $this;
-    }
-
-    public function getUploader(): ?User
-    {
-        return $this->uploader;
-    }
-
-    public function setUploader(?User $uploader): static
-    {
-        $this->uploader = $uploader;
+        $this->olduploader = $olduploader;
 
         return $this;
     }
@@ -177,14 +155,24 @@ class Upload
         return $this;
     }
 
-    public function getOldUpload(): ?OldUpload
+    public function getUpload(): ?Upload
     {
-        return $this->OldUpload;
+        return $this->upload;
     }
 
-    public function setOldUpload(?OldUpload $OldUpload): static
+    public function setUpload(?Upload $upload): static
     {
-        $this->OldUpload = $OldUpload;
+        // unset the owning side of the relation if necessary
+        if ($upload === null && $this->upload !== null) {
+            $this->upload->setOldUpload(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($upload !== null && $upload->getOldUpload() !== $this) {
+            $upload->setOldUpload($this);
+        }
+
+        $this->upload = $upload;
 
         return $this;
     }

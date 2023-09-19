@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\File;
@@ -14,10 +15,11 @@ use App\Repository\UploadRepository;
 
 use App\Entity\Upload;
 use App\Entity\User;
+use App\Entity\OldUpload;
 
 use App\Service\FolderCreationService;
 use App\Service\ValidationService;
-
+use App\Service\OldUploadService;
 
 // This class is used to manage the uploads files and logic
 class UploadService extends AbstractController
@@ -29,6 +31,7 @@ class UploadService extends AbstractController
     protected $buttonRepository;
     protected $folderCreationService;
     protected $validationService;
+    protected $oldUploadService;
 
 
     public function __construct(
@@ -38,7 +41,8 @@ class UploadService extends AbstractController
         ParameterBagInterface $params,
         UploadRepository $uploadRepository,
         LoggerInterface $logger,
-        validationService $validationService
+        ValidationService $validationService,
+        OldUploadService $oldUploadService
     ) {
         $this->uploadRepository      = $uploadRepository;
         $this->manager               = $manager;
@@ -47,6 +51,7 @@ class UploadService extends AbstractController
         $this->buttonRepository      = $buttonRepository;
         $this->folderCreationService = $folderCreationService;
         $this->validationService     = $validationService;
+        $this->oldUploadService      = $oldUploadService;
     }
 
     // This function is responsible for the logic of uploading the uploads files
@@ -54,16 +59,12 @@ class UploadService extends AbstractController
     {
         // Define the allowed file extensions
         $allowedExtensions = ['pdf'];
-
         // Get all the files from the request
         $files = $request->files->all();
-
         // Set the path to the 'public' directory
         $public_dir = $this->projectDir . '/public';
-
         // Iterate over each file
         foreach ($files as $file) {
-
             // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
             if ($request->request->get('validatorRequired') == 'true') {
                 foreach ($request->request->keys() as $key) {
@@ -77,48 +78,36 @@ class UploadService extends AbstractController
                 }
             } else {
                 $validated = true;
-            }
-            ;
-
+            };
             // Dynamic folder creation and file upload
-
             // Get the name of the button
             $buttonname = $button->getName();
-
             // Split the button name into parts using '.'
             $parts = explode('.', $buttonname);
-
             // Reverse the order of the parts
             $parts = array_reverse($parts);
-
             // Create the base folder path
             $folderPath = $public_dir . '/doc';
-
             // Append the parts to the folder path
             foreach ($parts as $part) {
                 $folderPath .= '/' . $part;
             }
-
             // Check if the file is of the right type
-
             // Get the file extension
             $extension = $file->guessExtension();
-
             // Check if the extension is in the list of allowed extensions
             if (!in_array($extension, $allowedExtensions)) {
                 return $this->addFlash('error', 'Le fichier doit être un pdf');
             }
-
             // Check the MIME type of the file
             if ($file->getMimeType() != 'application/pdf') {
                 return $this->addFlash('error', 'Le fichier doit être un pdf');
             }
-
+            // Specify the revision number starting from 1
+            $revision = 1;
             // Check if the user changed the file name or not and process it accordingly 
-
             // Initialize the filename variable
             $filename = '';
-
             // Check if a new filename is provided
             if ($newFileName) {
                 $filename = $newFileName;
@@ -126,10 +115,8 @@ class UploadService extends AbstractController
                 // Use the original filename of the file
                 $filename = $file->getClientOriginalName();
             }
-
             // Construct the full path of the file
             $path = $folderPath . '/' . $filename;
-
             // Move the file to the specified folder
             $file->move($folderPath . '/', $filename);
             // Store the filename for return value
@@ -150,6 +137,8 @@ class UploadService extends AbstractController
             $upload->setUploadedAt(new \DateTime());
             // Set the validated boolean property
             $upload->setValidated($validated);
+            // Set the revision property
+            $upload->setRevision($revision);
             // Persist the upload object
             $this->manager->persist($upload);
         }
@@ -170,6 +159,10 @@ class UploadService extends AbstractController
     public function deleteFile(int $uploadId)
     {
         $upload     = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        if ($upload->getOldUpload() != null) {
+            $oldUploadId = $upload->getOldUpload()->getId();
+            $this->oldUploadService->deleteOldFile($oldUploadId);
+        }
         $filename   = $upload->getFilename();
         $name       = $filename;
         $public_dir = $this->projectDir . '/public';
@@ -198,7 +191,7 @@ class UploadService extends AbstractController
 
 
     // This function is responsible for the logic of modifying the uploads files
-    public function modifyFile(Upload $upload, User $user, Request $request)
+    public function modifyFile(Upload $upload, User $user, Request $request, string $oldFileName)
     {
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
@@ -219,6 +212,8 @@ class UploadService extends AbstractController
         }
         $Path = $folderPath . '/' . $upload->getFilename();
 
+
+
         // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
         foreach ($request->request->keys() as $key) {
             if (strpos($key, 'validator_department') !== false) {
@@ -232,6 +227,10 @@ class UploadService extends AbstractController
 
         // If new file exists, process it and delete the old one
         if ($newFile) {
+
+            // Retire the old file
+            $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
+
             // Check if the file is of the right type
             if ($newFile->getMimeType() != 'application/pdf') {
                 throw new \Exception('Le fichier doit être un pdf');
@@ -252,7 +251,9 @@ class UploadService extends AbstractController
             $upload->setUploader($user);
             // Reset the validation and approbation property
             $request->request->set('modification-outlined', 'heavy-modification');
-
+            // If the modification is heavy, increment the revision number
+            $upload->setRevision($upload->getRevision() + 1);
+            // If the modification is heavy, reset the approbation
             $this->validationService->resetApprobation($upload, $request);
         } else {
             // If no new file is uploaded, just rename the old one if necessary
@@ -304,6 +305,7 @@ class UploadService extends AbstractController
 
         return $groupedUploads;
     }
+
 
     // This function is responsible for the logic of modifying the uploads files
     public function modifyDisapprovedFile(Upload $upload, User $user, Request $request)

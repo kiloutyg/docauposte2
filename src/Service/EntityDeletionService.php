@@ -5,6 +5,7 @@
 namespace App\Service;
 
 use App\Controller\BaseController;
+use App\Entity\OldUpload;
 use Doctrine\ORM\EntityManagerInterface;
 
 use App\Repository\ZoneRepository;
@@ -17,12 +18,13 @@ use App\Repository\IncidentCategoryRepository;
 use App\Repository\DepartmentRepository;
 use App\Repository\UserRepository;
 use App\Repository\ValidationRepository;
+use App\Repository\OldUploadRepository;
 
 use App\Service\UploadService;
+use App\Service\OldUploadService;
 use App\Service\IncidentService;
 use App\Service\FolderCreationService;
 
-// use App\Entity\Validation;
 
 // This class is responsible for managing the deletion of entities, their related entities from the database
 // It also refer to the logic for deleting the folder and files from the server filesystem
@@ -42,41 +44,44 @@ class EntityDeletionService
     private $departmentRepository;
     private $userRepository;
     private $validationRepository;
-    // private $validation;
+    private $OldUploadRepository;
+    private $oldUploadService;
 
 
     public function __construct(
-        EntityManagerInterface $em,
-        ZoneRepository $zoneRepository,
-        ProductLineRepository $productLineRepository,
-        CategoryRepository $categoryRepository,
-        ButtonRepository $buttonRepository,
-        UploadRepository $uploadRepository,
-        IncidentRepository $incidentRepository,
-        UploadService $uploadService,
-        IncidentCategoryRepository $incidentCategoryRepository,
-        IncidentService $incidentService,
-        FolderCreationService $folderCreationService,
-        DepartmentRepository $departmentRepository,
-        UserRepository $userRepository,
-        ValidationRepository $validationRepository,
-        // Validation $validation
+        EntityManagerInterface          $em,
+        ZoneRepository                  $zoneRepository,
+        ProductLineRepository           $productLineRepository,
+        CategoryRepository              $categoryRepository,
+        ButtonRepository                $buttonRepository,
+        UploadRepository                $uploadRepository,
+        IncidentRepository              $incidentRepository,
+        UploadService                   $uploadService,
+        IncidentCategoryRepository      $incidentCategoryRepository,
+        IncidentService                 $incidentService,
+        FolderCreationService           $folderCreationService,
+        DepartmentRepository            $departmentRepository,
+        UserRepository                  $userRepository,
+        ValidationRepository            $validationRepository,
+        OldUploadRepository             $OldUploadRepository,
+        OldUploadService                $oldUploadService
     ) {
-        $this->em = $em;
-        $this->zoneRepository = $zoneRepository;
-        $this->productLineRepository = $productLineRepository;
-        $this->categoryRepository = $categoryRepository;
-        $this->buttonRepository = $buttonRepository;
-        $this->uploadRepository = $uploadRepository;
-        $this->uploadService = $uploadService;
-        $this->incidentRepository = $incidentRepository;
-        $this->incidentCategoryRepository = $incidentCategoryRepository;
-        $this->incidentService = $incidentService;
-        $this->folderCreationService = $folderCreationService;
-        $this->departmentRepository = $departmentRepository;
-        $this->userRepository = $userRepository;
-        $this->validationRepository = $validationRepository;
-        // $this->validation = $validation;
+        $this->em                           = $em;
+        $this->zoneRepository               = $zoneRepository;
+        $this->productLineRepository        = $productLineRepository;
+        $this->categoryRepository           = $categoryRepository;
+        $this->buttonRepository             = $buttonRepository;
+        $this->uploadRepository             = $uploadRepository;
+        $this->uploadService                = $uploadService;
+        $this->incidentRepository           = $incidentRepository;
+        $this->incidentCategoryRepository   = $incidentCategoryRepository;
+        $this->incidentService              = $incidentService;
+        $this->folderCreationService        = $folderCreationService;
+        $this->departmentRepository         = $departmentRepository;
+        $this->userRepository               = $userRepository;
+        $this->validationRepository         = $validationRepository;
+        $this->OldUploadRepository          = $OldUploadRepository;
+        $this->oldUploadService             = $oldUploadService;
     }
 
     // This function is responsible for deleting an entity and its related entities from the database and the server filesystem
@@ -114,6 +119,9 @@ class EntityDeletionService
                 break;
             case 'validation':
                 $repository = $this->validationRepository;
+                break;
+            case 'oldUpload':
+                $repository = $this->OldUploadRepository;
                 break;
         }
         // If the repository is not found or the entity is not found in the database, return false
@@ -160,9 +168,6 @@ class EntityDeletionService
             foreach ($entity->getIncidents() as $incident) {
                 $this->deleteEntity('incident', $incident->getId());
             }
-            // foreach ($entity->getValidations() as $validation) {
-            //     $this->deleteEntity('validation', $validation->getId());
-            // }
         } elseif ($entityType === 'incidentCategory') {
             foreach ($entity->getIncidents() as $incident) {
                 $this->deleteEntity('incident', $incident->getId());

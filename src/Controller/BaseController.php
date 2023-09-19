@@ -26,6 +26,7 @@ use App\Repository\IncidentCategoryRepository;
 use App\Repository\DepartmentRepository;
 use App\Repository\ValidationRepository;
 use App\Repository\ApprobationRepository;
+use App\Repository\OldUploadRepository;
 
 // use App\Entity\Zone;
 // use App\Entity\ProductLine;
@@ -46,6 +47,7 @@ use App\Service\IncidentService;
 use App\Service\EntityHeritanceService;
 use App\Service\ValidationService;
 use App\Service\MailerService;
+use App\Service\OldUploadService;
 
 
 #[Route('/', name: 'app_')]
@@ -78,6 +80,7 @@ class BaseController extends AbstractController
     protected $zoneRepository;
     protected $productLineRepository;
     protected $userRepository;
+    protected $oldUploadRepository;
 
     // Services methods
     protected $validationService;
@@ -88,6 +91,7 @@ class BaseController extends AbstractController
     protected $entitydeletionService;
     protected $accountService;
     protected $uploadService;
+    protected $oldUploadService;
 
     // Variables used in the twig templates to display all the entities
     protected $departments;
@@ -124,6 +128,7 @@ class BaseController extends AbstractController
         ZoneRepository                  $zoneRepository,
         ProductLineRepository           $productLineRepository,
         UserRepository                  $userRepository,
+        OldUploadRepository             $oldUploadRepository,
 
         // Services methods
         ValidationService               $validationService,
@@ -133,39 +138,47 @@ class BaseController extends AbstractController
         EntityDeletionService           $entitydeletionService,
         AccountService                  $accountService,
         UploadService                   $uploadService,
-        MailerService                   $mailerService
+        MailerService                   $mailerService,
+        OldUploadService                $oldUploadService
 
     ) {
 
+        $this->em                           = $em;
+        $this->requestStack                 = $requestStack;
+        $this->security                     = $security;
+        $this->passwordHasher               = $passwordHasher;
+        $this->logger                       = $loggerInterface;
+        $this->request                      = $this->requestStack->getCurrentRequest();
+        $this->session                      = $this->requestStack->getSession();
+        $this->projectDir                   = $params->get('kernel.project_dir');
+        $this->public_dir                   = $this->projectDir . '/public';
+        $this->authChecker                  = $authChecker;
+
+        // Variables related to the repositories
+        $this->departmentRepository         = $departmentRepository;
+        $this->approbationRepository        = $approbationRepository;
+        $this->validationRepository         = $validationRepository;
+        $this->incidentCategoryRepository   = $incidentCategoryRepository;
+        $this->incidentRepository           = $incidentRepository;
         $this->uploadRepository             = $uploadRepository;
         $this->zoneRepository               = $zoneRepository;
         $this->productLineRepository        = $productLineRepository;
         $this->userRepository               = $userRepository;
         $this->categoryRepository           = $categoryRepository;
         $this->buttonRepository             = $buttonRepository;
-        $this->em                           = $em;
-        $this->requestStack                 = $requestStack;
-        $this->security                     = $security;
-        $this->passwordHasher               = $passwordHasher;
-        $this->entitydeletionService        = $entitydeletionService;
-        $this->accountService               = $accountService;
-        $this->uploadService                = $uploadService;
-        $this->logger                       = $loggerInterface;
-        $this->request                      = $this->requestStack->getCurrentRequest();
-        $this->session                      = $this->requestStack->getSession();
-        $this->projectDir                   = $params->get('kernel.project_dir');
-        $this->public_dir                   = $this->projectDir . '/public';
-        $this->folderCreationService        = $folderCreationService;
-        $this->incidentRepository           = $incidentRepository;
-        $this->incidentService              = $incidentService;
-        $this->incidentCategoryRepository   = $incidentCategoryRepository;
-        $this->entityHeritanceService       = $entityHeritanceService;
-        $this->authChecker                  = $authChecker;
-        $this->departmentRepository         = $departmentRepository;
-        $this->validationService            = $validationService;
-        $this->approbationRepository        = $approbationRepository;
-        $this->validationRepository         = $validationRepository;
+        $this->oldUploadRepository          = $oldUploadRepository;
+
+        // Variables related to the services
         $this->mailerService                = $mailerService;
+        $this->oldUploadService             = $oldUploadService;
+        $this->validationService            = $validationService;
+        $this->incidentService              = $incidentService;
+        $this->entityHeritanceService       = $entityHeritanceService;
+        $this->folderCreationService        = $folderCreationService;
+        $this->uploadService                = $uploadService;
+        $this->accountService               = $accountService;
+        $this->entitydeletionService        = $entitydeletionService;
+
 
         // Variables used in the twig templates to display all the entities
         $this->zones                        = $this->zoneRepository->findAll();
