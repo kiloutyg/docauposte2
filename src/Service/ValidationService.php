@@ -310,33 +310,12 @@ class ValidationService extends AbstractController
 
     public function disapprovedModifiedEmail(Validation $validation, User $user)
     {
-        $upload = $validation->getUpload();
-        $filename = $upload->getFilename();
-        $uploader = $upload->getUploader();
-        $uploaderName = $uploader->getUsername();
-
-        $subject = 'Docauposte - Validation suite à modification ' . $filename;
-        $html = "<p> Bonjour, </p>
-        <p> Vous avez une validation à effectuer d'une nouvelle version du document $filename qui a été uploadé par $uploaderName consécutivement à votre refus.</p>
-        <p> Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant : <a class='btn-info' href='http://slanlp0033/login'>Page de connexion</a></p>
-        <p> Cordialement </p>";
-
-        $this->mailerService->sendEmail($user, $subject, $html);
+        $this->mailerService->sendDisapprovedModifiedEmail($validation, $user);
     }
 
 
     public function approvalEmail(Validation $validation)
     {
-        $upload = $validation->getUpload();
-        $filename = $upload->getFilename();
-        $uploader = $upload->getUploader();
-
-        $subject = 'Docauposte - Le document ' . $filename . ' a été validé';
-        $html = "<p> Bonjour, </p>
-        <p> Le document $filename a été accepté par les valideurs. Il est désormais disponible à la consultation publique. </p>
-        <p> Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant : <a class='btn-info' href='http://slanlp0033/login'>Page de connexion</a></p>
-        <p> Cordialement </p>";
-
-        $this->mailerService->sendEmail($uploader, $subject, $html);
+        $this->mailerService->sendApprovalEmail($validation);
     }
 }
