@@ -38,9 +38,6 @@ class OldUpload
     #[ORM\JoinColumn(nullable: false)]
     private ?Button $button = null;
 
-    #[ORM\ManyToOne(inversedBy: 'olduploads')]
-    private ?DisplayOption $displayOption = null;
-
     #[ORM\Column(nullable: true)]
     private ?bool $validated = null;
 
@@ -134,19 +131,6 @@ class OldUpload
     public function setButton(?Button $button): self
     {
         $this->button = $button;
-
-        return $this;
-    }
-
-
-    public function getDisplayOption(): ?DisplayOption
-    {
-        return $this->displayOption;
-    }
-
-    public function setDisplayOption(?DisplayOption $displayOption): static
-    {
-        $this->displayOption = $displayOption;
 
         return $this;
     }

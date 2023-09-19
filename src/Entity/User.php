@@ -38,6 +38,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'uploader', targetEntity: Upload::class)]
     private Collection $uploads;
 
+    #[ORM\OneToMany(mappedBy: 'olduploader', targetEntity: Upload::class)]
+    private Collection $olduploads;
+
     #[ORM\OneToMany(mappedBy: 'Uploader', targetEntity: Incident::class)]
     private Collection $incidents;
 
@@ -51,6 +54,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->uploads = new ArrayCollection();
+        $this->olduploads = new ArrayCollection();
         $this->incidents = new ArrayCollection();
         $this->approbations = new ArrayCollection();
     }
@@ -173,6 +177,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($upload->getUploader() === $this) {
                 $upload->setUploader(null);
+            }
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @return Collection<int, Upload>
+     */
+    public function getOldUploads(): Collection
+    {
+        return $this->olduploads;
+    }
+
+    public function addOldUpload(OldUpload $oldupload): static
+    {
+        if (!$this->olduploads->contains($oldupload)) {
+            $this->olduploads->add($oldupload);
+            $oldupload->setOldUploader($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOldUpload(OldUpload $oldupload): static
+    {
+        if ($this->olduploads->removeElement($oldupload)) {
+            // set the owning side to null (unless already changed)
+            if ($oldupload->getOldUploader() === $this) {
+                $oldupload->setOldUploader(null);
             }
         }
 

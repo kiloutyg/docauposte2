@@ -161,7 +161,7 @@ class UploadService extends AbstractController
         $upload     = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         if ($upload->getOldUpload() != null) {
             $oldUploadId = $upload->getOldUpload()->getId();
-            $this->oldUploadService->deleteoldFile($oldUploadId);
+            $this->oldUploadService->deleteOldFile($oldUploadId);
         }
         $filename   = $upload->getFilename();
         $name       = $filename;
@@ -191,7 +191,7 @@ class UploadService extends AbstractController
 
 
     // This function is responsible for the logic of modifying the uploads files
-    public function modifyFile(Upload $upload, User $user, Request $request)
+    public function modifyFile(Upload $upload, User $user, Request $request, string $oldFileName)
     {
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
@@ -227,6 +227,10 @@ class UploadService extends AbstractController
 
         // If new file exists, process it and delete the old one
         if ($newFile) {
+
+            // Retire the old file
+            $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
+
             // Check if the file is of the right type
             if ($newFile->getMimeType() != 'application/pdf') {
                 throw new \Exception('Le fichier doit être un pdf');

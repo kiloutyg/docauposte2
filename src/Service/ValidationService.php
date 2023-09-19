@@ -19,6 +19,8 @@ use App\Entity\Validation;
 use App\Entity\Approbation;
 
 use App\Service\MailerService;
+use App\Service\OldUploadService;
+
 
 class ValidationService extends AbstractController
 {
@@ -30,6 +32,7 @@ class ValidationService extends AbstractController
     protected $validationRepository;
     protected $approbationRepository;
     protected $mailerService;
+    protected $oldUploadService;
 
     public function __construct(
         LoggerInterface $logger,
@@ -39,7 +42,8 @@ class ValidationService extends AbstractController
         UserRepository $userRepository,
         ValidationRepository $validationRepository,
         ApprobationRepository $approbationRepository,
-        MailerService $mailerService
+        MailerService $mailerService,
+        OldUploadService $oldUploadService
     ) {
         $this->logger                = $logger;
         $this->em                    = $em;
@@ -49,6 +53,7 @@ class ValidationService extends AbstractController
         $this->validationRepository  = $validationRepository;
         $this->approbationRepository = $approbationRepository;
         $this->mailerService         = $mailerService;
+        $this->oldUploadService      = $oldUploadService;
     }
 
     public function createValidation(Upload $upload, Request $request)
@@ -210,8 +215,15 @@ class ValidationService extends AbstractController
         $this->em->flush();
         $upload = $validation->getUpload();
         $upload->setValidated($status);
+        // Delete the previously retired file if it exists
+        if ($upload->getOldUpload() !== null) {
+            $oldUpload = $upload->getOldUpload()->getId();
+            $this->oldUploadService->deleteOldFile($oldUpload);
+        }
+        $upload->setOldUpload(null);
         $this->em->persist($upload);
         $this->em->flush();
+
         $this->approvalEmail($validation);
         // Return early
         return;

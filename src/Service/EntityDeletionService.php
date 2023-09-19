@@ -182,9 +182,6 @@ class EntityDeletionService
                 $entity->removeUser($user);
             }
         }
-        // elseif ($entityType === 'oldUpload') {
-        //     $this->oldUploadService->deleteOldFile($entity->getId());
-        // }
 
 
         $this->em->remove($entity);

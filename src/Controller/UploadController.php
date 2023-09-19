@@ -139,6 +139,7 @@ class UploadController extends FrontController
         $category    = $button->getCategory();
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
+        $oldFileName = $upload->getFilename();
 
         // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
@@ -160,8 +161,7 @@ class UploadController extends FrontController
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
-                $this->oldUploadService->retireOldUpload($upload);
-                $this->uploadService->modifyFile($upload, $user, $request);
+                $this->uploadService->modifyFile($upload, $user, $request, $oldFileName);
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirect($originUrl);
             } catch (\Exception $e) {
