@@ -115,4 +115,47 @@ class MailerService extends AbstractController
             return $e->getMessage();
         }
     }
+
+    public function sendDisapprobationEmail(Validation $validation)
+    {
+
+        $upload = $validation->getUpload();
+
+        $approbations = [];
+        $approbators = [];
+
+        $approbations = $this->approbationRepository->findBy(['Validation' => $validation, 'Approval' => false]);
+        foreach ($approbations as $approbation) {
+            $approbators[] = $approbation->getUserApprobator();
+        }
+
+
+        $senderEmail = 'lan.docauposte@plasticomnium.com';
+        $emailRecipientsAddress = $upload->getUploader()->getEmailAddress();
+        $filename = $upload->getFilename();
+
+
+
+
+        $email = (new TemplatedEmail())
+            ->from($senderEmail)
+            ->to($emailRecipientsAddress)
+            ->subject('Docauposte - Le document ' . $filename . ' a été refusé.')
+            ->htmlTemplate('email_templates/disapprobationEmail.html.twig')
+            ->context([
+                'upload'                    => $upload,
+                'validation'                => $validation,
+                'approbations'              => $approbations,
+                'filename'                  => $filename,
+                'senderEmail'               => $senderEmail,
+                'emailRecipientsAddress'    => $emailRecipientsAddress,
+            ]);
+
+        try {
+            $this->mailer->send($email);
+            return true;
+        } catch (TransportExceptionInterface $e) {
+            return $e->getMessage();
+        }
+    }
 }

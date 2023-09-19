@@ -4,7 +4,7 @@
 {% for soleApprobator in approbators %}
 {% if soleApprobator is same as(approbator) %}
 {% else %}
-{{ soleApprobator.username|capitalize|split('.')|first }} {{ soleApprobator.username|upper|split('.')|last }}
+<strong>{{ soleApprobator.username|capitalize|split('.')|first }} {{ soleApprobator.username|upper|split('.')|last }}</strong>
 {% if not loop.last %}, {% elseif loop.revindex0 == 1 %} et {% else %}
 {% endif %}
 {% endif %}
