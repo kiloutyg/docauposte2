@@ -27,12 +27,8 @@ class OldUpload
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $expiry_date = null;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $olduploaded_at = null;
-
 
     #[ORM\ManyToOne(inversedBy: 'olduploads')]
     #[ORM\JoinColumn(nullable: false)]
@@ -93,19 +89,6 @@ class OldUpload
     public function setPath(string $path): self
     {
         $this->path = $path;
-
-        return $this;
-    }
-
-
-    public function getExpiryDate(): ?\DateTimeInterface
-    {
-        return $this->expiry_date;
-    }
-
-    public function setExpiryDate(?\DateTimeInterface $expiry_date): self
-    {
-        $this->expiry_date = $expiry_date;
 
         return $this;
     }

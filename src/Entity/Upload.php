@@ -31,12 +31,8 @@ class Upload
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $expiry_date = null;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $uploaded_at = null;
-
 
     #[ORM\ManyToOne(inversedBy: 'uploads')]
     #[ORM\JoinColumn(nullable: false)]
@@ -58,12 +54,7 @@ class Upload
     private ?OldUpload $OldUpload = null;
 
 
-
-
-
     #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
-
-
 
 
     public function setFile(?File $file = null): void
@@ -109,19 +100,6 @@ class Upload
         return $this;
     }
 
-
-    public function getExpiryDate(): ?\DateTimeInterface
-    {
-        return $this->expiry_date;
-    }
-
-    public function setExpiryDate(?\DateTimeInterface $expiry_date): self
-    {
-        $this->expiry_date = $expiry_date;
-
-        return $this;
-    }
-
     public function getUploadedAt(): ?\DateTimeInterface
     {
         return $this->uploaded_at;
@@ -133,7 +111,6 @@ class Upload
 
         return $this;
     }
-
 
     public function getButton(): ?Button
     {

@@ -49,7 +49,6 @@ class OldUploadService extends AbstractController
         } else {
 
             $button             = $upload->getButton();
-            $displayOption      = $upload->getDisplayOption();
             $uploader           = $upload->getUploader();
             $filename           = $OldFileName;
             $oldFilename        = 'Old_' . $filename;
@@ -88,7 +87,6 @@ class OldUploadService extends AbstractController
             $oldUpload = new OldUpload();
             $oldUpload->setFile(new File($oldPath));
             $oldUpload->setButton($button);
-            $oldUpload->setDisplayOption($displayOption);
             $oldUpload->setOldUploader($uploader);
             $oldUpload->setFilename($oldFilename);
             $oldUpload->setPath($oldPath);

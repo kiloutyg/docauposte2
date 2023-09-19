@@ -25,7 +25,7 @@ class Button
     #[ORM\OneToMany(mappedBy: 'button', targetEntity: Upload::class, orphanRemoval: true)]
     private Collection $uploads;
 
-    #[ORM\OneToMany(mappedBy: 'button', targetEntity: Upload::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'button', targetEntity: OldUpload::class, orphanRemoval: true)]
     private Collection $olduploads;
 
     public function __construct()

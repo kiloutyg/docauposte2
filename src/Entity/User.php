@@ -38,7 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'uploader', targetEntity: Upload::class)]
     private Collection $uploads;
 
-    #[ORM\OneToMany(mappedBy: 'olduploader', targetEntity: Upload::class)]
+    #[ORM\OneToMany(mappedBy: 'olduploader', targetEntity: OldUpload::class)]
     private Collection $olduploads;
 
     #[ORM\OneToMany(mappedBy: 'Uploader', targetEntity: Incident::class)]
