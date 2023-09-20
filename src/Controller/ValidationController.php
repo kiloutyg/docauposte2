@@ -40,9 +40,11 @@ class ValidationController extends FrontController
     public function validationApprobationPage(
         int $approbationId = null
     ): Response {
-
         $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
-
+        if ($approbation->isApproval() !== null) {
+            $this->addFlash('error', 'Une réponse à cette demande de validation a déja été fourni.');
+            return $this->redirectToRoute('app_base');
+        }
         return $this->render('services/validation/approbation.html.twig', [
 
             'approbation' => $approbation,
@@ -89,7 +91,6 @@ class ValidationController extends FrontController
     public function validationApproval(Request $request, int $approbationId = null): Response
     {
         $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
-
 
         $this->validationService->validationApproval($approbation, $request);
 

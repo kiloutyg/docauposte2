@@ -1,5 +1,5 @@
 <p> Bonjour, </p>
-<p> Vous avez une nouvelle validation à effectuer du document {{upload.filename}} qui a été uploadé par <strong>{{upload.uploader.username|capitalize|split('.')|first}} {{upload.uploader.username|upper|split('.')|last }}</strong>.</p>
+<p> Vous avez une nouvelle validation à effectuer du document <strong><i>{{upload.filename}}</i></strong> qui a été uploadé par <strong>{{upload.uploader.username|capitalize|split('.')|first}} {{upload.uploader.username|upper|split('.')|last }}</strong>.</p>
 <p> Le document doit aussi être validé par 
 {% for soleApprobator in approbators %}
 {% if soleApprobator is same as(approbator) %}

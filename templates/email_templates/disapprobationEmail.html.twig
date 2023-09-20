@@ -1,5 +1,5 @@
 <p> Bonjour, </p>
-<p> Votre document {{upload.filename}} a été refusé par: 
+<p> Votre document <strong><i>{{upload.filename}}</i></strong> a été refusé par: 
 {% for approbation in approbations %}
 <li><strong>{{ approbation.userapprobator.username|capitalize|split('.')|first }} {{ approbation.userapprobator.username|upper|split('.')|last }}</strong>
 {% if approbation.comment is not empty %} avec le commentaire suivant : 

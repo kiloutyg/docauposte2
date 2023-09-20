@@ -8,40 +8,25 @@ use Symfony\Component\Mime\Email;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Doctrine\Common\Collections\Collection;
-use Psr\Log\LoggerInterface;
-
-use App\Repository\UserRepository;
-use App\Repository\ValidationRepository;
 
 use App\Entity\Validation;
 use App\Entity\User;
-use App\Entity\Upload;
 use App\Entity\Approbation;
 use App\Repository\ApprobationRepository;
 
 class MailerService extends AbstractController
 {
     private $security;
-    private $userRepository;
     private $mailer;
-    private $validationRepository;
-    private $logger;
     private $approbationRepository;
 
     public function __construct(
         Security $security,
-        UserRepository $userRepository,
         MailerInterface $mailer,
-        ValidationRepository $validationRepository,
-        LoggerInterface $logger,
         ApprobationRepository $approbationRepository
     ) {
         $this->security             = $security;
-        $this->userRepository       = $userRepository;
         $this->mailer               = $mailer;
-        $this->validationRepository = $validationRepository;
-        $this->logger               = $logger;
         $this->approbationRepository = $approbationRepository;
     }
 
@@ -49,15 +34,12 @@ class MailerService extends AbstractController
     {
         $sender = $this->security->getUser();
         $senderEmail = $sender->getEmailAddress();
-
         $emailRecipientsAddress = $recipient->getEmailAddress();
-
         $email = (new Email())
             ->from($senderEmail)
             ->to($emailRecipientsAddress)
             ->subject($subject)
             ->html($html);
-
         try {
             $this->mailer->send($email);
             return true;
@@ -66,32 +48,23 @@ class MailerService extends AbstractController
         }
     }
 
-    public function sendApprobationEmail(int $approbationId)
+
+    public function sendApprobationEmail($approbation)
     {
-
-        $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
-
         $senderEmail = 'lan.docauposte@plasticomnium.com';
-
         $approbator = $approbation->getUserApprobator();
         $emailRecipientsAddress = $approbator->getEmailAddress();
-
         $validation = $approbation->getValidation();
-
         $upload = $validation->getUpload();
-
         $filename = $upload->getFilename();
-
         $approbations = [];
         $approbations = $this->approbationRepository->findBy(['Validation' => $validation]);
-
         $approbators = [];
         foreach ($approbations as $soleApprobation) {
             if ($soleApprobation->getUserApprobator() != $approbator) {
                 $approbators[] = $soleApprobation->getUserApprobator();
             }
         }
-
         $email = (new TemplatedEmail())
             ->from($senderEmail)
             ->to($emailRecipientsAddress)
@@ -107,7 +80,6 @@ class MailerService extends AbstractController
                 'senderEmail'               => $senderEmail,
                 'emailRecipientsAddress'    => $emailRecipientsAddress,
             ]);
-
         try {
             $this->mailer->send($email);
             return true;
@@ -116,22 +88,18 @@ class MailerService extends AbstractController
         }
     }
 
+
     public function sendDisapprobationEmail(Validation $validation)
     {
-
         $upload = $validation->getUpload();
-
         $approbations = [];
         $approbators = [];
-
         $approbations = $this->approbationRepository->findBy(['Validation' => $validation, 'Approval' => false]);
         foreach ($approbations as $approbation) {
             $approbators[] = $approbation->getUserApprobator();
         }
-
         $senderEmail = 'lan.docauposte@plasticomnium.com';
         $emailRecipientsAddress = $upload->getUploader()->getEmailAddress();
-
         $email = (new TemplatedEmail())
             ->from($senderEmail)
             ->to($emailRecipientsAddress)
@@ -141,7 +109,6 @@ class MailerService extends AbstractController
                 'upload'                    => $upload,
                 'approbations'              => $approbations
             ]);
-
         try {
             $this->mailer->send($email);
             return true;
@@ -151,18 +118,23 @@ class MailerService extends AbstractController
     }
 
 
-    public function sendDisapprovedModifiedEmail(Validation $validation, User $user)
+
+    public function sendDisapprovedModifiedEmail(Approbation $approbation)
     {
+
         $senderEmail = 'lan.docauposte@plasticomnium.com';
+        $validation = $approbation->getValidation();
         $upload = $validation->getUpload();
+
         $filename = $upload->getFilename();
 
+        $user = $approbation->getUserApprobator();
         $emailRecipientsAddress = $user->getEmailAddress();
 
         $email = (new TemplatedEmail())
             ->from($senderEmail)
             ->to($emailRecipientsAddress)
-            ->subject('Docauposte - Le document ' . $filename . ' a été refusé.')
+            ->subject('Docauposte - Le document ' . $filename . ' a été corrigé.')
             ->htmlTemplate('email_templates/disapprovedModifiedEmail.html.twig')
             ->context([
                 'upload'                    => $upload,
@@ -188,7 +160,7 @@ class MailerService extends AbstractController
         $email = (new TemplatedEmail())
             ->from($senderEmail)
             ->to($emailRecipientsAddress)
-            ->subject('Docauposte - Le document ' . $filename . ' a été refusé.')
+            ->subject('Docauposte - Le document ' . $filename . ' a été validé.')
             ->htmlTemplate('email_templates/approvalEmail.html.twig')
             ->context([
                 'upload'                    => $upload
