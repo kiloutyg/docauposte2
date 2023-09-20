@@ -185,7 +185,7 @@ class IncidentController extends FrontController
 
 
     // Create a route to visualize the file in the modifcation view.
-    #[Route('/modify_download_incident/{id}', name: 'modify_incident_download_file')]
+    #[Route('/incident/modify_download_incident/{id}', name: 'modify_incident_download_file')]
     public function modify_download_file(int $id = null): Response
     {
         $file       = $this->incidentRepository->findOneBy(['id' => $id]);
