@@ -39,7 +39,7 @@ class FrontController extends BaseController
             $error = null;
             $result = $this->accountService->createAccount(
                 $request,
-                $error,
+                $error
             );
             if ($result) {
                 $this->addFlash('success', 'Le compte de Super-Administrateur a bien été créé.');
