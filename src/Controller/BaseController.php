@@ -103,6 +103,7 @@ class BaseController extends AbstractController
     protected $buttons;
     protected $incidents;
     protected $incidentCategories;
+    protected $validations;
 
 
 
@@ -190,6 +191,7 @@ class BaseController extends AbstractController
         $this->incidents                    = $this->incidentRepository->findAll();
         $this->incidentCategories           = $this->incidentCategoryRepository->findAll();
         $this->departments                  = $this->departmentRepository->findAll();
+        $this->validations                  = $this->validationRepository->findAll();
     }
 
     protected function render(string $view, array $parameters = [], Response $response = null): Response
@@ -204,6 +206,7 @@ class BaseController extends AbstractController
             'incidents'             => $this->incidents,
             'incidentCategories'    => $this->incidentCategories,
             'departments'           => $this->departments,
+            'validations'           => $this->validations,
         ];
 
         $parameters = array_merge($commonParameters, $parameters);
