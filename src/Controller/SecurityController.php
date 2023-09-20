@@ -33,7 +33,6 @@ class SecurityController extends FrontController
 
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
-            'users'         => $this->userRepository->findAll(),
             'error'         => $error,
             'user'          => $this->getUser()
         ]);

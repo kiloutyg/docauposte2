@@ -41,14 +41,7 @@ class ProductLineAdminController extends FrontController
             'groupedUploads'    => $groupedUploads,
             'groupincidents'    => $groupIncidents,
             'zone'              => $zone,
-            'productLine'       => $productLine,
-            'categories'        => $this->categoryRepository->findAll(),
-            'uploads'           => $this->uploadRepository->findAll(),
-            'users'             => $this->userRepository->findAll(),
-            'buttons'           => $this->buttonRepository->findAll(),
-            'incidents'         => $this->incidentRepository->findAll(),
-            'incidentCategories' => $this->incidentCategoryRepository->findAll(),
-
+            'productLine'       => $productLine
         ]);
     }
 
@@ -76,9 +69,7 @@ class ProductLineAdminController extends FrontController
         return $this->redirectToRoute('app_productline', [
             'zone'        => $zone,
             'name'        => $zone->getName(),
-            'uploads'     => $this->uploadRepository->findAll(),
             'productline' => $productLine->getName(),
-            'categories'  => $this->categoryRepository->findAll(),
             'productLine' => $productLine,
         ]);
     }
@@ -99,10 +90,8 @@ class ProductLineAdminController extends FrontController
                 'name'              => $zone->getName(),
                 'productLine'       => $productLine,
                 'productline'       => $productLine->getName(),
-                'categories'        => $this->categoryRepository->findAll(),
             ]);
         } else {
-
 
             // Check if the category already exists by looking for a category with the same name
             $categoryname = $request->request->get('categoryname') . '.' . $productLine->getName();
@@ -117,7 +106,6 @@ class ProductLineAdminController extends FrontController
                     'name'              => $zone->getName(),
                     'productLine'       => $productLine,
                     'productline'       => $productLine->getName(),
-                    'categories'        => $this->categoryRepository->findAll(),
 
                 ]);
                 // If the category doesn't exist, create it and redirect to the productline admin interface with a flash message
@@ -135,7 +123,6 @@ class ProductLineAdminController extends FrontController
                     'name'              => $zone->getName(),
                     'productLine'       => $productLine,
                     'productline'       => $productLine->getName(),
-                    'categories'        => $this->categoryRepository->findAll(),
                 ]);
             }
         }

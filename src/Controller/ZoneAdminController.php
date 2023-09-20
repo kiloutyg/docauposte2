@@ -28,15 +28,7 @@ class ZoneAdminController extends FrontController
         return $this->render('zone_admin/zone_admin_index.html.twig', [
             'groupedUploads'    => $groupedUploads,
             'groupincidents'    => $groupIncidents,
-            'zone'              => $zone,
-            'productLines'      => $this->productLineRepository->findAll(),
-            'buttons'           => $this->buttonRepository->findAll(),
-            'uploads'           => $this->uploadRepository->findAll(),
-            'users'             => $this->userRepository->findAll(),
-            'incidents'         => $this->incidentRepository->findAll(),
-            'incidentCategories' => $this->incidentCategoryRepository->findAll(),
-
-
+            'zone'              => $zone
         ]);
     }
 
@@ -62,8 +54,7 @@ class ZoneAdminController extends FrontController
 
         return $this->redirectToRoute('app_zone', [
             'zone'         => $zone->getName(),
-            'id'           => $zone->getId(),
-            'productLines' => $this->productLineRepository->findAll(),
+            'id'           => $zone->getId()
         ]);
     }
 
@@ -78,8 +69,7 @@ class ZoneAdminController extends FrontController
             // Handle the case when productlinne name contains disallowed characters
             $this->addFlash('danger', 'Nom de ligne de produit invalide');
             return $this->redirectToRoute('app_zone_admin', [
-                'zone' => $zone->getName(),
-                'productLines' => $this->productLineRepository->findAll(),
+                'zone' => $zone->getName()
             ]);
         } else {
             // Check if the productline already exists by comparing the productline name and the zone
@@ -89,8 +79,7 @@ class ZoneAdminController extends FrontController
             if ($productline) {
                 $this->addFlash('danger', 'La ligne de produit existe déjà');
                 return $this->redirectToRoute('app_zone_admin', [
-                    'zone' => $zone->getName(),
-                    'productLines' => $this->productLineRepository->findAll(),
+                    'zone' => $zone->getName()
                 ]);
                 // Create a productline
 
@@ -103,8 +92,7 @@ class ZoneAdminController extends FrontController
                 $this->folderCreationService->folderStructure($productlinename);
                 $this->addFlash('success', 'The Product Line has been created');
                 return $this->redirectToRoute('app_zone_admin', [
-                    'zone' => $zone->getName(),
-                    'productLines' => $this->productLineRepository->findAll(),
+                    'zone' => $zone->getName()
                 ]);
             }
         }

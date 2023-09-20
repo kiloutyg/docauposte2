@@ -45,11 +45,8 @@ class CategoryManagerController extends FrontController
             'zone'                  => $zone,
             'productLine'           => $productLine,
             'category'              => $category,
-            'buttons'               => $this->buttonRepository->findAll(),
             'uploads'               => $uploads,
-            'users'                 => $this->userRepository->findAll(),
             'incidents'             => $incidents,
-            'incidentCategories'    => $this->incidentCategoryRepository->findAll(),
 
         ]);
     }
@@ -67,7 +64,7 @@ class CategoryManagerController extends FrontController
         // This function is responsible for creating a new user, it depends on the AccountService class.
         $result = $this->accountService->createAccount(
             $request,
-            $error,
+            $error
         );
 
         if ($result) {

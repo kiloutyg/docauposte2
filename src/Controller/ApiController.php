@@ -20,7 +20,7 @@ class ApiController extends FrontController
                 'id'    => $zone->getId(),
                 'name'  => $zone->getName()
             ];
-        }, $this->zoneRepository->findAll());
+        }, $this->zones);
 
         $productLines = array_map(function ($productLine) {
             return [
@@ -28,7 +28,7 @@ class ApiController extends FrontController
                 'name'      => $productLine->getName(),
                 'zone_id'   => $productLine->getZone()->getId()
             ];
-        }, $this->productLineRepository->findAll());
+        }, $this->productLines);
 
         $categories = array_map(function ($category) {
             return [
@@ -36,7 +36,7 @@ class ApiController extends FrontController
                 'name'              => $category->getName(),
                 'product_line_id'   => $category->getProductLine()->getId()
             ];
-        }, $this->categoryRepository->findAll());
+        }, $this->categories);
 
         $buttons = array_map(function ($button) {
             return [
@@ -44,7 +44,7 @@ class ApiController extends FrontController
                 'name'          => $button->getName(),
                 'category_id'   => $button->getCategory()->getId()
             ];
-        }, $this->buttonRepository->findAll());
+        }, $this->buttons);
 
         $responseData = [
             'zones'         => $zones,
@@ -66,7 +66,7 @@ class ApiController extends FrontController
                 'id'        => $zone->getId(),
                 'name'      => $zone->getName()
             ];
-        }, $this->zoneRepository->findAll());
+        }, $this->zones);
 
         $productLines = array_map(function ($productLine) {
             return [
@@ -74,14 +74,14 @@ class ApiController extends FrontController
                 'name'      => $productLine->getName(),
                 'zone_id'   => $productLine->getZone()->getId()
             ];
-        }, $this->productLineRepository->findAll());
+        }, $this->productLines);
 
         $incidentsCategories = array_map(function ($incidentsCategory) {
             return [
                 'id'    => $incidentsCategory->getId(),
                 'name'  => $incidentsCategory->getName(),
             ];
-        }, $this->incidentCategoryRepository->findAll());
+        }, $this->incidentCategories);
 
 
         $responseData = [
@@ -101,7 +101,7 @@ class ApiController extends FrontController
                 'id'    => $department->getId(),
                 'name'  => $department->getName(),
             ];
-        }, $this->departmentRepository->findAll());
+        }, $this->departments);
 
         $responseData = [
 
@@ -115,7 +115,7 @@ class ApiController extends FrontController
     public function getUserData(): JsonResponse
     {
         $filteredUsers = [];
-        $allUsers = $this->userRepository->findAll();
+        $allUsers = $this->users;
         $currentUser = $this->getUser();
 
         foreach ($allUsers as $user) {

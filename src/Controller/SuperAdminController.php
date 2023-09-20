@@ -34,17 +34,7 @@ class SuperAdminController extends FrontController
             'groupedUploads'        => $groupedUploads,
             'groupincidents'        => $groupIncidents,
             'error'                 => $error,
-            'last_username'         => $lastUsername,
-            'zones'                 => $this->zones,
-            'productLines'          => $this->productLines,
-            'categories'            => $this->categories,
-            'buttons'               => $this->buttons,
-            'uploads'               => $this->uploads,
-            'users'                 => $this->users,
-            'incidents'             => $this->incidents,
-            'incidentCategories'    => $this->incidentCategories,
-            'departments'           => $this->departments,
-
+            'last_username'         => $lastUsername
         ]);
     }
 
@@ -64,11 +54,7 @@ class SuperAdminController extends FrontController
         }
 
         return $this->redirectToRoute('app_super_admin', [
-            'buttons'       => $this->buttonRepository->findAll(),
-            'uploads'       => $this->uploadRepository->findAll(),
-            'error'         => $error,
-            'zones'         => $this->zoneRepository->findAll(),
-            'users'         => $this->userRepository->findAll()
+            'error'         => $error
         ]);
     }
 
@@ -82,10 +68,7 @@ class SuperAdminController extends FrontController
             $zone = $this->zoneRepository->findOneBy(['name' => $zonename]);
             if (empty($zonename)) {
                 $this->addFlash('danger', 'Le nom de la Zone ne peut être vide');
-                return $this->redirectToRoute('app_super_admin', [
-                    'zones' => $this->zoneRepository->findAll(),
-                    'users' => $this->userRepository->findAll()
-                ]);
+                return $this->redirectToRoute('app_super_admin');
             }
 
             if (!file_exists($this->public_dir . '/doc/')) {
@@ -94,10 +77,7 @@ class SuperAdminController extends FrontController
 
             if ($zone) {
                 $this->addFlash('danger', 'La zone existe déjà');
-                return $this->redirectToRoute('app_super_admin', [
-                    'zones' => $this->zoneRepository->findAll(),
-                    'users' => $this->userRepository->findAll()
-                ]);
+                return $this->redirectToRoute('app_super_admin');
             } else {
                 $zone = new Zone();
                 $zone->setName($zonename);
@@ -105,10 +85,7 @@ class SuperAdminController extends FrontController
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($zonename);
                 $this->addFlash('success', 'La zone a été créee');
-                return $this->redirectToRoute('app_super_admin', [
-                    'zones' => $this->zoneRepository->findAll(),
-                    'users' => $this->userRepository->findAll()
-                ]);
+                return $this->redirectToRoute('app_super_admin');
             }
         }
     }
