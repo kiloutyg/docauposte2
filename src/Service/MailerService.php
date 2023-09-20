@@ -135,7 +135,7 @@ class MailerService extends AbstractController
         $email = (new TemplatedEmail())
             ->from($senderEmail)
             ->to($emailRecipientsAddress)
-            ->subject('Docauposte - Le document ' . $$upload->getFilename() . ' a été refusé.')
+            ->subject('Docauposte - Le document ' . $upload->getFilename() . ' a été refusé.')
             ->htmlTemplate('email_templates/disapprobationEmail.html.twig')
             ->context([
                 'upload'                    => $upload,

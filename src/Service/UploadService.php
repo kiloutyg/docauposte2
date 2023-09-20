@@ -253,8 +253,9 @@ class UploadService extends AbstractController
             $request->request->set('modification-outlined', 'heavy-modification');
             // If the modification is heavy, increment the revision number
             $upload->setRevision($upload->getRevision() + 1);
-            // If the modification is heavy, reset the approbation
-            $this->validationService->resetApprobation($upload, $request);
+            // If the modification is heavy, reset the approbation and set the $globalModification flag to true
+            $globalModification = true;
+            $this->validationService->resetApprobation($upload, $request, $globalModification);
         } else {
             // If no new file is uploaded, just rename the old one if necessary
             if ($oldFilePath != $Path) {

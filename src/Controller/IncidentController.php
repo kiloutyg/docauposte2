@@ -86,8 +86,7 @@ class IncidentController extends FrontController
                 'productline.html.twig',
                 [
                     'zone'        => $zone,
-                    'categories'  => $this->categoryRepository->findAll(),
-                    'productLine' => $productLine,
+                    'productLine' => $productLine
                 ]
             );
         }

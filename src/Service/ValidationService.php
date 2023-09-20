@@ -240,7 +240,7 @@ class ValidationService extends AbstractController
         return;
     }
 
-    public function resetApprobation(Upload $upload, Request $request)
+    public function resetApprobation(Upload $upload, Request $request, ?bool $globalModification = false)
     {
         if ($upload->getValidation() == null) {
             return;
@@ -268,7 +268,9 @@ class ValidationService extends AbstractController
                 $approbation->setApprovedAt(null);
                 $approbation->setComment(null);
                 $approbator = $approbation->getUserApprobator();
-                $this->disapprovedModifiedEmail($validation, $approbator);
+                if (!$globalModification) {
+                    $this->disapprovedModifiedEmail($validation, $approbator);
+                }
             }
             // If the Approbation is not approved or the Approval property is null
             elseif ($approbation->isApproval() == false) {
@@ -279,6 +281,9 @@ class ValidationService extends AbstractController
                 $approbator = $approbation->getUserApprobator();
                 $this->disapprovedModifiedEmail($validation, $approbator);
             }
+        }
+        if ($globalModification) {
+            $this->approbationEmail($validation);
         }
 
         // Persist the Approbation instance to the database

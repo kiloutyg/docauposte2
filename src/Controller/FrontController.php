@@ -21,16 +21,7 @@ class FrontController extends BaseController
         return $this->render(
             'base.html.twig',
             [
-                'zones'                 => $this->zones,
-                'productLines'          => $this->productLines,
-                'categories'            => $this->categories,
-                'buttons'               => $this->buttons,
-                'uploads'               => $this->uploads,
-                'users'                 => $this->users,
-                'incidents'             => $this->incidents,
-                'incidentCategories'    => $this->incidentCategories,
-                'departments'           => $this->departments,
-                'user'                  => $this->getUser(),
+                'user'                  => $this->getUser()
             ]
         );
     }
@@ -41,14 +32,14 @@ class FrontController extends BaseController
     public function createSuperAdmin(Request $request): Response
     {
         $users = [];
-        $users  = $this->userRepository->findAll();
+        $users  = $this->users;
 
         if ($users == null) {
 
             $error = null;
             $result = $this->accountService->createAccount(
                 $request,
-                $error,
+                $error
             );
             if ($result) {
                 $this->addFlash('success', 'Le compte de Super-Administrateur a bien été créé.');
@@ -73,8 +64,7 @@ class FrontController extends BaseController
         return $this->render(
             'zone.html.twig',
             [
-                'zone'         => $zone,
-                'productLines' => $this->productLineRepository->findAll(),
+                'zone'         => $zone
             ]
         );
     }
@@ -102,8 +92,7 @@ class FrontController extends BaseController
                 'productline.html.twig',
                 [
                     'zone'        => $zone,
-                    'categories'  => $this->categoryRepository->findAll(),
-                    'productLine' => $productLine,
+                    'productLine' => $productLine
                 ]
             );
         } else {
@@ -135,9 +124,7 @@ class FrontController extends BaseController
                 [
                     'zone'        => $zone,
                     'productLine' => $productLine,
-                    'category'    => $category,
-                    'categories'  => $this->categoryRepository->findAll(),
-                    'buttons'     => $this->buttonRepository->findAll(),
+                    'category'    => $category
                 ]
             );
         } else {
@@ -176,14 +163,12 @@ class FrontController extends BaseController
                     'zone'        => $zone,
                     'productLine' => $productLine,
                     'category'    => $category,
-                    'categories'  => $this->categoryRepository->findAll(),
                     'button'      => $buttonEntity,
                     'uploads'     => $uploads,
                 ]
             );
         } else {
             $uploadId = $uploads[0]->getId();
-            $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
             return $uploadController->download_file($uploadId, $request);
         }
     }
