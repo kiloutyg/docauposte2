@@ -43,9 +43,11 @@ sg docker -c "
 
 # Ask the user for the git repository address either in ssh or http
     read -p "Address of the git repository (ssh or http ) :  " GIT_ADDRESS;
+    echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
 # Clone the git repository and run the env_create.sh script
     git clone ${GIT_ADDRESS};
+    
     cd docauposte2;
 
     bash ./env_create.sh;
