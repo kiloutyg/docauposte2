@@ -4,7 +4,7 @@ read -p "Are you running the app for the first Time ?(yes/no) " ANSWER;
 
 while true; do
 # Check if the user answered yes or no
-    if [ "${ANSWER}" = "yes" ] || [ "${ANSWER}" = "no" ]; then
+    if [ "${ANSWER}" == "yes" ] || [ "${ANSWER}" == "no" ]; then
         break
     else
         echo "Please answer yes or no"; 
