@@ -2,7 +2,6 @@
 
 # Entrypoint scritp destined to the production environment
 # Install the app dependencies 
-export http_proxy='http://10.0.0.1:80';
 composer install --no-dev --optimize-autoloader;
 yarn install --production;
 composer clear-cache;
