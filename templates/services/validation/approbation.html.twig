@@ -25,19 +25,38 @@
 
 		{% block title %}Page de validation de document par
 			<u>{{user.username}}</u><br>
-			{% set toBeValidated = [] %}
-			{% for approbation in app.user.approbations %}
-				{% if approbation.approval is same as null %}
-					{% set toBeValidated = toBeValidated|merge([approbation]) %}
+			<div class="dropdown">
+				{% set toBeValidated = [] %}
+				{% set currentApprobationId = approbation.id %}
+				{% for approbation in app.user.approbations %}
+					{% if approbation.approval is same as null %}
+						{% set toBeValidated = toBeValidated|merge([approbation]) %}
+					{% endif %}
+				{% endfor %}
+				{% if toBeValidated|length - 1 > 0  %}
+				<button class="btn dropdown-toggle" style="background-color:#007AFF; color:white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+					Il reste
+					<span class="badge bg-danger rounded-pill">
+						{{toBeValidated|length - 1}}
+					</span>
+					document(s) à valider
 				{% endif %}
-			{% endfor %}
-			{% if toBeValidated|length - 1 > 0  %}
-				Il reste
-				<span class="badge bg-danger rounded-pill">
-					{{toBeValidated|length - 1}}
-				</span>
-				document(s) à valider
-			{% endif %}
+				</button>					
+				<ul class="dropdown-menu dropdown-menu-start shadow shadow-inset" aria-labelledby="dropdownMenuButton1">
+					{% for approbation in app.user.approbations %}
+						{% if approbation.approval is same as null %}
+							{% if approbation.id is same as currentApprobationId %}
+							{% else %}
+								<li>			
+									<a href="{{ path('app_validation_approbation', {'approbationId': approbation.id})}}" class="dropdown-item shadow ">
+										{{ approbation.validation.upload.filename|upper }}
+									</a>
+								</li>
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+				</ul>
+			</div>
 		{% endblock %}
 		<h2 style="text-align: center;">
 			<strong>{{approbation.validation.upload.filename|split('.')|first|upper}}</strong>
