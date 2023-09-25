@@ -1,17 +1,11 @@
-# FROM php:8.2-apache-bullseye
-# FROM debian:bookworm-slim
-FROM debian:bullseye-slim
-ENV http_proxy='http://10.0.0.1:80'
 #
 # NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
-# FROM scratch as BASE
-# ADD rootfs.tar.xz /
-# CMD ["bash"]
 
-# FROM BASE as BUILD
+FROM debian:bookworm-slim
+
 # prevent Debian's PHP packages from being installed
 # https://github.com/docker-library/php/pull/542
 RUN set -eux; \
@@ -124,9 +118,9 @@ ENV PHP_LDFLAGS="-Wl,-O1 -pie"
 
 ENV GPG_KEYS 39B641343D8C104B2B146DC3F9C39DC0B9698544 E60913E4DF209907D8E30D96659A97C9CF2A795A 1198C0117593497A5EC5C199286AF1F9897469DC
 
-ENV PHP_VERSION 8.2.6
-ENV PHP_URL="https://www.php.net/distributions/php-8.2.6.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-8.2.6.tar.xz.asc"
-ENV PHP_SHA256="10b796f0ed45574229851212b30a596a76e70ae365322bcaaaf9c00fa7d58cca"
+ENV PHP_VERSION 8.2.11RC1
+ENV PHP_URL="https://downloads.php.net/~sergey/php-8.2.11RC1.tar.xz" PHP_ASC_URL="https://downloads.php.net/~sergey/php-8.2.11RC1.tar.xz.asc"
+ENV PHP_SHA256="c80428635a833f02cd13f8f02e675ea37010cf74670c4258b975ad646e2c441a"
 
 RUN set -eux; \
   \
@@ -263,7 +257,7 @@ RUN set -eux; \
   apt-mark auto '.*' > /dev/null; \
   [ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; \
   find /usr/local -type f -executable -exec ldd '{}' ';' \
-  | awk '/=>/ { print $(NF-1) }' \
+  | awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); print so }' \
   | sort -u \
   | xargs -r dpkg-query --search \
   | cut -d: -f1 \
@@ -294,16 +288,16 @@ WORKDIR /var/www/html
 
 EXPOSE 80
 
+## END of the php installation script
 
 COPY php.ini /usr/local/etc/php/php.ini
 RUN a2enmod rewrite
 RUN apt-get update -y \
-  && apt-get install -y curl libxslt-dev libzip-dev git wget libmagickwand-dev --no-install-recommends \
+  && apt-get install -y ca-certificates curl libxslt-dev libzip-dev git wget libmagickwand-dev gnupg --no-install-recommends \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-RUN docker-php-ext-install pdo mysqli pdo_mysql zip opcache xsl
-RUN pecl install xdebug imagick \
+RUN docker-php-ext-install pdo mysqli pdo_mysql zip opcache xsl \
+  && pecl install xdebug imagick \
   && docker-php-ext-enable imagick xdebug mysqli pdo_mysql pdo zip opcache xsl
 
 # fix git author
@@ -316,8 +310,13 @@ WORKDIR /var/www
 RUN sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/sites-available/000-default.conf
 
 # install nodejs 
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
-RUN apt-get install -y nodejs \
+RUN mkdir -p /etc/apt/keyrings
+RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
+  && gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" \
+  && tee /etc/apt/sources.list.d/nodesource.list
+RUN apt-get update -y \
+  && apt-get install -y nodejs \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

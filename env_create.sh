@@ -35,13 +35,15 @@ if [ "${PROXY_ANSWER}" == "yes" ]
         then
         PROXY_PORT="80"
       fi
-    PROXY_DOCKER="proxy"
+    # PROXY_DOCKER="proxy"
     PROXY_ENV="    environment:
       http_proxy: ${PROXY_ADDRESS}:${PROXY_PORT}"
     PROXY_DOCKERFILE="ENV http_proxy=\'${PROXY_ADDRESS}:${PROXY_PORT}\'"
+    # sed -i "3s|.*|$PROXY_DOCKERFILE|" docker/dockerfile-proxy/Dockerfile
     sed -i "3s|.*|$PROXY_DOCKERFILE|" docker/dockerfile-proxy/Dockerfile
+
   else
-    ${PROXY_DOCKER} = "no_proxy"
+    # ${PROXY_DOCKER} = "no_proxy"
 fi
 
 # Generate a new secret key
