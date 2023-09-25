@@ -40,7 +40,7 @@ if [ "${PROXY_ANSWER}" == "yes" ]
       http_proxy: ${PROXY_ADDRESS}:${PROXY_PORT}"
     PROXY_DOCKERFILE="ENV http_proxy=\'${PROXY_ADDRESS}:${PROXY_PORT}\'"
     # sed -i "3s|.*|$PROXY_DOCKERFILE|" docker/dockerfile-proxy/Dockerfile
-    sed -i "3s|.*|$PROXY_DOCKERFILE|" docker/dockerfile-proxy/Dockerfile
+    sed -i "3s|.*|$PROXY_DOCKERFILE|" docker/dockerfile/Dockerfile
 
   else
     # ${PROXY_DOCKER} = "no_proxy"
