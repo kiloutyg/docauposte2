@@ -41,8 +41,7 @@ if [ "${PROXY_ANSWER}" == "yes" ]
     PROXY_DOCKERFILE="ENV http_proxy=\'${PROXY_ADDRESS}:${PROXY_PORT}\'"
     # sed -i "3s|.*|$PROXY_DOCKERFILE|" docker/dockerfile-proxy/Dockerfile
     sed -i "3s|.*|$PROXY_DOCKERFILE|" docker/dockerfile/Dockerfile
-
-  else
+    # else
     # ${PROXY_DOCKER} = "no_proxy"
 fi
 
@@ -55,7 +54,8 @@ version: '3.8'
 
 services:
   web:
-    build: ./docker/dockerfile-${PROXY_DOCKER}/
+    # build: ./docker/dockerfile-${PROXY_DOCKER}/
+    build: ./docker/dockerfile/
     restart: unless-stopped 
     entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
 ${PROXY_ENV}
