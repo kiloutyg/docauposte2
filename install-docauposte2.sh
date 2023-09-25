@@ -1,12 +1,12 @@
 #!/bin/bash
 # Ask the user if they have already run the app
-read -p "Are you running the app for the first Time ?(yes/no) " ANSWER;
+read -p "Are you running the app for the first Time ? (yes/no) " ANSWER;
 
 # Check if the user answered yes or no
 if [ "${ANSWER}" != "yes" ] && [ "${ANSWER}" != "no" ]
 then 
     echo "Please answer yes or no";
-    read -p "Are you running the app for the first Time ?(yes/no) " ANSWER;
+    read -p "Are you running the app for the first Time ? (yes/no) " ANSWER;
 fi
 # If the user answered yes, we install the app
 if [ "${ANSWER}" == "yes" ]
