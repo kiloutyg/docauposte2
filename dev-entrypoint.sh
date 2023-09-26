@@ -9,7 +9,7 @@ yarn upgrade;
 composer clear-cache;
 
 # Set the permissions
-chmod 777 . -R -v;
+chmod 777 . -R;
 
 # Clear the cache
 php bin/console cache:clear --no-warmup --env=dev;

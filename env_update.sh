@@ -14,14 +14,6 @@ while true; do
         echo "Invalid app context. Please enter either the word prod or dev."
     fi
 done
-
-read -p "What Timezone to use? (default Europe/Paris) " TIMEZONE
-if [ -z "${TIMEZONE}" ]
-  then
-    TIMEZONE="Europe/Paris"
-fi
-
-
 while true; do
     read -p "Is there a proxy in your network ? (yes/no) " PROXY_ANSWER;
     if [ "${PROXY_ANSWER}" == "yes" ] || [ "${PROXY_ANSWER}" == "no" ]; then 
@@ -43,7 +35,8 @@ if [ "${PROXY_ANSWER}" == "yes" ]
         then
         PROXY_PORT="80"
       fi
-    PROXY_ENV="      http_proxy: ${PROXY_ADDRESS}:${PROXY_PORT}"
+    PROXY_ENV="    environment:
+      http_proxy: ${PROXY_ADDRESS}:${PROXY_PORT}"
     PROXY_DOCKERFILE="ENV http_proxy=\'${PROXY_ADDRESS}:${PROXY_PORT}\'"
     sed -i "3s|.*|$PROXY_DOCKERFILE|" docker/dockerfile/Dockerfile
 fi
@@ -60,9 +53,7 @@ services:
     build: ./docker/dockerfile/
     restart: unless-stopped 
     entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
-    environment:
 ${PROXY_ENV}
-      APP_TIMEZONE: ${TIMEZONE}
     volumes:
       - ./:/var/www
     ports:
@@ -85,7 +76,7 @@ MYSQL_PASSWORD=${MYSQL_PASSWORD}
 ###> symfony/framework-bundle ###
 APP_ENV=${APP_CONTEXT}
 APP_SECRET=${APP_SECRET}
-APP_TIMEZONE=${TIMEZONE}
+APP_TIMEZONE=Europe/Paris
 ###< symfony/framework-bundle ###
 
 ###> symfony/webapp-pack ###

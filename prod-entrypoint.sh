@@ -7,7 +7,7 @@ yarn install --production;
 composer clear-cache;
 
 # Set the permissions and clear the cache
-chmod 777 . -R -v;
+chmod 777 . -R ;
 php bin/console cache:clear --no-warmup --env=prod;
 
 # Warm up the cache
