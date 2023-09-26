@@ -1,7 +1,6 @@
 #!/bin/sh
 
 # Install the app dependencies 
-export http_proxy='http://10.0.0.1:80';
 composer install;
 composer update ;
 yarn install;
