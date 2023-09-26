@@ -74,7 +74,7 @@
 									{% for department in departments %}
 										<div class="col-10 mx-auto mb-3">
 											<li class="form-control shadow d-flex  justify-content-between  ">
-												{{department.name|split('.')|first|upper}}
+												{{department.name|upper}}
 												<a href="{{ path('app_department_deletion', {department : department.name}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-department">supprimer</a>
 											</li>
 

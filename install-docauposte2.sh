@@ -1,13 +1,14 @@
 #!/bin/bash
 # Ask the user if they have already run the app
+while true; do
 read -p "Are you running the app for the first Time ? (yes/no) " ANSWER;
-
 # Check if the user answered yes or no
-if [ "${ANSWER}" != "yes" ] && [ "${ANSWER}" != "no" ]
-then 
-    echo "Please answer yes or no";
-    read -p "Are you running the app for the first Time ? (yes/no) " ANSWER;
-fi
+    if [ "${ANSWER}" == "yes" ] || [ "${ANSWER}" == "no" ]; then 
+        break
+        else
+            echo "Please answer by yes or no";
+    fi
+done
 # If the user answered yes, we install the app
 if [ "${ANSWER}" == "yes" ]
 then 
@@ -55,6 +56,33 @@ sg docker -c "
 # Build the docker containers
     sg docker -c "docker compose up --build"
 else
-    cd docauposte2;
-    sg docker -c "docker compose up"
+# If the user answered no, we will ask if he wants to launch the app or if he wants to update it
+while true; do
+    read -p "Do you wish to run the app ? (yes/no) " LAUNCH_ANSWER;
+    if [ "${LAUNCH_ANSWER}" == "yes" ] || [ "${LAUNCH_ANSWER}" == "no" ]; then
+        break
+        else
+            echo "Please answer by yes or no";
+    fi
+done
+# If the user answered yes, we launch the app
+    if [ "${LAUNCH_ANSWER}" == "yes" ]; then
+        cd docauposte2;
+        sg docker -c "docker compose up"
+        else
+            while true; do
+                read -p "Do you wish to update the app ? (yes/no) " UPDATE_ANSWER;
+                if [ "${UPDATE_ANSWER}" == "yes" ] || [ "${UPDATE_ANSWER}" == "no" ]; then
+                    break
+                    else
+                        echo "Please answer by yes or no";
+                fi
+            done
+            if [ "${UPDATE_ANSWER}" == "yes" ]; then
+                cd docauposte2;
+                git pull;
+                bash ./env_update.sh;
+                sg docker -c "docker compose up --build"
+            fi
+    fi
 fi
