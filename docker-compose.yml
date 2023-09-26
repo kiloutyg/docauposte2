@@ -29,18 +29,6 @@ services:
         ipv4_address: 172.21.0.3
     depends_on:
       - database
-  # web:
-  #   build: ./docker/dockerfilehalf/
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ./:/var/www
-  #   ports:
-  #     - "80:80"
-  #   depends_on:
-  #     - database
-  #   networks:
-  #     vpcbr:
-  #       ipv4_address: 172.21.0.4
 networks:
   vpcbr:
     driver: bridge
