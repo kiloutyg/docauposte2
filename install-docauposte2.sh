@@ -80,6 +80,7 @@ done
             done
             if [ "${UPDATE_ANSWER}" == "yes" ]; then
                 cd docauposte2;
+                git fetch origin;
                 git pull;
                 bash ./env_update.sh;
                 sg docker -c "docker compose up --build"
