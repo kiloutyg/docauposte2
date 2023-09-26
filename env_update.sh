@@ -39,8 +39,6 @@ sed -i "s|^APP_ENV=prod.*|APP_ENV=dev|" .env
 APP_CONTEXT="dev"
 sed -i "s|^# MAILER_DSN=.*|MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0|" .env
 
-# # Generate a new secret key
-# APP_SECRET=$(openssl rand -hex 16)
 
 # Create docker-compose.override.yml file to use the good entrypoint
 cat > docker-compose.override.yml <<EOL
@@ -66,3 +64,37 @@ ${PROXY_ENV}
 EOL
 
 
+sg docker -c "docker compose up --build -d"
+
+sleep 200
+
+sg docker -c "docker compose stop"
+
+sleep 120
+
+sed -i "s|^APP_ENV=dev.*|APP_ENV=prod|" .env
+APP_CONTEXT="prod"
+
+
+# Create docker-compose.override.yml file to use the good entrypoint
+cat > docker-compose.override.yml <<EOL
+version: '3.8'
+
+services:
+  web:
+    build: ./docker/dockerfile/
+    restart: unless-stopped 
+    entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
+    environment:
+${PROXY_ENV}
+      APP_TIMEZONE: ${TIMEZONE}
+    volumes:
+      - ./:/var/www
+    ports:
+      - "80:80"
+    depends_on:
+      - database
+    networks:
+      vpcbr:
+        ipv4_address: 172.21.0.4
+EOL
