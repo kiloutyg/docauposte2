@@ -151,6 +151,11 @@ class FrontController extends BaseController
 
         $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonEntity->getId()]);
         foreach ($buttonUploads as $buttonUpload) {
+            if ($buttonUpload->isValidated() == null && $buttonUpload->getUploadedAt() < new \DateTime()) {
+                $this->validationService->updateValidationRecycle($buttonUpload);
+            }
+        }
+        foreach ($buttonUploads as $buttonUpload) {
             if ($buttonUpload->isValidated() || $buttonUpload->getOldUpload() != null) {
                 $uploads[] = $buttonUpload;
             }
