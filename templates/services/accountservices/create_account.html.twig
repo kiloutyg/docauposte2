@@ -98,7 +98,7 @@
 								{% for user in users %}
 									{% if app.user.id != user.id and compare_roles(app.user.roles, user.roles) %}
 										<tr>
-											<td>{{ user.username }}</td>
+											<td>{{user.username|capitalize|split('.')|first }} {{user.username|upper|split('.')|last }}</td>
 											<td>{{ user.roles|json_encode|convert_encoding('UTF-8', 'UTF-8') }}</td>
 											<td>
 												{% if user.department.name is defined%}

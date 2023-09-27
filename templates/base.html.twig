@@ -105,7 +105,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					{% else %}
 						<p>
 							<strong>
-								{{ app.user.username|capitalize }}
+								{{app.user.username|capitalize|split('.')|first }} {{app.user.username|upper|split('.')|last }}
 							</strong>
 							<a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
 						</p>

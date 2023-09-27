@@ -56,9 +56,11 @@
 																				</a>
 																				{% if  is_granted('ROLE_LINE_ADMIN') %}
 																					<div class="ml-auto">
-																			{% if upload.uploader is defined %}
-																						<strong> inconnu {% else %} {{upload.uploader.username|capitalize|split('.')|first }} {{upload.uploader.username|upper|split('.')|last }}
-																						</strong>{% endif %}|
+																						
+																							<strong>{% if upload.uploader is not empty %} {{upload.uploader.username|capitalize|split('.')|first }} {{upload.uploader.username|upper|split('.')|last }}
+																							{% else %} inconnu {% endif %}|
+																							</strong>
+																						
 																						Rev. {{upload.revision}}
 																						|
 																						{% if upload.validated is same as(false) %}
@@ -168,9 +170,10 @@
 																				{% if  is_granted('ROLE_LINE_ADMIN') %}
 																					<div class="ml-auto">
 																						Mis en ligne de la Rev. {{upload.revision}}
-																						 par: 	{% if upload.uploader is defined %}
-																						<strong> inconnu {% else %} {{upload.uploader.username|capitalize|split('.')|first }} {{upload.uploader.username|upper|split('.')|last }}
-																						</strong>{% endif %}| le {{ upload.uploadedAt|date('d/m/Y') }}
+																						 par: 	
+																						<strong>{% if upload.uploader is not empty %} {{upload.uploader.username|capitalize|split('.')|first }} {{upload.uploader.username|upper|split('.')|last }}{% else %} inconnu 
+																						{% endif %}
+																						</strong>| le {{ upload.uploadedAt|date('d/m/Y') }}
 																						<br>
 																						{% if upload.validated is same as(true) %}
 																							{% if upload.validation is not empty %}
