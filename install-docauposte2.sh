@@ -58,7 +58,7 @@ sg docker -c "
 else
 # If the user answered no, we will ask if he wants to launch the app or if he wants to update it
 while true; do
-    read -p "Do you wish to run the app ? (yes/no) " LAUNCH_ANSWER;
+    read -p "Do you wish to launch the app ? (yes/no) " LAUNCH_ANSWER;
     if [ "${LAUNCH_ANSWER}" == "yes" ] || [ "${LAUNCH_ANSWER}" == "no" ]; then
         break
         else
@@ -80,7 +80,9 @@ done
             done
             if [ "${UPDATE_ANSWER}" == "yes" ]; then
                 cd docauposte2;
-                git pull;
+                sg docker -c "docker compose stop";
+                git fetch origin --force;
+                git pull --force;
                 bash ./env_update.sh;
                 sg docker -c "docker compose up --build"
             fi
