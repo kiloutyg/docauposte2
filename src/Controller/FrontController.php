@@ -18,6 +18,19 @@ class FrontController extends BaseController
     #[Route('/', name: 'base')]
     public function base(): Response
     {
+
+        // Updating the uploads validation status
+        $uploads = [];
+        $uploads = $this->uploadRepository->findBy(
+            ['validated' => null]
+        );
+
+        foreach ($uploads as $upload) {
+            if ($upload->getUploadedAt() < new \DateTime()) {
+                $this->validationService->updateValidationRecycle($upload);
+            }
+        }
+
         return $this->render(
             'base.html.twig',
             [
@@ -150,11 +163,6 @@ class FrontController extends BaseController
         $uploads = [];
 
         $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonEntity->getId()]);
-        foreach ($buttonUploads as $buttonUpload) {
-            if ($buttonUpload->isValidated() == null && $buttonUpload->getUploadedAt() < new \DateTime()) {
-                $this->validationService->updateValidationRecycle($buttonUpload);
-            }
-        }
         foreach ($buttonUploads as $buttonUpload) {
             if ($buttonUpload->isValidated() || $buttonUpload->getOldUpload() != null) {
                 $uploads[] = $buttonUpload;

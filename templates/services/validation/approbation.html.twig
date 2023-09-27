@@ -24,7 +24,7 @@
 	<div style="width: 31%" class="text-center card-body">
 
 		{% block title %}Page de validation de document par
-			<u>{{user.username}}</u><br>
+			<u>{{user.username|capitalize|split('.')|first }} {{user.username|upper|split('.')|last }}</u><br>
 			<div class="dropdown">
 				{% set toBeValidated = [] %}
 				{% set currentApprobationId = approbation.id %}
@@ -71,7 +71,7 @@
 		{% for approbation in approbations %}
 			<ul>
 				{% if app.user != approbation.userapprobator  %}
-					<u>{{ approbation.userapprobator.username|capitalize }}</u>
+					<u>{{ approbation.userapprobator.username|capitalize|split('.')|first }} {{ approbation.userapprobator.username|upper|split('.')|last }}</u>
 					{% if approbation.approval is not null %}
 					{{ approbation.approval ? ' a validé le document' : ' a refusé de validé le document'}}.
 					{% else %}
