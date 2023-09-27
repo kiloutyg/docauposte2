@@ -5,7 +5,7 @@
 read -p "What Timezone to use? (default Europe/Paris) " TIMEZONE
 if [ -z "${TIMEZONE}" ]
   then
-    TIMEZONE="Europe/Paris"
+    TIMEZONE="'Europe/Paris'"
 fi
 
 
@@ -38,6 +38,25 @@ fi
 sed -i "s|^APP_ENV=prod.*|APP_ENV=dev|" .env
 APP_CONTEXT="dev"
 sed -i "s|^# MAILER_DSN=.*|MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0|" .env
+cat > src/Kernel.php <<EOL
+<?php
+
+namespace App;
+
+use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+
+class Kernel extends BaseKernel
+{
+    use MicroKernelTrait;
+
+    public function boot(): void
+    {
+        parent::boot();
+        date_default_timezone_set(${TIMEZONE});
+    }
+}
+EOL
 
 
 # Create docker-compose.override.yml file to use the good entrypoint
