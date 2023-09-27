@@ -65,15 +65,18 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						</iframe>
 
 				{% else %}
+					{% if upload.validation is not defined %}
 						<div class=" alert alert-info m-0 justify-content-center">
 						{% for approbation in upload.validation.approbations %}
 								<li>
 									{{ approbation.userapprobator.username|capitalize|split('.')|first }} {{ approbation.userapprobator.username|upper|split('.')|last }}
 									{{ approbation.approval is same as(true) ? ' a validé ce document le ' ~ approbation.approvedAt|date('d/m/Y') ~ ' à ' ~ approbation.approvedAt|date('H') ~ 'h' ~ approbation.approvedAt|date('i')}}.
 								</li>
-						{% endfor %}
+						{% endfor %}	
 						</div>
+						{% endif %}
 						<iframe src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" width="100%" height="750" target="_blank"></iframe>
+				
 				{% endif %}
 					<div class="mb-3 mt-3">
 						{{ form_label(form.file, 'Choisissez un nouveau ficher:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
@@ -146,8 +149,38 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
 							{{ form_widget(form.button,{'attr': {'class': 'form-select', 'name': 'button', 'id': 'upload_button', 'required': true}}) }}
 						</div>
+										<div class="accordion d-grid col-12 d-md-flex justify-content-md-center" id="accordionValidator">
+					<div class="accordion-item ">
+						<div class="accordion-header" id="validatorNeeded-header">
+						<input type="hidden" name="validatorRequired" value="false">
+							
+							<input type="checkbox" class="btn-check" name="validatorRequired" id="validatorRequired" autocomplete="off" value="true">
+							<label class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed" for="validatorRequired" data-bs-toggle="collapse" data-bs-target="#validatorNeeded" aria-expanded="false" aria-controls="validatorNeeded" id="validatorSelect"><strong>Validation du Document</strong> &nbsp; (Ouvrez le menu pour activer la validation de document, fermez le pour la désactiver)</label>
+						
+						</div>
+						<div id="validatorNeeded" aria-labelledby="validatorNeeded" data-bs-parent="#accordionValidator" class="accordion-collapse collapse ">
+
+							<div class="accordion-body row ">
+
+								<div class="col-md-2 col-sm-2 mt-2 mb-2">
+									<label for="validator_user" style="color:black">Valideur :</label>
+								</div>
+
+								<div id="usersContainer" class="col-md-10 col-sm-10 mt-2 mb-2">
+									<select class="form-select userSelect" name="validator_user" id="validator_user"></select>
+								</div>
+
+							</div>
+
+						</div>
+					</div>
+
+				</div>
 					</div>
 				</div>
+
+
+
 				<div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
 					<button type="submit" class="btn btn-primary mb-5 submit-upload-modification">Modifier</button>
 				</div>

@@ -85,11 +85,11 @@ EOL
 
 sg docker -c "docker compose up --build -d"
 
-sleep 200
+sleep 90
 
 sg docker -c "docker compose stop"
 
-sleep 120
+sleep 30
 
 sed -i "s|^APP_ENV=dev.*|APP_ENV=prod|" .env
 APP_CONTEXT="prod"

@@ -74,6 +74,26 @@ ${PROXY_ENV}
         ipv4_address: 172.21.0.4
 EOL
 
+# Change the src/Kernel.php to set the good timezone.
+cat > src/Kernel.php <<EOL
+<?php
+
+namespace App;
+
+use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+
+class Kernel extends BaseKernel
+{
+    use MicroKernelTrait;
+
+    public function boot(): void
+    {
+        parent::boot();
+        date_default_timezone_set(${TIMEZONE});
+    }
+}
+EOL
 
 # Create .env file
 cat > .env <<EOL
