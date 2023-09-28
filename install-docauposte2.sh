@@ -80,7 +80,7 @@ done
                 fi
             done
             if [ "${UPDATE_ANSWER}" == "yes" ]; then
-            cat > ~/.ssh/config <<EOL
+cat > ~/.ssh/config <<EOL
 Host github.com
     StrictHostKeyChecking no
 EOL
