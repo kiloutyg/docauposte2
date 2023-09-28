@@ -88,7 +88,8 @@ EOL
                 cd docauposte2;
                 sg docker -c "docker compose stop";
                 git fetch origin --force;
-                git pull --force;
+                git reset HARD --force;
+                git pull --rebase origin main;
                 bash ./env_update.sh;
                 sg docker -c "docker compose up --build"
             fi
