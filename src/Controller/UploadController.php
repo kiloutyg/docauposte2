@@ -193,7 +193,7 @@ class UploadController extends FrontController
         $currentUser = $this->security->getUser();
         $uploader = $upload->getUploader();
         // If it's a GET request, render the form
-        if ($request->isMethod('GET') && $currentUser === $uploader) {
+        if ($request->isMethod('GET') && ($currentUser === $uploader || $uploader === null)) {
             return $this->render('services/uploads/uploads_modification.html.twig', [
                 'form'        => $form->createView(),
                 'zone'        => $zone,

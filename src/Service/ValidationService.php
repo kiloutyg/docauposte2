@@ -293,6 +293,15 @@ class ValidationService extends AbstractController
         return;
     }
 
+    public function updateValidationRecycle(Upload $upload)
+    {
+        if ($upload->getValidation() == null) {
+            $upload->setValidated(true);
+            $this->em->persist($upload);
+            $this->em->flush();
+            return;
+        }
+    }
 
 
     public function approbationEmail(Validation $validation)

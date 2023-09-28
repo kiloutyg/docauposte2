@@ -213,17 +213,34 @@ class UploadService extends AbstractController
         $Path = $folderPath . '/' . $upload->getFilename();
 
 
-
+        ////////////// Part mainly important for the intriduction of the validation process in the production environment
         // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
-        foreach ($request->request->keys() as $key) {
-            if (strpos($key, 'validator_department') !== false) {
-                $validated = null;
-            } elseif (strpos($key, 'validator_user') !== false) {
-                $validated = null;
-            } else {
-                $validated = true;
+        if ($request->request->get('validatorRequired') == 'true') {
+            foreach ($request->request->keys() as $key) {
+                if (strpos($key, 'validator_department') !== false) {
+                    $validated = null;
+                } elseif (strpos($key, 'validator_user') !== false) {
+                    $validated = null;
+                } else {
+                    $validated = true;
+                }
             }
-        }
+            // Retire the old file
+            $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
+            // Set the validated boolean property
+            $upload->setValidated($validated);
+            // Update the uploader in the upload object
+            $upload->setUploader($user);
+            // Set the revision 
+            $upload->setRevision(1);
+            if ($validated === null) {
+                $this->validationService->createValidation($upload, $request);
+            }
+        } else {
+            $validated = true;
+        };
+
+
 
         // If new file exists, process it and delete the old one
         if ($newFile) {

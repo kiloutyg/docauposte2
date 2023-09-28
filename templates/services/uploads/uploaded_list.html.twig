@@ -56,7 +56,11 @@
 																				</a>
 																				{% if  is_granted('ROLE_LINE_ADMIN') %}
 																					<div class="ml-auto">
-																						<strong>{{upload.uploader.username|capitalize|split('.')|first }} {{upload.uploader.username|upper|split('.')|last }}</strong>|
+																						
+																							<strong>{% if upload.uploader is not empty %} {{upload.uploader.username|capitalize|split('.')|first }} {{upload.uploader.username|upper|split('.')|last }}
+																							{% else %} inconnu {% endif %}|
+																							</strong>
+																						
 																						Rev. {{upload.revision}}
 																						|
 																						{% if upload.validated is same as(false) %}
@@ -68,7 +72,7 @@
 																							|
 																						{% endif %}
 																						{{ upload.uploadedAt|date('d/m/Y') }}
-																						{% if app.user is same as(upload.uploader) %}
+																						{% if app.user is same as(upload.uploader) or (upload.uploader) is empty %}
 																						<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify shadow ">
 																							Modifier
 																						</a>
@@ -166,7 +170,10 @@
 																				{% if  is_granted('ROLE_LINE_ADMIN') %}
 																					<div class="ml-auto">
 																						Mis en ligne de la Rev. {{upload.revision}}
-																						 par: <strong>{{upload.uploader.username|capitalize|split('.')|first }} {{upload.uploader.username|upper|split('.')|last }}</strong> le {{ upload.uploadedAt|date('d/m/Y') }}
+																						 par: 	
+																						<strong>{% if upload.uploader is not empty %} {{upload.uploader.username|capitalize|split('.')|first }} {{upload.uploader.username|upper|split('.')|last }}{% else %} inconnu 
+																						{% endif %}
+																						</strong>| le {{ upload.uploadedAt|date('d/m/Y') }}
 																						<br>
 																						{% if upload.validated is same as(true) %}
 																							{% if upload.validation is not empty %}

@@ -147,4 +147,14 @@ class AccountService
         $this->manager->persist($user);
         $this->manager->flush();
     }
+
+    public function updateUserEmail(User $user)
+    {
+        $username = $user->getUsername();
+        $emailAddress = $username . '@' . 'plasticomnium.com';
+        $user->setEmailAddress($emailAddress);
+        $this->manager->persist($user);
+        $this->manager->flush();
+        return;
+    }
 }

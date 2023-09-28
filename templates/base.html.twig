@@ -105,7 +105,8 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					{% else %}
 						<p>
 							<strong>
-								{{ app.user.username|capitalize }}
+								{{app.user.username|capitalize|split('.')|first }}
+								{{app.user.username|upper|split('.')|last }}
 							</strong>
 							<a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
 						</p>
@@ -121,10 +122,10 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 		<div class="container ">
 			{% if users is defined %}
 				{% if users is empty %}
-					<h4 class="my-4">
+					<h5 class="my-5">
 						<strong>Pour commencer à utiliser l'application, veuillez créer le superadministrateur :
 						</strong>
-					</h4>
+					</h5>
 					<div class="card border-0 shadow rounded-3 my-5">
 						<div class="card-body">
 							<div class="row">
@@ -154,7 +155,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						{% endif %}
 					{% endif %}
 					<p>
-						<h1 class="text-justify mb-2 mt-5 flex-shrink-0">
+						<h1 class="text-justify mb-2 mt-4 flex-shrink-0">
 							<strong>
 								Doc Au Poste
 							</strong>
@@ -178,9 +179,11 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					</div>
 				</div>
 			{% endblock body %}
-		</div><!-- Footer --><footer class="container py-3 border-top  flex-shrink-0">
+		</div>
+		<!-- Footer -->
+		<footer class="container py-3 border-top  flex-shrink-0">
 			<div class="d-flex flex-wrap justify-content-between">
-				<div class="col-md-4 d-flex align-items-center">
+				<div class="col-md-5 d-flex align-items-center">
 					<span class="me-1" style="color: red">
 						<i class="fas fa-copyright"></i>
 					</span>
@@ -191,7 +194,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						<i class="fa fa-arrow-circle-o-left" 'aria-hidden="false"'>Retour</i>
 					</a>
 				</div>
-				<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+				<ul class="nav col-md-5 justify-content-end list-unstyled d-flex">
 					<li class="ms-3">
 						<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/">
 							<i class="fab fa-github"></i>
