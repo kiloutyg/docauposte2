@@ -35,8 +35,8 @@ if [ "${PROXY_ANSWER}" == "yes" ]
     sed -i "3s|.*|$PROXY_DOCKERFILE|" docker/dockerfile/Dockerfile
 fi
 
-sed -i "s|^APP_ENV=prod.*|APP_ENV=dev|" .env
 APP_CONTEXT="dev"
+sed -i "s|^APP_ENV=prod.*|APP_ENV=dev|" .env
 sed -i "s|^# MAILER_DSN=.*|MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0|" .env
 cat > src/Kernel.php <<EOL
 <?php

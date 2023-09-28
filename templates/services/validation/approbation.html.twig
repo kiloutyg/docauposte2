@@ -6,17 +6,21 @@
 
 {% block javascripts %}
 
-			{{ encore_entry_script_tags('app') }}
-			{{ encore_entry_script_tags('document-validator') }}
-			{{ encore_entry_script_tags('confirmation') }}
-			{{ encore_entry_script_tags('toast') }}
-			{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
-			{{ encore_entry_script_tags('cascading-dropdowns') }}
-			{{ encore_entry_script_tags('department-creation') }}
+	{{ encore_entry_script_tags('app') }}
+	{{ encore_entry_script_tags('document-validator') }}
+	{{ encore_entry_script_tags('confirmation') }}
+	{{ encore_entry_script_tags('toast') }}
+	{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
+	{{ encore_entry_script_tags('cascading-dropdowns') }}
+	{{ encore_entry_script_tags('department-creation') }}
 {% endblock %}
 
 
 {% block body %}
+{% set lastZone = null %}
+{% set lastProductLine = null %}
+{% set lastCategory = null %}
+{% set lastButton = null %}
 
 <div class=" d-flex align-items-center  flex-row">
 
@@ -24,7 +28,8 @@
 	<div style="width: 31%" class="text-center card-body">
 
 		{% block title %}Page de validation de document par
-			<u>{{user.username|capitalize|split('.')|first }} {{user.username|upper|split('.')|last }}</u><br>
+			<u>{{user.username|capitalize|split('.')|first }}
+				{{user.username|upper|split('.')|last }}</u><br>
 			<div class="dropdown">
 				{% set toBeValidated = [] %}
 				{% set currentApprobationId = approbation.id %}
@@ -34,24 +39,24 @@
 					{% endif %}
 				{% endfor %}
 				{% if toBeValidated|length - 1 > 0  %}
-				<button class="btn dropdown-toggle" style="background-color:#007AFF; color:white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-					Il reste
-					<span class="badge bg-danger rounded-pill">
-						{{toBeValidated|length - 1}}
-					</span>
-					document(s) à valider
-				{% endif %}
-				</button>					
+					<button class="btn dropdown-toggle" style="background-color:#007AFF; color:white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+						Il reste
+						<span class="badge bg-danger rounded-pill">
+							{{toBeValidated|length - 1}}
+						</span>
+						document(s) à valider
+					{% endif %}
+				</button>
 				<ul class="dropdown-menu dropdown-menu-start shadow shadow-inset" aria-labelledby="dropdownMenuButton1">
 					{% for approbation in app.user.approbations %}
 						{% if approbation.approval is same as null %}
 							{% if approbation.id is same as currentApprobationId %}
-							{% else %}
-								<li>			
-									<a href="{{ path('app_validation_approbation', {'approbationId': approbation.id})}}" class="dropdown-item shadow ">
-										{{ approbation.validation.upload.filename|upper }}
-									</a>
-								</li>
+								{% else %}
+									<li>
+										<a href="{{ path('app_validation_approbation', {'approbationId': approbation.id})}}" class="dropdown-item shadow ">
+											{{ approbation.validation.upload.filename|upper }}
+										</a>
+									</li>
 							{% endif %}
 						{% endif %}
 					{% endfor %}
@@ -61,6 +66,35 @@
 		<h2 style="text-align: center;">
 			<strong>{{approbation.validation.upload.filename|split('.')|first|upper}}</strong>
 		</h2>
+		{# Display the current button hierarchy #}
+		{% if lastZone != approbation.validation.upload.button.category.productLine.zone %}
+
+			{% set lastZone = approbation.validation.upload.button.category.productLine.zone %}
+
+			{{ lastZone.name|split('.')|first|upper }}
+			>
+		{% endif %}
+		{% if lastProductLine != approbation.validation.upload.button.category.productLine %}
+
+			{% set lastProductLine = approbation.validation.upload.button.category.productLine %}
+
+			{{ lastProductLine.name|split('.')|first|upper }}
+			>
+		{% endif %}
+		{% if lastCategory != approbation.validation.upload.button.category %}
+
+			{% set lastCategory = approbation.validation.upload.button.category %}
+
+			{{ lastCategory.name|split('.')|first|upper }}
+			>
+		{% endif %}
+
+		{% if lastButton != approbation.validation.upload.button %}
+
+			{% set lastButton = approbation.validation.upload.button %}
+
+
+		{% endif %}
 
 		<h3 style="text-align: center;">
 			{{approbation.validation.upload.button.name|split('.')|first|upper}}
@@ -71,11 +105,12 @@
 		{% for approbation in approbations %}
 			<ul>
 				{% if app.user != approbation.userapprobator  %}
-					<u>{{ approbation.userapprobator.username|capitalize|split('.')|first }} {{ approbation.userapprobator.username|upper|split('.')|last }}</u>
+					<u>{{ approbation.userapprobator.username|capitalize|split('.')|first }}
+						{{ approbation.userapprobator.username|upper|split('.')|last }}</u>
 					{% if approbation.approval is not null %}
-					{{ approbation.approval ? ' a validé le document' : ' a refusé de validé le document'}}.
+						{{ approbation.approval ? ' a validé le document' : ' a refusé de validé le document'}}.
 					{% else %}
-					{{ ' n\'a pas encore rendu son avis.' }}
+						{{ ' n\'a pas encore rendu son avis.' }}
 					{% endif %}
 					{% if approbation.comment is not empty %}
 					

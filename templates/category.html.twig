@@ -42,10 +42,10 @@
 		</div>
 		<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
 			{% if matchingButtons|length > 0 %}
-				<div class="d-flex  mb-4 mt-4 line-list align-items-center justify-content-center flex-wrap">
+				<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 					{% for button in matchingButtons %}
 
-						<a class="btn btn-primary btn-lg m-4" role="button" aria-pressed="true" style="color:white" href="{{path('app_button', {button: button.name, category: button.category.name, productline: button.category.productLine.name, zone: button.category.productLine.zone.name})}}">
+						<a class="btn btn-primary btn-lg m-5" role="button" aria-pressed="true" style="color:white" href="{{path('app_button', {button: button.name, category: button.category.name, productline: button.category.productLine.name, zone: button.category.productLine.zone.name})}}">
 							<span class="line-details text-justify">
 								{{ button.name|split('.')|first|upper}}
 
