@@ -18,7 +18,7 @@ done
 read -p "What Timezone to use? (default Europe/Paris) " TIMEZONE
 if [ -z "${TIMEZONE}" ]
   then
-    TIMEZONE="Europe/Paris"
+    TIMEZONE="'Europe/Paris'"
 fi
 
 
