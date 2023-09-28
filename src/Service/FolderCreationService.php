@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use Doctrine\ORM\Mapping\Entity;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 

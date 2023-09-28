@@ -7,22 +7,16 @@ namespace App\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-
-use App\Service\AccountService;
-use App\Service\UploadsService;
-use App\Service\IncidentsService;
-
 
 use App\Entity\Category;
 
 // This controller manage the logic of the productline admin interface
-class ProductLineAdminController extends BaseController
+class ProductLineAdminController extends FrontController
 {
     #[Route('/productline_admin/{productline}', name: 'app_productline_admin')]
 
     // This function is responsible for rendering the productline's admin interface
-    public function index(IncidentsService $incidentsService, UploadsService $uploadsService, string $productline = null): Response
+    public function index(string $productline = null): Response
     {
         $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
         $zone = $productLine->getZone();
@@ -38,8 +32,8 @@ class ProductLineAdminController extends BaseController
         );
 
         // Group the uploads and incidents by parents entity
-        $groupedUploads = $uploadsService->groupUploads($uploads);
-        $groupIncidents = $incidentsService->groupIncidents($incidents);
+        $groupedUploads = $this->uploadService->groupUploads($uploads);
+        $groupIncidents = $this->incidentService->groupIncidents($incidents);
 
 
 
@@ -47,26 +41,19 @@ class ProductLineAdminController extends BaseController
             'groupedUploads'    => $groupedUploads,
             'groupincidents'    => $groupIncidents,
             'zone'              => $zone,
-            'productLine'       => $productLine,
-            'categories'        => $this->categoryRepository->findAll(),
-            'uploads'           => $this->uploadRepository->findAll(),
-            'users'             => $this->userRepository->findAll(),
-            'buttons'           => $this->buttonRepository->findAll(),
-            'incidents'         => $this->incidentRepository->findAll(),
-            'incidentCategories' => $this->incidentCategoryRepository->findAll(),
-
+            'productLine'       => $productLine
         ]);
     }
 
     // This function will create a new User 
     #[Route('/productline_admin/create_manager/{productline}', name: 'app_productline_admin_create_manager')]
-    public function createManager(string $productline = null, AccountService $accountService, Request $request): Response
+    public function createManager(string $productline = null, Request $request): Response
     {
         $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
         $zone = $productLine->getZone();
 
         $error = null;
-        $result = $accountService->createAccount(
+        $result = $this->accountService->createAccount(
             $request,
             $error,
         );
@@ -82,9 +69,7 @@ class ProductLineAdminController extends BaseController
         return $this->redirectToRoute('app_productline', [
             'zone'        => $zone,
             'name'        => $zone->getName(),
-            'uploads'     => $this->uploadRepository->findAll(),
             'productline' => $productLine->getName(),
-            'categories'  => $this->categoryRepository->findAll(),
             'productLine' => $productLine,
         ]);
     }
@@ -101,14 +86,12 @@ class ProductLineAdminController extends BaseController
             $this->addFlash('danger', 'Nom de catégorie invalide');
             return $this->redirectToRoute('app_productline_admin', [
                 'controller_name'   => 'LineAdminController',
-                'zone'          => $zone,
-                'name'          => $zone->getName(),
-                'productLine'   => $productLine,
-                'productline'   => $productLine->getName(),
-                'categories'    => $this->categoryRepository->findAll(),
+                'zone'              => $zone,
+                'name'              => $zone->getName(),
+                'productLine'       => $productLine,
+                'productline'       => $productLine->getName(),
             ]);
         } else {
-
 
             // Check if the category already exists by looking for a category with the same name
             $categoryname = $request->request->get('categoryname') . '.' . $productLine->getName();
@@ -119,11 +102,10 @@ class ProductLineAdminController extends BaseController
                 $this->addFlash('danger', 'La catégorie existe deja');
                 return $this->redirectToRoute('app_productline_admin', [
                     'controller_name'   => 'LineAdminController',
-                    'zone'          => $zone,
-                    'name'          => $zone->getName(),
-                    'productLine'   => $productLine,
-                    'productline'   => $productLine->getName(),
-                    'categories'    => $this->categoryRepository->findAll(),
+                    'zone'              => $zone,
+                    'name'              => $zone->getName(),
+                    'productLine'       => $productLine,
+                    'productline'       => $productLine->getName(),
 
                 ]);
                 // If the category doesn't exist, create it and redirect to the productline admin interface with a flash message
@@ -137,11 +119,10 @@ class ProductLineAdminController extends BaseController
                 $this->addFlash('success', 'La catégorie a été créée');
                 return $this->redirectToRoute('app_productline_admin', [
                     'controller_name'   => 'LineAdminController',
-                    'zone'          => $zone,
-                    'name'          => $zone->getName(),
-                    'productLine'   => $productLine,
-                    'productline'   => $productLine->getName(),
-                    'categories'    => $this->categoryRepository->findAll(),
+                    'zone'              => $zone,
+                    'name'              => $zone->getName(),
+                    'productLine'       => $productLine,
+                    'productline'       => $productLine->getName(),
                 ]);
             }
         }

@@ -39,6 +39,7 @@ security:
         - { path: ^/delete_account, roles: ROLE_SUPER_ADMIN}
         - { path: ^/modify_account, roles: ROLE_SUPER_ADMIN}
         - { path: ^/modify_account_view, roles: ROLE_SUPER_ADMIN}
+        - { path: ^/department, roles: ROLE_SUPER_ADMIN}
 
         - { path: ^/zone_admin, roles: ROLE_ADMIN }
         - { path: ^/incident, roles: ROLE_ADMIN }
@@ -49,14 +50,12 @@ security:
         - { path: ^/modifyfile, roles: ROLE_LINE_ADMIN }
         - { path: ^/uploading, roles: ROLE_LINE_ADMIN }
         - { path: ^/uploaded, roles: ROLE_LINE_ADMIN }
+        - { path: ^/validation, roles: ROLE_LINE_ADMIN }
 
-        - { path: ^/category_manager, roles: ROLE_MANAGER }    
-
-        # - { path: ^/api, roles: ROLE_LINE_ADMIN }
-
+        - { path: ^/category_manager, roles: ROLE_MANAGER }
+        - { path: ^/tutorial, roles: ROLE_MANAGER }
 
 
-        # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
     security:

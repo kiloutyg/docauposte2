@@ -2,17 +2,15 @@ FROM php:8.2-apache-bookworm
 
 ENV http_proxy='http://10.0.0.1:80'
 COPY php.ini /usr/local/etc/php/php.ini
-#COPY docker/dockerfilehalf/php.ini /usr/local/etc/php/php.ini
-
-RUN a2enmod rewrite
+RUN a2enmod rewrite \
+  && service apache2 restart
 RUN apt-get update -y \
-  && apt-get install -y curl libxslt-dev libzip-dev git wget libmagickwand-dev --no-install-recommends \
+  && apt-get install -y ca-certificates curl libxslt-dev libzip-dev git wget gnupg --no-install-recommends \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-RUN docker-php-ext-install pdo mysqli pdo_mysql zip opcache xsl
-RUN pecl install xdebug imagick \
-  && docker-php-ext-enable imagick xdebug mysqli pdo_mysql pdo zip opcache xsl
+RUN docker-php-ext-install pdo mysqli pdo_mysql zip opcache xsl \
+  && pecl install xdebug \
+  && docker-php-ext-enable xdebug mysqli pdo_mysql pdo zip opcache xsl
 
 # fix git author
 RUN git config --global user.email "floriandkhissi@gmail.com"
@@ -24,11 +22,13 @@ WORKDIR /var/www
 RUN sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/sites-available/000-default.conf
 
 # install nodejs 
-RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
-RUN apt-get install -y nodejs \
+RUN mkdir -p /etc/apt/keyrings
+RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+RUN apt-get update -y \
+  && apt-get install -y nodejs \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
 RUN npm install -g yarn
 
 # install composer

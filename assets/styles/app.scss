@@ -9,6 +9,7 @@
 @import "~@fortawesome/fontawesome-free/scss/solid";
 @import "~@fortawesome/fontawesome-free/scss/brands";
 @import "~@fortawesome/fontawesome-free/css/all.css";
+@import '~select2/dist/css/select2.min';
 
 body {
     background-color: #2c5066;
@@ -141,5 +142,18 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
 
 .black-text {
     color: black;
-  }
-  
+}
+
+.right-line {
+  border-right: 5px #ccc solid;
+  height:2em
+}
+
+.top-line {
+  border-top: 5px #ccc solid;
+}
+
+.halved {
+  width: 50%;
+  float:left;
+}

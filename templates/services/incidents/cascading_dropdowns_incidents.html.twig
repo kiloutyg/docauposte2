@@ -1,7 +1,7 @@
 <div class="row">
 
 	<div class="col-md-2 col-sm-2 mt-2 mb-2">
-		<label for="incident_zone" style="color:white">Zone :</label>
+		<label for="incident_zone" style="color:white">Zone:</label>
 	</div>
 	<div class="col-md-10 col-sm-10 mt-2 mb-2">
 		<select name="incident_zone" id="incident_zone" class="form-select" required>
@@ -9,7 +9,7 @@
 		</select>
 	</div>
 	<div class="col-md-2 col-sm-2 mt-2 mb-2">
-		<label for="incident_productline" style="color:white">Ligne :</label>
+		<label for="incident_productline" style="color:white">Ligne:</label>
 	</div>
 	<div class="col-md-10 col-sm-10 mt-2 mb-2">
 		<select name="incident_productline" id="incident_productline" class="form-select" required>
@@ -17,10 +17,9 @@
 		</select>
 	</div>
 </div>
-<br>
 <div class="row">
 	<div class="col-md-2 col-sm-2 mt-2 mb-2">
-		<label for="incidents_incidentsCategory" style="color:white">Type d'incident :</label>
+		<label for="incidents_incidentsCategory" style="color:white">Type d'incident:</label>
 	</div>
 	<div class="col-md-10 col-sm-10 mt-2 mb-2">
 		<select name="incidents_incidentsCategory" id="incidents_incidentsCategory" class="form-select" required>
@@ -28,24 +27,3 @@
 		</select>
 	</div>
 </div>
-<br><br>
-{% if is_granted('ROLE_ADMIN') %}
-	<div class="row mb-3">
-		<label for="incidents_newFileName" class="form-label">Nouveau Type d'Incident :</label>
-		<div class="col-sm">
-			<input type="text" class="form-control" id="incident_incidentsCategory_name" name="incident_incidentsCategory_name" placeholder="Entrer un nouveu type d'incident (optionnel)">
-		</div>
-		<div class="col-sm-auto">
-			<input type="button" id="create_incident_incidentsCategory" class="btn btn-secondary shadow border border-dark-subtle" value="Ajouter un nouveau type d'incident">
-		</div>
-	</div>
-	{% for incidentCategory in incidentCategories %}
-		<div class="row mb-3">
-			<li class="form-control shadow d-flex justify-content-between align-items-center">
-				{{incidentCategory.name|split('.')|first|upper}}
-				<a href="{{ path('app_incident_incidentsCategory_deletion', {incidentCategory : incidentCategory.name}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-incidentCategory">supprimer</a>
-			</li>
-
-		</div>
-	{% endfor %}
-{% endif %}

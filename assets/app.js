@@ -20,12 +20,14 @@ import { createPopper } from "@popperjs/core";
 global.$ = global.jQuery = $;
 global.createPopper = createPopper;
 
-// import "./js/formdata.js";
+// Import Bootstrap's JavaScript
 import "bootstrap";
 
-// // homegrown javascript
-// import "./js/confirmation.js";
-// import "./js/cascading-dropdowns.js";
-// import "./js/incident-cascading-dropdowns.js";
-// import "./js/incident-checkbox-signature.js";
-// import "./js/toast.js";
+// Import the Select2 library
+import "select2";
+
+// initialize Select2 on your elements
+$(document).ready(function () {
+    $('.select2-enable').select2();
+});
+

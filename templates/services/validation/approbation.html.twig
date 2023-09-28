@@ -1,0 +1,154 @@
+{% block stylesheets %}
+	{{
+		encore_entry_link_tags("app")
+        }}
+{% endblock %}
+
+{% block javascripts %}
+
+	{{ encore_entry_script_tags('app') }}
+	{{ encore_entry_script_tags('document-validator') }}
+	{{ encore_entry_script_tags('confirmation') }}
+	{{ encore_entry_script_tags('toast') }}
+	{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
+	{{ encore_entry_script_tags('cascading-dropdowns') }}
+	{{ encore_entry_script_tags('department-creation') }}
+{% endblock %}
+
+
+{% block body %}
+{% set lastZone = null %}
+{% set lastProductLine = null %}
+{% set lastCategory = null %}
+{% set lastButton = null %}
+
+<div class=" d-flex align-items-center  flex-row">
+
+	<iframe src="{{ path('app_validation_approbation_file', { 'approbationId': approbation.id }) }}" width="69%" height="950" target="_blank"></iframe>
+	<div style="width: 31%" class="text-center card-body">
+
+		{% block title %}Page de validation de document par
+			<u>{{user.username|capitalize|split('.')|first }}
+				{{user.username|upper|split('.')|last }}</u><br>
+			<div class="dropdown">
+				{% set toBeValidated = [] %}
+				{% set currentApprobationId = approbation.id %}
+				{% for approbation in app.user.approbations %}
+					{% if approbation.approval is same as null %}
+						{% set toBeValidated = toBeValidated|merge([approbation]) %}
+					{% endif %}
+				{% endfor %}
+				{% if toBeValidated|length - 1 > 0  %}
+					<button class="btn dropdown-toggle" style="background-color:#007AFF; color:white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+						Il reste
+						<span class="badge bg-danger rounded-pill">
+							{{toBeValidated|length - 1}}
+						</span>
+						document(s) à valider
+					{% endif %}
+				</button>
+				<ul class="dropdown-menu dropdown-menu-start shadow shadow-inset" aria-labelledby="dropdownMenuButton1">
+					{% for approbation in app.user.approbations %}
+						{% if approbation.approval is same as null %}
+							{% if approbation.id is same as currentApprobationId %}
+								{% else %}
+									<li>
+										<a href="{{ path('app_validation_approbation', {'approbationId': approbation.id})}}" class="dropdown-item shadow ">
+											{{ approbation.validation.upload.filename|upper }}
+										</a>
+									</li>
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+				</ul>
+			</div>
+		{% endblock %}
+		<h2 style="text-align: center;">
+			<strong>{{approbation.validation.upload.filename|split('.')|first|upper}}</strong>
+		</h2>
+		{# Display the current button hierarchy #}
+		{% if lastZone != approbation.validation.upload.button.category.productLine.zone %}
+
+			{% set lastZone = approbation.validation.upload.button.category.productLine.zone %}
+
+			{{ lastZone.name|split('.')|first|upper }}
+			>
+		{% endif %}
+		{% if lastProductLine != approbation.validation.upload.button.category.productLine %}
+
+			{% set lastProductLine = approbation.validation.upload.button.category.productLine %}
+
+			{{ lastProductLine.name|split('.')|first|upper }}
+			>
+		{% endif %}
+		{% if lastCategory != approbation.validation.upload.button.category %}
+
+			{% set lastCategory = approbation.validation.upload.button.category %}
+
+			{{ lastCategory.name|split('.')|first|upper }}
+			>
+		{% endif %}
+
+		{% if lastButton != approbation.validation.upload.button %}
+
+			{% set lastButton = approbation.validation.upload.button %}
+
+
+		{% endif %}
+
+		<h3 style="text-align: center;">
+			{{approbation.validation.upload.button.name|split('.')|first|upper}}
+		</h3>
+
+		{% set validation = approbation.validation %}
+		{% set approbations = validation.approbations %}
+		{% for approbation in approbations %}
+			<ul>
+				{% if app.user != approbation.userapprobator  %}
+					<u>{{ approbation.userapprobator.username|capitalize|split('.')|first }}
+						{{ approbation.userapprobator.username|upper|split('.')|last }}</u>
+					{% if approbation.approval is not null %}
+						{{ approbation.approval ? ' a validé le document' : ' a refusé de validé le document'}}.
+					{% else %}
+						{{ ' n\'a pas encore rendu son avis.' }}
+					{% endif %}
+					{% if approbation.comment is not empty %}
+					
+						<ul>
+						En commentant :
+						<br>
+							- {{ approbation.comment }}
+						</ul>
+					{% endif %}
+				{% endif %}
+			</ul>
+    	{% endfor %}
+
+			<div style="height: 5vh;"></div>
+			<div class="d-flex justify-content-center align-items-center">
+				<form class="d-grid" method="post" action="{{ path('app_validation_approval', { 'approbationId': approbation.id }) }}" enctype="multipart/form-data">
+
+					<input type="radio" class="btn-check" name="approvalRadio" id="success-outlined" autocomplete="off" value="true" checked>
+					<label class="btn btn-outline-success" for="success-outlined">Approuver</label>
+
+					<input type="radio" class="btn-check" name="approvalRadio" id="danger-outlined" autocomplete="off" value="false">
+					<label class="btn btn-outline-danger" for="danger-outlined">Désapprouver</label>
+					<div class="input-group  justify-content-center">
+						<div class="input-group-prepend">
+							<span class="input-group-text">Commentaire</span>
+
+							<textarea class="form-control  " name="approbationComment" aria-label="With textarea"></textarea>
+						</div>
+					</div>
+					<div style="height: 5vh;"></div>
+					<button type="submit" class="btn btn-primary btn-lg submit-approval">Envoyer</button>
+				</form>
+			</div>
+			<div style="height: 5vh;"></div>
+			<a class="btn btn-dark" href="{{ path('app_logout') }}">Déconnexion</a>
+
+
+		</div>
+	</div>
+	
+{% endblock %}
