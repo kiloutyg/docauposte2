@@ -9,6 +9,7 @@ read -p "Are you running the app for the first Time ? (yes/no) " ANSWER;
             echo "Please answer by yes or no";
     fi
 done
+
 # If the user answered yes, we install the app
 if [ "${ANSWER}" == "yes" ]
 then 
