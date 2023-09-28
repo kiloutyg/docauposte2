@@ -52,7 +52,7 @@ From a remote connection to a server from a windows computer for example, print 
 1 - Download the installation script :
 
 ```
-    wget https://github.com/kiloutyg/DocAuPoste2/releases/download/v1.02/install-docauposte2.sh 
+    wget https://github.com/polangres/DocAuPoste2/releases/download/v1.02/install-docauposte2.sh 
 ```
 If wget or curl are not available you can use cat as described in the wiki : [https://github.com/polangres/DocAuPoste2/wiki/3-%E2%80%90-Deployment](https://github.com/polangres/DocAuPoste2/wiki/3-%E2%80%90-Deployment)
 
