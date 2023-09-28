@@ -9,6 +9,7 @@ read -p "Are you running the app for the first Time ? (yes/no) " ANSWER;
             echo "Please answer by yes or no";
     fi
 done
+
 # If the user answered yes, we install the app
 if [ "${ANSWER}" == "yes" ]
 then 
@@ -79,6 +80,11 @@ done
                 fi
             done
             if [ "${UPDATE_ANSWER}" == "yes" ]; then
+cat > ~/.ssh/config <<EOL
+Host github.com
+    StrictHostKeyChecking no
+EOL
+
                 cd docauposte2;
                 sg docker -c "docker compose stop";
                 git fetch origin --force;
