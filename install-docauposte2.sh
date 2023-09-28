@@ -79,6 +79,11 @@ done
                 fi
             done
             if [ "${UPDATE_ANSWER}" == "yes" ]; then
+            cat > ~/.ssh/config <<EOL
+Host github.com
+    StrictHostKeyChecking no
+EOL
+
                 cd docauposte2;
                 sg docker -c "docker compose stop";
                 git fetch origin --force;
