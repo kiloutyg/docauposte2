@@ -105,7 +105,8 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					{% else %}
 						<p>
 							<strong>
-								{{app.user.username|capitalize|split('.')|first }} {{app.user.username|upper|split('.')|last }}
+								{{app.user.username|capitalize|split('.')|first }}
+								{{app.user.username|upper|split('.')|last }}
 							</strong>
 							<a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
 						</p>
@@ -121,11 +122,11 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 		<div class="container ">
 			{% if users is defined %}
 				{% if users is empty %}
-					<h4 class="my-4">
+					<h5 class="my-5">
 						<strong>Pour commencer à utiliser l'application, veuillez créer le superadministrateur :
 						</strong>
-					</h4>
-					<div class="card border-0 shadow rounded-3 my-4">
+					</h5>
+					<div class="card border-0 shadow rounded-3 my-5">
 						<div class="card-body">
 							<div class="row">
 								<form action="{{ path('app_create_super_admin') }}" method="post">
@@ -165,9 +166,9 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 							Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
 					</h3>
 					<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
-						<div class="d-flex  mb-4 mt-4 line-list align-items-center justify-content-center flex-wrap">
+						<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 							{% for zone in zones %}
-								<a class="btn btn-primary btn-lg m-4 " role="button" aria-pressed="true" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
+								<a class="btn btn-primary btn-lg m-5 " role="button" aria-pressed="true" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
 									<span class="line-details text-justify">
 										{{ zone.name|split('.')|first|upper }}
 
@@ -182,7 +183,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 		<!-- Footer -->
 		<footer class="container py-3 border-top  flex-shrink-0">
 			<div class="d-flex flex-wrap justify-content-between">
-				<div class="col-md-4 d-flex align-items-center">
+				<div class="col-md-5 d-flex align-items-center">
 					<span class="me-1" style="color: red">
 						<i class="fas fa-copyright"></i>
 					</span>
@@ -193,7 +194,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						<i class="fa fa-arrow-circle-o-left" 'aria-hidden="false"'>Retour</i>
 					</a>
 				</div>
-				<ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+				<ul class="nav col-md-5 justify-content-end list-unstyled d-flex">
 					<li class="ms-3">
 						<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/">
 							<i class="fab fa-github"></i>

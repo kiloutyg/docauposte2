@@ -225,6 +225,8 @@ class UploadService extends AbstractController
                     $validated = true;
                 }
             }
+            // Retire the old file
+            $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
             // Set the validated boolean property
             $upload->setValidated($validated);
             // Update the uploader in the upload object

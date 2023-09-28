@@ -141,14 +141,18 @@ class ValidationController extends FrontController
                 return $this->redirectToRoute('app_base');
             }
         }
+        if ($validation->isStatus() === false) {
+            return $this->render('services/validation/disapprovedModification.html.twig', [
+                'approbation'  => $approbation,
+                'upload'       => $upload,
+                'user'         => $this->getUser(),
+                'form'         => $form->createView(),
+                'approbations' => $approbations,
 
-        return $this->render('services/validation/disapprovedModification.html.twig', [
-            'approbation'  => $approbation,
-            'upload'       => $upload,
-            'user'         => $this->getUser(),
-            'form'         => $form->createView(),
-            'approbations' => $approbations,
-
-        ]);
+            ]);
+        } else {
+            $this->addFlash('error', 'Le fichier a bien été modifié.');
+            return $this->redirect($originUrl);
+        }
     }
 }
