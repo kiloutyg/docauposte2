@@ -1,6 +1,9 @@
 #!/bin/bash
 
-
+cat > ~/.ssh/config <<EOL
+Host github.com
+    StrictHostKeyChecking no
+EOL
 
 read -p "What Timezone to use? (default Europe/Paris) " TIMEZONE
 if [ -z "${TIMEZONE}" ]
