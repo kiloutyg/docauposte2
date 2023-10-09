@@ -1,12 +1,12 @@
 {% block body %}
-	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
+	{# <div class="card border-0 shadow rounded-3 my-5 bg-secondary">
 		<div class="card-body ">
 			<h4 class="card-title text-white m-0">
 				<strong>
 					Liste des documents :
 				</strong>
 			</h4>
-			<div class="">
+			<div class=""> #}
 				{% if (groupedUploads is defined) and (groupedUploads is not empty ) %}
 					<div class="accordion col-10 mx-auto justify-content-center" id="accordionExample">
 						{% set outerIndex = 0 %}
@@ -14,7 +14,7 @@
 							{% set outerIndex = outerIndex + 1 %}
 							<div class="accordion-item">
 								<h2 class="accordion-header" id="headingZone{{ outerIndex }}">
-									<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone{{ outerIndex }}" aria-expanded="false" aria-controls="collapseZone{{ outerIndex }}">
+									<button class="accordion-button collapsed" style="background-color: red;" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone{{ outerIndex }}" aria-expanded="false" aria-controls="collapseZone{{ outerIndex }}">
 										Zone:
 										{{ zoneName|split('.')|first|upper }}
 									</button>
@@ -107,13 +107,7 @@
 						</a>
 					</div>
 				{% endif %}
-			</div>
+			{# </div>
 		</div>
-	</div>
-{% endblock %}
-{% block javascripts %}
-
-	{{ encore_entry_script_tags('cascading-dropdowns') }}
-	{% block javascript_data %}{% endblock %}
-
+	</div> #}
 {% endblock %}
