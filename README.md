@@ -9,7 +9,7 @@ Created from scratch with Docker 20, PHP8.1 and Symfony6.2.6.
 
 ##### A - Create your ssh key pair follow the instruction and default option, I STRONGLY ADVISE TO PUT A PASSWORD but it is optional:
 ```
-    ssh-keygen -t ed25519 -C "any_comment_you_wish_to_add"
+    ssh-keygen -t ed25519 -C "docauposte2 github"
 ```
 
 ##### B - Copy the key in your clipboard :
@@ -52,7 +52,7 @@ From a remote connection to a server from a windows computer for example, print 
 1 - Download the installation script :
 
 ```
-    wget https://github.com/polangres/DocAuPoste2/releases/download/v1.02/install-docauposte2.sh 
+    wget https://github.com/polangres/DocAuPoste2/releases/download/v1.1/install-docauposte2.sh 
 ```
 If wget or curl are not available you can use cat as described in the wiki : [https://github.com/polangres/DocAuPoste2/wiki/3-%E2%80%90-Deployment](https://github.com/polangres/DocAuPoste2/wiki/3-%E2%80%90-Deployment)
 
