@@ -6,44 +6,60 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 
-use App\Service\AccountService;
-
 use App\Controller\UploadController;
 
+// This controller manage the logic of the front interface, it is the main controller of the application and is responsible for rendering the front interface.
+// It is also responsible for creating the super-admin account.
 
 #[Route('/', name: 'app_')]
 class FrontController extends BaseController
 {
-    // Page d'accueil
+    // Render the base page
     #[Route('/', name: 'base')]
     public function base(): Response
     {
+
+        // Updating the uploads validation status
+        $uploads = [];
+        $uploads = $this->uploadRepository->findBy(
+            ['validated' => null]
+        );
+        foreach ($uploads as $upload) {
+            if ($upload->getUploadedAt() < new \DateTime('2023-09-19 00:00:00')) {
+                $this->validationService->updateValidationRecycle($upload);
+            }
+        }
+
+        //Updating Users Email
+        $users = [];
+        $users = $this->userRepository->findBy(['emailAddress' => null]);
+        foreach ($users as $user) {
+            $this->accountService->updateUserEmail($user);
+        }
+
+
         return $this->render(
             'base.html.twig',
             [
-                'categories'  => $this->categoryRepository->findAll(),
-                'buttons' => $this->buttonRepository->findAll(),
-                'zones'        => $this->zoneRepository->findAll(),
-                'productLines' => $this->productLineRepository->findAll(),
-                'users'        => $this->userRepository->findAll(),
-                'user'         => $this->getUser(),
+                'user'                  => $this->getUser()
             ]
         );
     }
 
 
+    // This function is responsible for creating the super-admin account at the first connection of the application.
     #[Route('/createSuperAdmin', name: 'create_super_admin')]
-    public function createSuperAdmin(AccountService $accountService, Request $request): Response
+    public function createSuperAdmin(Request $request): Response
     {
         $users = [];
-        $users  = $this->userRepository->findAll();
+        $users  = $this->users;
 
         if ($users == null) {
 
             $error = null;
-            $result = $accountService->createAccount(
+            $result = $this->accountService->createAccount(
                 $request,
-                $error,
+                $error
             );
             if ($result) {
                 $this->addFlash('success', 'Le compte de Super-Administrateur a bien été créé.');
@@ -59,7 +75,7 @@ class FrontController extends BaseController
     }
 
 
-    // Page de zone
+    // Render the zone page
     #[Route('/zone/{zone}', name: 'zone')]
     public function zone(string $zone = null): Response
     {
@@ -68,20 +84,20 @@ class FrontController extends BaseController
         return $this->render(
             'zone.html.twig',
             [
-                'zone'         => $zone,
-                'productLines' => $this->productLineRepository->findAll(),
+                'zone'         => $zone
             ]
         );
     }
 
 
-    // Productline page
+    // Render the productline page and redirect to the mandatory incident page if there is one
     #[Route('/zone/{zone}/productline/{productline}', name: 'productline')]
     public function productline(string $productline = null): Response
     {
 
         $productLine = $this->productLineRepository->findoneBy(['name' => $productline]);
         $zone        = $productLine->getZone();
+
         $incidents = [];
         $incidents = $this->incidentRepository->findBy(
             ['ProductLine' => $productLine->getId()],
@@ -90,15 +106,13 @@ class FrontController extends BaseController
 
         $incidentid = count($incidents) > 0 ? $incidents[0]->getId() : null;
 
-
         if (count($incidents) == 0) {
 
             return $this->render(
                 'productline.html.twig',
                 [
                     'zone'        => $zone,
-                    'categories'  => $this->categoryRepository->findAll(),
-                    'productLine' => $productLine,
+                    'productLine' => $productLine
                 ]
             );
         } else {
@@ -112,7 +126,7 @@ class FrontController extends BaseController
 
 
 
-    // Page de category
+    // Render the category page and redirect to the button page if there is only one button in the category
     #[Route('/zone/{zone}/productline/{productline}/category/{category}', name: 'category')]
 
     public function category(string $category = null): Response
@@ -130,9 +144,7 @@ class FrontController extends BaseController
                 [
                     'zone'        => $zone,
                     'productLine' => $productLine,
-                    'category'    => $category,
-                    'categories'  => $this->categoryRepository->findAll(),
-                    'buttons'     => $this->buttonRepository->findAll(),
+                    'category'    => $category
                 ]
             );
         } else {
@@ -147,33 +159,37 @@ class FrontController extends BaseController
     }
 
 
+    // Render the button page and redirect to the upload page if there is only one upload in the button
     #[Route('/zone/{zone}/productline/{productline}/category/{category}/button/{button}', name: 'button')]
-    public function ButtonShowing(UploadController $uploadController, string $button = null): Response
+    public function ButtonShowing(UploadController $uploadController, string $button = null, Request $request): Response
     {
-        $buttonEntity = $this->buttonRepository->findoneBy(['name' => $button]);
+        $buttonEntity = $this->buttonRepository->findOneBy(['name' => $button]);
         $category    = $buttonEntity->getCategory();
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
         $uploads = [];
-        $uploads = $this->uploadRepository->findBy(['button' => $buttonEntity->getId()]);
+
+        $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonEntity->getId()]);
+        foreach ($buttonUploads as $buttonUpload) {
+            if ($buttonUpload->isValidated() || $buttonUpload->getOldUpload() != null) {
+                $uploads[] = $buttonUpload;
+            }
+        }
 
         if (count($uploads) != 1) {
-
             return $this->render(
                 'button.html.twig',
                 [
                     'zone'        => $zone,
                     'productLine' => $productLine,
                     'category'    => $category,
-                    'categories'  => $this->categoryRepository->findAll(),
                     'button'      => $buttonEntity,
-                    'uploads'     => $this->uploadRepository->findAll(),
-
+                    'uploads'     => $uploads,
                 ]
             );
         } else {
-            $filename = $uploads[0]->getFilename();
-            return $uploadController->download_file($filename);
+            $uploadId = $uploads[0]->getId();
+            return $uploadController->download_file($uploadId, $request);
         }
     }
 }

@@ -2,9 +2,10 @@
 
 namespace App\Service;
 
-use Doctrine\ORM\Mapping\Entity;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
+
+// This class is responsible for the logic of creating and deleting the folder structure used to store the files and organize them in the server filesystem making it easier to manage.
 class FolderCreationService
 {
     protected $public_dir;
@@ -15,22 +16,24 @@ class FolderCreationService
         $this->public_dir = $params->get('kernel.project_dir') . '/public';
     }
 
+    // This function creates the folder structure for a given entity
     public function folderStructure(string $folderName)
     {
+        // The function obtain the right folder name from the entity name 
         $parts = explode('.', $folderName);
         $parts = array_reverse($parts);
         $folderPath = $this->public_dir . '/doc';
 
+        // Then the function creates the folder using the dedicated function
         foreach ($parts as $part) {
             $folderPath .= '/' . $part;
             $this->createFolder($folderPath);
         }
     }
 
-    // public function deleteFolderStructure(Entity $entity)
+    // This function deletes the folder structure for a given entity
     public function deleteFolderStructure($folderName)
     {
-        // $folderName = getName($entity);
 
         $parts = explode('.', $folderName);
         $parts = array_reverse($parts);
@@ -42,6 +45,7 @@ class FolderCreationService
         $this->deleteFolder($folderPath);
     }
 
+    // This function creates a folder and chmod it to 0777
     public function createFolder($folderPath)
     {
         if (!file_exists($folderPath)) {
@@ -49,6 +53,7 @@ class FolderCreationService
         }
     }
 
+    // This function deletes a folder
     public function deleteFolder($folderPath)
     {
         if (file_exists($folderPath)) {

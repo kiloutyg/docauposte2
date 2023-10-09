@@ -2,25 +2,26 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\File;
+
 use Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 use App\Form\UploadType;
 
-use App\Service\UploadsService;
+use App\Entity\Upload;
 
 
 
+// This controlle is responsible for managing the logic of the upload interface
 #[Route('/', name: 'app_')]
-
 class UploadController extends FrontController
 {
+    // This function is responsible for rendering the upload interface
     #[Route('/upload', name: 'upload')]
     public function index(): Response
     {
@@ -28,96 +29,125 @@ class UploadController extends FrontController
     }
 
 
-
+    // This function is responsible for rendering the uploaded files interface
     #[Route('/uploaded', name: 'uploaded_files')]
     public function uploaded_files(): Response
     {
-
         return $this->render(
             'services/uploads/uploaded.html.twig'
         );
     }
 
-    // create a route to upload a file
+
+    // Create a route to upload a file, and pass the request to the UploadService to handle the file upload
     #[Route('/uploading', name: 'generic_upload_files')]
-    public function generic_upload_files(UploadsService $uploadsService, Request $request): Response
+    public function generic_upload_files(Request $request): Response
     {
-        $this->uploadsService = $uploadsService;
-
+        // Get the URL of the page from which the request originated
         $originUrl = $request->headers->get('Referer');
-
-        $button = $request->request->get('button');
+        // Retrieve the User object
+        $user = $this->getUser();
+        // Retrieve the button and the newFileName from the request
+        $button      = $request->request->get('button');
         $newFileName = $request->request->get('newFileName');
+        // Find the Button entity in the repository based on its ID
         $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
-
-        // Check if the file already exists
+        // Check if the file already exists by comparing the filename and the button
         $conflictFile = '';
-        $filename = '';
-        $file = $request->files->get('file');
+        $filename     = '';
+        $file         = $request->files->get('file');
         if ($newFileName) {
-            $filename   = $newFileName;
+            $filename = $newFileName;
         } else {
-            $filename   = $file->getClientOriginalName();
+            $filename = $file->getClientOriginalName();
         }
         $conflictFile = $this->uploadRepository->findOneBy(['button' => $buttonEntity, 'filename' => $filename]);
+        // If the file already exists, return an error message
         if ($conflictFile) {
             $this->addFlash('error', 'Le fichier ' . $filename . ' existe déjà.');
             return $this->redirect($originUrl);
-
-            // if it does not exist pass the request to the service 
-        } else if ($request->isMethod('POST')) {
-
-            // Use the UploadsService to handle file uploads
-            $name = $this->uploadsService->uploadFiles($request, $buttonEntity, $newFileName);
-            $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
-            return $this->redirect($originUrl);
         } else {
-            $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
+            // Use the UploadService to handle file uploads
+            $name = $this->uploadService->uploadFiles($request, $buttonEntity, $user, $newFileName);
+            $this->addFlash('success', 'Le document ' . $name . ' a été correctement chargé');
             return $this->redirect($originUrl);
         }
     }
 
 
-    // create a route to download a file
-    #[Route('/download/{filename}', name: 'download_file')]
-    public function download_file(string $filename = null): Response
+    // create a route to download a file in more simple terms to display the file
+    #[Route('/download/{uploadId}', name: 'download_file')]
+    public function download_file(int $uploadId, Request $request): Response
     {
-        $file = $this->uploadRepository->findOneBy(['filename' => $filename]);
+        // Retrieve the origin URL
+        $originUrl = $request->headers->get('Referer');
+        $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $file = $upload;
+        if (!$file->isValidated()) {
+            $this->addFlash('error', 'Le fichier n\'a pas été validé.');
+            if ($file->getOldUpload() != null) {
+                $oldUploadId = $file->getOldUpload()->getId();
+                $oldUpload = $this->oldUploadRepository->findOneBy(['id' => $oldUploadId]);
+                $path = $oldUpload->getPath();
+                $file = new File($path);
+                return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
+            }
+
+            return $this->redirect($originUrl);
+        }
         $path = $file->getPath();
-        $file       = new File($path);
+        $file = new File($path);
+        return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
+    }
+
+
+    // create a route to download a file in more simple terms to display the file
+    #[Route('/download/invalidation/{uploadId}', name: 'download_invalidation_file')]
+    public function download_invalidation_file(int $uploadId = null, Request $request): Response
+    {
+        // Retrieve the origin URL
+        $originUrl = $request->headers->get('Referer');
+        $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $path = $file->getPath();
+        $file = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
 
     // create a route to delete a file
-    #[Route('/delete/upload/{button}/{filename}', name: 'delete_file')]
+    #[Route('/delete/upload/{uploadId}', name: 'delete_file')]
 
-    public function delete_file(string $filename = null, int $button = null, UploadsService $uploadsService, Request $request): RedirectResponse
+    public function delete_file(int $uploadId = null, Request $request): RedirectResponse
     {
-        $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
         $originUrl = $request->headers->get('Referer');
 
-        // Use the UploadsService to handle file deletion
-        $name = $uploadsService->deleteFile($filename, $buttonEntity);
+        // Use the UploadService to handle file deletion
+        $name = $this->uploadService->deleteFile($uploadId);
         $this->addFlash('success', 'Le fichier  ' . $name . ' a été supprimé.');
 
         return $this->redirect($originUrl);
     }
 
 
-
     // create a route to modify a file and or display the modification page
     #[Route('/modify/{uploadId}', name: 'modify_file')]
-    public function modify_file(Request $request, int $uploadId, UploadsService $uploadsService): Response
+    public function modify_file(Request $request, int $uploadId): Response
     {
         // Retrieve the current upload entity based on the uploadId
-        $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
-        $button = $upload->getButton();
-        $category = $button->getCategory();
+        $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $button      = $upload->getButton();
+        $category    = $button->getCategory();
         $productLine = $category->getProductLine();
-        $zone = $productLine->getZone();
+        $zone        = $productLine->getZone();
+        $oldFileName = $upload->getFilename();
+
+        // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
 
+        // Retrieve the User object
+        $user = $this->getUser();
+
+        // Check if there is a file to modify
         if (!$upload) {
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
             return $this->redirect($originUrl);
@@ -125,25 +155,18 @@ class UploadController extends FrontController
 
         // Create a form to modify the Upload entity
         $form = $this->createForm(UploadType::class, $upload);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
-                $uploadsService->modifyFile($upload);
-
+                $this->uploadService->modifyFile($upload, $user, $request, $oldFileName);
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirect($originUrl);
             } catch (\Exception $e) {
-                $this->addFlash('error', 'Une erreur s\'est produite lors de la modification du fichier.');
-
-                $response = [
-                    'status' => 'error',
-                    'message' => 'Une erreur s\'est produite lors de la modification du fichier.',
-                    'error' => $e->getMessage(),
-                ];
-
-                return new JsonResponse($response);
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirect($originUrl);
             }
         }
 
@@ -167,14 +190,21 @@ class UploadController extends FrontController
             return $this->redirect($originUrl); // Return a 400 Bad Request response
         }
 
+        $currentUser = $this->security->getUser();
+        $uploader = $upload->getUploader();
         // If it's a GET request, render the form
-        return $this->render('services/uploads/uploads_modification.html.twig', [
-            'form' => $form->createView(),
-            'zone'        => $zone,
-            'productLine' => $productLine,
-            'category'    => $category,
-            'button'      => $button,
-            'upload' => $upload
-        ]);
+        if ($request->isMethod('GET') && ($currentUser === $uploader || $uploader === null)) {
+            return $this->render('services/uploads/uploads_modification.html.twig', [
+                'form'        => $form->createView(),
+                'zone'        => $zone,
+                'productLine' => $productLine,
+                'category'    => $category,
+                'button'      => $button,
+                'upload'      => $upload
+            ]);
+        } else {
+            $this->addFlash('error', 'Vous n\'avez pas les droits pour modifier ce fichier.');
+            return $this->redirectToRoute('app_base');
+        }
     }
 }

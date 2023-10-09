@@ -14,12 +14,13 @@ use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
 
 use App\Entity\Incident;
-use App\Entity\ProductLine;
+use App\Entity\User;
 
 use App\Service\FolderCreationService;
 
 
-class IncidentsService extends AbstractController
+// This class is responsible for the logic of managing the incidents files
+class IncidentService extends AbstractController
 {
 
     protected $incidentRepository;
@@ -38,7 +39,7 @@ class IncidentsService extends AbstractController
         ParameterBagInterface $params,
         IncidentRepository $incidentRepository,
         LoggerInterface $logger,
-        IncidentCategoryRepository $incidentCategoryRepository,
+        IncidentCategoryRepository $incidentCategoryRepository
     ) {
         $this->incidentRepository = $incidentRepository;
         $this->manager = $manager;
@@ -48,7 +49,9 @@ class IncidentsService extends AbstractController
         $this->folderCreationService = $folderCreationService;
         $this->incidentCategoryRepository = $incidentCategoryRepository;
     }
-    public function uploadIncidentFiles(Request $request, $productline,  $IncidentCategoryId, $newName = null)
+
+    // This function is responsible for the logic of uploading the incidents files
+    public function uploadIncidentFiles(Request $request, $productline,  $IncidentCategoryId, User $user, $newName = null)
     {
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();
@@ -57,7 +60,7 @@ class IncidentsService extends AbstractController
 
         foreach ($files as $file) {
 
-            // Dinamyic folder creation and file incident
+            // Dynamic folder creation in the case it does not aleady exist
             $productlinename = $productline->getName();
             $parts = explode('.', $productlinename);
             $parts = array_reverse($parts);
@@ -67,11 +70,16 @@ class IncidentsService extends AbstractController
                 $folderPath .= '/' . $part;
             }
 
+            // Check if the file is a pdf
             $extension = $file->guessExtension();
             if (!in_array($extension, $allowedExtensions)) {
                 return $this->addFlash('error', 'Le fichier doit être un pdf');;
             }
+            if ($file->getMimeType() != 'application/pdf') {
+                return $this->addFlash('error', 'Le fichier doit être un pdf');;
+            }
 
+            // Check if the user added a new name for the file
             if ($newName) {
                 $name   = $newName;
             } else {
@@ -87,6 +95,7 @@ class IncidentsService extends AbstractController
             $incident->setFile(new File($path));
             $incident->setName($name);
             $incident->setPath($path);
+            $incident->setUploader($user);
             $incident->setIncidentCategory($IncidentCategory);
             $incident->setProductLine($productline);
             $incident->setuploadedAt(new \DateTime());
@@ -96,13 +105,12 @@ class IncidentsService extends AbstractController
         return $name;
     }
 
-
+    // This function is responsible for the logic of deleting the incidents files 
     public function deleteIncidentFile($name, $productline)
     {
-        // $name;
         $public_dir = $this->projectDir . '/public';
 
-        // Dinamyic folder creation and file incident
+        // Dynamic folder creation and file incident
         $productlinename = $productline->getName();
         $parts = explode('.', $productlinename);
         $parts = array_reverse($parts);
@@ -125,10 +133,9 @@ class IncidentsService extends AbstractController
     }
 
 
-    public function modifyIncidentFile(incident $incident)
+    // This function is responsible for the logic of modifying the incidents files
+    public function modifyIncidentFile(incident $incident, User $user)
     {
-        // Log the form data
-        $this->logger->info('original incident state', ['incident' => $incident]);
 
         // Get the new file directly from the incident object
         $newFile = $incident->getFile();
@@ -152,8 +159,15 @@ class IncidentsService extends AbstractController
 
         $Path = $folderPath . '/' . $incident->getName();
 
+
+
         // If new file exists, process it and delete the old one
         if ($newFile) {
+            // Check if the file is of the right type
+            if ($newFile->getMimeType() != 'application/pdf') {
+                throw new \Exception('Le fichier doit être un pdf');
+            }
+
             // Remove old file if it exists
             if (file_exists($oldFilePath)) {
                 unlink($oldFilePath);
@@ -163,17 +177,20 @@ class IncidentsService extends AbstractController
             try {
                 $newFile->move($folderPath . '/', $incident->getName());
             } catch (\Exception $e) {
-                $this->logger->error('Failed to move incidented file: ' . $e->getMessage());
                 throw $e;
             }
 
             // Update the file path in the incident object
             $incident->setPath($Path);
+            // Update the uploader in the incident object
+            $incident->setUploader($user);
         } else {
             // If no new file is incidented, just rename the old one if necessary
             if ($oldFilePath != $Path) {
                 rename($oldFilePath, $Path);
                 $incident->setPath($Path);
+                // Update the uploader in the incident object
+                $incident->setUploader($user);
             }
         }
 
@@ -184,6 +201,7 @@ class IncidentsService extends AbstractController
     }
 
 
+    // This function is responsible for the logic of grouping the incidents files by parent entity
     public function groupIncidents($incidents)
     {
 

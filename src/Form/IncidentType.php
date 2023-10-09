@@ -6,6 +6,7 @@ use App\Repository\ProductLineRepository;
 
 use App\Entity\Incident;
 use App\Entity\ProductLine;
+use App\Entity\IncidentCategory;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\AbstractType;
@@ -22,7 +23,8 @@ use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-
+// This class is responsible for creating the form for the incident entity and transforming the data to be used by the controller and the entit. 
+// It also contains the logic for the form validation and the form submission.
 class IncidentType extends AbstractType
 {
     private $productLineRepository;
@@ -45,9 +47,7 @@ class IncidentType extends AbstractType
                 'label' => 'Nouveau nom du fichier d\'incident:',
                 'required' => false,
                 'empty_data' => null,
-
             ])
-
             ->add(
                 'productline',
                 EntityType::class,
@@ -57,6 +57,18 @@ class IncidentType extends AbstractType
                     'label' => 'Select a productline:',
                     'placeholder' => 'Choisir un Produit',
                     'required' => true,
+                    'multiple' => false,
+                ]
+            )
+            ->add(
+                'incidentCategory',
+                EntityType::class,
+                [
+                    'class' => IncidentCategory::class,
+                    'choice_label' => 'name',
+                    'label' => 'Select an incident category:',
+                    'placeholder' => 'Choisir un type d\'incident',
+                    'required' => false,
                     'multiple' => false,
                 ]
             );

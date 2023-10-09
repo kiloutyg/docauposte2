@@ -8,25 +8,23 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-use App\Service\UploadsService;
-use App\Service\AccountService;
-use App\Service\IncidentsService;
-
 
 use App\Entity\Zone;
 
-class SuperAdminController extends BaseController
+// This controller is responsible for rendering the super admin interface an managing the logic of the super admin interface
+class SuperAdminController extends FrontController
 {
 
+    // This function is responsible for rendering the super admin interface
     #[Route('/super_admin', name: 'app_super_admin')]
-
-    public function index(IncidentsService $incidentsService, UploadsService $uploadsService, AuthenticationUtils $authenticationUtils,): Response
+    public function index(AuthenticationUtils $authenticationUtils): Response
     {
-        $incidents = $this->incidentRepository->findAll();
-        $uploads = $this->uploadRepository->findAll();
+        $incidents = $this->incidents;
+        $uploads = $this->uploads;
 
-        $groupedUploads = $uploadsService->groupUploads($uploads);
-        $groupIncidents = $incidentsService->groupIncidents($incidents);
+        // Group the uploads and incidents by parent entity
+        $groupedUploads = $this->uploadService->groupUploads($uploads);
+        $groupIncidents = $this->incidentService->groupIncidents($incidents);
 
         // Get the error and last username using AuthenticationUtils
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -36,26 +34,16 @@ class SuperAdminController extends BaseController
             'groupedUploads'        => $groupedUploads,
             'groupincidents'        => $groupIncidents,
             'error'                 => $error,
-            'last_username'         => $lastUsername,
-            'zones'                 => $this->zoneRepository->findAll(),
-            'productLines'          => $this->productLineRepository->findAll(),
-            'categories'            => $this->categoryRepository->findAll(),
-            'buttons'               => $this->buttonRepository->findAll(),
-            'uploads'               => $this->uploadRepository->findAll(),
-            'users'                 => $this->userRepository->findAll(),
-            'incidents'             => $this->incidentRepository->findAll(),
-            'incidentCategories'    => $this->incidentCategoryRepository->findAll(),
-
+            'last_username'         => $lastUsername
         ]);
     }
 
-
+    // Creation of new user account destined to the super admin
     #[Route('/super_admin/create_admin', name: 'app_super_admin_create_admin')]
-
-    public function createAdmin(AccountService $accountService, Request $request): Response
+    public function createAdmin(Request $request): Response
     {
         $error = null;
-        $result = $accountService->createAccount($request, $error);
+        $result = $this->accountService->createAccount($request, $error);
 
         if ($result) {
             $this->addFlash('success', 'Le compte a été créé');
@@ -66,16 +54,11 @@ class SuperAdminController extends BaseController
         }
 
         return $this->redirectToRoute('app_super_admin', [
-            'buttons'       => $this->buttonRepository->findAll(),
-            'uploads'       => $this->uploadRepository->findAll(),
-            'error'         => $error,
-            'zones'         => $this->zoneRepository->findAll(),
-            'users'         => $this->userRepository->findAll()
+            'error'         => $error
         ]);
     }
 
-
-
+    // Zone creation logic destined to the super admin, it also creates the folder structure for the zone
     #[Route('/super_admin/create_zone', name: 'app_super_admin_create_zone')]
     public function createZone(Request $request)
     {
@@ -85,10 +68,7 @@ class SuperAdminController extends BaseController
             $zone = $this->zoneRepository->findOneBy(['name' => $zonename]);
             if (empty($zonename)) {
                 $this->addFlash('danger', 'Le nom de la Zone ne peut être vide');
-                return $this->redirectToRoute('app_super_admin', [
-                    'zones' => $this->zoneRepository->findAll(),
-                    'users' => $this->userRepository->findAll()
-                ]);
+                return $this->redirectToRoute('app_super_admin');
             }
 
             if (!file_exists($this->public_dir . '/doc/')) {
@@ -97,10 +77,7 @@ class SuperAdminController extends BaseController
 
             if ($zone) {
                 $this->addFlash('danger', 'La zone existe déjà');
-                return $this->redirectToRoute('app_super_admin', [
-                    'zones' => $this->zoneRepository->findAll(),
-                    'users' => $this->userRepository->findAll()
-                ]);
+                return $this->redirectToRoute('app_super_admin');
             } else {
                 $zone = new Zone();
                 $zone->setName($zonename);
@@ -108,14 +85,12 @@ class SuperAdminController extends BaseController
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($zonename);
                 $this->addFlash('success', 'La zone a été créee');
-                return $this->redirectToRoute('app_super_admin', [
-                    'zones' => $this->zoneRepository->findAll(),
-                    'users' => $this->userRepository->findAll()
-                ]);
+                return $this->redirectToRoute('app_super_admin');
             }
         }
     }
 
+    // Zone deletion logic destined to the super admin, it also deletes the folder structure for the zone
     #[Route('/super_admin/delete_zone/{zone}', name: 'app_super_admin_delete_zone')]
     public function deleteEntity(string $zone): Response
     {

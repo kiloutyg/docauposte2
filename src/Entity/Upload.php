@@ -3,9 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\UploadRepository;
+use App\Repository\OldUploadRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
+
+use App\Entity\OldUpload;
+
 use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\HttpFoundation\File\File;
@@ -27,27 +31,30 @@ class Upload
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $expiry_date = null;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $uploaded_at = null;
-
 
     #[ORM\ManyToOne(inversedBy: 'uploads')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Button $button = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $validated = null;
+
+    #[ORM\OneToOne(mappedBy: 'Upload', cascade: ['persist', 'remove'])]
+    private ?Validation $validation = null;
+
     #[ORM\ManyToOne(inversedBy: 'uploads')]
-    private ?DisplayOption $displayOption = null;
+    private ?User $uploader = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $revision = null;
 
-
+    #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
+    private ?OldUpload $OldUpload = null;
 
 
     #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
-
-
 
 
     public function setFile(?File $file = null): void
@@ -93,28 +100,6 @@ class Upload
         return $this;
     }
 
-    // #[ORM\PrePersist]
-    // #[ORM\PreUpdate]
-
-    // public function updatePath(): void
-    // {
-    //     // This is just an example, adjust it according to your actual directory structure.
-
-    //     $this->path = '/var/www/public/doc/' . $this->filename;
-    // }
-
-    public function getExpiryDate(): ?\DateTimeInterface
-    {
-        return $this->expiry_date;
-    }
-
-    public function setExpiryDate(?\DateTimeInterface $expiry_date): self
-    {
-        $this->expiry_date = $expiry_date;
-
-        return $this;
-    }
-
     public function getUploadedAt(): ?\DateTimeInterface
     {
         return $this->uploaded_at;
@@ -126,7 +111,6 @@ class Upload
 
         return $this;
     }
-
 
     public function getButton(): ?Button
     {
@@ -140,44 +124,67 @@ class Upload
         return $this;
     }
 
-    // /**
-    //  * @return Collection<int, Incident>
-    //  */
-    // public function getIncidents(): Collection
-    // {
-    //     return $this->incidents;
-    // }
-
-    // public function addIncident(Incident $incident): self
-    // {
-    //     if (!$this->incidents->contains($incident)) {
-    //         $this->incidents->add($incident);
-    //         $incident->setUpload($this);
-    //     }
-
-    //     return $this;
-    // }
-
-    // public function removeIncident(Incident $incident): self
-    // {
-    //     if ($this->incidents->removeElement($incident)) {
-    //         // set the owning side to null (unless already changed)
-    //         if ($incident->getUpload() === $this) {
-    //             $incident->setUpload(null);
-    //         }
-    //     }
-
-    //     return $this;
-    // }
-
-    public function getDisplayOption(): ?DisplayOption
+    public function isValidated(): ?bool
     {
-        return $this->displayOption;
+        return $this->validated;
     }
 
-    public function setDisplayOption(?DisplayOption $displayOption): static
+    public function setValidated(?bool $validated): static
     {
-        $this->displayOption = $displayOption;
+        $this->validated = $validated;
+
+        return $this;
+    }
+
+    public function getValidation(): ?Validation
+    {
+        return $this->validation;
+    }
+
+    public function setValidation(Validation $validation): static
+    {
+        // set the owning side of the relation if necessary
+        if ($validation->getUpload() !== $this) {
+            $validation->setUpload($this);
+        }
+
+        $this->validation = $validation;
+
+        return $this;
+    }
+
+    public function getUploader(): ?User
+    {
+        return $this->uploader;
+    }
+
+    public function setUploader(?User $uploader): static
+    {
+        $this->uploader = $uploader;
+
+        return $this;
+    }
+
+    public function getRevision(): ?int
+    {
+        return $this->revision;
+    }
+
+    public function setRevision(?int $revision): static
+    {
+        $this->revision = $revision;
+
+        return $this;
+    }
+
+    public function getOldUpload(): ?OldUpload
+    {
+        return $this->OldUpload;
+    }
+
+    public function setOldUpload(?OldUpload $OldUpload): static
+    {
+        $this->OldUpload = $OldUpload;
 
         return $this;
     }
