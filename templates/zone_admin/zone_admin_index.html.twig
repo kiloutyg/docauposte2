@@ -154,5 +154,45 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 				</div>
 			</div>
 		</div>
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="headingUploadedList">
+				<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUploadedList" aria-expanded="false" aria-controls="collapseUploadedList">
+					<strong>Liste des fichiers chargés :</strong>
+				</button>
+			</h2>
+			<div id="collapseUploadedList" class="accordion-collapse collapse" aria-labelledby="headingUploadedList" data-bs-parent="#accordionAdmin">
+				<div class="accordion-body accordion-bg shadow shadow-inset">
+					<div class="card border-0 shadow rounded-3 my-5">
+						<div class="card-body">
+							<div class="row">
+								<div>
+									{% include "services/uploads/uploaded_list.html.twig" %}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+				<div class="accordion-item">
+			<h2 class="accordion-header" id="headingValidatedList">
+				<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseValidatedList" aria-expanded="false" aria-controls="collapseValidatedList">
+					<strong>Liste des validations :</strong>
+				</button>
+			</h2>
+			<div id="collapseValidatedList" class="accordion-collapse collapse" aria-labelledby="headingValidatedList" data-bs-parent="#accordionAdmin">
+				<div class="accordion-body accordion-bg shadow shadow-inset">
+					<div class="card border-0 shadow rounded-3 my-5">
+						<div class="card-body">
+							<div class="row">
+								<div>
+									{% include "services/validation/validation_list.html.twig" %}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 {% endblock %}
