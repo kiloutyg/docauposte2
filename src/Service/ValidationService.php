@@ -259,10 +259,14 @@ class ValidationService extends AbstractController
         $validation = $upload->getValidation();
         // Remove the Validation status from the database
         $validation->setStatus(null);
+        
         // Store the comment in a variable
         $comment = $request->request->get('modificationComment');
         // If the user added a comment persist the comment 
+        if ($comment != null) {
         $validation->setComment($comment);
+        }
+        
         // Persist the Validation instance to the database
         $this->em->persist($validation);
         // Flush changes to the database
