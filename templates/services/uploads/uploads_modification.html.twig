@@ -111,11 +111,25 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}) }}
 					</div>
 
+
+
+<div class="accordion mx-auto col-11 justify-content-center" id="accordionOtherModifications">
+
+<div class="accordion-item">
+
+<div class="accordion-header" id="otherModifications-header">
+
+<label class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed" for="otherModifications" data-bs-toggle="collapse" data-bs-target="#otherModifications" aria-expanded="false" aria-controls="otherModifications" id="otherModificationsSelect"><strong>Autres modifications</strong> &nbsp; (Ouvrez ce menu pour acceder aux autres modifications)</label>
+</div>
+
+<div id="otherModifications" aria-labelledby="otherModifications" data-bs-parent="#accordionOtherModifications" class="accordion-collapse collapse ">
+<div class="col-10 mx-auto">
+
 					<div class="mb-3">
-						{{ form_label(form.filename, 'Nouveau nom du fichier:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
+						{{ form_label(form.filename, 'Nouveau nom du fichier:', {'label_attr': {'class': 'form-label', 'style': 'color:black'}}) }}
 						{{ form_widget(form.filename, {'attr': {'class': 'form-control', 'id': 'filename', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)'}}) }}
 					</div>
-					<div style='color:white'>
+					<div style='color:black'>
 					
 					{# Display the current button hierarchy #}
 					{% if lastZone != upload.button.category.productLine.zone %}
@@ -146,7 +160,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					</div>
 					<div class="row">
 						<div class="col-md-2 col-sm-2 mt-2 mb-2">
-							<label for="zone" style="color:white">Zone :</label>
+							<label for="zone" style="color:black">Zone :</label>
 						</div>
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
 							<select name="zone" id="zone" class="form-select" required>
@@ -154,7 +168,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 							</select>
 						</div>
 						<div class="col-md-2 col-sm-2 mt-2 mb-2">
-							<label for="productline" style="color:white">Ligne :</label>
+							<label for="productline" style="color:black">Ligne :</label>
 						</div>
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
 							<select name="productline" id="productline" class="form-select" required>
@@ -162,7 +176,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 							</select>
 						</div>
 						<div class="col-md-2 col-sm-2 mt-2 mb-2">
-							<label for="category" style="color:white">Categorie :</label>
+							<label for="category" style="color:black">Categorie :</label>
 						</div>
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
 							<select name="category" id="category" class="form-select" required>
@@ -170,15 +184,23 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 							</select>
 						</div>
 						<div class="col-md-2 col-sm-2 mt-2 mb-2">
-							<label for="button" style="color:white">Bouton :</label>
+							<label for="button" style="color:black">Bouton :</label>
 						</div>
 
 
 						<div class="col-md-10 col-sm-10 mt-2 mb-4">
 							{{ form_widget(form.button,{'attr': {'class': 'form-select', 'name': 'button', 'id': 'upload_button', 'required': true}}) }}
 						</div>
+						
+</div>
+</div>
+</div>
+</div>
+</div>
 
-						<div class="accordion d-grid col-12 d-md-flex justify-content-md-center" id="accordionValidator">
+					<div class="row">
+
+						<div class="accordion d-grid mt-2 col-12 d-md-flex justify-content-md-center" id="accordionValidator">
 
 						{% if upload.uploadedAt < date('2023-10-19 00:00:00') %}
 							<div class="accordion-item ">
