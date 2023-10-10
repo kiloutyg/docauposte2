@@ -35,7 +35,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 				</p>
 				{% set toBeCorrected = [] %}
 				{% for upload in app.user.uploads %}
-					{% if upload.isValidated is same as false %}
+					{% if upload.isValidated is same as (false) %}
 						{% set toBeCorrected = toBeCorrected|merge([upload]) %}
 					{% endif %}
 				{% endfor %}
@@ -56,7 +56,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 				<div class="fallback">
 
 					{% for approbation in approbations %}
-						{% if approbation.comment is not empty and approbation.approval is same as false %}
+						{% if approbation.comment is not empty and approbation.approval is same as (false) %}
 							<blockquote class="blockquote text-center">
 								<cite title="Source Title" style="color:black">Commentaire de refus</cite>
 								<p class="mb-2">{{approbation.comment}}</p>
@@ -64,7 +64,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 								</footer>
 							</blockquote>
 						{% endif %}
-						{% if approbation.comment is not empty and approbation.approval is same as true %}
+						{% if approbation.comment is not empty and approbation.approval is same as (true) %}
 							<blockquote class="blockquote text-center">
 								<cite title="Source Title" style="color:black">Commentaire de Validation</cite>
 								<p class="mb-2">{{approbation.comment}}</p>

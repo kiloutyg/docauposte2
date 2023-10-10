@@ -29,6 +29,9 @@ class Validation
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $validated_at = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $Comment = null;
+
     public function __construct()
     {
         $this->approbations = new ArrayCollection();
@@ -101,6 +104,18 @@ class Validation
     public function setValidatedAt(?\DateTimeInterface $validated_at): static
     {
         $this->validated_at = $validated_at;
+
+        return $this;
+    }
+
+    public function getComment(): ?string
+    {
+        return $this->Comment;
+    }
+
+    public function setComment(?string $Comment): static
+    {
+        $this->Comment = $Comment;
 
         return $this;
     }

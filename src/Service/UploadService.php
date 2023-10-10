@@ -213,7 +213,7 @@ class UploadService extends AbstractController
         $Path = $folderPath . '/' . $upload->getFilename();
 
 
-        ////////////// Part mainly important for the intriduction of the validation process in the production environment
+        ////////////// Part mainly important for the introduction of the validation process in the production environment
         // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
         if ($request->request->get('validatorRequired') == 'true') {
             foreach ($request->request->keys() as $key) {

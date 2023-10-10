@@ -226,7 +226,7 @@ function createSelectElement() {
 
 // Overall, this code handles the population, reset, and creation of cascading dropdowns based on user data.
 
-// document.addEventListener("DOMContentLoaded", function () {
+// Methods use to force the user to add a comment to the form in case of specific event, here the selection of the radio button "Désapprouver" which emits a danger-outlined
 document.addEventListener("turbo:load", function () {
   // Get the radio button and the textarea
   const radioDisapprove = document.getElementById('danger-outlined');
