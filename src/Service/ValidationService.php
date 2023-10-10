@@ -60,7 +60,7 @@ class ValidationService extends AbstractController
     {
         // Create empty arrays to store values for validator_department and validator_user
         $validator_user_values = [];
-        $this->logger->info('request: ' . json_encode($request->request->all()));
+
         // Iterate through the keys in the request
         foreach ($request->request->keys() as $key) {
             // If the key contains 'validator_user', add its value to the validator_user_values array
@@ -68,6 +68,7 @@ class ValidationService extends AbstractController
                 $validator_user_values[] = $request->request->get($key);
             }
         }
+
 
         // Create a new Validation instance
         $validation = new Validation();
@@ -77,6 +78,11 @@ class ValidationService extends AbstractController
 
         // Set the status of the Validation instance to false
         $validation->setStatus(null);
+
+        // Store the comment in a variable
+        $comment = $request->request->get('modificationComment');
+        // If the user added a comment persist the comment 
+        $validation->setComment($comment);
 
         // Persist the Validation instance to the database
         $this->em->persist($validation);
@@ -251,42 +257,56 @@ class ValidationService extends AbstractController
         $upload->setValidated(null);
         // Get the ID of the validation instance
         $validation = $upload->getValidation();
-        // Remove the Validation instance from the database
+        // Remove the Validation status from the database
         $validation->setStatus(null);
+        
+        // Store the comment in a variable
+        $comment = $request->request->get('modificationComment');
+        // If the user added a comment persist the comment 
+        if ($comment != null) {
+        $validation->setComment($comment);
+        }
+        
         // Persist the Validation instance to the database
         $this->em->persist($validation);
         // Flush changes to the database
         $this->em->flush();
-        // Create an empty array to store Approbation instances
-        $approbations = [];
-        // Get the ID of the Validation instance
-        $approbations = $validation->getApprobations();
-        // Loop through each Approbation instance
-        foreach ($approbations as $approbation) {
-            //If it's a major modification reset all approbations
-            if ($request->request->get('modification-outlined') == 'heavy-modification') {
-                // Remove the Approbation instance from the database
-                $approbation->setApproval(null);
-                $approbation->setApprovedAt(null);
-                $approbation->setComment(null);
-                if (!$globalModification) {
+
+        // If the Validation instance has Approbation instances
+        if ($validation->getApprobations() != null) {
+            // Create an empty array to store Approbation instances
+            $approbations = [];
+            // Get the ID of the Validation instance
+            $approbations = $validation->getApprobations();
+            // Loop through each Approbation instance
+            foreach ($approbations as $approbation) {
+                //If it's a major modification reset all approbations
+                if ($request->request->get('modification-outlined') == 'heavy-modification') {
+                    // Remove the Approbation instance from the database
+                    $approbation->setApproval(null);
+                    $approbation->setApprovedAt(null);
+                    $approbation->setComment(null);
+                    if (!$globalModification) {
+                        $this->disapprovedModifiedEmail($approbation);
+                    }
+                }
+                // If the Approbation is not approved or the Approval property is null
+                elseif ($approbation->isApproval() == false) {
+                    // Remove the Approbation instance from the database
+                    $approbation->setApproval(null);
+                    $approbation->setApprovedAt(null);
+                    $approbation->setComment(null);
                     $this->disapprovedModifiedEmail($approbation);
                 }
             }
-            // If the Approbation is not approved or the Approval property is null
-            elseif ($approbation->isApproval() == false) {
-                // Remove the Approbation instance from the database
-                $approbation->setApproval(null);
-                $approbation->setApprovedAt(null);
-                $approbation->setComment(null);
-                $this->disapprovedModifiedEmail($approbation);
-            }
+            // Persist the Approbation instance to the database
+            $this->em->persist($approbation);
         }
+
         if ($globalModification) {
             $this->approbationEmail($validation);
         }
-        // Persist the Approbation instance to the database
-        $this->em->persist($approbation);
+
         // Flush changes to the database
         $this->em->flush();
         // Return early

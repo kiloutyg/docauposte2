@@ -27,14 +27,24 @@
 	<iframe src="{{ path('app_validation_approbation_file', { 'approbationId': approbation.id }) }}" width="69%" height="950" target="_blank"></iframe>
 	<div style="width: 31%" class="text-center card-body">
 
-		{% block title %}Page de validation de document par
+		{% block title %}
+
+		Page de validation de document par
 			<u>{{user.username|capitalize|split('.')|first }}
 				{{user.username|upper|split('.')|last }}</u><br>
+				
+				{% if approbation.validation.comment is defined %}
+		Validation faisant suite à modification du document par <u>{{approbation.validation.upload.uploader.username|capitalize|split('.')|first }}
+				{{approbation.validation.upload.uploader.username|upper|split('.')|last }}</u><br> avec le commentaire suivant  :
+				<br>
+				<blockquote><i>"{{approbation.validation.comment}}"</i></blockquote>
+				{% endif %}
+
 			<div class="dropdown">
 				{% set toBeValidated = [] %}
 				{% set currentApprobationId = approbation.id %}
 				{% for approbation in app.user.approbations %}
-					{% if approbation.approval is same as null %}
+					{% if approbation.approval is same as (null) %}
 						{% set toBeValidated = toBeValidated|merge([approbation]) %}
 					{% endif %}
 				{% endfor %}
@@ -49,8 +59,8 @@
 				</button>
 				<ul class="dropdown-menu dropdown-menu-start shadow shadow-inset" aria-labelledby="dropdownMenuButton1">
 					{% for approbation in app.user.approbations %}
-						{% if approbation.approval is same as null %}
-							{% if approbation.id is same as currentApprobationId %}
+						{% if approbation.approval is same as (null) %}
+							{% if approbation.id is same as (currentApprobationId) %}
 								{% else %}
 									<li>
 										<a href="{{ path('app_validation_approbation', {'approbationId': approbation.id})}}" class="dropdown-item shadow ">

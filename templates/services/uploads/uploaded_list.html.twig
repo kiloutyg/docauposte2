@@ -59,7 +59,7 @@
 																									{% if upload.validated is same as(false) %}
 																									<a href="{{path('app_validation', {'uploadId' : upload.id} )}}">{{upload.validated ? 'Validé' : 'Non validé'}}
 																									<a>
-																											|
+
 																									{% else  %}
 																										{{upload.validated ? 'Validé' : 'Non validé'}}
 																										|

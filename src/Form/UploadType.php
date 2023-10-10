@@ -82,38 +82,17 @@ class UploadType extends AbstractType
                     'multiple' => false,
                 ]
             )
-            // // Adds an entity field for selecting approbators to the form
+            // // Add a comment section for the modifcation page for the file that went through the validation cycle 
             // ->add(
-            //     'approbator',
-            //     EntityType::class,
+            //     'comment',
+            //     TextType::class,
             //     [
-            //         'class' => User::class, // Adjust this to match your User entity namespace
-            //         'query_builder' => function (EntityRepository $er) use ($currentUserId, $currentApprobationId) {
-            //             return $er->createQueryBuilder('u')
-            //                 ->leftJoin('u.approbations', 'a') // Assuming 'approbations' is a relationship in your User entity
-            //                 ->where('u.roles NOT LIKE :role')
-            //                 ->andWhere('a.id = :currentApprobationId')
-            //                 ->andWhere('u.id != :currentUserId')
-            //                 ->setParameter('role', '%ROLE_SUPER_ADMIN%')
-            //                 ->setParameter('currentUserId', $currentUserId)
-            //                 ->setParameter('currentApprobationId', $currentApprobationId)
-            //                 ->orderBy('u.username', 'ASC');
-            //         },
-            //         'choice_label' => 'username', // Assuming your user entity has a 'username' property
-            //         'label' => 'Select approbators:',
+            //         'label' => 'Commentaire:',
             //         'required' => false,
-            //         'multiple' => true, // Now the form can accept multiple approbators
-            //         'mapped' => false // This is the important part
+            //         'empty_data' => null,
             //     ]
             // )
-            // // Adds a choice field for selecting the modification type to the form
-            // ->add('modificationType', ChoiceType::class, [
-            //     'mapped' => false,  // this tells Symfony not to expect the `modificationType` property on the entity
-            //     'choices' => [
-            //         'Modification Mineure' => 'light-modification',
-            //         'Modification Majeure' => 'heavy-modification',
-            //     ],
-            // ])
+          
         ;
 
         // Event listener triggered before form submission 
