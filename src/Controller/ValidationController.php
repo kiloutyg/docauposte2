@@ -128,14 +128,9 @@ class ValidationController extends FrontController
 
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
-            $this->logger->info('form' . json_encode($form->getData()));
-            $this->logger->info('form' . json_encode($form->getErrors()));
-            $this->logger->info('request' . json_encode($request->request->all()));
-            $this->logger->info('result' . json_encode($form->isSubmitted()));
+
 
             if ($form->isSubmitted() && $form->isValid()) {
-                $this->logger->info('result' . json_encode($form->isValid()));
-
                 $this->uploadService->modifyDisapprovedFile($upload, $user, $request);
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirectToRoute('app_base');

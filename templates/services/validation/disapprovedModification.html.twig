@@ -90,11 +90,17 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}) }}
 					</div>
 
+	<div class="accordion mx-auto col-11 justify-content-center" id="accordionOtherDisapprovedModifications">
+		<div class="accordion-item">
+			<div class="accordion-header" id="otherDisapprovedModifications-header">
+			<label class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed" for="otherDisapprovedModifications" data-bs-toggle="collapse" data-bs-target="#otherDisapprovedModifications" aria-expanded="false" aria-controls="otherDisapprovedModifications" id="otherDisapprovedModificationsSelect"><strong>Autres modifications</strong> &nbsp; (Ouvrez ce menu pour acceder aux autres modifications)</label>
+			</div>
+			<div id="otherDisapprovedModifications" aria-labelledby="otherDisapprovedModifications" data-bs-parent="#accordionOtherDisapprovedModifications" class="accordion-collapse collapse ">
+				<div class="col-10 mx-auto">
 					<div class="mb-3">
-						{{ form_label(form.filename, 'Nouveau nom du fichier :', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
+						{{ form_label(form.filename, 'Nouveau nom du fichier :', {'label_attr': {'class': 'form-label', 'style': 'color:black'}}) }}
 						{{ form_widget(form.filename, {'attr': {'class': 'form-control', 'id': 'filename', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)'}}) }}
 					</div>
-
 					{# Display the current button hierarchy #}
 					{% if lastZone != upload.button.category.productLine.zone %}
 						{% set lastZone = upload.button.category.productLine.zone %}
@@ -114,7 +120,6 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						{{ lastCategory.name|split('.')|first|upper }}
 						>
 					{% endif %}
-
 					{% if lastButton != upload.button %}
 						{% set lastButton = upload.button %}
 						Bouton:
@@ -124,7 +129,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 
 					<div class="row">
 						<div class="col-md-2 col-sm-2 mt-2 mb-2">
-							<label for="zone" style="color:white">Zone :</label>
+							<label for="zone" style="color:black">Zone :</label>
 						</div>
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
 							<select name="zone" id="zone" class="form-select" required>
@@ -132,7 +137,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 							</select>
 						</div>
 						<div class="col-md-2 col-sm-2 mt-2 mb-2">
-							<label for="productline" style="color:white">Ligne :</label>
+							<label for="productline" style="color:black">Ligne :</label>
 						</div>
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
 							<select name="productline" id="productline" class="form-select" required>
@@ -140,7 +145,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 							</select>
 						</div>
 						<div class="col-md-2 col-sm-2 mt-2 mb-2">
-							<label for="category" style="color:white">Categorie :</label>
+							<label for="category" style="color:black">Categorie :</label>
 						</div>
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
 							<select name="category" id="category" class="form-select" required>
@@ -148,17 +153,26 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 							</select>
 						</div>
 						<div class="col-md-2 col-sm-2 mt-2 mb-2">
-							<label for="button" style="color:white">Bouton :</label>
+							<label for="button" style="color:black">Bouton :</label>
 						</div>
 						<div class="col-md-10 col-sm-10 mt-2 mb-2">
 							{{ form_widget(form.button,{'attr': {'class': 'form-select', 'name': 'button', 'id': 'upload_button', 'required': true}}) }}
 						</div>
 					</div>
 				</div>
+			</div>
+		</div>
+	</div>
+					<div class="d-grid col-8 mt-2 mx-auto">
+						<div class="input-group  justify-content-center">
+							<div class="input-group-prepend">
+								<span class="input-group-text">Commentaire</span>
+								<textarea class="form-control" name="modificationComment" aria-label="With textarea"  rows="2" cols="50" ></textarea>
+							</div>
+						</div>
+					</div>
 
 				<div class="d-grid w-75 mx-auto">
-
-
 					<div class="card border-5 shadow rounded-3 mt-2 " style="display: inline-block;">
 						<div class="card-body d-flex ">
 							<div class="container text-center">
