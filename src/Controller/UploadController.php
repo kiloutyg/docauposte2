@@ -180,6 +180,8 @@ class UploadController extends FrontController
         // Create a form to modify the Upload entity
         $form = $this->createForm(UploadType::class, $upload);
 
+        $this->logger->info('Logging the full request at the modifying controller:', ['full_request' => $request->request->all()]);
+
         // Retrieve the origin URL
         $refererUrl = $request->headers->get('Referer');
         // $originUrl = $request->headers->get('Referer');
