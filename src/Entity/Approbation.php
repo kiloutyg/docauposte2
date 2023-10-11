@@ -30,6 +30,9 @@ class Approbation
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $Approved_at = null;
 
+    #[ORM\ManyToOne(inversedBy: 'approbations')]
+    private ?Department $DepartmentApprobator = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -91,6 +94,18 @@ class Approbation
     public function setApprovedAt(?\DateTimeInterface $Approved_at): static
     {
         $this->Approved_at = $Approved_at;
+
+        return $this;
+    }
+
+    public function getDepartmentApprobator(): ?Department
+    {
+        return $this->DepartmentApprobator;
+    }
+
+    public function setDepartmentApprobator(?Department $DepartmentApprobator): static
+    {
+        $this->DepartmentApprobator = $DepartmentApprobator;
 
         return $this;
     }

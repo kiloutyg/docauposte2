@@ -36,15 +36,15 @@ class ValidationService extends AbstractController
     protected $oldUploadService;
 
     public function __construct(
-        LoggerInterface $logger,
-        EntityManagerInterface $em,
-        UploadRepository $uploadRepository,
-        DepartmentRepository $departmentRepository,
-        UserRepository $userRepository,
-        ValidationRepository $validationRepository,
-        ApprobationRepository $approbationRepository,
-        MailerService $mailerService,
-        OldUploadService $oldUploadService
+        LoggerInterface                 $logger,
+        EntityManagerInterface          $em,
+        UploadRepository                $uploadRepository,
+        DepartmentRepository            $departmentRepository,
+        UserRepository                  $userRepository,
+        ValidationRepository            $validationRepository,
+        ApprobationRepository           $approbationRepository,
+        MailerService                   $mailerService,
+        OldUploadService                $oldUploadService
     ) {
         $this->logger                = $logger;
         $this->em                    = $em;
@@ -114,23 +114,14 @@ class ValidationService extends AbstractController
         }
 
         $validator_department = null;
-        $department_users = [];
 
         // Loop through each validator_department value
         foreach ($validator_department_values as $validator_department_value) {
-            if ($validator_user_value !== null || $validator_user_value !== '') {
+            if ($validator_department_value !== null || $validator_department_value !== '') {
                 $validator_department = $this->departmentRepository->find($validator_department_value);
             }
-            // $department_users = $validator_department->getUsers();
-            // foreach ($department_users as $department_user) {
-            //     $this->createApprobationProcess(
-            //         $validation,
-            //         $department_user
-            //     );
-            // }
             $this->createDepartmentApprobationProcess(
                 $validation,
-                null,
                 $validator_department
             );
             $validator_department = null;
@@ -171,7 +162,7 @@ class ValidationService extends AbstractController
 
     public function createDepartmentApprobationProcess(
         $validation,
-        Departement $validator_department
+        Department $validator_department = null
     ) {
         // Create a new Approbation instance
         $approbation = new Approbation();
