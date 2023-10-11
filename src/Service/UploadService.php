@@ -214,7 +214,7 @@ class UploadService extends AbstractController
 
         $comment = $request->request->get('modificationComment');
 
-        $this->logger->info('commentaire', [$comment]);
+        $this->logger->info('commentaire service', [$comment]);
 
         ////////////// Part mainly important for the introduction of the validation process in the production environment
         // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
@@ -289,6 +289,7 @@ class UploadService extends AbstractController
         $upload->setUploadedAt(new \DateTime());
         $this->manager->persist($upload);
         $this->manager->flush();
+        return;
     }
 
 

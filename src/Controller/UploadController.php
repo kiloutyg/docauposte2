@@ -133,67 +133,22 @@ class UploadController extends FrontController
     #[Route('/modify/{uploadId}', name: 'modify_file')]
     public function modify_file(Request $request, int $uploadId): Response
     {
+
         // Retrieve the current upload entity based on the uploadId
         $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $button      = $upload->getButton();
         $category    = $button->getCategory();
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
-        $oldFileName = $upload->getFilename();
-
-        // Retrieve the origin URL
-        $originUrl = $request->headers->get('Referer');
-
-        // Retrieve the User object
-        $user = $this->getUser();
-
-        // Check if there is a file to modify
-        if (!$upload) {
-            $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
-            return $this->redirect($originUrl);
-        }
 
         // Create a form to modify the Upload entity
         $form = $this->createForm(UploadType::class, $upload);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Process the form data and modify the Upload entity
-            try {
-                $this->uploadService->modifyFile($upload, $user, $request, $oldFileName);
-                $this->addFlash('success', 'Le fichier a été modifié.');
-                return $this->redirect($originUrl);
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirect($originUrl);
-            }
-        }
-
-        // Convert the errors to an array
-        $errorMessages = [];
-        if ($form->isSubmitted() && !$form->isValid()) {
-            // Get form errors
-            $errors = $form->getErrors(true);
-
-            foreach ($errors as $error) {
-                $errorMessages[] = $error->getMessage();
-            }
-            // Return the errors in the JSON response
-            $this->addFlash('error', 'Invalid form. Check the entered data.');
-            return $this->redirect($originUrl);
-        }
-
-        // If it's a POST request but the form is not valid or not submitted
-        if ($request->isMethod('POST')) {
-            $this->addFlash('error', 'Invalid form. Errors: ' . implode(', ', $errorMessages));
-            return $this->redirect($originUrl); // Return a 400 Bad Request response
-        }
 
         $currentUser = $this->security->getUser();
         $uploader = $upload->getUploader();
         // If it's a GET request, render the form
         if ($request->isMethod('GET') && ($currentUser === $uploader || $uploader === null)) {
+            $this->logger->info('Logging the full request in the if get of the controller:', ['full_request' => $request->request->all()]);
             return $this->render('services/uploads/uploads_modification.html.twig', [
                 'form'        => $form->createView(),
                 'zone'        => $zone,
@@ -205,6 +160,85 @@ class UploadController extends FrontController
         } else {
             $this->addFlash('error', 'Vous n\'avez pas les droits pour modifier ce fichier.');
             return $this->redirectToRoute('app_base');
+        }
+    }
+
+    // Testing separting the post and get in two different method to see if the issue of not reloading the pages and persisting the comments can be resolved through
+    // the reorganization of the code
+    #[Route('/modifying/{uploadId}', name: 'modifying_file')]
+    public function modifying_file(Request $request, int $uploadId): Response
+    {
+
+
+        // Retrieve the current upload entity based on the uploadId
+        $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $button      = $upload->getButton();
+        $category    = $button->getCategory();
+        $productLine = $category->getProductLine();
+        $zone        = $productLine->getZone();
+        $oldFileName = $upload->getFilename();
+
+        // Create a form to modify the Upload entity
+        $form = $this->createForm(UploadType::class, $upload);
+
+        // Retrieve the origin URL
+        // $refererUrl = $request->headers->get('Referer');
+        $originUrl = $request->headers->get('Referer');
+
+        // Getting the current URL
+        $currentUrl = $request->getSchemeAndHttpHost() . $request->getRequestUri();
+
+        // Retrieve the User object
+        $user = $this->getUser();
+
+
+        // if ($currentUrl === $refererUrl) {
+        //     // The current URL is the same as the referer URL
+        //     $originUrl = $request->headers->get('Origin');
+        // } else {
+        //     // They are different
+        //     $originUrl = $refererUrl;
+        // }
+
+        // Check if there is a file to modify
+        if (!$upload) {
+            $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
+            return $this->redirect($originUrl);
+        }
+
+        $comment = $request->request->get('modificationComment');
+        $this->logger->info('commentaire controlleur', [$comment]);
+
+
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Process the form data and modify the Upload entity
+            try {
+                if ($comment == null && $comment == "") {
+                    $this->addFlash('error', 'Le commentaire est vide.');
+                    return $this->redirectToRoute('app_base');
+                }
+                $this->uploadService->modifyFile($upload, $user, $request, $oldFileName);
+                $this->logger->info('Logging the full request in the post submitted and valid but without error:', ['full_request' => $request->request->all()]);
+
+                $this->addFlash('success', 'Le fichier a été modifié.');
+                return $this->redirect($originUrl);
+            } catch (\Exception $e) {
+                $this->logger->info('Logging the full request in the post submitted and valid but with error:', ['full_request' => $request->request->all()]);
+
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirect($originUrl);
+            }
+        }
+        // Convert the errors to an array
+        if ($form->isSubmitted() && !$form->isValid()) {
+            // Return the errors in the JSON response
+            $this->logger->info('Logging the full request in the post submitted and not valid:', ['full_request' => $request->request->all()]);
+
+            $this->addFlash('error', 'Invalid form. Check the entered data.');
+            return $this->redirect($originUrl);
         }
     }
 }

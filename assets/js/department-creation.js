@@ -37,25 +37,7 @@ function populateDropdown(dropdown, data, selectedId) {
   });
 }
 
-// Methods use to force the user to add a comment to the form in case of specific event, here the upload of a file
-document.addEventListener("turbo:load", function () {
-  // Get the radio button and the textarea
-  const fileInput = document.getElementById('upload_file');
-  const textareaComment = document.querySelector('textarea[name="modificationComment"]');
-  console.log(textareaComment);
-  // Listen for changes on the radio button
-  fileInput.addEventListener('change', function () {
-    if (this.files && this.files.length > 0) {
-      // Make the textarea required if a file has been selected
-      textareaComment.required = true;
-      console.log('required');
-    } else {
-    // Remove the 'required' attribute when "upload_file" is empty
-    textareaComment.required = false;
-    console.log('not required');
-  }
-});
-});
+
 
 // This is a function named populateDropdown that takes three parameters: dropdown, data, and selectedId. 
 // It populates the given dropdown element with options based on the provided data array. 

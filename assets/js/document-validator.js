@@ -231,24 +231,56 @@ document.addEventListener("turbo:load", function () {
   // Get the radio button and the textarea
   const radioDisapprove = document.getElementById('danger-outlined');
   const textareaComment = document.querySelector('textarea[name="approbationComment"]');
-  console.log(textareaComment);
-  // Listen for changes on the radio button
-  radioDisapprove.addEventListener('change', function () {
-    if (this.checked) {
-      // Make the textarea required if "Désapprouver" is checked
-      textareaComment.required = true;
-      console.log('required');
-    }
-  });
 
-  // You'll also want to listen for changes on the "Approuver" radio button to remove the 'required' attribute
+  // Check if both elements exist before proceeding
+  if (radioDisapprove && textareaComment) {
+    console.log(textareaComment);
+
+    // Listen for changes on the radio button
+    radioDisapprove.addEventListener('change', function () {
+      if (this.checked) {
+        // Make the textarea required if "Désapprouver" is checked
+        textareaComment.required = true;
+        console.log('required');
+      }
+    });
+  }
+
+  // Get the "Approuver" radio button
   const radioApprove = document.getElementById('success-outlined');
-  radioApprove.addEventListener('change', function () {
-    if (this.checked) {
-      // Remove the 'required' attribute when "Approuver" is checked
-      textareaComment.required = false;
-      console.log('not required');
-    }
-  });
+
+  // Check if both radioApprove and textareaComment exist before proceeding
+  if (radioApprove && textareaComment) {
+    radioApprove.addEventListener('change', function () {
+      if (this.checked) {
+        // Remove the 'required' attribute when "Approuver" is checked
+        textareaComment.required = false;
+        console.log('not required');
+      }
+    });
+  }
+});
+
+
+// Methods use to force the user to add a comment to the form in case of specific event, here the upload of a file
+document.addEventListener("turbo:load", function () {
+  // Get the radio button and the textarea
+  const fileInput = document.getElementById('upload_file');
+  const textareaComment = document.querySelector('textarea[name="modificationComment"]');
+  // Listen for changes on the radio button
+  if (fileInput && textareaComment) {
+    console.log(textareaComment);
+    fileInput.addEventListener('change', function () {
+      if (this.files && this.files.length > 0) {
+        // Make the textarea required if a file has been selected
+        textareaComment.required = true;
+        console.log('required');
+      } else {
+        // Remove the 'required' attribute when "upload_file" is empty
+        textareaComment.required = false;
+        console.log('not required');
+      }
+    });
+  }
 
 });
