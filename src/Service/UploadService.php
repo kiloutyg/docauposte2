@@ -212,6 +212,9 @@ class UploadService extends AbstractController
         }
         $Path = $folderPath . '/' . $upload->getFilename();
 
+        $comment = $request->request->get('modificationComment');
+
+        $this->logger->info('commentaire', [$comment]);
 
         ////////////// Part mainly important for the introduction of the validation process in the production environment
         // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
