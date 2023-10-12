@@ -1,13 +1,19 @@
 <p> Bonjour, </p>
 <p> Vous avez une nouvelle validation à effectuer du document <strong><i>{{upload.filename}}</i></strong> qui a été uploadé par <strong>{{upload.uploader.username|capitalize|split('.')|first}} {{upload.uploader.username|upper|split('.')|last }}</strong>.</p>
+{% if approbators|length > 0  %}
 <p> Le document doit aussi être validé par 
 {% for soleApprobator in approbators %}
 {% if soleApprobator is same as(approbator) %}
 {% else %}
-<strong>{{ soleApprobator.username|capitalize|split('.')|first }} {{ soleApprobator.username|upper|split('.')|last }}</strong>
+<strong>{{ soleApprobator.username|capitalize|split('.')|first }} {{ soleApprobator.username|upper|split('.')|last }}
+</strong>
 {% if not loop.last %}, {% elseif loop.revindex0 == 1 %} et {% else %}
 {% endif %}
 {% endif %}
-{% endfor %}.</p>
+{% endfor %}.
+</p>
+
+{% endif %}
+
 <p> Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant : <a class='btn-info' href='http://slanlp0040/login'>Page de connexion</a></p>
 <p> Cordialement </p>
