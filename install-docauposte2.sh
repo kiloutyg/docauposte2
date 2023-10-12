@@ -44,8 +44,12 @@ sg docker -c "
     sudo systemctl enable containerd.service;"
 
 # Ask the user for the git repository address either in ssh or http
-    read -p "Address of the git repository (ssh or http ) :  " GIT_ADDRESS;
-    echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+    read -p "Address of the git repository (ssh or http // default: https://github.com/polangres/docauposte2 ) :  " GIT_ADDRESS;
+    if [ -z "${GIT_ADDRESS}" ]
+    then
+        GIT_ADDRESS="https://github.com/polangres/docauposte2"
+    fi
+echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
 # Clone the git repository and run the env_create.sh script
     git clone ${GIT_ADDRESS};
@@ -80,13 +84,11 @@ done
                 fi
             done
             if [ "${UPDATE_ANSWER}" == "yes" ]; then
-cat > ~/.ssh/config <<EOL
-Host github.com
-    StrictHostKeyChecking no
-EOL
 
                 cd docauposte2;
                 sg docker -c "docker compose stop";
+                git remote set-url --add origin https://github.com/polangres/docauposte2;
+                git remote set-url --delete origin git@github.com:polangres/docauposte2;
                 git fetch origin --force;
                 git reset HARD --force;
                 git pull --rebase origin main;
