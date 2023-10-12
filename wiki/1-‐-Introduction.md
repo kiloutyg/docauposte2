@@ -1,5 +1,6 @@
 ## Introduction
 
+
 The application being structured around the Symfony Framework Version 6.3 it is basically an M.V.C. architecture.
 Some parts are built following the Micro-Services architectures to make it easier to manage and maintain. 
 
