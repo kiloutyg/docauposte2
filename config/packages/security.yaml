@@ -25,7 +25,8 @@ security:
         ROLE_MANAGER: [ROLE_USER]
         ROLE_LINE_ADMIN: [ROLE_MANAGER]
         ROLE_ADMIN: [ROLE_LINE_ADMIN]
-        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_VALIDATOR: [ROLE_ADMIN]
+        ROLE_SUPER_ADMIN: [ROLE_VALIDATOR, ROLE_ALLOWED_TO_SWITCH]
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
@@ -46,6 +47,7 @@ security:
 
         - { path: ^/productline_admin, roles: ROLE_LINE_ADMIN }
         - { path: ^/modify, roles: ROLE_LINE_ADMIN }
+        - { path: ^/modifyingfile, roles: ROLE_LINE_ADMIN }
         - { path: ^/delete, roles: ROLE_LINE_ADMIN }
         - { path: ^/modifyfile, roles: ROLE_LINE_ADMIN }
         - { path: ^/uploading, roles: ROLE_LINE_ADMIN }
