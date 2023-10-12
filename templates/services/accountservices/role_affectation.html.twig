@@ -13,31 +13,44 @@
 		<label>Selectionnez le role du nouveau compte:</label>
 		<select class="form-control " required name="role" id="role">
 			<option value="">--Choisissez un role--</option>
-			<option value="ROLE_VALIDATOR">Valideur</option>
+			<option value="ROLE_ADMIN_VALIDATOR">Admin de zone Valideur</option>
 			<option value="ROLE_ADMIN">Admin de Zone</option>
+			<option value="ROLE_LINE_ADMIN_VALIDATOR">Admin de Ligne Valideur</option>
 			<option value="ROLE_LINE_ADMIN">Admin de Ligne</option>
 			<option value="ROLE_MANAGER">Manager</option>
 			<option value="ROLE_USER">User</option>
 		</select>
 	</div>
 
-{% elseif is_granted('ROLE_VALIDATOR') %}
+{% elseif is_granted('ROLE_ADMIN_VALIDATOR') %}
 	<div>
 		<label>Selectionnez le role du nouveau compte:</label>
 		<select class="form-control " required name="role" id="role">
 			<option value="">--Choisissez un role--</option>
 			<option value="ROLE_ADMIN">Admin de Zone</option>
+			<option value="ROLE_LINE_ADMIN_VALIDATOR">Admin de Ligne Valideur</option>
 			<option value="ROLE_LINE_ADMIN">Admin de Ligne</option>
 			<option value="ROLE_MANAGER">Manager</option>
 			<option value="ROLE_USER">User</option>
 		</select>
 	</div>
 
-
 {% elseif is_granted('ROLE_ADMIN') %}
 	<div>
 		<label>Selectionnez le role du nouveau compte:</label>
-		<select class="form-control " required name="role" id="role">
+		<select class="form-control " name="role" id="role">
+			<option value="">--Choisissez un role--</option>
+			<option value="ROLE_LINE_ADMIN_VALIDATOR">Admin de Ligne Valideur</option>
+			<option value="ROLE_LINE_ADMIN">Admin de Ligne</option>
+			<option value="ROLE_MANAGER">Manager</option>
+			<option value="ROLE_USER">User</option>
+		</select>
+	</div>
+
+{% elseif is_granted('ROLE_LINE_ADMIN_VALIDATOR') %}
+	<div>
+		<label>Selectionnez le role du nouveau compte:</label>
+		<select class="form-control " name="role" id="role">
 			<option value="">--Choisissez un role--</option>
 			<option value="ROLE_LINE_ADMIN">Admin de Ligne</option>
 			<option value="ROLE_MANAGER">Manager</option>
