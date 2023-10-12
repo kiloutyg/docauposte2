@@ -119,11 +119,13 @@ class ApiController extends FrontController
         $currentUser = $this->getUser();
 
         foreach ($allUsers as $user) {
-            if ((!in_array('ROLE_SUPER_ADMIN', $user->getRoles())) && ($user !== $currentUser)) {
-                $filteredUsers[] = [
-                    'id'        => $user->getId(),
-                    'username'  => $user->getUsername(),
-                ];
+            if ((in_array('ROLE_LINE_ADMIN_VALIDATOR', $user->getRoles())) || (in_array('ROLE_ADMIN_VALIDATOR', $user->getRoles()))) {
+                if ($user !== $currentUser) {
+                    $filteredUsers[] = [
+                        'id'        => $user->getId(),
+                        'username'  => $user->getUsername(),
+                    ];
+                }
             }
         }
 
