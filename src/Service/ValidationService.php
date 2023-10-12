@@ -15,6 +15,7 @@ use App\Repository\ApprobationRepository;
 
 use App\Entity\Upload;
 use App\Entity\User;
+use App\Entity\Department;
 use App\Entity\Validation;
 use App\Entity\Approbation;
 
@@ -35,15 +36,15 @@ class ValidationService extends AbstractController
     protected $oldUploadService;
 
     public function __construct(
-        LoggerInterface $logger,
-        EntityManagerInterface $em,
-        UploadRepository $uploadRepository,
-        DepartmentRepository $departmentRepository,
-        UserRepository $userRepository,
-        ValidationRepository $validationRepository,
-        ApprobationRepository $approbationRepository,
-        MailerService $mailerService,
-        OldUploadService $oldUploadService
+        LoggerInterface                 $logger,
+        EntityManagerInterface          $em,
+        UploadRepository                $uploadRepository,
+        DepartmentRepository            $departmentRepository,
+        UserRepository                  $userRepository,
+        ValidationRepository            $validationRepository,
+        ApprobationRepository           $approbationRepository,
+        MailerService                   $mailerService,
+        OldUploadService                $oldUploadService
     ) {
         $this->logger                = $logger;
         $this->em                    = $em;
@@ -60,12 +61,16 @@ class ValidationService extends AbstractController
     {
         // Create empty arrays to store values for validator_department and validator_user
         $validator_user_values = [];
+        $validator_department_values = [];
 
         // Iterate through the keys in the request
         foreach ($request->request->keys() as $key) {
             // If the key contains 'validator_user', add its value to the validator_user_values array
             if (strpos($key, 'validator_user') !== false && $request->request->get($key) !== null && $request->request->get($key) !== '') {
                 $validator_user_values[] = $request->request->get($key);
+            }
+            if (strpos($key, 'validator_department') !== false && $request->request->get($key) !== null && $request->request->get($key) !== '') {
+                $validator_department_values[] = $request->request->get($key);
             }
         }
 
@@ -108,6 +113,22 @@ class ValidationService extends AbstractController
             $validator_user = null;
         }
 
+        $validator_department = null;
+
+        // Loop through each validator_department value
+        foreach ($validator_department_values as $validator_department_value) {
+            if ($validator_department_value !== null || $validator_department_value !== '') {
+                $validator_department = $this->departmentRepository->find($validator_department_value);
+            }
+            $this->createDepartmentApprobationProcess(
+                $validation,
+                $validator_department
+            );
+            $validator_department = null;
+        }
+
+
+
         // Send a notification email to the validator
         $this->approbationEmail($validation);
 
@@ -127,6 +148,29 @@ class ValidationService extends AbstractController
         // Set the UserApprobator object on the Approbation instance
         if ($validator_user !== null || $validator_user !== '') {
             $approbation->setUserApprobator($validator_user);
+        }
+
+        // Persist the Approbation instance to the database
+        $this->em->persist($approbation);
+
+        // Flush changes to the database
+        $this->em->flush();
+
+        // Return the Approbation instance
+        return $approbation;
+    }
+
+    public function createDepartmentApprobationProcess(
+        $validation,
+        Department $validator_department = null
+    ) {
+        // Create a new Approbation instance
+        $approbation = new Approbation();
+        // Set the Validation object on the Approbation instance
+        $approbation->setValidation($validation);
+        // Set the UserApprobator object on the Approbation instance
+        if ($validator_department !== null || $validator_department !== '') {
+            $approbation->setDepartmentApprobator($validator_department);
         }
 
         // Persist the Approbation instance to the database
@@ -259,14 +303,14 @@ class ValidationService extends AbstractController
         $validation = $upload->getValidation();
         // Remove the Validation status from the database
         $validation->setStatus(null);
-        
+
         // Store the comment in a variable
         $comment = $request->request->get('modificationComment');
         // If the user added a comment persist the comment 
         if ($comment != null) {
-        $validation->setComment($comment);
+            $validation->setComment($comment);
         }
-        
+
         // Persist the Validation instance to the database
         $this->em->persist($validation);
         // Flush changes to the database

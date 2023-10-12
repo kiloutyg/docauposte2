@@ -87,7 +87,7 @@ function resetDropdowns() {
   const validatorDepartment = document.getElementById("validator_department0");
 
   if (validatorDepartment) {
-    department.selectedIndex = 0;
+    validatorDepartment.selectedIndex = 0;
   }
 }
 
@@ -236,7 +236,7 @@ function createSelectElement() {
   // Create a default option for the new select element
   const defaultOption = document.createElement('option');
   defaultOption.value = '';
-  defaultOption.textContent = 'Selectionner un Valideur';
+  defaultOption.textContent = 'Selectionner un autre Service';
 
   // Append the default option to the new select element
   newSelect.appendChild(defaultOption);

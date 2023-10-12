@@ -180,7 +180,7 @@ function createSelectElement() {
   // Create a default option for the new select element
   const defaultOption = document.createElement('option');
   defaultOption.value = '';
-  defaultOption.textContent = 'Selectionner un Valideur';
+  defaultOption.textContent = 'Selectionner un autre Valideur';
 
   // Append the default option to the new select element
   newSelect.appendChild(defaultOption);
