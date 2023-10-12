@@ -2,7 +2,7 @@
 
 	<div>
 		<label>Selectionnez le role du nouveau compte:</label>
-		<select class="form-control "  name="role" id="role">
+		<select class="form-control " name="role" id="role">
 			<option value="">--Choisissez un role--</option>
 			<option value="ROLE_SUPER_ADMIN">Super Admin</option>
 		</select>
@@ -11,7 +11,20 @@
 {% elseif is_granted('ROLE_SUPER_ADMIN') %}
 	<div>
 		<label>Selectionnez le role du nouveau compte:</label>
-		<select class="form-control "  name="role" id="role">
+		<select class="form-control " required name="role" id="role">
+			<option value="">--Choisissez un role--</option>
+			<option value="ROLE_VALIDATOR">Valideur</option>
+			<option value="ROLE_ADMIN">Admin de Zone</option>
+			<option value="ROLE_LINE_ADMIN">Admin de Ligne</option>
+			<option value="ROLE_MANAGER">Manager</option>
+			<option value="ROLE_USER">User</option>
+		</select>
+	</div>
+
+{% elseif is_granted('ROLE_VALIDATOR') %}
+	<div>
+		<label>Selectionnez le role du nouveau compte:</label>
+		<select class="form-control " required name="role" id="role">
 			<option value="">--Choisissez un role--</option>
 			<option value="ROLE_ADMIN">Admin de Zone</option>
 			<option value="ROLE_LINE_ADMIN">Admin de Ligne</option>
@@ -20,10 +33,11 @@
 		</select>
 	</div>
 
+
 {% elseif is_granted('ROLE_ADMIN') %}
 	<div>
 		<label>Selectionnez le role du nouveau compte:</label>
-		<select class="form-control "  name="role" id="role">
+		<select class="form-control " name="role" id="role">
 			<option value="">--Choisissez un role--</option>
 			<option value="ROLE_LINE_ADMIN">Admin de Ligne</option>
 			<option value="ROLE_MANAGER">Manager</option>
@@ -34,7 +48,7 @@
 {% elseif is_granted('ROLE_LINE_ADMIN') %}
 	<div>
 		<label>Selectionnez le role du nouveau compte:</label>
-		<select class="form-control "  name="role" id="role">
+		<select class="form-control " name="role" id="role">
 			<option value="">--Choisissez un role--</option>
 			<option value="ROLE_MANAGER">Manager</option>
 			<option value="ROLE_USER">User</option>
@@ -44,7 +58,7 @@
 {% elseif is_granted('ROLE_MANAGER') %}
 	<div>
 		<label>Selectionnez le role du nouveau compte:</label>
-		<select class="form-control "  name="role" id="role">
+		<select class="form-control " name="role" id="role">
 			<option value="">--Choisissez un role--</option>
 			<option value="ROLE_USER">User</option>
 		</select>
