@@ -16,6 +16,9 @@ php bin/console cache:clear --no-warmup --env=dev;
 # Warm up the cache
 php bin/console cache:warmup --env=dev;
 
+# Remove old migrations folder and files
+rm -rf migrations;
+
 # Create the migrations directory
 mkdir -p migrations;
 

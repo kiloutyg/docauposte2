@@ -265,7 +265,7 @@ sg docker -c "
     then
         GIT_ADDRESS="https://github.com/polangres/docauposte2"
     fi
-    echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
 # Clone the git repository and run the env_create.sh script
     git clone ${GIT_ADDRESS};
@@ -299,18 +299,18 @@ done
                         echo "Please answer by yes or no";
                 fi
             done
-            if [ "${UPDATE_ANSWER}" == "yes" ]; then
+        if [ "${UPDATE_ANSWER}" == "yes" ]; then
 
-                cd docauposte2;
-                sg docker -c "docker compose stop";
-                git remote set-url --add origin https://github.com/polangres/docauposte2;
-                git remote set-url --delete origin git@github.com:polangres/docauposte2;
-                git fetch origin --force;
-                git reset --hard;
-                git pull --rebase origin main;
-                bash ./env_update.sh;
-                sg docker -c "docker compose up --build"
-            fi
+            cd docauposte2;
+            sg docker -c "docker compose stop";
+            git remote set-url --add origin ${GIT_ADDRESS};
+            git remote set-url --delete origin git@github.com:polangres/docauposte2;
+            git fetch origin --force;
+            git reset HARD --force;
+            git pull --rebase origin main;
+            bash ./env_update.sh;
+            sg docker -c "docker compose up --build"
+        fi
     fi
 fi
 OUTER
