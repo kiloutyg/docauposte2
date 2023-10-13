@@ -84,7 +84,12 @@ done
                 fi
             done
         if [ "${UPDATE_ANSWER}" == "yes" ]; then
-
+        # Ask the user for the git repository address either in ssh or http
+            read -p "Address of the git repository (ssh or http // default: https://github.com/polangres/docauposte2 ) :  " GIT_ADDRESS;
+            if [ -z "${GIT_ADDRESS}" ]
+            then
+                GIT_ADDRESS="https://github.com/polangres/docauposte2"
+            fi
             cd docauposte2;
             sg docker -c "docker compose stop";
             git remote set-url --add origin ${GIT_ADDRESS};
