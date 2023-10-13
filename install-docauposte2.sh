@@ -92,10 +92,10 @@ done
             fi
             cd docauposte2;
             sg docker -c "docker compose stop";
-            git remote set-url --add origin ${GIT_ADDRESS};
-            git remote set-url --delete origin git@github.com:polangres/docauposte2;
+            git remote remove origin;
+            git remote add origin ${GIT_ADDRESS};
             git fetch origin --force;
-            git reset --hard origin;
+            git reset --hard origin/main;
             git pull --rebase origin main;
             bash ./env_update.sh;
             sg docker -c "docker compose up --build"
