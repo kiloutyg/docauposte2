@@ -85,11 +85,15 @@ class IncidentService extends AbstractController
             } else {
                 $name   = $file->getClientOriginalName();
             }
+            $originalName = pathinfo($name, PATHINFO_FILENAME); // Gets the filename without extension
+            $fileExtension = pathinfo($name, PATHINFO_EXTENSION); // Gets the file extension
 
-            $path       = $folderPath . '/' . $name;
-            $file->move($folderPath . '/', $name);
-
-            $name;
+            if (file_exists($folderPath . '/' . $name)) {
+                $iteration = count($this->incidentRepository->findBy(['name' => $name, 'ProductLine' => $productline]));
+                $storageName = $originalName . '-' . ($iteration + 1) . '.' . $fileExtension;
+            }
+            $path       = $folderPath . '/' . $storageName;
+            $file->move($folderPath . '/', $storageName);
 
             $incident = new incident();
             $incident->setFile(new File($path));
