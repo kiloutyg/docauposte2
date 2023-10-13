@@ -311,7 +311,7 @@ done
             git remote set-url --add origin ${GIT_ADDRESS};
             git remote set-url --delete origin git@github.com:polangres/docauposte2;
             git fetch origin --force;
-            git reset HARD --force;
+            git reset HARD;
             git pull --rebase origin main;
             bash ./env_update.sh;
             sg docker -c "docker compose up --build"
