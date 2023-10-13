@@ -53,13 +53,13 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 							{% endfor %}
 						</ul>
 						{% if upload.revision is same as (1) %}
-							{% else %}
-							Le fichier a été modifié le {{upload.uploadedAt|date('d/m/y')}} 
-								{% if upload.validation.comment is defined %}
-									avec le commentaire suivant: 				
-									<ul><blockquote><i>"{{upload.validation.comment}}"</i></blockquote></ul>
-								{% endif %}
+						{% else %}
+						Le fichier a été modifié le {{upload.uploadedAt|date('d/m/y')}} 
+							{% if upload.validation.comment is defined %}
+								avec le commentaire suivant: 				
+								<ul><blockquote><i>"{{upload.validation.comment}}"</i></blockquote></ul>
 							{% endif %}
+						{% endif %}
 					</div>
 					<iframe src="{{ path('app_download_invalidation_file', { 'uploadId': upload.id }) }}" width="100%" height="750" target="_blank"></iframe>
 				{% elseif upload.validated is same as(false) %}
@@ -201,12 +201,12 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 															<select class="form-select userSelect" name="validator_user" id="validator_user"></select>
 														</div>
 														{# <div class="col-md-2 col-sm-2 mt-2 mb-2">
-																													<label for="validator_department" style="color:black">Service Valideur:</label>
-																												</div>
-														
-																												<div id="departmentsContainer" class="col-md-10 col-sm-10 mt-2 mb-2">
-																													<select class="form-select departmentSelect" name="validator_department" id="validator_department"></select>
-																												</div> #}
+																																											<label for="validator_department" style="color:black">Service Valideur:</label>
+																																										</div>
+																												
+																																										<div id="departmentsContainer" class="col-md-10 col-sm-10 mt-2 mb-2">
+																																											<select class="form-select departmentSelect" name="validator_department" id="validator_department"></select>
+																																										</div> #}
 													</div>
 												</div>
 											</div>
