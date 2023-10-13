@@ -21,8 +21,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 			<div class="row d-flex align-items-center gy-lg-0 gy-5">
 				<h3 class="text-white m-0" style="color:white">
 					Modification du fichier
-					<strong>{{upload.filename}}</strong>
-					:
+					<strong>{{upload.filename}}</strong>:
 				</h3>
 				<h5>Revision n°{{upload.revision}}</h5>
 				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_modifying_file', {'uploadId': upload.id})}) }}
@@ -34,10 +33,10 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 							<div class=" alert alert-danger mb-1 justify-content-center">
 								<h5>
 									<strong>
-										Fichier non validé.
+										Fichier en cours de validation.
 									</strong>
 								</h5>
-								Les validations en cours :
+								Les validations en cours:
 								<br>
 								<ul>
 									{% for approbation in upload.validation.approbations %}
@@ -57,7 +56,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 							{% else %}
 							Le fichier a été modifié le {{upload.uploadedAt|date('d/m/y')}} 
 								{% if upload.validation.comment is defined %}
-									avec le commentaire suivant : 				
+									avec le commentaire suivant: 				
 									<ul><blockquote><i>"{{upload.validation.comment}}"</i></blockquote></ul>
 								{% endif %}
 							{% endif %}
@@ -80,7 +79,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						{% else %}
 						Le fichier a été modifié le {{upload.uploadedAt|date('d/m/y')}} 
 							{% if upload.validation.comment is defined %}
-								avec le commentaire suivant : 				
+								avec le commentaire suivant: 				
 								<ul><blockquote><i>"{{upload.validation.comment}}"</i></blockquote></ul>
 							{% endif %}
 						{% endif %}
@@ -149,7 +148,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 													</div>
 													<div class="row">
 														<div class="col-md-2 col-sm-2 mt-2 mb-2">
-															<label for="zone" style="color:black">Zone :</label>
+															<label for="zone" style="color:black">Zone:</label>
 														</div>
 														<div class="col-md-10 col-sm-10 mt-2 mb-2">
 															<select name="zone" id="zone" class="form-select" required>
@@ -157,7 +156,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 															</select>
 														</div>
 														<div class="col-md-2 col-sm-2 mt-2 mb-2">
-															<label for="productline" style="color:black">Ligne :</label>
+															<label for="productline" style="color:black">Ligne:</label>
 														</div>
 														<div class="col-md-10 col-sm-10 mt-2 mb-2">
 															<select name="productline" id="productline" class="form-select" required>
@@ -165,7 +164,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 															</select>
 														</div>
 														<div class="col-md-2 col-sm-2 mt-2 mb-2">
-															<label for="category" style="color:black">Categorie :</label>
+															<label for="category" style="color:black">Categorie:</label>
 														</div>
 														<div class="col-md-10 col-sm-10 mt-2 mb-2">
 															<select name="category" id="category" class="form-select" required>
@@ -173,7 +172,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 															</select>
 														</div>
 														<div class="col-md-2 col-sm-2 mt-2 mb-2">
-															<label for="button" style="color:black">Bouton :</label>
+															<label for="button" style="color:black">Bouton:</label>
 														</div>
 														<div class="col-md-10 col-sm-10 mt-2 mb-4">
 															{{ form_widget(form.button,{'attr': {'class': 'form-select', 'name': 'button', 'id': 'upload_button', 'required': true}}) }}
@@ -196,18 +195,18 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 												<div id="validatorNeeded" aria-labelledby="validatorNeeded" data-bs-parent="#accordionValidator" class="accordion-collapse collapse ">
 													<div class="accordion-body row ">
 														<div class="col-md-2 col-sm-2 mt-2 mb-2">
-															<label for="validator_user" style="color:black">Valideur :</label>
+															<label for="validator_user" style="color:black">Valideur:</label>
 														</div>
 														<div id="usersContainer" class="col-md-10 col-sm-10 mt-2 mb-2">
 															<select class="form-select userSelect" name="validator_user" id="validator_user"></select>
 														</div>
-														<div class="col-md-2 col-sm-2 mt-2 mb-2">
-															<label for="validator_department" style="color:black">Service Valideur :</label>
-														</div>
-
-														<div id="departmentsContainer" class="col-md-10 col-sm-10 mt-2 mb-2">
-															<select class="form-select departmentSelect" name="validator_department" id="validator_department"></select>
-														</div>
+														{# <div class="col-md-2 col-sm-2 mt-2 mb-2">
+																													<label for="validator_department" style="color:black">Service Valideur:</label>
+																												</div>
+														
+																												<div id="departmentsContainer" class="col-md-10 col-sm-10 mt-2 mb-2">
+																													<select class="form-select departmentSelect" name="validator_department" id="validator_department"></select>
+																												</div> #}
 													</div>
 												</div>
 											</div>
