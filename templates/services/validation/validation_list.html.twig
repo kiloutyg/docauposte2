@@ -1,9 +1,12 @@
 {% block body %}
 
-	{% if (groupedUploads is defined) and (groupedUploads is not empty ) %}
+	{% if (groupedValidatedUploads is defined) and (groupedValidatedUploads is not empty ) %}
+
+
 		<div class="accordion col-11 mx-auto justify-content-center" id="accordionValidationList">
 			{% set outerIndex = 0 %}
-			{% for zoneName, zoneKey in groupedUploads %}
+			{% for zoneName, zoneKey in groupedValidatedUploads %}
+
 				{% set outerIndex = outerIndex + 1 %}
 				<div class="accordion-item shadow-lg shadow-lg-inset border border-dark">
 					<h2 class="accordion-header" id="headingZoneValidationList{{ outerIndex }}">
@@ -79,6 +82,9 @@
 																									<br>
 																								{% endfor %}
 																							{% endif %}
+																						{% else %}
+																							-
+																							<strong>Document en cours de validation</strong>
 																						{% endif %}
 																					</div>
 																				{% endif %}
