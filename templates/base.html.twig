@@ -171,7 +171,6 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 								<a class="btn btn-primary btn-lg m-5 " role="button" aria-pressed="true" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
 									<span class="line-details text-justify">
 										{{ zone.name|split('.')|first|upper }}
-
 									</span>
 								</a>
 							{% endfor %}

@@ -10,7 +10,11 @@
 				<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
 					<div class="card-body">
 						<div class="row d-flex align-items-center gy-lg-0 gy-5">
-							<form class="form row" method="post" action="{{path('app_views_modification')}}"></form>
+							<form class="form row" method="post" action="{{path('app_views_modification')}}">
+								{% for zone in zones|order('sortOrder') %}
+									{{ dump(zone.sortOrder) }}
+								{% endfor %}
+							</form>
 						</div>
 					</div>
 				</div>
