@@ -185,12 +185,16 @@ class BaseController extends AbstractController
         $this->viewsModificationService     = $viewsModificationService;
 
         // Variables used in the twig templates to display all the entities
-        $this->zones                        = $this->zoneRepository->findAll();
-        $this->productLines                 = $this->productLineRepository->findAll();
+        // $this->zones                        = $this->zoneRepository->findAll();
+        $this->zones                        = $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']);
+        // $this->productLines                 = $this->productLineRepository->findAll();
+        $this->productLines                 = $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']);
+        // $this->categories                   = $this->categoryRepository->findAll();
+        $this->categories                   = $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']);
+        // $this->buttons                      = $this->buttonRepository->findAll();
+        $this->buttons                      = $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']);
         $this->users                        = $this->userRepository->findAll();
         $this->uploads                      = $this->uploadRepository->findAll();
-        $this->categories                   = $this->categoryRepository->findAll();
-        $this->buttons                      = $this->buttonRepository->findAll();
         $this->incidents                    = $this->incidentRepository->findAll();
         $this->incidentCategories           = $this->incidentCategoryRepository->findAll();
         $this->departments                  = $this->departmentRepository->findAll();
