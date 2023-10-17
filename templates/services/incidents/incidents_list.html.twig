@@ -44,7 +44,8 @@
 																<a href="{{ path('app_incident_modify_file', {'incidentId': incident.id}) }}" class="btn btn-modify shadow">
 																	Modifier
 																</a>
-																<a href="{{ path('app_incident_delete_file', { name: incident.name, productline: incident.productline.id }) }}" class="btn btn-danger shadow delete-incident">
+																<a href="{{ path('app_incident_delete_file', { incidentId: incident.id, productlineId: incident.productline.id }) }}" class="btn btn-danger shadow delete-incident">
+
 																	Supprimer
 																</a>
 															</div>
