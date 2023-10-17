@@ -2,7 +2,20 @@
 
 {% block title %}BaseViewModification
 {% endblock %}
+
 {% block body %}
+	<script>
+		$(document).ready(function () { // Stop event propagation for inputs inside accordion buttons
+$('.button input, .button select').on('click', function (e) {
+e.stopPropagation();
+});
+
+// Additionally, if you want to prevent the accordion from acting when the input or select gains focus
+$('.button input, .button select').on('focus', function (e) {
+e.stopPropagation();
+});
+});
+	</script>
 	<div class="card border-0 shadow rounded-3 my-5">
 		<div class="card-body">
 			<div class="row">
@@ -16,9 +29,11 @@
 
 											<button class="accordion-button collapsed" id="zoneViewsMod{{ zone.id }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZoneViewsMod{{zone.id}}" aria-expanded="false" aria-controls="collapseZoneViewsMod{{zone.id}}">
 												{{zone.name}}
-												<input type="text" name="zoneName" value="{{zone.name}}" class="" id="zoneName" placeholder="Nom de la zone">
-												<input type="select" name="zoneSortOrder" value="{{zone.sortOrder}}" class="" id="zoneSortOrder" placeholder="Placement de la zone">
+												<input type="text" name="zoneName{{zone.id}}" value="{{zone.name}}" class="" id="zoneName{{zone.id}}" placeholder="Nom de la zone">
+												<select name="zoneSortOrder{{zone.id}}" value="{{zone.sortOrder}}" class="" id="zoneSortOrder{{zone.id}}" placeholder="Placement de la zone"></select>
+
 											</button>
+
 											<div id="collapseZoneViewsMod{{zone.id}}" class="accordion-collapse collapse" aria-labelledby="zoneViewsMod" data-bs-parent="#accordionViewsMod">
 												<div class="accordion-body">
 													{% for productLine in zone.productLines %}
@@ -28,29 +43,37 @@
 
 																<button class="accordion-button collapsed" id="productLineViewsMod{{ productLine.id }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProductLineViewsMod{{productLine.id}}" aria-expanded="false" aria-controls="collapseProductLineViewsMod{{productLine.id}}">
 																	{{productLine.name|split('.')|first}}
-																	<input type="text" name="productLineName" value="{{productLine.name|split('.')|first}}" class="" id="productLineName" placeholder="Nom de la productLine">
-																	<input type="select" name="productLineSortOrder" value="{{productLine.sortOrder}}" class="" id="productLineSortOrder" placeholder="Placement de la productLine">
+																	<input type="text" name="productLineName{{ productLine.id }}" value="{{productLine.name|split('.')|first}}" class="" id="productLineName{{ productLine.id }}" placeholder="Nom de la productLine">
+
+
+																	<select name="productLineSortOrder{{ productLine.id }}" value="{{productLine.sortOrder}}" class="" id="productLineSortOrder{{ productLine.id }}" placeholder="Placement de la productLine"></select>
+
+
 																</button>
 																<div id="collapseProductLineViewsMod{{ productLine.id }}" class="accordion-collapse collapse" aria-labelledby="productLineViewsMod" data-bs-parent="#collapseZoneViewsMod{{ zone.id }}">
-																	<div class="accordion-item shadow-lg shadow-lg-inset border border-dark rounded-3">
+																	<div class="accordion-body">
 
 
 																		{% for category in productLine.categories %}
 																			<div class="accordion" id="categoryAccordionViewsMod{{ category.id }}">
-																				<div class="accordion-item">
+																				<div class="accordion-item shadow-lg shadow-lg-inset border border-dark rounded-3">
+
 																					<button class="accordion-button collapsed" id="categoryViewsMod{{ category.id }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategoryViewsMod{{category.id}}" aria-expanded="false" aria-controls="collapseCategoryViewsMod{{category.id}}">
 																						{{category.name|split('.')|first}}
-																						<input type="text" name="categoryName" value="{{category.name}}" class="" id="categoryName" placeholder="Nom de la categorie">
-																						<input type="select" name="categorySortOrder" value="{{category.sortOrder}}" class="" id="categorySortOrder" placeholder="Placement de la categorie">
+																						<input type="text" name="categoryName{{ category.id }}" value="{{category.name|split('.')|first}}" class="" id="categoryName{{ category.id }}" placeholder="Nom de la categorie">
+																						<select name="categorySortOrder{{ category.id }}" value="{{category.sortOrder}}" class="" id="categorySortOrder{{ category.id }}" placeholder="Placement de la categorie"></select>
+
 																					</button>
 																					<div id="collapseCategoryViewsMod{{ category.id }}" class="accordion-collapse collapse" aria-labelledby="categoryViewsMod" data-bs-parent="#collapseproductLineViewsMod{{ productLine.id }}">
-																						<div class="accordion-item shadow-lg shadow-lg-inset border border-dark rounded-3">
-
+																						<div class="shadow-lg shadow-lg-inset border border-dark rounded-3">
 																							{% for button in category.buttons %}
 																								<div>
-																									{{button.name|split('.')|first}}
-																									<input type="text" name="buttonName" value="{{button.name}}" class="" id="buttonName" placeholder="Nom du bouton">
-																									<input type="select" name="buttonSortOrder" value="{{button.sortOrder}}" class="" id="buttonSortOrder" placeholder="Placement du bouton">
+																									<div class="accordion-body">
+																										{{button.name|split('.')|first}}
+																										<input type="text" name="buttonName{{ button.id }}" value="{{button.name|split('.')|first}}" class="" id="buttonName{{ button.id }}" placeholder="Nom du bouton">
+																										<select name="buttonSortOrder{{ button.id }}" value="{{button.sortOrder}}" class="" id="buttonSortOrder{{ button.id }}" placeholder="Placement du bouton"></select>
+
+																									</div>
 																								</div>
 																							{% endfor %}
 																						</div>

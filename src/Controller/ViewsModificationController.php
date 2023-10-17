@@ -23,5 +23,9 @@ class ViewsModificationController extends FrontController
     #[Route('/viewmod/modifying', name: 'app_views_modification')]
     public function viewsModification(Request $request)
     {
+        $originUrl = $request->headers->get('Origin');
+
+        $this->logger->info('Full request: ' . $request);
+        return $this->redirect($originUrl);
     }
 }
