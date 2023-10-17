@@ -25,6 +25,9 @@ class Category
     #[ORM\OneToMany(mappedBy: 'Category', targetEntity: Button::class)]
     private Collection $buttons;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $SortOrder = null;
+
 
 
     public function __construct()
@@ -87,6 +90,18 @@ class Category
                 $button->setCategory(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSortOrder(): ?int
+    {
+        return $this->SortOrder;
+    }
+
+    public function setSortOrder(?int $SortOrder): static
+    {
+        $this->SortOrder = $SortOrder;
 
         return $this;
     }

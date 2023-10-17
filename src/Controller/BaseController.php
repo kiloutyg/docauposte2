@@ -48,6 +48,7 @@ use App\Service\EntityHeritanceService;
 use App\Service\ValidationService;
 use App\Service\MailerService;
 use App\Service\OldUploadService;
+use App\Service\ViewsModificationService;
 
 
 #[Route('/', name: 'app_')]
@@ -92,6 +93,7 @@ class BaseController extends AbstractController
     protected $accountService;
     protected $uploadService;
     protected $oldUploadService;
+    protected $viewsModificationService;
 
     // Variables used in the twig templates to display all the entities
     protected $departments;
@@ -140,7 +142,8 @@ class BaseController extends AbstractController
         AccountService                  $accountService,
         UploadService                   $uploadService,
         MailerService                   $mailerService,
-        OldUploadService                $oldUploadService
+        OldUploadService                $oldUploadService,
+        ViewsModificationService        $viewsModificationService
 
     ) {
 
@@ -179,7 +182,7 @@ class BaseController extends AbstractController
         $this->uploadService                = $uploadService;
         $this->accountService               = $accountService;
         $this->entitydeletionService        = $entitydeletionService;
-
+        $this->viewsModificationService     = $viewsModificationService;
 
         // Variables used in the twig templates to display all the entities
         $this->zones                        = $this->zoneRepository->findAll();

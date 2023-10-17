@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BaseViewModification
+{% endblock %}
+
+{% block body %}
+	<div class="card border-0 shadow rounded-3 my-5">
+		<div class="card-body">
+			<div class="row">
+				<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
+					<div class="card-body">
+						<div class="row d-flex align-items-center gy-lg-0 gy-5">
+							<form class="form row" method="post" action="{{path('app_views_modification')}}"></form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

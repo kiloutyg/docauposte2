@@ -35,6 +35,9 @@ class ProductLine
     #[ORM\OneToMany(mappedBy: 'ProductLine', targetEntity: Incident::class)]
     private Collection $incidents;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $SortOrder = null;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -128,6 +131,18 @@ class ProductLine
                 $incident->setProductLine(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSortOrder(): ?int
+    {
+        return $this->SortOrder;
+    }
+
+    public function setSortOrder(?int $SortOrder): static
+    {
+        $this->SortOrder = $SortOrder;
 
         return $this;
     }
