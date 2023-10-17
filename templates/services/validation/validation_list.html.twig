@@ -1,98 +1,112 @@
 {% block body %}
 
-			{% if (groupedUploads is defined) and (groupedUploads is not empty ) %}
-				<div class="accordion col-11 mx-auto justify-content-center" id="accordionValidation">
-					{% set outerIndex = 0 %}
-					{% for zoneName, zoneKey in groupedUploads %}
-						{% set outerIndex = outerIndex + 1 %}
-						<div class="accordion-item shadow-lg shadow-lg-inset border border-dark">
-							<h2 class="accordion-header" id="headingZone{{ outerIndex }}">
-								<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZoneValidation{{ outerIndex }}" aria-expanded="false" aria-controls="collapseZoneValidation{{ outerIndex }}">
-									Zone:
-									{{ zoneName|split('.')|first|upper }}
-								</button>
-							</h2>
-							<div id="collapseZoneValidation{{ outerIndex }}" class="accordion-collapse collapse" aria-labelledby="headingZone{{ outerIndex }}" data-bs-parent="#accordionValidation">
-								<div class="accordion-body">
-									{% set middleIndex = 0 %}
-									{% for productLineName, productLineKey in zoneKey %}
-										{% set middleIndex = middleIndex + 1 %}
-										<div class="accordion" id="productLineAccordion{{ outerIndex }}{{ middleIndex }}">
-											<div class="accordion-item">
-												<h2 class="accordion-header" id="headingProductLineValidation{{ outerIndex }}{{ middleIndex }}">
-													<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProductLineValidation{{ outerIndex }}{{ middleIndex }}" aria-expanded="false" aria-controls="collapseProductLineValidation{{ outerIndex }}{{ middleIndex }}">
-														Produit:
-														{{ productLineName|split('.')|first|upper }}
-													</button>
-												</h2>
-												<div id="collapseProductLineValidation{{ outerIndex }}{{ middleIndex }}" class="accordion-collapse collapse" aria-labelledby="headingProductLineValidation{{ outerIndex }}{{ middleIndex }}" data-bs-parent="#productLineAccordionValidation{{ outerIndex }}{{ middleIndex }}">
-													<div class="accordion-body">
-														{% set innerIndex = 0 %}
-														{% for categoryName, categoryKey in productLineKey %}
-															{% set innerIndex = innerIndex + 1 %}
-															<div class="accordion" id="categoryAccordion{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
-																<div class="accordion-item">
-																	<h2 class="accordion-header" id="headingCategoryValidation{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
-																		<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategoryValidation{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}" aria-expanded="false" aria-controls="collapseCategoryValidation{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
-																			Categorie:
-																			{{ categoryName|split('.')|first|upper }}
-																		</button>
-																	</h2>
-																	<div id="collapseCategoryValidation{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}" class="accordion-collapse collapse" aria-labelledby="headingCategoryValidation{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}" data-bs-parent="#categoryValidationAccordion{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
-																		<div class="accordion-body">
-																			{% for buttonName, buttonKey in categoryKey %}
-																				<strong>Bouton:</strong>
-																				{{ buttonName|split('.')|first|upper }}
-																				{% for upload in buttonKey %}
-																					<li class="list-group-item d-flex justify-content-between align-items-center mb-3 shadow-lg">
-																						<a href="{{ path('app_download_file', { 'uploadId': upload.id }) }}" class="btn btn-link" target="_blank">
-																							-
-																							{{ upload.filename|upper }}
-																						</a>
-																						{% if  is_granted('ROLE_LINE_ADMIN') %}
-																							<div class="ml-auto">
-																								Mis en ligne de la Rev. {{upload.revision}}
-																								par: 	
-																								<strong>{% if upload.uploader is not empty %} {{upload.uploader.username|capitalize|split('.')|first }} {{upload.uploader.username|upper|split('.')|last }}{% else %} inconnu 
-																								{% endif %}
-																								</strong>| le {{ upload.uploadedAt|date('d/m/Y') }}
-																								<br>
-																								{% if upload.validated is same as(true) %}
-																									{% if upload.validation is not empty %}
-																										{% for approbation in upload.validation.approbations %}
-																											- <strong>{{ approbation.userapprobator.username|capitalize|split('.')|first }} {{ approbation.userapprobator.username|upper|split('.')|last }}</strong>
-																											{{ approbation.approval is same as(true) ? ' a validé ce document le ' ~ approbation.approvedAt|date('d/m/Y') ~ ' à ' ~ approbation.approvedAt|date('H') ~ 'h' ~ approbation.approvedAt|date('i')}}.
-																											<br>
-																										{% endfor %}
-																									{% endif %}
-																								{% endif %}
-																							</div>
+	{% if (groupedUploads is defined) and (groupedUploads is not empty ) %}
+		<div class="accordion col-11 mx-auto justify-content-center" id="accordionValidationList">
+			{% set outerIndex = 0 %}
+			{% for zoneName, zoneKey in groupedUploads %}
+				{% set outerIndex = outerIndex + 1 %}
+				<div class="accordion-item shadow-lg shadow-lg-inset border border-dark">
+					<h2 class="accordion-header" id="headingZoneValidationList{{ outerIndex }}">
+						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZoneValidationList{{ outerIndex }}" aria-expanded="false" aria-controls="collapseZoneValidationList{{ outerIndex }}">
+							Zone:
+							{{ zoneName|split('.')|first|upper }}
+						</button>
+					</h2>
+					<div id="collapseZoneValidationList{{ outerIndex }}" class="accordion-collapse collapse" aria-labelledby="headingZoneValidationList{{ outerIndex }}" data-bs-parent="#accordionValidationList">
+
+						<div class="accordion-body">
+							{% set middleIndex = 0 %}
+							{% for productLineName, productLineKey in zoneKey %}
+								{% set middleIndex = middleIndex + 1 %}
+								<div class="accordion" id="productLineAccordionValidationList{{ outerIndex }}{{ middleIndex }}">
+
+									<div class="accordion-item">
+										<h2 class="accordion-header" id="headingProductLineValidationList{{ outerIndex }}{{ middleIndex }}">
+											<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProductLineValidationList{{ outerIndex }}{{ middleIndex }}" aria-expanded="false" aria-controls="collapseProductLineValidationList{{ outerIndex }}{{ middleIndex }}">
+												Produit:
+												{{ productLineName|split('.')|first|upper }}
+											</button>
+										</h2>
+										<div id="collapseProductLineValidationList{{ outerIndex }}{{ middleIndex }}" class="accordion-collapse collapse" aria-labelledby="headingProductLineValidationList{{ outerIndex }}{{ middleIndex }}" data-bs-parent="#collapseZoneValidationList{{ outerIndex }}">
+
+											<div class="accordion-body">
+												{% set innerIndex = 0 %}
+												{% for categoryName, categoryKey in productLineKey %}
+													{% set innerIndex = innerIndex + 1 %}
+													<div class="accordion" id="categoryAccordionValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
+
+														<div class="accordion-item">
+															<h2 class="accordion-header" id="headingCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
+																<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}" aria-expanded="false" aria-controls="collapseCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
+																	Catégorie:
+																	{{ categoryName|split('.')|first|upper }}
+																</button>
+															</h2>
+															<div id="collapseCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}" class="accordion-collapse collapse" aria-labelledby="headingCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}" data-bs-parent="#collapseProductLineValidationList{{ outerIndex }}{{ middleIndex }}">
+
+																<div class="accordion-body">
+																	{% for buttonName, buttonKey in categoryKey %}
+																		<strong>Bouton:</strong>
+																		{{ buttonName|split('.')|first|upper }}
+																		{% for upload in buttonKey %}
+																			<li class="list-group-item d-flex justify-content-between align-items-center mb-3 shadow-lg">
+																				<a href="{{ path('app_download_file', { 'uploadId': upload.id }) }}" class="btn btn-link" target="_blank">
+																					-
+																					{{ upload.filename|upper }}
+																				</a>
+																				{% if  is_granted('ROLE_LINE_ADMIN') %}
+																					<div class="ml-auto">
+																						Mis en ligne de la Rev.
+																						{{upload.revision}}
+																						par:
+																						<strong>
+																							{% if upload.uploader is not empty %}
+																								{{upload.uploader.username|capitalize|split('.')|first }}
+																								{{upload.uploader.username|upper|split('.')|last }}
+																							{% else %}
+																								inconnu
+																							{% endif %}
+																						</strong>| le
+																						{{ upload.uploadedAt|date('d/m/Y') }}
+																						<br>
+																						{% if upload.validated is same as(true) %}
+																							{% if upload.validation is not empty %}
+																								{% for approbation in upload.validation.approbations %}
+																									-
+																									<strong>{{ approbation.userapprobator.username|capitalize|split('.')|first }}
+																										{{ approbation.userapprobator.username|upper|split('.')|last }}</strong>
+																									{{ approbation.approval is same as(true) ? ' a validé ce document le ' ~ approbation.approvedAt|date('d/m/Y') ~ ' à ' ~ approbation.approvedAt|date('H') ~ 'h' ~ approbation.approvedAt|date('i')}}.
+																									<br>
+																								{% endfor %}
+																							{% endif %}
 																						{% endif %}
-																					</li>
-																				{% endfor %}
-																			{% endfor %}
-																		</div>
-																	</div>
+																					</div>
+																				{% endif %}
+																			</li>
+																		{% endfor %}
+																	{% endfor %}
 																</div>
 															</div>
-														{% endfor %}
+														</div>
 													</div>
-												</div>
+												{% endfor %}
 											</div>
 										</div>
-									{% endfor %}
+									</div>
 								</div>
-							</div>
+							{% endfor %}
 						</div>
-					{% endfor %}
+					</div>
 				</div>
+			{% endfor %}
+		</div>
 
-			{% else %}
-				<div class="alert alert-danger">
-					<a href="{{path('app_base')}}">
-						Il n'y a pas de documents disponible
-					</a>
-				</div>
-			{% endif %}
+	{% else %}
+		<div class="alert alert-danger">
+			<a href="{{path('app_base')}}">
+				Il n'y a pas de documents disponible
+			</a>
+		</div>
+	{% endif %}
 
 {% endblock %}
