@@ -38,9 +38,11 @@ class CategoryManagerController extends FrontController
         // These functions are responsible for grouping the uploads and incidents by button and parent entity, it depends on the UploadService and IncidentService classes.
         $groupedUploads = $this->uploadService->groupUploads($uploads);
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
+        $groupedValidatedUploads = $this->uploadService->groupValidatedUploads($uploads);
 
         return $this->render('category_manager/category_manager_index.html.twig', [
             'groupedUploads'        => $groupedUploads,
+            'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'        => $groupIncidents,
             'zone'                  => $zone,
             'productLine'           => $productLine,

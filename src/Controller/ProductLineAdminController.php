@@ -34,11 +34,13 @@ class ProductLineAdminController extends FrontController
         // Group the uploads and incidents by parents entity
         $groupedUploads = $this->uploadService->groupUploads($uploads);
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
+        $groupedValidatedUploads = $this->uploadService->groupValidatedUploads($uploads);
 
 
 
         return $this->render('productline_admin/productline_admin.html.twig', [
             'groupedUploads'    => $groupedUploads,
+            'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'    => $groupIncidents,
             'zone'              => $zone,
             'productLine'       => $productLine

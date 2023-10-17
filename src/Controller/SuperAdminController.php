@@ -24,6 +24,7 @@ class SuperAdminController extends FrontController
 
         // Group the uploads and incidents by parent entity
         $groupedUploads = $this->uploadService->groupUploads($uploads);
+        $groupedValidatedUploads = $this->uploadService->groupValidatedUploads($uploads);
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
 
         // Get the error and last username using AuthenticationUtils
@@ -32,6 +33,7 @@ class SuperAdminController extends FrontController
 
         return $this->render('super_admin/super_admin_index.html.twig', [
             'groupedUploads'        => $groupedUploads,
+            'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'        => $groupIncidents,
             'error'                 => $error,
             'last_username'         => $lastUsername
