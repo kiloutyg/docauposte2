@@ -35,7 +35,6 @@ Encore
   )
   .addEntry("department-creation", "./assets/js/department-creation.js")
   .addEntry("document-validator", "./assets/js/document-validator.js")
-  .addEntry("views-modification", "./assets/js/views-modification.js")
 
   // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
   .enableStimulusBridge("./assets/controllers.json")

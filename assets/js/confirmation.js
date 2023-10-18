@@ -24,6 +24,8 @@ window.addEventListener("turbo:load", () => {
     ".submit-upload-modification");
   const submitIncidentModifcationButtons = document.querySelectorAll(
     ".submit-incident-modification");
+  const submitViewsModifcationButtons = document.querySelectorAll(
+    ".submit-views-modification");
 
   const confirmationHandler = (event, message) => {
     const confirmed = confirm(message);
@@ -138,6 +140,14 @@ window.addEventListener("turbo:load", () => {
     });
   });
   submitIncidentModifcationButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "Êtes vous sûr de vouloir soumettre ces modifications?"
+      );
+    });
+  });
+  submitViewsModifcationButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
       confirmationHandler(
         event,
