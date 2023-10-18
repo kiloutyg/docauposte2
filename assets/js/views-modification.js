@@ -1,11 +1,13 @@
-$(document).ready(function () {
-    // Stop event propagation for inputs inside accordion buttons
-    $('.accordion-button input, .accordion-button select').on('click', function (e) {
+document.addEventListener("turbo:load", function () {
+    // Create a variable to store the input and select elements inside accordion buttons
+    var accordionInputs = $('.accordion-button input, .accordion-button select');
+
+    // Attach event listeners to the accordionInputs variable
+    accordionInputs.addEventListener('click', function (e) {
         e.stopPropagation();
     });
 
-    // Additionally, if you want to prevent the accordion from acting when the input or select gains focus
-    $('.accordion-button input, .accordion-button select').on('focus', function (e) {
+    accordionInputs.addEventListener('focus', function (e) {
         e.stopPropagation();
     });
 });
