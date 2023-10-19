@@ -61,9 +61,7 @@ class FolderCreationService
         }
     }
 
-    // public function updateFolderStructure($oldName, $newName)
-    // {
-    //     $this->deleteFolderStructure($oldName);
-    //     $this->folderStructure($newName);
-    // }
+    public function updateFolderStructureAndName($oldName, $newName)
+    {
+    }
 }

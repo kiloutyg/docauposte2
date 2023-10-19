@@ -2,11 +2,14 @@
 
 namespace App\Service;
 
+use Doctrine\ORM\EntityManagerInterface;
+
 use App\Repository\ButtonRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductLineRepository;
 use App\Repository\ZoneRepository;
-use Doctrine\ORM\EntityManagerInterface;
+
+use App\Service\FolderCreationService;
 
 class ViewsModificationService
 {
@@ -15,19 +18,22 @@ class ViewsModificationService
     private $productLineRepository;
     private $categoryRepository;
     private $buttonRepository;
+    private $folderCreationService;
 
     public function __construct(
         EntityManagerInterface $em,
         ZoneRepository $zoneRepository,
         ProductLineRepository $productLineRepository,
         CategoryRepository $categoryRepository,
-        ButtonRepository $buttonRepository
+        ButtonRepository $buttonRepository,
+        FolderCreationService $folderCreationService
     ) {
         $this->em = $em;
         $this->zoneRepository = $zoneRepository;
         $this->productLineRepository = $productLineRepository;
         $this->categoryRepository = $categoryRepository;
         $this->buttonRepository = $buttonRepository;
+        $this->folderCreationService = $folderCreationService;
     }
 
     public function updateTheUpdatingOfTheSortOrder()
@@ -127,6 +133,7 @@ class ViewsModificationService
                 $entity->setSortOrder($newValue);
                 break;
             case 'name':
+
                 $nameParts = explode('.', $originalValue);
                 $nameParts = array_reverse($nameParts);
                 $newName = '';
@@ -134,6 +141,9 @@ class ViewsModificationService
                     $newName .= '.' . $namePart;
                 }
                 $newName .= '.' . $newValue;
+
+                $this->folderCreationService->updateFolderStructureAndName($originalValue, $newName);
+
                 $entity->setName($newName);
                 break;
         }
