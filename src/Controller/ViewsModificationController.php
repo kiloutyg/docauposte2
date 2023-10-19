@@ -25,20 +25,30 @@ class ViewsModificationController extends FrontController
     {
         $originUrl = $request->headers->get('referer');
         $this->logger->info('Full request: ' . $request);
+
+
         foreach ($request->request->keys() as $key) {
+
             $this->logger->info('Key: ' . $key);
             $structuredKey = $this->viewsModificationService->extractComponentsFromKey($key);
+
             $this->logger->info('Structured key: ' . json_encode($structuredKey));
             $this->logger->info('Key entity: ' . $structuredKey['entity']);
             $repository = $this->viewsModificationService->defineEntityType($structuredKey['entity']);
+
+
             $this->logger->info('repo:' . json_encode($repository));
             if (!$repository) {
                 continue;
             }
+
             $entity = $repository->find($structuredKey['id']);
+
             $this->logger->info('Entity: ' . json_encode($entity));
             $originalValue = $this->viewsModificationService->defineOriginalValue($entity, $structuredKey['field']);
+
             if ($originalValue != $request->request->get($key)) {
+
                 $this->logger->info('Original value: ' . $originalValue);
                 $this->logger->info('New value: ' . $request->request->get($key));
                 $this->viewsModificationService->updateEntity($entity, $structuredKey['field'], $request->request->get($key), $originalValue);

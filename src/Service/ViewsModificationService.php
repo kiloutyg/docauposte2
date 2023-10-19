@@ -120,15 +120,21 @@ class ViewsModificationService
         return $OriginalValue;
     }
 
-    public function updateEntity($entity, $field, $newValue, $OriginalValue)
+    public function updateEntity($entity, $field, $newValue, $originalValue)
     {
         switch ($field) {
             case 'sortOrder':
                 $entity->setSortOrder($newValue);
                 break;
             case 'name':
-
-                $entity->setName($newValue);
+                $nameParts = explode('.', $originalValue);
+                $nameParts = array_reverse($nameParts);
+                $newName = '';
+                foreach ($nameParts as $namePart) {
+                    $newName .= '.' . $namePart;
+                }
+                $newName .= '.' . $newValue;
+                $entity->setName($newName);
                 break;
         }
         $this->em->persist($entity);
