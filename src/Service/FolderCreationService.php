@@ -60,4 +60,10 @@ class FolderCreationService
             rmdir($folderPath);
         }
     }
+
+    // public function updateFolderStructure($oldName, $newName)
+    // {
+    //     $this->deleteFolderStructure($oldName);
+    //     $this->folderStructure($newName);
+    // }
 }

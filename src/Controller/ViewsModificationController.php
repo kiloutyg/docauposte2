@@ -41,7 +41,7 @@ class ViewsModificationController extends FrontController
             if ($originalValue != $request->request->get($key)) {
                 $this->logger->info('Original value: ' . $originalValue);
                 $this->logger->info('New value: ' . $request->request->get($key));
-                $this->viewsModificationService->updateEntity($entity, $structuredKey['field'], $request->request->get($key));
+                $this->viewsModificationService->updateEntity($entity, $structuredKey['field'], $request->request->get($key), $originalValue);
             } else {
                 continue;
             }

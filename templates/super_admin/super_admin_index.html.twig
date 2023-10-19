@@ -75,7 +75,7 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 												<a href="{{path('app_base_views_modification')}}" class="btn btn-info">
 													Modifier
 												</a>
-												<a href="{{path('app_super_admin_delete_zone', {zone: zone.name})}}" class="btn btn-danger delete-zone">
+												<a href="{{path('app_super_admin_delete_zone', {zoneId: zone.id})}}" class="btn btn-danger delete-zone">
 													Supprimer
 												</a>
 											</li>

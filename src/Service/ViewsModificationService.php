@@ -120,13 +120,14 @@ class ViewsModificationService
         return $OriginalValue;
     }
 
-    public function updateEntity($entity, $field, $newValue)
+    public function updateEntity($entity, $field, $newValue, $OriginalValue)
     {
         switch ($field) {
             case 'sortOrder':
                 $entity->setSortOrder($newValue);
                 break;
             case 'name':
+
                 $entity->setName($newValue);
                 break;
         }
