@@ -3,37 +3,65 @@
 namespace App\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+
 
 use App\Repository\ButtonRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductLineRepository;
 use App\Repository\ZoneRepository;
+use App\Repository\UploadRepository;
+use App\Repository\OldUploadRepository;
+use App\Repository\IncidentRepository;
 
 use App\Service\FolderCreationService;
 
-class ViewsModificationService
+class ViewsModificationService extends AbstractController
 {
     private $em;
+    private $projectDir;
+    private $logger;
+
     private $zoneRepository;
     private $productLineRepository;
     private $categoryRepository;
     private $buttonRepository;
+    private $uploadRepository;
+    private $oldUploadRepository;
+    private $incidentRepository;
+
     private $folderCreationService;
 
     public function __construct(
         EntityManagerInterface $em,
+        ParameterBagInterface $params,
+        LoggerInterface $logger,
+
         ZoneRepository $zoneRepository,
         ProductLineRepository $productLineRepository,
         CategoryRepository $categoryRepository,
         ButtonRepository $buttonRepository,
+        UploadRepository $uploadRepository,
+        OldUploadRepository $oldUploadRepository,
+        IncidentRepository $incidentRepository,
+
         FolderCreationService $folderCreationService
     ) {
-        $this->em = $em;
-        $this->zoneRepository = $zoneRepository;
-        $this->productLineRepository = $productLineRepository;
-        $this->categoryRepository = $categoryRepository;
-        $this->buttonRepository = $buttonRepository;
-        $this->folderCreationService = $folderCreationService;
+        $this->em                       = $em;
+        $this->projectDir               = $params->get('kernel.project_dir');
+        $this->logger                   = $logger;
+
+        $this->zoneRepository           = $zoneRepository;
+        $this->productLineRepository    = $productLineRepository;
+        $this->categoryRepository       = $categoryRepository;
+        $this->buttonRepository         = $buttonRepository;
+        $this->uploadRepository         = $uploadRepository;
+        $this->oldUploadRepository      = $oldUploadRepository;
+        $this->incidentRepository       = $incidentRepository;
+
+        $this->folderCreationService    = $folderCreationService;
     }
 
     public function updateTheUpdatingOfTheSortOrder()
@@ -68,7 +96,9 @@ class ViewsModificationService
         }
         $this->em->flush();
     }
-
+    // 
+    // 
+    //     
     public function extractComponentsFromKey($key)
     {
         // Split the string by underscores
@@ -85,8 +115,9 @@ class ViewsModificationService
 
         return null;
     }
-
-
+    // 
+    // 
+    //     
     public function defineEntityType($entityType)
     {
         $repository = null;
@@ -111,7 +142,9 @@ class ViewsModificationService
         }
         return $repository;
     }
-
+    // 
+    // 
+    //     
     public function defineOriginalValue($entity, $field)
     {
         $OriginalValue = null;
@@ -125,8 +158,10 @@ class ViewsModificationService
         }
         return $OriginalValue;
     }
-
-    public function updateEntity($entity, $field, $newValue, $originalValue)
+    // 
+    // 
+    //     
+    public function updateEntity($entityType, $entity, $field, $newValue, $originalValue)
     {
         switch ($field) {
             case 'sortOrder':
@@ -135,19 +170,162 @@ class ViewsModificationService
             case 'name':
 
                 $nameParts = explode('.', $originalValue);
-                $nameParts = array_reverse($nameParts);
-                $newName = '';
+                array_shift($nameParts);  // Removing the first key/value from the array
+                $newName = $newValue;
                 foreach ($nameParts as $namePart) {
                     $newName .= '.' . $namePart;
                 }
-                $newName .= '.' . $newValue;
 
                 $this->folderCreationService->updateFolderStructureAndName($originalValue, $newName);
+
+                $entityId = $entity->getId();
+                $this->updateNameAndFolderByParentEntity($entityType, $entityId, $newName, $originalValue);
 
                 $entity->setName($newName);
                 break;
         }
         $this->em->persist($entity);
         $this->em->flush();
+    }
+    // 
+    // 
+    //     
+    public function updateEntityNameInheritance($entityType, $entity, $newParentName, $originalValue)
+    {
+        $entityName = $entity->getName();
+        $newName = $entityName . '.' . $newParentName;
+
+        $entityId = $entity->getId();
+        $this->updateNameAndFolderByParentEntity($entityType, $entityId, $newName, $originalValue);
+
+        $entity->setName($newName);
+        $this->em->persist($entity);
+        $this->em->flush();
+    }
+    // 
+    // 
+    //     
+    public function updateDocumentPath($entityType, $entity, $newParentName, $originalValue)
+    {
+        $public_dir = $this->projectDir . '/public';
+        switch ($entityType) {
+            case 'upload':
+                // $upload = $this->uploadRepository->find($entityId);
+                $upload = $entity;
+
+                // $buttonname = $upload->getButton()->getName();
+                // $parts      = explode('.', $buttonname);
+
+                $parts      = explode('.', $newParentName);
+                $parts      = array_reverse($parts);
+                $folderPath = $public_dir . '/doc';
+                foreach ($parts as $part) {
+                    $folderPath .= '/' . $part;
+                }
+                $Path = $folderPath . '/' . $upload->getFilename();
+                $upload->setPath($Path);
+                break;
+
+            case 'oldupload':
+                // $oldUpload = $this->oldUploadRepository->find($entityId);
+                $oldUpload = $entity;
+
+                // $buttonname = $oldUpload->getButton()->getName();
+                // $parts      = explode('.', $buttonname);
+
+                $parts      = explode('.', $newParentName);
+                $parts      = array_reverse($parts);
+                $folderPath = $public_dir . '/doc';
+                foreach ($parts as $part) {
+                    $folderPath .= '/' . $part;
+                }
+                $Path = $folderPath . '/' . $oldUpload->getFilename();
+                $oldUpload->setPath($Path);
+                break;
+
+            case 'incident':
+                // $incident = $this->incidentRepository->find($entityId);
+                $incident = $entity;
+
+                // $productlineName = $incident->getProductLine()->getName();
+                // $parts      = explode('.', $productlineName);
+
+                $parts      = explode('.', $newParentName);
+                $parts      = array_reverse($parts);
+                $folderPath = $public_dir . '/doc';
+                foreach ($parts as $part) {
+                    $folderPath .= '/' . $part;
+                }
+                $Path = $folderPath . '/' . $incident->getName();
+                $incident->setPath($Path);
+                break;
+        }
+    }
+    // 
+    //     
+    //     
+    public function updateNameAndFolderByParentEntity($entityType, $id, $newName, $originalValue)
+    {
+        // Get the repository of the entity type
+        $repository = null;
+        switch ($entityType) {
+            case 'zone':
+                $repository = $this->zoneRepository;
+                break;
+            case 'productline':
+                $repository = $this->productLineRepository;
+                break;
+            case 'category':
+                $repository = $this->categoryRepository;
+                break;
+            case 'button':
+                $repository = $this->buttonRepository;
+                break;
+            case 'upload':
+                $repository = $this->uploadRepository;
+                break;
+            case 'incident':
+                $repository = $this->incidentRepository;
+                break;
+            case 'oldupload':
+                $repository = $this->oldUploadRepository;
+                break;
+        }
+        // If the entity type is not valid, return an empty array
+        if (!$repository) {
+            return [];
+        }
+        // Get the entity from the database and return an empty array if it doesn't exist
+        $entity = $repository->find($id);
+        if (!$entity) {
+            return [];
+        }
+        // Depending on the entity type, get the related entities
+        if ($entityType === 'zone') {
+            foreach ($entity->getProductLines() as $productLine) {
+                // $this->updateNameAndFolderByParentEntity('productline', $productLine->getId(), $newName, $originalValue);
+                $this->updateEntityNameInheritance('productline', $productLine, $newName, $originalValue);
+            }
+        } elseif ($entityType === 'productline') {
+            foreach ($entity->getIncidents() as $incident) {
+                $this->updateDocumentPath('incident', $incident, $newName, $originalValue);
+            }
+            foreach ($entity->getCategories() as $category) {
+                // $this->updateNameAndFolderByParentEntity('category', $category->getId(), $newName, $originalValue);
+                $this->updateEntityNameInheritance('category', $category, $newName, $originalValue);
+            }
+        } elseif ($entityType === 'category') {
+            foreach ($entity->getButtons() as $button) {
+                // $this->updateNameAndFolderByParentEntity('button', $button->getId(), $newName, $originalValue);
+                $this->updateEntityNameInheritance('button', $button, $newName, $originalValue);
+            }
+        } elseif ($entityType === 'button') {
+            foreach ($entity->getUploads() as $upload) {
+                $this->updateDocumentPath('upload', $upload, $newName, $originalValue);
+            }
+            foreach ($entity->getOldUploads() as $oldUpload) {
+                $this->updateDocumentPath('oldupload', $oldUpload, $newName, $originalValue);
+            }
+        }
     }
 }
