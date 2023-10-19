@@ -111,9 +111,12 @@ class CategoryManagerController extends FrontController
                 ]);
                 // If the button does not exist, create it and redirect to the category manager page and display a flash message. It depends on the FolderCreationService class.
             } else {
+                $count = $this->buttonRepository->count(['Category' => $categoryentity->getId()]);
+                $sortOrder = $count + 1;
                 $button = new Button();
                 $button->setName($buttonname);
                 $button->setCategory($categoryentity);
+                $button->setSortOrder($sortOrder);
                 $this->em->persist($button);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($buttonname);

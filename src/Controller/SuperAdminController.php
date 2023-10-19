@@ -81,8 +81,11 @@ class SuperAdminController extends FrontController
                 $this->addFlash('danger', 'La zone existe déjà');
                 return $this->redirectToRoute('app_super_admin');
             } else {
+                $count = $this->zoneRepository->count([]);
+                $sortOrder = $count + 1;
                 $zone = new Zone();
                 $zone->setName($zonename);
+                $zone->setSortOrder($sortOrder);
                 $this->em->persist($zone);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($zonename);

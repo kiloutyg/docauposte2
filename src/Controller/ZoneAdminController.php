@@ -88,9 +88,12 @@ class ZoneAdminController extends FrontController
                 // Create a productline
 
             } else {
+                $count = $this->productLineRepository->count(['zone' => $zone->getId()]);
+                $sortOrder = $count + 1;
                 $productline = new ProductLine();
                 $productline->setName($productlinename);
                 $productline->setZone($zone);
+                $productline->setSortOrder($sortOrder);
                 $this->em->persist($productline);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($productlinename);
