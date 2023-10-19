@@ -42,4 +42,5 @@ temp
 # yarn.lock
 docker-compose.override.yml
 database.test.tar.gz
+doc.test.tar.gz
 ```
