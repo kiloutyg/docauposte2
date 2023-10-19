@@ -7,6 +7,7 @@ namespace App\Service;
 use App\Controller\BaseController;
 use App\Entity\OldUpload;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
 use App\Repository\ZoneRepository;
 use App\Repository\ProductLineRepository;
@@ -46,6 +47,7 @@ class EntityDeletionService
     private $validationRepository;
     private $OldUploadRepository;
     private $oldUploadService;
+    private $logger;
 
 
     public function __construct(
@@ -64,7 +66,8 @@ class EntityDeletionService
         UserRepository                  $userRepository,
         ValidationRepository            $validationRepository,
         OldUploadRepository             $OldUploadRepository,
-        OldUploadService                $oldUploadService
+        OldUploadService                $oldUploadService,
+        LoggerInterface                 $logger
     ) {
         $this->em                           = $em;
         $this->zoneRepository               = $zoneRepository;
@@ -82,6 +85,7 @@ class EntityDeletionService
         $this->validationRepository         = $validationRepository;
         $this->OldUploadRepository          = $OldUploadRepository;
         $this->oldUploadService             = $oldUploadService;
+        $this->logger                       = $logger;
     }
 
     // This function is responsible for deleting an entity and its related entities from the database and the server filesystem
@@ -137,53 +141,69 @@ class EntityDeletionService
         // Deletion logic for related entities, folder and files
         if ($entityType === 'zone') {
             foreach ($entity->getProductLines() as $productLine) {
+                $this->logger->info('productline ID: ' . $productLine->getId());
                 $this->deleteEntity('productline', $productLine->getId());
             }
+            $this->logger->info('zone name' . $entity->getName());
             $this->folderCreationService->deleteFolderStructure($entity->getName());
         } elseif ($entityType === 'productline') {
 
             foreach ($entity->getCategories() as $category) {
+                $this->logger->info('category ID: ' . $category->getId());
                 $this->deleteEntity('category', $category->getId());
             }
 
             foreach ($entity->getIncidents() as $incident) {
+                $this->logger->info('incident ID: ' . $incident->getId());
                 $this->deleteEntity('incident', $incident->getId());
             }
-
+            $this->logger->info('productline name' . $entity->getName());
             $this->folderCreationService->deleteFolderStructure($entity->getName());
         } elseif ($entityType === 'category') {
             foreach ($entity->getButtons() as $button) {
+                $this->logger->info('button ID: ' . $button->getId());
                 $this->deleteEntity('button', $button->getId());
             }
+            $this->logger->info('category name' . $entity->getName());
             $this->folderCreationService->deleteFolderStructure($entity->getName());
         } elseif ($entityType === 'button') {
             foreach ($entity->getUploads() as $upload) {
+                $this->logger->info('upload ID: ' . $upload->getId());
                 $this->deleteEntity('upload', $upload->getId());
             }
+            $this->logger->info('button name' . $entity->getName());
             $this->folderCreationService->deleteFolderStructure($entity->getName());
         } elseif ($entityType === 'user') {
             foreach ($entity->getUploads() as $upload) {
+                $this->logger->info('upload ID: ' . $upload->getId());
                 $this->deleteEntity('upload', $upload->getId());
             }
             foreach ($entity->getIncidents() as $incident) {
+                $this->logger->info('incident ID: ' . $incident->getId());
                 $this->deleteEntity('incident', $incident->getId());
             }
+            $this->logger->info('user name: ' . $entity->getUsername());
         } elseif ($entityType === 'incidentCategory') {
             foreach ($entity->getIncidents() as $incident) {
+                $this->logger->info('incident ID: ' . $incident->getId());
                 $this->deleteEntity('incident', $incident->getId());
             }
         } elseif ($entityType === 'upload') {
-            $this->deleteEntity('validation', $entity->getValidation()->getId());
+            $this->logger->info('upload name: ' . $entity->getFileName());
+            $this->logger->info('upload ID: ' . $entity->getId());
             $this->uploadService->deleteFile($entity->getId());
+            // $this->deleteEntity('validation', $entity->getValidation()->getId());
         } elseif ($entityType === 'incident') {
+            $this->logger->info('incident name' . $entity->getName());
             $this->incidentService->deleteIncidentFile($entity->getName(), $entity->getProductLine());
         } elseif ($entityType === 'department') {
+            $this->logger->info('department name' . $entity->getName());
             foreach ($entity->getUsers() as $user) {
                 $entity->removeUser($user);
             }
         }
 
-
+        $this->logger->info('entity Type: ' . $entityType);
         $this->em->remove($entity);
         $this->em->flush();
 
