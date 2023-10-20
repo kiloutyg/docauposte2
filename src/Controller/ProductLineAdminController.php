@@ -34,11 +34,13 @@ class ProductLineAdminController extends FrontController
         // Group the uploads and incidents by parents entity
         $groupedUploads = $this->uploadService->groupUploads($uploads);
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
+        $groupedValidatedUploads = $this->uploadService->groupValidatedUploads($uploads);
 
 
 
         return $this->render('productline_admin/productline_admin.html.twig', [
             'groupedUploads'    => $groupedUploads,
+            'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'    => $groupIncidents,
             'zone'              => $zone,
             'productLine'       => $productLine
@@ -110,9 +112,12 @@ class ProductLineAdminController extends FrontController
                 ]);
                 // If the category doesn't exist, create it and redirect to the productline admin interface with a flash message
             } else {
+                $count = $this->categoryRepository->count(['ProductLine' => $productLine->getId()]);
+                $sortOrder = $count + 1;
                 $category = new Category();
                 $category->setName($categoryname);
                 $category->setProductLine($productLine);
+                $category->setSortOrder($sortOrder);
                 $this->em->persist($category);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($categoryname);

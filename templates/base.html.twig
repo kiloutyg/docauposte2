@@ -20,15 +20,15 @@
 			{{ encore_entry_script_tags('toast') }}
 			{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
 			{{ encore_entry_script_tags('cascading-dropdowns') }}
-			{{encore_entry_script_tags('department-creation') }}
-			{{encore_entry_script_tags('document-validator') }}
+			{{ encore_entry_script_tags('department-creation') }}
+			{{ encore_entry_script_tags('document-validator') }}
 			<script>
 
 				{% if zone is defined and zone is not null %}
 zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
 			</script>
-
 		{% endblock %}
+
 		{% include "services/_toasts.html.twig" %}
 	</head>
 	<body
@@ -171,7 +171,6 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 								<a class="btn btn-primary btn-lg m-5 " role="button" aria-pressed="true" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
 									<span class="line-details text-justify">
 										{{ zone.name|split('.')|first|upper }}
-
 									</span>
 								</a>
 							{% endfor %}

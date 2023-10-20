@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Incident[]    findAll()
  * @method Incident[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class IncidentRepository extends ServiceEntityRepository
+class IncidentRepository extends BaseRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -39,28 +39,28 @@ class IncidentRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Incident[] Returns an array of Incident objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('i')
-//            ->andWhere('i.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('i.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    //    /**
+    //     * @return Incident[] Returns an array of Incident objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('i')
+    //            ->andWhere('i.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('i.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
 
-//    public function findOneBySomeField($value): ?Incident
-//    {
-//        return $this->createQueryBuilder('i')
-//            ->andWhere('i.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    //    public function findOneBySomeField($value): ?Incident
+    //    {
+    //        return $this->createQueryBuilder('i')
+    //            ->andWhere('i.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }

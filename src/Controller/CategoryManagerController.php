@@ -38,9 +38,11 @@ class CategoryManagerController extends FrontController
         // These functions are responsible for grouping the uploads and incidents by button and parent entity, it depends on the UploadService and IncidentService classes.
         $groupedUploads = $this->uploadService->groupUploads($uploads);
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
+        $groupedValidatedUploads = $this->uploadService->groupValidatedUploads($uploads);
 
         return $this->render('category_manager/category_manager_index.html.twig', [
             'groupedUploads'        => $groupedUploads,
+            'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'        => $groupIncidents,
             'zone'                  => $zone,
             'productLine'           => $productLine,
@@ -109,9 +111,12 @@ class CategoryManagerController extends FrontController
                 ]);
                 // If the button does not exist, create it and redirect to the category manager page and display a flash message. It depends on the FolderCreationService class.
             } else {
+                $count = $this->buttonRepository->count(['Category' => $categoryentity->getId()]);
+                $sortOrder = $count + 1;
                 $button = new Button();
                 $button->setName($buttonname);
                 $button->setCategory($categoryentity);
+                $button->setSortOrder($sortOrder);
                 $this->em->persist($button);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($buttonname);

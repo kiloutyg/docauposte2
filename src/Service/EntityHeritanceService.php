@@ -4,6 +4,8 @@
 
 namespace App\Service;
 
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 use Doctrine\ORM\EntityManagerInterface;
 
 use App\Repository\ZoneRepository;
@@ -13,13 +15,14 @@ use App\Repository\ButtonRepository;
 use App\Repository\UploadRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
+use App\Repository\OldUploadRepository;
 
 use App\Service\UploadService;
 use App\Service\IncidentService;
 
 
 // This class is responsible for the logic of getting the related entities of a given entity
-class EntityHeritanceService
+class EntityHeritanceService extends AbstractController
 {
     private $em;
     private $zoneRepository;
@@ -27,9 +30,11 @@ class EntityHeritanceService
     private $categoryRepository;
     private $buttonRepository;
     private $uploadRepository;
-    private $uploadService;
     private $incidentRepository;
     private $incidentCategoryRepository;
+    private $oldUploadRepository;
+
+    private $uploadService;
     private $incidentService;
 
     public function __construct(
@@ -40,9 +45,11 @@ class EntityHeritanceService
         ButtonRepository $buttonRepository,
         UploadRepository $uploadRepository,
         IncidentRepository $incidentRepository,
-        UploadService $uploadService,
         IncidentCategoryRepository $incidentCategoryRepository,
-        IncidentService $incidentService,
+        OldUploadRepository $oldUploadRepository,
+
+        UploadService $uploadService,
+        IncidentService $incidentService
     ) {
         $this->em = $em;
         $this->zoneRepository = $zoneRepository;
@@ -50,9 +57,11 @@ class EntityHeritanceService
         $this->categoryRepository = $categoryRepository;
         $this->buttonRepository = $buttonRepository;
         $this->uploadRepository = $uploadRepository;
-        $this->uploadService = $uploadService;
         $this->incidentRepository = $incidentRepository;
         $this->incidentCategoryRepository = $incidentCategoryRepository;
+        $this->oldUploadRepository = $oldUploadRepository;
+
+        $this->uploadService = $uploadService;
         $this->incidentService = $incidentService;
     }
 

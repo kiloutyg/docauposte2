@@ -195,14 +195,15 @@ class IncidentController extends FrontController
     }
 
     // Create a route to delete a file
-    #[Route('/incident/delete/{productline}/{name}', name: 'incident_delete_file')]
-    public function delete_file(string $name = null, string $productline = null, Request $request): Response
+    #[Route('/incident/delete/{productlineId}/{incidentId}', name: 'incident_delete_file')]
+    public function delete_file(int $incidentId, int $productlineId, Request $request): Response
     {
-        $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productline]);
+        $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productlineId]);
         $originUrl = $request->headers->get('referer');
+        $incidentEntity = $this->incidentRepository->findOneBy(['id' => $incidentId]);
 
         // Use the incidentService to handle file deletion
-        $name = $this->incidentService->deleteIncidentFile($name, $productlineEntity);
+        $name = $this->incidentService->deleteIncidentFile($incidentEntity, $productlineEntity);
         $this->addFlash('success', 'File ' . $name . ' deleted');
 
         return $this->redirect($originUrl);

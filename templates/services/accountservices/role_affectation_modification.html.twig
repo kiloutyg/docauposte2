@@ -11,7 +11,7 @@
 {% elseif is_granted('ROLE_SUPER_ADMIN') %}
 	<div>
 		<label>Selectionnez le role du nouveau compte:</label>
-		<select class="form-control " required name="role" id="role">
+		<select class="form-control " name="role" id="role">
 			<option value="">--Choisissez un role--</option>
 			<option value="ROLE_ADMIN_VALIDATOR">Admin de Zone Valideur</option>
 			<option value="ROLE_ADMIN">Admin de Zone</option>
@@ -25,7 +25,7 @@
 {% elseif is_granted('ROLE_ADMIN_VALIDATOR') %}
 	<div>
 		<label>Selectionnez le role du nouveau compte:</label>
-		<select class="form-control " required name="role" id="role">
+		<select class="form-control " name="role" id="role">
 			<option value="">--Choisissez un role--</option>
 			<option value="ROLE_ADMIN">Admin de Zone</option>
 			<option value="ROLE_LINE_ADMIN_VALIDATOR">Admin de Ligne Valideur</option>

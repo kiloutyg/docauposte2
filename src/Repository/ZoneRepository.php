@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Zone[]    findAll()
  * @method Zone[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ZoneRepository extends ServiceEntityRepository
+class ZoneRepository extends BaseRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -39,28 +39,28 @@ class ZoneRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Zone[] Returns an array of Zone objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('z')
-//            ->andWhere('z.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('z.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    //    /**
+    //     * @return Zone[] Returns an array of Zone objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('z')
+    //            ->andWhere('z.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('z.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
 
-//    public function findOneBySomeField($value): ?Zone
-//    {
-//        return $this->createQueryBuilder('z')
-//            ->andWhere('z.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    //    public function findOneBySomeField($value): ?Zone
+    //    {
+    //        return $this->createQueryBuilder('z')
+    //            ->andWhere('z.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }

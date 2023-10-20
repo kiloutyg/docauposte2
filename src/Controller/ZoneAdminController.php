@@ -23,14 +23,17 @@ class ZoneAdminController extends FrontController
 
         // Group the uploads and incidents by parent entity
         $groupedUploads = $this->uploadService->groupUploads($uploads);
+        $groupedValidatedUploads = $this->uploadService->groupValidatedUploads($uploads);
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
 
         return $this->render('zone_admin/zone_admin_index.html.twig', [
-            'groupedUploads'    => $groupedUploads,
-            'groupincidents'    => $groupIncidents,
-            'zone'              => $zone
+            'groupedUploads'            => $groupedUploads,
+            'groupedValidatedUploads'   => $groupedValidatedUploads,
+            'groupincidents'            => $groupIncidents,
+            'zone'                      => $zone
         ]);
     }
+
 
     // Creation of new user account destined to the zone admin but only accessible by the super admin
     #[Route('/zone_admin/create_line_admin/{zone}', name: 'app_zone_admin_create_line_admin')]
@@ -58,6 +61,7 @@ class ZoneAdminController extends FrontController
         ]);
     }
 
+
     // Creation of new productline
     #[Route('/zone_admin/create_productline/{zone}', name: 'app_zone_admin_create_productline')]
     public function createProductLine(Request $request, string $zone = null)
@@ -84,9 +88,12 @@ class ZoneAdminController extends FrontController
                 // Create a productline
 
             } else {
+                $count = $this->productLineRepository->count(['zone' => $zone->getId()]);
+                $sortOrder = $count + 1;
                 $productline = new ProductLine();
                 $productline->setName($productlinename);
                 $productline->setZone($zone);
+                $productline->setSortOrder($sortOrder);
                 $this->em->persist($productline);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($productlinename);
@@ -97,6 +104,7 @@ class ZoneAdminController extends FrontController
             }
         }
     }
+
 
     // Delete a productline and all its children entities, it depends on the entitydeletionService
     #[Route('/zone_admin/delete_productline/{productline}', name: 'app_zone_admin_delete_productline')]

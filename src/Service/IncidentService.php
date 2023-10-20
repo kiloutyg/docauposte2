@@ -91,9 +91,12 @@ class IncidentService extends AbstractController
             if (file_exists($folderPath . '/' . $name)) {
                 $iteration = count($this->incidentRepository->findBy(['name' => $name, 'ProductLine' => $productline]));
                 $storageName = $originalName . '-' . ($iteration + 1) . '.' . $fileExtension;
+                $path       = $folderPath . '/' . $storageName;
+                $file->move($folderPath . '/', $storageName);
+            } else {
+                $path       = $folderPath . '/' . $name;
+                $file->move($folderPath . '/', $name);
             }
-            $path       = $folderPath . '/' . $storageName;
-            $file->move($folderPath . '/', $storageName);
 
             $incident = new incident();
             $incident->setFile(new File($path));
@@ -110,12 +113,14 @@ class IncidentService extends AbstractController
     }
 
     // This function is responsible for the logic of deleting the incidents files 
-    public function deleteIncidentFile($name, $productline)
+    public function deleteIncidentFile($incidentEntity, $productlineEntity)
     {
+        $incidentName = $incidentEntity->getName();
+
         $public_dir = $this->projectDir . '/public';
 
         // Dynamic folder creation and file incident
-        $productlinename = $productline->getName();
+        $productlinename = $productlineEntity->getName();
         $parts = explode('.', $productlinename);
         $parts = array_reverse($parts);
         $folderPath = $public_dir . '/doc';
@@ -124,16 +129,15 @@ class IncidentService extends AbstractController
             $folderPath .= '/' . $part;
         }
 
-        $path       = $folderPath . '/' . $name;
+        $path = $incidentEntity->getPath();
 
         if (file_exists($path)) {
             unlink($path);
         }
 
-        $incident = $this->incidentRepository->findOneBy(['name' => $name, 'ProductLine' => $productline]);
-        $this->manager->remove($incident);
+        $this->manager->remove($incidentEntity);
         $this->manager->flush();
-        return $name;
+        return $incidentName;
     }
 
 

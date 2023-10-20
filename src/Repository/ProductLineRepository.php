@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method ProductLine[]    findAll()
  * @method ProductLine[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ProductLineRepository extends ServiceEntityRepository
+class ProductLineRepository extends BaseRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -39,28 +39,28 @@ class ProductLineRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return ProductLine[] Returns an array of ProductLine objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    //    /**
+    //     * @return ProductLine[] Returns an array of ProductLine objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('p')
+    //            ->andWhere('p.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('p.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
 
-//    public function findOneBySomeField($value): ?ProductLine
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    //    public function findOneBySomeField($value): ?ProductLine
+    //    {
+    //        return $this->createQueryBuilder('p')
+    //            ->andWhere('p.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }

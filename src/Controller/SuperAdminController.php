@@ -24,6 +24,7 @@ class SuperAdminController extends FrontController
 
         // Group the uploads and incidents by parent entity
         $groupedUploads = $this->uploadService->groupUploads($uploads);
+        $groupedValidatedUploads = $this->uploadService->groupValidatedUploads($uploads);
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
 
         // Get the error and last username using AuthenticationUtils
@@ -32,6 +33,7 @@ class SuperAdminController extends FrontController
 
         return $this->render('super_admin/super_admin_index.html.twig', [
             'groupedUploads'        => $groupedUploads,
+            'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'        => $groupIncidents,
             'error'                 => $error,
             'last_username'         => $lastUsername
@@ -79,8 +81,11 @@ class SuperAdminController extends FrontController
                 $this->addFlash('danger', 'La zone existe déjà');
                 return $this->redirectToRoute('app_super_admin');
             } else {
+                $count = $this->zoneRepository->count([]);
+                $sortOrder = $count + 1;
                 $zone = new Zone();
                 $zone->setName($zonename);
+                $zone->setSortOrder($sortOrder);
                 $this->em->persist($zone);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($zonename);
@@ -91,13 +96,13 @@ class SuperAdminController extends FrontController
     }
 
     // Zone deletion logic destined to the super admin, it also deletes the folder structure for the zone
-    #[Route('/super_admin/delete_zone/{zone}', name: 'app_super_admin_delete_zone')]
-    public function deleteEntity(string $zone): Response
+    #[Route('/super_admin/delete_zone/{zoneId}', name: 'app_super_admin_delete_zone')]
+    public function deleteEntity(int $zoneId): Response
     {
         $entityType = 'zone';
-        $entityid = $this->zoneRepository->findOneBy(['name' => $zone]);
+        $entity = $this->zoneRepository->findOneBy(['id' => $zoneId]);
 
-        $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
+        $entity = $this->entitydeletionService->deleteEntity($entityType, $entity->getId());
 
         if ($entity == true) {
 
