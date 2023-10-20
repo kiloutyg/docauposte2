@@ -11,7 +11,7 @@ use App\Controller\FrontController;
 
 class ViewsModificationController extends FrontController
 {
-    #[Route('/viewmod/base', name: 'app_base_views_modification')]
+    #[Route('/view/viewmod/base', name: 'app_base_views_modification')]
     public function baseViewModificationPageView(): Response
     {
 
@@ -20,7 +20,7 @@ class ViewsModificationController extends FrontController
         ]);
     }
 
-    #[Route('/viewmod/modifying', name: 'app_views_modification')]
+    #[Route('/view/viewmod/modifying', name: 'app_views_modification')]
     public function viewsModification(Request $request)
     {
         $originUrl = $request->headers->get('referer');
