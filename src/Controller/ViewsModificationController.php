@@ -41,11 +41,14 @@ class ViewsModificationController extends FrontController
             $newValue = $request->request->get($key);
 
             if ($structuredKey['field'] == 'name') {
+                $this->logger->info('viewsModification: originalValue: ' . $originalValue);
+
                 $nameParts = explode('.', $originalValue);
                 array_shift($nameParts);  // Removing the first key/value from the array
                 foreach ($nameParts as $namePart) {
                     $newValue .= '.' . $namePart;
                 }
+                $this->logger->info('viewsModification: newValue: ' . $newValue);
             }
             if ($originalValue != $newValue) {
                 // Instead of updating immediately, store the entity and its new value for later processing
