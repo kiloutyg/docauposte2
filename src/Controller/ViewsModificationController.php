@@ -42,7 +42,11 @@ class ViewsModificationController extends FrontController
 
             if ($structuredKey['field'] == 'name') {
                 $this->logger->info('viewsModification: originalValue: ' . $originalValue);
-
+                // Check if the name does not contain the disallowed characters
+                if (!preg_match("/^[^.]+$/", $request->request->get('$key'))) {
+                    // Handle the case when button name contains disallowed characters
+                    $this->addFlash('danger', 'Nom invalide');
+                }
                 $nameParts = explode('.', $originalValue);
                 array_shift($nameParts);  // Removing the first key/value from the array
                 foreach ($nameParts as $namePart) {
