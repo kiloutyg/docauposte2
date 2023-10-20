@@ -115,4 +115,34 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 			</div>
 		</div>
 	</div>
-{% endblock %}
+	<h2 class="my-4">
+
+		<strong>Liste des fichiers chargés :</strong>
+
+	</h2>
+	<div class="card border-0 shadow rounded-3 my-5">
+		<div class="card-body">
+			<div class="row">
+
+				<div>
+					{% include "services/uploads/uploaded_list.html.twig" %}
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<h2 class="my-4">
+		<strong>Liste des validations :</strong>
+
+	</h2>
+	<div class="card border-0 shadow rounded-3 my-5">
+		<div class="card-body">
+			<div class="row">
+
+				<div>
+					{% include "services/validation/validation_list.html.twig" %}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>{% endblock %}

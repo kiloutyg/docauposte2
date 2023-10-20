@@ -20,4 +20,19 @@ abstract class BaseRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+
+    public function findAllExceptOneByParent($entityId, $parentEntityId, $parentFieldName)
+    {
+        return $this->createQueryBuilder('e')
+            ->join('e.' . $parentFieldName, 'p')
+            ->where('e.id != :entityId')
+            ->andWhere('p.id = :parentEntityId')
+            ->setParameters([
+                'entityId' => $entityId,
+                'parentEntityId' => $parentEntityId,
+            ])
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -119,6 +119,7 @@ class ViewsModificationService extends AbstractController
     //     
     public function defineEntityType($entityType)
     {
+        $this->logger->info('defineEntityType: entityType: ' . $entityType);
         $repository = null;
         switch ($entityType) {
             case 'zone':
@@ -161,15 +162,19 @@ class ViewsModificationService extends AbstractController
     //     
     public function updateEntity($entityType, $entity, $field, $newValue, $originalValue)
     {
-        $this->logger->info('field: ' . $field);
+        $this->logger->info('updateEntity: entityType: ' . $entityType);
+        $this->logger->info('updateEntity: entityName: ' . $entity->getName());
+        $this->logger->info('updateEntity: field: ' . $field);
+        $this->logger->info('updateEntity: newValue: ' . $newValue);
+        $this->logger->info('updateEntity: originalValue: ' . $originalValue);
+
+        $entityId = $entity->getId();
         switch ($field) {
             case 'sortOrder':
-
-                $entity->setSortOrder($newValue);
+                $this->updateNameAndFolderByParentEntity($entityType, $entityId, $newValue, $originalValue, $field);
                 break;
             case 'name':
                 $this->folderCreationService->updateFolderStructureAndName($originalValue, $newValue);
-                $entityId = $entity->getId();
                 $this->updateNameAndFolderByParentEntity($entityType, $entityId, $newValue, $originalValue, $field);
                 $entity->setName($newValue);
                 break;
@@ -179,30 +184,40 @@ class ViewsModificationService extends AbstractController
     }
     // 
     // 
-    //
+    //     
     public function updateSortOrders($otherEntities, $entity, $newValue, $originalValue)
     {
+        $this->logger->info('entity name' . $entity->getName());
+        $this->logger->info('entity id' . $entity->getId());
+        $this->logger->info('newValue: ' . $newValue);
+        $this->logger->info('originalValue: ' . $originalValue);
         $entity->setSortorder($newValue);
+        $entityCount = count($otherEntities);
+        $this->logger->info('entityCount: ' . $entityCount);
+
+        // Moved to a higher position (i.e., lower value)
         if ($newValue < $originalValue) {
-            if ($newValue = 1) {
-                foreach ($otherEntities as $otherEntity) {
-                    $otherEntity->setSortOrder(++$newValue);
-                }
-            }
-            if ($newValue > 1) {
-                foreach ($otherEntities as $otherEntity) {
-                    if ($otherEntity->getSortOrder() >= $newValue) {
-                        $otherEntity->setSortOrder(++$newValue);
-                    }
-                }
-            }
-        } else if ($newValue > $originalValue) {
             foreach ($otherEntities as $otherEntity) {
-                if ($otherEntity->getSortOrder() <= $newValue) {
-                    $otherEntity->setSortOrder(--$newValue);
+                $otherSortOrder = $otherEntity->getSortOrder();
+                if ($otherSortOrder >= $newValue && $otherSortOrder < $originalValue) {
+                    $otherEntity->setSortOrder($otherSortOrder + 1);
+                    $this->logger->info('Incrementing sortOrder for entity with ID: ' . $otherEntity->getId());
                 }
             }
         }
+        // Moved to a lower position (i.e., higher value)
+        elseif ($newValue > $originalValue) {
+            foreach ($otherEntities as $otherEntity) {
+                $otherSortOrder = $otherEntity->getSortOrder();
+                if ($otherSortOrder <= $newValue && $otherSortOrder > $originalValue) {
+                    $otherEntity->setSortOrder($otherSortOrder - 1);
+                    $this->logger->info('Decrementing sortOrder for entity with ID: ' . $otherEntity->getId());
+                }
+            }
+        }
+
+        // Set the sortOrder for the entity being changed
+        $entity->setSortorder($newValue);
     }
     // 
     // 
@@ -269,6 +284,11 @@ class ViewsModificationService extends AbstractController
     //     
     public function updateNameAndFolderByParentEntity($entityType, $id, $newName, $originalValue, $field)
     {
+        $this->logger->info('updateNameAndFolderByParentEntity: entityType: ' . $entityType);
+        $this->logger->info('updateNameAndFolderByParentEntity: entityId: ' . $id);
+        $this->logger->info('updateNameAndFolderByParentEntity: field: ' . $field);
+        $this->logger->info('updateNameAndFolderByParentEntity: newValue: ' . $newName);
+        $this->logger->info('updateNameAndFolderByParentEntity: originalValue: ' . $originalValue);
         // Get the repository of the entity type
         $repository = null;
         switch ($entityType) {
@@ -277,21 +297,28 @@ class ViewsModificationService extends AbstractController
                 break;
             case 'productline':
                 $repository = $this->productLineRepository;
+                $parentFieldName = 'Zone';
                 break;
             case 'category':
                 $repository = $this->categoryRepository;
+                $parentFieldName = 'ProductLine';
                 break;
             case 'button':
                 $repository = $this->buttonRepository;
+                $parentFieldName = 'Category';
                 break;
             case 'upload':
                 $repository = $this->uploadRepository;
+                $parentFieldName = 'Button';
                 break;
             case 'incident':
                 $repository = $this->incidentRepository;
+                $parentFieldName = 'ProductLine';
+
                 break;
             case 'oldupload':
                 $repository = $this->oldUploadRepository;
+                $parentFieldName = 'Button';
                 break;
         }
         // If the entity type is not valid, return an empty array
@@ -319,15 +346,14 @@ class ViewsModificationService extends AbstractController
                 }
                 continue;
             }
-            $this->updateSortOrders($repository->findAllExceptOne($id), $entity, $newName, $originalValue);
-
             foreach ($entity->getCategories() as $category) {
                 if ($field === 'name') {
                     $this->updateEntityNameInheritance('category', $category, $newName, $originalValue, $field);
                 }
                 continue;
             }
-            $this->updateSortOrders($repository->findAllExceptOne($id), $entity, $newName, $originalValue);
+            $parentEntityId = $entity->getZone()->getId();
+            $this->updateSortOrders($repository->findAllExceptOneByParent($id, $parentEntityId, $parentFieldName), $entity, $newName, $originalValue);
         } elseif ($entityType === 'category') {
             foreach ($entity->getButtons() as $button) {
                 if ($field === 'name') {
@@ -335,7 +361,8 @@ class ViewsModificationService extends AbstractController
                 }
                 continue;
             }
-            $this->updateSortOrders($repository->findAllExceptOne($id), $entity, $newName, $originalValue);
+            $parentEntityId = $entity->getProductLine()->getId();
+            $this->updateSortOrders($repository->findAllExceptOne($id, $parentEntityId, $parentFieldName), $entity, $newName, $originalValue);
         } elseif ($entityType === 'button') {
             foreach ($entity->getUploads() as $upload) {
                 if ($field === 'name') {
@@ -349,7 +376,8 @@ class ViewsModificationService extends AbstractController
                 }
                 continue;
             }
-            $this->updateSortOrders($repository->findAllExceptOne($id), $entity, $newName, $originalValue);
+            $parentEntityId = $entity->getCategory()->getId();
+            $this->updateSortOrders($repository->findAllExceptOneByParent($id, $parentEntityId, $parentFieldName), $entity, $newName, $originalValue);
         }
     }
 }

@@ -24,7 +24,7 @@ class ViewsModificationController extends FrontController
     public function viewsModification(Request $request)
     {
         $originUrl = $request->headers->get('referer');
-
+        $entitiesToUpdate = [];
         foreach ($request->request->keys() as $key) {
 
             $structuredKey = $this->viewsModificationService->extractComponentsFromKey($key);
@@ -48,11 +48,29 @@ class ViewsModificationController extends FrontController
                 }
             }
             if ($originalValue != $newValue) {
-                $this->viewsModificationService->updateEntity($structuredKey['entity'], $entity, $structuredKey['field'], $newValue, $originalValue);
-            } else {
-                continue;
+                // Instead of updating immediately, store the entity and its new value for later processing
+                $entitiesToUpdate[] = [
+                    'entityType' => $structuredKey['entity'],
+                    'entity' => $entity,
+                    'field' => $structuredKey['field'],
+                    'newValue' => $newValue,
+                    'originalValue' => $originalValue
+                ];
             }
         }
+
+        // Now process the updates
+        foreach ($entitiesToUpdate as $updateInfo) {
+            $this->viewsModificationService->updateEntity(
+                $updateInfo['entityType'],
+                $updateInfo['entity'],
+                $updateInfo['field'],
+                $updateInfo['newValue'],
+                $updateInfo['originalValue']
+            );
+        }
+
+
         return $this->redirect($originUrl);
     }
 
