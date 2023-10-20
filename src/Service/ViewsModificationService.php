@@ -174,9 +174,9 @@ class ViewsModificationService extends AbstractController
                 $this->updateNameAndFolderByParentEntity($entityType, $entityId, $newValue, $originalValue, $field);
                 break;
             case 'name':
-                $this->folderCreationService->updateFolderStructureAndName($originalValue, $newValue);
                 $this->updateNameAndFolderByParentEntity($entityType, $entityId, $newValue, $originalValue, $field);
                 $entity->setName($newValue);
+                $this->folderCreationService->updateFolderStructureAndName($originalValue, $newValue);
                 break;
         }
         $this->em->persist($entity);
@@ -336,48 +336,53 @@ class ViewsModificationService extends AbstractController
                 if ($field === 'name') {
                     $this->updateEntityNameInheritance('productline', $productLine, $newName, $originalValue, $field);
                 }
-                continue;
             }
-            $this->updateSortOrders($repository->findAllExceptOne($id), $entity, $newName, $originalValue);
+            if ($field === 'sortOrder') {
+                $this->updateSortOrders($repository->findAllExceptOne($id), $entity, $newName, $originalValue);
+            }
         } elseif ($entityType === 'productline') {
             foreach ($entity->getIncidents() as $incident) {
                 if ($field === 'name') {
                     $this->updateDocumentPath('incident', $incident, $newName, $originalValue);
                 }
-                continue;
             }
             foreach ($entity->getCategories() as $category) {
                 if ($field === 'name') {
                     $this->updateEntityNameInheritance('category', $category, $newName, $originalValue, $field);
                 }
-                continue;
             }
-            $parentEntityId = $entity->getZone()->getId();
-            $this->updateSortOrders($repository->findAllExceptOneByParent($id, $parentEntityId, $parentFieldName), $entity, $newName, $originalValue);
+            if ($field === 'sortOrder') {
+
+                $parentEntityId = $entity->getZone()->getId();
+                $this->updateSortOrders($repository->findAllExceptOneByParent($id, $parentEntityId, $parentFieldName), $entity, $newName, $originalValue);
+            }
         } elseif ($entityType === 'category') {
             foreach ($entity->getButtons() as $button) {
                 if ($field === 'name') {
                     $this->updateEntityNameInheritance('button', $button, $newName, $originalValue, $field);
                 }
-                continue;
             }
-            $parentEntityId = $entity->getProductLine()->getId();
-            $this->updateSortOrders($repository->findAllExceptOne($id, $parentEntityId, $parentFieldName), $entity, $newName, $originalValue);
+            if ($field === 'sortOrder') {
+
+                $parentEntityId = $entity->getProductLine()->getId();
+                $this->updateSortOrders($repository->findAllExceptOne($id, $parentEntityId, $parentFieldName), $entity, $newName, $originalValue);
+            }
         } elseif ($entityType === 'button') {
             foreach ($entity->getUploads() as $upload) {
                 if ($field === 'name') {
                     $this->updateDocumentPath('upload', $upload, $newName, $originalValue);
                 }
-                continue;
             }
             foreach ($entity->getOldUploads() as $oldUpload) {
                 if ($field === 'name') {
                     $this->updateDocumentPath('oldupload', $oldUpload, $newName, $originalValue);
                 }
-                continue;
             }
-            $parentEntityId = $entity->getCategory()->getId();
-            $this->updateSortOrders($repository->findAllExceptOneByParent($id, $parentEntityId, $parentFieldName), $entity, $newName, $originalValue);
+            if ($field === 'sortOrder') {
+
+                $parentEntityId = $entity->getCategory()->getId();
+                $this->updateSortOrders($repository->findAllExceptOneByParent($id, $parentEntityId, $parentFieldName), $entity, $newName, $originalValue);
+            }
         }
     }
 }
