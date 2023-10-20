@@ -177,13 +177,11 @@ class UploadService extends AbstractController
         foreach ($parts as $part) {
             $folderPath .= '/' . $part;
         }
-
         $path = $folderPath . '/' . $filename;
 
         if (file_exists($path)) {
             unlink($path);
         }
-
         $this->manager->remove($upload);
         $this->manager->flush();
         return $name;
@@ -242,9 +240,6 @@ class UploadService extends AbstractController
         } else {
             $validated = true;
         };
-
-
-
         // If new file exists, process it and delete the old one
         if ($newFile) {
 
@@ -309,22 +304,17 @@ class UploadService extends AbstractController
             if (!isset($groupedUploads[$zoneName])) {
                 $groupedUploads[$zoneName] = [];
             }
-
             if (!isset($groupedUploads[$zoneName][$productLineName])) {
                 $groupedUploads[$zoneName][$productLineName] = [];
             }
-
             if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName])) {
                 $groupedUploads[$zoneName][$productLineName][$categoryName] = [];
             }
-
             if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
                 $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
             }
-
             $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
         }
-
         return $groupedUploads;
     }
 
@@ -332,7 +322,6 @@ class UploadService extends AbstractController
     // This function is responsible for the logic of grouping the uploads files by parent entities
     public function groupValidatedUploads($uploads)
     {
-
         $groupedValidatedUploads = [];
 
         // Group uploads by zone, productLine, category, and button
@@ -348,19 +337,15 @@ class UploadService extends AbstractController
                 if (!isset($groupedValidatedUploads[$zoneName])) {
                     $groupedValidatedUploads[$zoneName] = [];
                 }
-
                 if (!isset($groupedValidatedUploads[$zoneName][$productLineName])) {
                     $groupedValidatedUploads[$zoneName][$productLineName] = [];
                 }
-
                 if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName])) {
                     $groupedValidatedUploads[$zoneName][$productLineName][$categoryName] = [];
                 }
-
                 if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
                     $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
                 }
-
                 $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
             }
         }
@@ -377,10 +362,8 @@ class UploadService extends AbstractController
         $newFile = $upload->getFile();
         // Public directory
         $public_dir = $this->projectDir . '/public';
-
         // Old file path
         $oldFilePath = $upload->getPath();
-
         // New file path
         // Dynamic folder creation and file upload
         $buttonname = $upload->getButton()->getName();

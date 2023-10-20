@@ -26,6 +26,9 @@ class Zone
     #[ORM\OneToMany(mappedBy: 'zone', targetEntity: ProductLine::class, orphanRemoval: true)]
     private Collection $productLines;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $SortOrder = null;
+
     public function __construct()
     {
         $this->productLines = new ArrayCollection();
@@ -74,6 +77,18 @@ class Zone
                 $productLines->setZone(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSortOrder(): ?int
+    {
+        return $this->SortOrder;
+    }
+
+    public function setSortOrder(?int $SortOrder): static
+    {
+        $this->SortOrder = $SortOrder;
 
         return $this;
     }

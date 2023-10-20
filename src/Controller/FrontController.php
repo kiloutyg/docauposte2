@@ -37,11 +37,19 @@ class FrontController extends BaseController
             $this->accountService->updateUserEmail($user);
         }
 
+        // Updating the SortOrder field in each category
+
+        foreach ($this->zones as $zone) {
+            if ($zone->getSortOrder() === null) {
+                $this->viewsModificationService->updateTheUpdatingOfTheSortOrder();
+            }
+        }
+
 
         return $this->render(
             'base.html.twig',
             [
-                'user'                  => $this->getUser()
+                'user'                  => $this->getUser(),
             ]
         );
     }

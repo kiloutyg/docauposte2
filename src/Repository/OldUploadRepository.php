@@ -15,7 +15,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method OldUpload[]    findAll()
  * @method OldUpload[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class OldUploadRepository extends ServiceEntityRepository
+class OldUploadRepository extends BaseRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

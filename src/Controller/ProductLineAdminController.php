@@ -112,9 +112,12 @@ class ProductLineAdminController extends FrontController
                 ]);
                 // If the category doesn't exist, create it and redirect to the productline admin interface with a flash message
             } else {
+                $count = $this->categoryRepository->count(['ProductLine' => $productLine->getId()]);
+                $sortOrder = $count + 1;
                 $category = new Category();
                 $category->setName($categoryname);
                 $category->setProductLine($productLine);
+                $category->setSortOrder($sortOrder);
                 $this->em->persist($category);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($categoryname);

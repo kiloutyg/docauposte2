@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 
@@ -9,11 +10,14 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class FolderCreationService
 {
     protected $public_dir;
+    protected $logger;
 
     public function __construct(
         ParameterBagInterface $params,
+        LoggerInterface $logger
     ) {
         $this->public_dir = $params->get('kernel.project_dir') . '/public';
+        $this->logger = $logger;
     }
 
     // This function creates the folder structure for a given entity
@@ -60,4 +64,36 @@ class FolderCreationService
             rmdir($folderPath);
         }
     }
+
+    public function updateFolderStructureAndName($oldName, $newName)
+    {
+
+        // Old directory name
+        $oldNameParts = explode('.', $oldName);
+        $oldNameParts = array_reverse($oldNameParts);
+        $oldPath = $this->public_dir . '/doc';
+        foreach ($oldNameParts as $part) {
+            $oldPath .= '/' . $part;
+        }
+
+        // New directory name
+        $newNameParts = explode('.', $newName);
+        $newNameParts = array_reverse($newNameParts);
+        $newPath = $this->public_dir . '/doc';
+        foreach ($newNameParts as $part) {
+            $newPath .= '/' . $part;
+        }
+
+        // Check if the folder exists
+        // Try to rename the folder
+        if (rename($oldPath, $newPath)) {
+        }
+        // } else {
+        $this->logger->info('Folder does not exist');
+        $this->logger->info('Old path: ' . $oldPath);
+        $this->logger->info('New path: ' . $newPath);
+        $this->logger->info('Old name: ' . $oldName);
+        $this->logger->info('New name: ' . $newName);
+    }
 }
+// }

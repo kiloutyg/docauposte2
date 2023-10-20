@@ -48,6 +48,7 @@ use App\Service\EntityHeritanceService;
 use App\Service\ValidationService;
 use App\Service\MailerService;
 use App\Service\OldUploadService;
+use App\Service\ViewsModificationService;
 
 
 #[Route('/', name: 'app_')]
@@ -92,6 +93,7 @@ class BaseController extends AbstractController
     protected $accountService;
     protected $uploadService;
     protected $oldUploadService;
+    protected $viewsModificationService;
 
     // Variables used in the twig templates to display all the entities
     protected $departments;
@@ -140,7 +142,8 @@ class BaseController extends AbstractController
         AccountService                  $accountService,
         UploadService                   $uploadService,
         MailerService                   $mailerService,
-        OldUploadService                $oldUploadService
+        OldUploadService                $oldUploadService,
+        ViewsModificationService        $viewsModificationService
 
     ) {
 
@@ -179,15 +182,19 @@ class BaseController extends AbstractController
         $this->uploadService                = $uploadService;
         $this->accountService               = $accountService;
         $this->entitydeletionService        = $entitydeletionService;
-
+        $this->viewsModificationService     = $viewsModificationService;
 
         // Variables used in the twig templates to display all the entities
-        $this->zones                        = $this->zoneRepository->findAll();
-        $this->productLines                 = $this->productLineRepository->findAll();
+        // $this->zones                        = $this->zoneRepository->findAll();
+        $this->zones                        = $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']);
+        // $this->productLines                 = $this->productLineRepository->findAll();
+        $this->productLines                 = $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']);
+        // $this->categories                   = $this->categoryRepository->findAll();
+        $this->categories                   = $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']);
+        // $this->buttons                      = $this->buttonRepository->findAll();
+        $this->buttons                      = $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']);
         $this->users                        = $this->userRepository->findAll();
         $this->uploads                      = $this->uploadRepository->findAll();
-        $this->categories                   = $this->categoryRepository->findAll();
-        $this->buttons                      = $this->buttonRepository->findAll();
         $this->incidents                    = $this->incidentRepository->findAll();
         $this->incidentCategories           = $this->incidentCategoryRepository->findAll();
         $this->departments                  = $this->departmentRepository->findAll();

@@ -28,6 +28,9 @@ class Button
     #[ORM\OneToMany(mappedBy: 'button', targetEntity: OldUpload::class, orphanRemoval: true)]
     private Collection $olduploads;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $SortOrder = null;
+
     public function __construct()
     {
         $this->uploads = new ArrayCollection();
@@ -120,6 +123,18 @@ class Button
                 $oldupload->setButton(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSortOrder(): ?int
+    {
+        return $this->SortOrder;
+    }
+
+    public function setSortOrder(?int $SortOrder): static
+    {
+        $this->SortOrder = $SortOrder;
 
         return $this;
     }

@@ -28,7 +28,6 @@ class UploadController extends FrontController
         return $this->render('/services/uploads/upload.html.twig', []);
     }
 
-
     // This function is responsible for rendering the uploaded files interface
     #[Route('/uploaded', name: 'uploaded_files')]
     public function uploaded_files(): Response
@@ -37,8 +36,11 @@ class UploadController extends FrontController
             'services/uploads/uploaded.html.twig'
         );
     }
-
-
+    // 
+    // 
+    // 
+    //     
+    // 
     // Create a route to upload a file, and pass the request to the UploadService to handle the file upload
     #[Route('/uploading', name: 'generic_upload_files')]
     public function generic_upload_files(Request $request): Response
@@ -73,8 +75,10 @@ class UploadController extends FrontController
             return $this->redirect($originUrl);
         }
     }
-
-
+    // 
+    // 
+    // 
+    // 
     // create a route to download a file in more simple terms to display the file
     #[Route('/download/{uploadId}', name: 'download_file')]
     public function download_file(int $uploadId, Request $request): Response
@@ -92,15 +96,16 @@ class UploadController extends FrontController
                 $file = new File($path);
                 return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
             }
-
             return $this->redirect($originUrl);
         }
         $path = $file->getPath();
         $file = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
-
-
+    // 
+    // 
+    // 
+    // 
     // create a route to download a file in more simple terms to display the file
     #[Route('/download/invalidation/{uploadId}', name: 'download_invalidation_file')]
     public function download_invalidation_file(int $uploadId = null, Request $request): Response
@@ -112,8 +117,10 @@ class UploadController extends FrontController
         $file = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
-
-
+    // 
+    // 
+    // 
+    // 
     // create a route to delete a file
     #[Route('/delete/upload/{uploadId}', name: 'delete_file')]
 
@@ -127,13 +134,14 @@ class UploadController extends FrontController
 
         return $this->redirect($originUrl);
     }
-
-
+    // 
+    // 
+    // 
+    // 
     // create a route to modify a file and or display the modification page
     #[Route('/modify/{uploadId}', name: 'modify_file')]
     public function modify_file(Request $request, int $uploadId): Response
     {
-
         // Retrieve the current upload entity based on the uploadId
         $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $button      = $upload->getButton();
@@ -162,7 +170,10 @@ class UploadController extends FrontController
             return $this->redirectToRoute('app_base');
         }
     }
-
+    // 
+    // 
+    // 
+    // 
     // Testing separting the post and get in two different method to see if the issue of not reloading the pages and persisting the comments can be resolved through
     // the reorganization of the code
     #[Route('/modifying/{uploadId}', name: 'modifying_file')]
@@ -192,7 +203,6 @@ class UploadController extends FrontController
         // Retrieve the User object
         $user = $this->getUser();
 
-
         if ($currentUrl === $refererUrl) {
             // The current URL is the same as the referer URL
             $originUrl = $request->headers->get('Origin');
@@ -200,7 +210,6 @@ class UploadController extends FrontController
             // They are different
             $originUrl = $refererUrl;
         }
-
         // Check if there is a file to modify
         if (!$upload) {
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
@@ -208,7 +217,6 @@ class UploadController extends FrontController
                 'uploadId' => $uploadId
             ]);
         }
-
         $comment = $request->request->get('modificationComment');
         $this->logger->info('commentaire controlleur', [$comment]);
 
