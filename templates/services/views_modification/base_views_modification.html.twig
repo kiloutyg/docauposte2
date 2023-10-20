@@ -16,7 +16,6 @@
 											<button class="accordion-button accButViewMod collapsed" id="zoneViewsMod{{ zone.id }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZoneViewsMod{{zone.id}}" aria-expanded="false" aria-controls="collapseZoneViewsMod{{zone.id}}">
 												<strong>{{zone.name|split('.')|first|upper}}</strong>
 
-
 											</button>
 											<div id="collapseZoneViewsMod{{zone.id}}" class="accordion-collapse collapse" aria-labelledby="zoneViewsMod" data-bs-parent="#accordionViewsMod">
 												<div class="accordion-body">
@@ -35,15 +34,12 @@
 																<button class="accordion-button accButViewMod collapsed" id="productLineViewsMod{{ productLine.id }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProductLineViewsMod{{productLine.id}}" aria-expanded="false" aria-controls="collapseProductLineViewsMod{{productLine.id}}">
 																	<strong>{{productLine.name|split('.')|first|upper}}</strong>
 
-
 																</button>
 																<div id="collapseProductLineViewsMod{{ productLine.id }}" class="accordion-collapse collapse" aria-labelledby="productLineViewsMod" data-bs-parent="#collapseZoneViewsMod{{ zone.id }}">
 																	<div class="accordion-body">
 																		<input type="text" name="productLine_{{ productLine.id }}_name" value="{{ productLine.name|split('.')|first }}" class="" id="productLineName{{ productLine.id }}" placeholder="Nom de la productLine">
 
-
 																		<select name="productLine_{{ productLine.id }}_sortOrder" value="" class="productLineSortOrderSelect" id="productLineSortOrder{{ productLine.id }}" placeholder="Placement de la productLine">
-
 
 																			{% for k in 1..productLinesCounts %}
 																				<option value="{{k}}" {{ k == productLine.sortOrder ? 'selected' : '' }}>{{k}}</option>
@@ -56,14 +52,12 @@
 																					<button class="accordion-button accButViewMod collapsed" id="categoryViewsMod{{ category.id }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategoryViewsMod{{category.id}}" aria-expanded="false" aria-controls="collapseCategoryViewsMod{{category.id}}">
 																						<strong>{{category.name|split('.')|first|upper}}</strong>
 
-
 																					</button>
 																					<div id="collapseCategoryViewsMod{{ category.id }}" class="accordion-collapse collapse" aria-labelledby="categoryViewsMod" data-bs-parent="#collapseproductLineViewsMod{{ productLine.id }}">
 																						<div class="shadow-lg shadow-lg-inset border border-dark rounded-3">
 																							<input type="text" name="category_{{ category.id }}_name" value="{{ category.name|split('.')|first }}" class="" id="categoryName{{ category.id }}" placeholder="Nom de la categorie">
 
 																							<select name="category_{{ category.id }}_sortOrder" value="" class="categorySortOrderSelect" id="categorySortOrder{{ category.id }}" placeholder="Placement de la categorie">
-
 
 																								{% for k in 1..categoriesCounts %}
 																									<option value="{{k}}" {{ k == category.sortOrder ? 'selected' : '' }}>{{k}}</option>
@@ -75,7 +69,6 @@
 																									<div class="accordion-body shadow-lg-inset border border-dark rounded-3">
 
 																										<strong>{{button.name|split('.')|first|upper}}</strong>
-
 
 																										<input type="text" name="button_{{ button.id }}_name" value="{{ button.name|split('.')|first }}" class="" id="buttonName{{ button.id }}" placeholder="Nom du bouton">
 

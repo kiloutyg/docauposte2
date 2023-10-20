@@ -67,10 +67,11 @@ class FolderCreationService
 
     public function updateFolderStructureAndName($oldName, $newName)
     {
+
         // Old directory name
         $oldNameParts = explode('.', $oldName);
         $oldNameParts = array_reverse($oldNameParts);
-        $oldPath = '';
+        $oldPath = $this->public_dir . '/doc';
         foreach ($oldNameParts as $part) {
             $oldPath .= '/' . $part;
         }
@@ -78,22 +79,21 @@ class FolderCreationService
         // New directory name
         $newNameParts = explode('.', $newName);
         $newNameParts = array_reverse($newNameParts);
-        $newPath = '';
+        $newPath = $this->public_dir . '/doc';
         foreach ($newNameParts as $part) {
             $newPath .= '/' . $part;
         }
 
         // Check if the folder exists
-        if (is_dir($oldPath)) {
-            // Try to rename the folder
-            if (rename($oldPath, $newPath)) {
-            }
-        } else {
-            $this->logger->info('Folder does not exist');
-            $this->logger->info('Old path: ' . $oldPath);
-            $this->logger->info('New path: ' . $newPath);
-            $this->logger->info('Old name: ' . $oldName);
-            $this->logger->info('New name: ' . $newName);
+        // Try to rename the folder
+        if (rename($oldPath, $newPath)) {
         }
+        // } else {
+        $this->logger->info('Folder does not exist');
+        $this->logger->info('Old path: ' . $oldPath);
+        $this->logger->info('New path: ' . $newPath);
+        $this->logger->info('Old name: ' . $oldName);
+        $this->logger->info('New name: ' . $newName);
     }
 }
+// }
