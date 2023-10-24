@@ -225,11 +225,13 @@ class UploadController extends FrontController
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
-                if ($comment == null && $comment == "") {
-                    $this->addFlash('error', 'Le commentaire est vide.');
-                    return $this->redirectToRoute('app_modify_file', [
-                        'uploadId' => $uploadId
-                    ]);
+                if ($upload->getValidation() != null) {
+                    if ($comment == null && $comment == "") {
+                        $this->addFlash('error', 'Le commentaire est vide.');
+                        return $this->redirectToRoute('app_modify_file', [
+                            'uploadId' => $uploadId
+                        ]);
+                    }
                 }
                 $this->uploadService->modifyFile($upload, $user, $request, $oldFileName);
                 $this->logger->info('Logging the full request in the post submitted and valid but without error:', ['full_request' => $request->request->all()]);
