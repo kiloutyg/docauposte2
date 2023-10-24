@@ -105,10 +105,11 @@ class FrontController extends BaseController
 
         $productLine = $this->productLineRepository->findoneBy(['name' => $productline]);
         $zone        = $productLine->getZone();
+        $productlineId = $productLine->getId();
 
         $incidents = [];
         $incidents = $this->incidentRepository->findBy(
-            ['ProductLine' => $productLine->getId()],
+            ['ProductLine' => $productlineId],
             ['id' => 'ASC'] // order by id ascending
         );
 

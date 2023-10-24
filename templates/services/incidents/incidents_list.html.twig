@@ -34,7 +34,7 @@
 											<div class="accordion-body">
 												{% for incident in productLine %}
 													<li class="form-control shadow d-flex justify-content-between align-items-center mb-3 shadow-lg">
-														<a href="{{ path('app_incident_download_file', { 'name': incident.name }) }}" class="btn btn-link" target="_blank">
+														<a href="{{ path('app_incident_download_file', { 'incidentId': incident.id }) }}" class="btn btn-link" target="_blank">
 															-
 															{{ incident.name|upper }}
 														</a>
