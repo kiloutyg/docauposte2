@@ -6,7 +6,7 @@
 {% block body %}
 	<div class="d-flex align-items-center  flex-row">
 
-		<iframe src="{{ path('app_incident_download_file', { 'name': incident.name }) }}" width="69%" height="950" target="_blank"></iframe>
+		<iframe src="{{ path('app_incident_download_file', { 'incidentId': incident.id }) }}" width="69%" height="950" target="_blank"></iframe>
 		<div style="width: 6%"></div>
 		<div style="width: 17%" class="text-center">
 

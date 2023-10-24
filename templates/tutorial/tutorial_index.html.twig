@@ -36,9 +36,14 @@
 							<li class="black-text">F : Bouton de navigation, ici, pour accéder au tutoriel.</li>
 						</ul>
 						<div style="height: 5vh;"></div>
-						<img src="{{ asset('/TutoImage/ZoneConnexionAdmin.png') }}" class="img-fluid align-center justify-content-center" alt="1">
-						<em class="black-text">
-							Capture d'écran de la page d'une zone</em>
+						<div class="accordion-body accordion-bg shadow shadow-inset">
+
+
+							<img src="{{ asset('/TutoImage/ZoneConnexionAdmin.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+							<em class="black-text">
+								Capture d'écran de la page d'une zone</em>
+						</div>
+
 
 						<ul>
 							<li class="black-text">A : Bouton d'accès au menu d'administration, ici, de Zone.</li>
@@ -47,32 +52,60 @@
 					</div>
 				</div>
 
-
-				<div class="accordion-item ">
-					<h4 class="accordion-header" id="headingSecondStep">
-						<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSecondStep" aria-expanded="true" aria-controls="collapseSecondStep">
-							<strong>2. Création d'une entité d'organisation (Zone/Produit/Catégorie/Bouton)
-							</strong>
-						</button>
-					</h4>
-					<div id="collapseSecondStep" class="accordion-collapse collapse " aria-labelledby="headingSecondStep" data-bs-parent="#accordionTuto">
-						<div class="accordion-body accordion-bg shadow shadow-inset">
-							<img src="{{ asset('/TutoImage/FormulaireCreationEntite.png') }}" class="img-fluid align-center justify-content-center" alt="1">
-							Capture d'écran du formulaire de création d'une zone
-							<br><br>
+				{% if is_granted('ROLE_SUPER_ADMIN') %}
+					<div class="accordion-item ">
+						<h4 class="accordion-header" id="headingSecondStep">
+							<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSecondStep" aria-expanded="true" aria-controls="collapseSecondStep">
+								<strong>2. Création et modification d'une entité d'organisation (Zone/Produit/Catégorie/Bouton)
+								</strong>
+							</button>
+						</h4>
+						<div id="collapseSecondStep" class="accordion-collapse collapse " aria-labelledby="headingSecondStep" data-bs-parent="#accordionTuto">
+							<div class="accordion-body accordion-bg shadow shadow-inset">
+								<img src="{{ asset('/TutoImage/FormulaireCreationEntite.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+								Capture d'écran du formulaire de création d'une zone
+								<br><br>
+							</div>
+							<ul>
+								<li class="black-text">A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.</li>
+								<li class="black-text">B : Formulaire de création de l'entité. Entrer le nom de la Ligne/Produit puis valider sa création.</li>
+								<li class="black-text">C : Bouton de navigation, ici pour accéder aux Lignes/Produits qui ont été crée.</li>
+								<li class="black-text">D : Bouton de suppression de l'entité. En cas d'erreur ou de fin d'existence du projet/produit le bouton permet de supprimer l'entité et tout ce qui y est relié.</li><br>
+							</ul>
+							<p>
+								Lors de la validation de cette étape identique dans chacune des entités, vous serez redirigé vers la même page. Vous pourrez ensuite accéder au menu d'administration de l'entité que vous venez de créer(Correspond au point C).</p>
+							<p>
+								Il est necessaire d'aller jusqu'a la création d'un bouton pour pouvoir charger un fichier.</p>
 						</div>
-						<ul>
-							<li class="black-text">A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.</li>
-							<li class="black-text">B : Formulaire de création de l'entité. Entrer le nom de la Ligne/Produit puis valider sa création.</li>
-							<li class="black-text">C : Bouton de navigation, ici pour accéder aux Lignes/Produits qui ont été crée.</li>
-							<li class="black-text">D : Bouton de suppression de l'entité. En cas d'erreur ou de fin d'existence du projet/produit le bouton permet de supprimer l'entité et tout ce qui y est relié.</li><br>
-						</ul>
-						<p>
-							Lors de la validation de cette étape identique dans chacune des entités, vous serez redirigé vers la même page. Vous pourrez ensuite accéder au menu d'administration de l'entité que vous venez de créer(Correspond au point C).</p>
-						<p>
-							Il est necessaire d'aller jusqu'a la création d'un bouton pour pouvoir charger un fichier.</p>
 					</div>
-				</div>
+				{% else %}
+					<div class="accordion-item ">
+						<h4 class="accordion-header" id="headingSecondStep">
+							<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSecondStep" aria-expanded="true" aria-controls="collapseSecondStep">
+								<strong>2. Création d'une entité d'organisation (Zone/Produit/Catégorie/Bouton)
+								</strong>
+							</button>
+						</h4>
+						<div id="collapseSecondStep" class="accordion-collapse collapse " aria-labelledby="headingSecondStep" data-bs-parent="#accordionTuto">
+							<div class="accordion-body accordion-bg shadow shadow-inset">
+								<img src="{{ asset('/TutoImage/FormulaireCreationEntite.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+								Capture d'écran du formulaire de création d'une zone
+								<br><br>
+							</div>
+							<ul>
+								<li class="black-text">A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.</li>
+								<li class="black-text">B : Formulaire de création de l'entité. Entrer le nom de la Ligne/Produit puis valider sa création.</li>
+								<li class="black-text">C : Bouton de navigation, ici pour accéder aux Lignes/Produits qui ont été crée.</li>
+								<li class="black-text">D : Bouton de suppression de l'entité. En cas d'erreur ou de fin d'existence du projet/produit le bouton permet de supprimer l'entité et tout ce qui y est relié.</li><br>
+							</ul>
+							<p>
+								Lors de la validation de cette étape identique dans chacune des entités, vous serez redirigé vers la même page. Vous pourrez ensuite accéder au menu d'administration de l'entité que vous venez de créer(Correspond au point C).</p>
+							<p>
+								Il est necessaire d'aller jusqu'a la création d'un bouton pour pouvoir charger un fichier.</p>
+						</div>
+					</div>
+
+				{% endif %}
 				<div class="accordion-item ">
 					<h4 class="accordion-header" id="headingThirdStep">
 						<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThirdStep" aria-expanded="true" aria-controls="collapseThirdStep">
@@ -96,7 +129,25 @@
 								<em>(Pour rappel : Sans bouton selectionner le chargement echouera)</em>
 							</li>
 							<li class="black-text">E : Bouton de validation de formulaire.</li>
-							<li class="black-text">F : Accordeon affichant les fichiers affecté à l'entité d'organisation.</li>
+							<li class="black-text">F : Bouton accordeon activant le processus de validation SWI et la selection des valideurs.</li>
+							<br>
+						</ul>
+						<div style="height: 5vh;"></div>
+
+						<div class="accordion-body accordion-bg shadow shadow-inset">
+
+
+							<img src="{{ asset('/TutoImage/FormulaireValidation.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+							Capture d'écran du formulaire d'activation de process de validation SWI
+							<br><br>
+						</div>
+
+
+						<ul>
+							<li class="black-text">A : Bouton d'activation du process de validation ( Actif dans l'illustration ).</li>
+							<li class="black-text">B : Menu deroulant de selection de valideur.</li>
+							<li class="black-text">C : Bouton de validation du formulaire de chargement de fichiers, dans ce contexte il lancera le processus de validation SWI.</li>
+
 							<br>
 						</ul>
 					</div>
@@ -133,6 +184,43 @@
 
 					</div>
 				</div>
+				<div class="accordion-item ">
+					<h4 class="accordion-header" id="headingFifthStep">
+						<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFifthStep" aria-expanded="true" aria-controls="collapseFifthStep">
+							<strong>5. Listes des fichiers chargés et des fichiers validés
+							</strong>
+						</button>
+					</h4>
+					<div id="collapseFifthStep" class="accordion-collapse collapse " aria-labelledby="headingFifthStep" data-bs-parent="#accordionTuto">
+						<div class="accordion-body accordion-bg shadow shadow-inset">
+							<img src="{{ asset('/TutoImage/ListeFichierUpload.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+							Capture d'écran de la liste de tous les fichiers chargés
+							<br>
+						</div>
+						<ul>
+							<li class="black-text">A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.</li>
+							<li class="black-text">B : Emplacement du fichier, cliquer dessus permet l'ouverture des niveaux.</li>
+
+							<li class="black-text">C : Cartouche indiquant, dans l'ordre: le nom du fichier, le nom du chargeur, la révision, le statut de validation, la date de chargement ou de dernière mis à jour, le bouton de modification ( seulement accessible au chargeur ) puis le bouton de suppression du fichier.<br>
+							</li>
+						</ul>
+						<div class="accordion-body accordion-bg shadow shadow-inset">
+							<img src="{{ asset('/TutoImage/ListeFichierValidation.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+							Capture d'écran de la liste des fichiers passés par le processus de validation
+							<br>
+						</div>
+						<ul>
+							<li class="black-text">A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.</li>
+							<li class="black-text">B : Emplacement du fichier, cliquer dessus permet l'ouverture des niveaux..</li>
+
+							<li class="black-text">C : Cartouche indiquant, dans l'ordre: le nom du fichier, la révision, le nom du chargeur, la date de chargement ou mis a jour. En-dessous: la liste des valideurs avec leurs prénoms et noms et la date de leurs validations.<br></li>
+
+						</li>
+					</ul>
+
+				</div>
 			</div>
+
 		</div>
-	{% endblock %}
+	</div>
+{% endblock %}

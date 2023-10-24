@@ -174,10 +174,10 @@ class IncidentController extends FrontController
 
 
     // Create a route to download a file, in more simple terms, to display a file.
-    #[Route('/download_incident/{name}', name: 'incident_download_file')]
-    public function download_file(string $name = null): Response
+    #[Route('/download_incident/{incidentId}', name: 'incident_download_file')]
+    public function download_file(int $incidentId = null): Response
     {
-        $file       = $this->incidentRepository->findOneBy(['name' => $name]);
+        $file       = $this->incidentRepository->findOneBy(['id' => $incidentId]);
         $path       = $file->getPath();
         $file       = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
