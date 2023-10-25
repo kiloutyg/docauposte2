@@ -210,9 +210,6 @@ class ValidationService extends AbstractController
         // Persist the Approbation instance to the database
         $this->em->persist($approbation);
 
-        // Flush changes to the database
-        $this->em->flush($approbation);
-
         // Get the Validation object associated with the Approbation instance
         $validation = $approbation->getValidation();
 
@@ -221,8 +218,9 @@ class ValidationService extends AbstractController
         }
         // Call the approbationCheck method to check if all approbations are approved
         $this->approbationCheck($validation);
-        // No need to return anything
-        return;
+        // Flush changes to the database
+        $this->em->flush($approbation);
+        // No need to return anything       
     }
 
 
