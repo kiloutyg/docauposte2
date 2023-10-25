@@ -209,46 +209,46 @@ class ValidationService extends AbstractController
 
         // Persist the Approbation instance to the database
         $this->em->persist($approbation);
-
+        // Flush changes to the database
+        $this->em->flush($approbation);
         // Get the Validation object associated with the Approbation instance
         $validation = $approbation->getValidation();
 
         if ($approbation->isApproval() === false) {
+            $this->logger->info('validation ID: ', [$validation->getId()]);
             $this->disapprobationEmail($validation);
         }
         // Call the approbationCheck method to check if all approbations are approved
         $this->approbationCheck($validation);
-        // Flush changes to the database
-        $this->em->flush($approbation);
+
         // No need to return anything       
     }
 
 
     public function approbationCheck(Validation $validation)
     {
+        $this->logger->info('approbationCheck');
         // Get the ID of the Validation instance
         $validationId = $validation->getId();
+
         // Create an empty array to store Approbation instances
-        $approbations = [];
-        // Find all Approbation instances associated with the Validation ID
-        $approbations = $this->approbationRepository->findBy(['Validation' => $validationId]);
+
         $status       = null;
-        // Loop through each Approbation instance
-        foreach ($approbations as $approbation) {
-            // If the Approbation is not approved or the Approval property is null
-            if ($approbation->isApproval() === false) {
-                $status = false;
-                $this->updateValidationAndUploadStatus($validation, $status);
-                return;
-            } else if ($approbation->isApproval() === true) {
-                $status = true;
-            } else if ($approbation->isApproval() === null) {
-                $status = null;
-                return;
-            }
+        $ApprobationCount = count($this->approbationRepository->findBy(['Validation' => $validationId]));
+        $NegApprobations = $this->approbationRepository->findBy(['Validation' => $validationId, 'Approval' => false]);
+        $PosApprobations = $this->approbationRepository->findBy(['Validation' => $validationId, 'Approval' => true]);
+        $NoApprobations  = $this->approbationRepository->findBy(['Validation' => $validationId, 'Approval' => null]);
+
+        if ($NegApprobations) {
+            $status = false;
+            $this->updateValidationAndUploadStatus($validation, $status);
+        } elseif ($NoApprobations) {
+            $status = null;
+            return;
+        } elseif (count($PosApprobations) === $ApprobationCount) {
+            $status = true;
+            $this->updateValidationAndUploadStatus($validation, $status);
         }
-        $this->updateValidationAndUploadStatus($validation, $status);
-        return;
     }
 
 

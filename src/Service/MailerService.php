@@ -111,7 +111,6 @@ class MailerService extends AbstractController
             ]);
         try {
             $this->mailer->send($email);
-            return true;
         } catch (TransportExceptionInterface $e) {
             return $e->getMessage();
         }
