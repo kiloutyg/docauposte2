@@ -14,8 +14,6 @@
 		{% if zone is defined and zone is not null %}
 zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
 	</script>
-
-
 	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
 		<div class="card-body ">
 			<div class="row d-flex align-items-center gy-lg-0 gy-5">
@@ -26,9 +24,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 				<h5>Revision n°{{upload.revision}}</h5>
 				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_modifying_file', {'uploadId': upload.id})}) }}
 				<div class="fallback">
-
 					{% if upload.validation is not empty %}
-
 						{% if upload.validated is same as(null)%}
 							<div class=" alert alert-danger mb-1 justify-content-center">
 								<h5>
@@ -36,13 +32,22 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 										Fichier en cours de validation.
 									</strong>
 								</h5>
+								{% if upload.validation.comment is not empty %}
+									Document posté avec le commentaire suivant :
+									<ul>
+										<li>
+											<i>"{{ upload.validation.comment }}"</i>
+										</li>
+									</ul>
+								{% endif %}
 								Les validations en cours:
 								<br>
 								<ul>
 									{% for approbation in upload.validation.approbations %}
 										<li>
-											{{ approbation.userapprobator.username }}
-											{{ approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé' : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}
+											{{approbation.userapprobator.username|capitalize|split('.')|first }}
+											{{approbation.userapprobator.username|upper|split('.')|last }}
+											{{approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé' : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}
 								{% if approbation.comment is not empty %}
 									<ul>
 										<li>{{ approbation.comment }}
@@ -116,7 +121,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 												<div class="col-10 mx-auto">
 													<div class="mb-3">
 														{{ form_label(form.filename, 'Nouveau nom du fichier:', {'label_attr': {'class': 'form-label', 'style': 'color:black'}}) }}
-														{{ form_widget(form.filename, {'attr': {'class': 'form-control', 'id': 'filename', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)'}}) }}
+														{{ form_widget(form.filename, {'attr': {'class': 'form-control', 'id': 'filename', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)', 'maxlength': '30'}}) }}
 													</div>
 													<div
 														style='color:black'>
@@ -182,39 +187,59 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 											</div>
 										</div>
 									</div>
-									<div
-										class="accordion mx-auto col-8 justify-content-center" id="accordionValidator">
-										{# {% if upload.uploadedAt < date('2023-10-19 00:00:00') %} #}
-										<div class="accordion-item ">
-											<div class="accordion-header" id="validatorNeeded-header">
-												<input type="hidden" name="validatorRequired" value="false">
-												<input type="checkbox" class="btn-check" name="validatorRequired" id="validatorRequired" autocomplete="off" value="true">
-												<label class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed" for="validatorRequired" data-bs-toggle="collapse" data-bs-target="#validatorNeeded" aria-expanded="false" aria-controls="validatorNeeded" id="validatorSelect">
-													<strong>Validation du Document</strong>
-													&nbsp; (Ouvrez ce menu pour activer la validation de document, fermez le pour la désactiver)</label>
-											</div>
-											<div id="validatorNeeded" aria-labelledby="validatorNeeded" data-bs-parent="#accordionValidator" class="accordion-collapse collapse ">
-												<div class="accordion-body row ">
-													<div class="col-md-2 col-sm-2 mt-2 mb-2">
-														<label for="validator_user" style="color:black">Valideur:</label>
+									{% if upload.validation is null %}
+										<div class="accordion mx-auto col-8 justify-content-center" id="accordionValidator">
+											<div class="accordion-item ">
+												<div class="accordion-header" id="validatorNeeded-header">
+													<input type="hidden" name="validatorRequired" value="false">
+													<input type="checkbox" class="btn-check" name="validatorRequired" id="validatorRequired" autocomplete="off" value="true">
+													<label class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed" for="validatorRequired" data-bs-toggle="collapse" data-bs-target="#validatorNeeded" aria-expanded="false" aria-controls="validatorNeeded" id="validatorSelect">
+														<strong>Validation du Document</strong>
+														&nbsp; (Ouvrez ce menu pour activer la validation de document, fermez le pour la désactiver)</label>
+												</div>
+												<div id="validatorNeeded" aria-labelledby="validatorNeeded" data-bs-parent="#accordionValidator" class="accordion-collapse collapse ">
+													<div class="accordion-body row ">
+														<div class="col-md-2 col-sm-2 mt-2 mb-2">
+															<label for="validator_user" style="color:black">Valideur:</label>
+														</div>
+														<div id="usersContainer" class="col-md-10 col-sm-10 mt-2 mb-2">
+															<select class="form-select userSelect" name="validator_user" id="validator_user"></select>
+														</div>
 													</div>
-													<div id="usersContainer" class="col-md-10 col-sm-10 mt-2 mb-2">
-														<select class="form-select userSelect" name="validator_user" id="validator_user"></select>
+													<div class="d-grid col-8 mt-2 mb-2 mx-auto">
+														<div class="input-group  justify-content-center">
+															<div class="input-group-prepend">
+																<span class="input-group-text">Commentaire</span>
+																<textarea class="form-control" name="modificationComment" aria-label="With textarea" rows="2" cols="50"></textarea>
+															</div>
+														</div>
 													</div>
-													{# <div class="col-md-2 col-sm-2 mt-2 mb-2">
-																																																								<label for="validator_department" style="color:black">Service Valideur:</label>
-																																																							</div>
-																																									
-																																																							<div id="departmentsContainer" class="col-md-10 col-sm-10 mt-2 mb-2">
-																																																								<select class="form-select departmentSelect" name="validator_department" id="validator_department"></select>
-																																																							</div> #}
 												</div>
 											</div>
 										</div>
-										{# {% endif %} #}
-									</div>
-									{% if upload.validation is not empty %}
-										<div class="d-grid col-8 mt-2 mx-auto">
+									{% else %}
+										<div class="accordion mx-auto col-8 justify-content-center" id="accordionValidator">
+											<div class="accordion-item ">
+												<div class="accordion-header" id="validatorNeeded-header">
+													<input type="hidden" name="validatorRequired" value="false">
+													<input type="checkbox" class="btn-check" name="validatorRequired" id="validatorRequired" autocomplete="off" value="true">
+													<label class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed" for="validatorRequired" data-bs-toggle="collapse" data-bs-target="#validatorNeeded" aria-expanded="false" aria-controls="validatorNeeded" id="validatorSelect">
+														<strong>Validation du Document</strong>
+														&nbsp; (Ouvrez ce menu pour activer la validation de document, fermez le pour la désactiver)</label>
+												</div>
+												<div id="validatorNeeded" aria-labelledby="validatorNeeded" data-bs-parent="#accordionValidator" class="accordion-collapse collapse ">
+													<div class="accordion-body row ">
+														<div class="col-md-2 col-sm-2 mt-2 mb-2">
+															<label for="validator_user" style="color:black">Valideur:</label>
+														</div>
+														<div id="usersContainer" class="col-md-10 col-sm-10 mt-2 mb-2">
+															<select class="form-select userSelect" name="validator_user" id="validator_user"></select>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="d-grid col-8 mt-2 mb-2 mx-auto">
 											<div class="input-group  justify-content-center">
 												<div class="input-group-prepend">
 													<span class="input-group-text">Commentaire</span>

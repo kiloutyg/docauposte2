@@ -73,7 +73,7 @@ class ValidationService extends AbstractController
                 $validator_department_values[] = $request->request->get($key);
             }
         }
-
+        $this->logger->info('comment in ValidationService:', ['full_request' => $request->request->all()]);
 
         // Create a new Validation instance
         $validation = new Validation();
@@ -84,11 +84,18 @@ class ValidationService extends AbstractController
         // Set the status of the Validation instance to false
         $validation->setStatus(null);
 
-        // Store the comment in a variable
-        $comment = $request->request->get('modificationComment');
-        // If the user added a comment persist the comment 
-        $validation->setComment($comment);
-
+        if ($request->request->get('ValidationComment') !== null) {
+            // Store the comment in a variable
+            $comment = $request->request->get('ValidationComment');
+            // If the user added a comment persist the comment 
+            $validation->setComment($comment);
+        }
+        if ($request->request->get('modificationComment') !== null) {
+            // Store the comment in a variable
+            $comment = $request->request->get('modificationComment');
+            // If the user added a comment persist the comment 
+            $validation->setComment($comment);
+        }
         // Persist the Validation instance to the database
         $this->em->persist($validation);
 
@@ -112,7 +119,6 @@ class ValidationService extends AbstractController
             );
             $validator_user = null;
         }
-
         $validator_department = null;
 
         // Loop through each validator_department value
@@ -126,9 +132,6 @@ class ValidationService extends AbstractController
             );
             $validator_department = null;
         }
-
-
-
         // Send a notification email to the validator
         $this->approbationEmail($validation);
 

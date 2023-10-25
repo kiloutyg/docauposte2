@@ -68,17 +68,17 @@ class UploadService extends AbstractController
             // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
             if ($request->request->get('validatorRequired') == 'true') {
                 foreach ($request->request->keys() as $key) {
-                    if (strpos($key, 'validator_department') !== false) {
+                    // if (strpos($key, 'validator_department') !== false) {
+                    //     $validated = null;
+                    // } else
+                    if (strpos($key, 'validator_user') !== false) {
                         $validated = null;
-                    } elseif (strpos($key, 'validator_user') !== false) {
-                        $validated = null;
-                    } else {
-                        $validated = true;
                     }
                 }
             } else {
                 $validated = true;
             };
+            $this->logger->info('Logging the validator liked stuff: ', ['validated value: ' . $validated]);
             // Dynamic folder creation and file upload
             // Get the name of the button
             $buttonname = $button->getName();
@@ -145,6 +145,7 @@ class UploadService extends AbstractController
 
         // Save the changes to the database
         $this->manager->flush();
+        $this->logger->info('uploadFile UploadService Logging the full request in uploadService:', ['full_request' => $request->request->all()]);
 
         $uploadEntity = $this->uploadRepository->findOneBy(['filename' => $filename, 'button' => $button]);
         if ($validated === null) {
@@ -212,18 +213,14 @@ class UploadService extends AbstractController
 
         $comment = $request->request->get('modificationComment');
 
-        $this->logger->info('commentaire service', [$comment]);
+        $this->logger->info('modifyFile UploadService commentaire service', [$comment]);
 
         ////////////// Part mainly important for the introduction of the validation process in the production environment
         // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
         if ($request->request->get('validatorRequired') == 'true') {
             foreach ($request->request->keys() as $key) {
-                if (strpos($key, 'validator_department') !== false) {
+                if (strpos($key, 'validator_user') !== false) {
                     $validated = null;
-                } elseif (strpos($key, 'validator_user') !== false) {
-                    $validated = null;
-                } else {
-                    $validated = true;
                 }
             }
             // Retire the old file

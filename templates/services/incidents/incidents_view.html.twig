@@ -11,11 +11,8 @@
 		<div style="width: 17%" class="text-center">
 
 			<h1 style="text-align: center;">
-				<strong>{{incident.name|split('.')|first|upper}}</strong>
+				<strong>{{incidentCategory.name|split('.')|first|upper}}</strong>
 			</h1>
-			<h3>
-				{{incidentCategory.name|split('.')|first|upper}}
-			</h3>
 			<div style="height: 40vh;"></div>
 			<a href="{{ path('app_mandatory_incident', {'incidentid': nextIncidentId, 'zone' : zone , 'productline' : productline})}}" class="btn btn-warning btn-lg">
 				<strong>Ok, J'ai compris</strong>

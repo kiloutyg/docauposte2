@@ -45,6 +45,8 @@ class UploadController extends FrontController
     #[Route('/uploading', name: 'generic_upload_files')]
     public function generic_upload_files(Request $request): Response
     {
+        $this->logger->info('Logging the full request in the uploadController:', ['full_request' => $request->request->all()]);
+
         // Get the URL of the page from which the request originated
         $originUrl = $request->headers->get('Referer');
         // Retrieve the User object
@@ -179,37 +181,16 @@ class UploadController extends FrontController
     #[Route('/modifying/{uploadId}', name: 'modifying_file')]
     public function modifying_file(Request $request, int $uploadId): Response
     {
-
         // Retrieve the current upload entity based on the uploadId
         $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
-        $button      = $upload->getButton();
-        $category    = $button->getCategory();
-        $productLine = $category->getProductLine();
-        $zone        = $productLine->getZone();
         $oldFileName = $upload->getFilename();
 
         // Create a form to modify the Upload entity
         $form = $this->createForm(UploadType::class, $upload);
 
-        $this->logger->info('Logging the full request at the modifying controller:', ['full_request' => $request->request->all()]);
-
-        // Retrieve the origin URL
-        $refererUrl = $request->headers->get('Referer');
-        // $originUrl = $request->headers->get('Referer');
-
-        // Getting the current URL
-        $currentUrl = $request->getSchemeAndHttpHost() . $request->getRequestUri();
-
         // Retrieve the User object
         $user = $this->getUser();
 
-        if ($currentUrl === $refererUrl) {
-            // The current URL is the same as the referer URL
-            $originUrl = $request->headers->get('Origin');
-        } else {
-            // They are different
-            $originUrl = $refererUrl;
-        }
         // Check if there is a file to modify
         if (!$upload) {
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
@@ -218,31 +199,24 @@ class UploadController extends FrontController
             ]);
         }
         $comment = $request->request->get('modificationComment');
-        $this->logger->info('commentaire controlleur', [$comment]);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
-                if ($upload->getValidation() != null) {
-                    if ($comment == null && $comment == "") {
-                        $this->addFlash('error', 'Le commentaire est vide.');
-                        return $this->redirectToRoute('app_modify_file', [
-                            'uploadId' => $uploadId
-                        ]);
-                    }
+                if ($upload->getFile() && $upload->getValidation() != null && $comment == null && $comment == "") {
+                    $this->addFlash('error', 'Le commentaire est vide. Commenter votre modification est obligatoire.');
+                    return $this->redirectToRoute('app_modify_file', [
+                        'uploadId' => $uploadId
+                    ]);
                 }
                 $this->uploadService->modifyFile($upload, $user, $request, $oldFileName);
-                $this->logger->info('Logging the full request in the post submitted and valid but without error:', ['full_request' => $request->request->all()]);
-
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirectToRoute('app_modify_file', [
                     'uploadId' => $uploadId
                 ]);
             } catch (\Exception $e) {
-                $this->logger->info('Logging the full request in the post submitted and valid but with error:', ['full_request' => $request->request->all()]);
-
                 $this->addFlash('error', $e->getMessage());
                 return $this->redirectToRoute('app_modify_file', [
                     'uploadId' => $uploadId
@@ -252,8 +226,6 @@ class UploadController extends FrontController
         // Convert the errors to an array
         if ($form->isSubmitted() && !$form->isValid()) {
             // Return the errors in the JSON response
-            $this->logger->info('Logging the full request in the post submitted and not valid:', ['full_request' => $request->request->all()]);
-
             $this->addFlash('error', 'Invalid form. Check the entered data.');
             return $this->redirectToRoute('app_modify_file', [
                 'uploadId' => $uploadId
