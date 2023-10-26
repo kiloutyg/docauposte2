@@ -265,7 +265,6 @@ sg docker -c "
     then
         GIT_ADDRESS="https://github.com/polangres/docauposte2"
     fi
-echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
 # Clone the git repository and run the env_create.sh script
     git clone ${GIT_ADDRESS};
