@@ -11,11 +11,11 @@ use App\Controller\UploadController;
 // This controller manage the logic of the front interface, it is the main controller of the application and is responsible for rendering the front interface.
 // It is also responsible for creating the super-admin account.
 
-#[Route('/', name: 'app_')]
+#[Route('/docauposte', name: 'app_')]
 class FrontController extends BaseController
 {
     // Render the base page
-    #[Route('/', name: 'base')]
+    #[Route('/docauposte', name: 'base')]
     public function base(): Response
     {
 
