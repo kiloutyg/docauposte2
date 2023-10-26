@@ -51,7 +51,7 @@ use App\Service\OldUploadService;
 use App\Service\ViewsModificationService;
 
 
-#[Route('/docauposte', name: 'app_')]
+#[Route('/', name: 'app_')]
 
 # This controller is extended to make it easier to access routes
 
