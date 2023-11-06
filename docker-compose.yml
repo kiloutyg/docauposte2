@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  databasedocauposte2:
+  database:
     image: mariadb:latest
     restart: unless-stopped
     environment:
@@ -15,11 +15,11 @@ services:
     networks:
       vpcbr:
         ipv4_address: 172.21.0.2
-  phpmyadmindocauposte2:
+  phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: unless-stopped
     environment:
-      PMA_HOST: databasedocauposte2
+      PMA_HOST: database
     volumes:
       - ./config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
     ports:
@@ -28,7 +28,7 @@ services:
       vpcbr:
         ipv4_address: 172.21.0.3
     depends_on:
-      - databasedocauposte2
+      - database
 networks:
   vpcbr:
     driver: bridge
