@@ -49,7 +49,7 @@ function populateDropdown(dropdown, data, selectedId) {
 
 // // Event listener to fetch user data and initialize cascading dropdowns
 document.addEventListener("turbo:load", function () {
-  fetch("/api/user_data")
+  fetch('/api/user_data')
     .then((response) => response.json())
     .then((data) => {
       usersData = data.users;
@@ -260,25 +260,50 @@ document.addEventListener("turbo:load", function () {
 });
 
 
-// Methods use to force the user to add a comment to the form in case of specific event, here the upload of a file
+// This code is listening for the "turbo:load" event on the document object
 document.addEventListener("turbo:load", function () {
-  // Get the radio button and the textarea
+
+  // This code selects the file input element with the id 'upload_file' and assigns it to the variable fileInput
   const fileInput = document.getElementById('upload_file');
+
+  // This code selects the textarea element with the name 'modificationComment' and assigns it to the variable textareaComment
   const textareaComment = document.querySelector('textarea[name="modificationComment"]');
-  // Listen for changes on the radio button
-  if (fileInput && textareaComment) {
-    console.log(textareaComment);
-    fileInput.addEventListener('change', function () {
-      if (this.files && this.files.length > 0) {
-        // Make the textarea required if a file has been selected
-        textareaComment.required = true;
-        console.log('required');
-      } else {
-        // Remove the 'required' attribute when "upload_file" is empty
-        textareaComment.required = false;
-        console.log('not required');
-      }
-    });
+
+  // This code selects the checkbox input element with the id 'validatorRequired' and assigns it to the variable validatorCheckbox
+  const validatorCheckbox = document.getElementById('validatorRequired');
+
+  // This is a function that will be used later to determine if the textarea should be required or not
+  function updateTextareaRequirement() {
+
+    // Check if there are any files selected in the file input and if the validator checkbox is checked
+    if (fileInput.files.length > 0 && validatorCheckbox.checked) {
+
+      // If both conditions are true, set the 'required' attribute of the textarea to true
+      textareaComment.required = true;
+
+      // Log a message to the console indicating that the textarea is now required
+      console.log('Textarea is now required');
+    } else {
+
+      // If either condition is false, set the 'required' attribute of the textarea to false
+      textareaComment.required = false;
+
+      // Log a message to the console indicating that the textarea is not required
+      console.log('Textarea is not required');
+    }
   }
 
+  // Check if the validator checkbox is present on the page
+  if (validatorCheckbox) {
+
+    // If it is, add an event listener to listen for changes on the checkbox and call the updateTextareaRequirement function
+    validatorCheckbox.addEventListener('change', updateTextareaRequirement);
+  }
+
+  // Check if both the file input and textarea are present on the page
+  if (fileInput && textareaComment) {
+
+    // If they are, add an event listener to listen for changes on the file input and call the updateTextareaRequirement function
+    fileInput.addEventListener('change', updateTextareaRequirement);
+  }
 });
