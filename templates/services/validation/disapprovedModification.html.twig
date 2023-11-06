@@ -25,6 +25,26 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 
 	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
 		<div class="card-body ">
+			{% if DisapprovedFile|length > 5 %}
+				{% if app.user %}
+					{% if  is_granted('ROLE_LINE_ADMIN') %}
+						<aside class="position-absolute end-0">
+							<a href="{{ path('app_productline_admin', {productline: upload.button.category.productline.name}) }}" class="btn shadow  bg-dark " style="color:white">
+								<span class="fa fa-gear"></span>
+								<strong>
+									<span class="button-text">Centre d'Administration de la ligne
+										{{upload.button.category.productline.name|split('.')|first|upper}}
+										de la zone
+										{{upload.button.category.productline.zone.name|split('.')|first|upper}}</span>
+
+
+								</strong>
+							</a>
+						</aside>
+					{% endif %}
+				{% endif %}
+			{% endif %}
+
 			<div class="row d-flex align-items-center gy-lg-0 gy-5">
 				<p class="text-white m-0">
 					<h3 style="color:white">
@@ -33,6 +53,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						:
 					</h3>
 				</p>
+
 				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyDisapprovedForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_validation_disapproved_modify', {'approbationId': approbation.id})}) }}
 
 				<div class="fallback">
