@@ -45,8 +45,6 @@ class UploadController extends FrontController
     #[Route('/uploading', name: 'generic_upload_files')]
     public function generic_upload_files(Request $request): Response
     {
-        $this->logger->info('Logging the full request in the uploadController:', ['full_request' => $request->request->all()]);
-
         // Get the URL of the page from which the request originated
         $originUrl = $request->headers->get('Referer');
         // Retrieve the User object

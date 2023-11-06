@@ -5,12 +5,40 @@
 {% endblock %}
 
 {% block body %}
-	<script>
-		let zoneIdFromServer = null;
-let productLineIdFromServer = null;
-let categoryIdFromServer = null;
-let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
-	</script>
+
+
+	{% if zoneIdFromServer is not defined %}
+		{% if zone is defined and zone is not null %}
+			<script>
+				zoneIdFromServer = parseInt('{{ zone.getId() }}')
+			</script>
+		{% endif %}
+	{% endif %}
+
+	{% if productLineIdFromServer is not defined %}
+		{% if productLine is defined and productLine is not null %}
+			<script>
+				productLineIdFromServer = parseInt('{{ productLine.getId() }}')
+			</script>
+		{% endif %}
+	{% endif %}
+
+	{% if categoryIdFromServer is not defined %}
+		{% if category is defined and category is not null %}
+			<script>
+				categoryIdFromServer = parseInt('{{ category.getId() }}')
+			</script>
+		{% endif %}
+	{% endif %}
+
+	{% if buttonIdFromServer is not defined %}
+		{% if button is defined and button is not null %}
+			<script>
+				buttonIdFromServer = parseInt('{{ button.getId() }}')
+			</script>
+		{% endif %}
+	{% endif %}
+
 
 	<h1 class="my-4">
 		<strong>Page d'administration de la catégorie
@@ -195,7 +223,7 @@ let buttonIdFromServer = null;{% if zone is defined and zone is not null %}zoneI
 				</div>
 			</div>
 		</div>
-		
+
 	{% endif %}
 
 {% endblock %}

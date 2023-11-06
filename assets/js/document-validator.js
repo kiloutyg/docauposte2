@@ -28,7 +28,13 @@ function populateDropdown(dropdown, data, selectedId) {
   data.forEach((item) => {
     const option = document.createElement("option");
     option.value = item.id;
-    option.textContent = item.username;
+
+    let nameParts = item.username.split(".");
+    nameParts[0] = nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
+    nameParts[1] = nameParts[1].toUpperCase();
+    userName = nameParts.join(" ");
+    console.log(userName);
+    option.textContent = userName;
 
     // If this option should be selected, set the 'selected' attribute
     if (item.id === selectedId) {
@@ -165,28 +171,21 @@ function createNewSelect(selectedValue, selectId) {
 function createSelectElement() {
   // Create a new select element
   var newSelect = document.createElement('select');
-
   // Add classes to the new select element
   newSelect.classList.add('mt-2', 'mb-2', 'form-select', 'userSelect');
-
   // Generate a unique id for the new select element
   var newSelectId = "validator_user" + document.querySelectorAll('.userSelect').length;
-
   // Set the id and name attributes of the new select element
   newSelect.id = newSelectId;
   newSelect.name = newSelectId;
-
   // Create a default option for the new select element
   const defaultOption = document.createElement('option');
   defaultOption.value = '';
   defaultOption.textContent = 'Selectionner un autre Valideur';
-
   // Append the default option to the new select element
   newSelect.appendChild(defaultOption);
-
   // Get all the selected options from other select elements
   var selectedOptions = Array.from(document.querySelectorAll('.userSelect')).map(sel => parseInt(sel.value));
-
   // Iterate over each user in the usersData array
   usersData.forEach(function (user) {
     // Check if the user has not been selected yet
@@ -194,7 +193,12 @@ function createSelectElement() {
       // Create a new option for the new select element
       const newOption = document.createElement('option');
       newOption.value = user.id;
-      newOption.textContent = user.username;
+      let nameParts = user.username.split(".");
+      nameParts[0] = nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
+      nameParts[1] = nameParts[1].toUpperCase();
+      userName = nameParts.join(" ");
+      console.log(userName);
+      newOption.textContent = userName;
 
       // Append the new option to the new select element
       newSelect.appendChild(newOption);
@@ -263,9 +267,15 @@ document.addEventListener("turbo:load", function () {
 // This code is listening for the "turbo:load" event on the document object
 document.addEventListener("turbo:load", function () {
   // This code selects the file input element with the id 'upload_file' and assigns it to the variable fileInput
-  const fileInput = document.getElementById('upload_file');
+  let fileInput = document.getElementById('upload_file');
+  if (!fileInput) {
+    fileInput = document.getElementById('file');
+  }
   // This code selects the textarea element with the name 'modificationComment' and assigns it to the variable textareaComment
-  const textareaComment = document.querySelector('textarea[name="modificationComment"]');
+  let textareaComment = document.querySelector('textarea[name="modificationComment"]');
+  if (!textareaComment) {
+    textareaComment = document.querySelector('textarea[name="validationComment"]');
+  }
   // This code selects the checkbox input element with the id 'validatorRequired' and assigns it to the variable validatorCheckbox
   const validatorCheckbox = document.getElementById('validatorRequired');
   // This is a function that will be used later to determine if the textarea should be required or not
@@ -283,6 +293,7 @@ document.addEventListener("turbo:load", function () {
       console.log('Textarea is not required');
     }
   }
+
   // Check if the validator checkbox is present on the page
   if (validatorCheckbox) {
     // If it is, add an event listener to listen for changes on the checkbox and call the updateTextareaRequirement function

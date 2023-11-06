@@ -84,9 +84,9 @@ class ValidationService extends AbstractController
         // Set the status of the Validation instance to false
         $validation->setStatus(null);
 
-        if ($request->request->get('ValidationComment') !== null) {
+        if ($request->request->get('validationComment') !== null) {
             // Store the comment in a variable
-            $comment = $request->request->get('ValidationComment');
+            $comment = $request->request->get('validationComment');
             // If the user added a comment persist the comment 
             $validation->setComment($comment);
         }
