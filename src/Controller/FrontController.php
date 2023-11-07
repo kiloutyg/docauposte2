@@ -19,7 +19,9 @@ class FrontController extends BaseController
     public function base(): Response
     {
         return $this->render(
-            'base.html.twig'
+            'base.html.twig',
+            ['user' => $this->getUser()]
+
         );
     }
 

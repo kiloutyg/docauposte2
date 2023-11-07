@@ -59,8 +59,6 @@ security:
 
         - { path: ^/category_manager, roles: ROLE_MANAGER }
         - { path: ^/tutorial, roles: ROLE_MANAGER }
-        - { path: ^/api, roles: ROLE_MANAGER }
-
 
 
 when@test:
