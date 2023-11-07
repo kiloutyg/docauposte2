@@ -86,6 +86,7 @@ class SuperAdminController extends FrontController
                 $zone = new Zone();
                 $zone->setName($zonename);
                 $zone->setSortOrder($sortOrder);
+                $zone->setCreator($this->getUser());
                 $this->em->persist($zone);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($zonename);
