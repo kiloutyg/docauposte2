@@ -94,6 +94,7 @@ class ZoneAdminController extends FrontController
                 $productline->setName($productlinename);
                 $productline->setZone($zone);
                 $productline->setSortOrder($sortOrder);
+                $productline->setProductLineCreator($this->getUser());
                 $this->em->persist($productline);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($productlinename);

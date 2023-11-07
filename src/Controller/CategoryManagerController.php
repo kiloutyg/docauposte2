@@ -117,6 +117,7 @@ class CategoryManagerController extends FrontController
                 $button->setName($buttonname);
                 $button->setCategory($categoryentity);
                 $button->setSortOrder($sortOrder);
+                $button->setButtonCreator($this->getUser());
                 $this->em->persist($button);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($buttonname);

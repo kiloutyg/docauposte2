@@ -80,7 +80,8 @@
 																							Sans validation |
 																						{% endif %}
 																						{{ upload.uploadedAt|date('d/m/Y') }}
-																						{% if app.user is same as(upload.uploader) or (upload.uploader) is empty %}
+																						{% if app.user is same as(upload.uploader) or (upload.uploader) is empty or is_granted
+																						('ROLE_SUPER_ADMIN')  %}
 																							<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify shadow ">
 																								Modifier
 																							</a>

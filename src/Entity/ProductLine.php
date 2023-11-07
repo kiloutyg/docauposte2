@@ -38,6 +38,9 @@ class ProductLine
     #[ORM\Column(nullable: true)]
     private ?int $SortOrder = null;
 
+    #[ORM\ManyToOne(inversedBy: 'productLines')]
+    private ?User $Creator = null;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -143,6 +146,18 @@ class ProductLine
     public function setSortOrder(?int $SortOrder): static
     {
         $this->SortOrder = $SortOrder;
+
+        return $this;
+    }
+
+    public function getCreator(): ?User
+    {
+        return $this->Creator;
+    }
+
+    public function setCreator(?User $Creator): static
+    {
+        $this->Creator = $Creator;
 
         return $this;
     }

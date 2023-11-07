@@ -50,6 +50,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?bool $blocked = null;
 
+    #[ORM\OneToMany(mappedBy: 'Creator', targetEntity: Zone::class)]
+    private Collection $zones;
+
+    #[ORM\OneToMany(mappedBy: 'Creator', targetEntity: ProductLine::class)]
+    private Collection $productLines;
+
+    #[ORM\OneToMany(mappedBy: 'Creator', targetEntity: Category::class)]
+    private Collection $categories;
+
+    #[ORM\OneToMany(mappedBy: 'Creator', targetEntity: Button::class)]
+    private Collection $buttons;
+
 
     public function __construct()
     {
@@ -57,6 +69,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->olduploads = new ArrayCollection();
         $this->incidents = new ArrayCollection();
         $this->approbations = new ArrayCollection();
+        $this->zones = new ArrayCollection();
+        $this->productLines = new ArrayCollection();
+        $this->categories = new ArrayCollection();
+        $this->buttons = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -283,6 +299,126 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setBlocked(?bool $blocked): static
     {
         $this->blocked = $blocked;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Zone>
+     */
+    public function getZones(): Collection
+    {
+        return $this->zones;
+    }
+
+    public function addZone(Zone $zone): static
+    {
+        if (!$this->zones->contains($zone)) {
+            $this->zones->add($zone);
+            $zone->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeZone(Zone $zone): static
+    {
+        if ($this->zones->removeElement($zone)) {
+            // set the owning side to null (unless already changed)
+            if ($zone->getCreator() === $this) {
+                $zone->setCreator(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductLine>
+     */
+    public function getProductLines(): Collection
+    {
+        return $this->productLines;
+    }
+
+    public function addProductLine(ProductLine $productLine): static
+    {
+        if (!$this->productLines->contains($productLine)) {
+            $this->productLines->add($productLine);
+            $productLine->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductLine(ProductLine $productLine): static
+    {
+        if ($this->productLines->removeElement($productLine)) {
+            // set the owning side to null (unless already changed)
+            if ($productLine->getCreator() === $this) {
+                $productLine->setCreator(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Category>
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    public function addCategory(Category $category): static
+    {
+        if (!$this->categories->contains($category)) {
+            $this->categories->add($category);
+            $category->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(Category $category): static
+    {
+        if ($this->categories->removeElement($category)) {
+            // set the owning side to null (unless already changed)
+            if ($category->getCreator() === $this) {
+                $category->setCreator(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Button>
+     */
+    public function getButtons(): Collection
+    {
+        return $this->buttons;
+    }
+
+    public function addButton(Button $button): static
+    {
+        if (!$this->buttons->contains($button)) {
+            $this->buttons->add($button);
+            $button->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeButton(Button $button): static
+    {
+        if ($this->buttons->removeElement($button)) {
+            // set the owning side to null (unless already changed)
+            if ($button->getCreator() === $this) {
+                $button->setCreator(null);
+            }
+        }
 
         return $this;
     }

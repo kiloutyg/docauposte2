@@ -155,7 +155,7 @@ class UploadController extends FrontController
         $currentUser = $this->security->getUser();
         $uploader = $upload->getUploader();
         // If it's a GET request, render the form
-        if ($request->isMethod('GET') && ($currentUser === $uploader || $uploader === null)) {
+        if ($request->isMethod('GET') && ($currentUser === $uploader || $uploader === null || $currentUser->getRoles() === ["ROLE_SUPER_ADMIN"])) {
             $this->logger->info('Logging the full request in the if get of the controller:', ['full_request' => $request->request->all()]);
             return $this->render('services/uploads/uploads_modification.html.twig', [
                 'form'        => $form->createView(),

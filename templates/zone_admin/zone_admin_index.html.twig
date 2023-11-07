@@ -93,9 +93,15 @@
 																	-
 																	{{ productLine.name|split('.')|first|upper}}
 																</a>
-																<a href="{{path('app_zone_admin_delete_productline', {productline: productLine.name})}}" class="btn btn-danger delete-productline">
-																	Supprimer
-																</a>
+
+
+																{% if is_granted ('ROLE_SUPER_ADMIN') or app.user is same as( productLine.ProductLineCreator) %}
+
+
+																	<a href="{{path('app_zone_admin_delete_productline', {productline: productLine.name})}}" class="btn btn-danger delete-productline">
+																		Supprimer
+																	</a>
+																{% endif %}
 															</li>
 														{% else %}
 															<li class="alert alert-danger">

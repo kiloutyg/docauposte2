@@ -33,7 +33,6 @@ function populateDropdown(dropdown, data, selectedId) {
     nameParts[0] = nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
     nameParts[1] = nameParts[1].toUpperCase();
     userName = nameParts.join(" ");
-    console.log(userName);
     option.textContent = userName;
 
     // If this option should be selected, set the 'selected' attribute
@@ -197,7 +196,6 @@ function createSelectElement() {
       nameParts[0] = nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
       nameParts[1] = nameParts[1].toUpperCase();
       userName = nameParts.join(" ");
-      console.log(userName);
       newOption.textContent = userName;
 
       // Append the new option to the new select element
@@ -236,8 +234,6 @@ document.addEventListener("turbo:load", function () {
 
   // Check if both elements exist before proceeding
   if (radioDisapprove && textareaComment) {
-    console.log(textareaComment);
-
     // Listen for changes on the radio button
     radioDisapprove.addEventListener('change', function () {
       if (this.checked) {
