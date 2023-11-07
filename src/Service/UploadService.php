@@ -292,10 +292,15 @@ class UploadService extends AbstractController
 
         // Group uploads by zone, productLine, category, and button
         foreach ($uploads as $upload) {
-            $zoneName        = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
-            $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
-            $categoryName    = $upload->getButton()->getCategory()->getName();
-            $buttonName      = $upload->getButton()->getName();
+            $button = $upload->getButton();
+            $category = $button->getCategory();
+            $productLine = $category->getProductLine();
+            $zone = $productLine->getZone();
+
+            $zoneName        = $zone->getName();
+            $productLineName = $productLine->getName();
+            $categoryName    = $category->getName();
+            $buttonName      = $button->getname();
 
             if (!isset($groupedUploads[$zoneName])) {
                 $groupedUploads[$zoneName] = [];
@@ -325,10 +330,15 @@ class UploadService extends AbstractController
 
             if ($upload->getValidation()) {
 
-                $zoneName        = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
-                $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
-                $categoryName    = $upload->getButton()->getCategory()->getName();
-                $buttonName      = $upload->getButton()->getName();
+                $button = $upload->getButton();
+                $category = $button->getCategory();
+                $productLine = $category->getProductLine();
+                $zone = $productLine->getZone();
+
+                $zoneName        = $zone->getName();
+                $productLineName = $productLine->getName();
+                $categoryName    = $category->getName();
+                $buttonName      = $button->getname();
 
                 if (!isset($groupedValidatedUploads[$zoneName])) {
                     $groupedValidatedUploads[$zoneName] = [];

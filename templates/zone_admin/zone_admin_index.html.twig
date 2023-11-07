@@ -38,7 +38,6 @@
 		{% endif %}
 	{% endif %}
 
-
 	<h1 class="my-4">
 		<strong>Page d'administration des Lignes de la Zone
 			{{zone.name|split('.')|first|upper}}</strong>
@@ -86,18 +85,13 @@
 															{{zone.name|split('.')|first|upper}}:</strong>
 													</h5>
 													<ul class="list-unstyled">
-														{% set matchingProductLines = productLines|filter(productLine => productLine.zone.id is same as(zone.id)) %}
-														{% for productLine in matchingProductLines %}
+														{% for productLine in zone.productLines %}
 															<li class="form-control d-flex justify-content-between align-items-center mb-2">
 																<a href="{{path('app_productline_admin', {productline: productLine.name})}}" class="btn btn-link">
 																	-
 																	{{ productLine.name|split('.')|first|upper}}
 																</a>
-
-
-																{% if is_granted ('ROLE_SUPER_ADMIN') or app.user is same as( productLine.ProductLineCreator) %}
-
-
+																{% if is_granted ('ROLE_SUPER_ADMIN') or app.user is same as( productLine.creator) %}
 																	<a href="{{path('app_zone_admin_delete_productline', {productline: productLine.name})}}" class="btn btn-danger delete-productline">
 																		Supprimer
 																	</a>
@@ -120,29 +114,6 @@
 				</div>
 			</div>
 		</div>
-		{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
-			<div class="accordion-item">
-
-				<h2 class="accordion-header" id="headingAccountcreation">
-					<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAccountcreation" aria-expanded="false" aria-controls="collapseAccountcreation">
-						<strong>Formulaire de création de compte utilisateur :</strong>
-					</button>
-				</h2>
-				<div id="collapseAccountcreation" class="accordion-collapse collapse" aria-labelledby="headingAccountcreation" data-bs-parent="#accordionAdmin">
-					<div class="accordion-body accordion-bg shadow shadow-inset">
-						<div class="card border-0 shadow rounded-3 my-5">
-							<div class="card-body">
-								<div class="row">
-									<form method="POST" action="{{ path('app_zone_admin_create_line_admin', {zone: zone.name}) }}">
-										{% include "services/accountservices/create_account.html.twig" %}
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		{% endif %}
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="headingUpload">
 				<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUpload" aria-expanded="false" aria-controls="collapseUpload">
@@ -154,7 +125,6 @@
 					<div class="card border-0 shadow rounded-3 my-5">
 						<div class="card-body">
 							<div class="row">
-
 								<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
 									{% include "services/uploads/upload.html.twig" %}
 								</form>

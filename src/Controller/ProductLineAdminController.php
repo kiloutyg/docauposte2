@@ -39,11 +39,11 @@ class ProductLineAdminController extends FrontController
 
 
         return $this->render('productline_admin/productline_admin.html.twig', [
-            'groupedUploads'    => $groupedUploads,
+            'groupedUploads'            => $groupedUploads,
             'groupedValidatedUploads'   => $groupedValidatedUploads,
-            'groupincidents'    => $groupIncidents,
-            'zone'              => $zone,
-            'productLine'       => $productLine
+            'groupincidents'            => $groupIncidents,
+            'zone'                      => $zone,
+            'productLine'               => $productLine
         ]);
     }
 
@@ -87,10 +87,6 @@ class ProductLineAdminController extends FrontController
             // Handle the case when category name contains disallowed characters
             $this->addFlash('danger', 'Nom de catégorie invalide');
             return $this->redirectToRoute('app_productline_admin', [
-                'controller_name'   => 'LineAdminController',
-                'zone'              => $zone,
-                'name'              => $zone->getName(),
-                'productLine'       => $productLine,
                 'productline'       => $productLine->getName(),
             ]);
         } else {
@@ -118,7 +114,7 @@ class ProductLineAdminController extends FrontController
                 $category->setName($categoryname);
                 $category->setProductLine($productLine);
                 $category->setSortOrder($sortOrder);
-                $category->setCategoryCreator($this->getUser());
+                $category->setCreator($this->getUser());
                 $this->em->persist($category);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($categoryname);
