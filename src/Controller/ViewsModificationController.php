@@ -15,9 +15,7 @@ class ViewsModificationController extends FrontController
     public function baseViewModificationPageView(): Response
     {
 
-        return $this->render('services/views_modification/base_views_modification.html.twig', [
-            'controller_name' => 'ViewsModificationController',
-        ]);
+        return $this->render('services/views_modification/base_views_modification.html.twig');
     }
 
     #[Route('/view/viewmod/modifying', name: 'app_views_modification')]
@@ -79,13 +77,5 @@ class ViewsModificationController extends FrontController
 
 
         return $this->redirect($originUrl);
-    }
-
-
-    #[Route('/view/update', name: 'app_update_view')]
-    public function updateView()
-    {
-        $this->viewsModificationService->updateTheUpdatingOfTheSortOrder();
-        return $this->redirectToRoute('app_base');
     }
 }

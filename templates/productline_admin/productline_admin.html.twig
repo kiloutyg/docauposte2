@@ -87,18 +87,20 @@
 																{{productLine.name|split('.')|first|upper}}:</strong>
 														</h5>
 														<ul class="list-unstyled">
-															{% set matchingCategories = categories|filter(category => category.productLine.id is same as(productLine.id)) %}
-															{% for category in matchingCategories %}
+
+															{% for category in productLine.categories %}
 																<li class="form-control d-flex justify-content-between align-items-center mb-2">
 																	<a href="{{path('app_category_manager', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}" class="btn btn-link">
 																		-
 																		{{ category.name|split('.')|first|upper }}
 																		<span class="visually-hidden">{{ category.id }}</span>
 																	</a>
-																	<a href="{{path('app_productline_admin_delete_category', {category: category.name})}}" class="btn btn-danger delete-category">
-																		Supprimer
-																		<span class="visually-hidden">{{ category.id }}</span>
-																	</a>
+																	{% if is_granted ('ROLE_SUPER_ADMIN') or app.user is same as( category.creator) %}
+																		<a href="{{path('app_productline_admin_delete_category', {category: category.name})}}" class="btn btn-danger delete-category">
+																			Supprimer
+																			<span class="visually-hidden">{{ category.id }}</span>
+																		</a>
+																	{% endif %}
 																</li>
 															{% else %}
 																<li class="alert alert-danger">
@@ -117,29 +119,6 @@
 					</div>
 				</div>
 			</div>
-			{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
-				<div class="accordion-item">
-
-					<h2 class="accordion-header" id="headingAccountcreation">
-						<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAccountcreation" aria-expanded="true" aria-controls="collapseAccountcreation">
-							<strong>Formulaire de création de compte utilisateur :</strong>
-						</button>
-					</h2>
-					<div id="collapseAccountcreation" class="accordion-collapse collapse" aria-labelledby="headingAccountcreation" data-bs-parent="#accordionLineAdmin">
-						<div class="accordion-body accordion-bg shadow shadow-inset">
-							<div class="card border-0 shadow rounded-3 my-5">
-								<div class="card-body">
-									<div class="row">
-										<form method="POST" action="{{ path('app_zone_admin_create_line_admin', {zone: zone.name}) }}">
-											{% include "services/accountservices/create_account.html.twig" %}
-										</form>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			{% endif %}
 			<div class="accordion-item">
 				<h2 class="accordion-header" id="headingUpload">
 					<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUpload" aria-expanded="true" aria-controls="collapseUpload">

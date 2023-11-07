@@ -45,19 +45,21 @@ security:
         - { path: ^/view, roles: ROLE_SUPER_ADMIN}
 
         - { path: ^/zone_admin, roles: ROLE_ADMIN }
-        - { path: ^/incident, roles: ROLE_ADMIN }
-
+        
+        - { path: ^/incident, roles: ROLE_LINE_ADMIN }
         - { path: ^/productline_admin, roles: ROLE_LINE_ADMIN }
         - { path: ^/modify, roles: ROLE_LINE_ADMIN }
         - { path: ^/modifyingfile, roles: ROLE_LINE_ADMIN }
         - { path: ^/delete, roles: ROLE_LINE_ADMIN }
         - { path: ^/modifyfile, roles: ROLE_LINE_ADMIN }
         - { path: ^/uploading, roles: ROLE_LINE_ADMIN }
+        - { path: ^/upload, roles: ROLE_LINE_ADMIN }
         - { path: ^/uploaded, roles: ROLE_LINE_ADMIN }
         - { path: ^/validation, roles: ROLE_LINE_ADMIN }
 
         - { path: ^/category_manager, roles: ROLE_MANAGER }
         - { path: ^/tutorial, roles: ROLE_MANAGER }
+        - { path: ^/api, roles: ROLE_MANAGER }
 
 
 

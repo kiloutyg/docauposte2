@@ -217,9 +217,10 @@ class IncidentService extends AbstractController
 
         // Group incidents by zone, productLine, category, and productline
         foreach ($incidents as $incident) {
-            $zoneName = $incident->getProductLine()->getZone()->getName();
-
-            $productLineName = $incident->getProductLine()->getName();
+            $productLine = $incident->getProductLine();
+            $productLineName = $productLine->getName();
+            $zone = $productLine->getZone();
+            $zoneName = $zone->getName();
 
             if (!isset($groupedincidents[$zoneName])) {
                 $groupedincidents[$zoneName] = [];
