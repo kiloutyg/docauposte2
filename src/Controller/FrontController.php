@@ -18,39 +18,8 @@ class FrontController extends BaseController
     #[Route('/', name: 'base')]
     public function base(): Response
     {
-
-        // Updating the uploads validation status
-        $uploads = [];
-        $uploads = $this->uploadRepository->findBy(
-            ['validated' => null]
-        );
-        foreach ($uploads as $upload) {
-            if ($upload->getUploadedAt() < new \DateTime('2023-09-19 00:00:00')) {
-                $this->validationService->updateValidationRecycle($upload);
-            }
-        }
-
-        //Updating Users Email
-        $users = [];
-        $users = $this->userRepository->findBy(['emailAddress' => null]);
-        foreach ($users as $user) {
-            $this->accountService->updateUserEmail($user);
-        }
-
-        // Updating the SortOrder field in each category
-
-        foreach ($this->zones as $zone) {
-            if ($zone->getSortOrder() === null) {
-                $this->viewsModificationService->updateTheUpdatingOfTheSortOrder();
-            }
-        }
-
-
         return $this->render(
-            'base.html.twig',
-            [
-                'user'                  => $this->getUser(),
-            ]
+            'base.html.twig'
         );
     }
 
