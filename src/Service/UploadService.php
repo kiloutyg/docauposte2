@@ -78,7 +78,6 @@ class UploadService extends AbstractController
             } else {
                 $validated = true;
             };
-            $this->logger->info('Logging the validator liked stuff: ', ['validated value: ' . $validated]);
             // Dynamic folder creation and file upload
             // Get the name of the button
             $buttonname = $button->getName();

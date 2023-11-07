@@ -118,6 +118,7 @@ class ProductLineAdminController extends FrontController
                 $category->setName($categoryname);
                 $category->setProductLine($productLine);
                 $category->setSortOrder($sortOrder);
+                $category->setCategoryCreator($this->getUser());
                 $this->em->persist($category);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($categoryname);

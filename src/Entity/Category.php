@@ -28,6 +28,9 @@ class Category
     #[ORM\Column(nullable: true)]
     private ?int $SortOrder = null;
 
+    #[ORM\ManyToOne(inversedBy: 'categories')]
+    private ?User $Creator = null;
+
 
 
     public function __construct()
@@ -102,6 +105,18 @@ class Category
     public function setSortOrder(?int $SortOrder): static
     {
         $this->SortOrder = $SortOrder;
+
+        return $this;
+    }
+
+    public function getCreator(): ?User
+    {
+        return $this->Creator;
+    }
+
+    public function setCreator(?User $Creator): static
+    {
+        $this->Creator = $Creator;
 
         return $this;
     }

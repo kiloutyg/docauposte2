@@ -42,6 +42,7 @@ security:
         - { path: ^/modify_account, roles: ROLE_SUPER_ADMIN}
         - { path: ^/modify_account_view, roles: ROLE_SUPER_ADMIN}
         - { path: ^/department, roles: ROLE_SUPER_ADMIN}
+        - { path: ^/view, roles: ROLE_SUPER_ADMIN}
 
         - { path: ^/zone_admin, roles: ROLE_ADMIN }
         - { path: ^/incident, roles: ROLE_ADMIN }

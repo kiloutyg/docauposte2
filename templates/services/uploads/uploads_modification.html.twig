@@ -93,6 +93,13 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						<li>
 							{{ approbation.userapprobator.username|capitalize|split('.')|first }} {{ approbation.userapprobator.username|upper|split('.')|last }}
 							{{ approbation.approval is same as(true) ? ' a validé ce document le ' ~ approbation.approvedAt|date('d/m/Y') ~ ' à ' ~ approbation.approvedAt|date('H') ~ 'h' ~ approbation.approvedAt|date('i')}}.
+{% if approbation.comment is not empty %}
+	<ul> 
+		<li>Commentaire: {{ approbation.comment }}
+		</li>
+	</ul>
+{% endif %}
+
 						</li>
 						</ul>
 						{% endfor %}	

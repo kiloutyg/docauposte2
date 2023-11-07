@@ -15,6 +15,7 @@ use App\Repository\ZoneRepository;
 use App\Repository\UploadRepository;
 use App\Repository\OldUploadRepository;
 use App\Repository\IncidentRepository;
+use App\Repository\UserRepository;
 
 use App\Service\FolderCreationService;
 
@@ -31,6 +32,7 @@ class ViewsModificationService extends AbstractController
     private $uploadRepository;
     private $oldUploadRepository;
     private $incidentRepository;
+    private $userRepository;
 
     private $folderCreationService;
 
@@ -46,6 +48,7 @@ class ViewsModificationService extends AbstractController
         UploadRepository $uploadRepository,
         OldUploadRepository $oldUploadRepository,
         IncidentRepository $incidentRepository,
+        UserRepository $userRepository,
 
         FolderCreationService $folderCreationService
     ) {
@@ -60,6 +63,7 @@ class ViewsModificationService extends AbstractController
         $this->uploadRepository         = $uploadRepository;
         $this->oldUploadRepository      = $oldUploadRepository;
         $this->incidentRepository       = $incidentRepository;
+        $this->userRepository          = $userRepository;
 
         $this->folderCreationService    = $folderCreationService;
     }
@@ -154,6 +158,13 @@ class ViewsModificationService extends AbstractController
             case 'name':
                 $OriginalValue = $entity->getName();
                 break;
+            case 'creator':
+                if ($entity->getCreator() === null) {
+                    $OriginalValue = null;
+                } else {
+                    $OriginalValue = $entity->getCreator()->getId();
+                }
+                break;
         }
         return $OriginalValue;
     }
@@ -171,13 +182,17 @@ class ViewsModificationService extends AbstractController
         $entityId = $entity->getId();
         switch ($field) {
             case 'sortOrder':
-                $this->updateNameAndFolderByParentEntity($entityType, $entityId, $newValue, $field);
+                $this->updateByParentEntity($entityType, $entityId, $newValue, $field);
                 break;
             case 'name':
                 $entity->setName($newValue);
-                $this->updateNameAndFolderByParentEntity($entityType, $entityId, $newValue, $field);
+                $this->updateByParentEntity($entityType, $entityId, $newValue, $field);
                 $this->folderCreationService->updateFolderStructureAndName($originalValue, $newValue);
-
+                break;
+            case 'creator':
+                $creator = $this->userRepository->findOneBy(['id' => $newValue]);
+                $entity->setCreator($creator);
+                $this->updateByParentEntity($entityType, $entityId, $newValue, $field);
                 break;
         }
         $this->em->persist($entity);
@@ -246,7 +261,7 @@ class ViewsModificationService extends AbstractController
         $this->em->persist($entity);
         $this->em->flush();
 
-        $this->updateNameAndFolderByParentEntity($entityType, $entityId, $newName, $field);
+        $this->updateByParentEntity($entityType, $entityId, $newName, $field);
     }
     // 
     // 
@@ -294,13 +309,13 @@ class ViewsModificationService extends AbstractController
     // 
     //     
     //     
-    public function updateNameAndFolderByParentEntity($entityType, $id, $newName, $field, $originalValue = null)
+    public function updateByParentEntity($entityType, $id, $newName, $field, $originalValue = null)
     {
-        $this->logger->info('updateNameAndFolderByParentEntity: entityType: ' . $entityType);
-        $this->logger->info('updateNameAndFolderByParentEntity: entityId: ' . $id);
-        $this->logger->info('updateNameAndFolderByParentEntity: field: ' . $field);
-        $this->logger->info('updateNameAndFolderByParentEntity: newValue: ' . $newName);
-        $this->logger->info('updateNameAndFolderByParentEntity: originalValue: ' . $originalValue);
+        $this->logger->info('updateByParentEntity: entityType: ' . $entityType);
+        $this->logger->info('updateByParentEntity: entityId: ' . $id);
+        $this->logger->info('updateByParentEntity: field: ' . $field);
+        $this->logger->info('updateByParentEntity: newValue: ' . $newName);
+        $this->logger->info('updateByParentEntity: originalValue: ' . $originalValue);
         // Get the repository of the entity type
         $repository = null;
         switch ($entityType) {
@@ -339,7 +354,7 @@ class ViewsModificationService extends AbstractController
         }
         // Get the entity from the database and return an empty array if it doesn't exist
         $entity = $repository->find($id);
-        $this->logger->info('updateNameAndFolderByParentEntity: entityName: ' . $entity->getName());
+        $this->logger->info('updateByParentEntity: entityName: ' . $entity->getName());
         if (!$entity) {
             return [];
         }
@@ -351,6 +366,10 @@ class ViewsModificationService extends AbstractController
                 }
             } else if ($field === 'sortOrder') {
                 $this->updateSortOrders($repository->findAllExceptOne($id), $entity, $newName, $originalValue);
+            } else if ($field === 'creator') {
+                foreach ($entity->getProductLines() as $productLine) {
+                    $this->updateEntity('productLine', $productLine, $field, $newName, $originalValue);
+                }
             }
         } elseif ($entityType === 'productLine') {
             if ($field === 'name') {
