@@ -127,11 +127,18 @@ class UploadController extends FrontController
     public function delete_file(int $uploadId = null, Request $request): RedirectResponse
     {
         $originUrl = $request->headers->get('Referer');
+        $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
 
-        // Use the UploadService to handle file deletion
-        $name = $this->uploadService->deleteFile($uploadId);
+        // Check if the user is the creator of the upload or if he is a super admin
+        if ($this->getUser()->getRoles() === ["ROLE_SUPER_ADMIN"] || $this->getUser() === $upload->getUploader()) {
+            // Use the UploadService to handle file deletion
+            $name = $this->uploadService->deleteFile($uploadId);
+        } else {
+            $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer ce document.');
+            return $this->redirect($originUrl);
+        }
+
         $this->addFlash('success', 'Le fichier  ' . $name . ' a été supprimé.');
-
         return $this->redirect($originUrl);
     }
     // 

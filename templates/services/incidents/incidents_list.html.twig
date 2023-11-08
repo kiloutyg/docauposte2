@@ -38,8 +38,9 @@
 															-
 															{{ incident.name|upper }}
 														</a>
-														{% if is_granted('ROLE_LINE_ADMIN') %}
+														{% if app.user is same as(incident.uploader) or (incident.uploader) is empty or is_granted ('ROLE_SUPER_ADMIN')  %}
 															<div class="ml-auto">
+
 																{{ incident.uploadedAt|date('d/m/Y') }}
 																<a href="{{ path('app_incident_modify_file', {'incidentId': incident.id}) }}" class="btn btn-modify shadow">
 																	Modifier

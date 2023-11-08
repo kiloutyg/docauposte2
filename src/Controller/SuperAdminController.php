@@ -103,9 +103,9 @@ class SuperAdminController extends FrontController
         $entityType = 'zone';
         $entity = $this->zoneRepository->findOneBy(['id' => $zoneId]);
 
-        $entity = $this->entitydeletionService->deleteEntity($entityType, $entity->getId());
+        $response = $this->entitydeletionService->deleteEntity($entityType, $entity->getId());
 
-        if ($entity == true) {
+        if ($response == true) {
 
             $this->addFlash('success', $entityType . ' has been deleted');
             return $this->redirectToRoute('app_super_admin');

@@ -112,14 +112,22 @@ class ZoneAdminController extends FrontController
     public function deleteEntity(string $productline): Response
     {
         $entityType = 'productline';
-        $entityid = $this->productLineRepository->findOneBy(['name' => $productline]);
+        $entity = $this->productLineRepository->findOneBy(['name' => $productline]);
+        $zone = $entity->getZone()->getName();
 
-        $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
+        // Check if the user is the creator of the entity or if he is a super admin
+        if ($this->getUser()->getRoles() != ["ROLE_SUPER_ADMIN"] || $this->getUser() === $entity->getCreator()) {
+            // This function is used to delete a category and all the infants entity attached to it, it depends on the EntityDeletionService class. 
+            // The folder is deleted by the FolderCreationService class through the EntityDeletionService class.
+            $response = $this->entitydeletionService->deleteEntity($entityType, $entity->getId());
+        } else {
+            $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer cette ligne.');
+            return $this->redirectToRoute('app_zone_admin', [
+                'zone' => $zone,
+            ]);
+        }
 
-        $zone = $entityid->getZone()->getName();
-
-        if ($entity == true) {
-
+        if ($response == true) {
             $this->addFlash('success', 'La ligne de produit ' . $entityType . ' a été supprimée');
             return $this->redirectToRoute('app_zone_admin', [
                 'zone' => $zone,

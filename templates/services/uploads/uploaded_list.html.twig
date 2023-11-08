@@ -85,10 +85,11 @@
 																							<a href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify shadow ">
 																								Modifier
 																							</a>
+
+																							<a href="{{ path('app_delete_file', { uploadId: upload.id }) }}" class="btn btn-danger delete-upload shadow">
+																								Supprimer
+																							</a>
 																						{% endif %}
-																						<a href="{{ path('app_delete_file', { uploadId: upload.id }) }}" class="btn btn-danger delete-upload shadow">
-																							Supprimer
-																						</a>
 																					</div>
 																				{% endif %}
 																			</li>

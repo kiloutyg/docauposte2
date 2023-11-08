@@ -95,8 +95,6 @@
 																		{{ button.name|split('.')|first|upper }}
 																	</a>
 																	{% if is_granted ('ROLE_SUPER_ADMIN') or app.user is same as( button.creator) %}
-
-
 																		<a href="{{path('app_category_manager_delete_button', {button: button.name})}}" class="btn btn-danger delete-button">
 																			Supprimer
 																		</a>

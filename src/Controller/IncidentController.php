@@ -202,8 +202,14 @@ class IncidentController extends FrontController
         $originUrl = $request->headers->get('referer');
         $incidentEntity = $this->incidentRepository->findOneBy(['id' => $incidentId]);
 
-        // Use the incidentService to handle file deletion
-        $name = $this->incidentService->deleteIncidentFile($incidentEntity, $productlineEntity);
+        // Check if the user is the creator of the upload or if he is a super admin
+        if ($this->getUser()->getRoles() === ('ROLE_SUPER_ADMIN') || $this->getUser() === $incidentEntity->getUploader()) {
+            // Use the incidentService to handle file deletion
+            $name = $this->incidentService->deleteIncidentFile($incidentEntity, $productlineEntity);
+        } else {
+            $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer ce document.');
+            return $this->redirectToRoute($originUrl);
+        }
         $this->addFlash('success', 'File ' . $name . ' deleted');
 
         return $this->redirect($originUrl);

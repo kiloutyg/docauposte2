@@ -135,13 +135,22 @@ class ProductLineAdminController extends FrontController
     public function deleteEntity(string $category): Response
     {
         $entityType = 'category';
-        $entityid = $this->categoryRepository->findOneBy(['name' => $category]);
+        $entity = $this->categoryRepository->findOneBy(['name' => $category]);
+        $productLine = $entity->getProductLine()->getName();
 
-        $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
+        // Check if the user is the creator of the entity or if he is a super admin
+        if ($this->getUser()->getRoles() === ["ROLE_SUPER_ADMIN"] || $this->getUser() === $entity->getCreator()) {
+            // This function is used to delete a category and all the infants entity attached to it, it depends on the EntityDeletionService class. 
+            // The folder is deleted by the FolderCreationService class through the EntityDeletionService class.
+            $response = $this->entitydeletionService->deleteEntity($entityType, $entity->getId());
+        } else {
+            $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer cette ' . $entityType . '.');
+            return $this->redirectToRoute('app_productline_admin', [
+                'productline'   => $productLine,
+            ]);
+        }
 
-        $productLine = $entityid->getProductLine()->getName();
-
-        if ($entity == true) {
+        if ($response == true) {
 
             $this->addFlash('success', 'La catégorie ' . $entityType . ' a été supprimée');
             return $this->redirectToRoute('app_productline_admin', [

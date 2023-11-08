@@ -136,16 +136,22 @@ class CategoryManagerController extends FrontController
     public function deleteEntity(string $button): Response
     {
         $entityType = 'button';
-        $entityid = $this->buttonRepository->findOneBy(['name' => $button]);
+        $entity = $this->buttonRepository->findOneBy(['name' => $button]);
+        $category = $entity->getCategory()->getName();
 
-        // This function is used to delete a button and all the uploads attached to it, it depends on the EntityDeletionService class. 
-        // The folder is deleted by the FolderCreationService class through the EntityDeletionService class.
-        $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
+        // Check if the user is the creator of the button or if he is a super admin
+        if ($this->getUser() === $entity->getCreator() || $this->getUser()->getRoles() === ["ROLE_SUPER_ADMIN"]) {
+            // This function is used to delete a button and all the uploads attached to it, it depends on the EntityDeletionService class. 
+            // The folder is deleted by the FolderCreationService class through the EntityDeletionService class.
+            $response = $this->entitydeletionService->deleteEntity($entityType, $entity->getId());
+        } else {
+            $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer cette ' . $entityType . '.');
+            return $this->redirectToRoute('app_category_manager', [
+                'category'    => $category,
+            ]);
+        }
 
-        $category = $entityid->getCategory()->getName();
-
-        if ($entity == true) {
-
+        if ($response == true) {
             $this->addFlash('success', 'Le bouton ' . $entityType . ' a été supprimé');
             return $this->redirectToRoute('app_category_manager', [
                 'category'    => $category,
