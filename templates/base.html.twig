@@ -121,21 +121,14 @@ let buttonIdFromServer = null;
 									Documents refusés
 								</button>
 								<ul class="dropdown-menu dropdown-menu-start shadow shadow-inset" aria-labelledby="dropdownMenuButton1">
-
-
 									{% for upload in DisapprovedFile %}
 										{% for approbation in upload.validation.approbations %}
 											{% if approbation.isApproval is same as(false) %}
-												{# {% if not upload.filename in DisplayedFiles %} #}
-
 												<li>
 													<a href="{{ path('app_validation_disapproved_modify', {'approbationId': approbation.id})}}" class="dropdown-item shadow ">
 														{{ upload.filename|upper }}
 													</a>
 												</li>
-												{# {% set displayedFiles = displayedFiles|merge([upload.filename]) %} #}
-
-												{# {% endif %} #}
 											{% endif %}
 										{% endfor %}
 									{% endfor %}
@@ -163,82 +156,91 @@ let buttonIdFromServer = null;
 					{% endif %}
 				</div>
 			</div>
-		</body>
-	</body>
-</html></nav><!-- End Main Navigation --><div class="container ">
-{% if users is defined %}
-	{% if users is empty %}
-		<h5 class="my-5">
-			<strong>Pour commencer à utiliser l'application, veuillez créer le superadministrateur :
-			</strong>
-		</h5>
-		<div class="card border-0 shadow rounded-3 my-5">
-			<div class="card-body">
-				<div class="row">
-					<form action="{{ path('app_create_super_admin') }}" method="post">
-						{% include "services/accountservices/create_account.html.twig" %}
-					</form>
-				</div>
-			</div>
-		</div>
-	{% endif %}
-{% endif %}</div><div class="container flex-grow-1 d-flex flex-column">{% include "services/navbarservices/navbarservices.html.twig" %}
-{% block body %}
-	<div class="inner-container flex-grow-1 d-flex flex-column">
-		{% if app.user %}
-			{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
-				<aside class="position-absolute end-0">
-					<a href="{{ path('app_super_admin') }}" class="btn shadow bg-dark" style="color:white;">
-						<span class="fa fa-gear"></span>
-						<strong>
-							<span class="button-text">Centre de Super-Administration</span>
+		</nav>
+		<!-- End Main Navigation -->
+		<div class="container ">
+			{% if users is defined %}
+				{% if users is empty %}
+					<h5 class="my-5">
+						<strong>Pour commencer à utiliser l'application, veuillez créer le superadministrateur :
 						</strong>
-					</a>
-				</aside>
-
+					</h5>
+					<div class="card border-0 shadow rounded-3 my-5">
+						<div class="card-body">
+							<div class="row">
+								<form action="{{ path('app_create_super_admin') }}" method="post">
+									{% include "services/accountservices/create_account.html.twig" %}
+								</form>
+							</div>
+						</div>
+					</div>
+				{% endif %}
 			{% endif %}
-		{% endif %}
-		<p>
-			<h1 class="text-justify mb-2 mt-4 flex-shrink-0">
-				<strong>
-					Doc Au Poste
-				</strong>
-			</h1>
-		</p>
-		<h3 class="text-justify flex-shrink-0">
-			<strong>
-				Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
-		</h3>
-		<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
-			<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
-				{% for zone in zones %}
-					<a class="btn btn-primary btn-lg m-5 " role="button" aria-pressed="true" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
-						<span class="line-details text-justify">
-							{{ zone.name|split('.')|first|upper }}
-						</span>
-					</a>
-				{% endfor %}
-			</div>
 		</div>
-	</div>
-{% endblock body %}</div><!-- Footer --><footer class="container py-3 border-top  flex-shrink-0">
-<div class="d-flex flex-wrap justify-content-between">
-	<div class="col-md-5 d-flex align-items-center">
-		<span class="me-1" style="color: red">
-			<i class="fas fa-copyright"></i>
-		</span>
-		<a target="_blank" href="http://topnet.corp.ponet/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium Langres</a>
-	</div>
-	<div>
-		<a href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
-			<i class="fa fa-arrow-circle-o-left" 'aria-hidden="false"'>Retour</i>
-		</a>
-	</div>
-	<ul class="nav col-md-5 justify-content-end list-unstyled d-flex">
-		<li class="ms-3">
-			<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/">
-				<i class="fab fa-github"></i>
-			</a>
-		</li>
-	</ul>
-</div></footer><!-- End Footer --></body></html>
+		<div class="container flex-grow-1 d-flex flex-column">{% include "services/navbarservices/navbarservices.html.twig" %}
+			{% block body %}
+				<div class="inner-container flex-grow-1 d-flex flex-column">
+					{% if app.user %}
+						{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
+							<aside class="position-absolute end-0">
+								<a href="{{ path('app_super_admin') }}" class="btn shadow bg-dark" style="color:white;">
+									<span class="fa fa-gear"></span>
+									<strong>
+										<span class="button-text">Centre de Super-Administration</span>
+									</strong>
+								</a>
+							</aside>
+
+						{% endif %}
+					{% endif %}
+					<p>
+						<h1 class="text-justify mb-2 mt-4 flex-shrink-0">
+							<strong>
+								Doc Au Poste
+							</strong>
+						</h1>
+					</p>
+					<h3 class="text-justify flex-shrink-0">
+						<strong>
+							Le site qui vous permet de trouver les documents dont vous avez besoin.</strong>
+					</h3>
+					<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+						<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
+							{% for zone in zones %}
+								<a class="btn btn-primary btn-lg m-5 " role="button" aria-pressed="true" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
+									<span class="line-details text-justify">
+										{{ zone.name|split('.')|first|upper }}
+									</span>
+								</a>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+			{% endblock body %}
+		</div>
+		<!-- Footer -->
+		<footer class="container py-3 border-top  flex-shrink-0">
+			<div class="d-flex flex-wrap justify-content-between">
+				<div class="col-md-5 d-flex align-items-center">
+					<span class="me-1" style="color: red">
+						<i class="fas fa-copyright"></i>
+					</span>
+					<a target="_blank" href="http://topnet.corp.ponet/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">PlasticOmnium Langres</a>
+				</div>
+				<div>
+					<a href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
+						<i class="fa fa-arrow-circle-o-left" 'aria-hidden="false"'>Retour</i>
+					</a>
+				</div>
+				<ul class="nav col-md-5 justify-content-end list-unstyled d-flex">
+					<li class="ms-3">
+						<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/">
+							<i class="fab fa-github"></i>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</footer>
+		<!-- End Footer -->
+	</body>
+</html>

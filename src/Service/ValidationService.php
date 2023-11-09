@@ -6,6 +6,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 use App\Repository\UploadRepository;
 use App\Repository\DepartmentRepository;
@@ -34,6 +36,8 @@ class ValidationService extends AbstractController
     protected $approbationRepository;
     protected $mailerService;
     protected $oldUploadService;
+    protected $projectDir;
+
 
     public function __construct(
         LoggerInterface                 $logger,
@@ -44,10 +48,12 @@ class ValidationService extends AbstractController
         ValidationRepository            $validationRepository,
         ApprobationRepository           $approbationRepository,
         MailerService                   $mailerService,
+        ParameterBagInterface           $params,
         OldUploadService                $oldUploadService
     ) {
         $this->logger                = $logger;
         $this->em                    = $em;
+        $this->projectDir            = $params->get('kernel.project_dir');
         $this->uploadRepository      = $uploadRepository;
         $this->departmentRepository  = $departmentRepository;
         $this->userRepository        = $userRepository;
@@ -366,5 +372,44 @@ class ValidationService extends AbstractController
             $this->em->flush();
             return;
         }
+    }
+
+    public function remindCheck(array $users)
+    {
+        $today = new \DateTime();
+        $fileName = 'email_sent.txt';
+        $filePath = $this->projectDir . '/public/doc/' . $fileName;
+        $approbationToAnswerWithId = [];
+        $uploadsWaitingValidation = [];
+
+        if ($today->format('N') == '4' && $today->format('d') % 3 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
+
+            $rolesToCheck = ['ROLE_LINE_ADMIN_VALIDATOR', 'ROLE_ADMIN_VALIDATOR'];
+            foreach ($users as $user) {
+                if (array_intersect($rolesToCheck, $user->getRoles())) {
+                    $validators[] = $user;
+                }
+            }
+            foreach ($validators as $validator) {
+                $approbationsNotAnswered = $this->approbationRepository->findBy(['UserApprobator' => $validator, 'Approval' => null]);
+                foreach ($approbationsNotAnswered as $approbationNotAnswered) {
+                    $upload = $approbationNotAnswered->getValidation()->getUpload();
+                    $uploadedAt = $upload->getUploadedAt();
+                    if (date_diff($today, $uploadedAt)->days >= 15) {
+                        $approbationToAnswerWithId[$validator->getId()][] = $upload;
+                        $uploadsWaitingValidation[] = $upload;
+                    }
+                }
+                if (count($uploadsWaitingValidation) > 0) {
+                    $return = $this->mailerService->sendReminderEmail($validator, $uploadsWaitingValidation);
+                    $uploadsWaitingValidation = [];
+                }
+            }
+            if ($return) {
+                file_put_contents($filePath, $today->format('Y-m-d'));
+            }
+        }
+
+        return $approbationToAnswerWithId;
     }
 }

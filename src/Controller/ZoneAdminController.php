@@ -44,7 +44,7 @@ class ZoneAdminController extends FrontController
         $error = null;
         $result = $this->accountService->createAccount(
             $request,
-            $error,
+            $error
         );
 
         if ($result) {

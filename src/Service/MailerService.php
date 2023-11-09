@@ -8,10 +8,14 @@ use Symfony\Component\Mime\Email;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Doctrine\Common\Collections\Collection;
+
 
 use App\Entity\Validation;
 use App\Entity\User;
 use App\Entity\Approbation;
+use App\Entity\Upload;
+
 use App\Repository\ApprobationRepository;
 
 class MailerService extends AbstractController
@@ -179,6 +183,27 @@ class MailerService extends AbstractController
             return true;
         } catch (TransportExceptionInterface $e) {
             return $e->getMessage();
+        }
+    }
+
+    public function sendReminderEmail(User $Recipient, array $uploads)
+    {
+        $senderEmail = 'lan.docauposte@plasticomnium.com';
+        $emailRecipientsAddress = $Recipient->getEmailAddress();
+
+        $email = (new TemplatedEmail())
+            ->from($senderEmail)
+            ->to($emailRecipientsAddress)
+            ->subject('Docauposte - Rappel de validation en cours')
+            ->htmlTemplate('email_templates/reminderEmail.html.twig')
+            ->context([
+                'uploads'                    => $uploads
+            ]);
+        try {
+            $this->mailer->send($email);
+            return true;
+        } catch (TransportExceptionInterface $e) {
+            return false;
         }
     }
 }
