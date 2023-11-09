@@ -382,7 +382,7 @@ class ValidationService extends AbstractController
         $approbationToAnswerWithId = [];
         $uploadsWaitingValidation = [];
 
-        if ($today->format('N') == '4' && $today->format('d') % 3 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
+        if ($today->format('N') == '2' && $today->format('d') % 2 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
 
             $rolesToCheck = ['ROLE_LINE_ADMIN_VALIDATOR', 'ROLE_ADMIN_VALIDATOR'];
             foreach ($users as $user) {
