@@ -133,7 +133,7 @@ class ValidationService extends AbstractController
             $validator_department = null;
         }
         // Send a notification email to the validator
-        $this->approbationEmail($validation);
+        $this->mailerService->approbationEmail($validation);
 
         // Return the Validation instance
         return $validation;
@@ -216,7 +216,7 @@ class ValidationService extends AbstractController
 
         if ($approbation->isApproval() === false) {
             $this->logger->info('validation ID: ', [$validation->getId()]);
-            $this->disapprobationEmail($validation);
+            $this->mailerService->sendDisapprobationEmail($validation);
         }
         // Call the approbationCheck method to check if all approbations are approved
         $this->approbationCheck($validation);
@@ -287,7 +287,7 @@ class ValidationService extends AbstractController
             $this->em->flush($oldUpload);
         }
         if ($validation->isStatus() === true) {
-            $this->approvalEmail($validation);
+            $this->mailerService->sendApprovalEmail($validation);
         }
         // Return early
         return;
@@ -332,7 +332,7 @@ class ValidationService extends AbstractController
                     $approbation->setApprovedAt(null);
                     $approbation->setComment(null);
                     if (!$globalModification) {
-                        $this->disapprovedModifiedEmail($approbation);
+                        $this->mailerService->sendDisapprovedModifiedEmail($approbation);
                     }
                 }
                 // If the Approbation is not approved or the Approval property is null
@@ -341,7 +341,7 @@ class ValidationService extends AbstractController
                     $approbation->setApproval(null);
                     $approbation->setApprovedAt(null);
                     $approbation->setComment(null);
-                    $this->disapprovedModifiedEmail($approbation);
+                    $this->mailerService->sendDisapprovedModifiedEmail($approbation);
                 }
             }
             // Persist the Approbation instance to the database
@@ -349,7 +349,7 @@ class ValidationService extends AbstractController
         }
 
         if ($globalModification) {
-            $this->approbationEmail($validation);
+            $this->mailerService->approbationEmail($validation);
         }
 
         // Flush changes to the database
@@ -366,33 +366,5 @@ class ValidationService extends AbstractController
             $this->em->flush();
             return;
         }
-    }
-
-
-    public function approbationEmail(Validation $validation)
-    {
-        $approbations = [];
-        $approbations = $this->approbationRepository->findBy(['Validation' => $validation]);
-        foreach ($approbations as $approbation) {
-            $this->mailerService->sendApprobationEmail($approbation);
-        }
-    }
-
-
-    public function disapprobationEmail(Validation $validation)
-    {
-        $this->mailerService->sendDisapprobationEmail($validation);
-    }
-
-
-    public function disapprovedModifiedEmail(Approbation $approbation)
-    {
-        $this->mailerService->sendDisapprovedModifiedEmail($approbation);
-    }
-
-
-    public function approvalEmail(Validation $validation)
-    {
-        $this->mailerService->sendApprovalEmail($validation);
     }
 }

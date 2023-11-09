@@ -30,6 +30,15 @@ class MailerService extends AbstractController
         $this->approbationRepository = $approbationRepository;
     }
 
+    public function approbationEmail(Validation $validation)
+    {
+        $approbations = [];
+        $approbations = $this->approbationRepository->findBy(['Validation' => $validation]);
+        foreach ($approbations as $approbation) {
+            $this->sendApprobationEmail($approbation);
+        }
+    }
+
     public function sendEmail(User $recipient, string $subject, string $html)
     {
         $sender = $this->security->getUser();
