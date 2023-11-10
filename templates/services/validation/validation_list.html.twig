@@ -44,13 +44,13 @@
 																	<strong>Bouton:</strong>
 																	{{ buttonName|split('.')|first|upper }}
 																	{% for upload in buttonKey %}
-																		<li class="list-group-item d-flex justify-content-between align-items-center mb-3 shadow-lg">
-																			<a href="{{ path('app_download_file', { 'uploadId': upload.id }) }}" class="btn btn-link" target="_blank">
-																				-
-																				{{ upload.filename|upper }}
+																		<li class="list-group-item d-flex justify-content-between align-items-start mb-3 shadow-lg ">
+																			<a href="{{ path('app_download_file', { 'uploadId': upload.id }) }}" class="btn btn-outline-primary order-3" target="_blank">
+																			{{ upload.filename|upper }}
 																			</a>
 																			{% if  is_granted('ROLE_LINE_ADMIN') %}
-																				<div class="ml-auto">
+																			<div class="order-2 ml-auto"></div>
+																				<div class="order-1 col-8">
 																					Mis en ligne de la Rev.
 																					{{upload.revision}}
 																					par:
@@ -83,15 +83,15 @@
 																						{% endif %}
 																					{% else %}
 																						<strong>- Document en cours de validation</strong>
-																						{% for approbation in upload.validation.approbations %}
 																						<ul>
-																							<li>
+																							{% for approbation in upload.validation.approbations %}
+																								<li>
 																								{{approbation.userapprobator.username|capitalize|split('.')|first }}
 																								{{approbation.userapprobator.username|upper|split('.')|last }}
 																								{{approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé' : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}
 																									{% if approbation.comment is not empty %}
 																										<ul>
-																											<li>{{ approbation.comment }}</li>
+																											<li >{{ approbation.comment }}</li>
 																										</ul>
 																									{% endif %}
 																								</li>
