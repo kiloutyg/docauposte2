@@ -137,7 +137,6 @@ let buttonIdFromServer = null;
 						</div>
 					</div>
 				{% endif %}
-				<div></div>
 				<div class="ms-auto d-flex align-items-center">
 					{% if app.user is null %}
 						<a class="btn btn-primary" href="{{ path('app_login') }}">Connexion</a>
@@ -177,7 +176,8 @@ let buttonIdFromServer = null;
 				{% endif %}
 			{% endif %}
 		</div>
-		<div class="container flex-grow-1 d-flex flex-column">{% include "services/navbarservices/navbarservices.html.twig" %}
+		<div class="container flex-grow-1 d-flex flex-column">
+			{% include "services/navbarservices/navbarservices.html.twig" %}
 			{% block body %}
 				<div class="inner-container flex-grow-1 d-flex flex-column">
 					{% if app.user %}
