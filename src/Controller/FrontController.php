@@ -18,12 +18,11 @@ class FrontController extends BaseController
     #[Route('/', name: 'base')]
     public function base(): Response
     {
-        $approbationToAnswerWithId = $this->validationService->remindCheck($this->users);
+        $this->validationService->remindCheck($this->users);
 
         return $this->render(
             'base.html.twig',
             [
-                'approbationToAnswerWithId' => $approbationToAnswerWithId,
             ]
         );
     }

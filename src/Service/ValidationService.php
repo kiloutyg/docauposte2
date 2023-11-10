@@ -379,7 +379,6 @@ class ValidationService extends AbstractController
         $today = new \DateTime();
         $fileName = 'email_sent.txt';
         $filePath = $this->projectDir . '/public/doc/' . $fileName;
-        $approbationToAnswerWithId = [];
         $uploadsWaitingValidation = [];
 
         if ($today->format('N') == '2' && $today->format('d') % 2 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
@@ -396,7 +395,6 @@ class ValidationService extends AbstractController
                     $upload = $approbationNotAnswered->getValidation()->getUpload();
                     $uploadedAt = $upload->getUploadedAt();
                     if (date_diff($today, $uploadedAt)->days >= 15) {
-                        $approbationToAnswerWithId[$validator->getId()][] = $upload;
                         $uploadsWaitingValidation[] = $upload;
                     }
                 }
@@ -410,6 +408,5 @@ class ValidationService extends AbstractController
             }
         }
 
-        return $approbationToAnswerWithId;
     }
 }
