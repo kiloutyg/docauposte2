@@ -171,7 +171,7 @@ class FrontController extends BaseController
             );
         } else {
             $uploadId = $uploads[0]->getId();
-            return $uploadController->download_file($uploadId, $request);
+            return $uploadController->downloadFile($uploadId, $request);
         }
     }
 }

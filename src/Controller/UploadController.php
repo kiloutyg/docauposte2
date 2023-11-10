@@ -81,14 +81,14 @@ class UploadController extends FrontController
     // 
     // create a route to download a file in more simple terms to display the file
     #[Route('/download/{uploadId}', name: 'download_file')]
-    public function download_file(int $uploadId, Request $request): Response
+    public function downloadFile(int $uploadId, Request $request): Response
     {
         // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $file = $upload;
         if (!$file->isValidated()) {
-            $this->addFlash('error', 'Le fichier n\'a pas été validé.');
+            $this->addFlash('error', 'Le nouveau fichier est en cours de validation.');
             if ($file->getOldUpload() != null) {
                 $oldUploadId = $file->getOldUpload()->getId();
                 $oldUpload = $this->oldUploadRepository->findOneBy(['id' => $oldUploadId]);
@@ -108,7 +108,7 @@ class UploadController extends FrontController
     // 
     // create a route to download a file in more simple terms to display the file
     #[Route('/download/invalidation/{uploadId}', name: 'download_invalidation_file')]
-    public function download_invalidation_file(int $uploadId = null, Request $request): Response
+    public function downloadInvalidationFile(int $uploadId = null, Request $request): Response
     {
         // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
@@ -124,7 +124,7 @@ class UploadController extends FrontController
     // create a route to delete a file
     #[Route('/delete/upload/{uploadId}', name: 'delete_file')]
 
-    public function delete_file(int $uploadId = null, Request $request): RedirectResponse
+    public function deleteFile(int $uploadId = null, Request $request): RedirectResponse
     {
         $originUrl = $request->headers->get('Referer');
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
@@ -147,7 +147,7 @@ class UploadController extends FrontController
     // 
     // create a route to modify a file and or display the modification page
     #[Route('/modify/{uploadId}', name: 'modify_file')]
-    public function modify_file(Request $request, int $uploadId): Response
+    public function modifyFile(Request $request, int $uploadId): Response
     {
         // Retrieve the current upload entity based on the uploadId
         $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
@@ -184,7 +184,7 @@ class UploadController extends FrontController
     // Testing separting the post and get in two different method to see if the issue of not reloading the pages and persisting the comments can be resolved through
     // the reorganization of the code
     #[Route('/modifying/{uploadId}', name: 'modifying_file')]
-    public function modifying_file(Request $request, int $uploadId): Response
+    public function modifyingFile(Request $request, int $uploadId): Response
     {
         // Retrieve the current upload entity based on the uploadId
         $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
