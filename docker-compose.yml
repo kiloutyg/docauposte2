@@ -23,12 +23,13 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.phpmyadmin.rule=PathPrefix(`/dappma`)"
+      - "traefik.http.routers.phpmyadmin.middlewares=strip-phpmyadmin-prefix"
+      - "traefik.http.middlewares.strip-phpmyadmin-prefix.stripPrefix.prefixes=/dappma"
       - "traefik.http.routers.phpmyadmin.entrypoints=web"
     environment:
       PMA_HOST: database
     volumes:
       - ./config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
-
     networks:
       vpcbr:
         ipv4_address: 172.21.0.3
