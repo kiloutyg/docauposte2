@@ -28,6 +28,7 @@ services:
       - "traefik.http.routers.phpmyadmin.entrypoints=web"
     environment:
       PMA_HOST: database
+      PMA_ABSOLUTE_URI: http://${HOSTNAME}/dappma/
     volumes:
       - ./config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
     networks:
