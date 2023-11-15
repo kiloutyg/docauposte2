@@ -152,7 +152,7 @@ document.addEventListener("turbo:load", function () {
 
 // // Event listener to fetch department data and initialize cascading dropdowns
 document.addEventListener("turbo:load", function () {
-  fetch("/api/department_data")
+  fetch("/docauposte/api/department_data")
     .then((response) => response.json())
     .then((data) => {
       departmentsData = data.departments;

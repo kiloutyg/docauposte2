@@ -54,7 +54,7 @@ function populateDropdown(dropdown, data, selectedId) {
 
 // // Event listener to fetch user data and initialize cascading dropdowns
 document.addEventListener("turbo:load", function () {
-  fetch('/api/user_data')
+  fetch("/docauposte/api/user_data")
     .then((response) => response.json())
     .then((data) => {
       usersData = data.users;

@@ -3,6 +3,8 @@ services:
   database:
     image: mariadb:latest
     restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -18,12 +20,17 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpmyadmin.rule=PathPrefix(`/dappma`)"
+      - "traefik.http.routers.phpmyadmin.middlewares=strip-phpmyadmin-prefix"
+      - "traefik.http.middlewares.strip-phpmyadmin-prefix.stripPrefix.prefixes=/dappma"
+      - "traefik.http.routers.phpmyadmin.entrypoints=web"
     environment:
       PMA_HOST: database
+      PMA_ABSOLUTE_URI: http://${HOSTNAME}/dappma/
     volumes:
       - ./config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
-    ports:
-      - "8082:80"
     networks:
       vpcbr:
         ipv4_address: 172.21.0.3

@@ -4,7 +4,7 @@ let incidentProductLinesData = [];
 let incidentsCategoriesData = [];
 
 // Fetch data from the API endpoint
-fetch("/api/incidents_cascading_dropdown_data")
+fetch("/docauposte/api/incidents_cascading_dropdown_data")
   .then((response) => response.json())
   .then((data) => {
     incidentZoneData = data.zones;
@@ -97,7 +97,7 @@ function resetDropdowns() {
 
 document.addEventListener("turbo:load", () => {
   // Fetch data from the API endpoint on page load
-  fetch("/api/incidents_cascading_dropdown_data")
+  fetch("/docauposte/api/incidents_cascading_dropdown_data")
     .then((response) => response.json())
     .then((data) => {
       incidentZoneData = data.zones;

@@ -37,9 +37,7 @@ yarn-error.log
 .vscode
 ###> VSC stuff ###
 temp
-# composer.lock
-# symfony.lock
-# yarn.lock
+
 docker-compose.override.yml
 database.test.tar.gz
 doc.test.tar.gz

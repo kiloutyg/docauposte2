@@ -5,7 +5,7 @@ let categoriesData = []; // array to store category data fetched from API
 let buttonsData = []; // array to store button data fetched from API
 
 // Fetch data from the API endpoint and populate the respective arrays
-fetch("/api/cascading_dropdown_data")
+fetch("/docauposte/api/cascading_dropdown_data")
   .then((response) => response.json()) // parse the JSON response
   .then((data) => {
     zonesData = data.zones;
@@ -122,7 +122,7 @@ function resetDropdowns() {
 // Event listener for Turbo-Links page load event
 document.addEventListener("turbo:load", () => {
   // Fetch data from the API endpoint on page load
-  fetch("/api/cascading_dropdown_data")
+  fetch("/docauposte/api/cascading_dropdown_data")
     .then((response) => response.json()) // parse the JSON response
     .then((data) => {
       zonesData = data.zones;
