@@ -65,8 +65,12 @@ ${PROXY_ENV}
       APP_TIMEZONE: ${TIMEZONE}
     volumes:
       - ./:/var/www
-    ports:
-      - "80:80"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.webdap.rule=PathPrefix(`/docauposte`)
+      - traefik.http.routers.webdap.middlewares=strip-webdap-prefix
+      - traefik.http.middlewares.strip-webdap-prefix.stripprefix.prefixes=/docauposte
+      - traefik.http.routers.webdap.entrypoints=web
     depends_on:
       - database
     networks:
@@ -167,8 +171,12 @@ ${PROXY_ENV}
       APP_TIMEZONE: ${TIMEZONE}
     volumes:
       - ./:/var/www
-    ports:
-      - "80:80"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.webdap.rule=PathPrefix(`/docauposte`)
+      - traefik.http.routers.webdap.middlewares=strip-webdap-prefix
+      - traefik.http.middlewares.strip-webdap-prefix.stripprefix.prefixes=/docauposte
+      - traefik.http.routers.webdap.entrypoints=web
     depends_on:
       - database
     networks:
@@ -211,8 +219,12 @@ ${PROXY_ENV}
       APP_TIMEZONE: ${TIMEZONE}
     volumes:
       - ./:/var/www
-    ports:
-      - "80:80"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.webdap.rule=PathPrefix(`/docauposte`)
+      - traefik.http.routers.webdap.middlewares=strip-webdap-prefix
+      - traefik.http.middlewares.strip-webdap-prefix.stripprefix.prefixes=/docauposte
+      - traefik.http.routers.webdap.entrypoints=web
     depends_on:
       - database
     networks:
