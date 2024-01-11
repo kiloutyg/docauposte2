@@ -58,7 +58,7 @@ sg docker -c "
     bash ./env_create.sh;
 
 # Build the docker containers
-    sg docker -c "docker compose up --build"
+    sg docker -c "docker compose up --build -d"
 else
 # If the user answered no, we will ask if he wants to launch the app or if he wants to update it
 while true; do
@@ -72,7 +72,7 @@ done
 # If the user answered yes, we launch the app
     if [ "${LAUNCH_ANSWER}" == "yes" ]; then
         cd docauposte2;
-        sg docker -c "docker compose up"
+        sg docker -c "docker compose up -d"
         else
             while true; do
                 read -p "Do you wish to update the app ? (yes/no) " UPDATE_ANSWER;
