@@ -78,7 +78,7 @@ ${PROXY_ENV}
       - ./:/var/www
     labels:
       - traefik.enable=true
-      - traefik.http.routers.webdap.rule=PathPrefix(`/docauposte`)
+      - traefik.http.routers.webdap.rule=PathPrefix(\`/docauposte\`)
       - traefik.http.routers.webdap.middlewares=strip-webdap-prefix
       - traefik.http.middlewares.strip-webdap-prefix.stripprefix.prefixes=/docauposte
       - traefik.http.routers.webdap.entrypoints=web
@@ -126,7 +126,7 @@ ${PROXY_ENV}
       - ./:/var/www
     labels:
       - traefik.enable=true
-      - traefik.http.routers.webdap.rule=PathPrefix(`/docauposte`)
+      - traefik.http.routers.webdap.rule=PathPrefix(\`/docauposte\`)
       - traefik.http.routers.webdap.middlewares=strip-webdap-prefix
       - traefik.http.middlewares.strip-webdap-prefix.stripprefix.prefixes=/docauposte
       - traefik.http.routers.webdap.entrypoints=web
