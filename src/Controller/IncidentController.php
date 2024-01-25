@@ -203,7 +203,10 @@ class IncidentController extends FrontController
         $incidentEntity = $this->incidentRepository->findOneBy(['id' => $incidentId]);
 
         // Check if the user is the creator of the upload or if he is a super admin
-        if ($this->getUser()->getRoles() === ('ROLE_SUPER_ADMIN') || $this->getUser() === $incidentEntity->getUploader() || $upload->getUploader() === null) {
+        if ($this->authChecker->isGranted('ROLE_ADMIN')) {
+            // Use the incidentService to handle file deletion
+            $name = $this->incidentService->deleteIncidentFile($incidentEntity, $productlineEntity);
+        } else if ($this->getUser() === $incidentEntity->getUploader()) {
             // Use the incidentService to handle file deletion
             $name = $this->incidentService->deleteIncidentFile($incidentEntity, $productlineEntity);
         } else {
