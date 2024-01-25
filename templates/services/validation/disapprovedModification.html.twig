@@ -25,9 +25,9 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 
 	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
 		<div class="card-body ">
-			{% if DisapprovedFile|length > 5 %}
+			{% if DisapprovedFile|length > 0 %}
 				{% if app.user %}
-					{% if  is_granted('ROLE_LINE_ADMIN') %}
+					{% if is_granted('ROLE_LINE_ADMIN') %}
 						<aside class="position-absolute end-0">
 							<a href="{{ path('app_productline_admin', {productline: upload.button.category.productline.name}) }}" class="btn shadow  bg-dark " style="color:white">
 								<span class="fa fa-gear"></span>
