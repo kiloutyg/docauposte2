@@ -223,6 +223,7 @@ class UploadController extends FrontController
                 ]);
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
+                // $this->addFlash('error', 'Une erreur est survenue lors de la modification du fichier.');
                 return $this->redirectToRoute('app_modify_file', [
                     'uploadId' => $uploadId
                 ]);
