@@ -130,7 +130,7 @@ class UploadController extends FrontController
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
 
         // Check if the user is the creator of the upload or if he is a super admin
-        if ($this->getUser()->getRoles() === ["ROLE_SUPER_ADMIN"] || $this->getUser() === $upload->getUploader() || $upload->getUploader() === null) {
+        if ($this->authChecker->isGranted("ROLE_LINE_ADMIN") || $this->getUser() === $upload->getUploader() || $upload->getUploader() === null) {
             // Use the UploadService to handle file deletion
             $name = $this->uploadService->deleteFile($uploadId);
         } else {
