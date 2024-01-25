@@ -230,8 +230,15 @@ class UploadService extends AbstractController
             $upload->setUploader($user);
             // Set the revision 
             $upload->setRevision(1);
-            if ($validated === null) {
-                $this->validationService->createValidation($upload, $request);
+            $preExistingValidation = !empty($upload->getValidation());
+            if ($preExistingValidation) {
+                if ($validated === null) {
+                    $this->validationService->updateValidation($upload, $request);
+                }
+            } else {
+                if ($validated === null) {
+                    $this->validationService->createValidation($upload, $request);
+                }
             }
         } else {
             $validated = true;
@@ -266,7 +273,9 @@ class UploadService extends AbstractController
             $upload->setRevision($upload->getRevision() + 1);
             // If the modification is heavy, reset the approbation and set the $globalModification flag to true
             $globalModification = true;
-            $this->validationService->resetApprobation($upload, $request, $globalModification);
+            if (!$preExistingValidation) {
+                $this->validationService->resetApprobation($upload, $request, $globalModification);
+            }
         } else {
             // If no new file is uploaded, just rename the old one if necessary
             if ($oldFilePath != $Path) {
