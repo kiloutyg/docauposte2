@@ -140,7 +140,7 @@ class CategoryManagerController extends FrontController
         $category = $entity->getCategory()->getName();
 
         // Check if the user is the creator of the button or if he is a super admin
-        if ($this->getUser() === $entity->getCreator() || $this->getUser()->getRoles() === ["ROLE_SUPER_ADMIN"]) {
+        if ($this->getUser() === $entity->getCreator() || $this->authChecker->isGranted("ROLE_LINE_ADMIN")) {
             // This function is used to delete a button and all the uploads attached to it, it depends on the EntityDeletionService class. 
             // The folder is deleted by the FolderCreationService class through the EntityDeletionService class.
             $response = $this->entitydeletionService->deleteEntity($entityType, $entity->getId());
