@@ -57,7 +57,7 @@ version: '3.8'
 
 services:
   web:
-    build: ./docker/dockerfile/
+    image: ghcr.io/polangres/docauposte2:main
     restart: unless-stopped 
     entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
     environment:
@@ -163,7 +163,7 @@ version: '3.8'
 
 services:
   web:
-    build: ./docker/dockerfile/
+    image: ghcr.io/polangres/docauposte2:main
     restart: unless-stopped 
     entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
     environment:
@@ -211,7 +211,7 @@ version: '3.8'
 
 services:
   web:
-    build: ./docker/dockerfile/
+    image: ghcr.io/polangres/docauposte2:main
     restart: unless-stopped 
     entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
     environment:

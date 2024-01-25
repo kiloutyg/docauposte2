@@ -130,7 +130,7 @@ class UploadController extends FrontController
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
 
         // Check if the user is the creator of the upload or if he is a super admin
-        if ($this->getUser()->getRoles() === ["ROLE_SUPER_ADMIN"] || $this->getUser() === $upload->getUploader() || $upload->getUploader() === null) {
+        if ($this->authChecker->isGranted("ROLE_LINE_ADMIN") || $this->getUser() === $upload->getUploader() || $upload->getUploader() === null) {
             // Use the UploadService to handle file deletion
             $name = $this->uploadService->deleteFile($uploadId);
         } else {
@@ -222,7 +222,8 @@ class UploadController extends FrontController
                     'uploadId' => $uploadId
                 ]);
             } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
+                // $this->addFlash('error', $e->getMessage());
+                $this->addFlash('error', 'Une erreur est survenue lors de la modification du fichier.');
                 return $this->redirectToRoute('app_modify_file', [
                     'uploadId' => $uploadId
                 ]);

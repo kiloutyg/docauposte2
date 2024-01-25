@@ -94,7 +94,7 @@
 													{{ category.name|split('.')|first|upper }}
 																		<span class="visually-hidden">{{ category.id }}</span>
 																	</a>
-																	{% if is_granted ('ROLE_SUPER_ADMIN') or app.user is same as( category.creator) %}
+																	{% if is_granted ('ROLE_LINE_ADMIN') or app.user is same as( category.creator) %}
 																		<a href="{{path('app_productline_admin_delete_category', {category: category.name})}}" class="btn btn-danger delete-category">
 																			Supprimer
 																			<span class="visually-hidden">{{ category.id }}</span>

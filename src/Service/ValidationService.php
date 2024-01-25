@@ -67,16 +67,12 @@ class ValidationService extends AbstractController
     {
         // Create empty arrays to store values for validator_department and validator_user
         $validator_user_values = [];
-        $validator_department_values = [];
 
         // Iterate through the keys in the request
         foreach ($request->request->keys() as $key) {
             // If the key contains 'validator_user', add its value to the validator_user_values array
             if (strpos($key, 'validator_user') !== false && $request->request->get($key) !== null && $request->request->get($key) !== '') {
                 $validator_user_values[] = $request->request->get($key);
-            }
-            if (strpos($key, 'validator_department') !== false && $request->request->get($key) !== null && $request->request->get($key) !== '') {
-                $validator_department_values[] = $request->request->get($key);
             }
         }
         $this->logger->info('comment in ValidationService:', ['full_request' => $request->request->all()]);
@@ -125,19 +121,7 @@ class ValidationService extends AbstractController
             );
             $validator_user = null;
         }
-        $validator_department = null;
 
-        // Loop through each validator_department value
-        foreach ($validator_department_values as $validator_department_value) {
-            if ($validator_department_value !== null || $validator_department_value !== '') {
-                $validator_department = $this->departmentRepository->find($validator_department_value);
-            }
-            $this->createDepartmentApprobationProcess(
-                $validation,
-                $validator_department
-            );
-            $validator_department = null;
-        }
         // Send a notification email to the validator
         $this->mailerService->approbationEmail($validation);
 
@@ -145,6 +129,64 @@ class ValidationService extends AbstractController
         return $validation;
     }
 
+    public function updateValidation(Upload $upload, Request $request)
+    {
+        // Get the Validation instance associated with the Upload instance
+        $validation = $upload->getValidation();
+
+        // Store the comment in a variable
+        $comment = $request->request->get('modificationComment');
+
+        // If the user added a comment persist the comment 
+        if ($comment != null) {
+            $validation->setComment($comment);
+        }
+
+        // Persist the Validation instance to the database
+        $this->em->persist($validation);
+
+        // Flush changes to the database
+        $this->em->flush();
+
+        // Get the approbators associated with the Validation instance
+        $approbations = [];
+
+        $approbations = $validation->getApprobations();
+
+        foreach ($approbations as $approbation) {
+            // Remove the Approbation instance from the database
+            $this->em->remove($approbation);
+        }
+
+        // Iterate through the keys in the request to get the id for  validator_user
+        foreach ($request->request->keys() as $key) {
+            // If the key contains 'validator_user', add its value to the validator_user_values array
+            if (strpos($key, 'validator_user') !== false && $request->request->get($key) !== null && $request->request->get($key) !== '') {
+                $validator_user_values[] = $request->request->get($key);
+            }
+        }
+
+        // Loop through each validator_user value
+        foreach ($validator_user_values as $validator_user_value) {
+            // If the validator_user value is not null
+            if ($validator_user_value !== null || $validator_user_value !== '') {
+                // Find the User entity using the repository and the validator_user value
+                $validator_user = $this->userRepository->find($validator_user_value);
+            }
+            // Call the createApprobationProcess method to create an Approbation process
+            $this->createApprobationProcess(
+                $validation,
+                $validator_user
+            );
+            $validator_user = null;
+        }
+
+        // Send a notification email to the validator
+        $this->mailerService->approbationEmail($validation);
+
+        // Return early
+        return;
+    }
 
     public function createApprobationProcess(
         $validation,
@@ -166,7 +208,7 @@ class ValidationService extends AbstractController
         $this->em->flush();
 
         // Return the Approbation instance
-        return $approbation;
+        return;
     }
 
     public function createDepartmentApprobationProcess(
@@ -407,6 +449,5 @@ class ValidationService extends AbstractController
                 file_put_contents($filePath, $today->format('Y-m-d'));
             }
         }
-
     }
 }
