@@ -248,7 +248,8 @@ class IncidentController extends FrontController
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirect($originUrl);
             } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
+                // $this->addFlash('error', $e->getMessage());
+                $this->addFlash('error', 'Le fichier n\'a pas été modifié. Veuillez réessayer.');
 
                 return $this->redirect($originUrl);
             }

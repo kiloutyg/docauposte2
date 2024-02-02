@@ -68,7 +68,7 @@ class IncidentType extends AbstractType
                     'choice_label' => 'name',
                     'label' => 'Select an incident category:',
                     'placeholder' => 'Choisir un type d\'incident',
-                    'required' => false,
+                    'required' => true,
                     'multiple' => false,
                 ]
             );
