@@ -18,8 +18,19 @@
 
 						<div class="form-control mb-3">
 							<label for="username">Nom d'utilisateur</label>
-							<input type="text" name="username" placeholder="Nom d'utilisateur" required class="form-control" id="username">
+							<div data-controller="username-validation">
+									<input type="text"
+													class="form-control"
+													data-username-validation-target="username"
+													data-action="keyup->username-validation#validateUsername"
+													placeholder="prénom.nom"
+													id="username"
+													name="username"
+													required>
 
+									<div data-username-validation-target="message"
+											class="username-message"></div>
+							</div>                                          
 						</div>
 						<div class="form-control mb-3">
 							<label for="floatingPassword">Mot de passe</label>

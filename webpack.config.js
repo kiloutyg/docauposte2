@@ -36,9 +36,6 @@ Encore
   .addEntry("department-creation", "./assets/js/department-creation.js")
   .addEntry("document-validator", "./assets/js/document-validator.js")
 
-  // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
-  .enableStimulusBridge("./assets/controllers.json")
-
   // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
   .splitEntryChunks()
 
@@ -87,6 +84,6 @@ Encore.enableSassLoader();
 //.enableIntegrityHashes(Encore.isProduction())
 
 // uncomment if you're having problems with a jQuery plugin
-// Encore.autoProvidejQuery();
+Encore.autoProvidejQuery();
 
 module.exports = Encore.getWebpackConfig();
