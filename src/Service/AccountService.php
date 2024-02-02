@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use App\Entity\User;
 
@@ -22,23 +23,26 @@ class AccountService
     private $manager;
     private $departmentRepository;
     private $entityDeletionService;
+    private $validator;
 
     public function __construct(
         UserPasswordHasherInterface $passwordHasher,
         UserRepository $userRepository,
         EntityManagerInterface $manager,
         DepartmentRepository $departmentRepository,
-        EntityDeletionService $entityDeletionService
+        EntityDeletionService $entityDeletionService,
+        ValidatorInterface $validator
     ) {
         $this->passwordHasher = $passwordHasher;
         $this->userRepository = $userRepository;
         $this->manager = $manager;
         $this->departmentRepository = $departmentRepository;
         $this->entityDeletionService = $entityDeletionService;
+        $this->validator = $validator;
     }
 
     // This function is responsible for creating a new user account and persisting it to the database
-    public function createAccount(Request $request, $error)
+    public function createAccount(Request $request)
     {
         if ($request->getMethod() == 'POST') {
             $name = $request->request->get('username');
@@ -49,19 +53,41 @@ class AccountService
             $emailAddress = $request->request->get('emailAddress');
 
 
+
             // check if the username is already in use
             $user = $this->userRepository->findOneBy(['username' => $name]);
             if ($user) {
-                $error = 'Ce nom d\'utilisateur est déja utilisé.';
+                throw new \Exception('Ce nom d\'utilisateur est déja utilisé.');
             } else {
                 // create the user
                 $user = new User();
+
                 $password = $this->passwordHasher->hashPassword($user, $password);
                 $user->setUsername($name);
                 $user->setPassword($password);
                 $user->setRoles([$role]);
                 $user->setDepartment($department);
                 $user->setEmailAddress($emailAddress);
+
+                $errors = $this->validator->validate($user);
+                if (count($errors) > 0) {
+                    $errorMessages = [];
+                    foreach ($errors as $violation) {
+                        // You can use ->getPropertyPath() if you need to show the field name
+                        // $errorMessages[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
+                        $errorMessages[] = $violation->getMessage();
+                    }
+
+                    // Now you have an array of user-friendly messages you can display
+                    // For example, you can separate them with new lines when displaying in text format:
+                    $errorsString = implode("\n", $errorMessages);
+
+                    // If you need to return JSON response:
+                    // return new JsonResponse(['errors' => $errorMessages], Response::HTTP_BAD_REQUEST);
+
+                    throw new \Exception($errorsString);
+                }
+
                 $this->manager->persist($user);
                 $this->manager->flush();
 

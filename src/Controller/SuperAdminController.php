@@ -45,14 +45,16 @@ class SuperAdminController extends FrontController
     public function createAdmin(Request $request): Response
     {
         $error = null;
-        $result = $this->accountService->createAccount($request, $error);
-
-        if ($result) {
-            $this->addFlash('success', 'Le compte a été créé');
-        }
-
-        if ($error) {
-            $this->addFlash('error', $error);
+        try {
+            $result = $this->accountService->createAccount($request);
+            if ($result) {
+                $this->addFlash('success', 'Le compte a bien été créé.');
+            }
+        } catch (\Exception $e) {
+            // Catch and handle the exception.
+            // Log it, add a flash message, etc.
+            $error = $e->getMessage();
+            $this->addFlash('danger', $error);
         }
 
         return $this->redirectToRoute('app_super_admin', [
