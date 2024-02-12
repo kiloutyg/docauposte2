@@ -206,7 +206,7 @@ class UploadController extends FrontController
         $comment = $request->request->get('modificationComment');
 
         $form->handleRequest($request);
-
+        $this->logger->info('modifying after the handlerequest', ['full_request' => $request->request->all()]);
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
@@ -222,8 +222,8 @@ class UploadController extends FrontController
                     'uploadId' => $uploadId
                 ]);
             } catch (\Exception $e) {
-                // $this->addFlash('error', $e->getMessage());
-                $this->addFlash('error', 'Une erreur est survenue lors de la modification du fichier.');
+                $this->addFlash('error', $e->getMessage());
+                // $this->addFlash('error', 'Une erreur est survenue lors de la modification du fichier.');
                 return $this->redirectToRoute('app_modify_file', [
                     'uploadId' => $uploadId
                 ]);

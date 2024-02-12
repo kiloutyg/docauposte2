@@ -17,12 +17,14 @@ function populateDropdown(dropdown, data, selectedId) {
 
   // Create a default "Select" option and add it to the dropdown
   const defaultOption = document.createElement("option");
-  defaultOption.value = "";
+  defaultOption.value = '';
   defaultOption.selected = true;
   defaultOption.disabled = true;
   defaultOption.hidden = true;
-  defaultOption.textContent = "Selectionner un Valideur";
+  defaultOption.textContent = 'Selectionner un Valideur';
   dropdown.appendChild(defaultOption);
+
+
 
   // Add each item in the data array as an option in the dropdown
   data.forEach((item) => {
@@ -34,6 +36,8 @@ function populateDropdown(dropdown, data, selectedId) {
     nameParts[1] = nameParts[1].toUpperCase();
     userName = nameParts.join(" ");
     option.textContent = userName;
+
+
 
     // If this option should be selected, set the 'selected' attribute
     if (item.id === selectedId) {
@@ -127,6 +131,8 @@ document.addEventListener('turbo:load', function () {
       createNewSelect(e.target.value, e.target.id);
     });
   }
+
+
 });
 
 // There is another event listener attached to the document's 
@@ -168,15 +174,20 @@ function createNewSelect(selectedValue, selectId) {
 // (up to the number of users in the usersData array), it calls the createSelectElement function.
 
 function createSelectElement() {
+  console.log('Creating a new select element createSelectElement called');  // Debug line
   // Create a new select element
   var newSelect = document.createElement('select');
   // Add classes to the new select element
   newSelect.classList.add('mt-2', 'mb-2', 'form-select', 'userSelect');
+  newSelect.required = true;
   // Generate a unique id for the new select element
   var newSelectId = "validator_user" + document.querySelectorAll('.userSelect').length;
   // Set the id and name attributes of the new select element
   newSelect.id = newSelectId;
   newSelect.name = newSelectId;
+  if (document.querySelectorAll('.userSelect').length > 3) {
+    newSelect.required = false;
+  }
   // Create a default option for the new select element
   const defaultOption = document.createElement('option');
   defaultOption.value = '';
@@ -262,22 +273,31 @@ document.addEventListener("turbo:load", function () {
 
 // This code is listening for the "turbo:load" event on the document object
 document.addEventListener("turbo:load", function () {
+
+
+  // Declaring a variable to check if the file is a validation cycle
+  // Check if the input element for validation cycle exists and set the flag accordingly
+  const validationCycleInput = document.querySelector('div[name="validation_cycle"]');
+  let isValidationCycle = validationCycleInput !== null;
+
+
   // This code selects the file input element with the id 'upload_file' and assigns it to the variable fileInput
-  let fileInput = document.getElementById('upload_file');
-  if (!fileInput) {
-    fileInput = document.getElementById('file');
-  }
+  let fileInput = document.getElementById('upload_file') || document.getElementById('file');
+
   // This code selects the textarea element with the name 'modificationComment' and assigns it to the variable textareaComment
-  let textareaComment = document.querySelector('textarea[name="modificationComment"]');
-  if (!textareaComment) {
-    textareaComment = document.querySelector('textarea[name="validationComment"]');
-  }
+  let textareaComment = document.querySelector('textarea[name="modificationComment"]') || document.querySelector('textarea[name="validationComment"]');
+
   // This code selects the checkbox input element with the id 'validatorRequired' and assigns it to the variable validatorCheckbox
   const validatorCheckbox = document.getElementById('validatorRequired');
   // This is a function that will be used later to determine if the textarea should be required or not
   function updateTextareaRequirement() {
+    // Check if there are any files selected in the file input and if the textarea is the modificationComment
+    if (isValidationCycle && fileInput.files.length > 0 && textareaComment === document.querySelector('textarea[name="modificationComment"]')) {
+      textareaComment.required = true;
+      console.log('Textarea is now required');
+    }
     // Check if there are any files selected in the file input and if the validator checkbox is checked
-    if (fileInput.files.length > 0 && validatorCheckbox.checked) {
+    else if (validatorCheckbox.checked) {
       // If both conditions are true, set the 'required' attribute of the textarea to true
       textareaComment.required = true;
       // Log a message to the console indicating that the textarea is now required
@@ -290,14 +310,42 @@ document.addEventListener("turbo:load", function () {
     }
   }
 
+  // Declare a variable to store the Select element with the id 'validator_user'
+  let validatorUser = document.querySelector('select[name="validator_user0"]');
+
+  // This is a function that will be used later to determine if the Select should be required or not
+  function updateSelectRequirement() {
+    // Check if there are any files selected in the file input and if the validator checkbox is checked
+    if (validatorCheckbox.checked) {
+      // If both conditions are true, set the 'required' attribute of the Select to true
+      validatorUser.required = true;
+      // Log a message to the console indicating that the Select is now required
+      console.log('Select validatorUser is now required');
+    } else {
+      // If either condition is false, set the 'required' attribute of the Select to false
+      validatorUser.required = false;
+      // Log a message to the console indicating that the Select is not required
+      console.log('Select validatorUser is not required');
+    }
+  }
+
   // Check if the validator checkbox is present on the page
   if (validatorCheckbox) {
     // If it is, add an event listener to listen for changes on the checkbox and call the updateTextareaRequirement function
     validatorCheckbox.addEventListener('change', updateTextareaRequirement);
+    validatorCheckbox.addEventListener('change', updateSelectRequirement);
   }
+
   // Check if both the file input and textarea are present on the page
   if (fileInput && textareaComment) {
     // If they are, add an event listener to listen for changes on the file input and call the updateTextareaRequirement function
     fileInput.addEventListener('change', updateTextareaRequirement);
+
+  }
+
+  // Check if both the file input and validatorUser are present on the page
+  if (fileInput && validatorUser) {
+    // If they are, add an event listener to listen for changes on the file input and call the updateSelectRequirement function
+    fileInput.addEventListener('change', updateSelectRequirement);
   }
 });

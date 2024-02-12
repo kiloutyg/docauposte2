@@ -25,16 +25,20 @@ class OldUploadService extends AbstractController
     protected $uploadRepository;
     protected $projectDir;
 
+    protected $logger;
+
     public function __construct(
         EntityManagerInterface $manager,
         OldUploadRepository $oldUploadRepository,
         ParameterBagInterface $params,
-        UploadRepository $uploadRepository
+        UploadRepository $uploadRepository,
+        LoggerInterface $logger
     ) {
         $this->manager                  = $manager;
         $this->oldUploadRepository      = $oldUploadRepository;
         $this->uploadRepository         = $uploadRepository;
         $this->projectDir               = $params->get('kernel.project_dir');
+        $this->logger                   = $logger;
     }
 
 
@@ -42,6 +46,7 @@ class OldUploadService extends AbstractController
     public function retireOldUpload(string $OldFilePath, string $OldFileName)
 
     {
+        $this->logger->info('hello from retireOldUpload method', [$OldFileName, $OldFilePath]);
         $upload = $this->uploadRepository->findOneBy(['path' => $OldFilePath]);
 
         if ($upload->getOldUpload() !== null) {

@@ -193,6 +193,9 @@ class UploadService extends AbstractController
     {
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
+
+        $this->logger->info('in modifyFile does it know it got a new file',  ['full_request' => $request->request->all(), 'newfile var value' => $newFile]);
+
         // Public directory
         $public_dir = $this->projectDir . '/public';
 
@@ -214,8 +217,11 @@ class UploadService extends AbstractController
 
         $this->logger->info('modifyFile UploadService commentaire service', [$comment]);
 
+        $preExistingValidation = !empty($upload->getValidation());
+        $this->logger->info(' does it have a preexistingvalidation', [$preExistingValidation]);
+
         ////////////// Part mainly important for the introduction of the validation process in the production environment
-        // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
+        // Check if the file need to be validated or not, by checking if there is a validator_user string in the request
         if ($request->request->get('validatorRequired') == 'true') {
             foreach ($request->request->keys() as $key) {
                 if (strpos($key, 'validator_user') !== false) {
@@ -223,6 +229,7 @@ class UploadService extends AbstractController
                 }
             }
             // Retire the old file
+            $this->logger->info('hello from just before the retireOldUpload method inside the validator required loop');
             $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
             // Set the validated boolean property
             $upload->setValidated($validated);
@@ -230,7 +237,6 @@ class UploadService extends AbstractController
             $upload->setUploader($user);
             // Set the revision 
             $upload->setRevision(1);
-            $preExistingValidation = !empty($upload->getValidation());
             if ($preExistingValidation) {
                 if ($validated === null) {
                     $this->validationService->updateValidation($upload, $request);
@@ -246,9 +252,14 @@ class UploadService extends AbstractController
         // If new file exists, process it and delete the old one
         if ($newFile) {
 
-            // Retire the old file
-            $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
+            try { // Retire the old file
+                $this->logger->info('hello from just before the retireOldUpload method inside the newfile loop');
 
+                $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
+            } catch (\exception $e) {
+                $this->logger->info('with newfile, error while retiring the old file', [$e]);
+                throw $e;
+            }
             // Check if the file is of the right type
             if ($newFile->getMimeType() != 'application/pdf') {
                 throw new \Exception('Le fichier doit être un pdf');
@@ -261,6 +272,7 @@ class UploadService extends AbstractController
             try {
                 $newFile->move($folderPath . '/', $upload->getFilename());
             } catch (\Exception $e) {
+                $this->logger->info('with newfile, error while moving the file', [$e]);
                 throw $e;
             }
             // Update the file path in the upload object
@@ -273,7 +285,8 @@ class UploadService extends AbstractController
             $upload->setRevision($upload->getRevision() + 1);
             // If the modification is heavy, reset the approbation and set the $globalModification flag to true
             $globalModification = true;
-            if (!$preExistingValidation) {
+            $this->logger->info('with newfile does it have a preexistingvalidation', [$preExistingValidation]);
+            if ($preExistingValidation) {
                 $this->validationService->resetApprobation($upload, $request, $globalModification);
             }
         } else {
