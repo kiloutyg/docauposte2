@@ -144,7 +144,6 @@ class UploadService extends AbstractController
 
         // Save the changes to the database
         $this->manager->flush();
-        $this->logger->info('uploadFile UploadService Logging the full request in uploadService:', ['full_request' => $request->request->all()]);
 
         $uploadEntity = $this->uploadRepository->findOneBy(['filename' => $filename, 'button' => $button]);
         if ($validated === null) {
@@ -194,8 +193,6 @@ class UploadService extends AbstractController
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
 
-        $this->logger->info('in modifyFile does it know it got a new file',  ['full_request' => $request->request->all(), 'newfile var value' => $newFile]);
-
         // Public directory
         $public_dir = $this->projectDir . '/public';
 
@@ -215,10 +212,7 @@ class UploadService extends AbstractController
 
         $comment = $request->request->get('modificationComment');
 
-        $this->logger->info('modifyFile UploadService commentaire service', [$comment]);
-
         $preExistingValidation = !empty($upload->getValidation());
-        $this->logger->info(' does it have a preexistingvalidation', [$preExistingValidation]);
 
         ////////////// Part mainly important for the introduction of the validation process in the production environment
         // Check if the file need to be validated or not, by checking if there is a validator_user string in the request
@@ -229,7 +223,6 @@ class UploadService extends AbstractController
                 }
             }
             // Retire the old file
-            $this->logger->info('hello from just before the retireOldUpload method inside the validator required loop');
             $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
             // Set the validated boolean property
             $upload->setValidated($validated);
@@ -253,11 +246,9 @@ class UploadService extends AbstractController
         if ($newFile) {
 
             try { // Retire the old file
-                $this->logger->info('hello from just before the retireOldUpload method inside the newfile loop');
 
                 $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
             } catch (\exception $e) {
-                $this->logger->info('with newfile, error while retiring the old file', [$e]);
                 throw $e;
             }
             // Check if the file is of the right type
@@ -272,7 +263,6 @@ class UploadService extends AbstractController
             try {
                 $newFile->move($folderPath . '/', $upload->getFilename());
             } catch (\Exception $e) {
-                $this->logger->info('with newfile, error while moving the file', [$e]);
                 throw $e;
             }
             // Update the file path in the upload object
@@ -285,7 +275,6 @@ class UploadService extends AbstractController
             $upload->setRevision($upload->getRevision() + 1);
             // If the modification is heavy, reset the approbation and set the $globalModification flag to true
             $globalModification = true;
-            $this->logger->info('with newfile does it have a preexistingvalidation', [$preExistingValidation]);
             if ($preExistingValidation) {
                 $this->validationService->resetApprobation($upload, $request, $globalModification);
             }
@@ -306,10 +295,10 @@ class UploadService extends AbstractController
     }
 
 
+
     // This function is responsible for the logic of grouping the uploads files by parent entities
     public function groupUploads($uploads)
     {
-
         $groupedUploads = [];
 
         // Group uploads by zone, productLine, category, and button

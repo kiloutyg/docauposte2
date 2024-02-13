@@ -46,7 +46,6 @@ class OldUploadService extends AbstractController
     public function retireOldUpload(string $OldFilePath, string $OldFileName)
 
     {
-        $this->logger->info('hello from retireOldUpload method', [$OldFileName, $OldFilePath]);
         $upload = $this->uploadRepository->findOneBy(['path' => $OldFilePath]);
 
         if ($upload->getOldUpload() !== null) {

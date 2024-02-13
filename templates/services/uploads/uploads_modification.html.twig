@@ -201,7 +201,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 													<input type="checkbox" class="btn-check" name="validatorRequired" id="validatorRequired" autocomplete="off" value="true">
 													<label class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed" for="validatorRequired" data-bs-toggle="collapse" data-bs-target="#validatorNeeded" aria-expanded="false" aria-controls="validatorNeeded" id="validatorSelect">
 														<strong>Validation du Document</strong>
-														&nbsp; (Ouvrez ce menu pour activer la validation de document, fermez le pour la désactiver)</label>
+														&nbsp; (Ouvrez ce menu pour activer la validation de document, fermez le pour la désactiver. Si le document a déjà nécéssité une validation il n'est pas necessaire de selectionner à nouveau les validateurs.)</label>
 												</div>
 												<div id="validatorNeeded" aria-labelledby="validatorNeeded" data-bs-parent="#accordionValidator" class="accordion-collapse collapse ">
 													<div class="accordion-body row ">
@@ -226,13 +226,11 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 									{% else %}
 										<div class="accordion mx-auto col-8 justify-content-center" id="accordionValidator">
 											<div class="accordion-item ">
-												<div
-													class="accordion-header" id="validatorNeeded-header">
-													{# <input type="hidden" name="validatorRequired" value="false"> #}
+												<div class="accordion-header" id="validatorNeeded-header">
 													<input type="checkbox" class="btn-check" name="validatorRequired" id="validatorRequired" autocomplete="off" value="true">
 													<label class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed" for="validatorRequired" data-bs-toggle="collapse" data-bs-target="#validatorNeeded" aria-expanded="false" aria-controls="validatorNeeded" id="validatorSelect">
 														<strong>Validation du Document</strong>
-														&nbsp; (Ouvrez ce menu pour activer la validation de document, fermez le pour la désactiver)</label>
+														&nbsp; (Ouvrez ce menu pour activer la validation de document, fermez le pour la désactiver. Si le document a déjà nécéssité une validation il n'est pas necessaire de selectionner à nouveau les validateurs.)</label>
 												</div>
 												<div id="validatorNeeded" aria-labelledby="validatorNeeded" data-bs-parent="#accordionValidator" class="accordion-collapse collapse ">
 													<div class="accordion-body row ">
