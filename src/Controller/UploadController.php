@@ -162,7 +162,7 @@ class UploadController extends FrontController
         $currentUser = $this->security->getUser();
         $uploader = $upload->getUploader();
         // If it's a GET request, render the form
-        if ($request->isMethod('GET') && ($currentUser === $uploader || $uploader === null || $currentUser->getRoles() === ["ROLE_SUPER_ADMIN"])) {
+        if ($request->isMethod('GET') && ($currentUser === $uploader || $uploader === null || $currentUser->getRoles() === ["ROLE_ADMIN"])) {
             return $this->render('services/uploads/uploads_modification.html.twig', [
                 'form'        => $form->createView(),
                 'zone'        => $zone,
@@ -172,7 +172,7 @@ class UploadController extends FrontController
                 'upload'      => $upload
             ]);
         } else {
-            $this->addFlash('error', 'Vous n\'avez pas les droits pour modifier ce fichier.');
+            $this->addFlash('error', 'Vous n\'avez pas les droits pour modifier ce fichier. Contacter un administrateur ou le service informatique.');
             return $this->redirectToRoute('app_base');
         }
     }
