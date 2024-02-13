@@ -38,7 +38,17 @@
 			</script>
 		{% endif %}
 	{% endif %}
-
+	{% if  is_granted('ROLE_LINE_ADMIN') %}
+		<aside class="position-absolute end-0 mt-2">
+			<a href="{{ path('app_productline_admin', {productline: productLine.name}) }}" class="btn shadow  bg-dark " style="color:white">
+				<span class="fa fa-gear"></span>
+				<strong>
+					<span class="button-text">Centre d'Administration de la Ligne
+					</span>
+				</strong>
+			</a>
+		</aside>
+	{% endif %}
 
 	<h1 class="my-4">
 		<strong>Page d'administration de la catégorie
@@ -91,7 +101,7 @@
 															{% for button in category.buttons %}
 																<li class="form-control d-flex justify-content-between align-items-center mb-2">
 																	<a href="{{path('app_button', {button: button.name, category: button.category.name, productline: button.category.productLine.name, zone: button.category.productLine.zone.name})}}" class="btn btn-dark">
-													{{ button.name|split('.')|first|upper }}
+																		{{ button.name|split('.')|first|upper }}
 																	</a>
 																	{% if is_granted ('ROLE_LINE_ADMIN') or app.user is same as( button.creator) %}
 																		<a href="{{path('app_category_manager_delete_button', {button: button.name})}}" class="btn btn-danger delete-button">
