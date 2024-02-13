@@ -88,12 +88,8 @@ class FolderCreationService
         // Try to rename the folder
         if (rename($oldPath, $newPath)) {
         } else {
-            $this->logger->info('updateFolderStructureAndName: Folder does not exist');
+            throw new \Exception('updateFolderStructureAndName: Could not rename the folder');
         }
-        $this->logger->info('updateFolderStructureAndName: Old path: ' . $oldPath);
-        $this->logger->info('updateFolderStructureAndName: New path: ' . $newPath);
-        $this->logger->info('updateFolderStructureAndName: Old name: ' . $oldName);
-        $this->logger->info('updateFolderStructureAndName: New name: ' . $newName);
     }
 }
 // }

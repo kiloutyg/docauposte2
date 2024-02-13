@@ -163,7 +163,6 @@ class UploadController extends FrontController
         $uploader = $upload->getUploader();
         // If it's a GET request, render the form
         if ($request->isMethod('GET') && ($currentUser === $uploader || $uploader === null || $currentUser->getRoles() === ["ROLE_SUPER_ADMIN"])) {
-            $this->logger->info('Logging the full request in the if get of the controller:', ['full_request' => $request->request->all()]);
             return $this->render('services/uploads/uploads_modification.html.twig', [
                 'form'        => $form->createView(),
                 'zone'        => $zone,
@@ -203,15 +202,30 @@ class UploadController extends FrontController
                 'uploadId' => $uploadId
             ]);
         }
+
         $comment = $request->request->get('modificationComment');
+        $newValidation = $request->request->get('validatorRequired');
+        $enoughValidator = false;
+        // foreach ($request->request->keys() as $key) {
+        //     if (($key == "validator_user3")) {
+        //         $enoughValidator = true;
+        //         break;
+        //     }
+        // }
+        $enoughValidator = $request->request->has('validator_user4');
 
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
                 if ($upload->getFile() && $upload->getValidation() != null && $comment == null && $comment == "") {
                     $this->addFlash('error', 'Le commentaire est vide. Commenter votre modification est obligatoire.');
+                    return $this->redirectToRoute('app_modify_file', [
+                        'uploadId' => $uploadId
+                    ]);
+                }
+                if ($newValidation == "true" && $enoughValidator == false) {
+                    $this->addFlash('error', 'Selectionner au moins 4 validateurs pour valider le fichier.');
                     return $this->redirectToRoute('app_modify_file', [
                         'uploadId' => $uploadId
                     ]);
@@ -222,8 +236,8 @@ class UploadController extends FrontController
                     'uploadId' => $uploadId
                 ]);
             } catch (\Exception $e) {
-                // $this->addFlash('error', $e->getMessage());
-                $this->addFlash('error', 'Une erreur est survenue lors de la modification du fichier.');
+                $this->addFlash('error', $e->getMessage());
+                // $this->addFlash('error', 'Une erreur est survenue lors de la modification du fichier.');
                 return $this->redirectToRoute('app_modify_file', [
                     'uploadId' => $uploadId
                 ]);

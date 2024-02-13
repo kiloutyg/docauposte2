@@ -144,7 +144,6 @@ class UploadService extends AbstractController
 
         // Save the changes to the database
         $this->manager->flush();
-        $this->logger->info('uploadFile UploadService Logging the full request in uploadService:', ['full_request' => $request->request->all()]);
 
         $uploadEntity = $this->uploadRepository->findOneBy(['filename' => $filename, 'button' => $button]);
         if ($validated === null) {
@@ -193,6 +192,7 @@ class UploadService extends AbstractController
     {
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
+
         // Public directory
         $public_dir = $this->projectDir . '/public';
 
@@ -212,10 +212,10 @@ class UploadService extends AbstractController
 
         $comment = $request->request->get('modificationComment');
 
-        $this->logger->info('modifyFile UploadService commentaire service', [$comment]);
+        $preExistingValidation = !empty($upload->getValidation());
 
         ////////////// Part mainly important for the introduction of the validation process in the production environment
-        // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
+        // Check if the file need to be validated or not, by checking if there is a validator_user string in the request
         if ($request->request->get('validatorRequired') == 'true') {
             foreach ($request->request->keys() as $key) {
                 if (strpos($key, 'validator_user') !== false) {
@@ -230,7 +230,6 @@ class UploadService extends AbstractController
             $upload->setUploader($user);
             // Set the revision 
             $upload->setRevision(1);
-            $preExistingValidation = !empty($upload->getValidation());
             if ($preExistingValidation) {
                 if ($validated === null) {
                     $this->validationService->updateValidation($upload, $request);
@@ -246,9 +245,12 @@ class UploadService extends AbstractController
         // If new file exists, process it and delete the old one
         if ($newFile) {
 
-            // Retire the old file
-            $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
+            try { // Retire the old file
 
+                $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
+            } catch (\exception $e) {
+                throw $e;
+            }
             // Check if the file is of the right type
             if ($newFile->getMimeType() != 'application/pdf') {
                 throw new \Exception('Le fichier doit être un pdf');
@@ -273,7 +275,7 @@ class UploadService extends AbstractController
             $upload->setRevision($upload->getRevision() + 1);
             // If the modification is heavy, reset the approbation and set the $globalModification flag to true
             $globalModification = true;
-            if (!$preExistingValidation) {
+            if ($preExistingValidation) {
                 $this->validationService->resetApprobation($upload, $request, $globalModification);
             }
         } else {
@@ -293,10 +295,10 @@ class UploadService extends AbstractController
     }
 
 
+
     // This function is responsible for the logic of grouping the uploads files by parent entities
     public function groupUploads($uploads)
     {
-
         $groupedUploads = [];
 
         // Group uploads by zone, productLine, category, and button
