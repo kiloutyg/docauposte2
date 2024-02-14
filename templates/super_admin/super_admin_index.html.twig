@@ -53,14 +53,14 @@
 			</h2>
 			<div id="collapseAccount" class="accordion-collapse collapse" aria-labelledby="headingAccount" data-bs-parent="#accordionSuperAdmin">
 				<div class="accordion-body accordion-bg shadow shadow-inset">
-
-					<form class="form-floating row mx-auto" method="POST" action="{{ path('app_super_admin_create_admin') }}">
-						{% include "services/accountservices/create_account.html.twig" %}
-					</form>
+					<div class="card border-0 shadow rounded-3 my-5">
+						<form class="form-floating row mx-auto" method="POST" action="{{ path('app_super_admin_create_admin') }}">
+							{% include "services/accountservices/create_account.html.twig" %}
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>
-
 
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="headingZone">
@@ -127,85 +127,104 @@
 							</div>
 						</div>
 					</div>
-					{{ render(controller('App\\Controller\\SuperAdminController::operatorManagement'), options = []) }}
-
-					<div class="accordion-item">
-						<h2 class="accordion-header" id="headingUpload">
-							<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUpload" aria-expanded="false" aria-controls="collapseUpload">
-								<strong>Formulaire d'upload :</strong>
-							</button>
-						</h2>
-						<div id="collapseUpload" class="accordion-collapse collapse" aria-labelledby="headingUpload" data-bs-parent="#accordionSuperAdmin">
-							<div class="accordion-body accordion-bg shadow shadow-inset">
-								<div class="card border-0 shadow rounded-3 my-5">
-									<div class="card-body">
-										<div class="row">
-											<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
-												{% include "services/uploads/upload.html.twig" %}
-											</form>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-
-					<div class="accordion-item">
-						<h2 class="accordion-header" id="headingIncident">
-							<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIncident" aria-expanded="false" aria-controls="collapseIncident">
-								<strong>Formulaire d'ajout d'Incident :</strong>
-							</button>
-						</h2>
-						<div id="collapseIncident" class="accordion-collapse collapse" aria-labelledby="headingIncident" data-bs-parent="#accordionSuperAdmin">
-							<div class="accordion-body accordion-bg shadow shadow-inset">
-								<div class="card border-0 shadow rounded-3 my-5">
-									<div class="card-body">
-										<div class="row">
-											<form action="{{path('app_generic_upload_incident_files')}}" method="POST" enctype="multipart/form-data">
-												{% include "services/incidents/incidents.html.twig" %}
-											</form>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-
-					<div class="accordion-item">
-						<h2 class="accordion-header" id="headingUploadedList">
-							<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUploadedList" aria-expanded="false" aria-controls="collapseUploadedList">
-								<strong>Liste des fichiers chargés :</strong>
-							</button>
-						</h2>
-						<div id="collapseUploadedList" class="accordion-collapse collapse" aria-labelledby="headingUploadedList" data-bs-parent="#accordionSuperAdmin">
-							<div class="accordion-body accordion-bg shadow shadow-inset">
-								<div class="row">
-									<div>
-										{% include "services/uploads/uploaded_list.html.twig" %}
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-
-					<div class="accordion-item">
-						<h2 class="accordion-header" id="headingValidatedList">
-							<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseValidatedList" aria-expanded="false" aria-controls="collapseValidatedList">
-								<strong>Liste des validations :</strong>
-							</button>
-						</h2>
-						<div id="collapseValidatedList" class="accordion-collapse collapse" aria-labelledby="headingValidatedList" data-bs-parent="#accordionSuperAdmin">
-							<div class="accordion-body accordion-bg shadow shadow-inset">
-								<div class="row">
-									<div>
-										{% include "services/validation/validation_list.html.twig" %}
-									</div>
-								</div>
+				</div>
+			</div>
+		</div>
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="headingOperatorMannagement">
+				<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOperatorMannagement" aria-expanded="false" aria-controls="collapseOperatorMannagement">
+					<strong>Formulaire de gestions Operateurs :</strong>
+				</button>
+			</h2>
+			<div id="collapseOperatorMannagement" class="accordion-collapse collapse" aria-labelledby="headingOperatorMannagement" data-bs-parent="#accordionSuperAdmin">
+				<div class="accordion-body accordion-bg shadow shadow-inset">
+					<div class="card border-0 shadow rounded-3 my-5">
+						<div class="card-body">
+							<div class="row">
+								{{ render(controller('App\\Controller\\SuperAdminController::operatorManagement'), options = []) }}
 							</div>
 						</div>
 					</div>
 				</div>
-			{% endblock %}
+			</div>
+		</div>
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="headingUpload">
+				<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUpload" aria-expanded="false" aria-controls="collapseUpload">
+					<strong>Formulaire d'upload :</strong>
+				</button>
+			</h2>
+			<div id="collapseUpload" class="accordion-collapse collapse" aria-labelledby="headingUpload" data-bs-parent="#accordionSuperAdmin">
+				<div class="accordion-body accordion-bg shadow shadow-inset">
+					<div class="card border-0 shadow rounded-3 my-5">
+						<div class="card-body">
+							<div class="row">
+								<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+									{% include "services/uploads/upload.html.twig" %}
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="headingIncident">
+				<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIncident" aria-expanded="false" aria-controls="collapseIncident">
+					<strong>Formulaire d'ajout d'Incident :</strong>
+				</button>
+			</h2>
+			<div id="collapseIncident" class="accordion-collapse collapse" aria-labelledby="headingIncident" data-bs-parent="#accordionSuperAdmin">
+				<div class="accordion-body accordion-bg shadow shadow-inset">
+					<div class="card border-0 shadow rounded-3 my-5">
+						<div class="card-body">
+							<div class="row">
+								<form action="{{path('app_generic_upload_incident_files')}}" method="POST" enctype="multipart/form-data">
+									{% include "services/incidents/incidents.html.twig" %}
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="headingUploadedList">
+				<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUploadedList" aria-expanded="false" aria-controls="collapseUploadedList">
+					<strong>Liste des fichiers chargés :</strong>
+				</button>
+			</h2>
+			<div id="collapseUploadedList" class="accordion-collapse collapse" aria-labelledby="headingUploadedList" data-bs-parent="#accordionSuperAdmin">
+				<div class="accordion-body accordion-bg shadow shadow-inset">
+					<div class="row">
+						<div>
+							{% include "services/uploads/uploaded_list.html.twig" %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="headingValidatedList">
+				<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseValidatedList" aria-expanded="false" aria-controls="collapseValidatedList">
+					<strong>Liste des validations :</strong>
+				</button>
+			</h2>
+			<div id="collapseValidatedList" class="accordion-collapse collapse" aria-labelledby="headingValidatedList" data-bs-parent="#accordionSuperAdmin">
+				<div class="accordion-body accordion-bg shadow shadow-inset">
+					<div class="row">
+						<div>
+							{% include "services/validation/validation_list.html.twig" %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
