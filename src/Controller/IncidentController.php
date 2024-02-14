@@ -220,7 +220,7 @@ class IncidentController extends FrontController
 
 
     // Create a route to modify a file and or display the modification page
-    #[Route('/modify_incident/{incidentId}', name: 'incident_modify_file')]
+    #[Route('/incident/modify_incident/{incidentId}', name: 'incident_modify_file')]
     public function modify_incident_file(Request $request, int $incidentId): Response
     {
         // Retrieve the current incident entity based on the incidentId

@@ -167,8 +167,6 @@ class IncidentService extends AbstractController
 
         $Path = $folderPath . '/' . $incident->getName();
 
-
-
         // If new file exists, process it and delete the old one
         if ($newFile) {
             // Check if the file is of the right type
