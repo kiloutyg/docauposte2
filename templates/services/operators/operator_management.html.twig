@@ -1,87 +1,81 @@
 {% block body %}
 
-	<h2 class="my-4">
-		<strong>Formulaire de gestions Operateurs :</strong>
-	</h2>
-	<div class="card border-0 shadow rounded-3 my-5">
-		<div class="card-body">
-			<div class="row">
 
-				<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
-					<div class="card-body ">
-						<div class="d-flex align-items-center gy-lg-0 gy-5">
-							{{ form_start(teamForm, { attr: { class: 'd-flex flex-column', 
+	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
+		<div class="card-body ">
+			<div class="d-flex align-items-center gy-lg-0 gy-5">
+				<div style="flex: 1;">
+					{{ form_start(teamForm, { attr: { class: 'd-flex flex-column', 
 													id: 'teamCreationForm',
 													style:'flex: 1;', 
 													method: 'POST', 
 													enctype: 'multipart/form-data' }, 
 													action: path('app_super_admin_operator_management') }) }}
 
-							{{ form_end(teamForm) }}
+					{{ form_end(teamForm) }}
 
-							{% if teams is not empty %}
-								<div style="flex: 0.05;"></div>
+					{% if teams is not empty %}
 
-								<div class="mt-auto mb-auto accordion" id="accordionTeamList" style="flex: 1;">
-									<div class="accordion-item shadow-lg shadow-lg-inset border border-dark">
-										<h2 class="accordion-header" id="headingTeamList">
-											<button class="accordion-button bg-white text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTeamList" aria-expanded="false" aria-controls="collapseTeamList">
-												<strong>Liste des équipes</strong>
-											</button>
-										</h2>
-										<div id="collapseTeamList" class="accordion-collapse collapse " aria-labelledby="headingTeamList" data-bs-parent="#accordionTeamList">
-											<div class="accordion-body bg-white text-dark">
-												<ul class="list-group">
-													{% for team in teams %}
-														<li class="list-group-item bg-white text-dark">
-															{{ team.name }}
-														</li>
-													{% endfor %}
-												</ul>
-											</div>
-										</div>
+						<div class="mt-auto mb-auto accordion" id="accordionTeamList">
+							<div class="accordion-item shadow-lg shadow-lg-inset border border-dark">
+								<h2 class="accordion-header" id="headingTeamList">
+									<button class="accordion-button bg-white text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTeamList" aria-expanded="false" aria-controls="collapseTeamList">
+										<strong>Liste des équipes</strong>
+									</button>
+								</h2>
+								<div id="collapseTeamList" class="accordion-collapse collapse " aria-labelledby="headingTeamList" data-bs-parent="#accordionTeamList">
+									<div class="accordion-body bg-white text-dark">
+										<ul class="list-group">
+											{% for team in teams %}
+												<li class="list-group-item bg-white text-dark">
+													{{ team.name }}
+												</li>
+											{% endfor %}
+										</ul>
 									</div>
 								</div>
-							{% endif %}
-							<div style="flex: 0.05;"></div>
-
-							{{ form_start(uapForm, { attr: { class: 'd-flex flex-column', 
+							</div>
+						</div>
+					{% endif %}
+				</div>
+				<div style="flex: 0.2;"></div>
+				<div style="flex: 1;">
+					{{ form_start(uapForm, { attr: { class: 'd-flex flex-column', 
 													id: 'uapCreationForm', 
 													style:'flex: 1;', 
 													method: 'POST', 
 													enctype: 'multipart/form-data' }, 
 													action: path('app_super_admin_operator_management') }) }}
 
-							{{ form_end(uapForm) }}
-							{% if uaps is not empty %}
-								<div style="flex: 0.05;"></div>
+					{{ form_end(uapForm) }}
+					{% if uaps is not empty %}
 
-								<div class="mt-auto mb-auto accordion" id="accordionUapList" style="flex: 0.9;">
-									<div class="accordion-item shadow-lg shadow-lg-inset border border-dark">
-										<h2 class="accordion-header" id="headingUapList">
-											<button class="accordion-button bg-white text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUapList" aria-expanded="false" aria-controls="collapseUapList">
-												<strong>Liste des équipes</strong>
-											</button>
-										</h2>
-										<div id="collapseUapList" class="accordion-collapse collapse " aria-labelledby="headingUapList" data-bs-parent="#accordionUapList">
-											<div class="accordion-body bg-white text-dark">
-												<ul class="list-group">
-													{% for uap in uaps %}
-														<li class="list-group-item bg-white text-dark">
-															{{ uap.name }}
-														</li>
-													{% endfor %}
-												</ul>
-											</div>
-										</div>
+						<div class="mt-auto mb-auto accordion" id="accordionUapList">
+							<div class="accordion-item shadow-lg shadow-lg-inset border border-dark">
+								<h2 class="accordion-header" id="headingUapList">
+									<button class="accordion-button bg-white text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUapList" aria-expanded="false" aria-controls="collapseUapList">
+										<strong>Liste des UAP</strong>
+									</button>
+								</h2>
+								<div id="collapseUapList" class="accordion-collapse collapse " aria-labelledby="headingUapList" data-bs-parent="#accordionUapList">
+									<div class="accordion-body bg-white text-dark">
+										<ul class="list-group">
+											{% for uap in uaps %}
+												<li class="list-group-item bg-white text-dark">
+													{{ uap.name }}
+												</li>
+											{% endfor %}
+										</ul>
 									</div>
 								</div>
-							{% endif %}
+							</div>
 						</div>
-					</div>
-				</div>
+					{% endif %}
 
+				</div>
 			</div>
 		</div>
 	</div>
+
+
 {% endblock %}
