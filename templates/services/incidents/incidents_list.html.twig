@@ -33,22 +33,27 @@
 
 											<div class="accordion-body">
 												{% for incident in productLine %}
-													<li class="form-control shadow d-flex justify-content-between align-items-center mb-3 shadow-lg">
-														<a href="{{ path('app_incident_download_file', { 'incidentId': incident.id }) }}" class="btn btn-link" target="_blank">
+													<li class="form-control shadow d-flex justify-content-between align-items-center mb-3 shadow-lg" style="display: flex;">
+														<a href="{{ path('app_incident_download_file', { 'incidentId': incident.id }) }}" class="btn btn-link" target="_blank" style="flex: 1; text-align: left;">
 															-
 															{{ incident.name|upper }}
 														</a>
-														{% if app.user is same as(incident.uploader) or (incident.uploader) is empty or is_granted ('ROLE_SUPER_ADMIN')  %}
+														{% if app.user is same as(incident.uploader) or (incident.uploader) is empty or is_granted ('ROLE_LINE_ADMIN')  %}
 															<div class="ml-auto">
-
-																{{ incident.uploadedAt|date('d/m/Y') }}
-																<a href="{{ path('app_incident_modify_file', {'incidentId': incident.id}) }}" class="btn btn-modify shadow">
+																<div style="flex: 1; text-align: right;">
+																	{{ incident.uploadedAt|date('d/m/Y') }}
+																	<br>
+																	{{incident.uploader is not empty ? 'par ' ~  
+																incident.uploader.username|upper|split('.')|last : ''}}
+																</div>
+																<a href="{{ path('app_incident_modify_file', {'incidentId': incident.id}) }}" class="btn btn-modify shadow" style="flex: 1; text-align: center;">
 																	Modifier
 																</a>
-																<a href="{{ path('app_incident_delete_file', { incidentId: incident.id, productlineId: incident.productline.id }) }}" class="btn btn-danger shadow delete-incident">
-
-																	Supprimer
-																</a>
+																{% if is_granted('ROLE_ADMIN') %}
+																	<a href="{{ path('app_incident_delete_file', { incidentId: incident.id, productlineId: incident.productline.id }) }}" class="btn btn-danger shadow delete-incident" style="flex: 1; text-align: center;">
+																		Supprimer
+																	</a>
+																{% endif %}
 															</div>
 														{% endif %}
 													</li>

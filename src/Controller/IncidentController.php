@@ -220,7 +220,7 @@ class IncidentController extends FrontController
 
 
     // Create a route to modify a file and or display the modification page
-    #[Route('/modify_incident/{incidentId}', name: 'incident_modify_file')]
+    #[Route('/incident/modify_incident/{incidentId}', name: 'incident_modify_file')]
     public function modify_incident_file(Request $request, int $incidentId): Response
     {
         // Retrieve the current incident entity based on the incidentId
@@ -248,7 +248,8 @@ class IncidentController extends FrontController
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirect($originUrl);
             } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
+                // $this->addFlash('error', $e->getMessage());
+                $this->addFlash('error', 'Le fichier n\'a pas été modifié. Veuillez réessayer.');
 
                 return $this->redirect($originUrl);
             }

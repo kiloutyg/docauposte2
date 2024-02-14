@@ -3,9 +3,13 @@
 namespace App\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
+
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use App\Entity\User;
 
@@ -17,28 +21,52 @@ use App\Service\EntityDeletionService;
 // This class is responsible for managing the user accounts logic
 class AccountService
 {
-    private $passwordHasher;
+
     private $userRepository;
-    private $manager;
     private $departmentRepository;
+
     private $entityDeletionService;
 
+    private $passwordHasher;
+
+    private $manager;
+
+    private $validator;
+
+    private $logger;
+
     public function __construct(
-        UserPasswordHasherInterface $passwordHasher,
+
         UserRepository $userRepository,
-        EntityManagerInterface $manager,
         DepartmentRepository $departmentRepository,
-        EntityDeletionService $entityDeletionService
+
+        EntityDeletionService $entityDeletionService,
+
+        UserPasswordHasherInterface $passwordHasher,
+
+        EntityManagerInterface $manager,
+
+        ValidatorInterface $validator,
+
+        LoggerInterface $logger
+
     ) {
-        $this->passwordHasher = $passwordHasher;
         $this->userRepository = $userRepository;
-        $this->manager = $manager;
         $this->departmentRepository = $departmentRepository;
+
         $this->entityDeletionService = $entityDeletionService;
+
+        $this->passwordHasher = $passwordHasher;
+
+        $this->manager = $manager;
+
+        $this->validator = $validator;
+
+        $this->logger = $logger;
     }
 
     // This function is responsible for creating a new user account and persisting it to the database
-    public function createAccount(Request $request, $error)
+    public function createAccount(Request $request)
     {
         if ($request->getMethod() == 'POST') {
             $name = $request->request->get('username');
@@ -49,19 +77,41 @@ class AccountService
             $emailAddress = $request->request->get('emailAddress');
 
 
+
             // check if the username is already in use
             $user = $this->userRepository->findOneBy(['username' => $name]);
             if ($user) {
-                $error = 'Ce nom d\'utilisateur est déja utilisé.';
+                throw new \Exception('Ce nom d\'utilisateur est déja utilisé.');
             } else {
                 // create the user
                 $user = new User();
+
                 $password = $this->passwordHasher->hashPassword($user, $password);
                 $user->setUsername($name);
                 $user->setPassword($password);
                 $user->setRoles([$role]);
                 $user->setDepartment($department);
                 $user->setEmailAddress($emailAddress);
+
+                $errors = $this->validator->validate($user);
+                if (count($errors) > 0) {
+                    $errorMessages = [];
+                    foreach ($errors as $violation) {
+                        // You can use ->getPropertyPath() if you need to show the field name
+                        // $errorMessages[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
+                        $errorMessages[] = $violation->getMessage();
+                    }
+
+                    // Now you have an array of user-friendly messages you can display
+                    // For example, you can separate them with new lines when displaying in text format:
+                    $errorsString = implode("\n", $errorMessages);
+
+                    // If you need to return JSON response:
+                    // return new JsonResponse(['errors' => $errorMessages], Response::HTTP_BAD_REQUEST);
+
+                    throw new \Exception($errorsString);
+                }
+
                 $this->manager->persist($user);
                 $this->manager->flush();
 
@@ -155,6 +205,31 @@ class AccountService
         $user->setEmailAddress($emailAddress);
         $this->manager->persist($user);
         $this->manager->flush();
+        return;
+    }
+
+    public function transferWork(Request $request, int $userId)
+    {
+        $user = $this->userRepository->find($userId);
+        $recipient = $this->userRepository->find($request->request->get('work-transfer-recipient'));
+
+        if ($user->getIncidents()) {
+            foreach ($user->getIncidents() as $incident) {
+                $incident->setUploader($recipient);
+                $this->manager->persist($incident);
+            }
+        }
+
+
+        if ($user->getUploads()) {
+            foreach ($user->getUploads() as $upload) {
+                $upload->setUploader($recipient);
+                $this->manager->persist($upload);
+            }
+        }
+
+        $this->manager->flush();
+
         return;
     }
 }

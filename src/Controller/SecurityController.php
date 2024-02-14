@@ -89,16 +89,13 @@ class SecurityController extends FrontController
     public function delete_account_basic(Request $request): Response
     {
         $id = $request->query->get('id');
-        $user = $this->userRepository->findOneBy(['id' => $id]);
 
-        if ($user->getIncidents()->isEmpty() && $user->getUploads()->isEmpty() && $user->getApprobations()->isEmpty()) {
-            $this->accountService->deleteUser($id);
-            $this->addFlash('success',  'Le compte a été supprimé');
-        } else {
-            $this->addFlash('danger',  'Le compte ne peut pas être supprimé car il est lié à des incidents, des uploads, des validations ou des approbations. Il a été bloqué');
+        try {
             $this->accountService->blockUser($id);
+            $this->addFlash('danger',  'Le compte a été bloqué, il ne peut pas être supprimé car il est lié à des incidents, des uploads, des validations ou des approbations.');
+        } catch (\Exception $e) {
+            $this->addFlash('danger',  'Le compte ne peut pas être bloqué : ' . $e->getMessage());
         }
-
         return $this->redirectToRoute('app_super_admin');
     }
 
@@ -162,5 +159,20 @@ class SecurityController extends FrontController
             $this->addFlash('danger',  $entityType . '  does not exist');
             return $this->redirect($originUrl);
         }
+    }
+
+    // Create a route to allow transmission of work to another user before deleting the account with the delete_account method
+    #[Route('/delete_account/transfer_work/{userId}', name: 'app_transfer_work')]
+    public function transferWork(Request $request, int $userId): Response
+    {
+        $originUrl = $request->headers->get('Referer');
+        try {
+            $this->accountService->transferWork($request, $userId);
+        } catch (\Exception $e) {
+            $this->addFlash('danger',  'Le travail n\'a pas pu être transféré : ' . $e->getMessage());
+            return $this->redirect($originUrl);
+        }
+        $this->addFlash('success', 'Le travail a été transféré');
+        return $this->redirectToRoute('app_super_admin');
     }
 }
