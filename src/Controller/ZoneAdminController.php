@@ -14,10 +14,10 @@ use App\Entity\ProductLine;
 class ZoneAdminController extends FrontController
 {
     // This function is responsible for rendering the zone admin interface
-    #[Route('/zone_admin/{zone}', name: 'app_zone_admin')]
-    public function index(string $zone = null): Response
+    #[Route('/zone_admin/{zoneId}', name: 'app_zone_admin')]
+    public function index(int $zoneId = null): Response
     {
-        $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
+        $zone = $this->zoneRepository->find($zoneId);
         $uploads = $this->entityHeritanceService->uploadsByParentEntity('zone', $zone->getId());
         $incidents = $this->entityHeritanceService->incidentsByParentEntity('zone', $zone->getId());
 
@@ -36,10 +36,10 @@ class ZoneAdminController extends FrontController
 
 
     // Creation of new user account destined to the zone admin but only accessible by the super admin
-    #[Route('/zone_admin/create_line_admin/{zone}', name: 'app_zone_admin_create_line_admin')]
-    public function createLineAdmin(string $zone = null, Request $request): Response
+    #[Route('/zone_admin/create_line_admin/{zoneId}', name: 'app_zone_admin_create_line_admin')]
+    public function createLineAdmin(int $zoneId = null, Request $request): Response
     {
-        $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
+        $zone = $this->zoneRepository->find($zoneId);
 
         $error = null;
         $result = $this->accountService->createAccount(
@@ -63,11 +63,11 @@ class ZoneAdminController extends FrontController
 
 
     // Creation of new productline
-    #[Route('/zone_admin/create_productline/{zone}', name: 'app_zone_admin_create_productline')]
-    public function createProductLine(Request $request, string $zone = null)
+    #[Route('/zone_admin/create_productline/{zoneId}', name: 'app_zone_admin_create_productline')]
+    public function createProductLine(Request $request, int $zoneId = null)
     {
         // 
-        $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
+        $zone = $this->zoneRepository->find($zoneId);
 
         if (!preg_match("/^[^.]+$/", $request->request->get('productlinename'))) {
             // Handle the case when productlinne name contains disallowed characters
@@ -108,11 +108,11 @@ class ZoneAdminController extends FrontController
 
 
     // Delete a productline and all its children entities, it depends on the entitydeletionService
-    #[Route('/zone_admin/delete_productline/{productline}', name: 'app_zone_admin_delete_productline')]
-    public function deleteEntity(string $productline): Response
+    #[Route('/zone_admin/delete_productline/{productlineId}', name: 'app_zone_admin_delete_productline')]
+    public function deleteEntity(int $productlineId): Response
     {
         $entityType = 'productline';
-        $entity = $this->productLineRepository->findOneBy(['name' => $productline]);
+        $entity = $this->productLineRepository->find($productlineId);
         $zone = $entity->getZone()->getName();
 
         // Check if the user is the creator of the entity or if he is a super admin

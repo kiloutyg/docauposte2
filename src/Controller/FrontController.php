@@ -22,8 +22,7 @@ class FrontController extends BaseController
 
         return $this->render(
             'base.html.twig',
-            [
-            ]
+            []
         );
     }
 
@@ -57,10 +56,10 @@ class FrontController extends BaseController
 
 
     // Render the zone page
-    #[Route('/zone/{zone}', name: 'zone')]
-    public function zone(string $zone = null): Response
+    #[Route('/zone/{zoneId}', name: 'zone')]
+    public function zone(int $zoneId = null): Response
     {
-        $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
+        $zone = $this->zoneRepository->find($zoneId);
 
         return $this->render(
             'zone.html.twig',
@@ -72,11 +71,11 @@ class FrontController extends BaseController
 
 
     // Render the productline page and redirect to the mandatory incident page if there is one
-    #[Route('/zone/{zone}/productline/{productline}', name: 'productline')]
+    #[Route('/zone/{zoneId}/productline/{productlineId}', name: 'productline')]
     public function productline(string $productline = null): Response
     {
 
-        $productLine = $this->productLineRepository->findoneBy(['name' => $productline]);
+        $productLine = $this->productLineRepository->findoneBy($productlineId);
         $zone        = $productLine->getZone();
         $productlineId = $productLine->getId();
 
@@ -109,11 +108,11 @@ class FrontController extends BaseController
 
 
     // Render the category page and redirect to the button page if there is only one button in the category
-    #[Route('/zone/{zone}/productline/{productline}/category/{category}', name: 'category')]
+    #[Route('/zone/{zoneId}/productline/{productlineId}/category/{categoryId}', name: 'category')]
 
-    public function category(string $category = null): Response
+    public function category(int $categoryId = null): Response
     {
-        $category    = $this->categoryRepository->findoneBy(['name' => $category]);
+        $category    = $this->categoryRepository->find($categoryId);
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
         $buttons = [];
@@ -142,10 +141,10 @@ class FrontController extends BaseController
 
 
     // Render the button page and redirect to the upload page if there is only one upload in the button
-    #[Route('/zone/{zone}/productline/{productline}/category/{category}/button/{button}', name: 'button')]
-    public function ButtonShowing(UploadController $uploadController, string $button = null, Request $request): Response
+    #[Route('/zone/{zoneId}/productline/{productlineId}/category/{categoryId}/button/{buttonId}', name: 'button')]
+    public function ButtonShowing(UploadController $uploadController, int $buttonId = null, Request $request): Response
     {
-        $buttonEntity = $this->buttonRepository->findOneBy(['name' => $button]);
+        $buttonEntity = $this->buttonRepository->find($buttonId);
         $category    = $buttonEntity->getCategory();
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();

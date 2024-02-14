@@ -13,12 +13,12 @@ use App\Entity\Category;
 // This controller manage the logic of the productline admin interface
 class ProductLineAdminController extends FrontController
 {
-    #[Route('/productline_admin/{productline}', name: 'app_productline_admin')]
+    #[Route('/productline_admin/{productlineId}', name: 'app_productline_admin')]
 
     // This function is responsible for rendering the productline's admin interface
-    public function index(string $productline = null): Response
+    public function index(int $productlineId = null): Response
     {
-        $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
+        $productLine = $this->productLineRepository->find($productlineId);
         $zone = $productLine->getZone();
 
         // Get all the uploads and incidents related to the productline
@@ -48,10 +48,10 @@ class ProductLineAdminController extends FrontController
     }
 
     // This function will create a new User 
-    #[Route('/productline_admin/create_manager/{productline}', name: 'app_productline_admin_create_manager')]
-    public function createManager(string $productline = null, Request $request): Response
+    #[Route('/productline_admin/create_manager/{productlineId}', name: 'app_productline_admin_create_manager')]
+    public function createManager(int $productlineId = null, Request $request): Response
     {
-        $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
+        $productLine = $this->productLineRepository->find($productlineId);
         $zone = $productLine->getZone();
 
         $error = null;
@@ -77,10 +77,10 @@ class ProductLineAdminController extends FrontController
     }
 
     // This function will create a new category
-    #[Route('/productline_admin/create_category/{productline}', name: 'app_productline_admin_create_category')]
-    public function createCategory(Request $request, string $productline = null)
+    #[Route('/productline_admin/create_category/{productlineId}', name: 'app_productline_admin_create_category')]
+    public function createCategory(Request $request, int $productlineId = null)
     {
-        $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
+        $productLine = $this->productLineRepository->find($productlineId);
         $zone = $productLine->getZone();
 
         if (!preg_match("/^[^.]+$/", $request->request->get('categoryname'))) {
@@ -130,12 +130,12 @@ class ProductLineAdminController extends FrontController
         }
     }
 
-    #[Route('/productline_admin/delete_category/{category}', name: 'app_productline_admin_delete_category')]
+    #[Route('/productline_admin/delete_category/{categoryId}', name: 'app_productline_admin_delete_category')]
     // This function will delete a category and all of its children entities, it depends on the entitydeletionService
-    public function deleteEntity(string $category): Response
+    public function deleteEntity(int $categoryId): Response
     {
         $entityType = 'category';
-        $entity = $this->categoryRepository->findOneBy(['name' => $category]);
+        $entity = $this->categoryRepository->find($categoryId);
         $productLine = $entity->getProductLine()->getName();
 
         // Check if the user is the creator of the entity or if he is a super admin

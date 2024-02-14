@@ -100,12 +100,12 @@
 
 															{% for category in productLine.categories %}
 																<li class="form-control d-flex justify-content-between align-items-center mb-2">
-																	<a href="{{path('app_category_manager', {category: category.name, id: category.productline.name, name: category.productline.zone.name} )}}" class="btn btn-dark">
+																	<a href="{{path('app_category_manager', {categoryId: category.id, productlineId: category.productline.id, zoneId: category.productline.zone.id} )}}" class="btn btn-dark">
 																		{{ category.name|split('.')|first|upper }}
 																		<span class="visually-hidden">{{ category.id }}</span>
 																	</a>
 																	{% if is_granted ('ROLE_LINE_ADMIN') or app.user is same as( category.creator) %}
-																		<a href="{{path('app_productline_admin_delete_category', {category: category.name})}}" class="btn btn-danger delete-category">
+																		<a href="{{path('app_productline_admin_delete_category', {categoryId: category.id})}}" class="btn btn-danger delete-category">
 																			Supprimer
 																			<span class="visually-hidden">{{ category.id }}</span>
 																		</a>
