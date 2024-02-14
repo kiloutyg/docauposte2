@@ -51,6 +51,7 @@
 					<strong>Formulaire de création de Ligne :</strong>
 				</button>
 			</h2>
+
 			<div id="collapseProductline" class="accordion-collapse collapse " aria-labelledby="headingProductline" data-bs-parent="#accordionAdmin">
 				<div class="accordion-body accordion-bg shadow shadow-inset">
 					<div class="card border-0 shadow rounded-3 my-5">
@@ -88,7 +89,7 @@
 														{% for productLine in zone.productLines %}
 															<li class="form-control d-flex justify-content-between align-items-center mb-2">
 																<a href="{{path('app_productline_admin', {productline: productLine.name})}}" class="btn btn-dark">
-													{{ productLine.name|split('.')|first|upper}}
+																	{{ productLine.name|split('.')|first|upper}}
 																</a>
 																{% if is_granted ('ROLE_SUPER_ADMIN') or app.user is same as( productLine.creator) %}
 																	<a href="{{path('app_zone_admin_delete_productline', {productline: productLine.name})}}" class="btn btn-danger delete-productline">

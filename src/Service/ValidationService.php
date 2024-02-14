@@ -75,7 +75,6 @@ class ValidationService extends AbstractController
                 $validator_user_values[] = $request->request->get($key);
             }
         }
-        $this->logger->info('comment in ValidationService:', ['full_request' => $request->request->all()]);
 
         // Create a new Validation instance
         $validation = new Validation();
@@ -263,7 +262,6 @@ class ValidationService extends AbstractController
         $validation = $approbation->getValidation();
 
         if ($approbation->isApproval() === false) {
-            $this->logger->info('validation ID: ', [$validation->getId()]);
             $this->mailerService->sendDisapprobationEmail($validation);
         }
         // Call the approbationCheck method to check if all approbations are approved
@@ -275,7 +273,6 @@ class ValidationService extends AbstractController
 
     public function approbationCheck(Validation $validation)
     {
-        $this->logger->info('approbationCheck');
         // Get the ID of the Validation instance
         $validationId = $validation->getId();
 

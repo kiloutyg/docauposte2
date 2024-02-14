@@ -42,133 +42,170 @@
 	<h1 class="my-4">
 		<strong>Page de Super-Administration</strong>
 	</h1>
-	<h2 class="my-4">
-		<strong>Formulaire de creation de compte utilisateur :</strong>
-	</h2>
-	<div class="card border-0 shadow rounded-3 my-5">
-		<div class="card-body">
-			<div class="row">
-				<form method="POST" action="{{ path('app_super_admin_create_admin') }}">
-					{% include "services/accountservices/create_account.html.twig" %}
-				</form>
+
+	<div class="accordion" id="accordionSuperAdmin">
+
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="headingAccount">
+				<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAccount" aria-expanded="false" aria-controls="collapseAccount">
+					<strong>Formulaire de creation de compte utilisateur :</strong>
+				</button>
+			</h2>
+			<div id="collapseAccount" class="accordion-collapse collapse" aria-labelledby="headingAccount" data-bs-parent="#accordionSuperAdmin">
+				<div class="accordion-body accordion-bg shadow shadow-inset">
+
+					<form class="form-floating row mx-auto" method="POST" action="{{ path('app_super_admin_create_admin') }}">
+						{% include "services/accountservices/create_account.html.twig" %}
+					</form>
+				</div>
 			</div>
 		</div>
-	</div>
 
-	<h2 class="my-4">
-		<strong>Formulaire de création de zones :</strong>
-	</h2>
-	<div class="card border-0 shadow rounded-3 my-5">
-		<div class="card-body">
-			<div class="row ">
-				<form method="POST" action="{{ path('app_super_admin_create_zone') }}">
 
-					<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="headingZone">
+				<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZone" aria-expanded="false" aria-controls="collapseZone">
+					<strong>Formulaire de création de zones :</strong>
+				</button>
+			</h2>
+			<div id="collapseZone" class="accordion-collapse collapse" aria-labelledby="headingZone" data-bs-parent="#accordionSuperAdmin">
+				<div class="accordion-body accordion-bg shadow shadow-inset">
+
+					<div class="card border-0 shadow rounded-3 my-5">
 						<div class="card-body">
-							<div class="row d-flex align-items-center gy-lg-0 gy-5">
-								<div class="col-md-6">
+							<div class="row ">
+								<form method="POST" action="{{ path('app_super_admin_create_zone') }}">
 
-									<h3 class="card-title text-center mb-5 fw-light fs-5">
-										<strong>Création de Zones</strong>
-									</h3>
+									<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
+										<div class="card-body">
+											<div class="row d-flex align-items-center gy-lg-0 gy-5">
+												<div class="col-md-6">
 
-									<form class="form-floating" method="post">
+													<h3 class="card-title text-center mb-5 fw-light fs-5">
+														<strong>Création de Zones</strong>
+													</h3>
 
-										<div class="form-control mb-3">
-											<label for="zonename">Nom de la zone</label>
-											<input type="text" name="zonename" placeholder="Nom de la zone" required class="form-control" id="zonename">
+													<form class="form-floating" method="post">
+
+														<div class="form-control mb-3">
+															<label for="zonename">Nom de la zone</label>
+															<input type="text" name="zonename" placeholder="Nom de la zone" required class="form-control" id="zonename">
+														</div>
+
+														<div class="d-grid">
+															<button class="btn btn-primary btn-login text-first|uppercase fw-bold" type="submit">Valider</button>
+														</div>
+
+													</form>
+													<hr class="my-4">
+
+												</div>
+												<div class="col-md-6">
+													<h5 class="card-title text-center mb-5 fw-light fs-5">
+														<strong>Liste des zones :</strong>
+													</h5>
+													<ul class="list-unstyled">
+														{% for zone in zones %}
+															<li class="form-control d-flex justify-content-between align-items-center mb-2">
+																<a href="{{path('app_zone_admin', {zone: zone.name})}}" class="btn btn-dark">
+																	{{ zone.name|split('.')|first|upper }}
+																</a>
+																<a href="{{path('app_base_views_modification')}}" class="btn btn-info">
+																	Modifier
+																</a>
+																<a href="{{path('app_super_admin_delete_zone', {zoneId: zone.id})}}" class="btn btn-danger delete-zone">
+																	Supprimer
+																</a>
+															</li>
+														{% endfor %}
+													</ul>
+												</div>
+											</div>
 										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					{{ render(controller('App\\Controller\\SuperAdminController::operatorManagement'), options = []) }}
 
-										<div class="d-grid">
-											<button class="btn btn-primary btn-login text-first|uppercase fw-bold" type="submit">Valider</button>
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="headingUpload">
+							<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUpload" aria-expanded="false" aria-controls="collapseUpload">
+								<strong>Formulaire d'upload :</strong>
+							</button>
+						</h2>
+						<div id="collapseUpload" class="accordion-collapse collapse" aria-labelledby="headingUpload" data-bs-parent="#accordionSuperAdmin">
+							<div class="accordion-body accordion-bg shadow shadow-inset">
+								<div class="card border-0 shadow rounded-3 my-5">
+									<div class="card-body">
+										<div class="row">
+											<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+												{% include "services/uploads/upload.html.twig" %}
+											</form>
 										</div>
-
-									</form>
-									<hr class="my-4">
-
-								</div>
-								<div class="col-md-6">
-									<h5 class="card-title text-center mb-5 fw-light fs-5">
-										<strong>Liste des zones :</strong>
-									</h5>
-									<ul class="list-unstyled">
-										{% for zone in zones %}
-											<li class="form-control d-flex justify-content-between align-items-center mb-2">
-												<a href="{{path('app_zone_admin', {zone: zone.name})}}" class="btn btn-dark">
-													{{ zone.name|split('.')|first|upper }}
-												</a>
-												<a href="{{path('app_base_views_modification')}}" class="btn btn-info">
-													Modifier
-												</a>
-												<a href="{{path('app_super_admin_delete_zone', {zoneId: zone.id})}}" class="btn btn-danger delete-zone">
-													Supprimer
-												</a>
-											</li>
-										{% endfor %}
-									</ul>
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-            {{ render(controller('App\\Controller\\SuperAdminController::operatorManagement'), options = []) }}
 
-	<h2 class="my-4">
-		<strong>Formulaire d'upload :</strong>
-	</h2>
-	<div class="card border-0 shadow rounded-3 my-5">
-		<div class="card-body">
-			<div class="row">
-				<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
-					{% include "services/uploads/upload.html.twig" %}
-				</form>
-			</div>
-		</div>
-	</div>
-	<h2 class="my-4">
-		<strong>Formulaire d'ajout d'Incident :</strong>
-	</h2>
-	<div class="card border-0 shadow rounded-3 my-5">
-		<div class="card-body">
-			<div class="row">
 
-				<form action="{{path('app_generic_upload_incident_files')}}" method="POST" enctype="multipart/form-data">
-					{% include "services/incidents/incidents.html.twig" %}
-				</form>
-			</div>
-		</div>
-	</div>
-	<h2 class="my-4">
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="headingIncident">
+							<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIncident" aria-expanded="false" aria-controls="collapseIncident">
+								<strong>Formulaire d'ajout d'Incident :</strong>
+							</button>
+						</h2>
+						<div id="collapseIncident" class="accordion-collapse collapse" aria-labelledby="headingIncident" data-bs-parent="#accordionSuperAdmin">
+							<div class="accordion-body accordion-bg shadow shadow-inset">
+								<div class="card border-0 shadow rounded-3 my-5">
+									<div class="card-body">
+										<div class="row">
+											<form action="{{path('app_generic_upload_incident_files')}}" method="POST" enctype="multipart/form-data">
+												{% include "services/incidents/incidents.html.twig" %}
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
-		<strong>Liste des fichiers chargés :</strong>
 
-	</h2>
-	<div class="card border-0 shadow rounded-3 my-5">
-		<div class="card-body">
-			<div class="row">
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="headingUploadedList">
+							<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUploadedList" aria-expanded="false" aria-controls="collapseUploadedList">
+								<strong>Liste des fichiers chargés :</strong>
+							</button>
+						</h2>
+						<div id="collapseUploadedList" class="accordion-collapse collapse" aria-labelledby="headingUploadedList" data-bs-parent="#accordionSuperAdmin">
+							<div class="accordion-body accordion-bg shadow shadow-inset">
+								<div class="row">
+									<div>
+										{% include "services/uploads/uploaded_list.html.twig" %}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
-				<div>
-					{% include "services/uploads/uploaded_list.html.twig" %}
+
+					<div class="accordion-item">
+						<h2 class="accordion-header" id="headingValidatedList">
+							<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseValidatedList" aria-expanded="false" aria-controls="collapseValidatedList">
+								<strong>Liste des validations :</strong>
+							</button>
+						</h2>
+						<div id="collapseValidatedList" class="accordion-collapse collapse" aria-labelledby="headingValidatedList" data-bs-parent="#accordionSuperAdmin">
+							<div class="accordion-body accordion-bg shadow shadow-inset">
+								<div class="row">
+									<div>
+										{% include "services/validation/validation_list.html.twig" %}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
-
-			</div>
-		</div>
-	</div>
-	<h2 class="my-4">
-		<strong>Liste des validations :</strong>
-
-	</h2>
-	<div class="card border-0 shadow rounded-3 my-5">
-		<div class="card-body">
-			<div class="row">
-
-				<div>
-					{% include "services/validation/validation_list.html.twig" %}
-				</div>
-			</div>
-		</div>
-	</div>
-</div>{% endblock %}
+			{% endblock %}

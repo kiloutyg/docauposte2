@@ -39,7 +39,6 @@ class ViewsModificationController extends FrontController
             $newValue = $request->request->get($key);
 
             if ($structuredKey['field'] == 'name') {
-                $this->logger->info('viewsModification: originalValue: ' . $originalValue);
                 // Check if the name does not contain the disallowed characters
                 if (preg_match("/^[^.]+$/", $request->request->get('$key'))) {
                     // Handle the case when button name contains disallowed characters
@@ -50,7 +49,6 @@ class ViewsModificationController extends FrontController
                 foreach ($nameParts as $namePart) {
                     $newValue .= '.' . $namePart;
                 }
-                $this->logger->info('viewsModification: newValue: ' . $newValue);
             }
             if ($originalValue != $newValue) {
                 // Instead of updating immediately, store the entity and its new value for later processing

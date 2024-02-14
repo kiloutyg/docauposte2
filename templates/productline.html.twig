@@ -8,12 +8,12 @@
 	<div class="inner-container flex-grow-1 d-flex flex-column">
 
 		{% if app.user %}
-			{% if  is_granted('ROLE_LINE_ADMIN', object = null, field = null) %}
+			{% if  is_granted('ROLE_LINE_ADMIN') %}
 				<aside class="position-absolute end-0">
 					<a href="{{ path('app_productline_admin', {productline: productLine.name}) }}" class="btn shadow  bg-dark " style="color:white">
 						<span class="fa fa-gear"></span>
 						<strong>
-							<span class="button-text">Centre d'Administration de Ligne
+							<span class="button-text">Centre d'Administration de la Ligne
 							</span>
 						</strong>
 					</a>
