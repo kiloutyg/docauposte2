@@ -44,7 +44,7 @@
 				<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 
 					{% for productLine in matchingProductLines %}
-						<a class="btn btn-primary btn-lg m-5" role="button" aria-pressed="true" style="color:white" href="{{path('app_productline', {productlineId: productLine.id, zoneId: productLine.zone.id} )}}">
+						<a class="btn btn-primary btn-lg m-5" role="button" aria-pressed="true" style="color:white" href="{{path('app_productline', {productlineId: productLine.id} )}}">
 							<span class="line-details text-justify">
 								{{ productLine.name|split('.')|first|upper }}
 							</span>
