@@ -57,7 +57,7 @@ class ProductLineAdminController extends FrontController
         $error = null;
         $result = $this->accountService->createAccount(
             $request,
-            $error,
+            $error
         );
 
         if ($result) {
@@ -69,10 +69,7 @@ class ProductLineAdminController extends FrontController
         }
 
         return $this->redirectToRoute('app_productline', [
-            'zone'        => $zone,
-            'name'        => $zone->getName(),
-            'productline' => $productLine->getName(),
-            'productLine' => $productLine,
+            'productlineId' => $productlineId,
         ]);
     }
 
@@ -87,7 +84,7 @@ class ProductLineAdminController extends FrontController
             // Handle the case when category name contains disallowed characters
             $this->addFlash('danger', 'Nom de catégorie invalide');
             return $this->redirectToRoute('app_productline_admin', [
-                'productline'       => $productLine->getName(),
+                'productlineId'       => $productlineId(),
             ]);
         } else {
 
@@ -99,11 +96,7 @@ class ProductLineAdminController extends FrontController
             if ($category) {
                 $this->addFlash('danger', 'La catégorie existe deja');
                 return $this->redirectToRoute('app_productline_admin', [
-                    'controller_name'   => 'LineAdminController',
-                    'zone'              => $zone,
-                    'name'              => $zone->getName(),
-                    'productLine'       => $productLine,
-                    'productline'       => $productLine->getName(),
+                    'productlineId'       => $productlineId(),
 
                 ]);
                 // If the category doesn't exist, create it and redirect to the productline admin interface with a flash message
@@ -120,11 +113,7 @@ class ProductLineAdminController extends FrontController
                 $this->folderCreationService->folderStructure($categoryname);
                 $this->addFlash('success', 'La catégorie a été créée');
                 return $this->redirectToRoute('app_productline_admin', [
-                    'controller_name'   => 'LineAdminController',
-                    'zone'              => $zone,
-                    'name'              => $zone->getName(),
-                    'productLine'       => $productLine,
-                    'productline'       => $productLine->getName(),
+                    'productlineId'     => $productlineId,
                 ]);
             }
         }
@@ -136,7 +125,7 @@ class ProductLineAdminController extends FrontController
     {
         $entityType = 'category';
         $entity = $this->categoryRepository->find($categoryId);
-        $productLine = $entity->getProductLine()->getName();
+        $productLineId = $entity->getProductLine()->getId();
 
         // Check if the user is the creator of the entity or if he is a super admin
         if ($this->authChecker->isGranted("ROLE_LINE_ADMIN") || $this->getUser() === $entity->getCreator()) {
@@ -146,7 +135,7 @@ class ProductLineAdminController extends FrontController
         } else {
             $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer cette ' . $entityType . '.');
             return $this->redirectToRoute('app_productline_admin', [
-                'productline'   => $productLine,
+                'productlineId'   => $productLineId,
             ]);
         }
 
@@ -154,12 +143,12 @@ class ProductLineAdminController extends FrontController
 
             $this->addFlash('success', 'La catégorie ' . $entityType . ' a été supprimée');
             return $this->redirectToRoute('app_productline_admin', [
-                'productline'   => $productLine,
+                'productlineId'   => $productLineId,
             ]);
         } else {
             $this->addFlash('danger', 'La catégorie ' . $entityType . ' n\'existe pas');
             return $this->redirectToRoute('app_productline_admin', [
-                'productline'   => $productLine,
+                'productlineId'   => $productLineId,
             ]);
         }
     }

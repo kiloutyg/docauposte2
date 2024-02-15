@@ -18,8 +18,8 @@ class ZoneAdminController extends FrontController
     public function index(int $zoneId = null): Response
     {
         $zone = $this->zoneRepository->find($zoneId);
-        $uploads = $this->entityHeritanceService->uploadsByParentEntity('zone', $zone->getId());
-        $incidents = $this->entityHeritanceService->incidentsByParentEntity('zone', $zone->getId());
+        $uploads = $this->entityHeritanceService->uploadsByParentEntity('zone', $zoneId);
+        $incidents = $this->entityHeritanceService->incidentsByParentEntity('zone', $zoneId);
 
         // Group the uploads and incidents by parent entity
         $groupedUploads = $this->uploadService->groupUploads($uploads);
@@ -56,8 +56,7 @@ class ZoneAdminController extends FrontController
         }
 
         return $this->redirectToRoute('app_zone', [
-            'zone'         => $zone->getName(),
-            'id'           => $zone->getId()
+            'zoneId'           => $zoneId
         ]);
     }
 
@@ -73,7 +72,7 @@ class ZoneAdminController extends FrontController
             // Handle the case when productlinne name contains disallowed characters
             $this->addFlash('danger', 'Nom de ligne de produit invalide');
             return $this->redirectToRoute('app_zone_admin', [
-                'zone' => $zone->getName()
+                'zoneId' => $zoneId
             ]);
         } else {
             // Check if the productline already exists by comparing the productline name and the zone
@@ -83,7 +82,7 @@ class ZoneAdminController extends FrontController
             if ($productline) {
                 $this->addFlash('danger', 'La ligne de produit existe déjà');
                 return $this->redirectToRoute('app_zone_admin', [
-                    'zone' => $zone->getName()
+                    'zoneId' => $zoneId
                 ]);
                 // Create a productline
 
@@ -100,7 +99,7 @@ class ZoneAdminController extends FrontController
                 $this->folderCreationService->folderStructure($productlinename);
                 $this->addFlash('success', 'The Product Line has been created');
                 return $this->redirectToRoute('app_zone_admin', [
-                    'zone' => $zone->getName()
+                    'zoneId' => $zoneId
                 ]);
             }
         }
@@ -113,29 +112,29 @@ class ZoneAdminController extends FrontController
     {
         $entityType = 'productline';
         $entity = $this->productLineRepository->find($productlineId);
-        $zone = $entity->getZone()->getName();
+        $zoneId = $entity->getZone()->getId();
 
         // Check if the user is the creator of the entity or if he is a super admin
-        if ($this->getUser()->getRoles() != ["ROLE_SUPER_ADMIN"] || $this->getUser() === $entity->getCreator()) {
+        if ($this->getUser()->getRoles() != ["ROLE_ADMIN"] || $this->getUser() === $entity->getCreator()) {
             // This function is used to delete a category and all the infants entity attached to it, it depends on the EntityDeletionService class. 
             // The folder is deleted by the FolderCreationService class through the EntityDeletionService class.
             $response = $this->entitydeletionService->deleteEntity($entityType, $entity->getId());
         } else {
             $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer cette ligne.');
             return $this->redirectToRoute('app_zone_admin', [
-                'zone' => $zone,
+                'zoneId' => $zoneId,
             ]);
         }
 
         if ($response == true) {
             $this->addFlash('success', 'La ligne de produit ' . $entityType . ' a été supprimée');
             return $this->redirectToRoute('app_zone_admin', [
-                'zone' => $zone,
+                'zoneId' => $zoneId,
             ]);
         } else {
             $this->addFlash('danger', 'La ligne de produit ' . $entityType . ' n\'existe pas');
             return $this->redirectToRoute('app_zone_admin', [
-                'zone' => $zone,
+                'zoneId' => $zoneId,
             ]);
         }
     }

@@ -68,7 +68,7 @@
 								<div class="col-10 mx-auto mb-3">
 									<li class="form-control shadow d-flex justify-content-between align-items-center">
 										{{department.name|upper}}
-										<a href="{{ path('app_department_deletion', {department : department.name}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-department">supprimer</a>
+										<a href="{{ path('app_department_deletion', {departmentId : department.id}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-department">supprimer</a>
 									</li>
 								</div>
 

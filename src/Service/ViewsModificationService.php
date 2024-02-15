@@ -173,11 +173,6 @@ class ViewsModificationService extends AbstractController
     //     
     public function updateEntity($entityType, $entity, $field, $newValue, $originalValue)
     {
-        $this->logger->info('updateEntity: entityType: ' . $entityType);
-        $this->logger->info('updateEntity: entityName: ' . $entity->getName());
-        $this->logger->info('updateEntity: field: ' . $field);
-        $this->logger->info('updateEntity: newValue: ' . $newValue);
-        $this->logger->info('updateEntity: originalValue: ' . $originalValue);
 
         $entityId = $entity->getId();
         switch ($field) {
@@ -242,10 +237,6 @@ class ViewsModificationService extends AbstractController
     // 
     public function updateEntityNameInheritance($entityType, $entity, $newParentName, $field)
     {
-        $this->logger->info('updateEntityNameInheritance: entityType: ' . $entityType);
-        $this->logger->info('updateEntityNameInheritance: entityName: ' . $entity->getName());
-        $this->logger->info('updateEntityNameInheritance: field: ' . $field);
-        $this->logger->info('updateEntityNameInheritance: newParentName: ' . $newParentName);
 
         $entityNameParts = [];
         $entityNameParts = explode('.', $entity->getName());
@@ -311,11 +302,7 @@ class ViewsModificationService extends AbstractController
     //     
     public function updateByParentEntity($entityType, $id, $newName, $field, $originalValue = null)
     {
-        $this->logger->info('updateByParentEntity: entityType: ' . $entityType);
-        $this->logger->info('updateByParentEntity: entityId: ' . $id);
-        $this->logger->info('updateByParentEntity: field: ' . $field);
-        $this->logger->info('updateByParentEntity: newValue: ' . $newName);
-        $this->logger->info('updateByParentEntity: originalValue: ' . $originalValue);
+
         // Get the repository of the entity type
         $repository = null;
         switch ($entityType) {

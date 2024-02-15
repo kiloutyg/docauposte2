@@ -143,15 +143,15 @@ class SecurityController extends FrontController
     }
 
     // Create a route for department deletion. It depends on the entitydeletionService.
-    #[Route('/department/department_deletion/{department}', name: 'app_department_deletion')]
-    public function departmentDeletion(string $department, Request $request): Response
+    #[Route('/department/department_deletion/{departmentId}', name: 'app_department_deletion')]
+    public function departmentDeletion(int $departmentId, Request $request): Response
     {
         $entityType = "department";
-        $entityid = $this->departmentRepository->findOneBy(['name' => $department]);
-        $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
+        $entity = $this->departmentRepository->find($departmentId);
+        $response = $this->entitydeletionService->deleteEntity($entityType, $departmentId);
         $originUrl = $request->headers->get('referer');
 
-        if ($entity == true) {
+        if ($response == true) {
 
             $this->addFlash('success', $entityType . ' has been deleted');
             return $this->redirect($originUrl);
