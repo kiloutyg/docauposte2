@@ -29,7 +29,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 				{% if app.user %}
 					{% if is_granted('ROLE_LINE_ADMIN') %}
 						<aside class="position-absolute end-0">
-							<a href="{{ path('app_productline_admin', {productline: upload.button.category.productline.name}) }}" class="btn shadow  bg-dark " style="color:white">
+							<a href="{{ path('app_productline_admin', {productlineId: upload.button.category.productline.id}) }}" class="btn shadow  bg-dark " style="color:white">
 								<span class="fa fa-gear"></span>
 								<strong>
 									<span class="button-text">Centre d'Administration de la ligne
