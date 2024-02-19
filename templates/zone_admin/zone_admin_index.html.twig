@@ -92,6 +92,9 @@
 																	{{ productLine.name|split('.')|first|upper}}
 																</a>
 																{% if is_granted ('ROLE_LINE_ADMIN') or app.user is same as( productLine.creator) %}
+																	<a href="{{path('app_base_views_modification')}}" class="btn btn-info">
+																		Modifier
+																	</a>
 																	<a href="{{path('app_zone_admin_delete_productline', {productlineId: productLine.id})}}" class="btn btn-danger delete-productline">
 																		Supprimer
 																	</a>
