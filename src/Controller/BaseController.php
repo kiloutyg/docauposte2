@@ -212,7 +212,7 @@ class BaseController extends AbstractController
         $this->departments                  = $this->departmentRepository->findAll();
         $this->validations                  = $this->validationRepository->findAll();
         $this->teams                        = $this->teamRepository->findAll();
-        // $this->operators                    = $this->operatorRepository->findAll();
+        $this->operators                    = $this->operatorRepository->findAll();
         $this->uaps                         = $this->uapRepository->findAll();
     }
 
@@ -230,6 +230,7 @@ class BaseController extends AbstractController
             'departments'           => $this->departments,
             'validations'           => $this->validations,
             'teams'                 => $this->teams,
+            'operators'             => $this->operators,
             'uaps'                  => $this->uaps
         ];
 

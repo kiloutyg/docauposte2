@@ -75,7 +75,7 @@ class OperatorController extends FrontController
     }
 
     //first test of actual page rendering with a validated document and a dynamic form and list of operators and stuff
-    #[Route('/operator/visual/{validationId}', name: 'test_documents')]
+    #[Route('/operator/visual/{validationId}', name: 'app_test_document')]
     public function documentAndOperator(Request $request, int $validationId): Response
     {
         $originUrl = $request->headers->get('referer');
@@ -85,6 +85,7 @@ class OperatorController extends FrontController
         if ($request->getMethod() === 'GET') {
             return $this->render('services/operators/docAndOperator.html.twig', [
                 'upload' => $upload,
+
             ]);
         }
     }

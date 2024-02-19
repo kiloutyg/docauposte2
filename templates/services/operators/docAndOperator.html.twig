@@ -1,0 +1,17 @@
+{% block stylesheets %}
+	{{
+		encore_entry_link_tags("app")
+        }}
+{% endblock %}
+
+{% block javascripts %}
+
+	{{ encore_entry_script_tags('confirmation') }}
+	{{ encore_entry_script_tags('toast') }}
+
+{% endblock %}
+<div class=" d-flex align-items-center  flex-row">
+
+	<iframe src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" width="69%" height="950" target="_blank"></iframe>
+	<div style="width: 31%" class="text-center card-body"></div>
+</div>
