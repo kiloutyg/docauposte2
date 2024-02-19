@@ -10,7 +10,7 @@
 		{% if app.user %}
 			{% if  is_granted('ROLE_ADMIN') %}
 				<aside class="position-absolute end-0">
-					<a href="{{ path('app_zone_admin', {zone: zone.name}) }}" class="btn shadow  bg-dark " style="color:white">
+					<a href="{{ path('app_zone_admin', {zoneId: zone.id}) }}" class="btn shadow  bg-dark " style="color:white">
 						<span class="fa fa-gear"></span>
 						<strong>
 							<span class="button-text">Centre d'Administration de Zone</span>
@@ -44,7 +44,7 @@
 				<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 
 					{% for productLine in matchingProductLines %}
-						<a class="btn btn-primary btn-lg m-5" role="button" aria-pressed="true" style="color:white" href="{{path('app_productline', {productline: productLine.name, zone: productLine.zone.name} )}}">
+						<a class="btn btn-primary btn-lg m-5" role="button" aria-pressed="true" style="color:white" href="{{path('app_productline', {productlineId: productLine.id, zoneId: productLine.zone.id,} )}}">
 							<span class="line-details text-justify">
 								{{ productLine.name|split('.')|first|upper }}
 							</span>

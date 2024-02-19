@@ -6,16 +6,16 @@
 	{% if (button is defined) and (button is not empty) %}
 
 		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
-	{% set zone = {'name': button.category.productLine.zone.name, 'varName': 'zone'} %}
-	{% set productline = {'name': button.category.productLine.name, 'varName': 'productline'} %}
-	{% set category = {'name': button.category.name, 'varName': 'category'} %}
+	{% set zone = {'name': button.category.productLine.zone.name, 'varName': 'zone', 'id': button.category.productLine.zone.id|default(null)} %}
+	{% set productline = {'name': button.category.productLine.name, 'varName': 'productline', 'id': button.category.productLine.id|default(null)} %}
+	{% set category = {'name': button.category.name, 'varName': 'category', 'id': button.category.id|default(null)} %}
 	{% set button = null %}
 
 {% elseif (category is defined) and (category is not empty) %}
 
 	{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
-		{% set zone = {'name': category.productLine.zone.name, 'varName': 'zone'} %}
-		{% set productline = {'name': category.productLine.name, 'varName': 'productline'} %}
+		{% set zone = {'name': category.productLine.zone.name, 'varName': 'zone', 'id': category.productLine.zone.id|default(null)} %}
+		{% set productline = {'name': category.productLine.name, 'varName': 'productline', 'id': category.productLine.id|default(null)} %}
 		{% set category = null %}
 		{% set button = null %}
 
@@ -23,7 +23,7 @@
 	{% elseif (productLine is defined) and (productLine is not empty) %}
 
 		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
-	{% set zone = {'name': productLine.zone.name, 'varName': 'zone'} %}
+	{% set zone = {'name': productLine.zone.name, 'varName': 'zone', 'id': productLine.zone.id|default(null)} %}
 	{% set productline = null %}
 	{% set category = null %}
 	{% set button = null %}
@@ -50,7 +50,7 @@
 
 	{% for item in navbar %}
 		{% if item is not null %}
-			{% set params = params|merge({(item.varName): item.name}) %}
+			{% set params = params|merge({(item.varName ~ 'Id'): item.id|default(null)}) %}
 		{% endif %}
 	{% endfor %}
 <nav class="breadcrumb-nav mt-2" aria-label="breadcrumb">

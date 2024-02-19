@@ -179,7 +179,7 @@ class EntityDeletionService
             $this->uploadService->deleteFile($entity->getId());
             // $this->deleteEntity('validation', $entity->getValidation()->getId());
         } elseif ($entityType === 'incident') {
-            $this->incidentService->deleteIncidentFile($entity->getName(), $entity->getProductLine());
+            $this->incidentService->deleteIncidentFile($entity, $entity->getProductLine());
         } elseif ($entityType === 'department') {
             foreach ($entity->getUsers() as $user) {
                 $entity->removeUser($user);

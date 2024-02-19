@@ -208,7 +208,7 @@ let buttonIdFromServer = null;
 					<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
 						<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 							{% for zone in zones %}
-								<a class="btn btn-primary btn-lg m-5 " role="button" aria-pressed="true" style="color:white" href="{{path('app_zone', {zone: zone.name})}}">
+								<a class="btn btn-primary btn-lg m-5 " role="button" aria-pressed="true" style="color:white" href="{{path('app_zone', {zoneId: zone.id})}}">
 									<span class="line-details text-justify">
 										{{ zone.name|split('.')|first|upper }}
 									</span>

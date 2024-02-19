@@ -22,15 +22,17 @@ use App\Form\IncidentType;
 class IncidentController extends FrontController
 {
     // Render the incidents page and filter the incidents by productline and sort them by id ascending to display them in the right order
-    #[Route('/zone/{zone}/productline/{productline}/incident/{incidentid}', name: 'mandatory_incident')]
-    public function mandatoryIncident(string $productline = null, int $incidentid = null): Response
+    #[Route('/zone/{zoneId}/productline/{productlineId}/incident/{incidentId}', name: 'mandatory_incident')]
+    public function mandatoryIncident(int $productlineId = null, int $incidentId = null): Response
     {
-        // Get the incident entity based on the incident id in the url
-        $incidentEntity = $this->incidentRepository->findOneBy(['id' => $incidentid]);
+        $incidentEntity = null;
+        if ($incidentId != null) {
+            $incidentEntity = $this->incidentRepository->find($incidentId);
+        }
 
         // If the incident does not exist, we get the productline entity from the productline name
         if (!$incidentEntity) {
-            $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
+            $productLine = $this->productLineRepository->find($productlineId);
         } else {
             $productLine = $incidentEntity->getProductLine();
         }
@@ -40,7 +42,7 @@ class IncidentController extends FrontController
 
         // Get all the incidents of the productline and sort them by id ascending
         $incidents = $this->incidentRepository->findBy(
-            ['ProductLine' => $productLine->getId()],
+            ['ProductLine' => $productlineId],
             ['id' => 'ASC'] // order by id ascending
         );
 
@@ -50,7 +52,7 @@ class IncidentController extends FrontController
         }, $incidents);
 
         // Get the key of the current incident in the array
-        $currentIncidentKey = array_search($incidentid, $incidentIds);
+        $currentIncidentKey = array_search($incidentId, $incidentIds);
 
         // Get the current incident
         $incident = $incidents[$currentIncidentKey];
@@ -71,12 +73,12 @@ class IncidentController extends FrontController
             return $this->render(
                 '/services/incidents/incidents_view.html.twig',
                 [
-                    'incidentid'        => $incident ? $incident->getId() : null,
+                    'incidentId'        => $incident ? $incident->getId() : null,
                     'incident'          => $incident,
                     'incidentCategory'  => $incident ? $incident->getIncidentCategory() : null,
                     'incidents'         => $incidents,
-                    'productline'       => $productLine->getName(),
-                    'zone'              => $zone->getName(),
+                    'productlineId'     => $productLine->getId(),
+                    'zoneId'            => $zone->getId(),
                     'nextIncidentId'    => $nextIncident ? $nextIncident->getId() : null
                 ]
             );
@@ -124,12 +126,11 @@ class IncidentController extends FrontController
     }
 
     // Create a route for incidentCategory deletion. It depends on the entitydeletionService.
-    #[Route('/incident/delete/incident_incidentsCategory_deletion/{incidentCategory}', name: 'incident_incidentsCategory_deletion')]
-    public function incidentCategoryDeletion(string $incidentCategory, Request $request): Response
+    #[Route('/incident/delete/incident_incidentsCategory_deletion/{incidentCategoryId}', name: 'incident_incidentsCategory_deletion')]
+    public function incidentCategoryDeletion(int $incidentCategoryId, Request $request): Response
     {
         $entityType = "incidentCategory";
-        $entityid = $this->incidentCategoryRepository->findOneBy(['name' => $incidentCategory]);
-        $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
+        $entity = $this->entitydeletionService->deleteEntity($entityType, $incidentCategoryId);
         $originUrl = $request->headers->get('referer');
 
         if ($entity == true) {
@@ -177,7 +178,7 @@ class IncidentController extends FrontController
     #[Route('/download_incident/{incidentId}', name: 'incident_download_file')]
     public function download_file(int $incidentId = null): Response
     {
-        $file       = $this->incidentRepository->findOneBy(['id' => $incidentId]);
+        $file       = $this->incidentRepository->find($incidentId);
         $path       = $file->getPath();
         $file       = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
@@ -200,7 +201,7 @@ class IncidentController extends FrontController
     {
         $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productlineId]);
         $originUrl = $request->headers->get('referer');
-        $incidentEntity = $this->incidentRepository->findOneBy(['id' => $incidentId]);
+        $incidentEntity = $this->incidentRepository->find($incidentId);
 
         // Check if the user is the creator of the upload or if he is a super admin
         if ($this->authChecker->isGranted('ROLE_ADMIN')) {
@@ -224,7 +225,7 @@ class IncidentController extends FrontController
     public function modify_incident_file(Request $request, int $incidentId): Response
     {
         // Retrieve the current incident entity based on the incidentId
-        $incident = $this->incidentRepository->findOneBy(['id' => $incidentId]);
+        $incident = $this->incidentRepository->find($incidentId);
         $productLine = $incident->getProductLine();
         $zone = $productLine->getZone();
         $originUrl = $request->headers->get('referer');

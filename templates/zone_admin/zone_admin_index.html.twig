@@ -57,7 +57,7 @@
 					<div class="card border-0 shadow rounded-3 my-5">
 						<div class="card-body">
 							<div class="row">
-								<form method="POST" action="{{ path('app_zone_admin_create_productline', {zone: zone.name}) }}">
+								<form method="POST" action="{{ path('app_zone_admin_create_productline', {zoneId: zone.id}) }}">
 
 									<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
 										<div class="card-body">
@@ -88,11 +88,11 @@
 													<ul class="list-unstyled">
 														{% for productLine in zone.productLines %}
 															<li class="form-control d-flex justify-content-between align-items-center mb-2">
-																<a href="{{path('app_productline_admin', {productline: productLine.name})}}" class="btn btn-dark">
+																<a href="{{path('app_productline_admin', {productlineId: productLine.Id})}}" class="btn btn-dark">
 																	{{ productLine.name|split('.')|first|upper}}
 																</a>
-																{% if is_granted ('ROLE_SUPER_ADMIN') or app.user is same as( productLine.creator) %}
-																	<a href="{{path('app_zone_admin_delete_productline', {productline: productLine.name})}}" class="btn btn-danger delete-productline">
+																{% if is_granted ('ROLE_LINE_ADMIN') or app.user is same as( productLine.creator) %}
+																	<a href="{{path('app_zone_admin_delete_productline', {productlineId: productLine.id})}}" class="btn btn-danger delete-productline">
 																		Supprimer
 																	</a>
 																{% endif %}

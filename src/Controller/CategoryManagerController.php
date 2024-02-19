@@ -16,12 +16,12 @@ use App\Entity\Button;
 class CategoryManagerController extends FrontController
 {
 
-    #[Route('/category_manager/{category}', name: 'app_category_manager')]
+    #[Route('/category_manager/{categoryId}', name: 'app_category_manager')]
 
     // This function is responsible for rendering the category's admin interface. 
-    public function index(string $category = null): Response
+    public function index(int $categoryId = null): Response
     {
-        $category    = $this->categoryRepository->findoneBy(['name' => $category]);
+        $category    = $this->categoryRepository->find($categoryId);
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
 
@@ -41,26 +41,26 @@ class CategoryManagerController extends FrontController
         $groupedValidatedUploads = $this->uploadService->groupValidatedUploads($uploads);
 
         return $this->render('category_manager/category_manager_index.html.twig', [
-            'groupedUploads'        => $groupedUploads,
+            'groupedUploads'            => $groupedUploads,
             'groupedValidatedUploads'   => $groupedValidatedUploads,
-            'groupincidents'        => $groupIncidents,
-            'zone'                  => $zone,
-            'productLine'           => $productLine,
-            'category'              => $category,
-            'uploads'               => $uploads,
-            'incidents'             => $incidents,
+            'groupincidents'            => $groupIncidents,
+            'zone'                      => $zone,
+            'productLine'               => $productLine,
+            'category'                  => $category,
+            'uploads'                   => $uploads,
+            'incidents'                 => $incidents,
 
         ]);
     }
 
 
 
-    #[Route('/category_manager/create_user/{category}', name: 'app_category_manager_create_user')]
+    #[Route('/category_manager/create_user/{categoryId}', name: 'app_category_manager_create_user')]
 
     // This function is responsible for creating a new user, it's access is restricted on the frontend
-    public function createUser(string $category = null, Request $request): Response
+    public function createUser(int $categoryId = null, Request $request): Response
     {
-        $category    = $this->categoryRepository->findoneBy(['name' => $category]);
+        $category    = $this->categoryRepository->find($categoryId);
 
         $error = null;
         // This function is responsible for creating a new user, it depends on the AccountService class.
@@ -78,25 +78,24 @@ class CategoryManagerController extends FrontController
         }
 
         return $this->redirectToRoute('app_category_manager', [
-            'category'    => $category->getName(),
+            'categoryId'    => $categoryId,
         ]);
     }
 
 
-    #[Route('/category_manager/create_button/{category}', name: 'app_category_manager_create_button')]
+    #[Route('/category_manager/create_button/{categoryId}', name: 'app_category_manager_create_button')]
 
     // This function is used to create a new button to which is attached the uploads.
-    public function createButton(Request $request, string $category = null)
+    public function createButton(Request $request, int $categoryId = null)
     {
-        $categoryentity    = $this->categoryRepository->findoneBy(['name' => $category]);
-
+        $categoryentity = $this->categoryRepository->find($categoryId);
         // Check if button name does not contain the disallowed characters
         if (!preg_match("/^[^.]+$/", $request->request->get('buttonname'))) {
 
             // Handle the case when button name contains disallowed characters
             $this->addFlash('danger', 'Nom de bouton invalide');
             return $this->redirectToRoute('app_category_manager', [
-                'category'    => $category,
+                'categoryId'    => $categoryId,
             ]);
         } else {
             // Look if the the button already exists
@@ -107,7 +106,7 @@ class CategoryManagerController extends FrontController
             if ($button) {
                 $this->addFlash('danger', 'Le bouton existe déjà');
                 return $this->redirectToRoute('app_category_manager', [
-                    'category'    => $category,
+                    'categoryId'    => $categoryId,
                 ]);
                 // If the button does not exist, create it and redirect to the category manager page and display a flash message. It depends on the FolderCreationService class.
             } else {
@@ -124,42 +123,42 @@ class CategoryManagerController extends FrontController
 
                 $this->addFlash('success', 'Le bouton a été créé');
                 return $this->redirectToRoute('app_category_manager', [
-                    'category'    => $category,
+                    'categoryId'    => $categoryId,
                 ]);
             }
         }
     }
 
-    #[Route('/category_manager/delete_button/{button}', name: 'app_category_manager_delete_button')]
+    #[Route('/category_manager/delete_button/{buttonId}', name: 'app_category_manager_delete_button')]
 
     // This function is used to delete a button and all the uploads attached to it.
-    public function deleteEntity(string $button): Response
+    public function deleteEntity(int $buttonId): Response
     {
         $entityType = 'button';
-        $entity = $this->buttonRepository->findOneBy(['name' => $button]);
-        $category = $entity->getCategory()->getName();
+        $entity = $this->buttonRepository->find($buttonId);
+        $categoryId = $entity->getCategory()->getId();
 
         // Check if the user is the creator of the button or if he is a super admin
         if ($this->getUser() === $entity->getCreator() || $this->authChecker->isGranted("ROLE_LINE_ADMIN")) {
             // This function is used to delete a button and all the uploads attached to it, it depends on the EntityDeletionService class. 
             // The folder is deleted by the FolderCreationService class through the EntityDeletionService class.
-            $response = $this->entitydeletionService->deleteEntity($entityType, $entity->getId());
+            $response = $this->entitydeletionService->deleteEntity($entityType, $buttonId);
         } else {
             $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer cette ' . $entityType . '.');
             return $this->redirectToRoute('app_category_manager', [
-                'category'    => $category,
+                'categoryId'    => $categoryId,
             ]);
         }
 
         if ($response == true) {
             $this->addFlash('success', 'Le bouton ' . $entityType . ' a été supprimé');
             return $this->redirectToRoute('app_category_manager', [
-                'category'    => $category,
+                'categoryId'    => $categoryId,
             ]);
         } else {
             $this->addFlash('danger', 'Le bouton ' . $entityType . ' n\'existe pas.');
             return $this->redirectToRoute('app_category_manager', [
-                'category'    => $category,
+                'categoryId'    => $categoryId,
             ]);
         }
     }

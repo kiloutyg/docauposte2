@@ -198,6 +198,15 @@ class AccountService
         $this->manager->flush();
     }
 
+    public function unblockUser($id)
+    {
+        $user = $this->userRepository->find($id);
+        $user->setBlocked(null);
+        $this->manager->persist($user);
+        $this->manager->flush();
+    }
+
+
     public function updateUserEmail(User $user)
     {
         $username = $user->getUsername();
@@ -220,11 +229,57 @@ class AccountService
             }
         }
 
+        if ($user->getOldUploads()) {
+            foreach ($user->getOldUploads() as $oldUpload) {
+                $oldUpload->setOldUploader($recipient);
+                $this->manager->persist($oldUpload);
+            }
+        }
+
 
         if ($user->getUploads()) {
             foreach ($user->getUploads() as $upload) {
                 $upload->setUploader($recipient);
                 $this->manager->persist($upload);
+            }
+        }
+
+        if ($user->getZones()) {
+            foreach ($user->getZones() as $zone) {
+                $zone->setCreator($recipient);
+                $this->manager->persist($zone);
+            }
+        }
+
+        if ($user->getProductLines()) {
+            foreach ($user->getProductLines() as $productLine) {
+                $productLine->setCreator($recipient);
+                $this->manager->persist($productLine);
+            }
+        }
+
+        if ($user->getCategories()) {
+            foreach ($user->getCategories() as $category) {
+                $category->setCreator($recipient);
+                $this->manager->persist($category);
+            }
+        }
+
+        if ($user->getButtons()) {
+            foreach ($user->getButtons() as $button) {
+                $button->setCreator($recipient);
+                $this->manager->persist($button);
+            }
+        }
+
+        if ($user->getApprobations()) {
+            $uploadsNames = [];
+            foreach ($user->getApprobations() as $approbation) {
+                $uploadsNames[] = $approbation->getValidation()->getUpload()->getButton()->getName();
+            }
+            if (!empty($uploadsNames)) {
+                $namesString = implode(', ', $uploadsNames); // Convert the names array to a comma-separated string
+                throw new \Exception('Les approbations ne peuvent pas être transférées; veuillez revalider les documents suivants: ' . $namesString);
             }
         }
 

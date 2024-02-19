@@ -46,16 +46,17 @@ class SecurityController extends FrontController
     }
 
     // This function is responsible for rendering the account modifiying interface destined to the super admin
-    #[Route(path: '/modify_account/{userid}', name: 'app_modify_account')]
-    public function modify_account(UserInterface $currentUser, int $userid, AuthenticationUtils $authenticationUtils, Request $request): Response
+    #[Route(path: '/modify_account/{userId}', name: 'app_modify_account')]
+    public function modify_account(UserInterface $currentUser, int $userId, AuthenticationUtils $authenticationUtils, Request $request): Response
     {
         $error = $authenticationUtils->getLastAuthenticationError();
-        $user = $this->userRepository->findOneBy(['id' => $userid]);
+        $user = $this->userRepository->find($userId);
+        $originUrl = $request->headers->get('Referer');
 
         if ($request->isMethod('GET')) {
             if (in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
                 $this->addFlash('danger', 'Le compte ne peut être modifié');
-                return $this->redirectToRoute('app_base');
+                return $this->redirect($originUrl);
             }
             return $this->render('services/accountservices/modify_account_view.html.twig', [
                 'user'          => $user,
@@ -88,27 +89,46 @@ class SecurityController extends FrontController
     #[Route(path: '/delete_account/basic', name: 'app_delete_account_basic')]
     public function delete_account_basic(Request $request): Response
     {
-        $id = $request->query->get('id');
-
+        $userId = $request->query->get('userId');
+        $originUrl = $request->headers->get('Referer');
         try {
-            $this->accountService->blockUser($id);
+            $this->accountService->blockUser($userId);
             $this->addFlash('danger',  'Le compte a été bloqué, il ne peut pas être supprimé car il est lié à des incidents, des uploads, des validations ou des approbations.');
         } catch (\Exception $e) {
             $this->addFlash('danger',  'Le compte ne peut pas être bloqué : ' . $e->getMessage());
         }
-        return $this->redirectToRoute('app_super_admin');
+        return $this->redirect($originUrl);
+    }
+
+    // This function is responsible for managing the unblocking of an account
+    #[Route(path: '/delete_account/unblock_account', name: 'app_unblock_account')]
+    public function unblock_account(Request $request): Response
+    {
+        $userId = $request->query->get('userId');
+        $originUrl = $request->headers->get('Referer');
+        try {
+            $this->accountService->unblockUser($userId);
+            $this->addFlash('success',  'Le compte a été débloqué, vous devez réaffecter un Mot de passe et un Role à l\'utilisateur.');
+        } catch (\Exception $e) {
+            $this->addFlash('danger',  'Le compte ne peut pas être débloqué : ' . $e->getMessage());
+        }
+        return $this->redirect($originUrl);
     }
 
     // This function is responsible for managing the logic of the account deletion
     #[Route(path: '/delete_account', name: 'app_delete_account')]
     public function delete_account(Request $request): Response
     {
-        $id = $request->query->get('id');
-
-        $this->accountService->deleteUser($id);
-        $this->addFlash('success',  'Le compte a été supprimé');
-
-        return $this->redirectToRoute('app_super_admin');
+        $userId = $request->query->get('userId');
+        $originUrl = $request->headers->get('Referer');
+        $username = $this->userRepository->find($userId)->getUsername();
+        try {
+            $this->accountService->deleteUser($userId);
+            $this->addFlash('success',  'Le compte de ' . $username . ' a été supprimé');
+        } catch (\Exception $e) {
+            $this->addFlash('danger',  'Le compte ne peut pas être supprimé : ' . $e->getMessage());
+        }
+        return $this->redirect($originUrl);
     }
 
 
@@ -143,15 +163,15 @@ class SecurityController extends FrontController
     }
 
     // Create a route for department deletion. It depends on the entitydeletionService.
-    #[Route('/department/department_deletion/{department}', name: 'app_department_deletion')]
-    public function departmentDeletion(string $department, Request $request): Response
+    #[Route('/department/department_deletion/{departmentId}', name: 'app_department_deletion')]
+    public function departmentDeletion(int $departmentId, Request $request): Response
     {
         $entityType = "department";
-        $entityid = $this->departmentRepository->findOneBy(['name' => $department]);
-        $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
+        $entity = $this->departmentRepository->find($departmentId);
+        $response = $this->entitydeletionService->deleteEntity($entityType, $departmentId);
         $originUrl = $request->headers->get('referer');
 
-        if ($entity == true) {
+        if ($response == true) {
 
             $this->addFlash('success', $entityType . ' has been deleted');
             return $this->redirect($originUrl);
