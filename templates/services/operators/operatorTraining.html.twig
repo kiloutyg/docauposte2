@@ -1,0 +1,27 @@
+{% block stylesheets %}
+	{{
+		encore_entry_link_tags("app")
+        }}
+{% endblock %}
+{% block body %}
+	<html>
+
+		<body>
+			<div class="d-flex">
+				<select name="team-trainingRecord-select" id="team" class="form-select mx-1" style="flex:1;">
+					<option value="0">Select a Team</option>
+					{% for team in teams %}
+						<option value="{{ team.id }}">{{ team.name }}</option>
+					{% endfor %}
+				</select>
+
+				<select name="uap-trainingRecord-select" id="uap" class="form-select mx-1" style="flex:1;">
+					<option value="0">Select a UAP</option>
+					{% for uap in uaps %}
+						<option value="{{ uap.id }}">{{ uap.name }}</option>
+					{% endfor %}
+				</select>
+			</div>
+		</body>
+	</html>
+{% endblock %}

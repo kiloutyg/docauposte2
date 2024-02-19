@@ -10,8 +10,15 @@
 	{{ encore_entry_script_tags('toast') }}
 
 {% endblock %}
-<div class=" d-flex align-items-center  flex-row">
+<html>
+	<head>
+		<title>TrainingRecord</title>
+	</head>
+	<body>
+		<div class=" d-flex align-items-center  flex-row">
 
-	<iframe src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" width="69%" height="950" target="_blank"></iframe>
-	<div style="width: 31%" class="text-center card-body"></div>
-</div>
+			<iframe src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" width="69%" height="950" target="_blank"></iframe>
+			<iframe class="rounded-3" name="trainingRecord" width="31%" height="800" src="{{ path('app_training_list', { uploadId: upload.id})}}" frameborder="0"></iframe>
+		</div>
+	</body>
+</html>

@@ -89,4 +89,18 @@ class OperatorController extends FrontController
             ]);
         }
     }
+
+    // page with the training record and the operator list and the form to add a new operator, 
+    // page that will be integrated as an iframe probably in the test document page
+    #[Route('operator/trainginglist/{uploadId}', name: 'app_training_list')]
+    public function trainingList(Request $request, int $uploadId): Response
+    {
+        $upload = $this->uploadRepository->find($uploadId);
+        $trainingRecords = $upload->getTrainingRecords();
+
+        return $this->render('services/operators/operatorTraining.html.twig', [
+            'trainingRecords' => $trainingRecords,
+
+        ]);
+    }
 }
