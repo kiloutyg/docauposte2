@@ -126,12 +126,11 @@ class IncidentController extends FrontController
     }
 
     // Create a route for incidentCategory deletion. It depends on the entitydeletionService.
-    #[Route('/incident/delete/incident_incidentsCategory_deletion/{incidentCategory}', name: 'incident_incidentsCategory_deletion')]
-    public function incidentCategoryDeletion(string $incidentCategory, Request $request): Response
+    #[Route('/incident/delete/incident_incidentsCategory_deletion/{incidentCategoryId}', name: 'incident_incidentsCategory_deletion')]
+    public function incidentCategoryDeletion(int $incidentCategoryId, Request $request): Response
     {
         $entityType = "incidentCategory";
-        $entityid = $this->incidentCategoryRepository->findOneBy(['name' => $incidentCategory]);
-        $entity = $this->entitydeletionService->deleteEntity($entityType, $entityid->getId());
+        $entity = $this->entitydeletionService->deleteEntity($entityType, $incidentCategoryId);
         $originUrl = $request->headers->get('referer');
 
         if ($entity == true) {
