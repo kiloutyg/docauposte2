@@ -206,12 +206,7 @@ class UploadController extends FrontController
         $comment = $request->request->get('modificationComment');
         $newValidation = $request->request->get('validatorRequired');
         $enoughValidator = false;
-        // foreach ($request->request->keys() as $key) {
-        //     if (($key == "validator_user3")) {
-        //         $enoughValidator = true;
-        //         break;
-        //     }
-        // }
+
         $enoughValidator = $request->request->has('validator_user4');
 
         $form->handleRequest($request);

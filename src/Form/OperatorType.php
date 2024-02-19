@@ -5,9 +5,12 @@ namespace App\Form;
 use App\Entity\Operators;
 use App\Entity\Team;
 use App\Entity\Uap;
+
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OperatorType extends AbstractType
