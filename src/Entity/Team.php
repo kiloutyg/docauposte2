@@ -15,7 +15,7 @@ class Team
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToMany(mappedBy: 'Team', targetEntity: Operators::class)]
+    #[ORM\OneToMany(mappedBy: 'Team', targetEntity: Operator::class)]
     private Collection $operators;
 
     #[ORM\Column(length: 255)]
@@ -32,14 +32,14 @@ class Team
     }
 
     /**
-     * @return Collection<int, Operators>
+     * @return Collection<int, Operator>
      */
-    public function getOperators(): Collection
+    public function getOperator(): Collection
     {
         return $this->operators;
     }
 
-    public function addOperator(Operators $operator): static
+    public function addOperator(Operator $operator): static
     {
         if (!$this->operators->contains($operator)) {
             $this->operators->add($operator);
@@ -49,7 +49,7 @@ class Team
         return $this;
     }
 
-    public function removeOperator(Operators $operator): static
+    public function removeOperator(Operator $operator): static
     {
         if ($this->operators->removeElement($operator)) {
             // set the owning side to null (unless already changed)

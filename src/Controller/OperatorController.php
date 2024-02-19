@@ -4,30 +4,88 @@ namespace App\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 use App\Form\OperatorType;
 
 use App\Entity\Operator;
 
-class OperatorController extends FrontController{
+class OperatorController extends FrontController
+{
 
     // Route to have the basic page being display for dev purpose
     #[Route('/operator', name: 'app_operator')]
-    public function operatorBasePage(): Response
+    public function operatorBasePage(Request $request): Response
     {
+        $originUrl = $request->headers->get('referer');
 
-        if ($this->operatorsRepository->findAll() != null) {
+        if ($this->operatorRepository->findAll() != null) {
             $operators = $this->operatorRepository->findAll();
         }
-        $operator = new Operator();
-        
-        $operatorForm = $this->createForm(OperatorType::class, $operator);
+        $operatorForms = [];
 
-        return $this->render('services/operators/operators.html.twig', [
-            'operatorForm' => $operatorForm->createView(),
-        ]);
+        foreach ($operators as $operator) {
+            $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator)->createView();
+        }
+
+        $newOperator = new Operator();
+        $newOperatorForm = $this->createForm(OperatorType::class, $newOperator);
+        if ($request->getMethod() === 'POST') {
+            $newOperatorForm->handleRequest($request);
+            if ($newOperatorForm->isSubmitted() && $newOperatorForm->isValid()) {
+                $operator = $newOperatorForm->getData();
+                $this->em->persist($operator);
+                $this->em->flush();
+                $this->addFlash('success', 'L\'opérateur a bien été ajouté');
+                return $this->redirect($originUrl);
+            }
+        } else if ($request->getMethod() === 'GET') {
+            return $this->render('services/operators/operators.html.twig', [
+                'newOperatorForm' => $newOperatorForm->createView(),
+                'operatorForms' => $operatorForms,
+            ]);
+        }
+    }
+
+
+    // individual operator modification controller, used in dev purpose
+    #[Route('/operator/edit/{id}', name: 'app_operator_edit')]
+    public function editOperatorAction(Request $request, Operator $operator): Response
+    {
+        $originUrl = $request->headers->get('referer');
+
+        $form = $this->createForm(OperatorType::class, $operator);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $operator = $form->getData();
+            $this->em->persist($operator);
+            $this->em->flush();
+            $this->addFlash('success', 'L\'opérateur a bien été ajouté');
+            return $this->redirect($originUrl);
+        } else {
+            return $this->render('app_operator');
+            $this->addFlash(
+                'danger',
+                'cdlm'
+            );
+        }
+
+        // Redirect back to the main operator page or render a specific template
+    }
+
+    //first test of actual page rendering with a validated document and a dynamic form and list of operators and stuff
+    #[Route('/operator/visual/{validationId}', name: 'test_documents')]
+    public function documentAndOperator(Request $request, int $validationId): Response
+    {
+        $originUrl = $request->headers->get('referer');
+        $validation = $this->validationRepository->find($validationId);
+        $upload = $validation->getUpload();
+
+        if ($request->getMethod() === 'GET') {
+            return $this->render('services/operators/docAndOperator.html.twig', [
+                'upload' => $upload,
+            ]);
+        }
     }
 }

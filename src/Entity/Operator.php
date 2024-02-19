@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\OperatorsRepository;
+use App\Repository\OperatorRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: OperatorsRepository::class)]
-class Operators
+#[ORM\Entity(repositoryClass: OperatorRepository::class)]
+class Operator
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -18,9 +18,6 @@ class Operators
 
     #[ORM\ManyToOne(inversedBy: 'operators')]
     private ?Team $Team = null;
-
-    #[ORM\ManyToOne(inversedBy: 'operators')]
-    private ?Team $team = null;
 
     #[ORM\ManyToOne(inversedBy: 'operators')]
     private ?Uap $uap = null;

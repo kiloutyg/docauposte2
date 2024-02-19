@@ -2,27 +2,27 @@
 
 namespace App\Repository;
 
-use App\Entity\Operators;
+use App\Entity\Operator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Operators>
+ * @extends ServiceEntityRepository<Operator>
  *
- * @method Operators|null find($id, $lockMode = null, $lockVersion = null)
- * @method Operators|null findOneBy(array $criteria, array $orderBy = null)
- * @method Operators[]    findAll()
- * @method Operators[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Operator|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Operator|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Operator[]    findAll()
+ * @method Operator[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class OperatorsRepository extends ServiceEntityRepository
+class OperatorRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Operators::class);
+        parent::__construct($registry, Operator::class);
     }
 
 //    /**
-//     * @return Operators[] Returns an array of Operators objects
+//     * @return Operator[] Returns an array of Operator objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -36,7 +36,7 @@ class OperatorsRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Operators
+//    public function findOneBySomeField($value): ?Operator
 //    {
 //        return $this->createQueryBuilder('o')
 //            ->andWhere('o.exampleField = :val')
