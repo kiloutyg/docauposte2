@@ -91,7 +91,7 @@
 																<a href="{{path('app_productline_admin', {productlineId: productLine.Id})}}" class="btn btn-dark">
 																	{{ productLine.name|split('.')|first|upper}}
 																</a>
-																{% if is_granted ('ROLE_SUPER_ADMIN') or app.user is same as( productLine.creator) %}
+																{% if is_granted ('ROLE_LINE_ADMIN') or app.user is same as( productLine.creator) %}
 																	<a href="{{path('app_zone_admin_delete_productline', {productlineId: productLine.id})}}" class="btn btn-danger delete-productline">
 																		Supprimer
 																	</a>
