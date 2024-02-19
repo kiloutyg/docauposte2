@@ -13,12 +13,12 @@ use App\Entity\Category;
 // This controller manage the logic of the productline admin interface
 class ProductLineAdminController extends FrontController
 {
-    #[Route('/productline_admin/{productline}', name: 'app_productline_admin')]
+    #[Route('/productline_admin/{productlineId}', name: 'app_productline_admin')]
 
     // This function is responsible for rendering the productline's admin interface
-    public function index(string $productline = null): Response
+    public function index(int $productlineId = null): Response
     {
-        $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
+        $productLine = $this->productLineRepository->find($productlineId);
         $zone = $productLine->getZone();
 
         // Get all the uploads and incidents related to the productline
@@ -48,16 +48,16 @@ class ProductLineAdminController extends FrontController
     }
 
     // This function will create a new User 
-    #[Route('/productline_admin/create_manager/{productline}', name: 'app_productline_admin_create_manager')]
-    public function createManager(string $productline = null, Request $request): Response
+    #[Route('/productline_admin/create_manager/{productlineId}', name: 'app_productline_admin_create_manager')]
+    public function createManager(int $productlineId = null, Request $request): Response
     {
-        $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
+        $productLine = $this->productLineRepository->find($productlineId);
         $zone = $productLine->getZone();
 
         $error = null;
         $result = $this->accountService->createAccount(
             $request,
-            $error,
+            $error
         );
 
         if ($result) {
@@ -69,25 +69,22 @@ class ProductLineAdminController extends FrontController
         }
 
         return $this->redirectToRoute('app_productline', [
-            'zone'        => $zone,
-            'name'        => $zone->getName(),
-            'productline' => $productLine->getName(),
-            'productLine' => $productLine,
+            'productlineId' => $productlineId,
         ]);
     }
 
     // This function will create a new category
-    #[Route('/productline_admin/create_category/{productline}', name: 'app_productline_admin_create_category')]
-    public function createCategory(Request $request, string $productline = null)
+    #[Route('/productline_admin/create_category/{productlineId}', name: 'app_productline_admin_create_category')]
+    public function createCategory(Request $request, int $productlineId = null)
     {
-        $productLine = $this->productLineRepository->findOneBy(['name' => $productline]);
+        $productLine = $this->productLineRepository->find($productlineId);
         $zone = $productLine->getZone();
 
         if (!preg_match("/^[^.]+$/", $request->request->get('categoryname'))) {
             // Handle the case when category name contains disallowed characters
             $this->addFlash('danger', 'Nom de catégorie invalide');
             return $this->redirectToRoute('app_productline_admin', [
-                'productline'       => $productLine->getName(),
+                'productlineId'       => $productlineId(),
             ]);
         } else {
 
@@ -99,11 +96,7 @@ class ProductLineAdminController extends FrontController
             if ($category) {
                 $this->addFlash('danger', 'La catégorie existe deja');
                 return $this->redirectToRoute('app_productline_admin', [
-                    'controller_name'   => 'LineAdminController',
-                    'zone'              => $zone,
-                    'name'              => $zone->getName(),
-                    'productLine'       => $productLine,
-                    'productline'       => $productLine->getName(),
+                    'productlineId'       => $productlineId(),
 
                 ]);
                 // If the category doesn't exist, create it and redirect to the productline admin interface with a flash message
@@ -120,23 +113,19 @@ class ProductLineAdminController extends FrontController
                 $this->folderCreationService->folderStructure($categoryname);
                 $this->addFlash('success', 'La catégorie a été créée');
                 return $this->redirectToRoute('app_productline_admin', [
-                    'controller_name'   => 'LineAdminController',
-                    'zone'              => $zone,
-                    'name'              => $zone->getName(),
-                    'productLine'       => $productLine,
-                    'productline'       => $productLine->getName(),
+                    'productlineId'     => $productlineId,
                 ]);
             }
         }
     }
 
-    #[Route('/productline_admin/delete_category/{category}', name: 'app_productline_admin_delete_category')]
+    #[Route('/productline_admin/delete_category/{categoryId}', name: 'app_productline_admin_delete_category')]
     // This function will delete a category and all of its children entities, it depends on the entitydeletionService
-    public function deleteEntity(string $category): Response
+    public function deleteEntity(int $categoryId): Response
     {
         $entityType = 'category';
-        $entity = $this->categoryRepository->findOneBy(['name' => $category]);
-        $productLine = $entity->getProductLine()->getName();
+        $entity = $this->categoryRepository->find($categoryId);
+        $productLineId = $entity->getProductLine()->getId();
 
         // Check if the user is the creator of the entity or if he is a super admin
         if ($this->authChecker->isGranted("ROLE_LINE_ADMIN") || $this->getUser() === $entity->getCreator()) {
@@ -146,7 +135,7 @@ class ProductLineAdminController extends FrontController
         } else {
             $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer cette ' . $entityType . '.');
             return $this->redirectToRoute('app_productline_admin', [
-                'productline'   => $productLine,
+                'productlineId'   => $productLineId,
             ]);
         }
 
@@ -154,12 +143,12 @@ class ProductLineAdminController extends FrontController
 
             $this->addFlash('success', 'La catégorie ' . $entityType . ' a été supprimée');
             return $this->redirectToRoute('app_productline_admin', [
-                'productline'   => $productLine,
+                'productlineId'   => $productLineId,
             ]);
         } else {
             $this->addFlash('danger', 'La catégorie ' . $entityType . ' n\'existe pas');
             return $this->redirectToRoute('app_productline_admin', [
-                'productline'   => $productLine,
+                'productlineId'   => $productLineId,
             ]);
         }
     }

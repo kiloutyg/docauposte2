@@ -22,8 +22,7 @@ class FrontController extends BaseController
 
         return $this->render(
             'base.html.twig',
-            [
-            ]
+            []
         );
     }
 
@@ -57,10 +56,10 @@ class FrontController extends BaseController
 
 
     // Render the zone page
-    #[Route('/zone/{zone}', name: 'zone')]
-    public function zone(string $zone = null): Response
+    #[Route('/zone/{zoneId}', name: 'zone')]
+    public function zone(int $zoneId = null): Response
     {
-        $zone = $this->zoneRepository->findOneBy(['name' => $zone]);
+        $zone = $this->zoneRepository->find($zoneId);
 
         return $this->render(
             'zone.html.twig',
@@ -72,13 +71,12 @@ class FrontController extends BaseController
 
 
     // Render the productline page and redirect to the mandatory incident page if there is one
-    #[Route('/zone/{zone}/productline/{productline}', name: 'productline')]
-    public function productline(string $productline = null): Response
+    #[Route('/zone/{zoneId}/productline/{productlineId}', name: 'productline')]
+    public function productline(int $zoneId = null, int $productlineId = null): Response
     {
 
-        $productLine = $this->productLineRepository->findoneBy(['name' => $productline]);
+        $productLine = $this->productLineRepository->find($productlineId);
         $zone        = $productLine->getZone();
-        $productlineId = $productLine->getId();
 
         $incidents = [];
         $incidents = $this->incidentRepository->findBy(
@@ -86,7 +84,7 @@ class FrontController extends BaseController
             ['id' => 'ASC'] // order by id ascending
         );
 
-        $incidentid = count($incidents) > 0 ? $incidents[0]->getId() : null;
+        $incidentId = count($incidents) > 0 ? $incidents[0]->getId() : null;
 
         if (count($incidents) == 0) {
 
@@ -99,9 +97,9 @@ class FrontController extends BaseController
             );
         } else {
             return $this->redirectToRoute('app_mandatory_incident', [
-                'zone' => $zone->getName(),
-                'productline' => $productLine->getName(),
-                'incidentid' => $incidentid
+                'zoneId' => $zoneId,
+                'productlineId' => $productlineId,
+                'incidentId' => $incidentId
             ]);
         }
     }
@@ -109,15 +107,15 @@ class FrontController extends BaseController
 
 
     // Render the category page and redirect to the button page if there is only one button in the category
-    #[Route('/zone/{zone}/productline/{productline}/category/{category}', name: 'category')]
+    #[Route('/zone/{zoneId}/productline/{productlineId}/category/{categoryId}', name: 'category')]
 
-    public function category(string $category = null): Response
+    public function category(int $categoryId = null): Response
     {
-        $category    = $this->categoryRepository->findoneBy(['name' => $category]);
+        $category    = $this->categoryRepository->find($categoryId);
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
         $buttons = [];
-        $buttons = $this->buttonRepository->findBy(['Category' => $category->getId()]);
+        $buttons = $this->buttonRepository->findBy(['Category' => $categoryId]);
 
         if (count($buttons) != 1) {
 
@@ -130,28 +128,28 @@ class FrontController extends BaseController
                 ]
             );
         } else {
-            $button = $buttons[0]->getName();
+            $buttonId = $buttons[0]->getId();
             return $this->redirectToRoute('app_button', [
-                'zone' => $zone->getName(),
-                'productline' => $productLine->getName(),
-                'category' => $category->getName(),
-                'button' => $button
+                'zoneId'        => $zone->getId(),
+                'productlineId' => $productLine->getId(),
+                'categoryId'    => $category->getId(),
+                'buttonId'      => $buttonId
             ]);
         }
     }
 
 
     // Render the button page and redirect to the upload page if there is only one upload in the button
-    #[Route('/zone/{zone}/productline/{productline}/category/{category}/button/{button}', name: 'button')]
-    public function ButtonShowing(UploadController $uploadController, string $button = null, Request $request): Response
+    #[Route('/zone/{zoneId}/productline/{productlineId}/category/{categoryId}/button/{buttonId}', name: 'button')]
+    public function buttonDisplay(UploadController $uploadController, int $buttonId = null, Request $request): Response
     {
-        $buttonEntity = $this->buttonRepository->findOneBy(['name' => $button]);
+        $buttonEntity = $this->buttonRepository->find($buttonId);
         $category    = $buttonEntity->getCategory();
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
         $uploads = [];
 
-        $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonEntity->getId()]);
+        $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonId]);
         foreach ($buttonUploads as $buttonUpload) {
             if ($buttonUpload->isValidated() || $buttonUpload->getOldUpload() != null) {
                 $uploads[] = $buttonUpload;

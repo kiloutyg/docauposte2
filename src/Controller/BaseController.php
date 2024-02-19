@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Uap;
 use  \Psr\Log\LoggerInterface;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -27,6 +28,9 @@ use App\Repository\DepartmentRepository;
 use App\Repository\ValidationRepository;
 use App\Repository\ApprobationRepository;
 use App\Repository\OldUploadRepository;
+use App\Repository\UapRepository;
+use App\Repository\TeamRepository;
+use App\Repository\OperatorsRepository;
 
 // use App\Entity\Zone;
 // use App\Entity\ProductLine;
@@ -82,6 +86,9 @@ class BaseController extends AbstractController
     protected $productLineRepository;
     protected $userRepository;
     protected $oldUploadRepository;
+    protected $uapRepository;
+    protected $teamRepository;
+    protected $operatorsRepository;
 
     // Services methods
     protected $validationService;
@@ -106,6 +113,9 @@ class BaseController extends AbstractController
     protected $incidents;
     protected $incidentCategories;
     protected $validations;
+    protected $teams;
+    protected $operators;
+    protected $uaps;
 
 
 
@@ -132,6 +142,9 @@ class BaseController extends AbstractController
         ProductLineRepository           $productLineRepository,
         UserRepository                  $userRepository,
         OldUploadRepository             $oldUploadRepository,
+        UapRepository                   $uapRepository,
+        TeamRepository                  $teamRepository,
+        OperatorsRepository             $operatorsRepository,
 
         // Services methods
         ValidationService               $validationService,
@@ -171,6 +184,9 @@ class BaseController extends AbstractController
         $this->categoryRepository           = $categoryRepository;
         $this->buttonRepository             = $buttonRepository;
         $this->oldUploadRepository          = $oldUploadRepository;
+        $this->uapRepository                = $uapRepository;
+        $this->teamRepository               = $teamRepository;
+        $this->operatorsRepository          = $operatorsRepository;
 
         // Variables related to the services
         $this->mailerService                = $mailerService;
@@ -195,6 +211,9 @@ class BaseController extends AbstractController
         $this->incidentCategories           = $this->incidentCategoryRepository->findAll();
         $this->departments                  = $this->departmentRepository->findAll();
         $this->validations                  = $this->validationRepository->findAll();
+        $this->teams                        = $this->teamRepository->findAll();
+        $this->operators                    = $this->operatorsRepository->findAll();
+        $this->uaps                         = $this->uapRepository->findAll();
     }
 
     protected function render(string $view, array $parameters = [], Response $response = null): Response
@@ -210,6 +229,9 @@ class BaseController extends AbstractController
             'incidentCategories'    => $this->incidentCategories,
             'departments'           => $this->departments,
             'validations'           => $this->validations,
+            'teams'                 => $this->teams,
+            'operators'             => $this->operators,
+            'uaps'                  => $this->uaps
         ];
 
         $parameters = array_merge($commonParameters, $parameters);

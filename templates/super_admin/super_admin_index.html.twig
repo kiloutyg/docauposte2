@@ -53,14 +53,14 @@
 			</h2>
 			<div id="collapseAccount" class="accordion-collapse collapse" aria-labelledby="headingAccount" data-bs-parent="#accordionSuperAdmin">
 				<div class="accordion-body accordion-bg shadow shadow-inset">
-
-					<form class="form-floating row mx-auto" method="POST" action="{{ path('app_super_admin_create_admin') }}">
-						{% include "services/accountservices/create_account.html.twig" %}
-					</form>
+					<div class="card border-0 shadow rounded-3 my-5">
+						<form class="form-floating row mx-auto" method="POST" action="{{ path('app_super_admin_create_admin') }}">
+							{% include "services/accountservices/create_account.html.twig" %}
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>
-
 
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="headingZone">
@@ -107,7 +107,7 @@
 													<ul class="list-unstyled">
 														{% for zone in zones %}
 															<li class="form-control d-flex justify-content-between align-items-center mb-2">
-																<a href="{{path('app_zone_admin', {zone: zone.name})}}" class="btn btn-dark">
+																<a href="{{path('app_zone_admin', {zoneId: zone.id})}}" class="btn btn-dark">
 																	{{ zone.name|split('.')|first|upper }}
 																</a>
 																<a href="{{path('app_base_views_modification')}}" class="btn btn-info">
@@ -130,8 +130,24 @@
 				</div>
 			</div>
 		</div>
-
-
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="headingOperatorMannagement">
+				<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOperatorMannagement" aria-expanded="false" aria-controls="collapseOperatorMannagement">
+					<strong>Formulaire de gestions Operateurs :</strong>
+				</button>
+			</h2>
+			<div id="collapseOperatorMannagement" class="accordion-collapse collapse" aria-labelledby="headingOperatorMannagement" data-bs-parent="#accordionSuperAdmin">
+				<div class="accordion-body accordion-bg shadow shadow-inset">
+					<div class="card border-0 shadow rounded-3 my-5">
+						<div class="card-body">
+							<div class="row">
+								{{ render(controller('App\\Controller\\SuperAdminController::operatorManagement'), options = []) }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 		<div class="accordion-item">
 			<h2 class="accordion-header" id="headingUpload">
 				<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUpload" aria-expanded="false" aria-controls="collapseUpload">

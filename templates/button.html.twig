@@ -13,24 +13,19 @@
 				{% set matchinguploads = matchinguploads|merge([upload]) %}
 			{% endif %}
 		{% endfor %}
-		{% if matchinguploads|length > 1 or matchinguploads|length < 1 %}
+		{% if matchinguploads|length > 1 %}
 			<div>
 				<div class="justify-content-between align-items-center ">
 					<h2>
 						<strong>
-							Document pour
+							Documents pour
 							{{button.name|split('.')|first|upper}}
 						</strong>
 					</h2>
-					<p>
-						<strong>
-							Aucun upload pour ce bouton
-						</strong>
-					</p>
 					{% include 'services/uploads/uploaded.html.twig' %}
 				</div>
 			</div>
-		{% else %}
+		{% elseif matchinguploads|length < 1 %}
 			<div class="justify-content-between align-items-center ">
 				<h2>
 					<strong>
@@ -40,7 +35,7 @@
 				</h2>
 				<p>
 					<strong>
-						Aucun upload pour ce bouton
+						Aucun document pour ce bouton
 					</strong>
 				</p>
 				{% include 'services/uploads/uploaded.html.twig' %}
