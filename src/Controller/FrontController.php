@@ -72,7 +72,7 @@ class FrontController extends BaseController
 
     // Render the productline page and redirect to the mandatory incident page if there is one
     #[Route('/zone/{zoneId}/productline/{productlineId}', name: 'productline')]
-    public function productline(string $productlineId = null): Response
+    public function productline(int $zoneId = null, int $productlineId = null): Response
     {
 
         $productLine = $this->productLineRepository->find($productlineId);
@@ -97,7 +97,7 @@ class FrontController extends BaseController
             );
         } else {
             return $this->redirectToRoute('app_mandatory_incident', [
-                'zoneId' => $zone->getId(),
+                'zoneId' => $zoneId,
                 'productlineId' => $productlineId,
                 'incidentId' => $incidentId
             ]);
