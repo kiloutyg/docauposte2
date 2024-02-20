@@ -223,8 +223,7 @@ function createSelectElement() {
     createNewSelect(e.target.value, e.target.id);
   });
 
-  // Initialize Select2 on the newly created select
-  // $(newSelect).select2();
+
 }
 
 // The createSelectElement function creates a new select element, 

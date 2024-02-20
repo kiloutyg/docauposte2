@@ -92,15 +92,59 @@ class OperatorController extends FrontController
 
     // page with the training record and the operator list and the form to add a new operator, 
     // page that will be integrated as an iframe probably in the test document page
-    #[Route('operator/trainginglist/{uploadId}', name: 'app_training_list')]
-    public function trainingList(Request $request, int $uploadId): Response
+    #[Route('operator/traininglist/{uploadId}', name: 'app_training_list')]
+    public function trainingList(int $uploadId): Response
     {
+
+
+        // Handle the GET request
         $upload = $this->uploadRepository->find($uploadId);
-        $trainingRecords = $upload->getTrainingRecords();
-
         return $this->render('services/operators/operatorTraining.html.twig', [
-            'trainingRecords' => $trainingRecords,
+            'trainingRecords' => $upload->getTrainingRecords(),
+            'operators' => $this->operatorRepository->findAll(),
+            'upload' => $upload,
+        ]);
+    }
 
+    #[Route('/operator/traininglist/listform/{uploadId}', name: 'app_training_record_form')]
+    public function trainingListFormHandling(Request $request, int $uploadId): Response
+    {
+        // Log the full request for debugging
+        $this->logger->info('Full request', $request->request->all());
+
+        // Process the POST request
+
+        $teamId = $request->request->get('team-trainingRecord-select');
+        $uapId = $request->request->get('uap-trainingRecord-select');
+        if ($teamId == null || $uapId == null) {
+            $this->addFlash('danger', 'Veuillez sélectionner une équipe et une UAP');
+            return $this->redirectToRoute('app_training_list', ['uploadId' => $uploadId]);
+        }
+
+        // Redirect to the route that renders the partial
+        return $this->redirectToRoute('app_render_training_records', [
+            'uploadId' => $uploadId,
+            'teamId' => $teamId,
+            'uapId' => $uapId,
+        ]);
+    }
+
+    #[Route('/render-training-records/{uploadId}/{teamId}/{uapId}', name: 'app_render_training_records')]
+    public function renderTrainingRecords(int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
+    {
+        // Fetch the data needed for the partial
+        $selectedOperators = $this->operatorRepository->findBy(['Team' => $teamId, 'uap' => $uapId]);
+        $trainingRecords = [];
+
+        foreach ($selectedOperators as $operator) {
+            $records = $this->trainingRecordRepository->findBy(['operator' => $operator, 'Upload' => $uploadId]);
+            $trainingRecords = array_merge($trainingRecords, $records);
+        }
+
+        // Render the partial view
+        return $this->render('services/operators/component/_listOperator.html.twig', [
+            'selectedOperators' => $selectedOperators,
+            'trainingRecords'   => $trainingRecords,
         ]);
     }
 }

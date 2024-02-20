@@ -1,0 +1,43 @@
+<turbo-frame id="training-records">
+	{% if trainingRecords is defined and trainingRecords is not empty %}
+		{% for record in trainingRecords %}
+			<ul>
+				{{record.operator.name}}
+				-
+				{{record.trained}}
+			</ul>
+		{% endfor %}
+	{% else %}
+		{% if selectedOperators is defined and selectedOperators is not empty %}
+
+			{% for operator in selectedOperators %}
+				<ul>
+					{{operator.name}}
+					-
+					<select name="trained">
+						<option value='' selected>Choose</option>
+						<option value="true">Yes</option>
+						<option value="false">No</option>
+					</select>
+				</ul>
+			{% endfor %}
+		{% else %}
+			<p>No training records found, current team and uap operators list</p>
+
+			{% for operator in operators %}
+				<ul>
+
+					{{operator.name}}
+					-
+					<select name="trained">
+						<option value='' selected>Choose</option>
+						<option value="true">Yes</option>
+						<option value="false">No</option>
+					</select>
+				</ul>
+
+			{% endfor %}
+		{% endif %}
+
+	{% endif %}
+</turbo-frame>

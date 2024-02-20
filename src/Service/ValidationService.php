@@ -437,6 +437,7 @@ class ValidationService extends AbstractController
                         $uploadsWaitingValidation[] = $upload;
                     }
                 }
+                $return = false;
                 if (count($uploadsWaitingValidation) > 0) {
                     $return = $this->mailerService->sendReminderEmail($validator, $uploadsWaitingValidation);
                     $uploadsWaitingValidation = [];
