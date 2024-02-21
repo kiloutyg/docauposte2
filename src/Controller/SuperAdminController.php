@@ -36,11 +36,11 @@ class SuperAdminController extends FrontController
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('super_admin/super_admin_index.html.twig', [
-            'groupedUploads'        => $groupedUploads,
+            'groupedUploads'            => $groupedUploads,
             'groupedValidatedUploads'   => $groupedValidatedUploads,
-            'groupincidents'        => $groupIncidents,
-            'error'                 => $error,
-            'last_username'         => $lastUsername
+            'groupincidents'            => $groupIncidents,
+            'error'                     => $error,
+            'last_username'             => $lastUsername
         ]);
     }
 

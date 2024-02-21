@@ -5,13 +5,17 @@ namespace App\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use App\Form\OperatorType;
 
 use App\Entity\Operator;
 
+
+
 class OperatorController extends FrontController
 {
+
 
     // Route to have the basic page being display for dev purpose
     #[Route('/operator', name: 'app_operator')]
@@ -106,7 +110,7 @@ class OperatorController extends FrontController
 
     // Route to handle the newOperator form submission
     #[Route('/operator/traininglist/new/{uploadId}/{teamId}/{uapId}', name: 'app_training_new_operator')]
-    public function trainingListNewOperator(Request $request, int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
+    public function trainingListNewOperator(ValidatorInterface $validator, Request $request, int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
     {
 
         $this->logger->info('Full request', $request->request->all());
@@ -118,14 +122,6 @@ class OperatorController extends FrontController
 
         $operatorName = $request->request->get('newOperator');
 
-        if ($operatorName == null) {
-            $this->addFlash('danger', 'Veuillez entrer un nom d\'opérateur');
-            return $this->redirectToRoute('app_training_list', [
-                'uploadId' => $uploadId,
-                'teamId' => $teamId,
-                'uapId' => $uapId,
-            ]);
-        }
 
         $existingOperator = $this->operatorRepository->findOneBy(['name' => $operatorName]);
         if ($existingOperator != null) {
@@ -156,6 +152,31 @@ class OperatorController extends FrontController
         $operator->setName($operatorName);
         $operator->setTeam($team);
         $operator->setUap($uap);
+
+        $errors = $validator->validate($operator);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $violation) {
+                // You can use ->getPropertyPath() if you need to show the field name
+                // $errorMessages[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
+                $errorMessages[] = $violation->getMessage();
+            }
+
+            // Now you have an array of user-friendly messages you can display
+            // For example, you can separate them with new lines when displaying in text format:
+            $errorsString = implode("\n", $errorMessages);
+
+            // If you need to return JSON response:
+            // return new JsonResponse(['errors' => $errorMessages], Response::HTTP_BAD_REQUEST);
+
+            $this->addFlash('danger', $errorsString);
+            return $this->redirectToRoute('app_render_training_records', [
+                'uploadId' => $uploadId,
+                'teamId' => $teamId,
+                'uapId' => $uapId,
+            ]);
+        }
+
         $this->em->persist($operator);
         $this->em->flush();
         $this->addFlash('success', 'L\'opérateur a bien été ajouté');
