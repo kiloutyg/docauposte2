@@ -1,4 +1,7 @@
+import './bootstrap.js';
+
 import '@hotwired/turbo';
+
 document.addEventListener('turbo:load', () => {
     console.log('Turbo frame loaded');
 });
@@ -14,7 +17,6 @@ document.addEventListener('turbo:render', (event) => {
 document.addEventListener('turbo:submit-start', (event) => {
     console.log('Form submit started', event);
 });
-import './bootstrap.js';
 /*
  * Welcome to your app's main JavaScript file!
  *
@@ -32,7 +34,7 @@ import "./bootstrap";
 // import $ from "jquery";
 // import { createPopper } from "@popperjs/core";
 
-// Make jQuery and Popper.js available globally
+// // Make jQuery and Popper.js available globally
 // global.$ = global.jQuery = $;
 // global.createPopper = createPopper;
 

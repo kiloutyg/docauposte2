@@ -15,27 +15,28 @@
 	<body>
 
 
-		<form id="trainingRecord-form" class="d-flex" action="{{path('app_training_record_form', {'uploadId': upload.id})}}" method="post" data-turbo-frame="training-records">
-			<select name="team-trainingRecord-select" id="teamId" class="form-select mx-1" style="flex:1;">
+		<form id="trainingRecord-form" class="d-flex mx-2" action="{{path('app_training_record_form', {'uploadId': upload.id})}}" method="post" data-turbo-frame="training-records">
+			<select name="team-trainingRecord-select" id="teamId" class="form-select mx-1" style="flex:1;" data-controller="operator-training-select" data-action="change->operator-training-select#validateNewOperatorSelect" data-operator-training-select-target="newOperatorSelect" required>
 				<option value="">Select a Team</option>
 				{% for team in teams %}
 					<option value="{{ team.id }}">{{ team.name }}</option>
 				{% endfor %}
 			</select>
 
-			<select name="uap-trainingRecord-select" id="uapId" class="form-select mx-1" style="flex:1;">
+			<select name="uap-trainingRecord-select" id="uapId" class="form-select mx-1" style="flex:1;" required>
 				<option value="">Select a UAP</option>
 				{% for uap in uaps %}
 					<option value="{{ uap.id }}">{{ uap.name }}</option>
 				{% endfor %}
 			</select>
-			<input type="submit" class="btn btn-primary" value="Filter" style="flex:0.5;">
+			<input type="submit" class="btn btn-primary" value="Filtrer" style="flex:0.5;">
 		</form>
-		{# <div id="training-records" data-turbo-frame="training-records">
-														{% include "services/operators/component/_listOperator.html.twig" %}
-													</div> #}
-		<turbo-frame id="training-records" src="{{path('app_render_training_records', {'uploadId': upload.id})}}">
+		<div data-operator-training-select-target="newOperatorSelectMessage"></div>
+
+		<turbo-frame class="d-flex flex-column " id="training-records">
 			{% include "services/operators/component/_listOperator.html.twig" %}
+			{% include "services/_toasts.html.twig" %}
+
 		</turbo-frame>
 
 	</body>

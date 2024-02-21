@@ -2,23 +2,24 @@
 	{{
 		encore_entry_link_tags("app")
         }}
+	{{encore_entry_script_tags("toast")}}
+
 {% endblock %}
+{% block body %}
+	<html>
 
-<html>
+		<head>
+			<title>TrainingRecord</title>
+			{% include "services/_toasts.html.twig" %}
 
-	<head>
-		<title>TrainingRecord</title>
-		{% include "services/_toasts.html.twig" %}
+		</head>
+		<body>
+			<div class=" d-flex align-items-center  flex-row">
 
-	</head>
-	<body>
-		<div class=" d-flex align-items-center  flex-row">
+				<iframe src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" width="69%" height="950" target="_blank"></iframe>
+				<iframe class="rounded-3" name="trainingRecord" width="31%" height="850" src="{{ path('app_training_list', { uploadId: upload.id})}}" frameborder="0"></iframe>
 
-			<iframe src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" width="69%" height="950" target="_blank"></iframe>
-			<iframe class="rounded-3" name="trainingRecord" width="31%" height="850" src="{{ path('app_training_list', { uploadId: upload.id})}}" frameborder="0"></iframe>
-			{# <div class="rounded-3" width="31%" height="850">
-							{{ render(controller('App\\Controller\\OperatorController::trainingList', { 'uploadId': upload.id })) }}
-						</div> #}
-		</div>
-	</body>
-</html>
+			</div>
+		</body>
+	</html>
+{% endblock %}

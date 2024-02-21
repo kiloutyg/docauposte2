@@ -95,14 +95,74 @@ class OperatorController extends FrontController
     #[Route('operator/traininglist/{uploadId}', name: 'app_training_list')]
     public function trainingList(int $uploadId): Response
     {
-
-
         // Handle the GET request
         $upload = $this->uploadRepository->find($uploadId);
         return $this->render('services/operators/operatorTraining.html.twig', [
             'trainingRecords' => $upload->getTrainingRecords(),
             'operators' => $this->operatorRepository->findAll(),
             'upload' => $upload,
+        ]);
+    }
+
+    // Route to handle the newOperator form submission
+    #[Route('/operator/traininglist/new/{uploadId}/{teamId}/{uapId}', name: 'app_training_new_operator')]
+    public function trainingListNewOperator(Request $request, int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
+    {
+
+        $this->logger->info('Full request', $request->request->all());
+        $originUrl = $request->headers->get('referer');
+        $team = $this->teamRepository->find($teamId);
+        $this->logger->info('team', [$team->getName()]);
+        $uap = $this->uapRepository->find($uapId);
+        $this->logger->info('uap', [$uap->getName()]);
+
+        $operatorName = $request->request->get('newOperator');
+
+        if ($operatorName == null) {
+            $this->addFlash('danger', 'Veuillez entrer un nom d\'opérateur');
+            return $this->redirectToRoute('app_training_list', [
+                'uploadId' => $uploadId,
+                'teamId' => $teamId,
+                'uapId' => $uapId,
+            ]);
+        }
+
+        $existingOperator = $this->operatorRepository->findOneBy(['name' => $operatorName]);
+        if ($existingOperator != null) {
+            $this->logger->info('existingOperator', [$existingOperator->getName()]);
+            if ($existingOperator->getTeam() == $team && $existingOperator->getUap() == $uap) {
+                $this->addFlash('danger', 'Cet opérateur existe déjà');
+                return $this->redirectToRoute('app_training_list', [
+                    'uploadId' => $uploadId,
+                    'teamId' => $teamId,
+                    'uapId' => $uapId,
+                ]);
+            } else {
+                $existingOperator->setTeam($team);
+                $existingOperator->setUap($uap);
+                $this->em->persist($existingOperator);
+                $this->em->flush();
+                $this->addFlash('success', 'L\'opérateur a bien été ajouté et son equipe et son UAP ont été modifiées');
+                return $this->redirectToRoute('app_render_training_records', [
+                    'uploadId' => $uploadId,
+                    'teamId' => $teamId,
+                    'uapId' => $uapId,
+                ]);
+            }
+        }
+
+
+        $operator = new Operator();
+        $operator->setName($operatorName);
+        $operator->setTeam($team);
+        $operator->setUap($uap);
+        $this->em->persist($operator);
+        $this->em->flush();
+        $this->addFlash('success', 'L\'opérateur a bien été ajouté');
+        return $this->redirectToRoute('app_render_training_records', [
+            'uploadId' => $uploadId,
+            'teamId' => $teamId,
+            'uapId' => $uapId,
         ]);
     }
 
@@ -132,7 +192,9 @@ class OperatorController extends FrontController
     #[Route('/render-training-records/{uploadId}/{teamId}/{uapId}', name: 'app_render_training_records')]
     public function renderTrainingRecords(int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
     {
-        // Fetch the data needed for the partial
+        $upload = $this->uploadRepository->find($uploadId);
+
+
         $selectedOperators = $this->operatorRepository->findBy(['Team' => $teamId, 'uap' => $uapId]);
         $trainingRecords = [];
 
@@ -140,9 +202,12 @@ class OperatorController extends FrontController
             $records = $this->trainingRecordRepository->findBy(['operator' => $operator, 'Upload' => $uploadId]);
             $trainingRecords = array_merge($trainingRecords, $records);
         }
-
+        $this->addFlash('success', 'Tavu ça marche bien en fait');
         // Render the partial view
         return $this->render('services/operators/component/_listOperator.html.twig', [
+            'teamId' => $teamId,
+            'uapId' => $uapId,
+            'upload' => $upload,
             'selectedOperators' => $selectedOperators,
             'trainingRecords'   => $trainingRecords,
         ]);
