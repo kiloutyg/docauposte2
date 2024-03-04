@@ -254,6 +254,7 @@ class OperatorController extends FrontController
             $trainingRecord = new TrainingRecord();
             $trainingRecord->setOperator($operatorEntity);
             $trainingRecord->setUpload($upload);
+            $trainingRecord->setDate(new \DateTime());
             $trainingRecord->setTrained($trained);
             $this->em->persist($trainingRecord);
             $this->em->flush();

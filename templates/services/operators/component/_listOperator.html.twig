@@ -51,7 +51,8 @@
 				class="d-flex flex-row"
 				style="{{ record.trained ? 'background-color: green;' : 'background-color: yellow;' }}">
 				<div
-					style="flex:0.2;">
+					style="flex:0.2; text-align: left;"
+					class="mx-auto">
 					{{record.operator.name}}
 					<input
 						type="hidden"
@@ -59,29 +60,35 @@
 						value="{{record.operator.id}}">
 				</div>
 				<div
-					style="flex:0.05;">
+					style="flex:0.05; text-align: center;"
+					class="mx-auto">
 					-
 				</div>
 				<div
-					style="flex:0.2;">
+					style="flex:0.15; text-align: center;"
+					class="mx-auto">
 					{{record.operator.team.name}}
 				</div>
 				<div
-					style="flex:0.05;">
+					style="flex:0.05; text-align: center;"
+					class="mx-auto">
 					-
 				</div>
 				<div
-					style="flex:0.2;">
+					style="flex:0.15; text-align: center;"
+					class="mx-auto">
 					{{record.operator.uap.name}}
 				</div>
 				<div
-					style="flex:0.1;">
+					style="flex:0.05; text-align: center;"
+					class="mx-auto">
 					-
 				</div>
 				<div
-					style="flex:0.2;">
+					style="flex:0.3; text-align: right;"
+					class="mx-auto">
 
-					{{ record.trained ? 'Formé le' : 'À former' }}
+					{{ record.trained ? 'Formé le ' ~ record.date|date('d/m/Y') : 'À former' }}
 
 				</div>
 			</ul>
