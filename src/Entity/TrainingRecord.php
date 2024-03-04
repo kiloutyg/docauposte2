@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TrainingRecordRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
@@ -23,6 +24,9 @@ class TrainingRecord
 
     #[ORM\Column]
     private ?bool $trained = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $date = null;
 
     public function getId(): ?int
     {
@@ -61,6 +65,18 @@ class TrainingRecord
     public function setTrained(bool $trained): static
     {
         $this->trained = $trained;
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(?\DateTimeInterface $date): static
+    {
+        $this->date = $date;
 
         return $this;
     }
