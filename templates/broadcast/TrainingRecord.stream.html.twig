@@ -1,8 +1,8 @@
 {# Learn how to use Turbo Streams: https://github.com/symfony/ux-turbo#broadcast-doctrine-entities-update #}
 {% block create %}
-<turbo-stream action="append" target="roles">
+<turbo-stream action="append" target="training_records">
     <template>
-        <div id="{{ 'role_' ~ id }}">
+        <div id="{{ 'training_record_' ~ id }}">
             #{{ id }} created
         </div>
     </template>
@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block update %}
-<turbo-stream action="update" target="role_{{ id }}">
+<turbo-stream action="update" target="training_record_{{ id }}">
     <template>
         #{{ id }} updated
     </template>
@@ -18,5 +18,5 @@
 {% endblock %}
 
 {% block remove %}
-<turbo-stream action="remove" target="role_{{ id }}"></turbo-stream>
+<turbo-stream action="remove" target="training_record_{{ id }}"></turbo-stream>
 {% endblock %}

@@ -31,6 +31,7 @@ use App\Repository\OldUploadRepository;
 use App\Repository\UapRepository;
 use App\Repository\TeamRepository;
 use App\Repository\OperatorRepository;
+use App\Repository\TrainingRecordRepository;
 
 // use App\Entity\Zone;
 // use App\Entity\ProductLine;
@@ -89,6 +90,7 @@ class BaseController extends AbstractController
     protected $uapRepository;
     protected $teamRepository;
     protected $operatorRepository;
+    protected $trainingRecordRepository;
 
     // Services methods
     protected $validationService;
@@ -144,7 +146,8 @@ class BaseController extends AbstractController
         OldUploadRepository             $oldUploadRepository,
         UapRepository                   $uapRepository,
         TeamRepository                  $teamRepository,
-        OperatorRepository             $operatorRepository,
+        OperatorRepository              $operatorRepository,
+        TrainingRecordRepository        $trainingRecordRepository,
 
         // Services methods
         ValidationService               $validationService,
@@ -186,7 +189,8 @@ class BaseController extends AbstractController
         $this->oldUploadRepository          = $oldUploadRepository;
         $this->uapRepository                = $uapRepository;
         $this->teamRepository               = $teamRepository;
-        $this->operatorRepository          = $operatorRepository;
+        $this->operatorRepository           = $operatorRepository;
+        $this->trainingRecordRepository     = $trainingRecordRepository;
 
         // Variables related to the services
         $this->mailerService                = $mailerService;
@@ -212,7 +216,7 @@ class BaseController extends AbstractController
         $this->departments                  = $this->departmentRepository->findAll();
         $this->validations                  = $this->validationRepository->findAll();
         $this->teams                        = $this->teamRepository->findAll();
-        // $this->operators                    = $this->operatorRepository->findAll();
+        $this->operators                    = $this->operatorRepository->findAll();
         $this->uaps                         = $this->uapRepository->findAll();
     }
 
@@ -230,6 +234,7 @@ class BaseController extends AbstractController
             'departments'           => $this->departments,
             'validations'           => $this->validations,
             'teams'                 => $this->teams,
+            'operators'             => $this->operators,
             'uaps'                  => $this->uaps
         ];
 
