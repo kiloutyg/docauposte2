@@ -2,11 +2,11 @@
 	id="training-records"
 	class="d-flex flex-column mx-2 justify-content-evenly">
 
-	{% if teamId is defined and uapId is defined and teamId is not empty and uapId is not empty %}
+	{% if team is defined and uap is defined and team is not empty and uap is not empty %}
 		<form
 			id="trainingRecord-form-newOperator"
 			class="d-flex flex-grow flex-column justify-content-evenly"
-			action="{{path('app_training_new_operator', {'uploadId': upload.id, 'teamId': teamId, 'uapId': uapId})}}" method="post"
+			action="{{path('app_training_new_operator', {'uploadId': upload.id, 'teamId': team.id, 'uapId': uap.id})}}" method="post"
 			data-turbo-frame="training-records">
 
 			<div
@@ -36,65 +36,130 @@
 
 	{% endif %}
 
+
 	{% if trainingRecords is defined and trainingRecords is not empty %}
+		<p
+			style="flex:1;"
+			class=" mx-2">
+			Liste de tous les opérateurs formés tout UAP et équipe confondu.
+			<br>
+			Pour modifier les informations, veuillez sélectionner une équipe et une UAP.
+
+		</p>
 		{% for record in trainingRecords %}
 			<ul
-				class="d-flex  flex-fill">
-				{{record.operator.name}}
-				-
-				{{record.trained}}
+				class="d-flex flex-row"
+				style="{{ record.trained ? 'background-color: green;' : 'background-color: yellow;' }}">
+				<div
+					style="flex:0.2;">
+					{{record.operator.name}}
+					<input
+						type="hidden"
+						name="operatorId"
+						value="{{record.operator.id}}">
+				</div>
+				<div
+					style="flex:0.05;">
+					-
+				</div>
+				<div
+					style="flex:0.2;">
+					{{record.operator.team.name}}
+				</div>
+				<div
+					style="flex:0.05;">
+					-
+				</div>
+				<div
+					style="flex:0.2;">
+					{{record.operator.uap.name}}
+				</div>
+				<div
+					style="flex:0.1;">
+					-
+				</div>
+				<div
+					style="flex:0.2;">
+
+					{{ record.trained ? 'Formé le' : 'À former' }}
+
+				</div>
 			</ul>
 		{% endfor %}
 	{% else %}
 		{% if selectedOperators is defined and selectedOperators is not empty %}
+			<form
+				class="d-flex flex-column justify-content-evenly"
+				id="trainingRecord-form"
+				method="post"
+				action="{{path('app_training_record_form', {'uploadId': upload.id, 'teamId': team.id, 'uapId': uap.id})}}">
+				<p
+					style="flex:1;"
+					class=" mx-2">
+					Liste des Opérateurs de l'équipe
+					{{team.name}}
+					pour l'UAP
+					{{uap.name}}
 
-			{% for operator in selectedOperators %}
-				<ul
-					class="d-flex  flex-fill justify-content-center align-items-center">
-
-					<div
-						style="flex:0.4;">
-						{{operator.name}}
-					</div>
-					<div
-						style="flex:0.2;">
-						-
-					</div>
-					<div
-						style="flex:0.4;">
-						<select
-							name="trained">
-							<option
-								value=''
-								selected>
-								Choose
-							</option>
-							<option
-								value="true">
-								Yes
-							</option>
-							<option
-								value="false">
-								No
-							</option>
-						</select>
-					</div>
-				</ul>
-			{% endfor %}
+				</p>
+				{% for operator in selectedOperators %}
+					<ul
+						class="d-flex  flex-row">
+						<div
+							style="flex:0.4;">
+							{{operator.name}}
+							<input
+								type="hidden"
+								name="operators[{{ operator.id }}][id]"
+								value="{{operator.id}}">
+						</div>
+						<div
+							style="flex:0.2;">
+							-
+						</div>
+						<div
+							style="flex:0.4;">
+							<select
+								name="operators[{{ operator.id }}][trained]">
+								<option
+									value=''
+									selected>
+									Choose
+								</option>
+								<option
+									value="true">
+									Yes
+								</option>
+								<option
+									value="false">
+									No
+								</option>
+							</select>
+						</div>
+					</ul>
+				{% endfor %}
+				<input
+					type="submit"
+					class="btn btn-primary"
+					value="Enregistrer les modifications">
+			</form>
 		{% else %}
 			<p
 				style="flex:1;"
 				class=" mx-2">
-				Aucune liste correspondant aux critéres n'a été trouvé
+				Aucune liste correspondant aux critéres n'a été trouvé, sélectionnez d'autres critéres ou ajouté des opérateurs
 
 			</p>
 			{% for operator in operators %}
 				<ul
-					class="d-flex  flex-fill">
-
+					class="d-flex flex-row">
 					<div
 						style="flex:0.4;">
 						{{operator.name}}
+						<input
+							type="hidden"
+							name="operatorId"
+							value="{{operator.id}}">
 					</div>
 					<div
 						style="flex:0.2;">

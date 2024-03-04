@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use App\Form\OperatorType;
 
 use App\Entity\Operator;
-
+use App\Entity\TrainingRecord;
 
 
 class OperatorController extends FrontController
@@ -187,7 +187,7 @@ class OperatorController extends FrontController
     }
 
 
-    #[Route('/operator/traininglist/listform/{uploadId}', name: 'app_training_record_form')]
+    #[Route('/operator/traininglist/listform/{uploadId}', name: 'app_training_list_select_record_form')]
     public function trainingListFormHandling(Request $request, int $uploadId): Response
     {
         // Log the full request for debugging
@@ -211,7 +211,7 @@ class OperatorController extends FrontController
     }
 
 
-    #[Route('/render-training-records/{uploadId}/{teamId}/{uapId}', name: 'app_render_training_records')]
+    #[Route('/operator/render-training-records/{uploadId}/{teamId}/{uapId}', name: 'app_render_training_records')]
     public function renderTrainingRecords(int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
     {
         $upload = $this->uploadRepository->find($uploadId);
@@ -226,11 +226,44 @@ class OperatorController extends FrontController
         // $this->addFlash('success', 'Les opérateurs ont bien été ajoutés à la liste de formation');
         // Render the partial view
         return $this->render('services/operators/component/_listOperator.html.twig', [
-            'teamId' => $teamId,
-            'uapId' => $uapId,
+            'team' => $this->teamRepository->find($teamId),
+            'uap' => $this->uapRepository->find($uapId),
             'upload' => $upload,
             'selectedOperators' => $selectedOperators,
             'trainingRecords'   => $trainingRecords,
+        ]);
+    }
+
+    #[Route('/operator/trainingRecord/form/{uploadId}/{teamId}/{uapId}', name: 'app_training_record_form')]
+    public function trainingRecordForm(int $uploadId, Request $request, ?int $teamId = null, ?int $uapId = null): Response
+    {
+        $this->logger->info('Full request', $request->request->all());
+        $operators = [];
+        $operators = $request->request->all('operators');
+        $upload = $this->uploadRepository->find($uploadId);
+
+        foreach ($operators as $operator){
+            $this->logger->info('operator', [$operator]);
+            $operatorEntity = $this->operatorRepository->find($operator['id']);
+            $trained = $operator['trained'];
+            $this->logger->info('operator name and is he trained',     [
+                'name'    => $operatorEntity->getName(),
+                'trained' => $trained
+            ]);
+            
+            $trainingRecord = new TrainingRecord();
+            $trainingRecord->setOperator($operatorEntity);
+            $trainingRecord->setUpload($upload);
+            $trainingRecord->setTrained($trained);
+            $this->em->persist($trainingRecord);
+            $this->em->flush();
+
+        }
+
+        return $this->redirectToRoute('app_render_training_records', [
+            'uploadId' => $uploadId,
+            'teamId' => $teamId,
+            'uapId' => $uapId,
         ]);
     }
 }

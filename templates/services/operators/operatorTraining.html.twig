@@ -18,7 +18,7 @@
 
 		<form
 			id="trainingRecord-form"
-			action="{{path('app_training_record_form', {'uploadId': upload.id})}}" method="post"
+			action="{{path('app_training_list_select_record_form', {'uploadId': upload.id})}}" method="post"
 			data-turbo-frame="training-records">
 			<div
 				data-controller="operator-training-select"
@@ -82,7 +82,6 @@
 		<turbo-frame
 			id="training-records">
 			{% include "services/operators/component/_listOperator.html.twig" %}
-			{% include "services/_toasts.html.twig" %}
 
 		</turbo-frame>
 
