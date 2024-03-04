@@ -4,7 +4,7 @@
 
 	{% if team is defined and uap is defined and team is not empty and uap is not empty %}
 		<form
-			id="trainingRecord-form-newOperator"
+			id="trainingRecords-form-newOperator"
 			class="d-flex flex-grow flex-column justify-content-evenly"
 			action="{{path('app_training_new_operator', {'uploadId': upload.id, 'teamId': team.id, 'uapId': uap.id})}}" method="post"
 			data-turbo-frame="training-records">
@@ -36,96 +36,70 @@
 
 	{% endif %}
 
+	{% if selectedOperators is defined and selectedOperators is not empty %}
+		<form
+			class="d-flex flex-column justify-content-evenly"
+			id="trainingRecords-form"
+			method="post"
+			action="{{path('app_training_record_form', {'uploadId': upload.id, 'teamId': team.id, 'uapId': uap.id})}}">
+			<p
+				style="flex:1;"
+				class=" mx-2">
+				Liste des Opérateurs de l'équipe
+				{{team.name}}
+				pour l'UAP
+				{{uap.name}}
 
-	{% if trainingRecords is defined and trainingRecords is not empty %}
-		<p
-			style="flex:1;"
-			class=" mx-2">
-			Liste de tous les opérateurs formés tout UAP et équipe confondu.
-			<br>
-			Pour modifier les informations, veuillez sélectionner une équipe et une UAP.
+			</p>
+			{% for operator in selectedOperators %}
+				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
 
-		</p>
-		{% for record in trainingRecords %}
-			<ul
-				class="d-flex flex-row"
-				style="{{ record.trained ? 'background-color: green;' : 'background-color: yellow;' }}">
-				<div
-					style="flex:0.2; text-align: left;"
-					class="mx-auto">
-					{{record.operator.name}}
-					<input
-						type="hidden"
-						name="operatorId"
-						value="{{record.operator.id}}">
-				</div>
-				<div
-					style="flex:0.05; text-align: center;"
-					class="mx-auto">
-					-
-				</div>
-				<div
-					style="flex:0.15; text-align: center;"
-					class="mx-auto">
-					{{record.operator.team.name}}
-				</div>
-				<div
-					style="flex:0.05; text-align: center;"
-					class="mx-auto">
-					-
-				</div>
-				<div
-					style="flex:0.15; text-align: center;"
-					class="mx-auto">
-					{{record.operator.uap.name}}
-				</div>
-				<div
-					style="flex:0.05; text-align: center;"
-					class="mx-auto">
-					-
-				</div>
-				<div
-					style="flex:0.3; text-align: right;"
-					class="mx-auto">
-
-					{{ record.trained ? 'Formé le ' ~ record.date|date('d/m/Y') : 'À former' }}
-
-				</div>
-			</ul>
-		{% endfor %}
-	{% else %}
-		{% if selectedOperators is defined and selectedOperators is not empty %}
-			<form
-				class="d-flex flex-column justify-content-evenly"
-				id="trainingRecord-form"
-				method="post"
-				action="{{path('app_training_record_form', {'uploadId': upload.id, 'teamId': team.id, 'uapId': uap.id})}}">
-				<p
-					style="flex:1;"
-					class=" mx-2">
-					Liste des Opérateurs de l'équipe
-					{{team.name}}
-					pour l'UAP
-					{{uap.name}}
-
-				</p>
-				{% for operator in selectedOperators %}
-					<ul
-						class="d-flex  flex-row">
-						<div
-							style="flex:0.4;">
-							{{operator.name}}
-							<input
-								type="hidden"
-								name="operators[{{ operator.id }}][id]"
-								value="{{operator.id}}">
-						</div>
-						<div
-							style="flex:0.2;">
-							-
-						</div>
-						<div
-							style="flex:0.4;">
+				<ul
+					class="d-flex flex-row"
+					style="{{ trainingRecord.trained ? 'background-color: green;' : 'background-color: yellow;' }}">
+					<div
+						style="flex:2; text-align: left;"
+						class="mx-auto">
+						{{operator.name}}
+						<input
+							type="hidden"
+							name="operators[{{ operator.id }}][id]"
+							value="{{operator.id}}">
+					</div>
+					<div
+						style="flex:0; text-align: center;"
+						class="mx-auto">
+						-
+					</div>
+					<div
+						style="flex:1; text-align: center;"
+						class="mx-auto">
+						{{operator.team.name}}
+					</div>
+					<div
+						style="flex:0; text-align: center;"
+						class="mx-auto">
+						-
+					</div>
+					<div
+						style="flex:1; text-align: center;"
+						class="mx-auto">
+						{{operator.uap.name}}
+					</div>
+					<div
+						style="flex:0; text-align: center;"
+						class="mx-auto">
+						-
+					</div>
+					<div
+						style="flex:2; text-align: right;"
+						class="mx-auto">
+						{% if trainingRecord.trained %}
+							Formé le
+							{{ trainingRecord.date|date('d/m/Y') }}
+						{% else %}
+							À former	
+														-
 							<select
 								name="operators[{{ operator.id }}][trained]">
 								<option
@@ -142,14 +116,75 @@
 									No
 								</option>
 							</select>
-						</div>
-					</ul>
-				{% endfor %}
-				<input
-					type="submit"
-					class="btn btn-primary"
-					value="Enregistrer les modifications">
-			</form>
+
+						{% endif %}
+					</div>
+
+				</ul>
+			{% endfor %}
+			<input
+				type="submit"
+				class="btn btn-primary"
+				value="Enregistrer les modifications">
+		</form>
+
+	{% else %}
+		{% if trainingRecords is defined and trainingRecords is not empty %}
+			<p
+				style="flex:1;"
+				class=" mx-2">
+				Liste de tous les opérateurs formés tout UAP et équipe confondu.
+				<br>
+				Pour modifier les informations, veuillez sélectionner une équipe et une UAP.
+
+			</p>
+			{% for record in trainingRecords %}
+				<ul
+					class="d-flex flex-row"
+					style="{{ record.trained ? 'background-color: green;' : 'background-color: yellow;' }}">
+					<div
+						style="flex:0.2; text-align: left;"
+						class="mx-auto">
+						{{record.operator.name}}
+						<input
+							type="hidden"
+							name="operatorId"
+							value="{{record.operator.id}}">
+					</div>
+					<div
+						style="flex:0.05; text-align: center;"
+						class="mx-auto">
+						-
+					</div>
+					<div
+						style="flex:0.15; text-align: center;"
+						class="mx-auto">
+						{{record.operator.team.name}}
+					</div>
+					<div
+						style="flex:0.05; text-align: center;"
+						class="mx-auto">
+						-
+					</div>
+					<div
+						style="flex:0.15; text-align: center;"
+						class="mx-auto">
+						{{record.operator.uap.name}}
+					</div>
+					<div
+						style="flex:0.05; text-align: center;"
+						class="mx-auto">
+						-
+					</div>
+					<div
+						style="flex:0.3; text-align: right;"
+						class="mx-auto">
+
+						{{ record.trained ? 'Formé le ' ~ record.date|date('d/m/Y') : 'À former' }}
+
+					</div>
+				</ul>
+			{% endfor %}
 		{% else %}
 			<p
 				style="flex:1;"
