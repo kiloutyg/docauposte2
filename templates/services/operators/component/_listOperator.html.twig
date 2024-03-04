@@ -1,14 +1,34 @@
-<turbo-frame id="training-records" class="d-flex flex-column mx-2 justify-content-evenly">
+<turbo-frame
+	id="training-records"
+	class="d-flex flex-column mx-2 justify-content-evenly">
 
 	{% if teamId is defined and uapId is defined and teamId is not empty and uapId is not empty %}
-		<form id="trainingRecord-form-newOperator" class="d-flex flex-grow flex-column justify-content-evenly" action="{{path('app_training_new_operator', {'uploadId': upload.id, 'teamId': teamId, 'uapId': uapId})}}" method="post" data-turbo-frame="training-records">
+		<form
+			id="trainingRecord-form-newOperator"
+			class="d-flex flex-grow flex-column justify-content-evenly"
+			action="{{path('app_training_new_operator', {'uploadId': upload.id, 'teamId': teamId, 'uapId': uapId})}}" method="post"
+			data-turbo-frame="training-records">
 
-			<div data-controller="operator-training">
-				<div class="d-flex flex-fill">
-					<input type="text" class="form-control " data-operator-training-target="newOperator" data-action="keyup->operator-training#validateNewOperator" placeholder="prénom.nom" id="newOperator" name="newOperator">
-					<input type="submit" class="btn btn-primary " value="Ajouter">
+			<div
+				data-controller="operator-training">
+				<div
+					class="d-flex flex-fill">
+					<input
+						type="text"
+						class="form-control "
+						data-operator-training-target="newOperator"
+						data-action="keyup->operator-training#validateNewOperator"
+						placeholder="prénom.nom"
+						id="newOperator"
+						name="newOperator">
+					<input
+						type="submit"
+						class="btn btn-primary "
+						value="Ajouter">
 				</div>
-				<div data-operator-training-target="newOperatorMessage" class="newOperator-message d-flex justify-content-evenly"></div>
+				<div
+					data-operator-training-target="newOperatorMessage"
+					class="newOperator-message d-flex justify-content-evenly"></div>
 
 			</div>
 
@@ -18,7 +38,8 @@
 
 	{% if trainingRecords is defined and trainingRecords is not empty %}
 		{% for record in trainingRecords %}
-			<ul class="d-flex flex-row">
+			<ul
+				class="d-flex flex-row">
 				{{record.operator.name}}
 				-
 				{{record.trained}}
@@ -28,35 +49,74 @@
 		{% if selectedOperators is defined and selectedOperators is not empty %}
 
 			{% for operator in selectedOperators %}
-				<ul class="d-flex flex-row  justify-content-center align-items-center">
+				<ul
+					class="d-flex flex-row  justify-content-center align-items-center">
 
-					<div style="flex:0.4;">
+					<div
+						style="flex:0.4;">
 						{{operator.name}}
 					</div>
-					<div style="flex:0.2;">-</div>
-					<div style="flex:0.4;">
-						<select name="trained">
-							<option value='' selected>Choose</option>
-							<option value="true">Yes</option>
-							<option value="false">No</option>
+					<div
+						style="flex:0.2;">
+						-
+					</div>
+					<div
+						style="flex:0.4;">
+						<select
+							name="trained">
+							<option
+								value=''
+								selected>
+								Choose
+							</option>
+							<option
+								value="true">
+								Yes
+							</option>
+							<option
+								value="false">
+								No
+							</option>
 						</select>
 					</div>
 				</ul>
 			{% endfor %}
 		{% else %}
-			<p style="flex:1;" class=" mx-2">No training records found, current team and uap operators list</p>
-			{% for operator in operators %}
-				<ul class="d-flex flex-row">
+			<p
+				style="flex:1;"
+				class=" mx-2">
+				Pas de liste correspondant aux critéres n'a été trouvé
 
-					<div style="flex:0.4;">
+			</p>
+			{% for operator in operators %}
+				<ul
+					class="d-flex flex-row">
+
+					<div
+						style="flex:0.4;">
 						{{operator.name}}
 					</div>
-					<div style="flex:0.2;">-</div>
-					<div style="flex:0.4;">
-						<select name="trained">
-							<option value='' selected>Choose</option>
-							<option value="true">Yes</option>
-							<option value="false">No</option>
+					<div
+						style="flex:0.2;">
+						-
+					</div>
+					<div
+						style="flex:0.4;">
+						<select
+							name="trained">
+							<option
+								value=''
+								selected>
+								Choose
+							</option>
+							<option
+								value="true">
+								Yes
+							</option>
+							<option
+								value="false">
+								No
+							</option>
 						</select>
 					</div>
 				</ul>
