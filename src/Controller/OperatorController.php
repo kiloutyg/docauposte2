@@ -108,6 +108,7 @@ class OperatorController extends FrontController
         ]);
     }
 
+
     // Route to handle the newOperator form submission
     #[Route('/operator/traininglist/new/{uploadId}/{teamId}/{uapId}', name: 'app_training_new_operator')]
     public function trainingListNewOperator(ValidatorInterface $validator, Request $request, int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
@@ -121,7 +122,6 @@ class OperatorController extends FrontController
         $this->logger->info('uap', [$uap->getName()]);
 
         $operatorName = $request->request->get('newOperator');
-
 
         $existingOperator = $this->operatorRepository->findOneBy(['name' => $operatorName]);
         if ($existingOperator != null) {
@@ -146,7 +146,6 @@ class OperatorController extends FrontController
                 ]);
             }
         }
-
 
         $operator = new Operator();
         $operator->setName($operatorName);
@@ -187,6 +186,7 @@ class OperatorController extends FrontController
         ]);
     }
 
+
     #[Route('/operator/traininglist/listform/{uploadId}', name: 'app_training_record_form')]
     public function trainingListFormHandling(Request $request, int $uploadId): Response
     {
@@ -210,11 +210,11 @@ class OperatorController extends FrontController
         ]);
     }
 
+
     #[Route('/render-training-records/{uploadId}/{teamId}/{uapId}', name: 'app_render_training_records')]
     public function renderTrainingRecords(int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
     {
         $upload = $this->uploadRepository->find($uploadId);
-
 
         $selectedOperators = $this->operatorRepository->findBy(['Team' => $teamId, 'uap' => $uapId]);
         $trainingRecords = [];
@@ -223,7 +223,7 @@ class OperatorController extends FrontController
             $records = $this->trainingRecordRepository->findBy(['operator' => $operator, 'Upload' => $uploadId]);
             $trainingRecords = array_merge($trainingRecords, $records);
         }
-        $this->addFlash('success', 'Tavu ça marche bien en fait');
+        // $this->addFlash('success', 'Les opérateurs ont bien été ajoutés à la liste de formation');
         // Render the partial view
         return $this->render('services/operators/component/_listOperator.html.twig', [
             'teamId' => $teamId,

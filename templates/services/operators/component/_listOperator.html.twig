@@ -20,18 +20,18 @@
 						data-action="keyup->operator-training#validateNewOperator"
 						placeholder="prénom.nom"
 						id="newOperator"
-						name="newOperator">
+						name="newOperator"
+						style="flex:0.8;">
 					<input
 						type="submit"
 						class="btn btn-primary "
-						value="Ajouter">
+						value="Ajouter"
+						style="flex:0.2;">
 				</div>
 				<div
 					data-operator-training-target="newOperatorMessage"
 					class="newOperator-message d-flex justify-content-evenly"></div>
-
 			</div>
-
 		</form>
 
 	{% endif %}
@@ -39,7 +39,7 @@
 	{% if trainingRecords is defined and trainingRecords is not empty %}
 		{% for record in trainingRecords %}
 			<ul
-				class="d-flex flex-row">
+				class="d-flex  flex-fill">
 				{{record.operator.name}}
 				-
 				{{record.trained}}
@@ -50,7 +50,7 @@
 
 			{% for operator in selectedOperators %}
 				<ul
-					class="d-flex flex-row  justify-content-center align-items-center">
+					class="d-flex  flex-fill justify-content-center align-items-center">
 
 					<div
 						style="flex:0.4;">
@@ -90,7 +90,7 @@
 			</p>
 			{% for operator in operators %}
 				<ul
-					class="d-flex flex-row">
+					class="d-flex  flex-fill">
 
 					<div
 						style="flex:0.4;">
