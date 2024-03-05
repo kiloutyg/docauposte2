@@ -15,8 +15,6 @@ use App\Entity\TrainingRecord;
 
 class OperatorController extends FrontController
 {
-
-
     // Route to have the basic page being display for dev purpose
     #[Route('/operator', name: 'app_operator')]
     public function operatorBasePage(Request $request): Response
@@ -77,6 +75,7 @@ class OperatorController extends FrontController
 
         // Redirect back to the main operator page or render a specific template
     }
+
 
     //first test of actual page rendering with a validated document and a dynamic form and list of operators and stuff
     #[Route('/operator/visual/{validationId}', name: 'app_test_document')]

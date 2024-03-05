@@ -56,7 +56,7 @@
 
 				<ul
 					class="d-flex flex-row"
-					style="{{ trainingRecord.trained ? 'background-color: green;' : 'background-color: yellow;' }}">
+					style="{{ trainingRecord != null ? (trainingRecord.trained ? 'background-color: green;' : 'background-color: yellow;') : 'background-color: red;' }}">
 					<div
 						style="flex:2; text-align: left;"
 						class="mx-auto">
@@ -94,29 +94,50 @@
 					<div
 						style="flex:2; text-align: right;"
 						class="mx-auto">
-						{% if trainingRecord.trained %}
-							Formé le
-							{{ trainingRecord.date|date('d/m/Y') }}
-						{% else %}
-							À former	
-														-
+
+						{% if trainingRecord == null %}
+							À former -
 							<select
 								name="operators[{{ operator.id }}][trained]">
 								<option
 									value=''
 									selected>
-									Choose
+									Choisir
 								</option>
 								<option
 									value="true">
-									Yes
+									Oui
 								</option>
 								<option
 									value="false">
-									No
+									Non
 								</option>
 							</select>
+						{% else %}
+							{% if trainingRecord.trained %}
+								Formé le
+								{{ trainingRecord.date|date('d/m/Y') }}
+							{% else %}
 
+
+								À réentrainer	-
+								<select
+									name="operators[{{ operator.id }}][trained]">
+									<option
+										value=''>
+										Choisir
+									</option>
+									<option
+										value="true">
+										Oui
+									</option>
+									<option
+										value="false"
+										selected>
+										Non
+									</option>
+								</select>
+							{% endif %}
 						{% endif %}
 					</div>
 
@@ -189,7 +210,7 @@
 			<p
 				style="flex:1;"
 				class=" mx-2">
-				Aucune liste correspondant aux critéres n'a été trouvé, sélectionnez d'autres critéres ou ajouté des opérateurs
+				Aucune liste correspondant aux critéres n'a été trouvé, sélectionnez d'autres critéres ou ajouté des opérateurs à la liste.
 
 			</p>
 			{% for operator in operators %}
