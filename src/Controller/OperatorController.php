@@ -275,7 +275,6 @@ class OperatorController extends FrontController
                     $this->em->persist($trainingRecord);
                     $this->em->flush();
                 } else {
-
                     $existingTrainingRecord->setTrained($trained);
                     $this->em->persist($existingTrainingRecord);
                     $this->em->flush();

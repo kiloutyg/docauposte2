@@ -214,10 +214,14 @@
 
 			</p>
 			{% for operator in operators %}
+				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+
 				<ul
-					class="d-flex flex-row">
+					class="d-flex flex-row"
+					style="{{ trainingRecord != null ? (trainingRecord.trained ? 'background-color: green;' : 'background-color: yellow;') : 'background-color: red;' }}">
 					<div
-						style="flex:0.4;">
+						style="flex:2; text-align: left;"
+						class="mx-auto">
 						{{operator.name}}
 						<input
 							type="hidden"
@@ -225,28 +229,47 @@
 							value="{{operator.id}}">
 					</div>
 					<div
-						style="flex:0.2;">
+						style="flex:0; text-align: center;"
+						class="mx-auto">
 						-
 					</div>
 					<div
-						style="flex:0.4;">
-						<select
-							name="operators[{{ operator.id }}][trained]">
-							<option
-								value=''
-								selected>
-								Choose
-							</option>
-							<option
-								value="true">
-								Yes
-							</option>
-							<option
-								value="false">
-								No
-							</option>
-						</select>
+						style="flex:1; text-align: center;"
+						class="mx-auto">
+						{{operator.team.name}}
 					</div>
+					<div
+						style="flex:0; text-align: center;"
+						class="mx-auto">
+						-
+					</div>
+					<div
+						style="flex:1; text-align: center;"
+						class="mx-auto">
+						{{operator.uap.name}}
+					</div>
+					<div
+						style="flex:0; text-align: center;"
+						class="mx-auto">
+						-
+					</div>
+					<div
+						style="flex:2; text-align: right;"
+						class="mx-auto">
+
+						{% if trainingRecord == null %}
+							À former
+
+						{% else %}
+							{% if trainingRecord.trained %}
+								Formé le
+								{{ trainingRecord.date|date('d/m/Y') }}
+							{% else %}
+								À réentrainer
+							{% endif %}
+						{% endif %}
+					</div>
+
 				</ul>
 
 			{% endfor %}
