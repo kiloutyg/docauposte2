@@ -257,13 +257,29 @@ class OperatorController extends FrontController
                 if ($trained === null) {
                     break;
                 }
-                $trainingRecord = new TrainingRecord();
-                $trainingRecord->setOperator($operatorEntity);
-                $trainingRecord->setUpload($upload);
-                $trainingRecord->setDate(new \DateTime());
-                $trainingRecord->setTrained($trained);
-                $this->em->persist($trainingRecord);
-                $this->em->flush();
+
+                // Get all training records as a collection
+                $operatorTrainingRecords = $operatorEntity->getTrainingRecords();
+                // Filter the collection to find the record with the matching $upload
+                $filteredRecords = $operatorTrainingRecords->filter(function ($trainingRecord) use ($upload) {
+                    return $trainingRecord->getUpload() === $upload;
+                });
+                $existingTrainingRecord = $filteredRecords->first();
+
+                if ($existingTrainingRecord === null) {
+                    $trainingRecord = new TrainingRecord();
+                    $trainingRecord->setOperator($operatorEntity);
+                    $trainingRecord->setUpload($upload);
+                    $trainingRecord->setDate(new \DateTime());
+                    $trainingRecord->setTrained($trained);
+                    $this->em->persist($trainingRecord);
+                    $this->em->flush();
+                } else {
+
+                    $existingTrainingRecord->setTrained($trained);
+                    $this->em->persist($existingTrainingRecord);
+                    $this->em->flush();
+                }
             }
         }
 
