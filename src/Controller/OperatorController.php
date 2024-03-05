@@ -101,15 +101,15 @@ class OperatorController extends FrontController
         // Handle the GET request
         $upload = $this->uploadRepository->find($uploadId);
         return $this->render('services/operators/operatorTraining.html.twig', [
-            'trainingRecords' => $upload->getTrainingRecords(),
-            'operators' => $this->operatorRepository->findAll(),
-            'upload' => $upload,
+            'trainingRecords'   => $upload->getTrainingRecords(),
+            'operators'         => $this->operatorRepository->findAll(),
+            'upload'            => $upload,
         ]);
     }
 
 
     // Route to handle the newOperator form submission
-    #[Route('/operator/traininglist/new/{uploadId}/{teamId}/{uapId}', name: 'app_training_new_operator')]
+    #[Route('/operator/traininglist/newOperator/{uploadId}/{teamId}/{uapId}', name: 'app_training_new_operator')]
     public function trainingListNewOperator(ValidatorInterface $validator, Request $request, int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
     {
 
@@ -216,12 +216,15 @@ class OperatorController extends FrontController
         $upload = $this->uploadRepository->find($uploadId);
 
         $selectedOperators = $this->operatorRepository->findBy(['Team' => $teamId, 'uap' => $uapId]);
-        $trainingRecords = [];
+        $this->logger->info('selectedOperators', [$selectedOperators]);
 
+        $trainingRecords = [];
         foreach ($selectedOperators as $operator) {
             $records = $this->trainingRecordRepository->findBy(['operator' => $operator, 'Upload' => $uploadId]);
             $trainingRecords = array_merge($trainingRecords, $records);
         }
+        $this->logger->info('trainingRecords', [$trainingRecords]);
+
         // $this->addFlash('success', 'Les opérateurs ont bien été ajoutés à la liste de formation');
         // Render the partial view
         return $this->render('services/operators/component/_listOperator.html.twig', [

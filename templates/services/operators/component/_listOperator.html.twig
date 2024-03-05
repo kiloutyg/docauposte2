@@ -118,8 +118,6 @@
 								Formé le
 								{{ trainingRecord.date|date('d/m/Y') }}
 							{% else %}
-
-
 								À réentrainer	-
 								<select
 									name="operators[{{ operator.id }}][trained]">
@@ -154,7 +152,7 @@
 			<p
 				style="flex:1;"
 				class=" mx-2">
-				Liste de tous les opérateurs formés tout UAP et équipe confondu.
+				Liste de tous les opérateurs formés, tout UAP et équipe confondu.
 				<br>
 				Pour modifier les informations, veuillez sélectionner une équipe et une UAP.
 
@@ -201,10 +199,72 @@
 						style="flex:0.3; text-align: right;"
 						class="mx-auto">
 
-						{{ record.trained ? 'Formé le ' ~ record.date|date('d/m/Y') : 'À former' }}
+						{{ record.trained ? 'Formé le ' ~ record.date|date('d/m/Y') : 'À réentrainer' }}
 
 					</div>
 				</ul>
+
+
+			{% endfor %}
+			<p
+				style="flex:1;"
+				class=" mx-2">
+				Liste de tous les opérateurs Non-formés, tout UAP et équipe confondu.
+				<br>
+				Pour modifier les informations, veuillez sélectionner une équipe et une UAP.
+
+			</p>
+			{% for operator in operators %}
+				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+				{% if trainingRecord == null %}
+
+
+					<ul
+						class="d-flex flex-row  p-1 mb-1 "
+						style="background-color: red">
+						<div
+							style="flex:2; text-align: left;"
+							class="mx-auto">
+							{{operator.name}}
+							<input
+								type="hidden"
+								name="operators[{{ operator.id }}][id]"
+								value="{{operator.id}}">
+						</div>
+						<div
+							style="flex:0; text-align: center;"
+							class="mx-auto">
+							-
+						</div>
+						<div
+							style="flex:1; text-align: center;"
+							class="mx-auto">
+							{{operator.team.name}}
+						</div>
+						<div
+							style="flex:0; text-align: center;"
+							class="mx-auto">
+							-
+						</div>
+						<div
+							style="flex:1; text-align: center;"
+							class="mx-auto">
+							{{operator.uap.name}}
+						</div>
+						<div
+							style="flex:0; text-align: center;"
+							class="mx-auto">
+							-
+						</div>
+						<div
+							style="flex:2; text-align: right;"
+							class="mx-auto">
+
+							À former
+						</div>
+
+					</ul>
+				{% endif %}
 			{% endfor %}
 		{% else %}
 			<p
