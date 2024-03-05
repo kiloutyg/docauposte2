@@ -55,7 +55,7 @@
 				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
 
 				<ul
-					class="d-flex flex-row"
+					class="d-flex flex-row p-1 mb-1 "
 					style="{{ trainingRecord != null ? (trainingRecord.trained ? 'background-color: green;' : 'background-color: yellow;') : 'background-color: red;' }}">
 					<div
 						style="flex:2; text-align: left;"
@@ -161,7 +161,7 @@
 			</p>
 			{% for record in trainingRecords %}
 				<ul
-					class="d-flex flex-row"
+					class="d-flex flex-row p-1 mb-1"
 					style="{{ record.trained ? 'background-color: green;' : 'background-color: yellow;' }}">
 					<div
 						style="flex:0.2; text-align: left;"
@@ -217,7 +217,7 @@
 				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
 
 				<ul
-					class="d-flex flex-row"
+					class="d-flex flex-row  p-1 mb-1 "
 					style="{{ trainingRecord != null ? (trainingRecord.trained ? 'background-color: green;' : 'background-color: yellow;') : 'background-color: red;' }}">
 					<div
 						style="flex:2; text-align: left;"
