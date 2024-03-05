@@ -15,8 +15,6 @@ use App\Entity\TrainingRecord;
 
 class OperatorController extends FrontController
 {
-
-
     // Route to have the basic page being display for dev purpose
     #[Route('/operator', name: 'app_operator')]
     public function operatorBasePage(Request $request): Response
@@ -77,6 +75,7 @@ class OperatorController extends FrontController
 
         // Redirect back to the main operator page or render a specific template
     }
+
 
     //first test of actual page rendering with a validated document and a dynamic form and list of operators and stuff
     #[Route('/operator/visual/{validationId}', name: 'app_test_document')]
@@ -242,23 +241,45 @@ class OperatorController extends FrontController
         $operators = $request->request->all('operators');
         $upload = $this->uploadRepository->find($uploadId);
 
-        foreach ($operators as $operator){
-            $this->logger->info('operator', [$operator]);
-            $operatorEntity = $this->operatorRepository->find($operator['id']);
-            $trained = $operator['trained'];
-            $this->logger->info('operator name and is he trained',     [
-                'name'    => $operatorEntity->getName(),
-                'trained' => $trained
-            ]);
-            
-            $trainingRecord = new TrainingRecord();
-            $trainingRecord->setOperator($operatorEntity);
-            $trainingRecord->setUpload($upload);
-            $trainingRecord->setDate(new \DateTime());
-            $trainingRecord->setTrained($trained);
-            $this->em->persist($trainingRecord);
-            $this->em->flush();
+        foreach ($operators as $operator) {
+            $this->logger->info('does the key exist', [array_key_exists("trained", $operator)]);
 
+            if (array_key_exists("trained", $operator)) {
+
+                $this->logger->info('operator', [$operator]);
+                $operatorEntity = $this->operatorRepository->find($operator['id']);
+                $trained = ($operator['trained'] === '') ? null : (($operator['trained'] === 'true') ? true : false);
+
+                $this->logger->info('operator name and is he trained',     [
+                    'name'    => $operatorEntity->getName(),
+                    'trained' => $trained
+                ]);
+                if ($trained === null) {
+                    break;
+                }
+
+                // Get all training records as a collection
+                $operatorTrainingRecords = $operatorEntity->getTrainingRecords();
+                // Filter the collection to find the record with the matching $upload
+                $filteredRecords = $operatorTrainingRecords->filter(function ($trainingRecord) use ($upload) {
+                    return $trainingRecord->getUpload() === $upload;
+                });
+                $existingTrainingRecord = $filteredRecords->first();
+
+                if ($existingTrainingRecord === null) {
+                    $trainingRecord = new TrainingRecord();
+                    $trainingRecord->setOperator($operatorEntity);
+                    $trainingRecord->setUpload($upload);
+                    $trainingRecord->setDate(new \DateTime());
+                    $trainingRecord->setTrained($trained);
+                    $this->em->persist($trainingRecord);
+                    $this->em->flush();
+                } else {
+                    $existingTrainingRecord->setTrained($trained);
+                    $this->em->persist($existingTrainingRecord);
+                    $this->em->flush();
+                }
+            }
         }
 
         return $this->redirectToRoute('app_render_training_records', [
