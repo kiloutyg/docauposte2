@@ -54,6 +54,7 @@ use App\Service\ValidationService;
 use App\Service\MailerService;
 use App\Service\OldUploadService;
 use App\Service\ViewsModificationService;
+use App\Service\TrainingRecordService;
 
 
 #[Route('/', name: 'app_')]
@@ -103,6 +104,7 @@ class BaseController extends AbstractController
     protected $uploadService;
     protected $oldUploadService;
     protected $viewsModificationService;
+    protected $trainingRecordService;
 
     // Variables used in the twig templates to display all the entities
     protected $departments;
@@ -159,7 +161,8 @@ class BaseController extends AbstractController
         UploadService                   $uploadService,
         MailerService                   $mailerService,
         OldUploadService                $oldUploadService,
-        ViewsModificationService        $viewsModificationService
+        ViewsModificationService        $viewsModificationService,
+        TrainingRecordService           $trainingRecordService
 
     ) {
 
@@ -203,6 +206,7 @@ class BaseController extends AbstractController
         $this->accountService               = $accountService;
         $this->entitydeletionService        = $entitydeletionService;
         $this->viewsModificationService     = $viewsModificationService;
+        $this->trainingRecordService        = $trainingRecordService;
 
         // Variables used in the twig templates to display all the entities
         $this->zones                        = $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']);
@@ -216,7 +220,7 @@ class BaseController extends AbstractController
         $this->departments                  = $this->departmentRepository->findAll();
         $this->validations                  = $this->validationRepository->findAll();
         $this->teams                        = $this->teamRepository->findAll();
-        $this->operators                    = $this->operatorRepository->findAll();
+        $this->operators                    = $this->operatorRepository->findAllOrdered();
         $this->uaps                         = $this->uapRepository->findAll();
     }
 

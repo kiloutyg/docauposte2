@@ -21,28 +21,50 @@ class OperatorRepository extends ServiceEntityRepository
         parent::__construct($registry, Operator::class);
     }
 
-//    /**
-//     * @return Operator[] Returns an array of Operator objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('o')
-//            ->andWhere('o.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('o.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findAllOrdered()
+    {
+        $operators = $this->findAll();
 
-//    public function findOneBySomeField($value): ?Operator
-//    {
-//        return $this->createQueryBuilder('o')
-//            ->andWhere('o.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        usort($operators, function ($a, $b) {
+            // Compare by 'team'
+            if ($a->getTeam()->getId() != $b->getTeam()->getId()) {
+                return strcmp($a->getTeam()->getName(), $b->getTeam()->getName());
+            }
+            // If 'team' is the same, move on to compare by 'uap'
+            if ($a->getUap()->getId() != $b->getUap()->getId()) {
+                return strcmp($a->getUap()->getName(), $b->getUap()->getName());
+            }
+            // If 'uap' is also the same, finally compare by 'name'
+            return strcmp($a->getName(), $b->getName());
+        });
+
+        return $operators;
+    }
+
+
+
+    //    /**
+    //     * @return Operator[] Returns an array of Operator objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('o')
+    //            ->andWhere('o.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('o.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
+
+    //    public function findOneBySomeField($value): ?Operator
+    //    {
+    //        return $this->createQueryBuilder('o')
+    //            ->andWhere('o.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }
