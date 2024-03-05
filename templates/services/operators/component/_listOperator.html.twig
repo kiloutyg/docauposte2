@@ -169,7 +169,7 @@
 						{{record.operator.name}}
 						<input
 							type="hidden"
-							name="operatorId"
+							name="operators[{{ record.operator.id }}][id]"
 							value="{{record.operator.id}}">
 					</div>
 					<div
@@ -221,7 +221,7 @@
 						{{operator.name}}
 						<input
 							type="hidden"
-							name="operatorId"
+							name="operators[{{ operator.id }}][id]"
 							value="{{operator.id}}">
 					</div>
 					<div
@@ -231,7 +231,7 @@
 					<div
 						style="flex:0.4;">
 						<select
-							name="trained">
+							name="operators[{{ operator.id }}][trained]">
 							<option
 								value=''
 								selected>
