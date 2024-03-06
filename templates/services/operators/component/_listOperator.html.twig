@@ -21,7 +21,16 @@
 						placeholder="nom.prénom"
 						id="newOperator"
 						name="newOperator"
-						style="flex:0.8;">
+						style="flex:0.5;">
+					<input
+						type="text"
+						class="form-control "
+						data-operator-training-target="newOperatorCode"
+						data-action="keyup->operator-training#validateNewOperatorCode"
+						placeholder="Code Opérateur"
+						id="newOperatorCode"
+						name="newOperatorCode"
+						style="flex:0.3;">
 					<input
 						type="submit"
 						class="btn btn-primary "
@@ -31,6 +40,9 @@
 				<div
 					data-operator-training-target="newOperatorMessage"
 					class="newOperator-message d-flex justify-content-evenly"></div>
+				<div
+					data-operator-training-target="newOperatorMessageCode"
+					class="newOperatorCode-message d-flex justify-content-evenly"></div>
 			</div>
 		</form>
 
