@@ -13,6 +13,8 @@ use App\Entity\Operator;
 use App\Entity\TrainingRecord;
 
 
+
+
 class OperatorController extends FrontController
 {
     // Route to have the basic page being display for dev purpose
@@ -93,23 +95,30 @@ class OperatorController extends FrontController
         }
     }
 
+
+
+
     // page with the training record and the operator list and the form to add a new operator, 
     // page that will be integrated as an iframe probably in the test document page
     #[Route('operator/traininglist/{uploadId}', name: 'app_training_list')]
     public function trainingList(int $uploadId): Response
     {
+
+
         // Handle the GET request
         $upload = $this->uploadRepository->find($uploadId);
+
+        $trainingRecords = $this->trainingRecordService->getOrderedTrainingRecordsByUpload($upload);
+
         return $this->render('services/operators/operatorTraining.html.twig', [
-            'trainingRecords' => $upload->getTrainingRecords(),
-            'operators' => $this->operatorRepository->findAll(),
-            'upload' => $upload,
+            'trainingRecords'   => $trainingRecords,
+            'upload'            => $upload,
         ]);
     }
 
 
     // Route to handle the newOperator form submission
-    #[Route('/operator/traininglist/new/{uploadId}/{teamId}/{uapId}', name: 'app_training_new_operator')]
+    #[Route('/operator/traininglist/newOperator/{uploadId}/{teamId}/{uapId}', name: 'app_training_new_operator')]
     public function trainingListNewOperator(ValidatorInterface $validator, Request $request, int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
     {
 
@@ -215,13 +224,20 @@ class OperatorController extends FrontController
     {
         $upload = $this->uploadRepository->find($uploadId);
 
-        $selectedOperators = $this->operatorRepository->findBy(['Team' => $teamId, 'uap' => $uapId]);
-        $trainingRecords = [];
+        $selectedOperators = $this->operatorRepository->findBy(['Team' => $teamId, 'uap' => $uapId], ['Team' => 'ASC', 'uap' => 'ASC', 'name' => 'ASC']);
+        $this->logger->info('selectedOperators', [$selectedOperators]);
 
+
+        $trainingRecords = [];
         foreach ($selectedOperators as $operator) {
             $records = $this->trainingRecordRepository->findBy(['operator' => $operator, 'Upload' => $uploadId]);
-            $trainingRecords = array_merge($trainingRecords, $records);
+            $unorderedTrainingRecords = array_merge($trainingRecords, $records);
         }
+        if (!empty($unorderedTrainingRecords)) {
+            $trainingRecords = $this->trainingRecordService->getOrderedTrainingRecordsByTrainingRecordsArray($unorderedTrainingRecords);
+        }
+        $this->logger->info('trainingRecords', [$trainingRecords]);
+
         // $this->addFlash('success', 'Les opérateurs ont bien été ajoutés à la liste de formation');
         // Render the partial view
         return $this->render('services/operators/component/_listOperator.html.twig', [
@@ -264,21 +280,29 @@ class OperatorController extends FrontController
                 $filteredRecords = $operatorTrainingRecords->filter(function ($trainingRecord) use ($upload) {
                     return $trainingRecord->getUpload() === $upload;
                 });
-                $existingTrainingRecord = $filteredRecords->first();
 
-                if ($existingTrainingRecord === null) {
+                // Check if a TrainingRecord exists in the filtered collection
+                if (!$filteredRecords->isEmpty()) {
+                    $existingTrainingRecord = $filteredRecords->first();
+
+                    // Make sure $existingTrainingRecord is indeed a TrainingRecord instance
+                    if ($existingTrainingRecord instanceof TrainingRecord) {
+                        $existingTrainingRecord->setTrained($trained);
+                        $existingTrainingRecord->setDate(new \DateTime());
+                        $this->em->persist($existingTrainingRecord);
+                    }
+                } else {
+                    // If the collection was empty, create a new TrainingRecord
                     $trainingRecord = new TrainingRecord();
                     $trainingRecord->setOperator($operatorEntity);
                     $trainingRecord->setUpload($upload);
                     $trainingRecord->setDate(new \DateTime());
                     $trainingRecord->setTrained($trained);
                     $this->em->persist($trainingRecord);
-                    $this->em->flush();
-                } else {
-                    $existingTrainingRecord->setTrained($trained);
-                    $this->em->persist($existingTrainingRecord);
-                    $this->em->flush();
                 }
+
+                // Flush changes for each operator
+                $this->em->flush();
             }
         }
 

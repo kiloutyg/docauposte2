@@ -33,6 +33,9 @@ class Operator
     #[ORM\OneToMany(mappedBy: 'operator', targetEntity: TrainingRecord::class)]
     private Collection $trainingRecords;
 
+    #[ORM\Column(length: 255)]
+    private ?string $code = null;
+
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
@@ -105,6 +108,18 @@ class Operator
                 $trainingRecord->setOperator(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): static
+    {
+        $this->code = $code;
 
         return $this;
     }
