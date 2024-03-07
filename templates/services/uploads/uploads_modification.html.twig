@@ -14,19 +14,34 @@
 		{% if zone is defined and zone is not null %}
 zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
 	</script>
-	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
-		<div class="card-body ">
-			<div class="row d-flex align-items-center gy-lg-0 gy-5">
-				<h3 class="text-white m-0" style="color:white">
+	<div
+		class="card border-0 shadow rounded-3 my-5 bg-secondary">
+		<div
+			class="card-body ">
+			<div
+				class="row d-flex align-items-center gy-lg-0 gy-5">
+				<h3
+					class="text-white m-0"
+					style="color:white">
 					Modification du fichier
-					<strong>{{upload.filename}}</strong>:
+					<strong>
+						{{upload.filename}}
+					</strong>
+					:
 				</h3>
-				<h5>Revision n°{{upload.revision}}</h5>
+				<h5>
+					Revision n°
+					{{upload.revision}}
+				</h5>
 				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm', 'method': 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_modifying_file', {'uploadId': upload.id})}) }}
-				<div class="fallback">
+				<div
+					class="fallback">
 					{% if upload.validation is not empty %}
-						{% if upload.validated is same as(null)%}
-							<div class=" alert alert-danger mb-1 justify-content-center" id="validation_cycle" name="validation_cycle">
+						{% if upload.validated is same as(null) %}
+							<div
+								class=" alert alert-danger mb-1 justify-content-center"
+								id="validation_cycle"
+								name="validation_cycle">
 								<h5>
 									<strong>
 										Fichier en cours de validation.
@@ -36,7 +51,11 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 									Document posté avec le commentaire suivant :
 									<ul>
 										<li>
-											<i>"{{ upload.validation.comment }}"</i>
+											<i>
+												"
+												{{ upload.validation.comment }}
+												"
+											</i>
 										</li>
 									</ul>
 								{% endif %}
@@ -113,21 +132,47 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 				<iframe src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" width="100%" height="750" target="_blank"></iframe>
 			{% endif %}
 					<div class="mb-3 mt-3">
-						{{ form_label(form.file, 'Choisissez un nouveau ficher:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
-											{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}) }}</li>
+						{{ form_label(form.file, 'Choisissez un nouveau ficher:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}
+											) }}
+											{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}
+											) }}
+										</li>
 									</div>
-									<div class="accordion mx-auto col-8 mb-1 justify-content-center" id="accordionOtherModifications">
-										<div class="accordion-item">
-											<div class="accordion-header" id="otherModifications-header">
-												<label class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed" for="otherModifications" data-bs-toggle="collapse" data-bs-target="#otherModifications" aria-expanded="false" aria-controls="otherModifications" id="otherModificationsSelect">
-													<strong>Autres modifications</strong>
-													&nbsp; (Ouvrez ce menu pour acceder aux autres modifications)</label>
+									<div
+										class="accordion mx-auto col-8 mb-1 justify-content-center"
+										id="accordionOtherModifications">
+										<div
+											class="accordion-item">
+											<div
+												class="accordion-header"
+												id="otherModifications-header">
+												<label
+													class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed"
+													for="otherModifications"
+													data-bs-toggle="collapse"
+													data-bs-target="#otherModifications"
+													aria-expanded="false"
+													aria-controls="otherModifications"
+													id="otherModificationsSelect">
+													<strong>
+														Autres modifications
+													</strong>
+													&nbsp; (Ouvrez ce menu pour acceder aux autres modifications)
+												</label>
 											</div>
-											<div id="otherModifications" aria-labelledby="otherModifications" data-bs-parent="#accordionOtherModifications" class="accordion-collapse collapse ">
-												<div class="col-10 mx-auto">
-													<div class="mb-3">
-														{{ form_label(form.filename, 'Nouveau nom du fichier:', {'label_attr': {'class': 'form-label', 'style': 'color:black'}}) }}
-														{{ form_widget(form.filename, {'attr': {'class': 'form-control', 'id': 'filename', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)', 'maxlength': '30'}}) }}
+											<div
+												id="otherModifications"
+												aria-labelledby="otherModifications"
+												data-bs-parent="#accordionOtherModifications"
+												class="accordion-collapse collapse ">
+												<div
+													class="col-10 mx-auto">
+													<div
+														class="mb-3">
+														{{ form_label(form.filename, 'Nouveau nom du fichier:', {'label_attr': {'class': 'form-label', 'style': 'color:black'}}
+														) }}
+														{{ form_widget(form.filename, {'attr': {'class': 'form-control', 'id': 'filename', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)', 'maxlength': '30'}}
+														) }}
 													</div>
 													<div
 														style='color:black'>
@@ -157,36 +202,92 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 															:
 														{% endif %}
 													</div>
-													<div class="row">
-														<div class="col-md-2 col-sm-2 mt-2 mb-2">
-															<label for="zone" style="color:black">Zone:</label>
+													<div
+														class="row">
+														<div
+															class="col-md-2 col-sm-2 mt-2 mb-2">
+															<label
+																for="zone"
+																style="color:black">
+																Zone:
+															</label>
 														</div>
-														<div class="col-md-10 col-sm-10 mt-2 mb-2">
-															<select name="zone" id="zone" class="form-select" required>
-																<option value="" selected disabled hidden>Choisir une Zone</option>
+														<div
+															class="col-md-10 col-sm-10 mt-2 mb-2">
+															<select
+																name="zone"
+																id="zone"
+																class="form-select"
+																required>
+																<option
+																	value=""
+																	selected
+																	disabled
+																	hidden>
+																	Choisir une Zone
+																</option>
 															</select>
 														</div>
-														<div class="col-md-2 col-sm-2 mt-2 mb-2">
-															<label for="productline" style="color:black">Ligne:</label>
+														<div
+															class="col-md-2 col-sm-2 mt-2 mb-2">
+															<label
+																for="productline"
+																style="color:black">
+																Ligne:
+															</label>
 														</div>
-														<div class="col-md-10 col-sm-10 mt-2 mb-2">
-															<select name="productline" id="productline" class="form-select" required>
-																<option value="" selected disabled hidden>Choisir une Ligne</option>
+														<div
+															class="col-md-10 col-sm-10 mt-2 mb-2">
+															<select
+																name="productline"
+																id="productline"
+																class="form-select"
+																required>
+																<option
+																	value=""
+																	selected
+																	disabled
+																	hidden>
+																	Choisir une Ligne
+																</option>
 															</select>
 														</div>
-														<div class="col-md-2 col-sm-2 mt-2 mb-2">
-															<label for="category" style="color:black">Categorie:</label>
+														<div
+															class="col-md-2 col-sm-2 mt-2 mb-2">
+															<label
+																for="category"
+																style="color:black">
+																Categorie:
+															</label>
 														</div>
-														<div class="col-md-10 col-sm-10 mt-2 mb-2">
-															<select name="category" id="category" class="form-select" required>
-																<option value="" selected disabled hidden>Choisir une Catégorie</option>
+														<div
+															class="col-md-10 col-sm-10 mt-2 mb-2">
+															<select
+																name="category"
+																id="category"
+																class="form-select"
+																required>
+																<option
+																	value=""
+																	selected
+																	disabled
+																	hidden>
+																	Choisir une Catégorie
+																</option>
 															</select>
 														</div>
-														<div class="col-md-2 col-sm-2 mt-2 mb-2">
-															<label for="button" style="color:black">Bouton:</label>
+														<div
+															class="col-md-2 col-sm-2 mt-2 mb-2">
+															<label
+																for="button"
+																style="color:black">
+																Bouton:
+															</label>
 														</div>
-														<div class="col-md-10 col-sm-10 mt-2 mb-4">
-															{{ form_widget(form.button,{'attr': {'class': 'form-select', 'name': 'button', 'id': 'upload_button', 'required': true}}) }}
+														<div
+															class="col-md-10 col-sm-10 mt-2 mb-4">
+															{{ form_widget(form.button,{'attr': {'class': 'form-select', 'name': 'button', 'id': 'upload_button', 'required': true}}
+															) }}
 														</div>
 													</div>
 												</div>
@@ -194,29 +295,79 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 										</div>
 									</div>
 									{% if upload.validation is null %}
-										<div class="accordion mx-auto col-8 justify-content-center" id="accordionValidator">
-											<div class="accordion-item ">
-												<div class="accordion-header" id="validatorNeeded-header">
-													<input type="hidden" name="validatorRequired" value="false">
-													<input type="checkbox" class="btn-check" name="validatorRequired" id="validatorRequired" autocomplete="off" value="true">
-													<label class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed" for="validatorRequired" data-bs-toggle="collapse" data-bs-target="#validatorNeeded" aria-expanded="false" aria-controls="validatorNeeded" id="validatorSelect">
-														<strong>Validation du Document</strong>
-														&nbsp; (Ouvrez ce menu pour activer la validation de document, fermez le pour la désactiver. Si le document a déjà nécéssité une validation il n'est pas necessaire de selectionner à nouveau les validateurs.)</label>
+										<div
+											class="accordion mx-auto col-8 justify-content-center"
+											id="accordionValidator">
+											<div
+												class="accordion-item ">
+												<div
+													class="accordion-header"
+													id="validatorNeeded-header">
+													<input
+														type="hidden"
+														name="validatorRequired"
+														value="false">
+													<input
+														type="checkbox"
+														class="btn-check"
+														name="validatorRequired"
+														id="validatorRequired"
+														autocomplete="off"
+														value="true">
+													<label
+														class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed"
+														for="validatorRequired"
+														data-bs-toggle="collapse"
+														data-bs-target="#validatorNeeded"
+														aria-expanded="false"
+														aria-controls="validatorNeeded"
+														id="validatorSelect">
+														<strong>
+															Validation du Document
+														</strong>
+														&nbsp; (Ouvrez ce menu pour activer la validation de document, fermez le pour la désactiver. Si le document a déjà nécéssité une validation il n'est pas necessaire de selectionner à nouveau les validateurs.)
+													</label>
 												</div>
-												<div id="validatorNeeded" aria-labelledby="validatorNeeded" data-bs-parent="#accordionValidator" class="accordion-collapse collapse ">
-													<div class="accordion-body row ">
-														<div class="col-md-2 col-sm-2 mt-2 mb-2">
-															<label for="validator_user" style="color:black">Valideur:</label>
+												<div
+													id="validatorNeeded"
+													aria-labelledby="validatorNeeded"
+													data-bs-parent="#accordionValidator"
+													class="accordion-collapse collapse ">
+													<div
+														class="accordion-body row ">
+														<div
+															class="col-md-2 col-sm-2 mt-2 mb-2">
+															<label
+																for="validator_user"
+																style="color:black">
+																Valideur:
+															</label>
 														</div>
-														<div id="usersContainer" class="col-md-10 col-sm-10 mt-2 mb-2">
-															<select class="form-select userSelect" name="validator_user" id="validator_user"></select>
+														<div
+															id="usersContainer"
+															class="col-md-10 col-sm-10 mt-2 mb-2">
+															<select
+																class="form-select userSelect"
+																name="validator_user"
+																id="validator_user"></select>
 														</div>
 													</div>
-													<div class="d-grid col-8 mt-2 mb-2 mx-auto">
-														<div class="input-group  justify-content-center">
-															<div class="input-group-prepend">
-																<span class="input-group-text">Commentaire</span>
-																<textarea class="form-control" name="modificationComment" aria-label="With textarea" rows="2" cols="50"></textarea>
+													<div
+														class="d-grid col-8 mt-2 mb-2 mx-auto">
+														<div
+															class="input-group  justify-content-center">
+															<div
+																class="input-group-prepend">
+																<span
+																	class="input-group-text">
+																	Commentaire
+																</span>
+																<textarea
+																	class="form-control"
+																	name="modificationComment"
+																	aria-label="With textarea"
+																	rows="2"
+																	cols="50"></textarea>
 															</div>
 														</div>
 													</div>
@@ -224,37 +375,89 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 											</div>
 										</div>
 									{% else %}
-										<div class="accordion mx-auto col-8 justify-content-center" id="accordionValidator">
-											<div class="accordion-item ">
-												<div class="accordion-header" id="validatorNeeded-header">
-													<input type="checkbox" class="btn-check" name="validatorRequired" id="validatorRequired" autocomplete="off" value="true">
-													<label class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed" for="validatorRequired" data-bs-toggle="collapse" data-bs-target="#validatorNeeded" aria-expanded="false" aria-controls="validatorNeeded" id="validatorSelect">
-														<strong>Validation du Document</strong>
-														&nbsp; (Ouvrez ce menu pour activer la validation de document, fermez le pour la désactiver. Si le document a déjà nécéssité une validation il n'est pas necessaire de selectionner à nouveau les validateurs.)</label>
+										<div
+											class="accordion mx-auto col-8 justify-content-center"
+											id="accordionValidator">
+											<div
+												class="accordion-item ">
+												<div
+													class="accordion-header"
+													id="validatorNeeded-header">
+													<input
+														type="checkbox"
+														class="btn-check"
+														name="validatorRequired"
+														id="validatorRequired"
+														autocomplete="off"
+														value="true">
+													<label
+														class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed"
+														for="validatorRequired"
+														data-bs-toggle="collapse"
+														data-bs-target="#validatorNeeded"
+														aria-expanded="false"
+														aria-controls="validatorNeeded"
+														id="validatorSelect">
+														<strong>
+															Validation du Document
+														</strong>
+														&nbsp; (Ouvrez ce menu pour activer la validation de document, fermez le pour la désactiver. Si le document a déjà nécéssité une validation il n'est pas necessaire de selectionner à nouveau les validateurs.)
+													</label>
 												</div>
-												<div id="validatorNeeded" aria-labelledby="validatorNeeded" data-bs-parent="#accordionValidator" class="accordion-collapse collapse ">
-													<div class="accordion-body row ">
-														<div class="col-md-2 col-sm-2 mt-2 mb-2">
-															<label for="validator_user" style="color:black">Valideur:</label>
+												<div
+													id="validatorNeeded"
+													aria-labelledby="validatorNeeded"
+													data-bs-parent="#accordionValidator"
+													class="accordion-collapse collapse ">
+													<div
+														class="accordion-body row ">
+														<div
+															class="col-md-2 col-sm-2 mt-2 mb-2">
+															<label
+																for="validator_user"
+																style="color:black">
+																Valideur:
+															</label>
 														</div>
-														<div id="usersContainer" class="col-md-10 col-sm-10 mt-2 mb-2">
-															<select class="form-select userSelect" name="validator_user" id="validator_user"></select>
+														<div
+															id="usersContainer"
+															class="col-md-10 col-sm-10 mt-2 mb-2">
+															<select
+																class="form-select userSelect"
+																name="validator_user"
+																id="validator_user"></select>
 														</div>
 													</div>
 												</div>
 											</div>
 										</div>
-										<div class="d-grid col-8 mt-2 mb-2 mx-auto">
-											<div class="input-group  justify-content-center">
-												<div class="input-group-prepend">
-													<span class="input-group-text">Commentaire</span>
-													<textarea class="form-control" name="modificationComment" aria-label="With textarea" rows="2" cols="50"></textarea>
+										<div
+											class="d-grid col-8 mt-2 mb-2 mx-auto">
+											<div
+												class="input-group  justify-content-center">
+												<div
+													class="input-group-prepend">
+													<span
+														class="input-group-text">
+														Commentaire
+													</span>
+													<textarea
+														class="form-control"
+														name="modificationComment"
+														aria-label="With textarea"
+														rows="2"
+														cols="50"></textarea>
 												</div>
 											</div>
 										</div>
 									{% endif %}
-									<div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
-										<button type="submit" class="btn btn-primary mb-3 submit-upload-modification">Modifier</button>
+									<div
+										class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
+										<button
+											type="submit"
+											class="btn btn-primary mb-3 submit-upload-modification">
+											Modifier
+										</button>
 									</div>
 									{{ form_end(form) }}
 								</div>
