@@ -321,8 +321,11 @@ class OperatorController extends FrontController
     #[Route('/operator/check-duplicate-by-name', name: 'app_operator_check_duplicate_by_name', methods: ['POST'])]
     public function checkDuplicateOperatorByName(Request $request): JsonResponse
     {
-        $operatorName = $request->request->get('name');
-
+        $this->logger->info('Full requestbyname', [$request->request->all()]);
+        $parsedRequest = json_decode($request->getContent(), true);
+        $this->logger->info('parsedRequest', [$parsedRequest]);
+        $operatorName = $parsedRequest['name'];
+        $this->logger->info('operatorName', [$operatorName]);
         $existingOperatorName = $this->operatorRepository->findOneBy(['name' => $operatorName]);
         $this->logger->info('existingOperatorName', [$existingOperatorName]);
 
@@ -347,8 +350,11 @@ class OperatorController extends FrontController
     #[Route('/operator/check-duplicate-by-code', name: 'app_operator_check_duplicate_by_code', methods: ['POST'])]
     public function checkDuplicateOperatorByCode(Request $request): JsonResponse
     {
-        $operatorCode = $request->request->get('operatorCode');
-
+        $this->logger->info('Full request bycode', $request->request->all());
+        $parsedRequest = json_decode($request->getContent(), true);
+        $this->logger->info('parsedRequest', [$parsedRequest]);
+        $operatorCode = $parsedRequest['operatorCode'];
+        $this->logger->info('operatorCode', [$operatorCode]);
         $existingOperatorCode = $this->operatorRepository->findOneBy(['code' => $operatorCode]);
         $this->logger->info('existingOperatorCode', [$existingOperatorCode]);
 

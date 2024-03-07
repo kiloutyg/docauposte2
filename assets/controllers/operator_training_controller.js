@@ -35,7 +35,12 @@ export default class extends Controller {
     checkForExistingEntityByName() {
         const operatorName = this.newOperatorTarget.value;
         console.log(operatorName);
-        axios.post('/docauposte/operator/check-duplicate-by-name', { name: operatorName })
+        axios.post('/docauposte/operator/check-duplicate-by-name', { name: operatorName }, {
+            headers: {
+                'Content-Type': 'application/json',
+                // Include CSRF token if needed: 'X-CSRF-TOKEN': 'your_csrf_token_here'
+            }
+        })
             .then(response => {
                 if (response.data.found) {
                     // Duplicate found, handle accordingly
@@ -60,7 +65,7 @@ export default class extends Controller {
     checkForExistingEntityByCode() {
         const operatorCode = this.newOperatorCodeTarget.value;
         console.log(operatorCode)
-        axios.post('/docauposte/operator/check-duplicate-by-code', { name: operatorCode })
+        axios.post('/docauposte/operator/check-duplicate-by-code', { code: operatorCode })
             .then(response => {
                 if (response.data.found) {
                     // Duplicate found, handle accordingly
