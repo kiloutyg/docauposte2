@@ -353,7 +353,7 @@ class OperatorController extends FrontController
         $this->logger->info('Full request bycode', $request->request->all());
         $parsedRequest = json_decode($request->getContent(), true);
         $this->logger->info('parsedRequest', [$parsedRequest]);
-        $operatorCode = $parsedRequest['operatorCode'];
+        $operatorCode = $parsedRequest['code'];
         $this->logger->info('operatorCode', [$operatorCode]);
         $existingOperatorCode = $this->operatorRepository->findOneBy(['code' => $operatorCode]);
         $this->logger->info('existingOperatorCode', [$existingOperatorCode]);
