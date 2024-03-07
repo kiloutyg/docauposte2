@@ -237,6 +237,33 @@ class UploadController extends FrontController
                 ]);
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
+
+                // $backtrace = debug_backtrace();
+                // $origin = sprintf(
+                //     'Error at %s line %d',
+                //     $backtrace[0]['file'],
+                //     $backtrace[0]['line']
+                // );
+                // $this->addFlash('error', $e->getMessage() . ' ' . $origin);
+                // // Function to format the debug backtrace as a string
+                // $formatBacktrace = function ($backtrace) {
+                //     $output = '';
+                //     foreach ($backtrace as $entry) {
+                //         $file = isset($entry['file']) ? $entry['file'] : 'Unknown file';
+                //         $line = isset($entry['line']) ? $entry['line'] : 'Unknown line';
+                //         $function = isset($entry['function']) ? $entry['function'] : 'Unknown function';
+                //         $output .= sprintf("File: %s, Line: %d, Function: %s\n", $file, $line, $function);
+                //     }
+                //     return $output;
+                // };
+
+                // // Use the function to get a formatted string of the backtrace
+                // $formattedBacktrace = $formatBacktrace($backtrace);
+
+                // // Log the detailed error internally
+                // $this->logger->error($e->getMessage(), ['exception' => $e, 'backtrace' => $formattedBacktrace]);
+
+
                 // $this->addFlash('error', 'Une erreur est survenue lors de la modification du fichier.');
                 return $this->redirectToRoute('app_modify_file', [
                     'uploadId' => $uploadId
