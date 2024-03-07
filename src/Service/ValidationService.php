@@ -24,6 +24,7 @@ use App\Entity\Approbation;
 use App\Service\MailerService;
 use App\Service\OldUploadService;
 
+use function PHPUnit\Framework\isEmpty;
 
 class ValidationService extends AbstractController
 {
@@ -368,6 +369,7 @@ class ValidationService extends AbstractController
             $approbations = [];
             // Get the ID of the Validation instance
             $approbations = $validation->getApprobations();
+            $this->logger->info('Resetting approbations' . json_encode($approbations));
             // Loop through each Approbation instance
             foreach ($approbations as $approbation) {
                 //If it's a major modification reset all approbations
@@ -388,9 +390,11 @@ class ValidationService extends AbstractController
                     $approbation->setComment(null);
                     $this->mailerService->sendDisapprovedModifiedEmail($approbation);
                 }
+
+
+                // Persist the Approbation instance to the database
+                $this->em->persist($approbation);
             }
-            // Persist the Approbation instance to the database
-            $this->em->persist($approbation);
         }
 
         if ($globalModification) {
