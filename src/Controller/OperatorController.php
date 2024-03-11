@@ -128,7 +128,7 @@ class OperatorController extends FrontController
         $this->logger->info('uap', [$uap->getName()]);
         $operatorCode = $request->request->get('newOperatorCode');
 
-        $operatorName = $request->request->get('newOperator');
+        $operatorName = $request->request->get('newOperatorName');
 
         $existingOperator = $this->operatorRepository->findOneBy(['name' => $operatorName]);
         if ($existingOperator == null) {
@@ -322,20 +322,23 @@ class OperatorController extends FrontController
     public function checkDuplicateOperatorByName(Request $request): JsonResponse
     {
         $this->logger->info('Full requestbyname', [$request->request->all()]);
+
         $parsedRequest = json_decode($request->getContent(), true);
         $this->logger->info('parsedRequest', [$parsedRequest]);
-        $operatorName = $parsedRequest['name'];
-        $this->logger->info('operatorName', [$operatorName]);
-        $existingOperatorName = $this->operatorRepository->findOneBy(['name' => $operatorName]);
-        $this->logger->info('existingOperatorName', [$existingOperatorName]);
 
-        if ($existingOperatorName !== null) {
+        $operatorName = $parsedRequest['value'];
+        $this->logger->info('operatorName', [$operatorName]);
+
+        $existingOperator = $this->operatorRepository->findOneBy(['name' => $operatorName]);
+        $this->logger->info('existingOperator', [$existingOperator]);
+
+        if ($existingOperator !== null) {
             // Found duplicate
             return new JsonResponse([
                 'found' => true,
                 'message' => 'Un opérateur avec ce nom existe déjà',
                 'operator' => [
-                    'name' => $existingOperatorName->getName(),
+                    'id' => $existingOperator->getId(),
                     // Include additional details as necessary
                 ]
             ]);
@@ -343,7 +346,7 @@ class OperatorController extends FrontController
 
 
         // No duplicate found
-        return new JsonResponse(['found' => false]);
+        return new JsonResponse(['found' => false, 'message' => 'Aucun opérateur avec ce nom n\'existe']);
     }
 
 
@@ -351,20 +354,23 @@ class OperatorController extends FrontController
     public function checkDuplicateOperatorByCode(Request $request): JsonResponse
     {
         $this->logger->info('Full request bycode', $request->request->all());
+
         $parsedRequest = json_decode($request->getContent(), true);
         $this->logger->info('parsedRequest', [$parsedRequest]);
-        $operatorCode = $parsedRequest['code'];
-        $this->logger->info('operatorCode', [$operatorCode]);
-        $existingOperatorCode = $this->operatorRepository->findOneBy(['code' => $operatorCode]);
-        $this->logger->info('existingOperatorCode', [$existingOperatorCode]);
 
-        if ($existingOperatorCode !== null) {
+        $operatorCode = $parsedRequest['value'];
+        $this->logger->info('operatorCode', [$operatorCode]);
+
+        $existingOperator = $this->operatorRepository->findOneBy(['code' => $operatorCode]);
+        $this->logger->info('existingOperator', [$existingOperator]);
+
+        if ($existingOperator !== null) {
             // Found duplicate
             return new JsonResponse([
                 'found' => true,
                 'message' => 'Un opérateur avec ce codeOpé existe déjà',
                 'operator' => [
-                    'name' => $existingOperatorCode->getName(),
+                    'id' => $existingOperator->getId(),
                     // Include additional details as necessary
                 ]
             ]);
@@ -372,6 +378,38 @@ class OperatorController extends FrontController
 
 
         // No duplicate found
+        return new JsonResponse(['found' => false, 'message' => "Aucun opérateur avec ce codeOpé n'existe"]);
+    }
+
+
+    #[Route('/operator/check-corresponding-operator-by-code', name: 'app_operator_check_corresponding_operator_by_code', methods: ['POST'])]
+    public function checkCorrespondingOperatorByCode(Request $request): JsonResponse
+    {
+        $this->logger->info('Full request bycode', $request->request->all());
+
+        $parsedRequest = json_decode($request->getContent(), true);
+        $this->logger->info('parsedRequest', [$parsedRequest]);
+
+        $operatorCode = $parsedRequest['operatorCode'];
+        $this->logger->info('operatorCode', [$operatorCode]);
+
+        $operatorId = $parsedRequest['operatorId'];
+        $this->logger->info('operatorId', [$operatorId]);
+
+        $existingOperator = $this->operatorRepository->findOneBy(['code' => $operatorCode, 'id' => $operatorId]);
+        $this->logger->info('existingOperator', [$existingOperator]);
+
+        if ($existingOperator !== null) {
+            // Found duplicate
+            return new JsonResponse([
+                'found' => true,
+                'message' => 'Le codeOpé ne correspond pas a cet opérateur',
+                'operator' => [
+                    'id' => $existingOperator->getId(),
+                    // Include additional details as necessary
+                ]
+            ]);
+        }
         return new JsonResponse(['found' => false]);
     }
 }

@@ -2,87 +2,144 @@ import { Controller } from '@hotwired/stimulus';
 import axios from 'axios';
 
 export default class extends Controller {
-    static targets = ["newOperator", "newOperatorMessage", "newOperatorCode", "newOperatorMessageCode"];
+    static targets = ["newOperatorName", "newOperatorMessageName", "newOperatorCode", "newOperatorMessageCode", "newOperatorSubmitButton"];
+    /*
+    Validate the new operator name and code fields.
+    Update the message to the user based on the validation results.
 
-    validateNewOperator() {
-        const regex = /^[a-zA-Z]+\.[a-zA-Z]+$/;
-        const isValid = regex.test(this.newOperatorTarget.value);
+    */
+    validateNewOperatorName() {
+        console.log('validating new operator name: this.newOperatorNameTarget.value: ', this.newOperatorNameTarget.value);
+        const regex = /^[a-zA-Z]+\.(?!-)(?!.*--)[a-zA-Z-]+(?<!-)$/;
+        const isValid = regex.test(this.newOperatorNameTarget.value);
+        this.updateMessage(this.newOperatorMessageNameTarget, isValid, "Veuillez saisir sous la forme prénom.nom");
 
         if (isValid) {
             this.checkForExistingEntityByName();
-            this.newOperatorMessageTarget.textContent = "";
-        } else {
-            this.newOperatorMessageTarget.textContent = "Veuillez saisir sous la forme prénom.nom";
-            this.newOperatorMessageTarget.style.color = "red"; // Display the message in red color.
         }
     }
+
 
 
     validateNewOperatorCode() {
-        const regex = /^[a-zA-Z0-9]+$/;
+        console.log('validating new operator code: this.newOperatorCodeTarget.value: ', this.newOperatorCodeTarget.value);
+        const regex = /^[0-9]{5}$/;
         const isValid = regex.test(this.newOperatorCodeTarget.value);
+        this.updateMessage(this.newOperatorMessageCodeTarget, isValid, "Veuillez saisir un code correct.");
 
         if (isValid) {
             this.checkForExistingEntityByCode();
-            this.newOperatorMessageCodeTarget.textContent = "";
-        } else {
-            this.newOperatorMessageCodeTarget.textContent = "Veuillez saisir un code correcte.";
-            this.newOperatorMessageCodeTarget.style.color = "red"; // Display the message in red color.
         }
     }
 
 
-    checkForExistingEntityByName() {
-        const operatorName = this.newOperatorTarget.value;
-        console.log(operatorName);
-        axios.post('/docauposte/operator/check-duplicate-by-name', { name: operatorName }, {
-            headers: {
-                'Content-Type': 'application/json',
-                // Include CSRF token if needed: 'X-CSRF-TOKEN': 'your_csrf_token_here'
-            }
-        })
-            .then(response => {
-                if (response.data.found) {
-                    // Duplicate found, handle accordingly
-                    this.newOperatorMessageTarget.textContent = response.data.message;
-                    this.newOperatorMessageTarget.style.color = "red";
 
-                    // Further actions to suggest the original entity to the user could go here
-                    // e.g., display a modal or populate a form/input field with the found data
-
-                } else {
-                    // No duplicate, allow creation.
-                    this.newOperatorMessageTarget.textContent = "No duplicates found, ready to create.";
-                    this.newOperatorMessageTarget.style.color = "green";
-                }
-            })
-            .catch(error => {
-                console.error("There was an error checking for a duplicate operator!", error);
-            });
+    async checkForExistingEntityByName() {
+        try {
+            const response = await this.checkForDuplicate('/docauposte/operator/check-duplicate-by-name', this.newOperatorNameTarget.value);
+            console.log('response for check existing entity by name: ', response);
+            this.handleDuplicateResponse(response, this.newOperatorMessageNameTarget, "noms d'opérateurs");
+        } catch (error) {
+            console.error("Error checking for a duplicate operator name.", error);
+            this.manageNewOperatorSubmitButton();
+            this.newOperatorMessageNameTarget.textContent = "Erreur lors de la vérification du nom opérateur.";
+        }
     }
 
 
-    checkForExistingEntityByCode() {
-        const operatorCode = this.newOperatorCodeTarget.value;
-        console.log(operatorCode)
-        axios.post('/docauposte/operator/check-duplicate-by-code', { code: operatorCode })
-            .then(response => {
-                if (response.data.found) {
-                    // Duplicate found, handle accordingly
-                    this.newOperatorMessageCodeTarget.textContent = response.data.message;
-                    this.newOperatorMessageCodeTarget.style.color = "red";
 
-                    // Further actions to suggest the original entity to the user could go here
-                    // e.g., display a modal or populate a form/input field with the found data
+    async checkForExistingEntityByCode() {
+        try {
+            const response = await this.checkForDuplicate('/docauposte/operator/check-duplicate-by-code', this.newOperatorCodeTarget.value);
+            console.log('response for check existing entity by code: ', response);
+            this.handleDuplicateResponse(response, this.newOperatorMessageCodeTarget, "codes opérateurs");
+        } catch (error) {
+            console.error("Error checking for a duplicate operator code.", error);
+            this.manageNewOperatorSubmitButton();
+            this.newOperatorMessageCodeTarget.textContent = "Erreur lors de la vérification du code opérateur.";
+        }
+    }
 
+
+
+    updateMessage(targetElement, isValid, errorMessage) {
+        if (isValid) {
+            targetElement.textContent = "";
+            this.manageSubmitButton();
+        } else {
+            targetElement.textContent = errorMessage;
+            targetElement.style.color = "red";
+            this.manageNewOperatorSubmitButton();
+        }
+    }
+
+
+
+
+    duplicateCheckResults = [];
+
+    handleDuplicateResponse(response, messageTarget, fieldName) {
+        this.duplicateCheckResults.push(response);
+
+        console.log(`Number of stuff: ${this.duplicateCheckResults.length}`);
+
+        messageTarget.textContent = response.data.found
+            ? response.data.message
+            : `Aucun doublon trouvé dans les ${fieldName}, prêt à créer.`;
+
+        messageTarget.style.color = response.data.found ? "red" : "green";
+
+        if (this.duplicateCheckResults.length === 2) {
+            const resultsMatch = this.duplicateCheckResults[0].data.found == true && this.duplicateCheckResults[1].data.found == true;
+            if (resultsMatch) {
+                const entitiesMatch = this.duplicateCheckResults[0].data.operator.id === this.duplicateCheckResults[1].data.operator.id;
+                this.newOperatorMessageCodeTarget.textContent = "";
+                this.newOperatorMessageNameTarget.textContent = "";
+                if (entitiesMatch) {
+                    this.manageNewOperatorSubmitButton(true, "Transferer");
+                    this.newOperatorMessageNameTarget.textContent = "Nom et Code opérateurs correspondent à un même opérateur. Vous pouvez le transferer.";
+                    this.newOperatorMessageNameTarget.style.color = "green";
                 } else {
-                    // No duplicate, allow creation.
-                    this.newOperatorMessageCodeTarget.textContent = "No duplicates found, ready to create.";
-                    this.newOperatorMessageCodeTarget.style.color = "green";
+
+                    this.newOperatorMessageNameTarget.textContent = "Nom et Code opérateurs ne correspondent pas à un même opérateur. Veuillez saisir un autre nom ou code opérateur";
+                    this.newOperatorMessageNameTarget.style.color = "red"; // Changed to red to indicate an error
                 }
-            })
-            .catch(error => {
-                console.error("There was an error checking for a duplicate operator!", error);
-            });
+
+            }
+            // Clear the results after handling them 
+            this.duplicateCheckResults = [];
+        }
+
+    }
+
+
+    manageSubmitButton() {
+        const nameValue = this.newOperatorNameTarget.value.trim();
+        const codeValue = this.newOperatorCodeTarget.value.trim();
+        this.manageNewOperatorSubmitButton(!nameValue || !codeValue);
+    }
+
+
+    async manageNewOperatorSubmitButton(booleanValue = false, submitValue = "Ajouter") {
+
+        this.newOperatorSubmitButtonTarget.disabled = !booleanValue;
+        this.newOperatorSubmitButtonTarget.value = submitValue;
+
+
+    }
+
+    checkForDuplicate(url, value) {
+        return axios.post(url, { value: value });
+    }
+
+    checkForCorrespondingEntity(results) {
+
+        if (results[0].data.operator.id === results[1].data.operator.id) {
+            this.manageNewOperatorSubmitButton(true, "Transferer");
+            return true;
+        } else {
+            this.manageNewOperatorSubmitButton(false);
+            return false;
+        }
     }
 }
