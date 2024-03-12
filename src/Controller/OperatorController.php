@@ -336,6 +336,8 @@ class OperatorController extends FrontController
             // Found duplicate
             return new JsonResponse([
                 'found' => true,
+                'field' => 'name',
+                'value' => $operatorName,
                 'message' => 'Un opérateur avec ce nom existe déjà',
                 'operator' => [
                     'id' => $existingOperator->getId(),
@@ -346,7 +348,9 @@ class OperatorController extends FrontController
 
 
         // No duplicate found
-        return new JsonResponse(['found' => false, 'message' => 'Aucun opérateur avec ce nom n\'existe']);
+        return new JsonResponse([
+            'found' => false, 'field' => 'name', 'value' => $operatorName, 'message' => 'Aucun opérateur avec ce nom n\'existe'
+        ]);
     }
 
 
@@ -368,6 +372,8 @@ class OperatorController extends FrontController
             // Found duplicate
             return new JsonResponse([
                 'found' => true,
+                'field' => 'code',
+                'value' => $operatorCode,
                 'message' => 'Un opérateur avec ce codeOpé existe déjà',
                 'operator' => [
                     'id' => $existingOperator->getId(),
@@ -378,38 +384,40 @@ class OperatorController extends FrontController
 
 
         // No duplicate found
-        return new JsonResponse(['found' => false, 'message' => "Aucun opérateur avec ce codeOpé n'existe"]);
+        return new JsonResponse([
+            'found' => false, 'field' => 'code', 'value' => $operatorCode, 'message' => "Aucun opérateur avec ce codeOpé n'existe"
+        ]);
     }
 
 
-    #[Route('/operator/check-corresponding-operator-by-code', name: 'app_operator_check_corresponding_operator_by_code', methods: ['POST'])]
-    public function checkCorrespondingOperatorByCode(Request $request): JsonResponse
-    {
-        $this->logger->info('Full request bycode', $request->request->all());
+    // #[Route('/operator/check-corresponding-operator-by-code', name: 'app_operator_check_corresponding_operator_by_code', methods: ['POST'])]
+    // public function checkCorrespondingOperatorByCode(Request $request): JsonResponse
+    // {
+    //     $this->logger->info('Full request bycode', $request->request->all());
 
-        $parsedRequest = json_decode($request->getContent(), true);
-        $this->logger->info('parsedRequest', [$parsedRequest]);
+    //     $parsedRequest = json_decode($request->getContent(), true);
+    //     $this->logger->info('parsedRequest', [$parsedRequest]);
 
-        $operatorCode = $parsedRequest['operatorCode'];
-        $this->logger->info('operatorCode', [$operatorCode]);
+    //     $operatorCode = $parsedRequest['operatorCode'];
+    //     $this->logger->info('operatorCode', [$operatorCode]);
 
-        $operatorId = $parsedRequest['operatorId'];
-        $this->logger->info('operatorId', [$operatorId]);
+    //     $operatorId = $parsedRequest['operatorId'];
+    //     $this->logger->info('operatorId', [$operatorId]);
 
-        $existingOperator = $this->operatorRepository->findOneBy(['code' => $operatorCode, 'id' => $operatorId]);
-        $this->logger->info('existingOperator', [$existingOperator]);
+    //     $existingOperator = $this->operatorRepository->findOneBy(['code' => $operatorCode, 'id' => $operatorId]);
+    //     $this->logger->info('existingOperator', [$existingOperator]);
 
-        if ($existingOperator !== null) {
-            // Found duplicate
-            return new JsonResponse([
-                'found' => true,
-                'message' => 'Le codeOpé ne correspond pas a cet opérateur',
-                'operator' => [
-                    'id' => $existingOperator->getId(),
-                    // Include additional details as necessary
-                ]
-            ]);
-        }
-        return new JsonResponse(['found' => false]);
-    }
+    //     if ($existingOperator !== null) {
+    //         // Found duplicate
+    //         return new JsonResponse([
+    //             'found' => true,
+    //             'message' => 'Le codeOpé ne correspond pas a cet opérateur',
+    //             'operator' => [
+    //                 'id' => $existingOperator->getId(),
+    //                 // Include additional details as necessary
+    //             ]
+    //         ]);
+    //     }
+    //     return new JsonResponse(['found' => false]);
+    // }
 }
