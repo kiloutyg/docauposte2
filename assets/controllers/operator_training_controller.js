@@ -3,7 +3,7 @@ import { Controller } from '@hotwired/stimulus';
 import axios from 'axios';
 
 export default class extends Controller {
-    static targets = ["newOperatorName", "newOperatorMessageName", "newOperatorCode", "newOperatorMessageCode", "newOperatorMessageTransfer", "newOperatorSubmitButton"];
+    static targets = ["newOperatorName", "newOperatorMessageName", "newOperatorCode", "newOperatorMessageCode", "newOperatorMessageTransfer", "newOperatorSubmitButton", "trainingOperatorCode"];
 
     validateNewOperatorName() {
         console.log('validating new operator name:', this.newOperatorNameTarget.value);
@@ -31,6 +31,7 @@ export default class extends Controller {
             this.checkForExistingEntityByName();
         }
     }
+
 
     validateNewOperatorCode() {
         console.log('validating new operator code:', this.newOperatorCodeTarget.value);
@@ -113,7 +114,7 @@ export default class extends Controller {
 
         messageTarget.textContent = response.data.found
             ? response.data.message
-            : `Aucun doublon trouvé dans les ${fieldName}, prêt à créer.`;
+            : `Aucun doublon trouvé dans les ${fieldName}.`;
 
         messageTarget.style.color = response.data.found ? "red" : "green";
 
@@ -166,8 +167,8 @@ export default class extends Controller {
                 this.manageNewOperatorSubmitButton(false);
             }
         }
-
     }
+
 
     executeEntityMatchingLogic(matchesFound) {
         console.log('Executing entity matching logic:', matchesFound);
@@ -189,11 +190,13 @@ export default class extends Controller {
         this.manageNewOperatorSubmitButton(entitiesMatch, submitValue);
     }
 
+
     executeEntityNonMatchingLogic(unMatchedFound) {
         this.newOperatorMessageTransferTarget.textContent = "Nom et Code opérateurs ne correspondent à aucun opérateur. Vous pouvez les ajouter.";
         this.newOperatorMessageTransferTarget.style.color = "green";
         this.manageNewOperatorSubmitButton(unMatchedFound, "Ajouter");
     }
+
 
     resetUselessMessages() {
         console.log('Resetting useless messages if there is a transfer message.');
@@ -203,4 +206,75 @@ export default class extends Controller {
             this.newOperatorMessageCodeTarget.textContent = "";
         }
     }
+
+
+
+    validateCodeEntryForTraining() {
+        console.log('validating training operator code:', this.trainingOperatorCodeTarget.value);
+        const regex = /^[0-9]{5}$/;
+        const isValid = regex.test(this.trainingOperatorCodeTarget.value.trim());
+
+        if (isValid) {
+            this.checkOperatorIdentityByCode();
+        }
+    }
+
+
+    async checkOperatorIdentityByCode() {
+        const code = this.trainingOperatorCodeTarget.value;
+        const operatorId = this.trainingOperatorCodeTarget.dataset.operatorId;
+        const teamId = this.trainingOperatorCodeTarget.dataset.teamId;
+        const uapId = this.trainingOperatorCodeTarget.dataset.uapId;
+
+        try {
+            console.log('Checking operator identity by code:', this.trainingOperatorCodeTarget.value);
+            const response = await this.checkCodeAgainstOperatorCode('/docauposte/operator/check-entered-code-against-operator-code', code, operatorId, teamId, uapId);
+            if (response.data) {
+                console.log('response for operator identity by code:', response.data);
+                this.inputSwitch(response.data);
+            }
+        } catch (error) {
+            console.error("Error checking for operator identity by code.", error);
+        }
+
+    }
+
+
+    checkCodeAgainstOperatorCode(url, code, operatorId, teamId, uapId) {
+        console.log(`Checking code against operator code: ${code}, operatorId: ${operatorId}, teamId: ${teamId}, uapId: ${uapId}`);
+        return axios.post(`${url}/${teamId}/${uapId}`, { code: code, operatorId: operatorId, teamId: teamId, uapId: uapId });
+    }
+
+    inputSwitch(response) {
+        console.log('input switch response:', response);
+
+        if (response.found) {
+            // Create checkbox element
+            const checkbox = document.createElement('input');
+            checkbox.setAttribute('type', 'checkbox');
+            checkbox.setAttribute('class', 'btn-check');
+            checkbox.setAttribute('name', `operators[${response.operator.id}][trained]`);
+            checkbox.setAttribute('id', `success-outlined[${response.operator.id}]`);
+            checkbox.setAttribute('autocomplete', 'off');
+            checkbox.setAttribute('value', 'true')
+
+            // Create label element
+            const label = document.createElement('label');
+            label.setAttribute('class', 'btn btn-outline-success p-1 m-1');
+            label.setAttribute('for', `success-outlined[${response.operator.id}]`);
+            label.textContent = 'Formé';
+
+            // Remove the original text input element
+            this.trainingOperatorCodeTarget.remove();
+
+            // Append the new checkbox and label to the parent container
+            const parentContainer = document.querySelector(`#trainingCheckbox${response.operator.id}`); // Replace '#parent_container' with the actual ID or class of the parent container where you want to insert the checkbox and label.
+            parentContainer.appendChild(checkbox);
+            parentContainer.appendChild(label);
+        } else {
+            this.trainingOperatorCodeTarget.value = "";
+            this.trainingOperatorCodeTarget.placeholder = "Code invalide";
+        }
+    }
+
 }

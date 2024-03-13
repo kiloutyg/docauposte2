@@ -382,7 +382,6 @@ class OperatorController extends FrontController
             ]);
         }
 
-
         // No duplicate found
         return new JsonResponse([
             'found' => false, 'field' => 'code', 'value' => $operatorCode, 'message' => "Aucun opérateur avec ce codeOpé n'existe"
@@ -390,34 +389,49 @@ class OperatorController extends FrontController
     }
 
 
-    // #[Route('/operator/check-corresponding-operator-by-code', name: 'app_operator_check_corresponding_operator_by_code', methods: ['POST'])]
-    // public function checkCorrespondingOperatorByCode(Request $request): JsonResponse
-    // {
-    //     $this->logger->info('Full request bycode', $request->request->all());
+    // Route to check the operator to validate the training form and make the trained button appear
 
-    //     $parsedRequest = json_decode($request->getContent(), true);
-    //     $this->logger->info('parsedRequest', [$parsedRequest]);
+    #[Route('operator/check-entered-code-against-operator-code/{teamId}/{uapId}', name: 'app_check_entered_code_against_operator_code')]
+    public function checkEnteredCodeAgainstOperatorCode(Request $request, int $teamId, int $uapId): JsonResponse
+    {
+        $parsedRequest = json_decode($request->getContent(), true);
 
-    //     $operatorCode = $parsedRequest['operatorCode'];
-    //     $this->logger->info('operatorCode', [$operatorCode]);
+        $this->logger->info('Full request', $parsedRequest);
 
-    //     $operatorId = $parsedRequest['operatorId'];
-    //     $this->logger->info('operatorId', [$operatorId]);
+        $enteredCode = $parsedRequest['code'];
+        $this->logger->info('enteredCode', [$enteredCode]);
 
-    //     $existingOperator = $this->operatorRepository->findOneBy(['code' => $operatorCode, 'id' => $operatorId]);
-    //     $this->logger->info('existingOperator', [$existingOperator]);
+        $operatorId = (int)$parsedRequest['operatorId'];
+        $this->logger->info('operatorId', [$operatorId]);
 
-    //     if ($existingOperator !== null) {
-    //         // Found duplicate
-    //         return new JsonResponse([
-    //             'found' => true,
-    //             'message' => 'Le codeOpé ne correspond pas a cet opérateur',
-    //             'operator' => [
-    //                 'id' => $existingOperator->getId(),
-    //                 // Include additional details as necessary
-    //             ]
-    //         ]);
-    //     }
-    //     return new JsonResponse(['found' => false]);
-    // }
+        $controllerOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'Team' => $teamId, 'uap' => $uapId]);
+        $this->logger->info('controllerOperator', [$controllerOperator]);
+
+        if ($controllerOperator != null) {
+            $controllerOperatorId = $controllerOperator->getId();
+            $this->logger->info('controllerOperatorId', [$controllerOperatorId]);
+
+            $controllerOperatorId === $operatorId ? $operator = $controllerOperator : $operator = null;
+            $this->logger->info('operator', [$operator]);
+
+            if ($operator !== null) {
+                // Found operator
+                return new JsonResponse([
+                    'found' => true,
+                    'operator' => [
+                        'id' => $operator->getId(),
+                        'name' => $operator->getName(),
+                        'code' => $operator->getCode(),
+                        'team' => $operator->getTeam()->getName(),
+                        'uap' => $operator->getUap()->getName(),
+                    ]
+                ]);
+            }
+        }
+        // No operator found
+        return new JsonResponse([
+            'found' => false,
+            'message' => 'Aucun opérateur avec ce code n\'existe dans cette équipe et cette UAP'
+        ]);
+    }
 }

@@ -73,108 +73,98 @@
 				{{uap.name}}
 
 			</p>
+
+
 			{% for operator in selectedOperators %}
 				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-				<strong
-					style="color:white;">
+				<strong>
 					<ul
-						class="d-flex flex-row p-1 mb-1 "
-						style="{{ trainingRecord != null ? (trainingRecord.trained ? 'background-color: green;' : 'background-color: yellow;') : 'background-color: red;' }}">
-						<div
-							style="flex:2; text-align: left;"
-							class="mx-auto">
-							{{operator.name}}
+						class="list-unstyled d-flex align-items-center p-1 mb-1 {{ trainingRecord != null ? (trainingRecord.trained ? 'text-white bg-success' : 'text-dark bg-warning') : 'text-white bg-danger' }}">
+
+						<li
+							class="flex-fill text-start mx-auto">
+							{{ operator.name }}
 							<input
 								type="hidden"
 								name="operators[{{ operator.id }}][id]"
-								value="{{operator.id}}">
-						</div>
-						<div
-							style="flex:0; text-align: center;"
+								value="{{ operator.id }}">
+						</li>
+						<li
 							class="mx-auto">
 							-
-						</div>
-						<div
-							style="flex:1; text-align: center;"
-							class="mx-auto">
-							{{operator.team.name}}
-						</div>
-						<div
-							style="flex:0; text-align: center;"
+						</li>
+						<li
+							class="flex-fill text-center mx-auto">
+							{{ operator.team.name }}
+						</li>
+						<li
 							class="mx-auto">
 							-
-						</div>
-						<div
-							style="flex:1; text-align: center;"
-							class="mx-auto">
-							{{operator.uap.name}}
-						</div>
-						<div
-							style="flex:0; text-align: center;"
+						</li>
+						<li
+							class="flex-fill text-center mx-auto">
+							{{ operator.uap.name }}
+						</li>
+						<li
 							class="mx-auto">
 							-
-						</div>
-
+						</li>
 
 						{% if trainingRecord == null %}
-							<div
-								style="flex:2; text-align: right;"
-								class="mx-auto">
+							<li
+								class="flex-grow-1 text-end mx-auto">
 								À former -
-							</div>
-							<div
-								style="flex:1; text-align: right;"
-								class="mx-auto">
+							</li>
+							<li
+								class="flex-grow-1 text-end mx-auto"
+								data-controller="operator-training"
+								name="trainingCheckbox{{ operator.id }}"
+								id="trainingCheckbox{{ operator.id }}">
 								<input
-									type="checkbox"
-									class="btn-check"
-									name="operators[{{ operator.id }}][trained]"
-									id="success-outlined{{ operator.id }}"
-									autocomplete="off"
-									value="true">
-								<label
-									class="btn btn-outline-success  p-1 m-1"
-									for="success-outlined{{ operator.id }}">
-									Formé
-								</label>
-							</div>
+									type="text"
+									pattern="\d*"
+									maxlength="5"
+									class="form-control form-control-sm operator-input mx-auto"
+									data-operator-training-target="trainingOperatorCode"
+									data-action="keyup->operator-training#validateCodeEntryForTraining"
+									data-operator-id="{{ operator.id }}" data-team-id="{{ team.id }}" data-uap-id="{{ uap.id }}" placeholder="CodeOpé"
+									id="trainingOperatorCode{{ operator.id }}"
+									name="operators[{{ operator.id }}][trainingOperatorCode]">
+							</li>
 						{% else %}
 							{% if trainingRecord.trained %}
-								<div
-									style="flex:2; text-align: right;"
-									class="mx-auto">
+								<li
+									class="flex-grow-1 text-end mx-auto">
 									Formé le
 									{{ trainingRecord.date|date('d/m/Y') }}
-								</div>
-
+								</li>
 							{% else %}
-								<div
-									style="flex:2; text-align: right;"
-									class="mx-auto">
-									À réentrainer	-
-								</div>
-								<div
-									style="flex:1; text-align: right;"
-									class="mx-auto">
+								<li
+									class="flex-grow-1 text-end mx-auto">
+									À réentrainer -
+								</li>
+								<li
+									class="flex-grow-1 text-end mx-auto"
+									data-controller="operator-training"
+									name="trainingCheckbox{{ operator.id }}"
+									id="trainingCheckbox{{ operator.id }}">
 									<input
-										type="checkbox"
-										class="btn-check"
-										name="operators[{{ operator.id }}][trained]"
-										id="success-outlined{{ operator.id }}"
-										autocomplete="off">
-									<label
-										class="btn btn-outline-success  p-1 m-1"
-										for="success-outlined{{ operator.id }}">
-										Formé
-									</label>
-								</div>
+										type="text"
+										pattern="\d*"
+										maxlength="5"
+										class="form-control form-control-sm operator-input mx-auto"
+										data-operator-training-target="trainingOperatorCode"
+										data-action="keyup->operator-training#validateCodeEntryForTraining"
+										data-operator-id="{{ operator.id }}" data-team-id="{{ team.id }}" data-uap-id="{{ uap.id }}" placeholder="CodeOpé"
+										id="revalidateOperatorCode{{ operator.id }}"
+										name="operators[{{ operator.id }}][revalidateOperatorCode]">
+								</li>
 							{% endif %}
 						{% endif %}
-
 					</ul>
 				</strong>
-
 			{% endfor %}
+
 			<input
 				type="submit"
 				class="btn btn-primary"
@@ -192,7 +182,7 @@
 			</p>
 			{% for record in trainingRecords %}
 				<strong
-					style="color:white;">
+					style="{{ record.trained ? 'color: white;' : 'color: black;' }}">
 					<ul
 						class="d-flex flex-row p-1 mb-1"
 						style="{{ record.trained ? 'background-color: green;' : 'background-color: yellow;' }}">
