@@ -181,19 +181,14 @@
 
 			</p>
 			{% for record in trainingRecords %}
-				<strong
-					style="{{ record.trained ? 'color: white;' : 'color: black;' }}">
+				<strong>
 					<ul
-						class="d-flex flex-row p-1 mb-1"
-						style="{{ record.trained ? 'background-color: green;' : 'background-color: yellow;' }}">
+						class="list-unstyled d-flex align-items-center p-1 mb-1 {{ record.trained ? 'text-white bg-success' : 'text-dark bg-warning' }}">
 						<div
 							style="flex:0.2; text-align: left;"
 							class="mx-auto">
 							{{record.operator.name}}
-							<input
-								type="hidden"
-								name="operators[{{ record.operator.id }}][id]"
-								value="{{record.operator.id}}">
+
 						</div>
 						<div
 							style="flex:0.05; text-align: center;"
@@ -243,13 +238,11 @@
 				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
 				{% if trainingRecord == null %}
 
-					<strong
-						style="color:white;">
+					<strong>
 						<ul
-							class="d-flex flex-row  p-1 mb-1 "
-							style="background-color: red">
+							class="list-unstyled d-flex align-items-center p-1 mb-1 text-white bg-danger">
 							<div
-								style="flex:2; text-align: left;"
+								style="flex:0.2; text-align: left;"
 								class="mx-auto">
 								{{operator.name}}
 								<input
@@ -258,32 +251,32 @@
 									value="{{operator.id}}">
 							</div>
 							<div
-								style="flex:0; text-align: center;"
+								style="flex:0.05; text-align: center;"
 								class="mx-auto">
 								-
 							</div>
 							<div
-								style="flex:1; text-align: center;"
+								style="flex:0.15; text-align: center;"
 								class="mx-auto">
 								{{operator.team.name}}
 							</div>
 							<div
-								style="flex:0; text-align: center;"
+								style="flex:0.05; text-align: center;"
 								class="mx-auto">
 								-
 							</div>
 							<div
-								style="flex:1; text-align: center;"
+								style="flex:0.15; text-align: center;"
 								class="mx-auto">
 								{{operator.uap.name}}
 							</div>
 							<div
-								style="flex:0; text-align: center;"
+								style="flex:0.05; text-align: center;"
 								class="mx-auto">
 								-
 							</div>
 							<div
-								style="flex:2; text-align: right;"
+								style="flex:0.3; text-align: right;"
 								class="mx-auto">
 
 								À former
@@ -302,11 +295,9 @@
 			</p>
 			{% for operator in operators %}
 				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-				<strong
-					style="color:white;">
+				<strong>
 					<ul
-						class="d-flex flex-row  p-1 mb-1 "
-						style="{{ trainingRecord != null ? (trainingRecord.trained ? 'background-color: green;' : 'background-color: yellow;') : 'background-color: red;' }}">
+						class="list-unstyled d-flex align-items-center p-1 mb-1 {{ trainingRecord != null ? (trainingRecord.trained ? 'text-white bg-success' : 'text-dark bg-warning') : 'text-white bg-danger' }}">
 						<div
 							style="flex:2; text-align: left;"
 							class="mx-auto">
