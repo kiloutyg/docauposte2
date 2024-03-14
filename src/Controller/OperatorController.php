@@ -6,13 +6,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 use App\Form\OperatorType;
 
 use App\Entity\Operator;
 use App\Entity\TrainingRecord;
-
-
 
 
 class OperatorController extends FrontController
@@ -27,11 +26,11 @@ class OperatorController extends FrontController
             $operators = $this->operatorRepository->findAll();
         }
         $operatorForms = [];
-
-        foreach ($operators as $operator) {
-            $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator)->createView();
+        if (isset($operators)) {
+            foreach ($operators as $operator) {
+                $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator)->createView();
+            }
         }
-
         $newOperator = new Operator();
         $newOperatorForm = $this->createForm(OperatorType::class, $newOperator);
         if ($request->getMethod() === 'POST') {
@@ -123,19 +122,23 @@ class OperatorController extends FrontController
     {
 
         $this->logger->info('Full request', $request->request->all());
-        $originUrl = $request->headers->get('referer');
         $team = $this->teamRepository->find($teamId);
         $this->logger->info('team', [$team->getName()]);
         $uap = $this->uapRepository->find($uapId);
         $this->logger->info('uap', [$uap->getName()]);
+        $operatorCode = $request->request->get('newOperatorCode');
 
-        $operatorName = $request->request->get('newOperator');
+        $operatorName = $request->request->get('newOperatorName');
 
         $existingOperator = $this->operatorRepository->findOneBy(['name' => $operatorName]);
+        if ($existingOperator == null) {
+            $existingOperator = $this->operatorRepository->findOneBy(['code' => $operatorCode]);
+        }
+
         if ($existingOperator != null) {
             $this->logger->info('existingOperator', [$existingOperator->getName()]);
             if ($existingOperator->getTeam() == $team && $existingOperator->getUap() == $uap) {
-                $this->addFlash('danger', 'Cet opérateur existe déjà');
+                $this->addFlash('danger', 'Cet opérateur existe déjà dans cette equipe et uap');
                 return $this->redirectToRoute('app_training_list', [
                     'uploadId' => $uploadId,
                     'teamId' => $teamId,
@@ -159,6 +162,7 @@ class OperatorController extends FrontController
         $operator->setName($operatorName);
         $operator->setTeam($team);
         $operator->setUap($uap);
+        $operator->setCode($operatorCode);
 
         $errors = $validator->validate($operator);
         if (count($errors) > 0) {
@@ -176,7 +180,7 @@ class OperatorController extends FrontController
             // If you need to return JSON response:
             // return new JsonResponse(['errors' => $errorMessages], Response::HTTP_BAD_REQUEST);
 
-            $this->addFlash('danger', $errorsString);
+            $this->logger->info('danger', [$errorsString]);
             return $this->redirectToRoute('app_render_training_records', [
                 'uploadId' => $uploadId,
                 'teamId' => $teamId,
@@ -311,5 +315,149 @@ class OperatorController extends FrontController
             'teamId' => $teamId,
             'uapId' => $uapId,
         ]);
+    }
+
+
+    #[Route('/operator/check-duplicate-by-name', name: 'app_operator_check_duplicate_by_name', methods: ['POST'])]
+    public function checkDuplicateOperatorByName(Request $request): JsonResponse
+    {
+        $this->logger->info('Full requestbyname', [$request->request->all()]);
+
+        $parsedRequest = json_decode($request->getContent(), true);
+        $this->logger->info('parsedRequest', [$parsedRequest]);
+
+        $operatorName = $parsedRequest['value'];
+        $this->logger->info('operatorName', [$operatorName]);
+
+        $existingOperator = $this->operatorRepository->findOneBy(['name' => $operatorName]);
+        $this->logger->info('existingOperator', [$existingOperator]);
+
+        if ($existingOperator !== null) {
+            // Found duplicate
+            return new JsonResponse([
+                'found' => true,
+                'field' => 'name',
+                'value' => $operatorName,
+                'message' => 'Un opérateur avec ce nom existe déjà',
+                'operator' => [
+                    'id' => $existingOperator->getId(),
+                    // Include additional details as necessary
+                ]
+            ]);
+        }
+
+
+        // No duplicate found
+        return new JsonResponse([
+            'found' => false, 'field' => 'name', 'value' => $operatorName, 'message' => 'Aucun opérateur avec ce nom n\'existe'
+        ]);
+    }
+
+
+    #[Route('/operator/check-duplicate-by-code', name: 'app_operator_check_duplicate_by_code', methods: ['POST'])]
+    public function checkDuplicateOperatorByCode(Request $request): JsonResponse
+    {
+        $this->logger->info('Full request bycode', $request->request->all());
+
+        $parsedRequest = json_decode($request->getContent(), true);
+        $this->logger->info('parsedRequest', [$parsedRequest]);
+
+        $operatorCode = $parsedRequest['value'];
+        $this->logger->info('operatorCode', [$operatorCode]);
+
+        $existingOperator = $this->operatorRepository->findOneBy(['code' => $operatorCode]);
+        $this->logger->info('existingOperator', [$existingOperator]);
+
+        if ($existingOperator !== null) {
+            // Found duplicate
+            return new JsonResponse([
+                'found' => true,
+                'field' => 'code',
+                'value' => $operatorCode,
+                'message' => 'Un opérateur avec ce codeOpé existe déjà',
+                'operator' => [
+                    'id' => $existingOperator->getId(),
+                    // Include additional details as necessary
+                ]
+            ]);
+        }
+
+        // No duplicate found
+        return new JsonResponse([
+            'found' => false, 'field' => 'code', 'value' => $operatorCode, 'message' => "Aucun opérateur avec ce codeOpé n'existe"
+        ]);
+    }
+
+
+    // Route to check the operator to validate the training form and make the trained button appear
+
+    #[Route('operator/check-entered-code-against-operator-code/{teamId}/{uapId}', name: 'app_check_entered_code_against_operator_code')]
+    public function checkEnteredCodeAgainstOperatorCode(Request $request, int $teamId, int $uapId): JsonResponse
+    {
+        $parsedRequest = json_decode($request->getContent(), true);
+
+        $this->logger->info('Full request', $parsedRequest);
+
+        $enteredCode = $parsedRequest['code'];
+        $this->logger->info('enteredCode', [$enteredCode]);
+
+        $operatorId = (int)$parsedRequest['operatorId'];
+        $this->logger->info('operatorId', [$operatorId]);
+
+        $controllerOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'Team' => $teamId, 'uap' => $uapId]);
+        $this->logger->info('controllerOperator', [$controllerOperator]);
+
+        if ($controllerOperator != null) {
+            $controllerOperatorId = $controllerOperator->getId();
+            $this->logger->info('controllerOperatorId', [$controllerOperatorId]);
+
+            $controllerOperatorId === $operatorId ? $operator = $controllerOperator : $operator = null;
+            $this->logger->info('operator', [$operator]);
+
+            if ($operator !== null) {
+                // Found operator
+                return new JsonResponse([
+                    'found' => true,
+                    'operator' => [
+                        'id' => $operator->getId(),
+                        'name' => $operator->getName(),
+                        'code' => $operator->getCode(),
+                        'team' => $operator->getTeam()->getName(),
+                        'uap' => $operator->getUap()->getName(),
+                    ]
+                ]);
+            }
+        }
+        // No operator found
+        return new JsonResponse([
+            'found' => false,
+            'message' => 'Aucun opérateur avec ce code n\'existe dans cette équipe et cette UAP'
+        ]);
+    }
+
+
+    // Route to check if a code exist in the database and then return a boolean
+
+    #[Route('operator/check-if-code-exist', name: 'app_check_if_code_exist')]
+    public function checkIfCodeExist(Request $request): JsonResponse
+    {
+        $parsedRequest = json_decode($request->getContent(), true);
+
+        $this->logger->info('Full request', $parsedRequest);
+
+        $enteredCode = $parsedRequest['code'];
+        $this->logger->info('enteredCode', [$enteredCode]);
+
+        $existingOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode]);
+        if ($existingOperator !== null) {
+
+            return new JsonResponse([
+                'found' => true,
+            ]);
+        } else {
+            return new JsonResponse([
+                'found' => false,
+            ]);
+        }
     }
 }

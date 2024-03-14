@@ -20,7 +20,7 @@ class Operator
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 180)]
-    #[Assert\Regex(pattern: '/^[a-zA-Z]+\.[a-zA-Z]+$/', message: 'Le nom d\'utilisateur doit être au format prénom.nom')]
+    #[Assert\Regex(pattern: '/^[a-zA-Z]+\.[a-zA-Z-]+$/', message: 'Le nom d\'opérateur doit être au format prénom.nom')]
 
     private ?string $name = null;
 
@@ -34,6 +34,9 @@ class Operator
     private Collection $trainingRecords;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(5)]
+    #[Assert\Regex(pattern: '/[0-9]{5}$/', message: 'Le code Opérateur doit être composé de 5 chiffres.')]
     private ?string $code = null;
 
     public function __construct()

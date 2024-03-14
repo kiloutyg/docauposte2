@@ -30,13 +30,29 @@ class OperatorType extends AbstractType
                     'required' => true
                 ],
                 'row_attr' => [
-                    'class' => 'col-3'
+                    'class' => 'col-2'
                 ],
                 'label_attr' => [
                     'class' => 'form-label mb-4',
                     'style' => 'font-weight:  color: #ffffff;'
                 ]
 
+            ])
+            ->add('code', TextType::class, [
+                'label' => false,
+                'attr' => [
+                    'class' => 'form-control mx-auto mt-2',
+                    'placeholder' => 'Code de l\'opérateur',
+                    'id' => 'code',
+                    'required' => true
+                ],
+                'row_attr' => [
+                    'class' => 'col-2'
+                ],
+                'label_attr' => [
+                    'class' => 'form-label mb-4',
+                    'style' => 'font-weight:  color: #ffffff;'
+                ]
             ])
             ->add('Team', EntityType::class, [
                 'class' => Team::class,
@@ -50,7 +66,7 @@ class OperatorType extends AbstractType
                     'required' => true
                 ],
                 'row_attr' => [
-                    'class' => 'col-3'
+                    'class' => 'col-2'
                 ],
                 'label_attr' => [
                     'class' => 'form-label mb-4',
@@ -69,7 +85,7 @@ class OperatorType extends AbstractType
                     'required' => true
                 ],
                 'row_attr' => [
-                    'class' => 'col-3'
+                    'class' => 'col-2'
                 ],
                 'label_attr' => [
                     'class' => 'form-label mb-4',
@@ -79,7 +95,7 @@ class OperatorType extends AbstractType
             // ->add('addOperator', SubmitType::class, [
             //     'label' => 'AJouter l\'Operateur',
             //     'attr' => [
-            //         'class' => 'btn btn-primary btn-login text-uppercase fw-mt-2 mb-3 submit-operator-creation',
+            //         'class' => 'btn btn-primary btn-login text-uppercase fw-mt-2 mb-2 submit-operator-creation',
             //         'type' => 'submit'
             //     ]
             // ])

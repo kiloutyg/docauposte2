@@ -24,6 +24,7 @@ use App\Service\MailerService;
 use App\Service\OldUploadService;
 use App\Service\TrainingRecordService;
 
+use function PHPUnit\Framework\isEmpty;
 
 class ValidationService extends AbstractController
 {
@@ -377,6 +378,7 @@ class ValidationService extends AbstractController
             $approbations = [];
             // Get the ID of the Validation instance
             $approbations = $validation->getApprobations();
+            $this->logger->info('Resetting approbations' . json_encode($approbations));
             // Loop through each Approbation instance
             foreach ($approbations as $approbation) {
                 //If it's a major modification reset all approbations
@@ -397,9 +399,11 @@ class ValidationService extends AbstractController
                     $approbation->setComment(null);
                     $this->mailerService->sendDisapprovedModifiedEmail($approbation);
                 }
+
+
+                // Persist the Approbation instance to the database
+                $this->em->persist($approbation);
             }
-            // Persist the Approbation instance to the database
-            $this->em->persist($approbation);
         }
 
         if ($globalModification) {
@@ -429,7 +433,7 @@ class ValidationService extends AbstractController
         $filePath = $this->projectDir . '/public/doc/' . $fileName;
         $uploadsWaitingValidation = [];
 
-        if ($today->format('N') == '2' && $today->format('d') % 2 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
+        if ($today->format('d') % 4 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
 
             $rolesToCheck = ['ROLE_LINE_ADMIN_VALIDATOR', 'ROLE_ADMIN_VALIDATOR'];
             foreach ($users as $user) {
