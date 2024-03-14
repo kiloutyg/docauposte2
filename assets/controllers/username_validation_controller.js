@@ -14,4 +14,5 @@ export default class extends Controller {
             this.messageTarget.style.color = "red"; // Display the message in red color.
         }
     }
+
 }

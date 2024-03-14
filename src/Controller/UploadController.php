@@ -162,7 +162,7 @@ class UploadController extends FrontController
         $currentUser = $this->security->getUser();
         $uploader = $upload->getUploader();
         // If it's a GET request, render the form
-        if ($request->isMethod('GET') && ($currentUser === $uploader || $uploader === null || $currentUser->getRoles() === ["ROLE_ADMIN"])) {
+        if ($request->isMethod('GET') && ($currentUser === $uploader || $uploader === null || $this->authChecker->isGranted("ROLE_ADMIN"))) {
             return $this->render('services/uploads/uploads_modification.html.twig', [
                 'form'        => $form->createView(),
                 'zone'        => $zone,
@@ -206,12 +206,7 @@ class UploadController extends FrontController
         $comment = $request->request->get('modificationComment');
         $newValidation = $request->request->get('validatorRequired');
         $enoughValidator = false;
-        // foreach ($request->request->keys() as $key) {
-        //     if (($key == "validator_user3")) {
-        //         $enoughValidator = true;
-        //         break;
-        //     }
-        // }
+
         $enoughValidator = $request->request->has('validator_user4');
 
         $form->handleRequest($request);

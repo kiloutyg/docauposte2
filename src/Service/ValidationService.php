@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 use App\Repository\UploadRepository;
@@ -20,9 +19,10 @@ use App\Entity\User;
 use App\Entity\Department;
 use App\Entity\Validation;
 use App\Entity\Approbation;
-
+use App\Entity\TrainingRecord;
 use App\Service\MailerService;
 use App\Service\OldUploadService;
+use App\Service\TrainingRecordService;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -30,38 +30,47 @@ class ValidationService extends AbstractController
 {
     protected $logger;
     protected $em;
+    protected $projectDir;
+
     protected $uploadRepository;
     protected $departmentRepository;
     protected $userRepository;
     protected $validationRepository;
     protected $approbationRepository;
+
     protected $mailerService;
     protected $oldUploadService;
-    protected $projectDir;
+    protected $TrainingRecordService;
 
 
     public function __construct(
         LoggerInterface                 $logger,
         EntityManagerInterface          $em,
+        ParameterBagInterface           $params,
+
         UploadRepository                $uploadRepository,
         DepartmentRepository            $departmentRepository,
         UserRepository                  $userRepository,
         ValidationRepository            $validationRepository,
         ApprobationRepository           $approbationRepository,
+
         MailerService                   $mailerService,
-        ParameterBagInterface           $params,
-        OldUploadService                $oldUploadService
+        OldUploadService                $oldUploadService,
+        TrainingRecordService           $TrainingRecordService
     ) {
         $this->logger                = $logger;
         $this->em                    = $em;
         $this->projectDir            = $params->get('kernel.project_dir');
+
         $this->uploadRepository      = $uploadRepository;
         $this->departmentRepository  = $departmentRepository;
         $this->userRepository        = $userRepository;
         $this->validationRepository  = $validationRepository;
         $this->approbationRepository = $approbationRepository;
+
         $this->mailerService         = $mailerService;
         $this->oldUploadService      = $oldUploadService;
+        $this->TrainingRecordService = $TrainingRecordService;
     }
 
     public function createValidation(Upload $upload, Request $request)
@@ -334,8 +343,8 @@ class ValidationService extends AbstractController
         }
         if ($validation->isStatus() === true) {
             $this->mailerService->sendApprovalEmail($validation);
+            $this->TrainingRecordService->updateTrainingRecord($upload);
         }
-        // Return early
         return;
     }
 
@@ -441,6 +450,7 @@ class ValidationService extends AbstractController
                         $uploadsWaitingValidation[] = $upload;
                     }
                 }
+                $return = false;
                 if (count($uploadsWaitingValidation) > 0) {
                     $return = $this->mailerService->sendReminderEmail($validator, $uploadsWaitingValidation);
                     $uploadsWaitingValidation = [];
