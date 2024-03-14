@@ -1,0 +1,359 @@
+<turbo-frame
+	id="training-records"
+	class="d-flex flex-column mx-2 justify-content-evenly">
+
+	{% if team is defined and uap is defined and team is not empty and uap is not empty %}
+		<form
+			id="trainingRecords-form-newOperator"
+			class="d-flex flex-grow flex-column justify-content-evenly"
+			action="{{path('app_training_new_operator', {'uploadId': upload.id, 'teamId': team.id, 'uapId': uap.id})}}" method="post"
+			data-turbo-frame="training-records">
+
+			<div
+				data-controller="operator-training">
+				<div
+					class="d-flex flex-fill">
+					<input
+						type="text"
+						class="form-control "
+						data-operator-training-target="newOperatorName"
+						data-action="keyup->operator-training#validateNewOperatorName"
+						placeholder="nom.prénom"
+						id="newOperatorName"
+						name="newOperatorName"
+						style="flex:0.5;"
+						required>
+					<input
+						type="text"
+						class="form-control"
+						data-operator-training-target="newOperatorCode"
+						data-action="keyup->operator-training#validateNewOperatorCode"
+						placeholder="Code Opérateur"
+						id="newOperatorCode"
+						name="newOperatorCode"
+						style="flex:0.3;"
+						required
+						disabled>
+					<input
+						type="submit"
+						class="btn btn-primary "
+						data-operator-training-target="newOperatorSubmitButton"
+						id="newOperatorSubmitButton"
+						name="newOperatorSubmitButton"
+						value="Ajouter"
+						style="flex:0.2;"
+						disabled>
+
+				</div>
+				<div
+					data-operator-training-target="newOperatorMessageName"
+					class="newOperatorName-message d-flex justify-content-evenly"></div>
+				<div
+					data-operator-training-target="newOperatorMessageCode"
+					class="newOperatorCode-message d-flex justify-content-evenly"></div>
+				<div
+					data-operator-training-target="newOperatorMessageTransfer"
+					class="newOperatorTransfer-message d-flex justify-content-evenly"></div>
+			</div>
+		</form>
+
+	{% endif %}
+
+	{% if selectedOperators is defined and selectedOperators is not empty %}
+		<form
+			class="d-flex flex-column justify-content-evenly"
+			id="trainingRecords-form"
+			method="post"
+			action="{{path('app_training_record_form', {'uploadId': upload.id, 'teamId': team.id, 'uapId': uap.id})}}">
+			<p
+				style="flex:1;"
+				class=" mx-2">
+				Liste des Opérateurs de l'équipe
+				{{team.name}}
+				pour l'UAP
+				{{uap.name}}
+
+			</p>
+
+
+			{% for operator in selectedOperators %}
+				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+				<strong>
+					<ul
+						class="list-unstyled d-flex align-items-center p-1 mb-1 {{ trainingRecord != null ? (trainingRecord.trained ? 'text-white bg-success' : 'text-dark bg-warning') : 'text-white bg-danger' }}">
+
+						<li
+							class="flex-fill text-start mx-auto">
+							{{ operator.name }}
+							<input
+								type="hidden"
+								name="operators[{{ operator.id }}][id]"
+								value="{{ operator.id }}">
+						</li>
+						<li
+							class="mx-auto">
+							-
+						</li>
+						<li
+							class="flex-fill text-center mx-auto">
+							{{ operator.team.name }}
+						</li>
+						<li
+							class="mx-auto">
+							-
+						</li>
+						<li
+							class="flex-fill text-center mx-auto">
+							{{ operator.uap.name }}
+						</li>
+						<li
+							class="mx-auto">
+							-
+						</li>
+
+						{% if trainingRecord == null %}
+							<li
+								class="flex-grow-1 text-end mx-auto">
+								À former -
+							</li>
+							<li
+								class="flex-grow-1 text-end mx-auto"
+								data-controller="operator-training"
+								name="trainingCheckbox{{ operator.id }}"
+								id="trainingCheckbox{{ operator.id }}">
+								<input
+									type="text"
+									pattern="\d*"
+									maxlength="5"
+									class="form-control form-control-sm operator-input mx-auto"
+									data-operator-training-target="trainingOperatorCode"
+									data-action="keyup->operator-training#validateCodeEntryForTraining"
+									data-operator-id="{{ operator.id }}" data-team-id="{{ team.id }}" data-uap-id="{{ uap.id }}" placeholder="CodeOpé"
+									id="trainingOperatorCode{{ operator.id }}"
+									name="operators[{{ operator.id }}][trainingOperatorCode]">
+							</li>
+						{% else %}
+							{% if trainingRecord.trained %}
+								<li
+									class="flex-grow-1 text-end mx-auto">
+									Formé le
+									{{ trainingRecord.date|date('d/m/Y') }}
+								</li>
+							{% else %}
+								<li
+									class="flex-grow-1 text-end mx-auto">
+									À réentrainer -
+								</li>
+								<li
+									class="flex-grow-1 text-end mx-auto"
+									data-controller="operator-training"
+									name="trainingCheckbox{{ operator.id }}"
+									id="trainingCheckbox{{ operator.id }}">
+									<input
+										type="text"
+										pattern="\d*"
+										maxlength="5"
+										class="form-control form-control-sm operator-input mx-auto"
+										data-operator-training-target="trainingOperatorCode"
+										data-action="keyup->operator-training#validateCodeEntryForTraining"
+										data-operator-id="{{ operator.id }}" data-team-id="{{ team.id }}" data-uap-id="{{ uap.id }}" placeholder="CodeOpé"
+										id="revalidateOperatorCode{{ operator.id }}"
+										name="operators[{{ operator.id }}][revalidateOperatorCode]">
+								</li>
+							{% endif %}
+						{% endif %}
+					</ul>
+				</strong>
+			{% endfor %}
+
+			<input
+				type="submit"
+				class="btn btn-primary"
+				value="Enregistrer les modifications">
+		</form>
+	{% else %}
+		{% if trainingRecords is defined and trainingRecords is not empty %}
+			<p
+				style="flex:1;"
+				class=" mx-2">
+				Liste de tous les opérateurs formés, tout UAP et équipe confondu.
+				<br>
+				Pour modifier les informations, veuillez sélectionner une équipe et une UAP.
+
+			</p>
+			{% for record in trainingRecords %}
+				<strong>
+					<ul
+						class="list-unstyled d-flex align-items-center p-1 mb-1 {{ record.trained ? 'text-white bg-success' : 'text-dark bg-warning' }}">
+						<div
+							style="flex:0.2; text-align: left;"
+							class="mx-auto">
+							{{record.operator.name}}
+
+						</div>
+						<div
+							style="flex:0.05; text-align: center;"
+							class="mx-auto">
+							-
+						</div>
+						<div
+							style="flex:0.15; text-align: center;"
+							class="mx-auto">
+							{{record.operator.team.name}}
+						</div>
+						<div
+							style="flex:0.05; text-align: center;"
+							class="mx-auto">
+							-
+						</div>
+						<div
+							style="flex:0.15; text-align: center;"
+							class="mx-auto">
+							{{record.operator.uap.name}}
+						</div>
+						<div
+							style="flex:0.05; text-align: center;"
+							class="mx-auto">
+							-
+						</div>
+						<div
+							style="flex:0.3; text-align: right;"
+							class="mx-auto">
+
+							{{ record.trained ? 'Formé le ' ~ record.date|date('d/m/Y') : 'À réentrainer' }}
+
+						</div>
+					</ul>
+				</strong>
+
+			{% endfor %}
+			<p
+				style="flex:1;"
+				class=" mx-2">
+				Liste de tous les opérateurs Non-formés, tout UAP et équipe confondu.
+				<br>
+				Pour modifier les informations, veuillez sélectionner une équipe et une UAP.
+
+			</p>
+			{% for operator in operators %}
+				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+				{% if trainingRecord == null %}
+
+					<strong>
+						<ul
+							class="list-unstyled d-flex align-items-center p-1 mb-1 text-white bg-danger">
+							<div
+								style="flex:0.2; text-align: left;"
+								class="mx-auto">
+								{{operator.name}}
+								<input
+									type="hidden"
+									name="operators[{{ operator.id }}][id]"
+									value="{{operator.id}}">
+							</div>
+							<div
+								style="flex:0.05; text-align: center;"
+								class="mx-auto">
+								-
+							</div>
+							<div
+								style="flex:0.15; text-align: center;"
+								class="mx-auto">
+								{{operator.team.name}}
+							</div>
+							<div
+								style="flex:0.05; text-align: center;"
+								class="mx-auto">
+								-
+							</div>
+							<div
+								style="flex:0.15; text-align: center;"
+								class="mx-auto">
+								{{operator.uap.name}}
+							</div>
+							<div
+								style="flex:0.05; text-align: center;"
+								class="mx-auto">
+								-
+							</div>
+							<div
+								style="flex:0.3; text-align: right;"
+								class="mx-auto">
+
+								À former
+							</div>
+
+						</ul>
+					</strong>
+				{% endif %}
+			{% endfor %}
+		{% else %}
+			<p
+				style="flex:1;"
+				class=" mx-2">
+				Aucune liste correspondant aux critéres n'a été trouvé, sélectionnez d'autres critéres ou ajouté des opérateurs à la liste.
+
+			</p>
+			{% for operator in operators %}
+				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+				<strong>
+					<ul
+						class="list-unstyled d-flex align-items-center p-1 mb-1 {{ trainingRecord != null ? (trainingRecord.trained ? 'text-white bg-success' : 'text-dark bg-warning') : 'text-white bg-danger' }}">
+						<div
+							style="flex:2; text-align: left;"
+							class="mx-auto">
+							{{operator.name}}
+							<input
+								type="hidden"
+								name="operators[{{ operator.id }}][id]"
+								value="{{operator.id}}">
+						</div>
+						<div
+							style="flex:0; text-align: center;"
+							class="mx-auto">
+							-
+						</div>
+						<div
+							style="flex:1; text-align: center;"
+							class="mx-auto">
+							{{operator.team.name}}
+						</div>
+						<div
+							style="flex:0; text-align: center;"
+							class="mx-auto">
+							-
+						</div>
+						<div
+							style="flex:1; text-align: center;"
+							class="mx-auto">
+							{{operator.uap.name}}
+						</div>
+						<div
+							style="flex:0; text-align: center;"
+							class="mx-auto">
+							-
+						</div>
+						<div
+							style="flex:2; text-align: right;"
+							class="mx-auto">
+
+							{% if trainingRecord == null %}
+								À former
+
+							{% else %}
+								{% if trainingRecord.trained %}
+									Formé le
+									{{ trainingRecord.date|date('d/m/Y') }}
+								{% else %}
+									À réentrainer
+								{% endif %}
+							{% endif %}
+						</div>
+
+					</ul>
+				</strong>
+			{% endfor %}
+
+		{% endif %}
+	{% endif %}
+</turbo-frame>

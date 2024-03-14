@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 use App\Repository\UploadRepository;
@@ -20,47 +19,58 @@ use App\Entity\User;
 use App\Entity\Department;
 use App\Entity\Validation;
 use App\Entity\Approbation;
-
+use App\Entity\TrainingRecord;
 use App\Service\MailerService;
 use App\Service\OldUploadService;
+use App\Service\TrainingRecordService;
 
+use function PHPUnit\Framework\isEmpty;
 
 class ValidationService extends AbstractController
 {
     protected $logger;
     protected $em;
+    protected $projectDir;
+
     protected $uploadRepository;
     protected $departmentRepository;
     protected $userRepository;
     protected $validationRepository;
     protected $approbationRepository;
+
     protected $mailerService;
     protected $oldUploadService;
-    protected $projectDir;
+    protected $TrainingRecordService;
 
 
     public function __construct(
         LoggerInterface                 $logger,
         EntityManagerInterface          $em,
+        ParameterBagInterface           $params,
+
         UploadRepository                $uploadRepository,
         DepartmentRepository            $departmentRepository,
         UserRepository                  $userRepository,
         ValidationRepository            $validationRepository,
         ApprobationRepository           $approbationRepository,
+
         MailerService                   $mailerService,
-        ParameterBagInterface           $params,
-        OldUploadService                $oldUploadService
+        OldUploadService                $oldUploadService,
+        TrainingRecordService           $TrainingRecordService
     ) {
         $this->logger                = $logger;
         $this->em                    = $em;
         $this->projectDir            = $params->get('kernel.project_dir');
+
         $this->uploadRepository      = $uploadRepository;
         $this->departmentRepository  = $departmentRepository;
         $this->userRepository        = $userRepository;
         $this->validationRepository  = $validationRepository;
         $this->approbationRepository = $approbationRepository;
+
         $this->mailerService         = $mailerService;
         $this->oldUploadService      = $oldUploadService;
+        $this->TrainingRecordService = $TrainingRecordService;
     }
 
     public function createValidation(Upload $upload, Request $request)
@@ -333,8 +343,8 @@ class ValidationService extends AbstractController
         }
         if ($validation->isStatus() === true) {
             $this->mailerService->sendApprovalEmail($validation);
+            $this->TrainingRecordService->updateTrainingRecord($upload);
         }
-        // Return early
         return;
     }
 
@@ -368,6 +378,7 @@ class ValidationService extends AbstractController
             $approbations = [];
             // Get the ID of the Validation instance
             $approbations = $validation->getApprobations();
+            $this->logger->info('Resetting approbations' . json_encode($approbations));
             // Loop through each Approbation instance
             foreach ($approbations as $approbation) {
                 //If it's a major modification reset all approbations
@@ -388,9 +399,11 @@ class ValidationService extends AbstractController
                     $approbation->setComment(null);
                     $this->mailerService->sendDisapprovedModifiedEmail($approbation);
                 }
+
+
+                // Persist the Approbation instance to the database
+                $this->em->persist($approbation);
             }
-            // Persist the Approbation instance to the database
-            $this->em->persist($approbation);
         }
 
         if ($globalModification) {
@@ -420,7 +433,7 @@ class ValidationService extends AbstractController
         $filePath = $this->projectDir . '/public/doc/' . $fileName;
         $uploadsWaitingValidation = [];
 
-        if ($today->format('N') == '2' && $today->format('d') % 2 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
+        if ($today->format('d') % 4 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
 
             $rolesToCheck = ['ROLE_LINE_ADMIN_VALIDATOR', 'ROLE_ADMIN_VALIDATOR'];
             foreach ($users as $user) {
@@ -437,6 +450,7 @@ class ValidationService extends AbstractController
                         $uploadsWaitingValidation[] = $upload;
                     }
                 }
+                $return = false;
                 if (count($uploadsWaitingValidation) > 0) {
                     $return = $this->mailerService->sendReminderEmail($validator, $uploadsWaitingValidation);
                     $uploadsWaitingValidation = [];

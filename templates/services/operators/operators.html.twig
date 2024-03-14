@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	Truc des operateurs
+{% endblock %}
+{% block body %}
+	{% set fieldsName = ['Nom de l\'opérateur','Code de l\'opérateur', 'Equipe de l\'operateur', 'UAP de l\'opérateur'] %}
+	{% set fields = ['name','code', 'Team', 'uap'] %}
+
+	<div
+		class="card bg-secondary container row ">
+		<h2>
+			New Operator
+		</h2>
+		<ul>
+			<div
+				class="row">
+				{% for fieldName in fieldsName %}
+					<div
+						class="col-2 ">
+						{{ fieldName }}
+					</div>
+					{# Adjust the div class as needed #}
+				{% endfor %}
+				<div
+					class="col-2 mx-auto">
+					Actions
+				</div>
+				{# Column for actions like the update button #}
+			</div>
+		</ul>
+		<ul>
+			{{ form_start(newOperatorForm, {'attr': {'class': 'row', 'name': 'newOperator', 'id': 'newOperator'}}
+			) }}
+
+			{% for field in fields %}
+				{{ form_row(newOperatorForm[field]) }}
+			{% endfor %}
+			<button
+				type="submit"
+				class="btn btn-primary  text-uppercase  submit-operator-creation col-2 my-auto mx-auto">
+				Add Operator
+			</button>
+			{{ form_end(newOperatorForm) }}
+		</ul>
+
+
+		<h2>
+			Existing Operators
+		</h2>
+
+		{# Display each label once #}
+		<ul>
+			<div
+				class="row">
+				{% for fieldName in fieldsName %}
+					<div
+						class="col-2 mx-auto">
+						{{ fieldName }}
+					</div>
+					{# Adjust the div class as needed #}
+				{% endfor %}
+				<div
+					class="col-2">
+					Actions
+				</div>
+				{# Column for actions like the update button #}
+			</div>
+		</ul>
+
+		<ul>
+			{% for operatorId, operatorForm in operatorForms %}
+				{{ form_start(operatorForm, {'attr': {'class': 'row'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
+
+				{% for field in fields %}
+					{{ form_row(operatorForm[field]) }}
+				{% endfor %}
+				<button
+					type="submit"
+					class="btn btn-primary text-uppercase submit-operator-creation col-2 my-auto mx-auto">
+					Update Operator
+				</button>
+
+				{{ form_end(operatorForm) }}
+			{% else %}
+				<div
+					class="card ">
+					No operators found
+				</div>
+			{% endfor %}
+		</ul>
+	</div>
+
+{% endblock %}

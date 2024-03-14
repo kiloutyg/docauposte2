@@ -53,6 +53,14 @@ class Upload
     #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
     private ?OldUpload $OldUpload = null;
 
+    #[ORM\OneToMany(mappedBy: 'Upload', targetEntity: TrainingRecord::class)]
+    private Collection $trainingRecords;
+
+    public function __construct()
+    {
+        $this->trainingRecords = new ArrayCollection();
+    }
+
 
     #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
 
@@ -185,6 +193,36 @@ class Upload
     public function setOldUpload(?OldUpload $OldUpload): static
     {
         $this->OldUpload = $OldUpload;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TrainingRecord>
+     */
+    public function getTrainingRecords(): Collection
+    {
+        return $this->trainingRecords;
+    }
+
+    public function addTrainingRecord(TrainingRecord $trainingRecord): static
+    {
+        if (!$this->trainingRecords->contains($trainingRecord)) {
+            $this->trainingRecords->add($trainingRecord);
+            $trainingRecord->setUpload($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTrainingRecord(TrainingRecord $trainingRecord): static
+    {
+        if ($this->trainingRecords->removeElement($trainingRecord)) {
+            // set the owning side to null (unless already changed)
+            if ($trainingRecord->getUpload() === $this) {
+                $trainingRecord->setUpload(null);
+            }
+        }
 
         return $this;
     }

@@ -246,7 +246,6 @@ class UploadService extends AbstractController
         if ($newFile) {
 
             try { // Retire the old file
-
                 $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
             } catch (\exception $e) {
                 throw $e;

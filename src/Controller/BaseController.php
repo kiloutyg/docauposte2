@@ -30,7 +30,8 @@ use App\Repository\ApprobationRepository;
 use App\Repository\OldUploadRepository;
 use App\Repository\UapRepository;
 use App\Repository\TeamRepository;
-use App\Repository\OperatorsRepository;
+use App\Repository\OperatorRepository;
+use App\Repository\TrainingRecordRepository;
 
 // use App\Entity\Zone;
 // use App\Entity\ProductLine;
@@ -53,6 +54,7 @@ use App\Service\ValidationService;
 use App\Service\MailerService;
 use App\Service\OldUploadService;
 use App\Service\ViewsModificationService;
+use App\Service\TrainingRecordService;
 
 
 #[Route('/', name: 'app_')]
@@ -88,7 +90,8 @@ class BaseController extends AbstractController
     protected $oldUploadRepository;
     protected $uapRepository;
     protected $teamRepository;
-    protected $operatorsRepository;
+    protected $operatorRepository;
+    protected $trainingRecordRepository;
 
     // Services methods
     protected $validationService;
@@ -101,6 +104,7 @@ class BaseController extends AbstractController
     protected $uploadService;
     protected $oldUploadService;
     protected $viewsModificationService;
+    protected $trainingRecordService;
 
     // Variables used in the twig templates to display all the entities
     protected $departments;
@@ -144,7 +148,8 @@ class BaseController extends AbstractController
         OldUploadRepository             $oldUploadRepository,
         UapRepository                   $uapRepository,
         TeamRepository                  $teamRepository,
-        OperatorsRepository             $operatorsRepository,
+        OperatorRepository              $operatorRepository,
+        TrainingRecordRepository        $trainingRecordRepository,
 
         // Services methods
         ValidationService               $validationService,
@@ -156,7 +161,8 @@ class BaseController extends AbstractController
         UploadService                   $uploadService,
         MailerService                   $mailerService,
         OldUploadService                $oldUploadService,
-        ViewsModificationService        $viewsModificationService
+        ViewsModificationService        $viewsModificationService,
+        TrainingRecordService           $trainingRecordService
 
     ) {
 
@@ -186,7 +192,8 @@ class BaseController extends AbstractController
         $this->oldUploadRepository          = $oldUploadRepository;
         $this->uapRepository                = $uapRepository;
         $this->teamRepository               = $teamRepository;
-        $this->operatorsRepository          = $operatorsRepository;
+        $this->operatorRepository           = $operatorRepository;
+        $this->trainingRecordRepository     = $trainingRecordRepository;
 
         // Variables related to the services
         $this->mailerService                = $mailerService;
@@ -199,6 +206,7 @@ class BaseController extends AbstractController
         $this->accountService               = $accountService;
         $this->entitydeletionService        = $entitydeletionService;
         $this->viewsModificationService     = $viewsModificationService;
+        $this->trainingRecordService        = $trainingRecordService;
 
         // Variables used in the twig templates to display all the entities
         $this->zones                        = $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']);
@@ -212,7 +220,7 @@ class BaseController extends AbstractController
         $this->departments                  = $this->departmentRepository->findAll();
         $this->validations                  = $this->validationRepository->findAll();
         $this->teams                        = $this->teamRepository->findAll();
-        $this->operators                    = $this->operatorsRepository->findAll();
+        $this->operators                    = $this->operatorRepository->findAllOrdered();
         $this->uaps                         = $this->uapRepository->findAll();
     }
 
