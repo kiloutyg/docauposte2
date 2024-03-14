@@ -434,4 +434,30 @@ class OperatorController extends FrontController
             'message' => 'Aucun opérateur avec ce code n\'existe dans cette équipe et cette UAP'
         ]);
     }
+
+
+    // Route to check if a code exist in the database and then return a boolean
+
+    #[Route('operator/check-if-code-exist', name: 'app_check_if_code_exist')]
+    public function checkIfCodeExist(Request $request): JsonResponse
+    {
+        $parsedRequest = json_decode($request->getContent(), true);
+
+        $this->logger->info('Full request', $parsedRequest);
+
+        $enteredCode = $parsedRequest['code'];
+        $this->logger->info('enteredCode', [$enteredCode]);
+
+        $existingOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode]);
+        if ($existingOperator !== null) {
+
+            return new JsonResponse([
+                'found' => true,
+            ]);
+        } else {
+            return new JsonResponse([
+                'found' => false,
+            ]);
+        }
+    }
 }

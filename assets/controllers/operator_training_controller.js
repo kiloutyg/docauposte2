@@ -58,6 +58,7 @@ export default class extends Controller {
             console.log('Code is valid, clearing duplicate check results and checking for existing entity by code')
             this.duplicateCheckResults.code = null;
             this.checkForExistingEntityByCode();
+
         }
     }
 
@@ -69,6 +70,7 @@ export default class extends Controller {
             const response = await this.checkForDuplicate('/docauposte/operator/check-duplicate-by-name', this.newOperatorNameTarget.value);
             console.log('response for existing entity by name:', response.data.found);
             this.handleDuplicateResponse(response, this.newOperatorMessageNameTarget, "noms d'opérateurs");
+
         } catch (error) {
             console.error("Error checking for a duplicate operator name.", error);
             this.manageNewOperatorSubmitButton();
@@ -118,18 +120,30 @@ export default class extends Controller {
 
         messageTarget.style.color = response.data.found ? "red" : "green";
 
-        console.log('what\'s in the duplicate check results variable:', this.duplicateCheckResults);
-
-        if (response.data.field === "name") {
-            // if (fieldName === "noms d'opérateurs" && response.data.field == "name") {
-            this.duplicateCheckResults.name = response;
-            console.log('Duplicate check results for name:', this.duplicateCheckResults.name);
-        } else if (response.data.field === "code") {
-            // } else if (fieldName === "codes opérateurs" && response.data.field == "code") {
-            this.duplicateCheckResults.code = response;
-            console.log('Duplicate check results for code:', this.duplicateCheckResults.code);
+        if (response.data.found) {
+            console.log('what\'s in the duplicate check results variable:', this.duplicateCheckResults);
+            if (response.data.field === "name") {
+                // if (fieldName === "noms d'opérateurs" && response.data.field == "name") {
+                this.duplicateCheckResults.name = response;
+                console.log('Duplicate check results for name:', this.duplicateCheckResults.name);
+            } else if (response.data.field === "code") {
+                // } else if (fieldName === "codes opérateurs" && response.data.field == "code") {
+                this.duplicateCheckResults.code = response;
+                console.log('Duplicate check results for code:', this.duplicateCheckResults.code);
+            }
+            this.checkForCorrespondingEntity();
+            this.newOperatorCodeTarget.disabled = false;
+            this.newOperatorCodeTarget.focus();
+        } else {
+            console.log('No duplicate found, generating a code and allowing to write it.' + response.data.field);
+            if (response.data.field === "name") {
+                console.log('No duplicate found, generating a code and allowing to write it.');
+                this.codeGenerator();
+            }
+            this.newOperatorCodeTarget.disabled = false;
+            this.newOperatorCodeTarget.focus();
+            this.manageNewOperatorSubmitButton(true, "Ajouter");
         }
-        this.checkForCorrespondingEntity();
     }
 
 
@@ -275,6 +289,27 @@ export default class extends Controller {
             this.trainingOperatorCodeTarget.value = "";
             this.trainingOperatorCodeTarget.placeholder = "Code invalide";
         }
+    }
+
+    codeGenerator() {
+        console.log('generating a code');
+        const code = Math.floor(10000 + Math.random() * 90000);
+        const response = this.generatedCodeChecker(code);
+        console.log('response for generated code:', response.data);
+        if (response.data) {
+            console.log('Code already exists, generating another code');
+            this.codeGenerator();
+        } else {
+            this.newOperatorCodeTarget.value = code;
+            this.newOperatorCodeTarget.disabled = true;
+            this.newOperatorCodeTarget.focus();
+            this.validateNewOperatorCode();
+        }
+    }
+
+    generatedCodeChecker(code) {
+        console.log('checking generated code');
+        return axios.post(`/docauposte/operator/check-if-code-exist`, { code: code });
     }
 
 }
