@@ -165,11 +165,33 @@
 					</ul>
 				</strong>
 			{% endfor %}
-
-			<input
-				type="submit"
-				class="btn btn-primary"
-				value="Enregistrer les modifications">
+			<div
+				class="d-flex flex-fill"
+				data-controller="operator-training"
+				id="trainingValidation"
+				name="trainingValidation">
+				<input
+					type="text"
+					class="form-control "
+					data-operator-training-target="trainerOperatorName"
+					data-action="keyup->operator-training#trainerNewOperatorName"
+					placeholder="nom.prénom"
+					id="trainerOperatorName"
+					name="trainerOperatorName"
+					style="flex:0.5;"
+					required>
+				<input
+					type="text"
+					class="form-control"
+					data-operator-training-target="trainerOperatorCode"
+					data-action="keyup->operator-training#validateTrainerNewOperatorCode"
+					placeholder="Code Opérateur"
+					id="trainerOperatorCode"
+					name="trainerOperatorCode"
+					style="flex:0.5;"
+					required
+					disabled>
+			</div>
 		</form>
 	{% else %}
 		{% if trainingRecords is defined and trainingRecords is not empty %}
