@@ -4,16 +4,16 @@
 .env.local
 /.env.local.php
 /.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
-/public/doc/
-/var/
+/app/config/secrets/prod/prod.decrypt.private.php
+/app/public/bundles/
+/doc/
+/app/var/
 /vendor/
 /database_data/
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
-/phpunit.xml
+/app/phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
 
@@ -24,13 +24,13 @@
 
 ###> symfony/webpack-encore-bundle ###
 /node_modules/
-/public/build/
+/app/public/build/
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 
 ###> symfony/maker-bundle ###
-/migrations/*
+/app/migrations/*
 ###> symfony/maker-bundle ###
 
 ###> VSC stuff ###

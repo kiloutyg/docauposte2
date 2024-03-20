@@ -86,7 +86,7 @@ services:
 ${PROXY_ENV}
       APP_TIMEZONE: ${TIMEZONE}
     volumes:
-      - ./doc:/var/www/build/doc
+      - ./doc:/var/www/public/doc
     labels:
       - traefik.enable=true
       - traefik.http.routers.webdap.rule=PathPrefix(\`/docauposte\`)
@@ -134,7 +134,7 @@ services:
 ${PROXY_ENV}
       APP_TIMEZONE: ${TIMEZONE}
     volumes:
-      - ./doc:/var/www/build/doc
+      - ./doc:/var/www/public/doc
     labels:
       - traefik.enable=true
       - traefik.http.routers.webdap.rule=PathPrefix(\`/docauposte\`)
