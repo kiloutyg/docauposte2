@@ -1,6 +1,6 @@
 FROM php:8.2-apache-bookworm
 
-COPY docker/dockerfileGHAProd/php.ini /usr/local/etc/php/php.ini
+COPY docker/dockerfileGHADev/php.ini /usr/local/etc/php/php.ini
 RUN a2enmod rewrite \
   && service apache2 restart
 RUN apt-get update -y \
@@ -44,7 +44,8 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash \
 
 # Copy app in the container
 COPY app/ /var/www
-  
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
 # Dev entrypoint inspired commands 
 # Install the app dependencies 
 RUN composer install

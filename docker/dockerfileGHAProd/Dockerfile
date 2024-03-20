@@ -45,6 +45,7 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash \
 # Copy app in the container
 COPY app/ /var/www
 
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Entrypoint scritp destined to the production environment
 # Install the app dependencies 
