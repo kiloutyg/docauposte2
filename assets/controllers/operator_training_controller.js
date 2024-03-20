@@ -338,10 +338,10 @@ export default class extends Controller {
         }
     }
 
-    checkTrainerExistance(field) {
-        if (field === 'name') {
-            const response = axios.post('/docauposte/operator/check-if-trainer-exist', { name: this.trainerOperatorNameTarget.value })
-            response.data ? ;
-        }
-    }
+    // checkTrainerExistance(field) {
+    //     if (field === 'name') {
+    //         const response = axios.post('/docauposte/operator/check-if-trainer-exist', { name: this.trainerOperatorNameTarget.value })
+    //         response.data ? ;
+    //     }
+    // }
 }
