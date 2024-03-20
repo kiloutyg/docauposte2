@@ -47,27 +47,27 @@ COPY app/ /var/www
   
 # Dev entrypoint inspired commands 
 # Install the app dependencies 
-RUN composer install;
-RUN composer update -W;
-RUN yarn install;
-RUN yarn upgrade;
-RUN composer clear-cache;
+RUN composer install
+RUN composer update -W
+RUN yarn install
+RUN yarn upgrade
+RUN composer clear-cache
 
 # Set the permissions
-RUN chmod 777 . -R;
+RUN chmod 777 . -R
 
 # Clear the cache
-RUN php bin/console cache:clear --no-warmup --env=dev;
+RUN php bin/console cache:clear --no-warmup --env=dev
 
 # Warm up the cache
-RUN php bin/console cache:warmup --env=dev;
+RUN php bin/console cache:warmup --env=dev
 
 # Remove old migrations folder and files
-RUN rm -rf migrations;
+RUN rm -rf migrations
 
 # Create the migrations directory
-RUN mkdir -p migrations;
+RUN mkdir -p migrations
 
 # Create the database and run the migrations
-RUN php bin/console make:migration;
-RUN php bin/console doctrine:migrations:migrate;
+RUN php bin/console make:migration
+RUN php bin/console doctrine:migrations:migrate
