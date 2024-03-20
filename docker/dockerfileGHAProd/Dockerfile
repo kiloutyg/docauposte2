@@ -44,6 +44,7 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash \
 
 # Copy app in the container
 COPY app/ /var/www
+COPY docker/dockerfileGHAProd/.env /var/www/.env
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
