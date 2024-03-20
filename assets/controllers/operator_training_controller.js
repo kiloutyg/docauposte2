@@ -250,7 +250,6 @@ export default class extends Controller {
         } catch (error) {
             console.error("Error checking for operator identity by code.", error);
         }
-
     }
 
 
