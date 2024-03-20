@@ -44,5 +44,17 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash \
 
 # Copy app in the container
 COPY app/ /var/www
-  
 
+
+# Entrypoint scritp destined to the production environment
+# Install the app dependencies 
+RUN composer install --no-dev --optimize-autoloader;
+RUN yarn install --production;
+RUN composer clear-cache;
+
+# Set the permissions and clear the cache
+RUN chmod 777 . -R ;
+RUN php bin/console cache:clear --no-warmup --env=prod;
+
+# Warm up the cache
+RUN php bin/console cache:warmup --env=prod;

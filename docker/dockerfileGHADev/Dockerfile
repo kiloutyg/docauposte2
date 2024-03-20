@@ -1,6 +1,6 @@
 FROM php:8.2-apache-bookworm
 
-COPY php.ini /usr/local/etc/php/php.ini
+COPY docker/dockerfileGHAProd/php.ini /usr/local/etc/php/php.ini
 RUN a2enmod rewrite \
   && service apache2 restart
 RUN apt-get update -y \
@@ -41,3 +41,33 @@ RUN mv composer.phar /usr/bin/composer && chmod +x /usr/bin/composer
 # install symfony cli
 RUN curl -sS https://get.symfony.com/cli/installer | bash \
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
+
+# Copy app in the container
+COPY app/ /var/www
+  
+# Dev entrypoint inspired commands 
+# Install the app dependencies 
+RUN composer install;
+RUN composer update -W;
+RUN yarn install;
+RUN yarn upgrade;
+RUN composer clear-cache;
+
+# Set the permissions
+RUN chmod 777 . -R;
+
+# Clear the cache
+RUN php bin/console cache:clear --no-warmup --env=dev;
+
+# Warm up the cache
+RUN php bin/console cache:warmup --env=dev;
+
+# Remove old migrations folder and files
+RUN rm -rf migrations;
+
+# Create the migrations directory
+RUN mkdir -p migrations;
+
+# Create the database and run the migrations
+RUN php bin/console make:migration;
+RUN php bin/console doctrine:migrations:migrate;
