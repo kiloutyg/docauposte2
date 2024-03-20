@@ -38,6 +38,16 @@ if [ "${PROXY_ANSWER}" == "yes" ]
     sed -i "3s|.*|$PROXY_DOCKERFILE|" docker/dockerfile/Dockerfile
 fi
 
+
+while true do
+  read -p "Do you use the app fully containerized ? (yes/no) " CONTAINERIZED_ANSWER;
+    if [ "${CONTAINERIZED_ANSWER}" == "yes" ] || [ "${CONTAINERIZED_ANSWER}" == "no" ]; then 
+      break;
+    else
+        echo "Please answer yes or no";
+    fi
+done
+
 APP_CONTEXT="dev"
 sed -i "s|^APP_ENV=prod.*|APP_ENV=dev|" .env
 sed -i "s|^# MAILER_DSN=.*|MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0|" .env
@@ -61,7 +71,93 @@ class Kernel extends BaseKernel
 }
 EOL
 
+if [ "${CONTAINERIZED_ANSWER}" == "yes" ]
+  then
+# Create docker-compose.override.yml file to use the good entrypoint
+cat > docker-compose.override.yml <<EOL
+version: '3.8'
 
+services:
+  web:
+    image: ghcr.io/polangres/docauposte2:main
+    restart: unless-stopped 
+    entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
+    environment:
+${PROXY_ENV}
+      APP_TIMEZONE: ${TIMEZONE}
+    volumes:
+      - ./doc:/var/www/build/doc
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.webdap.rule=PathPrefix(\`/docauposte\`)
+      - traefik.http.routers.webdap.middlewares=strip-webdap-prefix
+      - traefik.http.middlewares.strip-webdap-prefix.stripprefix.prefixes=/docauposte
+      - traefik.http.routers.webdap.entrypoints=web
+    depends_on:
+      - database
+    networks:
+      vpcbr:
+        ipv4_address: 172.21.0.4
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+          gateway: 172.21.0.1
+
+EOL
+
+
+sg docker -c "docker compose up --build -d"
+
+sleep 90
+
+sg docker -c "docker compose stop"
+
+sleep 30
+
+sed -i "s|^APP_ENV=dev.*|APP_ENV=prod|" .env
+APP_CONTEXT="prod"
+
+
+# Create docker-compose.override.yml file to use the good entrypoint
+cat > docker-compose.override.yml <<EOL
+version: '3.8'
+
+services:
+  web:
+    image: ghcr.io/polangres/docauposte2:main
+    restart: unless-stopped 
+    entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
+    environment:
+${PROXY_ENV}
+      APP_TIMEZONE: ${TIMEZONE}
+    volumes:
+      - ./doc:/var/www/build/doc
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.webdap.rule=PathPrefix(\`/docauposte\`)
+      - traefik.http.routers.webdap.middlewares=strip-webdap-prefix
+      - traefik.http.middlewares.strip-webdap-prefix.stripprefix.prefixes=/docauposte
+      - traefik.http.routers.webdap.entrypoints=web
+    depends_on:
+      - database
+    networks:
+      vpcbr:
+        ipv4_address: 172.21.0.4
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+          gateway: 172.21.0.1
+
+EOL
+
+  else
+  
 # Create docker-compose.override.yml file to use the good entrypoint
 cat > docker-compose.override.yml <<EOL
 version: '3.8'
@@ -144,3 +240,5 @@ networks:
           gateway: 172.21.0.1
 
 EOL
+
+fi
