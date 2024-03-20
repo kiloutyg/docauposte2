@@ -460,4 +460,44 @@ class OperatorController extends FrontController
             ]);
         }
     }
+
+    // Route to check if a trainer exist by name and code
+    #[Route('operator/check-if-trainer-exist', name: 'app_check_if_trainer_exist')]
+    public function checkIfTrainerExist(Request $request): JsonResponse
+    {
+        $parsedRequest = json_decode($request->getContent(), true);
+
+        $this->logger->info('Full request', $parsedRequest);
+
+        $enteredCode = $parsedRequest['code'];
+        $this->logger->info('enteredCode', [$enteredCode]);
+
+        $enteredName = $parsedRequest['name'];
+        $this->logger->info('enteredName', [$enteredName]);
+        if ($enteredCode != null) {
+            $existingOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'name' => $enteredName]);
+            if ($existingOperator !== null) {
+
+                return new JsonResponse([
+                    'found' => true,
+                ]);
+            } else {
+                return new JsonResponse([
+                    'found' => false,
+                ]);
+            }
+        } else {
+            $existingOperator = $this->operatorRepository->findOneBy(['name' => $enteredName]);
+            if ($existingOperator !== null) {
+
+                return new JsonResponse([
+                    'found' => true,
+                ]);
+            } else {
+                return new JsonResponse([
+                    'found' => false,
+                ]);
+            }
+        }
+    }
 }
