@@ -1,6 +1,6 @@
 FROM php:8.2-apache-bookworm
 
-COPY php.ini /usr/local/etc/php/php.ini
+COPY docker/dockerfileGHAProd/php.ini /usr/local/etc/php/php.ini
 RUN a2enmod rewrite \
   && service apache2 restart
 RUN apt-get update -y \
