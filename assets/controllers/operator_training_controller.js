@@ -3,7 +3,7 @@ import { Controller } from '@hotwired/stimulus';
 import axios from 'axios';
 
 export default class extends Controller {
-    static targets = ["newOperatorName", "newOperatorMessageName", "newOperatorCode", "newOperatorMessageCode", "newOperatorMessageTransfer", "newOperatorSubmitButton", "trainingOperatorCode"];
+    static targets = ["newOperatorName", "newOperatorMessageName", "newOperatorCode", "newOperatorMessageCode", "newOperatorMessageTransfer", "newOperatorSubmitButton", "trainingOperatorCode", "trainerOperatorName", "trainerOperatorCode"];
 
     validateNewOperatorName() {
         console.log('validating new operator name:', this.newOperatorNameTarget.value);
@@ -250,7 +250,6 @@ export default class extends Controller {
         } catch (error) {
             console.error("Error checking for operator identity by code.", error);
         }
-
     }
 
 
@@ -312,4 +311,37 @@ export default class extends Controller {
         return axios.post(`/docauposte/operator/check-if-code-exist`, { code: code });
     }
 
+
+
+
+    validateTrainerOperatorName() {
+        console.log('validating new operator name:', this.trainerOperatorNameTarget.value);
+
+        const regex = /^[a-zA-Z]+\.(?!-)(?!.*--)[a-zA-Z-]+(?<!-)$/;
+
+        const isValid = regex.test(this.trainerOperatorNameTarget.value.trim());
+
+        if (isValid) {
+            this.checkTrainerExistance('name');
+        }
+    }
+
+
+    validateTrainerOperatorCode() {
+        console.log('validating new operator code:', this.trainerOperatorCodeTarget.value);
+
+        const regex = /^[0-9]{5}$/;
+        const isValid = regex.test(this.newOperatorCodeTarget.value.trim());
+
+        if (isValid) {
+            this.checkTrainerExistance('code');
+        }
+    }
+
+    // checkTrainerExistance(field) {
+    //     if (field === 'name') {
+    //         const response = axios.post('/docauposte/operator/check-if-trainer-exist', { name: this.trainerOperatorNameTarget.value })
+    //         response.data ? ;
+    //     }
+    // }
 }
