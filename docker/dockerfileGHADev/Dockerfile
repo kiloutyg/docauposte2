@@ -44,7 +44,7 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash \
 
 # Copy app in the container
 COPY app/ /var/www
-COPY docker/dockerfileGHADev/.env /var/www/.env
+COPY docker/dockerfileGHADev/env.dev /var/www/.env
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 # Dev entrypoint inspired commands 
