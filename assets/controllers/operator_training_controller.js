@@ -6,30 +6,35 @@ export default class extends Controller {
     static targets = ["newOperatorName", "newOperatorMessageName", "newOperatorCode", "newOperatorMessageCode", "newOperatorMessageTransfer", "newOperatorSubmitButton", "trainingOperatorCode", "trainerOperatorName", "trainerOperatorCode"];
 
     validateNewOperatorName() {
-        console.log('validating new operator name:', this.newOperatorNameTarget.value);
+        clearTimeout(this.typingTimeout);  // clear any existing timeout to reset the timer
 
-        const regex = /^[a-zA-Z]+\.(?!-)(?!.*--)[a-zA-Z-]+(?<!-)$/;
-        let isValid;
+        this.typingTimeout = setTimeout(() => {
+            console.log('validating new operator name:', this.newOperatorNameTarget.value);
 
-        if (this.duplicateCheckResults.name) {
-            console.log('duplicate check results data value for name:', this.duplicateCheckResults.name.data.value);
-            if (this.newOperatorNameTarget.value.trim() === this.duplicateCheckResults.name.data.value) {
-                console.log('Name is the same as the previous duplicate check, no need to do anything.');
-                return;
+            const regex = /^[a-zA-Z]+\.(?!-)(?!.*--)[a-zA-Z-]+(?<!-)$/;
+            let isValid;
+
+            if (this.duplicateCheckResults.name) {
+                console.log('duplicate check results data value for name:', this.duplicateCheckResults.name.data.value);
+                if (this.newOperatorNameTarget.value.trim() === this.duplicateCheckResults.name.data.value) {
+                    console.log('Name is the same as the previous duplicate check, no need to do anything.');
+                    return;
+                } else {
+                    this.duplicateCheckResults.name = null;
+                    isValid = regex.test(this.newOperatorNameTarget.value.trim());
+                }
             } else {
-                this.duplicateCheckResults.name = null;
                 isValid = regex.test(this.newOperatorNameTarget.value.trim());
             }
-        } else {
-            isValid = regex.test(this.newOperatorNameTarget.value.trim());
-        }
 
-        this.newOperatorMessageTransferTarget.textContent = "";
-        this.updateMessage(this.newOperatorMessageNameTarget, isValid, "Veuillez saisir sous la forme prénom.nom");
+            this.newOperatorMessageTransferTarget.textContent = "";
+            this.updateMessage(this.newOperatorMessageNameTarget, isValid, "Veuillez saisir sous la forme prénom.nom");
 
-        if (isValid) {
-            this.checkForExistingEntityByName();
-        }
+            if (isValid) {
+                this.checkForExistingEntityByName();
+            }
+        }, 1000); // delay in milliseconds
+
     }
 
 
@@ -125,11 +130,9 @@ export default class extends Controller {
         if (response.data.found) {
             console.log('what\'s in the duplicate check results variable:', this.duplicateCheckResults);
             if (response.data.field === "name") {
-                // if (fieldName === "noms d'opérateurs" && response.data.field == "name") {
                 this.duplicateCheckResults.name = response;
                 console.log('Duplicate check results for name:', this.duplicateCheckResults.name);
             } else if (response.data.field === "code") {
-                // } else if (fieldName === "codes opérateurs" && response.data.field == "code") {
                 this.duplicateCheckResults.code = response;
                 console.log('Duplicate check results for code:', this.duplicateCheckResults.code);
             }
@@ -357,10 +360,10 @@ export default class extends Controller {
         }
     }
 
-    checkTrainerExistance(field) {
-        if (field === 'name') {
-            const response = axios.post('/docauposte/operator/check-if-trainer-exist', { name: this.trainerOperatorNameTarget.value })
-            response.data ? ;
-        }
-    }
+    // checkTrainerExistance(field) {
+    //     if (field === 'name') {
+    //         const response = axios.post('/docauposte/operator/check-if-trainer-exist', { name: this.trainerOperatorNameTarget.value })
+    //         response.data ? ;
+    //     }
+    // }
 }
