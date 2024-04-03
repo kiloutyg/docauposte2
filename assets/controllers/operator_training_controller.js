@@ -102,6 +102,7 @@ export default class extends Controller {
             targetElement.textContent = "";
         } else {
             targetElement.textContent = errorMessage;
+            targetElement.style.fontWeight = "bold";
             targetElement.style.color = "red";
             this.manageNewOperatorSubmitButton();
         }
@@ -118,6 +119,7 @@ export default class extends Controller {
             ? response.data.message
             : `Aucun doublon trouvé dans les ${fieldName}.`;
 
+        messageTarget.style.fontWeight = "bold";
         messageTarget.style.color = response.data.found ? "red" : "green";
 
         if (response.data.found) {
@@ -269,13 +271,30 @@ export default class extends Controller {
             checkbox.setAttribute('name', `operators[${response.operator.id}][trained]`);
             checkbox.setAttribute('id', `success-outlined[${response.operator.id}]`);
             checkbox.setAttribute('autocomplete', 'off');
-            checkbox.setAttribute('value', 'true')
+            checkbox.setAttribute('value', 'true');
+
 
             // Create label element
             const label = document.createElement('label');
             label.setAttribute('class', 'btn btn-outline-success p-1 m-1');
             label.setAttribute('for', `success-outlined[${response.operator.id}]`);
-            label.textContent = 'Formé';
+            label.textContent = 'À Former';
+
+            // Set the background color of the label to white
+            label.style.backgroundColor = 'white';
+
+            // Event listener to toggle class based on checkbox checked state
+            checkbox.addEventListener('change', function () {
+                if (this.checked) {
+                    label.style.backgroundColor = 'green';
+                    label.textContent = 'Formé';
+
+                } else {
+                    label.style.backgroundColor = 'white';
+                    label.textContent = 'À Former';
+
+                }
+            });
 
             // Remove the original text input element
             this.trainingOperatorCodeTarget.remove();
@@ -286,7 +305,7 @@ export default class extends Controller {
             parentContainer.appendChild(label);
         } else {
             this.trainingOperatorCodeTarget.value = "";
-            this.trainingOperatorCodeTarget.placeholder = "Code invalide";
+            this.trainingOperatorCodeTarget.placeholder = "Invalide";
         }
     }
 
@@ -338,10 +357,10 @@ export default class extends Controller {
         }
     }
 
-    // checkTrainerExistance(field) {
-    //     if (field === 'name') {
-    //         const response = axios.post('/docauposte/operator/check-if-trainer-exist', { name: this.trainerOperatorNameTarget.value })
-    //         response.data ? ;
-    //     }
-    // }
+    checkTrainerExistance(field) {
+        if (field === 'name') {
+            const response = axios.post('/docauposte/operator/check-if-trainer-exist', { name: this.trainerOperatorNameTarget.value })
+            response.data ? ;
+        }
+    }
 }

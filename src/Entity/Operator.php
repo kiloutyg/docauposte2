@@ -39,6 +39,9 @@ class Operator
     #[Assert\Regex(pattern: '/[0-9]{5}$/', message: 'Le code Opérateur doit être composé de 5 chiffres.')]
     private ?string $code = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $trainer = null;
+
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
@@ -123,6 +126,18 @@ class Operator
     public function setCode(string $code): static
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function isTrainer(): ?bool
+    {
+        return $this->trainer;
+    }
+
+    public function setTrainer(?bool $trainer): static
+    {
+        $this->trainer = $trainer;
 
         return $this;
     }

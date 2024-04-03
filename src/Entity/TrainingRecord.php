@@ -28,6 +28,9 @@ class TrainingRecord
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $iluo = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -77,6 +80,18 @@ class TrainingRecord
     public function setDate(?\DateTimeInterface $date): static
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function getIluo(): ?string
+    {
+        return $this->iluo;
+    }
+
+    public function setIluo(?string $iluo): static
+    {
+        $this->iluo = $iluo;
 
         return $this;
     }
