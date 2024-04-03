@@ -102,6 +102,7 @@ export default class extends Controller {
             targetElement.textContent = "";
         } else {
             targetElement.textContent = errorMessage;
+            targetElement.style.fontWeight = "bold";
             targetElement.style.color = "red";
             this.manageNewOperatorSubmitButton();
         }
@@ -118,6 +119,7 @@ export default class extends Controller {
             ? response.data.message
             : `Aucun doublon trouvé dans les ${fieldName}.`;
 
+        messageTarget.style.fontWeight = "bold";
         messageTarget.style.color = response.data.found ? "red" : "green";
 
         if (response.data.found) {
@@ -286,7 +288,7 @@ export default class extends Controller {
             parentContainer.appendChild(label);
         } else {
             this.trainingOperatorCodeTarget.value = "";
-            this.trainingOperatorCodeTarget.placeholder = "Code invalide";
+            this.trainingOperatorCodeTarget.placeholder = "Invalide";
         }
     }
 
