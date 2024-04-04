@@ -242,9 +242,8 @@ class OperatorController extends FrontController
         }
         $this->logger->info('trainingRecords', [$trainingRecords]);
 
-        // $this->addFlash('success', 'Les opérateurs ont bien été ajoutés à la liste de formation');
         // Render the partial view
-        return $this->render('services/operators/component/_listOperator.html.twig', [
+        return $this->render('services/operators/component/_listOperatorContainer.html.twig', [
             'team' => $this->teamRepository->find($teamId),
             'uap' => $this->uapRepository->find($uapId),
             'upload' => $upload,

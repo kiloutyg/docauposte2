@@ -1,65 +1,7 @@
 <turbo-frame
-	id="training-records"
-	class="d-flex flex-column mx-2 justify-content-evenly">
-
-	{% if team is defined and uap is defined and team is not empty and uap is not empty %}
-		<form
-			id="trainingRecords-form-newOperator"
-			class="d-flex flex-grow flex-column justify-content-evenly"
-			action="{{path('app_training_new_operator', {'uploadId': upload.id, 'teamId': team.id, 'uapId': uap.id})}}" method="post"
-			data-turbo-frame="training-records">
-
-			<div
-				data-controller="operator-training">
-				<div
-					class="d-flex flex-fill">
-					<input
-						type="text"
-						class="form-control "
-						data-operator-training-target="newOperatorName"
-						data-action="keyup->operator-training#validateNewOperatorName"
-						placeholder="nom.prénom"
-						id="newOperatorName"
-						name="newOperatorName"
-						style="flex:0.5;"
-						required>
-					<input
-						type="text"
-						class="form-control"
-						data-operator-training-target="newOperatorCode"
-						data-action="keyup->operator-training#validateNewOperatorCode"
-						placeholder="Code Opérateur"
-						id="newOperatorCode"
-						name="newOperatorCode"
-						style="flex:0.3;"
-						required
-						disabled>
-					<input
-						type="submit"
-						class="btn btn-primary "
-						data-operator-training-target="newOperatorSubmitButton"
-						id="newOperatorSubmitButton"
-						name="newOperatorSubmitButton"
-						value="Ajouter"
-						style="flex:0.2;"
-						disabled>
-
-				</div>
-				<div
-					data-operator-training-target="newOperatorMessageName"
-					class="newOperatorName-message d-flex justify-content-evenly"></div>
-				<div
-					data-operator-training-target="newOperatorMessageCode"
-					class="newOperatorCode-message d-flex justify-content-evenly"></div>
-				<div
-					data-operator-training-target="newOperatorMessageTransfer"
-					class="newOperatorTransfer-message d-flex justify-content-evenly"></div>
-			</div>
-		</form>
-
-	{% endif %}
-
+	id="training-records-form">
 	{% if selectedOperators is defined and selectedOperators is not empty %}
+
 		<form
 			class="d-flex flex-column justify-content-evenly"
 			id="trainingRecords-form"
@@ -167,40 +109,8 @@
 			{% endfor %}
 			<div
 
-				data-controller="operator-trainer"
 				id="trainingValidation"
-				name="trainingValidation">
-				<div
-					class="d-flex flex-fill">
-					<input
-						type="text"
-						class="form-control "
-						data-operator-trainer-target="trainerOperatorName"
-						data-action="keyup->operator-trainer#validateTrainerOperatorName"
-						placeholder="nom.prénom"
-						id="trainerOperatorName"
-						name="trainerOperatorName"
-						style="flex:0.5;"
-						required>
-					<input
-						type="text"
-						class="form-control"
-						data-operator-trainer-target="trainerOperatorCode"
-						data-action="keyup->operator-trainer#validateTrainerOperatorCode"
-						placeholder="Code Opérateur"
-						id="trainerOperatorCode"
-						name="trainerOperatorCode"
-						style="flex:0.5;"
-						required
-						disabled>
-				</div>
-				<div
-					data-operator-trainer-target="trainerOperatorNameMessage"
-					class="trainerOperatorName-message d-flex justify-content-evenly"></div>
-				<div
-					data-operator-trainer-target="trainerOperatorCodeMessage"
-					class="trainerOperatorCode-message d-flex justify-content-evenly"></div>
-			</div>
+				name="trainingValidation"></div>
 		</form>
 	{% else %}
 		{% if trainingRecords is defined and trainingRecords is not empty %}

@@ -171,6 +171,13 @@ export default class extends Controller {
         this.newOperatorSubmitButtonTarget.value = submitValue;
     }
 
+    // submitNewOperator() {
+    //     this.newOperatorNameTarget.value = "";
+    //     this.newOperatorNameTarget.focus();
+    //     this.newOperatorCodeTarget.value = "";
+    //     this.newOperatorCodeTarget.disabled = true;
+    // }
+
 
 
     checkForDuplicate(url, value) {
@@ -345,7 +352,27 @@ export default class extends Controller {
         return axios.post(`/docauposte/operator/check-if-code-exist`, { code: code });
     }
 
+    handleSubmit(event) {
+        // You might want to validate form data here before clearing it
 
+        // Clearing input fields after submission but before Turbo takes over
+        this.newOperatorNameTarget.value = '';
+        this.newOperatorCodeTarget.value = '';
 
+        // Disabling inputs
+        this.newOperatorCodeTarget.disabled = true;
+        this.newOperatorSubmitButtonTarget.disabled = true;
+
+        // Focus on the name input if required
+        this.newOperatorNameTarget.focus();
+
+        // If you want to prevent standard form submission and do it via Ajax:
+        // event.preventDefault();
+        // Perform an Ajax request here...
+
+        // Otherwise, leave as is for normal form submission
+    }
 
 }
+
+

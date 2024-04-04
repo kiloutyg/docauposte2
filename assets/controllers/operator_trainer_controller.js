@@ -67,51 +67,6 @@ export default class extends Controller {
 
 
 
-    // async checkTrainerExistence(field, value) {
-    //     if (field === 'name') {
-    //         try {
-
-    //             const response = await this.checkForDuplicate('/docauposte/operator/check-if-trainer-exist', field, value)
-    //             console.log('entire axios response for trainer existence:', response.data);
-    //             this.handleTrainerExistenceResponse(response, field, 'trainerOperatorName');
-    //         } catch (error) {
-    //             console.log('error in axios request');
-    //             this.trainerOperatorNameMessageTarget.style.color = "red";
-    //             this.trainerOperatorNameMessageTarget.textContent = "Erreur lors de la recherche du formateur.";
-    //         }
-
-    //     } else if (field === 'code') {
-    //         try {
-    //             const fields = ['name', field];
-    //             const values = [this.trainerOperatorNameTarget.value, value];
-    //             const response = await this.checkForDuplicate('/docauposte/operator/check-if-trainer-exist', field, fields, value, values)
-    //             console.log('entire axios response for trainer existence:', response.data);
-    //             this.handleTrainerExistenceResponse(response, field, 'trainerOperatorCode');
-    //         } catch (error) {
-    //             console.log('error in axios request');
-    //             this.trainerOperatorCodeMessageTarget.style.color = "red";
-    //             this.trainerOperatorCodeMessageTarget.textContent = "Erreur lors de la recherche du formateur.";
-    //         }
-    //     }
-    // }
-
-    // checkForDuplicate(url, field, fields, value, values) {
-    //     if (fields && values) {
-    //         console.log(`Checking for duplicates at ${url} with values:`, values);
-    //         const payload = fields.reduce((obj, field, index) => {
-    //             obj[field] = values[index];
-    //             return obj;
-    //         }, {});
-    //         return axios.post(url, payload);
-    //     } else {
-    //         console.log(`Checking for duplicate at ${url} with value:`, value);
-
-    //         return axios.post(url, { [field]: value });
-    //     }
-
-
-
-
     async checkTrainerExistence(field, value) {
         const payload = {};
         payload[field] = value;
@@ -142,22 +97,93 @@ export default class extends Controller {
 
     handleTrainerExistenceResponse(response, field, fieldName) {
         if (response.data.found) {
+            if (field === 'name') {
+                this.validateTrainerOperatorCode();
+            } else {
+                this.trainerAuthenticated();
+                this.trainerOperatorNameMessageTarget.textContent = "";
+            }
             this[`${fieldName}Target`].disabled = true;
-            this.validateTrainerOperatorCode();
+            this[`${fieldName}MessageTarget`].style.fontWeight = "bold";
+            this[`${fieldName}MessageTarget`].style.color = "green";
+            this[`${fieldName}MessageTarget`].textContent = "Formateur trouvé.";
         } else {
             this[`${fieldName}Target`].value = "";
+            this[`${fieldName}MessageTarget`].style.fontWeight = "bold";
             this[`${fieldName}MessageTarget`].style.color = "red";
             this[`${fieldName}MessageTarget`].textContent = "Formateur non trouvé. "[field];
 
         };
 
     }
+    trainerAuthenticated() {
+        // initialize the new operator form
+        this.loadOperatorTrainingContent();
+        // enable the training button
+
+    }
 
 
-    // trainerExistenceValidated(response, field, fieldName) {
-    //     if (field === "name") {
 
-    //     }
+    loadOperatorTrainingContent() {
+        const container = document.getElementById('newOperatorContainer');
 
+        // You would fetch this content via an API or similar.
+        const content = `
 
+            <div>
+                <div
+                    class="d-flex flex-fill">
+                    <input
+                        type="text"
+                        class="form-control "
+                        data-operator-training-target="newOperatorName"
+                        data-action="keyup->operator-training#validateNewOperatorName"
+                        placeholder="nom.prénom"
+                        id="newOperatorName"
+                        name="newOperatorName"
+                        style="flex:0.5;"
+                        required>
+                    <input
+                        type="text"
+                        class="form-control"
+                        data-operator-training-target="newOperatorCode"
+                        data-action="keyup->operator-training#validateNewOperatorCode"
+                        placeholder="Code Opérateur"
+                        id="newOperatorCode"
+                        name="newOperatorCode"
+                        style="flex:0.3;"
+                        required
+                        disabled>
+                    <input
+                        type="submit"
+                        class="btn btn-primary "
+                        data-operator-training-target="newOperatorSubmitButton"
+                        id="newOperatorSubmitButton"
+                        name="newOperatorSubmitButton"
+                        value="Ajouter"
+                        style="flex:0.2;"
+                        disabled>
+
+                </div>
+                <div
+                    data-operator-training-target="newOperatorMessageName"
+                    class="newOperatorName-message d-flex justify-content-evenly"></div>
+                <div
+                    data-operator-training-target="newOperatorMessageCode"
+                    class="newOperatorCode-message d-flex justify-content-evenly"></div>
+                <div
+                    data-operator-training-target="newOperatorMessageTransfer"
+                    class="newOperatorTransfer-message d-flex justify-content-evenly"></div>
+            </div>
+
+        `;
+
+        container.innerHTML = content;
+    }
+
+    unloadOperatorTrainingContent() {
+        const container = document.getElementById('newOperatorContainer');
+        container.innerHTML = ''; // Clears out the inner content of the div
+    }
 }
