@@ -3,7 +3,16 @@ import { Controller } from '@hotwired/stimulus';
 import axios from 'axios';
 
 export default class extends Controller {
-    static targets = ["newOperatorName", "newOperatorMessageName", "newOperatorCode", "newOperatorMessageCode", "newOperatorMessageTransfer", "newOperatorSubmitButton", "trainingOperatorCode", "trainerOperatorName", "trainerOperatorCode"];
+    static targets = [
+        "newOperatorName",
+        "newOperatorMessageName",
+        "newOperatorCode",
+        "newOperatorMessageCode",
+        "newOperatorMessageTransfer",
+        "newOperatorSubmitButton",
+        "trainingOperatorCode",
+
+    ];
 
     validateNewOperatorName() {
         clearTimeout(this.typingTimeout);  // clear any existing timeout to reset the timer
@@ -28,7 +37,7 @@ export default class extends Controller {
             }
 
             this.newOperatorMessageTransferTarget.textContent = "";
-            this.updateMessage(this.newOperatorMessageNameTarget, isValid, "Veuillez saisir sous la forme prénom.nom");
+            this.updateMessage(this.newOperatorMessageNameTarget, isValid, "Veuillez saisir sous la forme prénom.nom.");
 
             if (isValid) {
                 this.checkForExistingEntityByName();
@@ -39,32 +48,35 @@ export default class extends Controller {
 
 
     validateNewOperatorCode() {
-        console.log('validating new operator code:', this.newOperatorCodeTarget.value);
+        clearTimeout(this.typingTimeout);
+        this.typingTimeout = setTimeout(() => {
 
-        const regex = /^[0-9]{5}$/;
-        let isValid;
+            console.log('validating new operator code:', this.newOperatorCodeTarget.value);
 
-        if (this.duplicateCheckResults.code) {
-            console.log('duplicate check results data value for code:', this.duplicateCheckResults.code.data.value);
-            if (this.newOperatorCodeTarget.value.trim() === this.duplicateCheckResults.code.data.value) {
-                console.log('Code is the same as the previous duplicate check, no need to do anything.');
-                return;
+            const regex = /^[0-9]{5}$/;
+            let isValid;
+
+            if (this.duplicateCheckResults.code) {
+                console.log('duplicate check results data value for code:', this.duplicateCheckResults.code.data.value);
+                if (this.newOperatorCodeTarget.value.trim() === this.duplicateCheckResults.code.data.value) {
+                    console.log('Code is the same as the previous duplicate check, no need to do anything.');
+                    return;
+                } else {
+                    this.duplicateCheckResults.code = null;
+                    isValid = regex.test(this.newOperatorCodeTarget.value.trim());
+                }
             } else {
-                this.duplicateCheckResults.code = null;
                 isValid = regex.test(this.newOperatorCodeTarget.value.trim());
             }
-        } else {
-            isValid = regex.test(this.newOperatorCodeTarget.value.trim());
-        }
-        this.newOperatorMessageTransferTarget.textContent = "";
-        this.updateMessage(this.newOperatorMessageCodeTarget, isValid, "Veuillez saisir un code correct.");
+            this.newOperatorMessageTransferTarget.textContent = "";
+            this.updateMessage(this.newOperatorMessageCodeTarget, isValid, "Veuillez saisir un code correct.");
 
-        if (isValid) {
-            console.log('Code is valid, clearing duplicate check results and checking for existing entity by code')
-            this.duplicateCheckResults.code = null;
-            this.checkForExistingEntityByCode();
-
-        }
+            if (isValid) {
+                console.log('Code is valid, clearing duplicate check results and checking for existing entity by code')
+                this.duplicateCheckResults.code = null;
+                this.checkForExistingEntityByCode();
+            }
+        }, 1000);
     }
 
 
@@ -336,34 +348,4 @@ export default class extends Controller {
 
 
 
-    validateTrainerOperatorName() {
-        console.log('validating new operator name:', this.trainerOperatorNameTarget.value);
-
-        const regex = /^[a-zA-Z]+\.(?!-)(?!.*--)[a-zA-Z-]+(?<!-)$/;
-
-        const isValid = regex.test(this.trainerOperatorNameTarget.value.trim());
-
-        if (isValid) {
-            this.checkTrainerExistance('name');
-        }
-    }
-
-
-    validateTrainerOperatorCode() {
-        console.log('validating new operator code:', this.trainerOperatorCodeTarget.value);
-
-        const regex = /^[0-9]{5}$/;
-        const isValid = regex.test(this.newOperatorCodeTarget.value.trim());
-
-        if (isValid) {
-            this.checkTrainerExistance('code');
-        }
-    }
-
-    // checkTrainerExistance(field) {
-    //     if (field === 'name') {
-    //         const response = axios.post('/docauposte/operator/check-if-trainer-exist', { name: this.trainerOperatorNameTarget.value })
-    //         response.data ? ;
-    //     }
-    // }
 }

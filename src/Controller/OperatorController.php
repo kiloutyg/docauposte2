@@ -469,8 +469,12 @@ class OperatorController extends FrontController
 
         $this->logger->info('Full request', $parsedRequest);
 
-        $enteredCode = $parsedRequest['code'];
-        $this->logger->info('enteredCode', [$enteredCode]);
+        if (key_exists('code', $parsedRequest)) {
+            $enteredCode = $parsedRequest['code'];
+            $this->logger->info('enteredCode', [$enteredCode]);
+        } else {
+            $enteredCode = null;
+        };
 
         $enteredName = $parsedRequest['name'];
         $this->logger->info('enteredName', [$enteredName]);
