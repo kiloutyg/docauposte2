@@ -476,14 +476,21 @@ class OperatorController extends FrontController
             $enteredCode = null;
         };
 
-        $enteredName = $parsedRequest['name'];
-        $this->logger->info('enteredName', [$enteredName]);
+        if (key_exists('name', $parsedRequest)) {
+            $enteredName = $parsedRequest['name'];
+            $this->logger->info('enteredName', [$enteredName]);
+        } else {
+            $enteredName = null;
+        };
+
         if ($enteredCode != null) {
             $existingOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'name' => $enteredName]);
             if ($existingOperator !== null) {
 
                 return new JsonResponse([
                     'found' => true,
+                    'name'  => $existingOperator->getName(),
+                    'code'  => $existingOperator->getCode(),
                 ]);
             } else {
                 return new JsonResponse([
@@ -496,6 +503,8 @@ class OperatorController extends FrontController
 
                 return new JsonResponse([
                     'found' => true,
+                    'name'  => $existingOperator->getName(),
+                    'code'  => $existingOperator->getCode(),
                 ]);
             } else {
                 return new JsonResponse([

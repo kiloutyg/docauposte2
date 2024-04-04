@@ -25,7 +25,7 @@ export default class extends Controller {
             const isValid = regex.test(value);
 
             if (isValid) {
-                this.checkTrainerExistance('name', value);
+                this.checkTrainerExistence('name', value);
             } else {
                 this.updateMessage(this.trainerOperatorNameMessageTarget, isValid, "Veuillez saisir sous la forme prénom.nom.")
             }
@@ -33,6 +33,9 @@ export default class extends Controller {
     }
 
     validateTrainerOperatorCode() {
+        this.trainerOperatorCodeTarget.disabled = false;
+        this.trainerOperatorCodeTarget.focus();
+
         clearTimeout(this.typingTimeout);  // clear any existing timeout to reset the timer
         this.typingTimeout = setTimeout(() => {
             console.log('validating new operator code:', this.trainerOperatorCodeTarget.value);
@@ -41,10 +44,12 @@ export default class extends Controller {
             const value = this.trainerOperatorCodeTarget.value.trim();
             const isValid = regex.test(value);
 
-            if (isValid) {
-                this.checkTrainerExistance('code', value);
-            } else {
-                this.updateMessage(this.trainerOperatorCodeMessageTarget, isValid, "Veuillez saisir un code valide: XXXXX.")
+            if (value.length > 0) { // only check if the field is not empty
+                if (isValid) {
+                    this.checkTrainerExistence('code', value);
+                } else {
+                    this.updateMessage(this.trainerOperatorCodeMessageTarget, isValid, "Veuillez saisir un code valide: XXXXX.")
+                }
             }
         }, 1000);
     }
@@ -62,35 +67,74 @@ export default class extends Controller {
 
 
 
-    async checkTrainerExistance(field, value) {
-        if (field === 'name') {
-            try {
+    // async checkTrainerExistence(field, value) {
+    //     if (field === 'name') {
+    //         try {
 
-                const response = await this.checkForDuplicate('/docauposte/operator/check-if-trainer-exist', value)
-                console.log('entire axios response for trainer existence:', response.data);
-                this.handleTrainerExistenceResponse(response, field, 'trainerOperatorName');
-            } catch (error) {
-                console.log('error in axios request');
-                this.trainerOperatorNameMessageTarget.style.color = "red";
-                this.trainerOperatorNameMessageTarget.textContent = "Erreur lors de la recherche du formateur.";
-            }
+    //             const response = await this.checkForDuplicate('/docauposte/operator/check-if-trainer-exist', field, value)
+    //             console.log('entire axios response for trainer existence:', response.data);
+    //             this.handleTrainerExistenceResponse(response, field, 'trainerOperatorName');
+    //         } catch (error) {
+    //             console.log('error in axios request');
+    //             this.trainerOperatorNameMessageTarget.style.color = "red";
+    //             this.trainerOperatorNameMessageTarget.textContent = "Erreur lors de la recherche du formateur.";
+    //         }
 
-        } else if (field === 'code') {
-            try {
-                const response = await this.checkForDuplicate('/docauposte/operator/check-if-trainer-exist', code, value)
-                console.log('entire axios response for trainer existence:', response.data);
-                this.handleTrainerExistenceResponse(response, field, 'trainerOperatorCode');
-            } catch (error) {
-                console.log('error in axios request');
-                this.trainerOperatorMessageCodeTarget.style.color = "red";
-                this.trainerOperatorMessageCodeTarget.textContent = "Erreur lors de la recherche du formateur.";
-            }
+    //     } else if (field === 'code') {
+    //         try {
+    //             const fields = ['name', field];
+    //             const values = [this.trainerOperatorNameTarget.value, value];
+    //             const response = await this.checkForDuplicate('/docauposte/operator/check-if-trainer-exist', field, fields, value, values)
+    //             console.log('entire axios response for trainer existence:', response.data);
+    //             this.handleTrainerExistenceResponse(response, field, 'trainerOperatorCode');
+    //         } catch (error) {
+    //             console.log('error in axios request');
+    //             this.trainerOperatorCodeMessageTarget.style.color = "red";
+    //             this.trainerOperatorCodeMessageTarget.textContent = "Erreur lors de la recherche du formateur.";
+    //         }
+    //     }
+    // }
+
+    // checkForDuplicate(url, field, fields, value, values) {
+    //     if (fields && values) {
+    //         console.log(`Checking for duplicates at ${url} with values:`, values);
+    //         const payload = fields.reduce((obj, field, index) => {
+    //             obj[field] = values[index];
+    //             return obj;
+    //         }, {});
+    //         return axios.post(url, payload);
+    //     } else {
+    //         console.log(`Checking for duplicate at ${url} with value:`, value);
+
+    //         return axios.post(url, { [field]: value });
+    //     }
+
+
+
+
+    async checkTrainerExistence(field, value) {
+        const payload = {};
+        payload[field] = value;
+
+        // If the field is 'code', also take the value of the name from the target.
+        if (field === 'code') {
+            payload['name'] = this.trainerOperatorNameTarget.value;
         }
-    }
 
-    checkForDuplicate(url, field, value) {
-        console.log(`Checking for duplicate at ${url} with value:`, value);
-        return axios.post(url, { [field]: value });
+        try {
+            const response = await axios.post('/docauposte/operator/check-if-trainer-exist', payload);
+            console.log('entire axios response for trainer existence:', response.data);
+
+            // Build the correct fieldName based on the field being checked.
+            const fieldName = field === 'name' ? 'trainerOperatorName' : 'trainerOperatorCode';
+            this.handleTrainerExistenceResponse(response, field, fieldName);
+
+        } catch (error) {
+            console.error('error in axios request', error); // Log out the actual error
+            const messageTarget = this[`${fieldName}MessageTarget`];
+            messageTarget.style.color = "red";
+            messageTarget.textContent = "Erreur lors de la recherche du formateur.";
+        }
     }
 
 
@@ -98,9 +142,7 @@ export default class extends Controller {
 
     handleTrainerExistenceResponse(response, field, fieldName) {
         if (response.data.found) {
-            // this[`${fieldName}Target`].value = code;
             this[`${fieldName}Target`].disabled = true;
-            this[`${fieldName}Target`].focus();
             this.validateTrainerOperatorCode();
         } else {
             this[`${fieldName}Target`].value = "";
@@ -110,6 +152,12 @@ export default class extends Controller {
         };
 
     }
+
+
+    // trainerExistenceValidated(response, field, fieldName) {
+    //     if (field === "name") {
+
+    //     }
 
 
 }
