@@ -166,31 +166,40 @@
 				</strong>
 			{% endfor %}
 			<div
-				class="d-flex flex-fill"
-				data-controller="operator-training"
+
+				data-controller="operator-trainer"
 				id="trainingValidation"
 				name="trainingValidation">
-				<input
-					type="text"
-					class="form-control "
-					data-operator-training-target="trainerOperatorName"
-					data-action="keyup->operator-training#trainerNewOperatorName"
-					placeholder="nom.prénom"
-					id="trainerOperatorName"
-					name="trainerOperatorName"
-					style="flex:0.5;"
-					required>
-				<input
-					type="text"
-					class="form-control"
-					data-operator-training-target="trainerOperatorCode"
-					data-action="keyup->operator-training#validateTrainerNewOperatorCode"
-					placeholder="Code Opérateur"
-					id="trainerOperatorCode"
-					name="trainerOperatorCode"
-					style="flex:0.5;"
-					required
-					disabled>
+				<div
+					class="d-flex flex-fill">
+					<input
+						type="text"
+						class="form-control "
+						data-operator-trainer-target="trainerOperatorName"
+						data-action="keyup->operator-trainer#validateTrainerOperatorName"
+						placeholder="nom.prénom"
+						id="trainerOperatorName"
+						name="trainerOperatorName"
+						style="flex:0.5;"
+						required>
+					<input
+						type="text"
+						class="form-control"
+						data-operator-trainer-target="trainerOperatorCode"
+						data-action="keyup->operator-trainer#validateTrainerOperatorCode"
+						placeholder="Code Opérateur"
+						id="trainerOperatorCode"
+						name="trainerOperatorCode"
+						style="flex:0.5;"
+						required
+						disabled>
+				</div>
+				<div
+					data-operator-trainer-target="trainerOperatorNameMessage"
+					class="trainerOperatorName-message d-flex justify-content-evenly"></div>
+				<div
+					data-operator-trainer-target="trainerOperatorCodeMessage"
+					class="trainerOperatorCode-message d-flex justify-content-evenly"></div>
 			</div>
 		</form>
 	{% else %}
