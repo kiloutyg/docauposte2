@@ -171,13 +171,6 @@ export default class extends Controller {
         this.newOperatorSubmitButtonTarget.value = submitValue;
     }
 
-    // submitNewOperator() {
-    //     this.newOperatorNameTarget.value = "";
-    //     this.newOperatorNameTarget.focus();
-    //     this.newOperatorCodeTarget.value = "";
-    //     this.newOperatorCodeTarget.disabled = true;
-    // }
-
 
 
     checkForDuplicate(url, value) {
