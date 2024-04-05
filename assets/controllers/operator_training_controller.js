@@ -46,6 +46,7 @@ export default class OperatorTrainingController extends Controller {
 
             this.newOperatorTransferMessageTarget.textContent = "";
             this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir sous la forme prénom.nom.");
+            this.newOperatorCodeTarget.disabled = true;
 
             if (isValid) {
                 this.checkForExistingEntityByName();
@@ -181,6 +182,7 @@ export default class OperatorTrainingController extends Controller {
         this.validatedTimeout = setTimeout(() => {
             this.newOperatorCodeTarget.value = "";
             this.newOperatorNameTarget.value = "";
+            this.duplicateCheckResults = { name: null, code: null };
             this.newOperatorCodeTarget.disabled = true;
             this.newOperatorNameTarget.focus();
             this.newOperatorSubmitButtonTarget.disabled = true;
