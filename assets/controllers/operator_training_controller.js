@@ -1,14 +1,22 @@
 
 import { Controller } from '@hotwired/stimulus';
+
 import axios from 'axios';
 
-export default class extends Controller {
+export default class OperatorTrainingController extends Controller {
+
+    // connect() {
+    //     if (this.element.classList.contains('.operator-input')) {
+    //         this.element.dispatchEvent(new CustomEvent('operatorInputConnected', { bubbles: true }));
+    //     }
+    // }
+
     static targets = [
         "newOperatorName",
-        "newOperatorMessageName",
+        "newOperatorNameMessage",
         "newOperatorCode",
-        "newOperatorMessageCode",
-        "newOperatorMessageTransfer",
+        "newOperatorCodeMessage",
+        "newOperatorTransferMessage",
         "newOperatorSubmitButton",
         "trainingOperatorCode",
 
@@ -36,8 +44,8 @@ export default class extends Controller {
                 isValid = regex.test(this.newOperatorNameTarget.value.trim());
             }
 
-            this.newOperatorMessageTransferTarget.textContent = "";
-            this.updateMessage(this.newOperatorMessageNameTarget, isValid, "Veuillez saisir sous la forme prénom.nom.");
+            this.newOperatorTransferMessageTarget.textContent = "";
+            this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir sous la forme prénom.nom.");
 
             if (isValid) {
                 this.checkForExistingEntityByName();
@@ -68,8 +76,8 @@ export default class extends Controller {
             } else {
                 isValid = regex.test(this.newOperatorCodeTarget.value.trim());
             }
-            this.newOperatorMessageTransferTarget.textContent = "";
-            this.updateMessage(this.newOperatorMessageCodeTarget, isValid, "Veuillez saisir un code correct.");
+            this.newOperatorTransferMessageTarget.textContent = "";
+            this.updateMessage(this.newOperatorCodeMessageTarget, isValid, "Veuillez saisir un code correct.");
 
             if (isValid) {
                 console.log('Code is valid, clearing duplicate check results and checking for existing entity by code')
@@ -86,12 +94,12 @@ export default class extends Controller {
 
             const response = await this.checkForDuplicate('/docauposte/operator/check-duplicate-by-name', this.newOperatorNameTarget.value);
             console.log('response for existing entity by name:', response.data.found);
-            this.handleDuplicateResponse(response, this.newOperatorMessageNameTarget, "noms d'opérateurs");
+            this.handleDuplicateResponse(response, this.newOperatorNameMessageTarget, "noms d'opérateurs");
 
         } catch (error) {
             console.error("Error checking for a duplicate operator name.", error);
             this.manageNewOperatorSubmitButton();
-            this.newOperatorMessageNameTarget.textContent = "Erreur lors de la vérification du nom opérateur.";
+            this.newOperatorNameMessageTarget.textContent = "Erreur lors de la vérification du nom opérateur.";
         }
     }
 
@@ -103,11 +111,11 @@ export default class extends Controller {
 
             const response = await this.checkForDuplicate('/docauposte/operator/check-duplicate-by-code', this.newOperatorCodeTarget.value);
             console.log('response for existing entity by code:', response.data.found);
-            this.handleDuplicateResponse(response, this.newOperatorMessageCodeTarget, "codes opérateurs");
+            this.handleDuplicateResponse(response, this.newOperatorCodeMessageTarget, "codes opérateurs");
         } catch (error) {
             console.error("Error checking for a duplicate operator code.", error);
             this.manageNewOperatorSubmitButton();
-            this.newOperatorMessageCodeTarget.textContent = "Erreur lors de la vérification du code opérateur.";
+            this.newOperatorCodeMessageTarget.textContent = "Erreur lors de la vérification du code opérateur.";
         }
     }
 
@@ -169,6 +177,18 @@ export default class extends Controller {
         console.log(`Setting new operator submit button - Enabled: ${enableButton}, Value: ${submitValue}`);
         this.newOperatorSubmitButtonTarget.disabled = !enableButton;
         this.newOperatorSubmitButtonTarget.value = submitValue;
+        clearTimeout(this.validatedTimeout);
+        this.validatedTimeout = setTimeout(() => {
+            this.newOperatorCodeTarget.value = "";
+            this.newOperatorNameTarget.value = "";
+            this.newOperatorCodeTarget.disabled = true;
+            this.newOperatorNameTarget.focus();
+            this.newOperatorSubmitButtonTarget.disabled = true;
+            this.resetUselessMessages();
+            this.newOperatorCodeMessageTarget.textContent = "";
+            this.newOperatorNameMessageTarget.textContent = "";
+            this.newOperatorTransferMessageTarget.textContent = "";
+        }, 5000);
     }
 
 
@@ -213,8 +233,8 @@ export default class extends Controller {
             ? "Nom et Code opérateurs correspondent à un même opérateur. Vous pouvez le transferer."
             : "Nom et Code opérateurs ne correspondent pas à un même opérateur. Veuillez saisir un autre nom ou code opérateur";
 
-        this.newOperatorMessageTransferTarget.textContent = message;
-        this.newOperatorMessageTransferTarget.style.color = entitiesMatch ? "green" : "red";
+        this.newOperatorTransferMessageTarget.textContent = message;
+        this.newOperatorTransferMessageTarget.style.color = entitiesMatch ? "green" : "red";
         this.resetUselessMessages();
 
         console.log(`Manage submit button to be ${entitiesMatch ? "enabled" : "disabled"} with value ${submitValue}`);
@@ -223,19 +243,23 @@ export default class extends Controller {
 
 
     executeEntityNonMatchingLogic(unMatchedFound) {
-        this.newOperatorMessageTransferTarget.textContent = "Nom et Code opérateurs ne correspondent à aucun opérateur. Vous pouvez les ajouter.";
-        this.newOperatorMessageTransferTarget.style.color = "green";
+        this.newOperatorTransferMessageTarget.textContent = "Nom et Code opérateurs ne correspondent à aucun opérateur. Vous pouvez les ajouter.";
+        this.newOperatorTransferMessageTarget.style.color = "green";
         this.manageNewOperatorSubmitButton(unMatchedFound, "Ajouter");
     }
 
 
     resetUselessMessages() {
         console.log('Resetting useless messages if there is a transfer message.');
-        if (this.newOperatorMessageTransferTarget.textContent !== "") {
+        if (this.newOperatorTransferMessageTarget.textContent !== "") {
             console.log('Clearing name and code validation messages');
-            this.newOperatorMessageNameTarget.textContent = "";
-            this.newOperatorMessageCodeTarget.textContent = "";
+            this.newOperatorNameMessageTarget.textContent = "";
+            this.newOperatorCodeMessageTarget.textContent = "";
         }
+        const operatorInputs = document.querySelectorAll('.operator-input');
+        operatorInputs.forEach(function (input) {
+            input.disabled = false;
+        });
     }
 
 
@@ -344,28 +368,10 @@ export default class extends Controller {
         console.log('checking generated code');
         return axios.post(`/docauposte/operator/check-if-code-exist`, { code: code });
     }
+    newOperatorHandleSubmit() {
+        console.log('submitting new operator form');
 
-    handleSubmit(event) {
-        // You might want to validate form data here before clearing it
-
-        // Clearing input fields after submission but before Turbo takes over
-        this.newOperatorNameTarget.value = '';
-        this.newOperatorCodeTarget.value = '';
-
-        // Disabling inputs
-        this.newOperatorCodeTarget.disabled = true;
-        this.newOperatorSubmitButtonTarget.disabled = true;
-
-        // Focus on the name input if required
-        this.newOperatorNameTarget.focus();
-
-        // If you want to prevent standard form submission and do it via Ajax:
-        // event.preventDefault();
-        // Perform an Ajax request here...
-
-        // Otherwise, leave as is for normal form submission
     }
-
 }
 
 
