@@ -111,7 +111,7 @@ export default class OperatorTrainerController extends Controller {
             if (field === 'name') {
                 this.validateTrainerOperatorCode();
             } else {
-                this.trainerAuthenticated();
+                this.trainerAuthenticated(response);
                 this.trainerOperatorNameMessageTarget.textContent = "";
             }
             this[`${fieldName}Target`].disabled = true;
@@ -128,9 +128,9 @@ export default class OperatorTrainerController extends Controller {
         };
 
     }
-    trainerAuthenticated() {
+    trainerAuthenticated(response) {
         // initialize the new operator form
-        this.loadOperatorTrainingContent();
+        this.loadOperatorTrainingContent(response);
         // enable the training button
         console.log('trainer authenticated');
         const operatorInputs = document.querySelectorAll('.operator-input');
@@ -156,7 +156,7 @@ export default class OperatorTrainerController extends Controller {
 
 
 
-    loadOperatorTrainingContent() {
+    loadOperatorTrainingContent(response) {
         const container = document.getElementById('newOperatorContainer');
 
         // You would fetch this content via an API or similar.
@@ -211,6 +211,20 @@ export default class OperatorTrainerController extends Controller {
         `;
 
         container.innerHTML = content;
+
+
+        let trainerId = response.data.trainerId;
+        const listUpdateSubmitContainer = document.getElementById('trainingValidationSubmitContainer');
+
+        const listUpdateSubmitContent = `
+        <input type="hidden" name="trainerId" value="${trainerId}">			
+        <input
+        type="submit"
+        class="btn btn-primary"
+        value="Enregistrer les modifications">
+        `;
+        listUpdateSubmitContainer.innerHTML = listUpdateSubmitContent;
+
     }
 
     unloadOperatorTrainingContent() {
