@@ -54,38 +54,13 @@
 						</li>
 
 						{% if trainingRecord == null %}
+
 							<li
 								class="flex-grow-1 text-end mx-auto">
 								À former  -
 							</li>
-							<li
-								class="flex-grow-1 text-end mx-auto"
-								data-controller="operator-training"
-								name="trainingCheckbox{{ operator.id }}"
-								id="trainingCheckbox{{ operator.id }}">
-								<input
-									type="text"
-									pattern="\d*"
-									maxlength="5"
-									class="form-control form-control-sm operator-input mx-auto"
-									data-operator-training-target="trainingOperatorCode"
-									data-action="keyup->operator-training#validateCodeEntryForTraining"
-									data-operator-id="{{ operator.id }}" data-team-id="{{ team.id }}" data-uap-id="{{ uap.id }}" placeholder="CodeOpé"
-									id="trainingOperatorCode{{ operator.id }}"
-									name="operators[{{ operator.id }}][trainingOperatorCode]">
-							</li>
-						{% else %}
-							{% if trainingRecord.trained %}
-								<li
-									class="flex-grow-1 text-end mx-auto">
-									Formé le
-									{{ trainingRecord.date|date('d/m/Y') }}
-								</li>
-							{% else %}
-								<li
-									class="flex-grow-1 text-end mx-auto">
-									À réentrainer -
-								</li>
+							<div
+								data-controller="operator-trainer">
 								<li
 									class="flex-grow-1 text-end mx-auto"
 									data-controller="operator-training"
@@ -99,9 +74,45 @@
 										data-operator-training-target="trainingOperatorCode"
 										data-action="keyup->operator-training#validateCodeEntryForTraining"
 										data-operator-id="{{ operator.id }}" data-team-id="{{ team.id }}" data-uap-id="{{ uap.id }}" placeholder="CodeOpé"
-										id="revalidateOperatorCode{{ operator.id }}"
-										name="operators[{{ operator.id }}][revalidateOperatorCode]">
+										id="trainingOperatorCode{{ operator.id }}"
+										name="operators[{{ operator.id }}][trainingOperatorCode]"
+										disabled>
 								</li>
+							</div>
+						{% else %}
+							{% if trainingRecord.trained %}
+								<li
+									class="flex-grow-1 text-end mx-auto">
+									Formé le
+									{{ trainingRecord.date|date('d/m/Y') }}
+								</li>
+							{% else %}
+
+
+								<li
+									class="flex-grow-1 text-end mx-auto">
+									À réentrainer -
+								</li>
+								<div
+									data-controller="operator-trainer">
+									<li
+										class="flex-grow-1 text-end mx-auto"
+										data-controller="operator-training"
+										name="trainingCheckbox{{ operator.id }}"
+										id="trainingCheckbox{{ operator.id }}">
+										<input
+											type="text"
+											pattern="\d*"
+											maxlength="5"
+											class="form-control form-control-sm operator-input mx-auto"
+											data-operator-training-target="trainingOperatorCode"
+											data-action="keyup->operator-training#validateCodeEntryForTraining"
+											data-operator-id="{{ operator.id }}" data-team-id="{{ team.id }}" data-uap-id="{{ uap.id }}" placeholder="CodeOpé"
+											id="revalidateOperatorCode{{ operator.id }}"
+											name="operators[{{ operator.id }}][revalidateOperatorCode]"
+											disabled>
+									</li>
+								</div>
 							{% endif %}
 						{% endif %}
 					</ul>

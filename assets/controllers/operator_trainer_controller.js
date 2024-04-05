@@ -2,12 +2,23 @@
 import { Controller } from '@hotwired/stimulus';
 import axios from 'axios';
 
-export default class extends Controller {
+
+export default class OperatorTrainerController extends Controller {
+
+    // connect() {
+    //     this.element.addEventListener('operatorInputConnected', this.revalidateTrainerAuthentication());
+    //     console.log('OperatorTrainerController connected');
+    // }
+
+    // disconnect() {
+    //     this.element.removeEventListener('operatorInputConnected', this.revalidateTrainerAuthentication());
+    // }
+
     static targets = [
         "trainerOperatorName",
         "trainerOperatorCode",
         "trainerOperatorNameMessage",
-        "trainerOperatorCodeMessage"
+        "trainerOperatorCodeMessage",
     ];
 
 
@@ -27,7 +38,7 @@ export default class extends Controller {
             if (isValid) {
                 this.checkTrainerExistence('name', value);
             } else {
-                this.updateMessage(this.trainerOperatorNameMessageTarget, isValid, "Veuillez saisir sous la forme prénom.nom.")
+                this.updateMessage(this.trainerOperatorNameMessageTarget, isValid, "Veuillez saisir sous la forme prénom.nom.");
             }
         }, 1000);
     }
@@ -48,7 +59,7 @@ export default class extends Controller {
                 if (isValid) {
                     this.checkTrainerExistence('code', value);
                 } else {
-                    this.updateMessage(this.trainerOperatorCodeMessageTarget, isValid, "Veuillez saisir un code valide: XXXXX.")
+                    this.updateMessage(this.trainerOperatorCodeMessageTarget, isValid, "Veuillez saisir un code valide: XXXXX.");
                 }
             }
         }, 1000);
@@ -112,7 +123,8 @@ export default class extends Controller {
             this[`${fieldName}MessageTarget`].style.fontWeight = "bold";
             this[`${fieldName}MessageTarget`].style.color = "red";
             this[`${fieldName}MessageTarget`].textContent = "Formateur non trouvé. "[field];
-
+            // Stop the repeating validation since we found the trainer
+            this.stopRepeatingValidation();
         };
 
     }
@@ -120,8 +132,27 @@ export default class extends Controller {
         // initialize the new operator form
         this.loadOperatorTrainingContent();
         // enable the training button
-
+        console.log('trainer authenticated');
+        const operatorInputs = document.querySelectorAll('.operator-input');
+        operatorInputs.forEach(function (input) {
+            input.disabled = false;
+        });
+        // this.startRepeatingValidation(5000);
     }
+    // revalidateTrainerAuthentication() {
+    //     console.log('revalidating trainer authentication');
+    //     this.validateTrainerOperatorName();
+    // }
+    // startRepeatingValidation(intervalMs) {
+    //     this.validationInterval = setInterval(() => {
+    //         this.validateTrainerOperatorName();
+    //     }, intervalMs);
+    // }
+    // stopRepeatingValidation() {
+    //     if (this.validationInterval) {
+    //         clearInterval(this.validationInterval);
+    //     }
+    // }
 
 
 
@@ -167,13 +198,13 @@ export default class extends Controller {
 
                 </div>
                 <div
-                    data-operator-training-target="newOperatorMessageName"
+                    data-operator-training-target="newOperatorNameMessage"
                     class="newOperatorName-message d-flex justify-content-evenly"></div>
                 <div
-                    data-operator-training-target="newOperatorMessageCode"
+                    data-operator-training-target="newOperatorCodeMessage"
                     class="newOperatorCode-message d-flex justify-content-evenly"></div>
                 <div
-                    data-operator-training-target="newOperatorMessageTransfer"
+                    data-operator-training-target="newOperatorTransferMessage"
                     class="newOperatorTransfer-message d-flex justify-content-evenly"></div>
             </div>
 
@@ -186,4 +217,8 @@ export default class extends Controller {
         const container = document.getElementById('newOperatorContainer');
         container.innerHTML = ''; // Clears out the inner content of the div
     }
+
+
+
+
 }
