@@ -487,9 +487,10 @@ class OperatorController extends FrontController
             if ($existingOperator !== null) {
 
                 return new JsonResponse([
-                    'found' => true,
-                    'name'  => $existingOperator->getName(),
-                    'code'  => $existingOperator->getCode(),
+                    'found'     => true,
+                    'name'      => $existingOperator->getName(),
+                    'code'      => $existingOperator->getCode(),
+                    'trainerId' => $existingOperator->getId(),
                 ]);
             } else {
                 return new JsonResponse([
