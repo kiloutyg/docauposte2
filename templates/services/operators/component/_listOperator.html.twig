@@ -1,6 +1,10 @@
 <turbo-frame
 	id="training-records-form">
 	{% if selectedOperators is defined and selectedOperators is not empty %}
+		{% set trainedOperators = trainedOperators|default([]) %}
+		{% set inTrainingOperators = inTrainingOperators|default([]) %}
+		{% set untrainedOperators = untrainedOperators|default([]) %}
+		{% set operatorsByTrainer = operatorsByTrainer|default([]) %}
 
 		<form
 			class="d-flex flex-column justify-content-evenly"
@@ -13,48 +17,205 @@
 				Liste des Opérateurs de l'équipe
 				{{team.name}}
 				pour l'UAP
-				{{uap.name}}
-				.
+				{{uap.name ~ '.'}}
 			</p>
 
+			<strong>
+				{% for operator in selectedOperators %}
+					{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+					{% if trainingRecord != null %}
+						{% if trainingRecord.trained %}
+							{% set trainedOperators = trainedOperators|merge([operator]) %}
+							{# {% set trainerId = trainingRecord.trainer.operator.id %} #}
+							{# {% set trainerName = trainingRecord.trainer.operator.name %} #}
+							{# {% set operatorsByTrainer = operatorsByTrainer|merge({(trainerId): (operatorsByTrainer[trainerId]|default([]))|merge([operator])}) %} #}
+							{# {% set operatorsByTrainer = operatorsByTrainer|merge({(trainerName): (operatorsByTrainer[trainerName]|default([]))|merge([operator])}) %} #}
 
-			{% for operator in selectedOperators %}
-				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-				<strong>
-					<ul
-						class="list-unstyled d-flex align-items-center p-1 mb-1 {{ trainingRecord != null ? (trainingRecord.trained ? 'text-white bg-success' : 'text-dark bg-warning') : 'text-white bg-danger' }}">
+						{% elseif trainingRecord.trained == false %}
+							{% set inTrainingOperators = inTrainingOperators|merge([operator]) %}
+							{# {% set trainerId = trainingRecord.trainer.id %}
+																																																																																											{% set operatorsByTrainer = operatorsByTrainer|merge({(trainerId): (operatorsByTrainer[trainerId]|default([]))|merge([operator])}) %} #}
+						{% endif %}
 
-						<li
-							class="flex-fill text-start mx-auto">
-							{{ operator.name }}
-							<input
-								type="hidden"
-								name="operators[{{ operator.id }}][id]"
-								value="{{ operator.id }}">
-						</li>
-						<li
-							class="mx-auto">
-							-
-						</li>
-						<li
-							class="flex-fill text-center mx-auto">
-							{{ operator.team.name }}
-						</li>
-						<li
-							class="mx-auto">
-							-
-						</li>
-						<li
-							class="flex-fill text-center mx-auto">
-							{{ operator.uap.name }}
-						</li>
-						<li
-							class="mx-auto">
-							-
-						</li>
+					{% elseif trainingRecord == null %}
+						{% set untrainedOperators = untrainedOperators|merge([operator]) %}
+					{% endif %}
+				{% endfor %}
 
-						{% if trainingRecord == null %}
+				{% if trainedOperators is defined and trainedOperators is not empty %}
 
+					{# {% for trainerId, operators in operatorsByTrainer %} #}
+					<p
+						class="mx-2 card text-center"
+						style="flex:1;">
+						Liste des Opérateurs formés par
+					{# {{ operators.first().trainingRecords|filter(record => record.trainer.operator.id == trainerId)|first().trainer.name }} #}
+						{# Liste des Opérateurs formés par
+																																																													{{ trainerName }} #}
+					</p>
+
+					{% for operator in trainedOperators  %}
+						{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+						{% set trainer = trainingRecord.trainer.operator.name %}
+						{{ dump(trainer) }}
+						{# {{ dump(trainingRecord) }} #}
+						<ul
+							class="list-unstyled d-flex align-items-center p-1 mb-1 {{ trainingRecord != null ? (trainingRecord.trained ? 'text-white bg-success' : 'text-dark bg-warning') : 'text-white bg-danger' }}">
+
+							<li
+								class="flex-fill text-start mx-auto">
+								{{ operator.name }}
+								<input
+									type="hidden"
+									name="operators[{{ operator.id }}][id]"
+									value="{{ operator.id }}">
+							</li>
+							<li
+								class="mx-auto">
+								-
+							</li>
+							<li
+								class="flex-fill text-center mx-auto">
+								{{ operator.team.name }}
+							</li>
+							<li
+								class="mx-auto">
+								-
+							</li>
+							<li
+								class="flex-fill text-center mx-auto">
+								{{ operator.uap.name }}
+							</li>
+							<li
+								class="mx-auto">
+								-
+							</li>
+							<li
+								class="flex-grow-1 text-end mx-auto">
+								Formé le
+								{{ trainingRecord.date|date('d/m/Y') }}
+							</li>
+						</ul>
+
+
+					{% endfor %}
+					{# {% endfor %} #}
+
+				{% endif %}
+
+				{% if inTrainingOperators is defined and inTrainingOperators is not empty %}
+
+					<p
+						style="flex:1;"
+						class=" mx-2 card text-center">
+						Liste des Opérateurs en attente de réentrainement au process.
+					</p>
+					{% for operator in inTrainingOperators %}
+						{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+
+
+						<ul
+							class="list-unstyled d-flex align-items-center p-1 mb-1 {{ trainingRecord != null ? (trainingRecord.trained ? 'text-white bg-success' : 'text-dark bg-warning') : 'text-white bg-danger' }}">
+
+							<li
+								class="flex-fill text-start mx-auto">
+								{{ operator.name }}
+								<input
+									type="hidden"
+									name="operators[{{ operator.id }}][id]"
+									value="{{ operator.id }}">
+							</li>
+							<li
+								class="mx-auto">
+								-
+							</li>
+							<li
+								class="flex-fill text-center mx-auto">
+								{{ operator.team.name }}
+							</li>
+							<li
+								class="mx-auto">
+								-
+							</li>
+							<li
+								class="flex-fill text-center mx-auto">
+								{{ operator.uap.name }}
+							</li>
+							<li
+								class="mx-auto">
+								-
+							</li>
+
+							<li
+								class="flex-grow-1 text-end mx-auto">
+								À réentrainer -
+							</li>
+							<div
+								data-controller="operator-trainer">
+								<li
+									class="flex-grow-1 text-end mx-auto"
+									data-controller="operator-training"
+									name="trainingCheckbox{{ operator.id }}"
+									id="trainingCheckbox{{ operator.id }}">
+									<input
+										type="text"
+										pattern="\d*"
+										maxlength="5"
+										class="form-control form-control-sm operator-input mx-auto"
+										data-operator-training-target="trainingOperatorCode"
+										data-action="keyup->operator-training#validateCodeEntryForTraining"
+										data-operator-id="{{ operator.id }}" data-team-id="{{ team.id }}" data-uap-id="{{ uap.id }}" placeholder="CodeOpé"
+										id="revalidateOperatorCode{{ operator.id }}"
+										name="operators[{{ operator.id }}][revalidateOperatorCode]"
+										disabled>
+								</li>
+							</div>
+						</ul>
+
+
+					{% endfor %}
+				{% endif %}
+				{% if untrainedOperators is defined and untrainedOperators is not empty %}
+					<p
+						style="flex:1;"
+						class=" mx-2 card text-center">
+						Liste des Opérateurs jamais formés au process.
+					</p>
+					{% for operator in untrainedOperators %}
+						{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+
+
+						<ul
+							class="list-unstyled d-flex align-items-center p-1 mb-1 {{ trainingRecord != null ? (trainingRecord.trained ? 'text-white bg-success' : 'text-dark bg-warning') : 'text-white bg-danger' }}">
+
+							<li
+								class="flex-fill text-start mx-auto">
+								{{ operator.name }}
+								<input
+									type="hidden"
+									name="operators[{{ operator.id }}][id]"
+									value="{{ operator.id }}">
+							</li>
+							<li
+								class="mx-auto">
+								-
+							</li>
+							<li
+								class="flex-fill text-center mx-auto">
+								{{ operator.team.name }}
+							</li>
+							<li
+								class="mx-auto">
+								-
+							</li>
+							<li
+								class="flex-fill text-center mx-auto">
+								{{ operator.uap.name }}
+							</li>
+							<li
+								class="mx-auto">
+								-
+							</li>
 							<li
 								class="flex-grow-1 text-end mx-auto">
 								À former  -
@@ -79,45 +240,12 @@
 										disabled>
 								</li>
 							</div>
-						{% else %}
-							{% if trainingRecord.trained %}
-								<li
-									class="flex-grow-1 text-end mx-auto">
-									Formé le
-									{{ trainingRecord.date|date('d/m/Y') }}
-								</li>
-							{% else %}
+						</ul>
 
+					{% endfor %}
+				{% endif %}
 
-								<li
-									class="flex-grow-1 text-end mx-auto">
-									À réentrainer -
-								</li>
-								<div
-									data-controller="operator-trainer">
-									<li
-										class="flex-grow-1 text-end mx-auto"
-										data-controller="operator-training"
-										name="trainingCheckbox{{ operator.id }}"
-										id="trainingCheckbox{{ operator.id }}">
-										<input
-											type="text"
-											pattern="\d*"
-											maxlength="5"
-											class="form-control form-control-sm operator-input mx-auto"
-											data-operator-training-target="trainingOperatorCode"
-											data-action="keyup->operator-training#validateCodeEntryForTraining"
-											data-operator-id="{{ operator.id }}" data-team-id="{{ team.id }}" data-uap-id="{{ uap.id }}" placeholder="CodeOpé"
-											id="revalidateOperatorCode{{ operator.id }}"
-											name="operators[{{ operator.id }}][revalidateOperatorCode]"
-											disabled>
-									</li>
-								</div>
-							{% endif %}
-						{% endif %}
-					</ul>
-				</strong>
-			{% endfor %}
+			</strong>
 			<div
 
 				id="trainingValidationSubmitContainer"
@@ -131,7 +259,6 @@
 				Liste de tous les opérateurs formés, tout UAP et équipe confondu.
 				<br>
 				Pour modifier ces informations, veuillez sélectionner une équipe et une UAP.
-
 			</p>
 			{% for record in trainingRecords %}
 				<strong>
@@ -177,7 +304,6 @@
 						</div>
 					</ul>
 				</strong>
-
 			{% endfor %}
 			<p
 				style="flex:1;"
@@ -185,7 +311,6 @@
 				Liste de tous les opérateurs Non-formés, tout UAP et équipe confondu.
 				<br>
 				Pour modifier ces informations, veuillez sélectionner une équipe et une UAP.
-
 			</p>
 			{% for operator in operators %}
 				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
@@ -244,7 +369,6 @@
 				style="flex:1;"
 				class=" mx-2 card">
 				Aucune liste correspondant aux critéres n'a été trouvé, sélectionnez d'autres critéres ou ajouté des opérateurs à la liste.
-
 			</p>
 			{% for operator in operators %}
 				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
@@ -305,7 +429,6 @@
 					</ul>
 				</strong>
 			{% endfor %}
-
 		{% endif %}
 	{% endif %}
 </turbo-frame>
