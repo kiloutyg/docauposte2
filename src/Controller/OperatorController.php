@@ -246,7 +246,7 @@ class OperatorController extends FrontController
     {
         $upload = $this->uploadRepository->find($uploadId);
 
-        $selectedOperators = $this->operatorRepository->findBy(['Team' => $teamId, 'uap' => $uapId], ['Team' => 'ASC', 'uap' => 'ASC', 'name' => 'ASC']);
+        $selectedOperators = $this->operatorRepository->findBy(['team' => $teamId, 'uap' => $uapId], ['team' => 'ASC', 'uap' => 'ASC', 'name' => 'ASC']);
         $this->logger->info('selectedOperators', [$selectedOperators]);
 
 
@@ -422,7 +422,7 @@ class OperatorController extends FrontController
         $operatorId = (int)$parsedRequest['operatorId'];
         $this->logger->info('operatorId', [$operatorId]);
 
-        $controllerOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'Team' => $teamId, 'uap' => $uapId]);
+        $controllerOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'team' => $teamId, 'uap' => $uapId]);
         $this->logger->info('controllerOperator', [$controllerOperator]);
 
         if ($controllerOperator != null) {

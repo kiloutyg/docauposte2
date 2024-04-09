@@ -8,14 +8,14 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TeamRepository::class)]
-class Team
+class team
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToMany(mappedBy: 'Team', targetEntity: Operator::class)]
+    #[ORM\OneToMany(mappedBy: 'team', targetEntity: Operator::class)]
     private Collection $operators;
 
     #[ORM\Column(length: 255)]
