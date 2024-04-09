@@ -12,6 +12,7 @@ use App\Form\OperatorType;
 
 use App\Entity\Operator;
 use App\Entity\TrainingRecord;
+use App\Entity\Trainer;
 
 
 class OperatorController extends FrontController
@@ -28,14 +29,31 @@ class OperatorController extends FrontController
         $operatorForms = [];
         if (isset($operators)) {
             foreach ($operators as $operator) {
-                $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator)->createView();
+                $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
+                    'operator_id' => $operator->getId(),
+                ])->createView();
             }
         }
         $newOperator = new Operator();
-        $newOperatorForm = $this->createForm(OperatorType::class, $newOperator);
+        $newOperatorForm = $this->createForm(OperatorType::class, $newOperator, [
+            'operator_id' => $operator->getId(),
+        ]);
         if ($request->getMethod() === 'POST') {
             $newOperatorForm->handleRequest($request);
             if ($newOperatorForm->isSubmitted() && $newOperatorForm->isValid()) {
+                $trainerBool = $newOperatorForm->get('isTrainer')->getData();
+                if ($trainerBool == true) {
+                    $trainer = new Trainer();
+                    $trainer->setOperator($newOperator);
+                    $this->em->persist($trainer);
+                    $newOperator->setTrainer($trainer);
+                } else if ($trainerBool != true) {
+                    $trainer = $operator->getTrainer();
+                    $operator->setTrainer(null);
+                    if ($trainer != null) {
+                        $this->em->remove($trainer);
+                    }
+                };
                 $operator = $newOperatorForm->getData();
                 $this->em->persist($operator);
                 $this->em->flush();
@@ -55,12 +73,30 @@ class OperatorController extends FrontController
     #[Route('/operator/edit/{id}', name: 'app_operator_edit')]
     public function editOperatorAction(Request $request, Operator $operator): Response
     {
+        $this->logger->info('Full request', $request->request->all());
         $originUrl = $request->headers->get('referer');
 
-        $form = $this->createForm(OperatorType::class, $operator);
+        $form = $this->createForm(OperatorType::class, $operator, [
+            'operator_id' => $operator->getId(),
+        ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $trainerBool = $form->get('isTrainer')->getData();
+            if ($trainerBool == true) {
+                $trainer = new Trainer();
+                $trainer->setOperator($operator);
+                $this->em->persist($trainer);
+                $operator->setTrainer($trainer);
+            } else if ($trainerBool != true) {
+                $trainer = $operator->getTrainer();
+                $operator->setTrainer(null);
+                if ($trainer != null) {
+                    $this->em->remove($trainer);
+                }
+            };
+
             $operator = $form->getData();
             $this->em->persist($operator);
             $this->em->flush();
@@ -228,7 +264,7 @@ class OperatorController extends FrontController
     {
         $upload = $this->uploadRepository->find($uploadId);
 
-        $selectedOperators = $this->operatorRepository->findBy(['Team' => $teamId, 'uap' => $uapId], ['Team' => 'ASC', 'uap' => 'ASC', 'name' => 'ASC']);
+        $selectedOperators = $this->operatorRepository->findBy(['team' => $teamId, 'uap' => $uapId], ['team' => 'ASC', 'uap' => 'ASC', 'name' => 'ASC']);
         $this->logger->info('selectedOperators', [$selectedOperators]);
 
 
@@ -404,7 +440,7 @@ class OperatorController extends FrontController
         $operatorId = (int)$parsedRequest['operatorId'];
         $this->logger->info('operatorId', [$operatorId]);
 
-        $controllerOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'Team' => $teamId, 'uap' => $uapId]);
+        $controllerOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'team' => $teamId, 'uap' => $uapId]);
         $this->logger->info('controllerOperator', [$controllerOperator]);
 
         if ($controllerOperator != null) {

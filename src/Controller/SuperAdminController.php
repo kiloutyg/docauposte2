@@ -124,7 +124,7 @@ class SuperAdminController extends FrontController
     #[Route('/super_admin/operator_management', name: 'app_super_admin_operator_management')]
     public function operatorManagement(Request $request): Response
     {
-        $team = new Team();
+        $team = new team();
         $uap = new Uap();
         $teamForm = $this->createForm(TeamType::class, $team);
         $uapForm = $this->createForm(UapType::class, $uap);
@@ -139,7 +139,7 @@ class SuperAdminController extends FrontController
                     $team = $teamForm->getData();
                     $this->em->persist($team);
                     $this->em->flush();
-                    $this->addFlash('success', 'Team has been created');
+                    $this->addFlash('success', 'team has been created');
                     return $this->redirect($originUrl);
                 } else {
                     // Validation failed, get the error message and display it

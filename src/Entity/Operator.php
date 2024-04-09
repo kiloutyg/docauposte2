@@ -25,7 +25,7 @@ class Operator
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'operators')]
-    private ?Team $Team = null;
+    private ?team $team = null;
 
     #[ORM\ManyToOne(inversedBy: 'operators')]
     private ?Uap $uap = null;
@@ -41,6 +41,9 @@ class Operator
 
     #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist', 'remove'])]
     private ?Trainer $trainer = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $IsTrainer = null;
 
 
     public function __construct()
@@ -65,14 +68,14 @@ class Operator
         return $this;
     }
 
-    public function getTeam(): ?Team
+    public function getTeam(): ?team
     {
-        return $this->Team;
+        return $this->team;
     }
 
-    public function setTeam(?Team $Team): static
+    public function setTeam(?team $team): static
     {
-        $this->Team = $Team;
+        $this->team = $team;
 
         return $this;
     }
@@ -149,6 +152,18 @@ class Operator
         }
 
         $this->trainer = $trainer;
+
+        return $this;
+    }
+
+    public function isIsTrainer(): ?bool
+    {
+        return $this->IsTrainer;
+    }
+
+    public function setIsTrainer(?bool $IsTrainer): static
+    {
+        $this->IsTrainer = $IsTrainer;
 
         return $this;
     }
