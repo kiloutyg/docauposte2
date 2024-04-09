@@ -39,8 +39,9 @@ class Operator
     #[Assert\Regex(pattern: '/[0-9]{5}$/', message: 'Le code Opérateur doit être composé de 5 chiffres.')]
     private ?string $code = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $trainer = null;
+    #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist', 'remove'])]
+    private ?Trainer $trainer = null;
+
 
     public function __construct()
     {
@@ -130,13 +131,23 @@ class Operator
         return $this;
     }
 
-    public function isTrainer(): ?bool
+    public function getTrainer(): ?Trainer
     {
         return $this->trainer;
     }
 
-    public function setTrainer(?bool $trainer): static
+    public function setTrainer(?Trainer $trainer): static
     {
+        // unset the owning side of the relation if necessary
+        if ($trainer === null && $this->trainer !== null) {
+            $this->trainer->setOperator(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($trainer !== null && $trainer->getOperator() !== $this) {
+            $trainer->setOperator($this);
+        }
+
         $this->trainer = $trainer;
 
         return $this;

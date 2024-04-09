@@ -259,6 +259,7 @@ class OperatorController extends FrontController
         $operators = [];
         $operators = $request->request->all('operators');
         $upload = $this->uploadRepository->find($uploadId);
+        $trainer = $request->request->get('trainer');
 
         foreach ($operators as $operator) {
             $this->logger->info('does the key exist', [array_key_exists("trained", $operator)]);
