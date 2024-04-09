@@ -32,6 +32,7 @@ use App\Repository\UapRepository;
 use App\Repository\TeamRepository;
 use App\Repository\OperatorRepository;
 use App\Repository\TrainingRecordRepository;
+use App\Repository\TrainerRepository;
 
 // use App\Entity\Zone;
 // use App\Entity\ProductLine;
@@ -92,6 +93,7 @@ class BaseController extends AbstractController
     protected $teamRepository;
     protected $operatorRepository;
     protected $trainingRecordRepository;
+    protected $trainerRepository;
 
     // Services methods
     protected $validationService;
@@ -150,6 +152,7 @@ class BaseController extends AbstractController
         TeamRepository                  $teamRepository,
         OperatorRepository              $operatorRepository,
         TrainingRecordRepository        $trainingRecordRepository,
+        TrainerRepository               $trainerRepository,
 
         // Services methods
         ValidationService               $validationService,
@@ -194,6 +197,7 @@ class BaseController extends AbstractController
         $this->teamRepository               = $teamRepository;
         $this->operatorRepository           = $operatorRepository;
         $this->trainingRecordRepository     = $trainingRecordRepository;
+        $this->trainerRepository            = $trainerRepository;
 
         // Variables related to the services
         $this->mailerService                = $mailerService;

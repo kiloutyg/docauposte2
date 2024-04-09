@@ -295,7 +295,17 @@ class OperatorController extends FrontController
         $operators = [];
         $operators = $request->request->all('operators');
         $upload = $this->uploadRepository->find($uploadId);
-        $trainer = $request->request->get('trainer');
+        $trainerId = $request->request->get('trainerId');
+
+        $trainerEntityWithUpload = $this->trainerRepository->findOneBy(['operator' => $trainerId, 'upload' => $upload]);
+        if ($trainerEntityWithUpload == null) {
+            $this->logger->info('operator ID', [$trainerId]);
+            $trainerOperatorId = $this->operatorRepository->find($trainerId);
+            $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $trainerOperatorId]);
+            $this->logger->info('trainerEntity', [$trainerEntity]);
+        } else {
+            $this->logger->info('trainerEntityWithUpload', [$trainerEntityWithUpload]);
+        };
 
         foreach ($operators as $operator) {
             $this->logger->info('does the key exist', [array_key_exists("trained", $operator)]);
@@ -328,6 +338,7 @@ class OperatorController extends FrontController
                     // Make sure $existingTrainingRecord is indeed a TrainingRecord instance
                     if ($existingTrainingRecord instanceof TrainingRecord) {
                         $existingTrainingRecord->setTrained($trained);
+                        $existingTrainingRecord->setTrainer($trainerEntity);
                         $existingTrainingRecord->setDate(new \DateTime());
                         $this->em->persist($existingTrainingRecord);
                     }
@@ -338,6 +349,7 @@ class OperatorController extends FrontController
                     $trainingRecord->setUpload($upload);
                     $trainingRecord->setDate(new \DateTime());
                     $trainingRecord->setTrained($trained);
+                    $trainingRecord->setTrainer($trainerEntity);
                     $this->em->persist($trainingRecord);
                 }
 
@@ -519,15 +531,34 @@ class OperatorController extends FrontController
             $enteredName = null;
         };
 
-        if ($enteredCode != null) {
-            $existingOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'name' => $enteredName]);
-            if ($existingOperator !== null) {
+        if (key_exists('uploadId', $parsedRequest)) {
+            $uploadId = $parsedRequest['uploadId'];
+            $this->logger->info('uploadId', [$uploadId]);
+            $upload = $this->uploadRepository->find($uploadId);
+        } else {
+            $upload = null;
+        };
 
+        if ($enteredCode != null) {
+            $existingOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'name' => $enteredName, 'IsTrainer' => true]);
+            if ($existingOperator !== null) {
+                $uploadTrainer = $this->trainerRepository->findOneBy(['operator' => $existingOperator, 'upload' => $upload]);
+                if ($uploadTrainer !== null) {
+                    return new JsonResponse([
+                        'found'         => true,
+                        'name'          => $existingOperator->getName(),
+                        'code'          => $existingOperator->getCode(),
+                        'trainerId'     => $existingOperator->getId(),
+                        'uploadTrainer' => true,
+                    ]);
+                }
                 return new JsonResponse([
-                    'found'     => true,
-                    'name'      => $existingOperator->getName(),
-                    'code'      => $existingOperator->getCode(),
-                    'trainerId' => $existingOperator->getId(),
+                    'found'         => true,
+                    'name'          => $existingOperator->getName(),
+                    'code'          => $existingOperator->getCode(),
+                    'trainerId'     => $existingOperator->getId(),
+                    'uploadTrainer' => false,
+
                 ]);
             } else {
                 return new JsonResponse([
@@ -535,7 +566,7 @@ class OperatorController extends FrontController
                 ]);
             }
         } else {
-            $existingOperator = $this->operatorRepository->findOneBy(['name' => $enteredName]);
+            $existingOperator = $this->operatorRepository->findOneBy(['name' => $enteredName, 'IsTrainer' => true]);
             if ($existingOperator !== null) {
 
                 return new JsonResponse([

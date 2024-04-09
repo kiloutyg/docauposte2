@@ -81,11 +81,15 @@ export default class OperatorTrainerController extends Controller {
     async checkTrainerExistence(field, value) {
         const payload = {};
         payload[field] = value;
-
+        console.log('payload1:', payload);
+        console.log('uploadId:', this.trainerOperatorNameTarget.dataset.uploadId);
+        payload['uploadId'] = this.trainerOperatorNameTarget.dataset.uploadId;
+        console.log('payload2:', payload);
         // If the field is 'code', also take the value of the name from the target.
         if (field === 'code') {
             payload['name'] = this.trainerOperatorNameTarget.value;
         }
+        console.log('payload3:', payload);
 
         try {
             const response = await axios.post('/docauposte/operator/check-if-trainer-exist', payload);
@@ -112,19 +116,32 @@ export default class OperatorTrainerController extends Controller {
                 this.validateTrainerOperatorCode();
             } else {
                 this.trainerAuthenticated(response);
-                this.trainerOperatorNameMessageTarget.textContent = "";
+                console.log('response.data.uploadTrainer:', response.data.uploadTrainer)
+                if (response.data.uploadTrainer === false) {
+                    this.trainerOperatorNameMessageTarget.style.fontWeight = "bold";
+                    this.trainerOperatorNameMessageTarget.style.color = "red";
+                    this.trainerOperatorNameMessageTarget.textContent = "Formateur trouvé. Non habilité sur ce process.";
+                } else {
+                    this.trainerOperatorNameMessageTarget.textContent = "";
+                }
             }
             this[`${fieldName}Target`].disabled = true;
+            this[`${fieldName}MessageTarget`].textContent = "";
+
             this[`${fieldName}MessageTarget`].style.fontWeight = "bold";
+
             this[`${fieldName}MessageTarget`].style.color = "green";
             this[`${fieldName}MessageTarget`].textContent = "Formateur trouvé.";
+
+
         } else {
             this[`${fieldName}Target`].value = "";
+            this[`${fieldName}MessageTarget`].textContent = "";
             this[`${fieldName}MessageTarget`].style.fontWeight = "bold";
             this[`${fieldName}MessageTarget`].style.color = "red";
             this[`${fieldName}MessageTarget`].textContent = "Formateur non trouvé. "[field];
             // Stop the repeating validation since we found the trainer
-            this.stopRepeatingValidation();
+            // this.stopRepeatingValidation();
         };
 
     }
