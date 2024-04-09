@@ -25,7 +25,7 @@ class Operator
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'operators')]
-    private ?Team $Team = null;
+    private ?team $team = null;
 
     #[ORM\ManyToOne(inversedBy: 'operators')]
     private ?Uap $uap = null;
@@ -39,8 +39,12 @@ class Operator
     #[Assert\Regex(pattern: '/[0-9]{5}$/', message: 'Le code Opérateur doit être composé de 5 chiffres.')]
     private ?string $code = null;
 
+    #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist', 'remove'])]
+    private ?Trainer $trainer = null;
+
     #[ORM\Column(nullable: true)]
-    private ?bool $trainer = null;
+    private ?bool $IsTrainer = null;
+
 
     public function __construct()
     {
@@ -64,14 +68,14 @@ class Operator
         return $this;
     }
 
-    public function getTeam(): ?Team
+    public function getTeam(): ?team
     {
-        return $this->Team;
+        return $this->team;
     }
 
-    public function setTeam(?Team $Team): static
+    public function setTeam(?team $team): static
     {
-        $this->Team = $Team;
+        $this->team = $team;
 
         return $this;
     }
@@ -130,14 +134,36 @@ class Operator
         return $this;
     }
 
-    public function isTrainer(): ?bool
+    public function getTrainer(): ?Trainer
     {
         return $this->trainer;
     }
 
-    public function setTrainer(?bool $trainer): static
+    public function setTrainer(?Trainer $trainer): static
     {
+        // unset the owning side of the relation if necessary
+        if ($trainer === null && $this->trainer !== null) {
+            $this->trainer->setOperator(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($trainer !== null && $trainer->getOperator() !== $this) {
+            $trainer->setOperator($this);
+        }
+
         $this->trainer = $trainer;
+
+        return $this;
+    }
+
+    public function isIsTrainer(): ?bool
+    {
+        return $this->IsTrainer;
+    }
+
+    public function setIsTrainer(?bool $IsTrainer): static
+    {
+        $this->IsTrainer = $IsTrainer;
 
         return $this;
     }

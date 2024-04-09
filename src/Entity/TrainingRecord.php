@@ -31,6 +31,9 @@ class TrainingRecord
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $iluo = null;
 
+    #[ORM\ManyToOne(inversedBy: 'trainingRecords')]
+    private ?Trainer $trainer = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -92,6 +95,18 @@ class TrainingRecord
     public function setIluo(?string $iluo): static
     {
         $this->iluo = $iluo;
+
+        return $this;
+    }
+
+    public function getTrainer(): ?Trainer
+    {
+        return $this->trainer;
+    }
+
+    public function setTrainer(?Trainer $trainer): static
+    {
+        $this->trainer = $trainer;
 
         return $this;
     }
