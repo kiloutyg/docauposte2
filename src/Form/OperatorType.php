@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -20,14 +21,16 @@ class OperatorType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $operatorId = $options['operator_id'] ?? null;
         $builder
             ->add('name', TextType::class, [
                 'label' => false,
+
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
                     'placeholder' => 'Nom de l\'opérateur',
-                    'id' => 'name',
-                    'required' => true
+                    'id' => 'name-' . $operatorId,
+                    'required' => true,
                 ],
                 'row_attr' => [
                     'class' => 'col-2'
@@ -43,7 +46,7 @@ class OperatorType extends AbstractType
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
                     'placeholder' => 'Code de l\'opérateur',
-                    'id' => 'code',
+                    'id' => 'code-' . $operatorId,
                     'required' => true
                 ],
                 'row_attr' => [
@@ -62,7 +65,7 @@ class OperatorType extends AbstractType
 
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
-                    'id' => 'name',
+                    'id' => 'name-' . $operatorId,
                     'required' => true
                 ],
                 'row_attr' => [
@@ -81,7 +84,7 @@ class OperatorType extends AbstractType
 
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
-                    'id' => 'name',
+                    'id' => 'name-' . $operatorId,
                     'required' => true
                 ],
                 'row_attr' => [
@@ -92,20 +95,33 @@ class OperatorType extends AbstractType
                     'style' => 'font-weight: color: #ffffff;'
                 ]
             ])
-            // ->add('addOperator', SubmitType::class, [
-            //     'label' => 'AJouter l\'Operateur',
-            //     'attr' => [
-            //         'class' => 'btn btn-primary btn-login text-uppercase fw-mt-2 mb-2 submit-operator-creation',
-            //         'type' => 'submit'
-            //     ]
-            // ])
-        ;
+            ->add('isTrainer', CheckboxType::class, [
+                'required' => false,
+
+                'attr' => [
+                    'class' => 'btn-check',
+                    'id' => 'trainer-' . $operatorId,
+                    'value' => true,
+                ],
+                'row_attr' => [
+                    'class' => 'col-2'
+                ],
+                'label_attr' => [
+
+                    'class' => 'btn btn-outline-primary mb-4',
+                    'style' => 'font-weight: bold; color: #ffffff;',
+                    'for' => 'trainer-' . $operatorId,
+                ],
+                'label' => 'Formateur',
+
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Operator::class,
+            'operator_id' => null,  // Add a default value for the custom option
         ]);
     }
 }

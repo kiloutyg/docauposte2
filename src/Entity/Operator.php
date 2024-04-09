@@ -42,6 +42,9 @@ class Operator
     #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist', 'remove'])]
     private ?Trainer $trainer = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $IsTrainer = null;
+
 
     public function __construct()
     {
@@ -149,6 +152,18 @@ class Operator
         }
 
         $this->trainer = $trainer;
+
+        return $this;
+    }
+
+    public function isIsTrainer(): ?bool
+    {
+        return $this->IsTrainer;
+    }
+
+    public function setIsTrainer(?bool $IsTrainer): static
+    {
+        $this->IsTrainer = $IsTrainer;
 
         return $this;
     }

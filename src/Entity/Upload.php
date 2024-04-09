@@ -56,9 +56,13 @@ class Upload
     #[ORM\OneToMany(mappedBy: 'Upload', targetEntity: TrainingRecord::class)]
     private Collection $trainingRecords;
 
+    #[ORM\OneToMany(mappedBy: 'upload', targetEntity: Trainer::class)]
+    private Collection $trainers;
+
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
+        $this->trainers = new ArrayCollection();
     }
 
 
@@ -221,6 +225,36 @@ class Upload
             // set the owning side to null (unless already changed)
             if ($trainingRecord->getUpload() === $this) {
                 $trainingRecord->setUpload(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Trainer>
+     */
+    public function getTrainers(): Collection
+    {
+        return $this->trainers;
+    }
+
+    public function addTrainer(Trainer $trainer): static
+    {
+        if (!$this->trainers->contains($trainer)) {
+            $this->trainers->add($trainer);
+            $trainer->setUpload($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTrainer(Trainer $trainer): static
+    {
+        if ($this->trainers->removeElement($trainer)) {
+            // set the owning side to null (unless already changed)
+            if ($trainer->getUpload() === $this) {
+                $trainer->setUpload(null);
             }
         }
 

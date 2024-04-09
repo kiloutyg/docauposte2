@@ -12,6 +12,7 @@ use App\Form\OperatorType;
 
 use App\Entity\Operator;
 use App\Entity\TrainingRecord;
+use App\Entity\Trainer;
 
 
 class OperatorController extends FrontController
@@ -28,11 +29,15 @@ class OperatorController extends FrontController
         $operatorForms = [];
         if (isset($operators)) {
             foreach ($operators as $operator) {
-                $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator)->createView();
+                $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
+                    'operator_id' => $operator->getId(),
+                ])->createView();
             }
         }
         $newOperator = new Operator();
-        $newOperatorForm = $this->createForm(OperatorType::class, $newOperator);
+        $newOperatorForm = $this->createForm(OperatorType::class, $newOperator, [
+            'operator_id' => $operator->getId(),
+        ]);
         if ($request->getMethod() === 'POST') {
             $newOperatorForm->handleRequest($request);
             if ($newOperatorForm->isSubmitted() && $newOperatorForm->isValid()) {
@@ -55,12 +60,25 @@ class OperatorController extends FrontController
     #[Route('/operator/edit/{id}', name: 'app_operator_edit')]
     public function editOperatorAction(Request $request, Operator $operator): Response
     {
+        $this->logger->info('Full request', $request->request->all());
         $originUrl = $request->headers->get('referer');
 
-        $form = $this->createForm(OperatorType::class, $operator);
+        $form = $this->createForm(OperatorType::class, $operator, [
+            'operator_id' => $operator->getId(),
+        ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $trainerBool = $form->get('isTrainer')->getData();
+            if ($trainerBool == true) {
+                $trainer = new Trainer();
+                $trainer->setOperator($operator);
+                $this->em->persist($trainer);
+                $operator->setTrainer($trainer);
+            } else {
+            };
+
             $operator = $form->getData();
             $this->em->persist($operator);
             $this->em->flush();
