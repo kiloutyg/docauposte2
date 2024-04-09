@@ -41,6 +41,19 @@ class OperatorController extends FrontController
         if ($request->getMethod() === 'POST') {
             $newOperatorForm->handleRequest($request);
             if ($newOperatorForm->isSubmitted() && $newOperatorForm->isValid()) {
+                $trainerBool = $newOperatorForm->get('isTrainer')->getData();
+                if ($trainerBool == true) {
+                    $trainer = new Trainer();
+                    $trainer->setOperator($newOperator);
+                    $this->em->persist($trainer);
+                    $newOperator->setTrainer($trainer);
+                } else if ($trainerBool != true) {
+                    $trainer = $operator->getTrainer();
+                    $operator->setTrainer(null);
+                    if ($trainer != null) {
+                        $this->em->remove($trainer);
+                    }
+                };
                 $operator = $newOperatorForm->getData();
                 $this->em->persist($operator);
                 $this->em->flush();
@@ -76,7 +89,12 @@ class OperatorController extends FrontController
                 $trainer->setOperator($operator);
                 $this->em->persist($trainer);
                 $operator->setTrainer($trainer);
-            } else {
+            } else if ($trainerBool != true) {
+                $trainer = $operator->getTrainer();
+                $operator->setTrainer(null);
+                if ($trainer != null) {
+                    $this->em->remove($trainer);
+                }
             };
 
             $operator = $form->getData();
