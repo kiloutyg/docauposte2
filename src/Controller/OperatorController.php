@@ -100,7 +100,7 @@ class OperatorController extends FrontController
             $operator = $form->getData();
             $this->em->persist($operator);
             $this->em->flush();
-            $this->addFlash('success', 'L\'opérateur a bien été ajouté');
+            $this->addFlash('success', 'L\'opérateur a bien été modifié');
             return $this->redirect($originUrl);
         } else {
             return $this->render('app_operator');
