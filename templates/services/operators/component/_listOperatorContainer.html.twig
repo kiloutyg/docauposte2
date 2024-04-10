@@ -4,7 +4,7 @@
 
 	{% if team is defined and uap is defined and team is not empty and uap is not empty %}
 		<div
-			data-controller="operator-trainer"
+
 			id="trainerValidation"
 			name="trainerValidation">
 			<div
@@ -21,6 +21,8 @@
 					required>
 				<input
 					type="text"
+					pattern="\d*"
+					maxlength="5"
 					class="form-control"
 					data-operator-trainer-target="trainerOperatorCode"
 					data-action="keyup->operator-trainer#validateTrainerOperatorCode"
@@ -37,17 +39,16 @@
 			<div
 				data-operator-trainer-target="trainerOperatorCodeMessage"
 				class="trainerOperatorCode-message d-flex justify-content-evenly"></div>
+
+			<form
+				class="d-flex flex-grow flex-column justify-content-evenly"
+				action="{{path('app_training_new_operator', {'uploadId': upload.id, 'teamId': team.id, 'uapId': uap.id})}}" method="post"
+				name="newOperatorContainer"
+				id="newOperatorContainer"
+				data-turbo-frame="training-records-form"
+				data-action="submit->operator-training#newOperatorHandleSubmit"></form>
+
 		</div>
-		<form
-			class="d-flex flex-grow flex-column justify-content-evenly"
-			action="{{path('app_training_new_operator', {'uploadId': upload.id, 'teamId': team.id, 'uapId': uap.id})}}" method="post"
-			name="newOperatorContainer"
-			id="newOperatorContainer"
-			data-turbo-frame="training-records-form"
-			data-controller="operator-training"
-			data-action="submit->operator-training#newOperatorHandleSubmit"></form>
-
-
 	{% endif %}
 	<turbo-frame
 		id="training-records-form">

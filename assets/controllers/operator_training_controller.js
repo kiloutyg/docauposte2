@@ -20,9 +20,9 @@ export default class OperatorTrainingController extends Controller {
 
 
     validateNewOperatorName() {
-        clearTimeout(this.typingTimeout);  // clear any existing timeout to reset the timer
+        clearTimeout(this.nameTypingTimeout);  // clear any existing timeout to reset the timer
 
-        this.typingTimeout = setTimeout(() => {
+        this.nameTypingTimeout = setTimeout(() => {
             console.log('validating new operator name:', this.newOperatorNameTarget.value);
 
             const regex = /^[a-zA-Z]+\.(?!-)(?!.*--)[a-zA-Z-]+(?<!-)$/;
@@ -54,8 +54,8 @@ export default class OperatorTrainingController extends Controller {
 
 
     validateNewOperatorCode() {
-        clearTimeout(this.typingTimeout);
-        this.typingTimeout = setTimeout(() => {
+        clearTimeout(this.codeTypingTimeout);
+        this.codeTypingTimeout = setTimeout(() => {
 
             console.log('validating new operator code:', this.newOperatorCodeTarget.value);
 
@@ -178,6 +178,7 @@ export default class OperatorTrainingController extends Controller {
         this.newOperatorSubmitButtonTarget.value = submitValue;
         clearTimeout(this.validatedTimeout);
         this.validatedTimeout = setTimeout(() => {
+            console.log('Resetting new operator form after 5 seconds')
             this.newOperatorCodeTarget.value = "";
             this.newOperatorNameTarget.value = "";
             this.duplicateCheckResults = { name: null, code: null };
@@ -188,7 +189,14 @@ export default class OperatorTrainingController extends Controller {
             this.newOperatorCodeMessageTarget.textContent = "";
             this.newOperatorNameMessageTarget.textContent = "";
             this.newOperatorTransferMessageTarget.textContent = "";
+
+            // console.log('About to dispatch operatorSubmitButtonManaged event', this.element);
+            // const event = new CustomEvent("operatorSubmitButtonManaged");
+            // console.log('dispatching operatorSubmitButtonManaged event')
+            // this.element.dispatchEvent(event);
+            // console.log('operatorSubmitButtonManaged event dispatched')
         }, 5000);
+
     }
 
 
@@ -268,13 +276,19 @@ export default class OperatorTrainingController extends Controller {
 
 
     validateCodeEntryForTraining() {
-        console.log('validating training operator code:', this.trainingOperatorCodeTarget.value);
-        const regex = /^[0-9]{5}$/;
-        const isValid = regex.test(this.trainingOperatorCodeTarget.value.trim());
+        clearTimeout(this.trainingCodeTypingTimeout);
+        this.trainingCodeTypingTimeout = setTimeout(() => {
+            console.log('validating training operator code:', this.trainingOperatorCodeTarget.value);
+            const regex = /^[0-9]{5}$/;
+            const isValid = regex.test(this.trainingOperatorCodeTarget.value.trim());
 
-        if (isValid) {
-            this.checkOperatorIdentityByCode();
-        }
+            if (isValid) {
+                this.checkOperatorIdentityByCode();
+            } else {
+                this.trainingOperatorCodeTarget.value = "";
+                this.trainingOperatorCodeTarget.placeholder = "Invalide";
+            }
+        }, 1000);
     }
 
 
@@ -288,9 +302,13 @@ export default class OperatorTrainingController extends Controller {
         try {
             console.log('Checking operator identity by code:', this.trainingOperatorCodeTarget.value);
             const response = await this.checkCodeAgainstOperatorCode('/docauposte/operator/check-entered-code-against-operator-code', code, operatorId, teamId, uapId);
-            if (response.data) {
+            if (response.data.found) {
                 console.log('response for operator identity by code:', response.data);
                 this.inputSwitch(response.data);
+            } else {
+                console.log('No operator found with the entered code.');
+                this.trainingOperatorCodeTarget.value = "";
+                this.trainingOperatorCodeTarget.placeholder = "Invalide";
             }
         } catch (error) {
             console.error("Error checking for operator identity by code.", error);
@@ -347,11 +365,14 @@ export default class OperatorTrainingController extends Controller {
 
             // Append the new checkbox and label to the parent container
             const parentContainer = document.querySelector(`#trainingCheckbox${response.operator.id}`); // Replace '#parent_container' with the actual ID or class of the parent container where you want to insert the checkbox and label.
+
+
             parentContainer.appendChild(checkbox);
             parentContainer.appendChild(label);
         } else {
             this.trainingOperatorCodeTarget.value = "";
             this.trainingOperatorCodeTarget.placeholder = "Invalide";
+
         }
     }
 
