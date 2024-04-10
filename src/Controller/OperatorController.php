@@ -268,14 +268,36 @@ class OperatorController extends FrontController
         $this->logger->info('selectedOperators', [$selectedOperators]);
 
 
-        $trainingRecords = [];
+        $trainingRecords = []; // Array of training records
+        $unorderedTrainingRecords = []; // Array of unordered training records
+        $untrainedOperators = []; // Array of untrained operators
+        $operatorsByTrainer = []; // Array of operators grouped by trainer
+        $inTrainingOperatorsByTrainer = []; // Array of operators in training grouped by trainer
+
         foreach ($selectedOperators as $operator) {
             $records = $this->trainingRecordRepository->findBy(['operator' => $operator, 'Upload' => $uploadId]);
             $unorderedTrainingRecords = array_merge($trainingRecords, $records);
+
+            $record = $records[0] ?? null;
+            if ($record) {
+                $this->logger->info('unorderedTrainingRecords', [$unorderedTrainingRecords]);
+                $trainerName = $record->getTrainer() ? $record->getTrainer()->getOperator()->getName() : 'Non assigné';
+                if ($record->isTrained()) {
+                    $operatorsByTrainer[$trainerName][] = $operator;
+                } else {
+                    $inTrainingOperatorsByTrainer[$trainerName][] = $operator;
+                }
+            } else {
+                $untrainedOperators[] = $operator;
+            }
         }
+
+
         if (!empty($unorderedTrainingRecords)) {
             $trainingRecords = $this->trainingRecordService->getOrderedTrainingRecordsByTrainingRecordsArray($unorderedTrainingRecords);
         }
+
+
         $this->logger->info('trainingRecords', [$trainingRecords]);
 
         // Render the partial view
@@ -285,6 +307,9 @@ class OperatorController extends FrontController
             'upload' => $upload,
             'selectedOperators' => $selectedOperators,
             'trainingRecords'   => $trainingRecords,
+            'untrainedOperators' => $untrainedOperators,
+            'operatorsByTrainer' => $operatorsByTrainer,
+            'inTrainingOperatorsByTrainer' => $inTrainingOperatorsByTrainer,
         ]);
     }
 
