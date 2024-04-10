@@ -5,11 +5,6 @@ import axios from 'axios';
 
 export default class OperatorTrainingController extends Controller {
 
-    // connect() {
-    //     if (this.element.classList.contains('.operator-input')) {
-    //         this.element.dispatchEvent(new CustomEvent('operatorInputConnected', { bubbles: true }));
-    //     }
-    // }
 
     static targets = [
         "newOperatorName",
@@ -21,6 +16,8 @@ export default class OperatorTrainingController extends Controller {
         "trainingOperatorCode",
 
     ];
+
+
 
     validateNewOperatorName() {
         clearTimeout(this.typingTimeout);  // clear any existing timeout to reset the timer
@@ -52,8 +49,8 @@ export default class OperatorTrainingController extends Controller {
                 this.checkForExistingEntityByName();
             }
         }, 1000); // delay in milliseconds
-
     }
+
 
 
     validateNewOperatorCode() {
@@ -87,6 +84,7 @@ export default class OperatorTrainingController extends Controller {
             }
         }, 1000);
     }
+
 
 
     async checkForExistingEntityByName() {
@@ -223,6 +221,7 @@ export default class OperatorTrainingController extends Controller {
     }
 
 
+
     executeEntityMatchingLogic(matchesFound) {
         console.log('Executing entity matching logic:', matchesFound);
 
@@ -244,11 +243,13 @@ export default class OperatorTrainingController extends Controller {
     }
 
 
+
     executeEntityNonMatchingLogic(unMatchedFound) {
         this.newOperatorTransferMessageTarget.textContent = "Nom et Code opérateurs ne correspondent à aucun opérateur. Vous pouvez les ajouter.";
         this.newOperatorTransferMessageTarget.style.color = "green";
         this.manageNewOperatorSubmitButton(unMatchedFound, "Ajouter");
     }
+
 
 
     resetUselessMessages() {
@@ -277,6 +278,7 @@ export default class OperatorTrainingController extends Controller {
     }
 
 
+
     async checkOperatorIdentityByCode() {
         const code = this.trainingOperatorCodeTarget.value;
         const operatorId = this.trainingOperatorCodeTarget.dataset.operatorId;
@@ -296,10 +298,13 @@ export default class OperatorTrainingController extends Controller {
     }
 
 
+
     checkCodeAgainstOperatorCode(url, code, operatorId, teamId, uapId) {
         console.log(`Checking code against operator code: ${code}, operatorId: ${operatorId}, teamId: ${teamId}, uapId: ${uapId}`);
         return axios.post(`${url}/${teamId}/${uapId}`, { code: code, operatorId: operatorId, teamId: teamId, uapId: uapId });
     }
+
+
 
     inputSwitch(response) {
         console.log('input switch response:', response);
@@ -350,6 +355,8 @@ export default class OperatorTrainingController extends Controller {
         }
     }
 
+
+
     codeGenerator() {
         console.log('generating a code');
         const code = Math.floor(10000 + Math.random() * 90000);
@@ -366,10 +373,15 @@ export default class OperatorTrainingController extends Controller {
         }
     }
 
+
+
     generatedCodeChecker(code) {
         console.log('checking generated code');
         return axios.post(`/docauposte/operator/check-if-code-exist`, { code: code });
     }
+
+
+
     newOperatorHandleSubmit() {
         console.log('submitting new operator form');
 

@@ -5,14 +5,7 @@ import axios from 'axios';
 
 export default class OperatorTrainerController extends Controller {
 
-    // connect() {
-    //     this.element.addEventListener('operatorInputConnected', this.revalidateTrainerAuthentication());
-    //     console.log('OperatorTrainerController connected');
-    // }
 
-    // disconnect() {
-    //     this.element.removeEventListener('operatorInputConnected', this.revalidateTrainerAuthentication());
-    // }
 
     static targets = [
         "trainerOperatorName",
@@ -43,6 +36,8 @@ export default class OperatorTrainerController extends Controller {
         }, 1000);
     }
 
+
+
     validateTrainerOperatorCode() {
         this.trainerOperatorCodeTarget.disabled = false;
         this.trainerOperatorCodeTarget.focus();
@@ -64,6 +59,8 @@ export default class OperatorTrainerController extends Controller {
             }
         }, 1000);
     }
+
+
 
     updateMessage(targetElement, isValid, errorMessage) {
         console.log(`Updating message: isValid: ${isValid}`);
@@ -109,7 +106,6 @@ export default class OperatorTrainerController extends Controller {
 
 
 
-
     handleTrainerExistenceResponse(response, field, fieldName) {
         if (response.data.found) {
             if (field === 'name') {
@@ -141,10 +137,11 @@ export default class OperatorTrainerController extends Controller {
             this[`${fieldName}MessageTarget`].style.color = "red";
             this[`${fieldName}MessageTarget`].textContent = "Formateur non trouvé. "[field];
             // Stop the repeating validation since we found the trainer
-            // this.stopRepeatingValidation();
         };
-
     }
+
+
+
     trainerAuthenticated(response) {
         // initialize the new operator form
         this.loadOperatorTrainingContent(response);
@@ -154,22 +151,7 @@ export default class OperatorTrainerController extends Controller {
         operatorInputs.forEach(function (input) {
             input.disabled = false;
         });
-        // this.startRepeatingValidation(5000);
     }
-    // revalidateTrainerAuthentication() {
-    //     console.log('revalidating trainer authentication');
-    //     this.validateTrainerOperatorName();
-    // }
-    // startRepeatingValidation(intervalMs) {
-    //     this.validationInterval = setInterval(() => {
-    //         this.validateTrainerOperatorName();
-    //     }, intervalMs);
-    // }
-    // stopRepeatingValidation() {
-    //     if (this.validationInterval) {
-    //         clearInterval(this.validationInterval);
-    //     }
-    // }
 
 
 
@@ -229,7 +211,6 @@ export default class OperatorTrainerController extends Controller {
 
         container.innerHTML = content;
 
-
         let trainerId = response.data.trainerId;
         const listUpdateSubmitContainer = document.getElementById('trainingValidationSubmitContainer');
 
@@ -238,18 +219,18 @@ export default class OperatorTrainerController extends Controller {
         <input
         type="submit"
         class="btn btn-primary"
+        data-operator-training-target="trainingUpdateSubmitButton"
         value="Enregistrer les modifications">
         `;
         listUpdateSubmitContainer.innerHTML = listUpdateSubmitContent;
-
     }
+
+
 
     unloadOperatorTrainingContent() {
         const container = document.getElementById('newOperatorContainer');
         container.innerHTML = ''; // Clears out the inner content of the div
     }
-
-
 
 
 }
