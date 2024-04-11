@@ -1,0 +1,61 @@
+<turbo-frame
+	id="training-records"
+	class="d-flex flex-column mx-2 justify-content-evenly">
+
+	{% if team is defined and uap is defined and team is not empty and uap is not empty %}
+		<div
+
+			id="trainerValidation"
+			name="trainerValidation">
+			<div
+				class="d-flex flex-fill">
+				<input
+					type="text"
+					class="form-control "
+					data-operator-trainer-target="trainerOperatorName"
+					data-action="keyup->operator-trainer#validateTrainerOperatorName"
+					data-upload-id="{{upload.id}}" placeholder="nom.prénom"
+					id="trainerOperatorName"
+					name="trainerOperatorName"
+					style="flex:0.5;"
+					required>
+				<input
+					type="password"
+					pattern="\d*"
+					maxlength="5"
+					class="form-control"
+					data-operator-trainer-target="trainerOperatorCode"
+					data-action="keyup->operator-trainer#validateTrainerOperatorCode "
+					placeholder="Code Opérateur"
+					id="trainerOperatorCode"
+					name="trainerOperatorCode"
+					style="flex:0.5;"
+					required
+					disabled>
+				<div
+					id="trainerLogOutContainer"
+					name="trainerLogOutContainer"></div>
+			</div>
+			<div
+				data-operator-trainer-target="trainerOperatorNameMessage"
+				class="trainerOperatorName-message d-flex justify-content-evenly"></div>
+			<div
+				data-operator-trainer-target="trainerOperatorCodeMessage"
+				class="trainerOperatorCode-message d-flex justify-content-evenly"></div>
+
+			<form
+				class="d-flex flex-grow flex-column justify-content-evenly"
+				action="{{path('app_training_new_operator', {'uploadId': upload.id, 'teamId': team.id, 'uapId': uap.id})}}" method="post"
+				name="newOperatorContainer"
+				id="newOperatorContainer"
+				data-turbo-frame="training-records-form"
+				data-action="submit->operator-training#newOperatorHandleSubmit"></form>
+
+		</div>
+	{% endif %}
+	<turbo-frame
+		id="training-records-form">
+		{% include "services/operators/component/_listOperator.html.twig" %}
+	</turbo-frame>
+
+</turbo-frame>

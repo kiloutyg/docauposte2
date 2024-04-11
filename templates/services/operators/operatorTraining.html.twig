@@ -13,10 +13,11 @@
 	{% include "services/_toasts.html.twig" %}
 
 	<body
-		class="d-flex flex-column justify-content-evenly align-items-evenly">
-
+		class="d-flex flex-column justify-content-evenly align-items-evenly card"
+		style="background-color: #d3d3d3;">
 
 		<form
+			class="mt-2"
 			id="trainingRecord-form"
 			action="{{path('app_training_list_select_record_form', {'uploadId': upload.id})}}" method="post"
 			data-turbo-frame="training-records">
@@ -80,11 +81,12 @@
 		</form>
 
 		<turbo-frame
+			data-controller="operator-trainer operator-training"
 			id="training-records"
-			class="d-flex flex-column mx-2 justify-content-evenly">
-			{% include "services/operators/component/_listOperator.html.twig" %}
+			class="d-flex flex-column mx-2 justify-content-evenly card border-2"
+			style="background-color: #c3c3c3;">
+			{% include "services/operators/component/_listOperatorContainer.html.twig" %}
 
 		</turbo-frame>
-
 	</body>
 </html>

@@ -3,11 +3,13 @@
 	Truc des operateurs
 {% endblock %}
 {% block body %}
-	{% set fieldsName = ['Nom de l\'opérateur','Code de l\'opérateur', 'Equipe de l\'operateur', 'UAP de l\'opérateur'] %}
-	{% set fields = ['name','code', 'Team', 'uap'] %}
+	{% set fieldsName = ['Nom de l\'opérateur','Code de l\'opérateur', 'Equipe de l\'operateur', 'UAP de l\'opérateur', 'Est-il un formateur?'] %}
+	{% set fields = ['name','code', 'team', 'uap','isTrainer'] %}
+
+	<br>
 
 	<div
-		class="card bg-secondary container row ">
+		class="card bg-secondary container row mb-2">
 		<h2>
 			New Operator
 		</h2>
@@ -54,26 +56,29 @@
 				class="row">
 				{% for fieldName in fieldsName %}
 					<div
-						class="col-2 mx-auto">
+						class="col-2 ">
 						{{ fieldName }}
 					</div>
 					{# Adjust the div class as needed #}
 				{% endfor %}
 				<div
-					class="col-2">
+					class="col-2 mx-auto">
 					Actions
 				</div>
 				{# Column for actions like the update button #}
 			</div>
 		</ul>
 
+
 		<ul>
 			{% for operatorId, operatorForm in operatorForms %}
 				{{ form_start(operatorForm, {'attr': {'class': 'row'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
 
 				{% for field in fields %}
-					{{ form_row(operatorForm[field]) }}
+					{% set customId = field ~ '-' ~ operatorId %}
+					{{ form_row(operatorForm[field], {'id': customId}) }}
 				{% endfor %}
+
 				<button
 					type="submit"
 					class="btn btn-primary text-uppercase submit-operator-creation col-2 my-auto mx-auto">
@@ -83,11 +88,12 @@
 				{{ form_end(operatorForm) }}
 			{% else %}
 				<div
-					class="card ">
+					class="card">
 					No operators found
 				</div>
 			{% endfor %}
 		</ul>
+
 	</div>
 
 {% endblock %}

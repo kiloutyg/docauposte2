@@ -15,6 +15,7 @@ export default class extends Controller {
             isValid = false;
         }
         this.newOperatorSelectMessageTarget.textContent = message;
+        this.newOperatorSelectMessageTarget.style.fontWeight = "bold";
         this.newOperatorSelectMessageTarget.style.color = isValid ? "black" : "red";
         if (isValid) {
             this.submitButtonClicked();

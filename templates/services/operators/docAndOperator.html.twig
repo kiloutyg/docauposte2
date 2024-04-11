@@ -9,15 +9,25 @@
 	<html>
 
 		<head>
-			<title>TrainingRecord</title>
+			<title>
+				TrainingRecord
+			</title>
 			{% include "services/_toasts.html.twig" %}
 
 		</head>
 		<body>
-			<div class=" d-flex align-items-center  flex-row">
+			<div
+				class="d-flex ">
 
-				<iframe src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" width="69%" height="950" target="_blank"></iframe>
-				<iframe class="rounded-3" name="trainingRecord" width="31%" height="850" src="{{ path('app_training_list', { uploadId: upload.id})}}" frameborder="0"></iframe>
+				<iframe
+					src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" class=" vh-100"
+					width="69%"
+					target="_blank"></iframe>
+				<iframe
+					class="rounded-3 card vh-100  border-2 bg-light "
+					name="trainingRecord"
+					width="31%"
+					src="{{ path('app_training_list', { uploadId: upload.id})}}" frameborder="0"></iframe>
 
 			</div>
 		</body>
