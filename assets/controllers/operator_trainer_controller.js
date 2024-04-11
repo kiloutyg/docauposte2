@@ -38,14 +38,13 @@ export default class OperatorTrainerController extends Controller {
     }
 
 
-
     validateTrainerOperatorCode() {
         this.trainerOperatorCodeTarget.disabled = false;
         this.trainerOperatorCodeTarget.focus();
 
         clearTimeout(this.typingTimeout);  // clear any existing timeout to reset the timer
         this.typingTimeout = setTimeout(() => {
-            console.log('validating new operator code:', this.trainerOperatorCodeTarget.value);
+            console.log('validating trainer code:', this.trainerOperatorCodeTarget.value);
 
             const regex = /^[0-9]{5}$/;
             const value = this.trainerOperatorCodeTarget.value.trim();
@@ -60,7 +59,6 @@ export default class OperatorTrainerController extends Controller {
             }
         }, 800);
     }
-
 
 
     updateMessage(targetElement, isValid, errorMessage) {
@@ -124,13 +122,9 @@ export default class OperatorTrainerController extends Controller {
             }
             this[`${fieldName}Target`].disabled = true;
             this[`${fieldName}MessageTarget`].textContent = "";
-
             this[`${fieldName}MessageTarget`].style.fontWeight = "bold";
-
             this[`${fieldName}MessageTarget`].style.color = "green";
             this[`${fieldName}MessageTarget`].textContent = "Formateur trouvé.";
-
-
         } else {
             this[`${fieldName}Target`].value = "";
             this[`${fieldName}MessageTarget`].textContent = "";
@@ -142,7 +136,6 @@ export default class OperatorTrainerController extends Controller {
     }
 
 
-
     trainerAuthenticated(response) {
         // initialize the new operator form
         this.loadOperatorTrainingContent(response);
@@ -152,8 +145,43 @@ export default class OperatorTrainerController extends Controller {
         operatorInputs.forEach(function (input) {
             input.disabled = false;
         });
+        this.logOutInputSwitch(true);
     }
 
+    logOutInputSwitch(logOut) {
+        console.log('logOutInputSwitch');
+        const trainerLogOutContainer = document.getElementById('trainerLogOutContainer');
+        let content = ``;
+        if (logOut) {
+            content = `
+            <input
+            type="button"
+            class="btn btn-danger"
+            data-action="click->operator-trainer#logOut"
+            value="Déconnexion">
+            `;
+        }
+        trainerLogOutContainer.innerHTML = content;
+
+    }
+
+    logOut() {
+        console.log('logOut');
+        this.trainerOperatorNameTarget.value = "";
+        this.trainerOperatorNameTarget.disabled = false;
+        this.trainerOperatorCodeTarget.value = "";
+        this.trainerOperatorCodeTarget.disabled = true;
+        this.trainerOperatorNameMessageTarget.textContent = "";
+        this.trainerOperatorCodeMessageTarget.textContent = "";
+        this.validateTrainerOperatorName();
+        this.unloadOperatorTrainingContent();
+        this.logOutInputSwitch(false);
+        const operatorInputs = document.querySelectorAll('.operator-input');
+        operatorInputs.forEach(function (input) {
+            input.disabled = true;
+        });
+
+    }
 
 
     loadOperatorTrainingContent(response) {
@@ -233,6 +261,8 @@ export default class OperatorTrainerController extends Controller {
     unloadOperatorTrainingContent() {
         const container = document.getElementById('newOperatorContainer');
         container.innerHTML = ''; // Clears out the inner content of the div
+        const listUpdateSubmitContainer = document.getElementById('trainingValidationSubmitContainer');
+        listUpdateSubmitContainer.innerHTML = '';
     }
 
     // connect() {

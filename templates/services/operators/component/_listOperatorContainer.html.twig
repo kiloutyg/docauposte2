@@ -20,18 +20,21 @@
 					style="flex:0.5;"
 					required>
 				<input
-					type="text"
+					type="password"
 					pattern="\d*"
 					maxlength="5"
 					class="form-control"
 					data-operator-trainer-target="trainerOperatorCode"
-					data-action="keyup->operator-trainer#validateTrainerOperatorCode"
+					data-action="keyup->operator-trainer#validateTrainerOperatorCode "
 					placeholder="Code Opérateur"
 					id="trainerOperatorCode"
 					name="trainerOperatorCode"
 					style="flex:0.5;"
 					required
 					disabled>
+				<div
+					id="trainerLogOutContainer"
+					name="trainerLogOutContainer"></div>
 			</div>
 			<div
 				data-operator-trainer-target="trainerOperatorNameMessage"
