@@ -12,6 +12,7 @@ export default class OperatorTrainerController extends Controller {
         "trainerOperatorCode",
         "trainerOperatorNameMessage",
         "trainerOperatorCodeMessage",
+
     ];
 
 
@@ -21,7 +22,7 @@ export default class OperatorTrainerController extends Controller {
         clearTimeout(this.typingTimeout);  // clear any existing timeout to reset the timer
 
         this.typingTimeout = setTimeout(() => {
-            console.log('validating new operator name:', this.trainerOperatorNameTarget.value);
+            console.log('validating trainer name:', this.trainerOperatorNameTarget.value);
 
             const regex = /^[a-zA-Z]+\.(?!-)(?!.*--)[a-zA-Z-]+(?<!-)$/;
 
@@ -33,7 +34,7 @@ export default class OperatorTrainerController extends Controller {
             } else {
                 this.updateMessage(this.trainerOperatorNameMessageTarget, isValid, "Veuillez saisir sous la forme prénom.nom.");
             }
-        }, 1000);
+        }, 800);
     }
 
 
@@ -57,7 +58,7 @@ export default class OperatorTrainerController extends Controller {
                     this.updateMessage(this.trainerOperatorCodeMessageTarget, isValid, "Veuillez saisir un code valide: XXXXX.");
                 }
             }
-        }, 1000);
+        }, 800);
     }
 
 
@@ -163,7 +164,8 @@ export default class OperatorTrainerController extends Controller {
 
             <div>
                 <div
-                    class="d-flex flex-fill">
+                    class="d-flex flex-fill"
+                    >
                     <input
                         type="text"
                         class="form-control "
@@ -189,6 +191,7 @@ export default class OperatorTrainerController extends Controller {
                         type="submit"
                         class="btn btn-primary "
                         data-operator-training-target="newOperatorSubmitButton"
+                        data-action="click->operator-trainer#resetFollowingSubmit"
                         id="newOperatorSubmitButton"
                         name="newOperatorSubmitButton"
                         value="Ajouter"
@@ -210,7 +213,7 @@ export default class OperatorTrainerController extends Controller {
         `;
 
         container.innerHTML = content;
-
+        console.log('response inside loadOperatorTrainingContent the famous form :', response)
         let trainerId = response.data.trainerId;
         const listUpdateSubmitContainer = document.getElementById('trainingValidationSubmitContainer');
 
@@ -219,7 +222,7 @@ export default class OperatorTrainerController extends Controller {
         <input
         type="submit"
         class="btn btn-primary"
-        data-operator-training-target="trainingUpdateSubmitButton"
+        data-action="click->operator-trainer#resetFollowingSubmit"
         value="Enregistrer les modifications">
         `;
         listUpdateSubmitContainer.innerHTML = listUpdateSubmitContent;
@@ -232,5 +235,26 @@ export default class OperatorTrainerController extends Controller {
         container.innerHTML = ''; // Clears out the inner content of the div
     }
 
+    // connect() {
+    //     this.element.addEventListener("operatorSubmitButtonManaged", this.handleOperatorSubmitButtonManaged.bind(this));
+    //     console.log('connected, will listen to god voice')
+    // }
+
+
+    // handleOperatorSubmitButtonManaged(event) {
+    //     console.log('custom event has been listened to. event detail:');
+    //     // Now call loadOperatorTrainingContent or any other method you need
+    //     this.validateTrainerOperatorName();
+    // }
+
+    // disconnect() {
+    //     this.element.removeEventListener("operatorSubmitButtonManaged", this.handleOperatorSubmitButtonManaged.bind(this));
+    //     console.log('disconnected, will not listen to god voice')
+    // }
+
+    resetFollowingSubmit() {
+        console.log('new operator submit button clicked');
+        this.validateTrainerOperatorName();
+    }
 
 }
