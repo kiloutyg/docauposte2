@@ -31,8 +31,17 @@ class TrainingRecordRepository extends ServiceEntityRepository
         if ($a->getUap()->getName() != $b->getUap()->getName()) {
             return strcmp($a->getUap()->getName(), $b->getUap()->getName());
         }
-        // If 'uap' is also the same, finally compare by 'name'
-        return strcmp($a->getName(), $b->getName());
+
+        // If 'uap' is also the same, finally compare by 'surname.firstname'
+        list($firstnameA, $surnameA) = explode('.', $a->getName(), 2);
+        list($firstnameB, $surnameB) = explode('.', $b->getName(), 2);
+
+        $surnameComparison = strcmp($surnameA, $surnameB);
+        if ($surnameComparison !== 0) {
+            return $surnameComparison;
+        }
+
+        return strcmp($firstnameA, $firstnameB);
     }
 
     //    /**

@@ -36,6 +36,12 @@ export default class OperatorTrainingController extends Controller {
     }
 
     validateNewOperatorFirstname() {
+
+        document.getElementById('newOperatorFirstname').addEventListener('input', function (e) {
+            var value = e.target.value;
+            e.target.value = value.charAt(0).toUpperCase() + value.slice(1);
+        });
+
         clearTimeout(this.firstnameTypingTimeout);
         this.firstnameTypingTimeout = setTimeout(() => {
             const firstnameValue = this.newOperatorFirstnameTarget.value;
@@ -43,9 +49,9 @@ export default class OperatorTrainingController extends Controller {
             console.log('validating new operator firstname:', this.newOperatorFirstnameTarget.value);
             const regex = /^[A-Z][a-z]+(-[A-Z][a-z]+)*$/;
             const isValid = regex.test(this.firstnameValue.trim());
-            this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir un prénom valide.");
+            this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir un prenom valide.");
             if (isValid) {
-                let combinedName = `${this.newOperatorSurnameTarget.value.trim()}.${this.newOperatorFirstnameTarget.value.trim()}`;
+                let combinedName = `${this.newOperatorFirstnameTarget.value.trim()}.${this.newOperatorSurnameTarget.value.trim()}`;
                 this.newOperatorNameTarget = combinedName.toLowerCase();
                 // this.newOperatorFirstnameTarget.disabled = true;
                 this.validateNewOperatorName();
@@ -84,7 +90,7 @@ export default class OperatorTrainingController extends Controller {
             }
 
             this.newOperatorTransferMessageTarget.textContent = "";
-            this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir sous la forme prénom.nom.");
+            this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir sous la forme prenom.nom.");
             this.newOperatorCodeTarget.disabled = true;
 
             if (isValid) {
@@ -221,7 +227,7 @@ export default class OperatorTrainingController extends Controller {
         this.newOperatorSubmitButtonTarget.value = submitValue;
         clearTimeout(this.validatedTimeout);
         this.validatedTimeout = setTimeout(() => {
-            console.log('Resetting new operator form after 5 seconds')
+            console.log('Resetting new operator form after 10 seconds')
             this.newOperatorCodeTarget.value = "";
             this.newOperatorSurnameTarget.value = "";
             this.newOperatorFirstnameTarget.value = "";
@@ -235,7 +241,7 @@ export default class OperatorTrainingController extends Controller {
             this.newOperatorCodeMessageTarget.textContent = "";
             this.newOperatorNameMessageTarget.textContent = "";
             this.newOperatorTransferMessageTarget.textContent = "";
-        }, 5000);
+        }, 10000);
 
     }
 

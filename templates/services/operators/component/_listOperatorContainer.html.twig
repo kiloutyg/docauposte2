@@ -4,9 +4,13 @@
 
 	{% if team is defined and uap is defined and team is not empty and uap is not empty %}
 		<div
-
+			class="card bg-light mb-3"
 			id="trainerValidation"
 			name="trainerValidation">
+			<h6
+				class="card-title mx-2 mb-0 ">
+				Identifiant Formateur
+			</h6>
 			<div
 				class="d-flex flex-fill">
 				<input
@@ -14,7 +18,7 @@
 					class="form-control "
 					data-operator-trainer-target="trainerOperatorName"
 					data-action="keyup->operator-trainer#validateTrainerOperatorName"
-					data-upload-id="{{upload.id}}" placeholder="nom.prénom"
+					data-upload-id="{{upload.id}}" placeholder="prenom.nom"
 					id="trainerOperatorName"
 					name="trainerOperatorName"
 					style="flex:0.5;"
