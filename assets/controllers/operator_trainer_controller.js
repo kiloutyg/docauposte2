@@ -34,7 +34,7 @@ export default class OperatorTrainerController extends Controller {
             } else {
                 this.updateMessage(this.trainerOperatorNameMessageTarget, isValid, "Veuillez saisir sous la forme prénom.nom.");
             }
-        }, 1000);
+        }, 800);
     }
 
 
@@ -58,7 +58,7 @@ export default class OperatorTrainerController extends Controller {
                     this.updateMessage(this.trainerOperatorCodeMessageTarget, isValid, "Veuillez saisir un code valide: XXXXX.");
                 }
             }
-        }, 1000);
+        }, 800);
     }
 
 

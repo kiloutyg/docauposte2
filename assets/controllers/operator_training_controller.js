@@ -48,7 +48,7 @@ export default class OperatorTrainingController extends Controller {
             if (isValid) {
                 this.checkForExistingEntityByName();
             }
-        }, 1000); // delay in milliseconds
+        }, 800); // delay in milliseconds
     }
 
 
@@ -82,7 +82,7 @@ export default class OperatorTrainingController extends Controller {
                 this.duplicateCheckResults.code = null;
                 this.checkForExistingEntityByCode();
             }
-        }, 1000);
+        }, 800);
     }
 
 
@@ -288,7 +288,7 @@ export default class OperatorTrainingController extends Controller {
                 this.trainingOperatorCodeTarget.value = "";
                 this.trainingOperatorCodeTarget.placeholder = "Invalide";
             }
-        }, 1000);
+        }, 800);
     }
 
 
