@@ -160,3 +160,11 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
     width: 50%;
     /* Adjust this width as necessary */
 }
+
+.capitalize-all-letters {
+    text-transform: uppercase;
+}
+
+.capitalize-first-letter::first-letter {
+    text-transform: uppercase;
+}

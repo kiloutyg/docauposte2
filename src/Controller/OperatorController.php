@@ -164,7 +164,21 @@ class OperatorController extends FrontController
         $this->logger->info('uap', [$uap->getName()]);
         $operatorCode = $request->request->get('newOperatorCode');
 
+        $surname = $request->request->get('newOperatorSurname');
+        $firstname = $request->request->get('newOperatorFirstname');
+        $concatenedOperatorNameNotLower = $surname . '.' . $firstname;
+        $concatenedOperatorNameLower = strtolower($concatenedOperatorNameNotLower);
+
         $operatorName = $request->request->get('newOperatorName');
+
+        if ($operatorName !== $concatenedOperatorNameLower) {
+            $this->addFlash('danger', 'Il y a eu un probleme, contactez votre administrateur');
+            return $this->redirectToRoute('app_training_list', [
+                'uploadId' => $uploadId,
+                'teamId' => $teamId,
+                'uapId' => $uapId,
+            ]);
+        }
 
         $existingOperator = $this->operatorRepository->findOneBy(['name' => $operatorName]);
         if ($existingOperator == null) {

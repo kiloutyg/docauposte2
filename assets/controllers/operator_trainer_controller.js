@@ -196,14 +196,25 @@ export default class OperatorTrainerController extends Controller {
                     >
                     <input
                         type="text"
-                        class="form-control "
-                        data-operator-training-target="newOperatorName"
-                        data-action="keyup->operator-training#validateNewOperatorName"
-                        placeholder="nom.prénom"
-                        id="newOperatorName"
-                        name="newOperatorName"
+                        class="form-control capitalize-all-letters"
+                        data-operator-training-target="newOperatorSurname"
+                        data-action="keyup->operator-training#validateNewOperatorSurname"
+                        placeholder="NOM"
+                        id="newOperatorSurname"
+                        name="newOperatorSurname"
                         style="flex:0.5;"
                         required>
+                    <input
+                        type="text"
+                        class="form-control capitalize-first-letter"
+                        data-operator-training-target="newOperatorFirstname"
+                        data-action="keyup->operator-training#validateNewOperatorFirstname"
+                        placeholder="Prenom"
+                        id="newOperatorFirstname"
+                        name="newOperatorFirstname"
+                        style="flex:0.5;"
+                        required
+                        disabled>
                     <input
                         type="text"
                         class="form-control"
@@ -215,6 +226,7 @@ export default class OperatorTrainerController extends Controller {
                         style="flex:0.3;"
                         required
                         disabled>
+                    <input type="hidden" id="newOperatorName" name="newOperatorName">           
                     <input
                         type="submit"
                         class="btn btn-primary "

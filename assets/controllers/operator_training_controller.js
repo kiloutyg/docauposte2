@@ -7,7 +7,8 @@ export default class OperatorTrainingController extends Controller {
 
 
     static targets = [
-        "newOperatorName",
+        "newOperatorSurname",
+        "newOperatorFirstname",
         "newOperatorNameMessage",
         "newOperatorCode",
         "newOperatorCodeMessage",
@@ -17,28 +18,69 @@ export default class OperatorTrainingController extends Controller {
 
     ];
 
+    validateNewOperatorSurname() {
+        clearTimeout(this.surnameTypingTimeout);
+        this.surnameTypingTimeout = setTimeout(() => {
+            console.log('validating new operator surname:', this.newOperatorSurnameTarget.value);
+            const regex = /^[A-Z][A-Z]+$/;
+            const surname = this.newOperatorSurnameTarget.value.toUpperCase();
+            const isValid = regex.test(surname.trim());
+            this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir un nom valide.");
+            if (isValid) {
+                // this.newOperatorSurnameTarget.disabled = true;
+                this.newOperatorFirstnameTarget.disabled = false;
+                this.newOperatorFirstnameTarget.focus();
+            }
 
+        }, 800);
+    }
+
+    validateNewOperatorFirstname() {
+        clearTimeout(this.firstnameTypingTimeout);
+        this.firstnameTypingTimeout = setTimeout(() => {
+            const firstnameValue = this.newOperatorFirstnameTarget.value;
+            this.firstnameValue = this.capitalizeFirstLetter(firstnameValue);
+            console.log('validating new operator firstname:', this.newOperatorFirstnameTarget.value);
+            const regex = /^[A-Z][a-z]+(-[A-Z][a-z]+)*$/;
+            const isValid = regex.test(this.firstnameValue.trim());
+            this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir un prénom valide.");
+            if (isValid) {
+                let combinedName = `${this.newOperatorSurnameTarget.value.trim()}.${this.newOperatorFirstnameTarget.value.trim()}`;
+                this.newOperatorNameTarget = combinedName.toLowerCase();
+                // this.newOperatorFirstnameTarget.disabled = true;
+                this.validateNewOperatorName();
+            }
+        }, 800);
+    }
+
+    capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    }
+
+    // lowercasingNameString(string) {
+    //     return string.toLowerCase();
+    // }
 
     validateNewOperatorName() {
         clearTimeout(this.nameTypingTimeout);  // clear any existing timeout to reset the timer
 
         this.nameTypingTimeout = setTimeout(() => {
-            console.log('validating new operator name:', this.newOperatorNameTarget.value);
+            console.log('validating new operator name:', this.newOperatorNameTarget);
 
             const regex = /^[a-zA-Z]+\.(?!-)(?!.*--)[a-zA-Z-]+(?<!-)$/;
             let isValid;
 
             if (this.duplicateCheckResults.name) {
                 console.log('duplicate check results data value for name:', this.duplicateCheckResults.name.data.value);
-                if (this.newOperatorNameTarget.value.trim() === this.duplicateCheckResults.name.data.value) {
+                if (this.newOperatorNameTarget.trim() === this.duplicateCheckResults.name.data.value) {
                     console.log('Name is the same as the previous duplicate check, no need to do anything.');
                     return;
                 } else {
                     this.duplicateCheckResults.name = null;
-                    isValid = regex.test(this.newOperatorNameTarget.value.trim());
+                    isValid = regex.test(this.newOperatorNameTarget.trim());
                 }
             } else {
-                isValid = regex.test(this.newOperatorNameTarget.value.trim());
+                isValid = regex.test(this.newOperatorNameTarget.trim());
             }
 
             this.newOperatorTransferMessageTarget.textContent = "";
@@ -89,9 +131,9 @@ export default class OperatorTrainingController extends Controller {
 
     async checkForExistingEntityByName() {
         try {
-            console.log('checking for existing entity by name:', this.newOperatorNameTarget.value);
+            console.log('checking for existing entity by name:', this.newOperatorNameTarget);
 
-            const response = await this.checkForDuplicate('/docauposte/operator/check-duplicate-by-name', this.newOperatorNameTarget.value);
+            const response = await this.checkForDuplicate('/docauposte/operator/check-duplicate-by-name', this.newOperatorNameTarget);
             console.log('response for existing entity by name:', response.data.found);
             this.handleDuplicateResponse(response, this.newOperatorNameMessageTarget, "noms d'opérateurs");
 
@@ -175,26 +217,24 @@ export default class OperatorTrainingController extends Controller {
     manageNewOperatorSubmitButton(enableButton = false, submitValue = "Ajouter") {
         console.log(`Setting new operator submit button - Enabled: ${enableButton}, Value: ${submitValue}`);
         this.newOperatorSubmitButtonTarget.disabled = !enableButton;
+        document.getElementById('newOperatorName').value = this.newOperatorNameTarget;
         this.newOperatorSubmitButtonTarget.value = submitValue;
         clearTimeout(this.validatedTimeout);
         this.validatedTimeout = setTimeout(() => {
             console.log('Resetting new operator form after 5 seconds')
             this.newOperatorCodeTarget.value = "";
-            this.newOperatorNameTarget.value = "";
+            this.newOperatorSurnameTarget.value = "";
+            this.newOperatorFirstnameTarget.value = "";
+            this.newOperatorNameTarget = "";
             this.duplicateCheckResults = { name: null, code: null };
+            this.newOperatorSurnameTarget.disabled = false;
             this.newOperatorCodeTarget.disabled = true;
-            this.newOperatorNameTarget.focus();
+            this.newOperatorSurnameTarget.focus();
             this.newOperatorSubmitButtonTarget.disabled = true;
             this.resetUselessMessages();
             this.newOperatorCodeMessageTarget.textContent = "";
             this.newOperatorNameMessageTarget.textContent = "";
             this.newOperatorTransferMessageTarget.textContent = "";
-
-            // console.log('About to dispatch operatorSubmitButtonManaged event', this.element);
-            // const event = new CustomEvent("operatorSubmitButtonManaged");
-            // console.log('dispatching operatorSubmitButtonManaged event')
-            // this.element.dispatchEvent(event);
-            // console.log('operatorSubmitButtonManaged event dispatched')
         }, 5000);
 
     }
