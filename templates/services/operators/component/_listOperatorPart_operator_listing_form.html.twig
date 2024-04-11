@@ -1,0 +1,42 @@
+{% import 'macros/training_macros.html.twig' as trainingMacros %}
+<strong>
+	<ul
+		class="list-unstyled d-flex align-items-center p-1 mb-1 {{ trainingRecord != null ? (trainingRecord.trained ? 'text-white bg-success' : 'text-dark bg-warning') : 'text-white bg-danger' }}">
+		<li
+			style="flex:0.2; text-align: left;"
+			class="mx-auto">
+			{{ operator.name }}
+			<input
+				type="hidden"
+				name="operators[{{ operator.id }}][id]"
+				value="{{ operator.id }}">
+		</li>
+		<li
+			style="flex:0.025; text-align: center;"
+			class="mx-auto">
+			-
+		</li>
+		<li
+			style="flex:0.125; text-align: center;"
+			class="mx-auto">
+			{{ operator.team.name }}
+		</li>
+		<li
+			style="flex:0.025; text-align: center;"
+			class="mx-auto">
+			-
+		</li>
+		<li
+			style="flex:0.125; text-align: center;"
+			class="mx-auto">
+			{{ operator.uap.name }}
+		</li>
+		<li
+			style="flex:0.025; text-align: center;"
+			class="mx-auto">
+			-
+		</li>
+
+		{{ trainingMacros.trainingStatus(operator.trainingRecords|filter(record => record.upload.id == upload.id)|first, operator.id, team.id, uap.id) }}
+	</ul>
+</strong>

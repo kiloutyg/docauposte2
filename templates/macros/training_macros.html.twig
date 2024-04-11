@@ -1,0 +1,56 @@
+{% macro trainingStatus(trainingRecord, operatorId, teamId, uapId) %}
+	{% if trainingRecord %}
+		<li
+			style="flex:0.3; text-align: right;"
+			class="mx-auto">
+			{{ trainingRecord.trained ? 'Formé le ' ~ trainingRecord.date|date('d/m/Y') : 'À réentrainer' }}
+		</li>
+		{% if not trainingRecord.trained %}
+			{# Additional elements for training in progress #}
+			<div
+				data-controller="operator-training">
+				<li
+					class="flex-grow-1 text-end mx-auto"
+					name="trainingCheckbox{{ operatorId }}"
+					id="trainingCheckbox{{ operatorId }}">
+					<input
+						type="text"
+						pattern="\d*"
+						maxlength="5"
+						class="form-control form-control-sm operator-input mx-auto"
+						data-operator-training-target="trainingOperatorCode"
+						data-action="keyup->operator-training#validateCodeEntryForTraining"
+						data-operator-id="{{ operatorId }}" data-team-id="{{ teamId }}" data-uap-id="{{ uapId }}" placeholder="CodeOpé"
+						id="revalidateOperatorCode{{ operatorId }}"
+						name="operators[{{ operatorId }}][revalidateOperatorCode]"
+						disabled>
+				</li>
+			</div>
+		{% endif %}
+	{% else %}
+		<li
+			style="flex:0.125; text-align: right;"
+			class="mx-auto">
+			À former
+		</li>
+
+		<li
+			data-controller="operator-training"
+			style="flex:0.3; text-align: right;"
+			class="flex-grow-0.5"
+			name="trainingCheckbox{{ operatorId }}"
+			id="trainingCheckbox{{ operatorId }}">
+			<input
+				type="text"
+				pattern="\d*"
+				maxlength="5"
+				class=" form-control form-control-sm operator-input mx-auto"
+				data-operator-training-target="trainingOperatorCode"
+				data-action="keyup->operator-training#validateCodeEntryForTraining"
+				data-operator-id="{{ operatorId }}" data-team-id="{{ teamId }}" data-uap-id="{{ uapId }}" placeholder="CodeOpé"
+				id="trainingOperatorCode{{ operatorId }}"
+				name="operators[{{ operatorId }}][trainingOperatorCode]"
+				disabled>
+		</li>
+	{% endif %}
+{% endmacro %}
