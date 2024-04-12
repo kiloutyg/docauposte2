@@ -58,7 +58,7 @@ class OperatorType extends AbstractType
                 ]
             ])
             ->add('team', EntityType::class, [
-                'class' => team::class,
+                'class' => Team::class,
                 'label' => false,
                 'choice_label' => 'name',
                 'placeholder' => 'Choisir une équipe',
