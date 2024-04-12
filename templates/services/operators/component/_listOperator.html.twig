@@ -25,7 +25,8 @@
 							class="mx-2 card text-center"
 							style="flex:1;">
 							Liste des Opérateurs formés par
-							{{ trainerName != null ? trainerName : 'un formateur inconnu' }}
+							{{ trainerName != null ? trainerName|upper|split('.')|last ~ ' ' ~ trainerName|capitalize|split('.')|first 
+							: 'un formateur inconnu' }}
 						</p>
 
 						{% for operator in operators  %}
@@ -44,6 +45,7 @@
 							Liste des Opérateurs en attente de réentrainement au process.
 						</p>
 						{% for operator in operators %}
+							{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
 
 							{% include 'services/operators/component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
 

@@ -4,7 +4,8 @@
 		<li
 			style="flex:0.2; text-align: left;"
 			class="mx-auto">
-			{{ operator.name }}
+			{{operator.name|upper|split('.')|last }}
+			{{operator.name|capitalize|split('.')|first }}
 		</li>
 		<li
 			style="flex:0.05; text-align: center;"
@@ -34,7 +35,7 @@
 		<li
 			style="flex:0.3; text-align: right;"
 			class="mx-auto">
-			{{ trainingRecord != null ? (trainingRecord.trained ? 'Formé le ' ~ trainingRecord.date|date('d/m/Y') : 'À réentrainer') : 'À former' }}
+			{{ trainingRecord != null ? (trainingRecord.trained ? 'Formé le ' ~ trainingRecord.date|date('d/m/Y') : 'À requalifier') : 'À former' }}
 		</li>
 	</ul>
 </strong>

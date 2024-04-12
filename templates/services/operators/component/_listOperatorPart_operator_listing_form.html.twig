@@ -3,9 +3,10 @@
 	<ul
 		class="list-unstyled d-flex align-items-center p-1 mb-1 {{ trainingRecord != null ? (trainingRecord.trained ? 'text-white bg-success' : 'text-dark bg-warning') : 'text-white bg-danger' }}">
 		<li
-			style="flex:0.2; text-align: left;"
+			style="flex:0.275; text-align: left;"
 			class="mx-auto">
-			{{ operator.name }}
+			{{operator.name|upper|split('.')|last }}
+			{{operator.name|capitalize|split('.')|first }}
 			<input
 				type="hidden"
 				name="operators[{{ operator.id }}][id]"
