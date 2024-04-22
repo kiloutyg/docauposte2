@@ -41,6 +41,18 @@ class OperatorRepository extends ServiceEntityRepository
         return $operators;
     }
 
+    public function findSortedOperators()
+    {
+        return $this->createQueryBuilder('o')
+            ->join('o.team', 't')
+            ->join('o.uap', 'u')
+            ->orderBy('t.name', 'ASC')
+            ->addOrderBy('u.name', 'ASC')
+            ->addOrderBy('o.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
 
 
     //    /**

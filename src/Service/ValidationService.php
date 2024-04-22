@@ -432,6 +432,7 @@ class ValidationService extends AbstractController
         $fileName = 'email_sent.txt';
         $filePath = $this->projectDir . '/public/doc/' . $fileName;
         $uploadsWaitingValidation = [];
+        $badValidators = [];
 
         if ($today->format('d') % 4 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
 
@@ -453,9 +454,17 @@ class ValidationService extends AbstractController
                 $return = false;
                 if (count($uploadsWaitingValidation) > 0) {
                     $return = $this->mailerService->sendReminderEmail($validator, $uploadsWaitingValidation);
-                    $uploadsWaitingValidation = [];
+                    // foreach ($uploadsWaitingValidation as $upload) {
+                    //     $uploaders[] = $upload->getUploader();
+                    // }
+
+                    // $badValidators[$validator] = $uploadsWaitingValidation;
+
+                    // $uploadsWaitingValidation = [];
                 }
             }
+
+
             if ($return) {
                 file_put_contents($filePath, $today->format('Y-m-d'));
             }

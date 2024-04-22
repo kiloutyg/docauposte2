@@ -30,3 +30,8 @@ services:
     App\Service\MailerService:
         arguments:
             $senderEmail: "%env(MAILER_SENDER_EMAIL)%"
+
+    App\Form\DataTransformer\NameToFirstAndLastNameTransformer: ~
+    App\Form\OperatorType:
+        arguments:
+            $transformer: '@App\Form\DataTransformer\NameToFirstAndLastNameTransformer'
