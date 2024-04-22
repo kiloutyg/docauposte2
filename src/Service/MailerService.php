@@ -23,15 +23,18 @@ class MailerService extends AbstractController
     private $security;
     private $mailer;
     private $approbationRepository;
+    private $senderEmail;
 
     public function __construct(
         Security $security,
         MailerInterface $mailer,
-        ApprobationRepository $approbationRepository
+        ApprobationRepository $approbationRepository,
+        string $senderEmail
     ) {
-        $this->security             = $security;
-        $this->mailer               = $mailer;
-        $this->approbationRepository = $approbationRepository;
+        $this->security                 = $security;
+        $this->mailer                   = $mailer;
+        $this->approbationRepository    = $approbationRepository;
+        $this->senderEmail              = $senderEmail;
     }
 
     public function approbationEmail(Validation $validation)
@@ -45,11 +48,11 @@ class MailerService extends AbstractController
 
     public function sendEmail(User $recipient, string $subject, string $html)
     {
-        $sender = $this->security->getUser();
-        $senderEmail = $sender->getEmailAddress();
+        // $sender = $this->security->getUser();
+        // $senderEmail = $sender->getEmailAddress();
         $emailRecipientsAddress = $recipient->getEmailAddress();
         $email = (new Email())
-            ->from($senderEmail)
+            ->from($this->senderEmail)
             ->to($emailRecipientsAddress)
             ->subject($subject)
             ->html($html);
@@ -64,7 +67,7 @@ class MailerService extends AbstractController
 
     public function sendApprobationEmail($approbation)
     {
-        $senderEmail = 'lan.docauposte@plasticomnium.com';
+        $senderEmail = $this->senderEmail;
         $approbator = $approbation->getUserApprobator();
         $emailRecipientsAddress = $approbator->getEmailAddress();
         $validation = $approbation->getValidation();
@@ -111,7 +114,7 @@ class MailerService extends AbstractController
         foreach ($approbations as $approbation) {
             $approbators[] = $approbation->getUserApprobator();
         }
-        $senderEmail = 'lan.docauposte@plasticomnium.com';
+        $senderEmail = $this->senderEmail;
         $emailRecipientsAddress = $upload->getUploader()->getEmailAddress();
         $email = (new TemplatedEmail())
             ->from($senderEmail)
@@ -134,7 +137,7 @@ class MailerService extends AbstractController
     public function sendDisapprovedModifiedEmail(Approbation $approbation)
     {
 
-        $senderEmail = 'lan.docauposte@plasticomnium.com';
+        $senderEmail = $this->senderEmail;
         $validation = $approbation->getValidation();
         $upload = $validation->getUpload();
 
@@ -164,7 +167,7 @@ class MailerService extends AbstractController
     public function sendApprovalEmail(Validation $validation)
     {
         $upload = $validation->getUpload();
-        $senderEmail = 'lan.docauposte@plasticomnium.com';
+        $senderEmail = $this->senderEmail;
         $emailRecipientsAddress = $upload->getUploader()->getEmailAddress();
         $filename = $upload->getFilename();
 
@@ -188,7 +191,7 @@ class MailerService extends AbstractController
 
     public function sendReminderEmail(User $Recipient, array $uploads)
     {
-        $senderEmail = 'lan.docauposte@plasticomnium.com';
+        $senderEmail = $this->senderEmail;
         $emailRecipientsAddress = $Recipient->getEmailAddress();
 
         $email = (new TemplatedEmail())
