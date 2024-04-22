@@ -124,7 +124,7 @@ class SuperAdminController extends FrontController
     #[Route('/super_admin/operator_management', name: 'app_super_admin_operator_management')]
     public function operatorManagement(Request $request): Response
     {
-        $team = new team();
+        $team = new Team();
         $uap = new Uap();
         $teamForm = $this->createForm(TeamType::class, $team);
         $uapForm = $this->createForm(UapType::class, $uap);

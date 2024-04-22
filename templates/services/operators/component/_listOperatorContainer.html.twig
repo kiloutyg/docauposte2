@@ -4,41 +4,46 @@
 
 	{% if team is defined and uap is defined and team is not empty and uap is not empty %}
 		<div
-			class="card bg-light mb-3"
 			id="trainerValidation"
 			name="trainerValidation">
-			<h6
-				class="card-title mx-2 mb-0 ">
-				Identifiant Formateur
-			</h6>
 			<div
-				class="d-flex flex-fill">
-				<input
-					type="text"
-					class="form-control "
-					data-operator-trainer-target="trainerOperatorName"
-					data-action="keyup->operator-trainer#validateTrainerOperatorName"
-					data-upload-id="{{upload.id}}" placeholder="prenom.nom"
-					id="trainerOperatorName"
-					name="trainerOperatorName"
-					style="flex:0.5;"
-					required>
-				<input
-					type="password"
-					pattern="\d*"
-					maxlength="5"
-					class="form-control"
-					data-operator-trainer-target="trainerOperatorCode"
-					data-action="keyup->operator-trainer#validateTrainerOperatorCode "
-					placeholder="Code Opérateur"
-					id="trainerOperatorCode"
-					name="trainerOperatorCode"
-					style="flex:0.5;"
-					required
-					disabled>
+				name="trainerSection"
+				id="trainerSection"
+				class="card bg-light mb-3">
+
+				<h6
+					class="card-title mx-2 mb-0 ">
+					Identifiant Formateur
+				</h6>
 				<div
-					id="trainerLogOutContainer"
-					name="trainerLogOutContainer"></div>
+					class="d-flex flex-fill">
+					<input
+						type="text"
+						class="form-control "
+						data-operator-trainer-target="trainerOperatorName"
+						data-action="keyup->operator-trainer#validateTrainerOperatorName"
+						data-upload-id="{{upload.id}}" placeholder="prenom.nom"
+						id="trainerOperatorName"
+						name="trainerOperatorName"
+						style="flex:0.5;"
+						required>
+					<input
+						type="password"
+						pattern="\d*"
+						maxlength="5"
+						class="form-control"
+						data-operator-trainer-target="trainerOperatorCode"
+						data-action="keyup->operator-trainer#validateTrainerOperatorCode "
+						placeholder="Code Opérateur"
+						id="trainerOperatorCode"
+						name="trainerOperatorCode"
+						style="flex:0.5;"
+						required
+						disabled>
+					<div
+						id="trainerLogOutContainer"
+						name="trainerLogOutContainer"></div>
+				</div>
 			</div>
 			<div
 				data-operator-trainer-target="trainerOperatorNameMessage"
