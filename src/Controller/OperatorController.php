@@ -166,7 +166,7 @@ class OperatorController extends FrontController
 
         $surname = $request->request->get('newOperatorSurname');
         $firstname = $request->request->get('newOperatorFirstname');
-        $concatenedOperatorNameNotLower = $surname . '.' . $firstname;
+        $concatenedOperatorNameNotLower = $firstname . '.' . $surname;
         $concatenedOperatorNameLower = strtolower($concatenedOperatorNameNotLower);
 
         $operatorName = $request->request->get('newOperatorName');
@@ -278,7 +278,15 @@ class OperatorController extends FrontController
     {
         $upload = $this->uploadRepository->find($uploadId);
 
-        $selectedOperators = $this->operatorRepository->findBy(['team' => $teamId, 'uap' => $uapId], ['team' => 'ASC', 'uap' => 'ASC', 'name' => 'ASC']);
+        $selectedOperators = $this->operatorRepository->findBy(['team' => $teamId, 'uap' => $uapId], ['team' => 'ASC', 'uap' => 'ASC']);
+
+        usort($selectedOperators, function ($a, $b) {
+            list($firstNameA, $surnameA) = explode('.', $a->getName());
+            list($firstNameB, $surnameB) = explode('.', $b->getName());
+
+            return $surnameA === $surnameB ? strcmp($firstNameA, $firstNameB) : strcmp($surnameA, $surnameB);
+        });
+
         $this->logger->info('selectedOperators', [$selectedOperators]);
 
 

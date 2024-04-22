@@ -32,7 +32,7 @@ export default class OperatorTrainerController extends Controller {
             if (isValid) {
                 this.checkTrainerExistence('name', value);
             } else {
-                this.updateMessage(this.trainerOperatorNameMessageTarget, isValid, "Veuillez saisir sous la forme prénom.nom.");
+                this.updateMessage(this.trainerOperatorNameMessageTarget, isValid, "Veuillez saisir sous la forme prenom.nom.");
             }
         }, 800);
     }
@@ -206,7 +206,7 @@ export default class OperatorTrainerController extends Controller {
                         required>
                     <input
                         type="text"
-                        class="form-control capitalize-first-letter"
+                        class="form-control capitalize-first-letter::first-letter "
                         data-operator-training-target="newOperatorFirstname"
                         data-action="keyup->operator-training#validateNewOperatorFirstname"
                         placeholder="Prenom"
@@ -217,6 +217,8 @@ export default class OperatorTrainerController extends Controller {
                         disabled>
                     <input
                         type="text"
+                        pattern="\\d*"
+                        maxlength="5"
                         class="form-control"
                         data-operator-training-target="newOperatorCode"
                         data-action="keyup->operator-training#validateNewOperatorCode"

@@ -25,55 +25,16 @@
 							class="mx-2 card text-center"
 							style="flex:1;">
 							Liste des Opérateurs formés par
-							{{ trainerName != null ? trainerName : 'un formateur inconnu' }}
+							{{ trainerName != null ? trainerName|upper|split('.')|last ~ ' ' ~ trainerName|capitalize|split('.')|first 
+							: 'un formateur inconnu' }}
 						</p>
 
 						{% for operator in operators  %}
 							{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-
-							<ul
-								class="list-unstyled d-flex align-items-center p-1 mb-1 text-white bg-success">
-
-								<li
-									class="flex-fill text-start mx-auto">
-									{{ operator.name }}
-									<input
-										type="hidden"
-										name="operators[{{ operator.id }}][id]"
-										value="{{ operator.id }}">
-								</li>
-								<li
-									class="mx-auto">
-									-
-								</li>
-								<li
-									class="flex-fill text-center mx-auto">
-									{{ operator.team.name }}
-								</li>
-								<li
-									class="mx-auto">
-									-
-								</li>
-								<li
-									class="flex-fill text-center mx-auto">
-									{{ operator.uap.name }}
-								</li>
-								<li
-									class="mx-auto">
-									-
-								</li>
-								<li
-									class="flex-grow-1 text-end mx-auto">
-									Formé le
-									{{ trainingRecord.date|date('d/m/Y') }}
-								</li>
-							</ul>
-
+							{% include 'services/operators/component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
 						{% endfor %}
-
 					{% endfor %}
 				{% endif %}
-
 
 				{% if inTrainingOperatorsByTrainer is defined and inTrainingOperatorsByTrainer is not empty %}
 					{% for trainerName, operators in inTrainingOperatorsByTrainer %}
@@ -84,64 +45,10 @@
 							Liste des Opérateurs en attente de réentrainement au process.
 						</p>
 						{% for operator in operators %}
+							{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
 
+							{% include 'services/operators/component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
 
-							<ul
-								class="list-unstyled d-flex align-items-center p-1 mb-1 text-dark bg-warning">
-
-								<li
-									class="flex-fill text-start mx-auto">
-									{{ operator.name }}
-									<input
-										type="hidden"
-										name="operators[{{ operator.id }}][id]"
-										value="{{ operator.id }}">
-								</li>
-								<li
-									class="mx-auto">
-									-
-								</li>
-								<li
-									class="flex-fill text-center mx-auto">
-									{{ operator.team.name }}
-								</li>
-								<li
-									class="mx-auto">
-									-
-								</li>
-								<li
-									class="flex-fill text-center mx-auto">
-									{{ operator.uap.name }}
-								</li>
-								<li
-									class="mx-auto">
-									-
-								</li>
-
-								<li
-									class="flex-grow-1 text-end mx-auto">
-									À réentrainer -
-								</li>
-								<div
-									data-controller="operator-training">
-									<li
-										class="flex-grow-1 text-end mx-auto"
-										name="trainingCheckbox{{ operator.id }}"
-										id="trainingCheckbox{{ operator.id }}">
-										<input
-											type="text"
-											pattern="\d*"
-											maxlength="5"
-											class="form-control form-control-sm operator-input mx-auto"
-											data-operator-training-target="trainingOperatorCode"
-											data-action="keyup->operator-training#validateCodeEntryForTraining"
-											data-operator-id="{{ operator.id }}" data-team-id="{{ team.id }}" data-uap-id="{{ uap.id }}" placeholder="CodeOpé"
-											id="revalidateOperatorCode{{ operator.id }}"
-											name="operators[{{ operator.id }}][revalidateOperatorCode]"
-											disabled>
-									</li>
-								</div>
-							</ul>
 						{% endfor %}
 
 
@@ -155,63 +62,8 @@
 					</p>
 					{% for operator in untrainedOperators %}
 						{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+						{% include 'services/operators/component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
 
-
-						<ul
-							class="list-unstyled d-flex align-items-center p-1 mb-1 {{ trainingRecord != null ? (trainingRecord.trained ? 'text-white bg-success' : 'text-dark bg-warning') : 'text-white bg-danger' }}">
-
-							<li
-								class="flex-fill text-start mx-auto">
-								{{ operator.name }}
-								<input
-									type="hidden"
-									name="operators[{{ operator.id }}][id]"
-									value="{{ operator.id }}">
-							</li>
-							<li
-								class="mx-auto">
-								-
-							</li>
-							<li
-								class="flex-fill text-center mx-auto">
-								{{ operator.team.name }}
-							</li>
-							<li
-								class="mx-auto">
-								-
-							</li>
-							<li
-								class="flex-fill text-center mx-auto">
-								{{ operator.uap.name }}
-							</li>
-							<li
-								class="mx-auto">
-								-
-							</li>
-							<li
-								class="flex-grow-1 text-end mx-auto">
-								À former  -
-							</li>
-							<div
-								data-controller="operator-training">
-								<li
-									class="flex-grow-1 text-end mx-auto"
-									name="trainingCheckbox{{ operator.id }}"
-									id="trainingCheckbox{{ operator.id }}">
-									<input
-										type="text"
-										pattern="\d*"
-										maxlength="5"
-										class="form-control form-control-sm operator-input mx-auto"
-										data-operator-training-target="trainingOperatorCode"
-										data-action="keyup->operator-training#validateCodeEntryForTraining"
-										data-operator-id="{{ operator.id }}" data-team-id="{{ team.id }}" data-uap-id="{{ uap.id }}" placeholder="CodeOpé"
-										id="trainingOperatorCode{{ operator.id }}"
-										name="operators[{{ operator.id }}][trainingOperatorCode]"
-										disabled>
-								</li>
-							</div>
-						</ul>
 
 					{% endfor %}
 				{% endif %}
@@ -232,49 +84,8 @@
 				Pour modifier ces informations, veuillez sélectionner une équipe et une UAP.
 			</p>
 			{% for record in trainingRecords %}
-				<strong>
-					<ul
-						class="list-unstyled d-flex align-items-center p-1 mb-1 {{ record.trained ? 'text-white bg-success' : 'text-dark bg-warning' }}">
-						<div
-							style="flex:0.2; text-align: left;"
-							class="mx-auto">
-							{{record.operator.name}}
+				{% include 'services/operators/component/_listOperatorPart_operator_listing.html.twig' with {'operator': record.operator, 'trainingRecord': record} %}
 
-						</div>
-						<div
-							style="flex:0.05; text-align: center;"
-							class="mx-auto">
-							-
-						</div>
-						<div
-							style="flex:0.15; text-align: center;"
-							class="mx-auto">
-							{{record.operator.team.name}}
-						</div>
-						<div
-							style="flex:0.05; text-align: center;"
-							class="mx-auto">
-							-
-						</div>
-						<div
-							style="flex:0.15; text-align: center;"
-							class="mx-auto">
-							{{record.operator.uap.name}}
-						</div>
-						<div
-							style="flex:0.05; text-align: center;"
-							class="mx-auto">
-							-
-						</div>
-						<div
-							style="flex:0.3; text-align: right;"
-							class="mx-auto">
-
-							{{ record.trained ? 'Formé le ' ~ record.date|date('d/m/Y') : 'À réentrainer' }}
-
-						</div>
-					</ul>
-				</strong>
 			{% endfor %}
 			<p
 				style="flex:1;"
@@ -287,52 +98,8 @@
 				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
 				{% if trainingRecord == null %}
 
-					<strong>
-						<ul
-							class="list-unstyled d-flex align-items-center p-1 mb-1 text-white bg-danger">
-							<div
-								style="flex:0.2; text-align: left;"
-								class="mx-auto">
-								{{operator.name}}
-								<input
-									type="hidden"
-									name="operators[{{ operator.id }}][id]"
-									value="{{operator.id}}">
-							</div>
-							<div
-								style="flex:0.05; text-align: center;"
-								class="mx-auto">
-								-
-							</div>
-							<div
-								style="flex:0.15; text-align: center;"
-								class="mx-auto">
-								{{operator.team.name}}
-							</div>
-							<div
-								style="flex:0.05; text-align: center;"
-								class="mx-auto">
-								-
-							</div>
-							<div
-								style="flex:0.15; text-align: center;"
-								class="mx-auto">
-								{{operator.uap.name}}
-							</div>
-							<div
-								style="flex:0.05; text-align: center;"
-								class="mx-auto">
-								-
-							</div>
-							<div
-								style="flex:0.3; text-align: right;"
-								class="mx-auto">
+					{% include 'services/operators/component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
 
-								À former
-							</div>
-
-						</ul>
-					</strong>
 				{% endif %}
 			{% endfor %}
 		{% else %}
@@ -343,62 +110,7 @@
 			</p>
 			{% for operator in operators %}
 				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-				<strong>
-					<ul
-						class="list-unstyled d-flex align-items-center p-1 mb-1 {{ trainingRecord != null ? (trainingRecord.trained ? 'text-white bg-success' : 'text-dark bg-warning') : 'text-white bg-danger' }}">
-						<div
-							style="flex:2; text-align: left;"
-							class="mx-auto">
-							{{operator.name}}
-							<input
-								type="hidden"
-								name="operators[{{ operator.id }}][id]"
-								value="{{operator.id}}">
-						</div>
-						<div
-							style="flex:0; text-align: center;"
-							class="mx-auto">
-							-
-						</div>
-						<div
-							style="flex:1; text-align: center;"
-							class="mx-auto">
-							{{operator.team.name}}
-						</div>
-						<div
-							style="flex:0; text-align: center;"
-							class="mx-auto">
-							-
-						</div>
-						<div
-							style="flex:1; text-align: center;"
-							class="mx-auto">
-							{{operator.uap.name}}
-						</div>
-						<div
-							style="flex:0; text-align: center;"
-							class="mx-auto">
-							-
-						</div>
-						<div
-							style="flex:2; text-align: right;"
-							class="mx-auto">
-
-							{% if trainingRecord == null %}
-								À former
-
-							{% else %}
-								{% if trainingRecord.trained %}
-									Formé le
-									{{ trainingRecord.date|date('d/m/Y') }}
-								{% else %}
-									À réentrainer
-								{% endif %}
-							{% endif %}
-						</div>
-
-					</ul>
-				</strong>
+				{% include 'services/operators/component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
 			{% endfor %}
 		{% endif %}
 	{% endif %}
