@@ -24,7 +24,7 @@ class OperatorController extends FrontController
         $originUrl = $request->headers->get('referer');
 
         if ($this->operatorRepository->findAll() != null) {
-            $operators = $this->operatorRepository->findSortedOperators();
+            $operators = $this->operatorRepository->findOperatorsSortedByLastNameFirstName();
         }
         $operatorForms = [];
         if (isset($operators)) {
