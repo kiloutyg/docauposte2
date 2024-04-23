@@ -61,7 +61,7 @@ class OperatorController extends FrontController
                 return $this->redirect($originUrl);
             }
         } else if ($request->getMethod() === 'GET') {
-            return $this->render('services/operators/operators.html.twig', [
+            return $this->render('services/operators/operators_admin.html.twig', [
                 'newOperatorForm' => $newOperatorForm->createView(),
                 'operatorForms' => $operatorForms,
             ]);
@@ -340,7 +340,7 @@ class OperatorController extends FrontController
         $this->logger->info('trainingRecords', [$trainingRecords]);
 
         // Render the partial view
-        return $this->render('services/operators/component/_listOperatorContainer.html.twig', [
+        return $this->render('services/operators/training_component/_listOperatorContainer.html.twig', [
             'team' => $this->teamRepository->find($teamId),
             'uap' => $this->uapRepository->find($uapId),
             'upload' => $upload,
