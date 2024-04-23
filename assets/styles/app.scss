@@ -164,3 +164,11 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
 .capitalize-all-letters {
     text-transform: uppercase;
 }
+
+.custom-container-flex-grow {
+    display: flex;
+}
+
+.custom-flex-grow {
+    flex-grow: 1;
+}

@@ -42,6 +42,76 @@ class OperatorRepository extends ServiceEntityRepository
     }
 
 
+    public function findSortedOperators()
+    {
+
+        $operators = $this->createQueryBuilder('o')
+            ->join('o.team', 't')
+            ->join('o.uap', 'u')
+            ->select('o, t, u')
+            ->orderBy('t.name', 'ASC')
+            ->addOrderBy('u.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        usort($operators, function ($a, $b) {
+            $nameA = explode('.', $a->getName());
+            $nameB = explode('.', $b->getName());
+
+            $lastNameA = strtolower($nameA[1]);
+            $lastNameB = strtolower($nameB[1]);
+            $firstNameA = strtolower($nameA[0]);
+            $firstNameB = strtolower($nameB[0]);
+
+            if ($lastNameA === $lastNameB) {
+                return $firstNameA <=> $firstNameB;
+            }
+            return $lastNameA <=> $lastNameB;
+        });
+
+        return $operators;
+    }
+    public function findOperatorsSortedByLastNameFirstName()
+    {
+        // Fetch all operators with their team and UAP
+        $operators = $this->createQueryBuilder('o')
+            ->join('o.team', 't')
+            ->join('o.uap', 'u')
+            ->select('o, t, u')
+            ->getQuery()
+            ->getResult();
+
+        // Sort the operators in PHP
+        usort($operators, function ($a, $b) {
+            // Split names to separate first name and last name
+            list($firstNameA, $lastNameA) = explode('.', $a->getName());
+            list($firstNameB, $lastNameB) = explode('.', $b->getName());
+
+            // Normalize for case insensitive comparison
+            $lastNameA = strtolower($lastNameA);
+            $lastNameB = strtolower($lastNameB);
+            $firstNameA = strtolower($firstNameA);
+            $firstNameB = strtolower($firstNameB);
+
+            // Compare by team name
+            if ($teamComparison = strcmp($a->getTeam()->getName(), $b->getTeam()->getName())) {
+                return $teamComparison;
+            }
+            // If team name is the same, compare by UAP name
+            if ($uapComparison = strcmp($a->getUap()->getName(), $b->getUap()->getName())) {
+                return $uapComparison;
+            }
+            // If UAP name is the same, compare by last name
+            if ($lastNameComparison = strcmp($lastNameA, $lastNameB)) {
+                return $lastNameComparison;
+            }
+            // If last name is the same, compare by first name
+            return strcmp($firstNameA, $firstNameB);
+        });
+
+        return $operators;
+    }
+
 
     //    /**
     //     * @return Operator[] Returns an array of Operator objects

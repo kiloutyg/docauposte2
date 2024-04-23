@@ -3,7 +3,7 @@ import { Controller } from '@hotwired/stimulus';
 
 import axios from 'axios';
 
-export default class OperatorTrainingController extends Controller {
+export default class CopyAdminController extends Controller {
 
 
     static targets = [
@@ -14,13 +14,14 @@ export default class OperatorTrainingController extends Controller {
         "newOperatorCodeMessage",
         "newOperatorTransferMessage",
         "newOperatorSubmitButton",
-        "trainingOperatorCode",
 
     ];
+
 
     validateNewOperatorSurname() {
         clearTimeout(this.surnameTypingTimeout);
         this.surnameTypingTimeout = setTimeout(() => {
+            console.log('checking what is carried by the target:', this.newOperatorSurnameTarget);
             console.log('validating new operator surname:', this.newOperatorSurnameTarget.value);
             const regex = /^[A-Z][A-Z]+$/;
             const surname = this.newOperatorSurnameTarget.value.toUpperCase();
@@ -31,18 +32,11 @@ export default class OperatorTrainingController extends Controller {
                 this.newOperatorFirstnameTarget.disabled = false;
                 this.newOperatorFirstnameTarget.focus();
             }
-
         }, 800);
     }
 
+
     validateNewOperatorFirstname() {
-
-        document.getElementById('newOperatorFirstname').addEventListener('input', function (e) {
-            var value = e.target.value;
-            e.target.value = value.charAt(0).toUpperCase() + value.slice(1);
-        });
-
-
         clearTimeout(this.firstnameTypingTimeout);
         this.firstnameTypingTimeout = setTimeout(() => {
             const firstnameValue = this.newOperatorFirstnameTarget.value;
@@ -60,8 +54,17 @@ export default class OperatorTrainingController extends Controller {
         }, 800);
     }
 
+
     capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    }
+
+
+    capitalizeFirstLetterMethod(event) {
+        const input = event.target;
+        if (input.selectionStart <= 1) {
+            input.value = input.value.charAt(0).toUpperCase() + input.value.slice(1).toLowerCase();
+        }
     }
 
 
@@ -87,7 +90,6 @@ export default class OperatorTrainingController extends Controller {
                 isValid = regex.test(this.newOperatorNameTarget.trim());
             }
 
-            this.newOperatorTransferMessageTarget.textContent = "";
             this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir sous la forme prenom.nom.");
             this.newOperatorCodeTarget.disabled = true;
 
@@ -96,7 +98,6 @@ export default class OperatorTrainingController extends Controller {
             }
         }, 800); // delay in milliseconds
     }
-
 
 
     validateNewOperatorCode() {
@@ -120,7 +121,6 @@ export default class OperatorTrainingController extends Controller {
             } else {
                 isValid = regex.test(this.newOperatorCodeTarget.value.trim());
             }
-            this.newOperatorTransferMessageTarget.textContent = "";
             this.updateMessage(this.newOperatorCodeMessageTarget, isValid, "Veuillez saisir un code correct.");
 
             if (isValid) {
@@ -130,7 +130,6 @@ export default class OperatorTrainingController extends Controller {
             }
         }, 800);
     }
-
 
 
     async checkForExistingEntityByName() {
@@ -149,7 +148,6 @@ export default class OperatorTrainingController extends Controller {
     }
 
 
-
     async checkForExistingEntityByCode() {
         try {
             console.log('checking for existing entity by code:', this.newOperatorCodeTarget.value);
@@ -165,7 +163,6 @@ export default class OperatorTrainingController extends Controller {
     }
 
 
-
     updateMessage(targetElement, isValid, errorMessage) {
         console.log(`Updating message: isValid: ${isValid}`);
         if (isValid) {
@@ -179,8 +176,8 @@ export default class OperatorTrainingController extends Controller {
     }
 
 
-
     duplicateCheckResults = { name: null, code: null };
+
 
     handleDuplicateResponse(response, messageTarget, fieldName) {
         console.log(`Handling duplicate response for ${fieldName}:`, response.data.found, response.data.field, response.data.message);
@@ -212,17 +209,15 @@ export default class OperatorTrainingController extends Controller {
             }
             this.newOperatorCodeTarget.disabled = false;
             this.newOperatorCodeTarget.focus();
-            this.manageNewOperatorSubmitButton(true, "Ajouter");
+            this.manageNewOperatorSubmitButton(true);
         }
     }
 
 
-
-    manageNewOperatorSubmitButton(enableButton = false, submitValue = "Ajouter") {
-        console.log(`Setting new operator submit button - Enabled: ${enableButton}, Value: ${submitValue}`);
+    manageNewOperatorSubmitButton(enableButton = false) {
+        console.log(`Setting new operator submit button - Enabled: ${enableButton}`);
         this.newOperatorSubmitButtonTarget.disabled = !enableButton;
         document.getElementById('newOperatorName').value = this.newOperatorNameTarget;
-        this.newOperatorSubmitButtonTarget.value = submitValue;
         clearTimeout(this.validatedTimeout);
         this.validatedTimeout = setTimeout(() => {
             console.log('Resetting new operator form after 10 seconds')
@@ -238,18 +233,15 @@ export default class OperatorTrainingController extends Controller {
             this.resetUselessMessages();
             this.newOperatorCodeMessageTarget.textContent = "";
             this.newOperatorNameMessageTarget.textContent = "";
-            this.newOperatorTransferMessageTarget.textContent = "";
         }, 10000);
 
     }
-
 
 
     checkForDuplicate(url, value) {
         console.log(`Checking for duplicate at ${url} with value:`, value);
         return axios.post(url, { value: value });
     }
-
 
 
     checkForCorrespondingEntity() {
@@ -273,7 +265,6 @@ export default class OperatorTrainingController extends Controller {
     }
 
 
-
     executeEntityMatchingLogic(matchesFound) {
         console.log('Executing entity matching logic:', matchesFound);
 
@@ -281,145 +272,19 @@ export default class OperatorTrainingController extends Controller {
         const codeOperatorId = this.duplicateCheckResults.code?.data?.operator?.id;
         const entitiesMatch = matchesFound && nameOperatorId === codeOperatorId;
 
-        const submitValue = entitiesMatch ? "Transferer" : "Ajouter";
         const message = entitiesMatch
             ? "Nom et Code opérateurs correspondent à un même opérateur. Vous pouvez le transferer."
             : "Nom et Code opérateurs ne correspondent pas à un même opérateur. Veuillez saisir un autre nom ou code opérateur";
 
-        this.newOperatorTransferMessageTarget.textContent = message;
-        this.newOperatorTransferMessageTarget.style.color = entitiesMatch ? "green" : "red";
-        this.resetUselessMessages();
 
-        console.log(`Manage submit button to be ${entitiesMatch ? "enabled" : "disabled"} with value ${submitValue}`);
-        this.manageNewOperatorSubmitButton(entitiesMatch, submitValue);
+        console.log(`Manage submit button to be ${entitiesMatch ? "enabled" : "disabled"} `);
+        this.manageNewOperatorSubmitButton(entitiesMatch);
     }
-
 
 
     executeEntityNonMatchingLogic(unMatchedFound) {
-        this.newOperatorTransferMessageTarget.textContent = "Nom et Code opérateurs ne correspondent à aucun opérateur. Vous pouvez les ajouter.";
-        this.newOperatorTransferMessageTarget.style.color = "green";
-        this.manageNewOperatorSubmitButton(unMatchedFound, "Ajouter");
+        this.manageNewOperatorSubmitButton(unMatchedFound);
     }
-
-
-
-    resetUselessMessages() {
-        console.log('Resetting useless messages if there is a transfer message.');
-        if (this.newOperatorTransferMessageTarget.textContent !== "") {
-            console.log('Clearing name and code validation messages');
-            this.newOperatorNameMessageTarget.textContent = "";
-            this.newOperatorCodeMessageTarget.textContent = "";
-        }
-        const operatorInputs = document.querySelectorAll('.operator-input');
-        operatorInputs.forEach(function (input) {
-            input.disabled = false;
-        });
-    }
-
-
-
-    validateCodeEntryForTraining() {
-        clearTimeout(this.trainingCodeTypingTimeout);
-        this.trainingCodeTypingTimeout = setTimeout(() => {
-            console.log('validating training operator code:', this.trainingOperatorCodeTarget.value);
-            const regex = /^[0-9]{5}$/;
-            const isValid = regex.test(this.trainingOperatorCodeTarget.value.trim());
-
-            if (isValid) {
-                this.checkOperatorIdentityByCode();
-            } else {
-                this.trainingOperatorCodeTarget.value = "";
-                this.trainingOperatorCodeTarget.placeholder = "Invalide";
-            }
-        }, 800);
-    }
-
-
-
-    async checkOperatorIdentityByCode() {
-        const code = this.trainingOperatorCodeTarget.value;
-        const operatorId = this.trainingOperatorCodeTarget.dataset.operatorId;
-        const teamId = this.trainingOperatorCodeTarget.dataset.teamId;
-        const uapId = this.trainingOperatorCodeTarget.dataset.uapId;
-
-        try {
-            console.log('Checking operator identity by code:', this.trainingOperatorCodeTarget.value);
-            const response = await this.checkCodeAgainstOperatorCode('/docauposte/operator/check-entered-code-against-operator-code', code, operatorId, teamId, uapId);
-            if (response.data.found) {
-                console.log('response for operator identity by code:', response.data);
-                this.inputSwitch(response.data);
-            } else {
-                console.log('No operator found with the entered code.');
-                this.trainingOperatorCodeTarget.value = "";
-                this.trainingOperatorCodeTarget.placeholder = "Invalide";
-            }
-        } catch (error) {
-            console.error("Error checking for operator identity by code.", error);
-        }
-    }
-
-
-
-    checkCodeAgainstOperatorCode(url, code, operatorId, teamId, uapId) {
-        console.log(`Checking code against operator code: ${code}, operatorId: ${operatorId}, teamId: ${teamId}, uapId: ${uapId}`);
-        return axios.post(`${url}/${teamId}/${uapId}`, { code: code, operatorId: operatorId, teamId: teamId, uapId: uapId });
-    }
-
-
-
-    inputSwitch(response) {
-        console.log('input switch response:', response);
-
-        if (response.found) {
-            // Create checkbox element
-            const checkbox = document.createElement('input');
-            checkbox.setAttribute('type', 'checkbox');
-            checkbox.setAttribute('class', 'btn-check');
-            checkbox.setAttribute('name', `operators[${response.operator.id}][trained]`);
-            checkbox.setAttribute('id', `success-outlined[${response.operator.id}]`);
-            checkbox.setAttribute('autocomplete', 'off');
-            checkbox.setAttribute('value', 'true');
-
-
-            // Create label element
-            const label = document.createElement('label');
-            label.setAttribute('class', 'btn btn-outline-success p-1 m-1');
-            label.setAttribute('for', `success-outlined[${response.operator.id}]`);
-            label.textContent = 'À Former';
-
-            // Set the background color of the label to white
-            label.style.backgroundColor = 'white';
-
-            // Event listener to toggle class based on checkbox checked state
-            checkbox.addEventListener('change', function () {
-                if (this.checked) {
-                    label.style.backgroundColor = 'green';
-                    label.textContent = 'Formé';
-
-                } else {
-                    label.style.backgroundColor = 'white';
-                    label.textContent = 'À Former';
-
-                }
-            });
-
-            // Remove the original text input element
-            this.trainingOperatorCodeTarget.remove();
-
-            // Append the new checkbox and label to the parent container
-            const parentContainer = document.querySelector(`#trainingCheckbox${response.operator.id}`); // Replace '#parent_container' with the actual ID or class of the parent container where you want to insert the checkbox and label.
-
-
-            parentContainer.appendChild(checkbox);
-            parentContainer.appendChild(label);
-        } else {
-            this.trainingOperatorCodeTarget.value = "";
-            this.trainingOperatorCodeTarget.placeholder = "Invalide";
-
-        }
-    }
-
 
 
     codeGenerator() {
@@ -439,18 +304,10 @@ export default class OperatorTrainingController extends Controller {
     }
 
 
-
     generatedCodeChecker(code) {
         console.log('checking generated code');
         return axios.post(`/docauposte/operator/check-if-code-exist`, { code: code });
     }
 
 
-
-    newOperatorHandleSubmit() {
-        console.log('submitting new operator form');
-
-    }
 }
-
-

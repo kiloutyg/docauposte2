@@ -24,7 +24,7 @@ class OperatorController extends FrontController
         $originUrl = $request->headers->get('referer');
 
         if ($this->operatorRepository->findAll() != null) {
-            $operators = $this->operatorRepository->findAll();
+            $operators = $this->operatorRepository->findOperatorsSortedByLastNameFirstName();
         }
         $operatorForms = [];
         if (isset($operators)) {
@@ -65,6 +65,23 @@ class OperatorController extends FrontController
                 'newOperatorForm' => $newOperatorForm->createView(),
                 'operatorForms' => $operatorForms,
             ]);
+        }
+    }
+
+    // Route to delete operator from the administrator view
+    #[Route('/operator/delete/{id}', name: 'app_operator_delete')]
+    public function deleteOperatorAction(Request $request, int $id): Response
+    {
+        $originUrl = $request->headers->get('referer');
+
+        $result = $this->entitydeletionService->deleteEntity('operator', $id);
+
+        if (!$result) {
+            $this->addFlash('danger', 'L\'opérateur n\'a pas pu être supprimé');
+            return $this->redirect($originUrl);
+        } else {
+            $this->addFlash('success', 'L\'opérateur a bien été supprimé');
+            return $this->redirect($originUrl);
         }
     }
 

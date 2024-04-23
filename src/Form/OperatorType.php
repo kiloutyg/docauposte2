@@ -2,38 +2,78 @@
 
 namespace App\Form;
 
-use App\Entity\Button;
 use App\Entity\Operator;
 use App\Entity\Team;
 use App\Entity\Uap;
 
+use App\Form\DataTransformer\FirstNameTransformer;
+use App\Form\DataTransformer\LastNameTransformer;
+
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
+
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OperatorType extends AbstractType
 {
+    private $firstNameTransformer;
+    private $lastNameTransformer;
+
+    public function __construct(FirstNameTransformer $firstNameTransformer, LastNameTransformer $lastNameTransformer)
+    {
+        $this->firstNameTransformer = $firstNameTransformer;
+        $this->lastNameTransformer = $lastNameTransformer;
+    }
+
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $operatorId = $options['operator_id'] ?? null;
         $builder
-            ->add('name', TextType::class, [
+
+            ->add('lastname', TextType::class, [
+                'label' => false,
+
+                'attr' => [
+                    'class' => 'form-control mx-auto mt-2 capitalize-all-letters',
+                    'placeholder' => 'NOM',
+                    'id' => 'lastname-' . $operatorId,
+                    'name' => 'newOperatorSurname' . $operatorId,
+                    'required' => true,
+                    'data-operator-admin-target' => "newOperatorSurname" . $operatorId,
+                    'data-action' => "keyup->operator-admin#validateNewOperatorSurname"
+                ],
+                'row_attr' => [
+                    'class' => 'col'
+                ],
+                'label_attr' => [
+                    'class' => 'form-label mb-4',
+                    'style' => 'font-weight:  color: #ffffff;'
+                ]
+
+            ])
+            ->add('firstname', TextType::class, [
                 'label' => false,
 
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
-                    'placeholder' => 'Nom de l\'opérateur',
-                    'id' => 'name-' . $operatorId,
+                    'placeholder' => 'Prenom',
+                    'id' => 'firstname-' . $operatorId,
+                    'name' => 'newOperatorFirstname' . $operatorId,
                     'required' => true,
+                    'data-operator-admin-target' => 'newOperatorFirstname' . $operatorId,
+                    'data-action' => 'keyup->operator-admin#validateNewOperatorFirstname input->operator-admin#capitalizeFirstLetterMethod',
+                    'disabled' => 'disabled'
+
                 ],
                 'row_attr' => [
-                    'class' => 'col-2'
+                    'class' => 'col'
                 ],
                 'label_attr' => [
                     'class' => 'form-label mb-4',
@@ -47,10 +87,15 @@ class OperatorType extends AbstractType
                     'class' => 'form-control mx-auto mt-2',
                     'placeholder' => 'Code de l\'opérateur',
                     'id' => 'code-' . $operatorId,
-                    'required' => true
+                    'name' => 'newOperatorCode' . $operatorId,
+                    'required' => true,
+                    'data-operator-admin-target' => 'newOperatorCode' . $operatorId,
+                    'data-action' => 'keyup->operator-admin#validateNewOperatorCode',
+                    'disabled' => 'disabled'
+
                 ],
                 'row_attr' => [
-                    'class' => 'col-2'
+                    'class' => 'col'
                 ],
                 'label_attr' => [
                     'class' => 'form-label mb-4',
@@ -69,7 +114,7 @@ class OperatorType extends AbstractType
                     'required' => true
                 ],
                 'row_attr' => [
-                    'class' => 'col-2'
+                    'class' => 'col'
                 ],
                 'label_attr' => [
                     'class' => 'form-label mb-4',
@@ -88,7 +133,7 @@ class OperatorType extends AbstractType
                     'required' => true
                 ],
                 'row_attr' => [
-                    'class' => 'col-2'
+                    'class' => 'col'
                 ],
                 'label_attr' => [
                     'class' => 'form-label mb-4',
@@ -104,7 +149,7 @@ class OperatorType extends AbstractType
                     'value' => true,
                 ],
                 'row_attr' => [
-                    'class' => 'col-2'
+                    'class' => 'col'
                 ],
                 'label_attr' => [
 
@@ -113,8 +158,12 @@ class OperatorType extends AbstractType
                     'for' => 'trainer-' . $operatorId,
                 ],
                 'label' => 'Formateur',
-
             ]);
+        $builder->get('firstname')
+            ->addModelTransformer($this->firstNameTransformer);
+
+        $builder->get('lastname')
+            ->addModelTransformer($this->lastNameTransformer);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -4,8 +4,6 @@
 
 namespace App\Service;
 
-use App\Controller\BaseController;
-use App\Entity\OldUpload;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -20,6 +18,8 @@ use App\Repository\DepartmentRepository;
 use App\Repository\UserRepository;
 use App\Repository\ValidationRepository;
 use App\Repository\OldUploadRepository;
+use App\Repository\OperatorRepository;
+use App\Repository\TrainingRecordRepository;
 
 use App\Service\UploadService;
 use App\Service\OldUploadService;
@@ -32,6 +32,8 @@ use App\Service\FolderCreationService;
 class EntityDeletionService
 {
     private $em;
+    private $logger;
+
     private $zoneRepository;
     private $productLineRepository;
     private $categoryRepository;
@@ -46,12 +48,14 @@ class EntityDeletionService
     private $userRepository;
     private $validationRepository;
     private $OldUploadRepository;
-    private $oldUploadService;
-    private $logger;
+    private $operatorRepository;
+    private $trainingRecordRepository;
 
 
     public function __construct(
         EntityManagerInterface          $em,
+        LoggerInterface                 $logger,
+
         ZoneRepository                  $zoneRepository,
         ProductLineRepository           $productLineRepository,
         CategoryRepository              $categoryRepository,
@@ -66,10 +70,12 @@ class EntityDeletionService
         UserRepository                  $userRepository,
         ValidationRepository            $validationRepository,
         OldUploadRepository             $OldUploadRepository,
-        OldUploadService                $oldUploadService,
-        LoggerInterface                 $logger
+        OperatorRepository              $operatorRepository,
+        TrainingRecordRepository        $trainingRecordRepository
     ) {
         $this->em                           = $em;
+        $this->logger                       = $logger;
+
         $this->zoneRepository               = $zoneRepository;
         $this->productLineRepository        = $productLineRepository;
         $this->categoryRepository           = $categoryRepository;
@@ -84,8 +90,8 @@ class EntityDeletionService
         $this->userRepository               = $userRepository;
         $this->validationRepository         = $validationRepository;
         $this->OldUploadRepository          = $OldUploadRepository;
-        $this->oldUploadService             = $oldUploadService;
-        $this->logger                       = $logger;
+        $this->operatorRepository           = $operatorRepository;
+        $this->trainingRecordRepository     = $trainingRecordRepository;
     }
 
     // This function is responsible for deleting an entity and its related entities from the database and the server filesystem
@@ -126,6 +132,12 @@ class EntityDeletionService
                 break;
             case 'oldUpload':
                 $repository = $this->OldUploadRepository;
+                break;
+            case 'operator':
+                $repository = $this->operatorRepository;
+                break;
+            case 'trainingRecord':
+                $repository = $this->trainingRecordRepository;
                 break;
         }
         // If the repository is not found or the entity is not found in the database, return false
@@ -183,6 +195,10 @@ class EntityDeletionService
         } elseif ($entityType === 'department') {
             foreach ($entity->getUsers() as $user) {
                 $entity->removeUser($user);
+            }
+        } elseif ($entityType === 'operator') {
+            foreach ($entity->getTrainingRecords() as $trainingRecord) {
+                $this->deleteEntity('trainingRecord', $trainingRecord->getId());
             }
         }
 

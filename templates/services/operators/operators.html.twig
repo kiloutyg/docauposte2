@@ -3,97 +3,110 @@
 	Truc des operateurs
 {% endblock %}
 {% block body %}
-	{% set fieldsName = ['Nom de l\'opérateur','Code de l\'opérateur', 'Equipe de l\'operateur', 'UAP de l\'opérateur', 'Est-il un formateur?'] %}
-	{% set fields = ['name','code', 'team', 'uap','isTrainer'] %}
+{% set fields = ['lastname', 'firstname', 'code', 'team', 'uap', 'isTrainer'] %}
 
-	<br>
+<div
+	class="card bg-secondary container row mb-2"
+	data-controller="operator-admin">
+	<h2>
+		Ajouter un nouvel Opérateur
+	</h2>
+	<ul>
+		<div
+			class="row">
+			{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
 
-	<div
-		class="card bg-secondary container row mb-2">
-		<h2>
-			Ajouter un nouvel Opérateur
-		</h2>
-		<ul>
-			<div
-				class="row">
 				{% for fieldName in fieldsName %}
 					<div
-						class="col-2 ">
+						class="col">
 						{{ fieldName }}
 					</div>
-					{# Adjust the div class as needed #}
 				{% endfor %}
 				<div
-					class="col-2 mx-auto">
+					class="col mx-auto">
 					Actions
 				</div>
-				{# Column for actions like the update button #}
 			</div>
 		</ul>
 		<ul>
 			{{ form_start(newOperatorForm, {'attr': {'class': 'row', 'name': 'newOperator', 'id': 'newOperator'}}
 			) }}
-
 			{% for field in fields %}
 				{{ form_row(newOperatorForm[field]) }}
 			{% endfor %}
 			<button
 				type="submit"
-				class="btn btn-primary  text-uppercase  submit-operator-creation col-2 my-auto mx-auto">
+				class="btn btn-primary text-uppercase col my-auto mx-auto"
+                data-operator-admin-target="newOperatorSubmitButton"
+                disabled>
 				Ajouter l'Opérateur
 			</button>
 			{{ form_end(newOperatorForm) }}
+            <div class="card">
+              <input type="hidden" id="newOperatorName" name="newOperatorName">   
+            <div
+                data-operator-admin-target="newOperatorNameMessage"
+                class="newOperatorName-message d-flex justify-content-evenly"></div>
+            <div
+                data-operator-admin-target="newOperatorCodeMessage"
+                class="newOperatorCode-message d-flex justify-content-evenly"></div>
+            <div
+                data-operator-admin-target="newOperatorTransferMessage"
+                class="newOperatorTransfer-message d-flex justify-content-evenly"></div>
+            </div>
 		</ul>
-
-
+                
 		<h2>
 			Liste des Opérateurs
 		</h2>
-
-		{# Display each label once #}
 		<ul>
 			<div
 				class="row">
+                {% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
+
 				{% for fieldName in fieldsName %}
 					<div
-						class="col-2 ">
+						class="col">
 						{{ fieldName }}
 					</div>
-					{# Adjust the div class as needed #}
 				{% endfor %}
 				<div
-					class="col-2 mx-auto">
+					class="col mx-auto">
 					Actions
 				</div>
-				{# Column for actions like the update button #}
 			</div>
 		</ul>
-
-
 		<ul>
-			{% for operatorId, operatorForm in operatorForms %}
-				{{ form_start(operatorForm, {'attr': {'class': 'row'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
-
-				{% for field in fields %}
-					{% set customId = field ~ '-' ~ operatorId %}
-					{{ form_row(operatorForm[field], {'id': customId}) }}
+			{% if operatorForms|length > 0 %}
+				{% for operatorId, operatorForm in operatorForms %}
+					{{ form_start(operatorForm, {'attr': {'class': 'row'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
+					{% for field in fields %}
+						{% set customId = field ~ '-' ~ operatorId %}
+						{{ form_row(operatorForm[field], {'id': customId}) }}
+					{% endfor %}
+                    <div class="col my-auto mx-auto">
+					    <button
+                            type="submit"
+                            class="btn btn-primary text-uppercase ">
+                            MAJ Opérateur
+					    </button>
+                        <a href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase">
+                            Supprimer
+                        </a>
+                    </div>
+					{{ form_end(operatorForm) }}
+				{% else %}
+					<div
+						class="card">
+						No operators found
+					</div>
 				{% endfor %}
-
-				<button
-					type="submit"
-					class="btn btn-primary text-uppercase submit-operator-creation col-2 my-auto mx-auto">
-					MAJ Opérateur
-				</button>
-
-				{{ form_end(operatorForm) }}
 			{% else %}
 				<div
 					class="card">
 					No operators found
 				</div>
-			{% endfor %}
+			{% endif %}
 		</ul>
-
 	</div>
-
 {% endblock %}

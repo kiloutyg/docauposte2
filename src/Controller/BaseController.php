@@ -21,6 +21,7 @@ use App\Repository\ProductLineRepository;
 use App\Repository\UserRepository;
 use App\Repository\UploadRepository;
 use App\Repository\CategoryRepository;
+
 use App\Repository\ButtonRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
@@ -56,7 +57,7 @@ use App\Service\MailerService;
 use App\Service\OldUploadService;
 use App\Service\ViewsModificationService;
 use App\Service\TrainingRecordService;
-
+use App\Service\OperatorService;
 
 #[Route('/', name: 'app_')]
 
@@ -107,6 +108,7 @@ class BaseController extends AbstractController
     protected $oldUploadService;
     protected $viewsModificationService;
     protected $trainingRecordService;
+    protected $operatorService;
 
     // Variables used in the twig templates to display all the entities
     protected $departments;
@@ -165,7 +167,8 @@ class BaseController extends AbstractController
         MailerService                   $mailerService,
         OldUploadService                $oldUploadService,
         ViewsModificationService        $viewsModificationService,
-        TrainingRecordService           $trainingRecordService
+        TrainingRecordService           $trainingRecordService,
+        OperatorService                 $operatorService
 
     ) {
 
@@ -211,6 +214,7 @@ class BaseController extends AbstractController
         $this->entitydeletionService        = $entitydeletionService;
         $this->viewsModificationService     = $viewsModificationService;
         $this->trainingRecordService        = $trainingRecordService;
+        $this->operatorService              = $operatorService;
 
         // Variables used in the twig templates to display all the entities
         $this->zones                        = $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']);

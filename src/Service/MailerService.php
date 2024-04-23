@@ -209,4 +209,10 @@ class MailerService extends AbstractController
             return false;
         }
     }
+
+    // public function sendReminderEmailToUploader(array $badValidators)
+    // {
+    //     $senderEmail = $this->senderEmail;
+
+    // }
 }

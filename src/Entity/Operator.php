@@ -67,6 +67,34 @@ class Operator
 
         return $this;
     }
+    public function getFirstName(): ?string
+    {
+        return explode('.', $this->name)[0] ?? null;
+    }
+
+    public function setFirstName(string $firstName): self
+    {
+        $names = explode('.', $this->name);
+        $lastName = $names[1] ?? '';
+        $name = $firstName . '.' . $lastName;
+        $this->name = strtolower($name);
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        $names = explode('.', $this->name);
+        return $names[1] ?? null;
+    }
+
+    public function setLastName(string $lastName): self
+    {
+        $names = explode('.', $this->name);
+        $firstName = $names[0] ?? '';
+        $name = $firstName . '.' . $lastName;
+        $this->name = strtolower($name);
+        return $this;
+    }
 
     public function getTeam(): ?Team
     {
