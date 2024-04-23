@@ -68,6 +68,23 @@ class OperatorController extends FrontController
         }
     }
 
+    // Route to delete operator from the administrator view
+    #[Route('/operator/delete/{id}', name: 'app_operator_delete')]
+    public function deleteOperatorAction(Request $request, int $id): Response
+    {
+        $originUrl = $request->headers->get('referer');
+
+        $result = $this->entitydeletionService->deleteEntity('operator', $id);
+
+        if (!$result) {
+            $this->addFlash('danger', 'L\'opérateur n\'a pas pu être supprimé');
+            return $this->redirect($originUrl);
+        } else {
+            $this->addFlash('success', 'L\'opérateur a bien été supprimé');
+            return $this->redirect($originUrl);
+        }
+    }
+
 
     // individual operator modification controller, used in dev purpose
     #[Route('/operator/edit/{id}', name: 'app_operator_edit')]

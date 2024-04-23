@@ -42,7 +42,8 @@
 						<p
 							style="flex:1;"
 							class=" mx-2 card text-center">
-							Liste des Opérateurs en attente de réentrainement au process.
+							Liste des Opérateurs en attente de requalification au process. Formés par
+							{{ trainerName != null ? trainerName|upper|split('.')|last ~ ' ' ~ trainerName|capitalize|split('.')|first}}
 						</p>
 						{% for operator in operators %}
 							{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}

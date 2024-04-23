@@ -44,9 +44,10 @@ class OperatorType extends AbstractType
                     'class' => 'form-control mx-auto mt-2 capitalize-all-letters',
                     'placeholder' => 'NOM',
                     'id' => 'lastname-' . $operatorId,
+                    'name' => 'newOperatorSurname' . $operatorId,
                     'required' => true,
-                    'data-operator-training-target' => "newOperatorSurname",
-                    'data-action' => "keyup->operator-training#validateNewOperatorSurname"
+                    'data-operator-admin-target' => "newOperatorSurname" . $operatorId,
+                    'data-action' => "keyup->operator-admin#validateNewOperatorSurname"
                 ],
                 'row_attr' => [
                     'class' => 'col'
@@ -61,12 +62,14 @@ class OperatorType extends AbstractType
                 'label' => false,
 
                 'attr' => [
-                    'class' => 'form-control mx-auto mt-2 capitalize-first-letter::first-letter',
+                    'class' => 'form-control mx-auto mt-2',
                     'placeholder' => 'Prenom',
                     'id' => 'firstname-' . $operatorId,
+                    'name' => 'newOperatorFirstname' . $operatorId,
                     'required' => true,
-                    'data-operator-training-target' => 'newOperatorFirstname',
-                    'data-action' => 'keyup->operator-training#validateNewOperatorFirstname',
+                    'data-operator-admin-target' => 'newOperatorFirstname' . $operatorId,
+                    'data-action' => 'keyup->operator-admin#validateNewOperatorFirstname input->operator-admin#capitalizeFirstLetterMethod',
+                    'disabled' => 'disabled'
 
                 ],
                 'row_attr' => [
@@ -84,7 +87,12 @@ class OperatorType extends AbstractType
                     'class' => 'form-control mx-auto mt-2',
                     'placeholder' => 'Code de l\'opérateur',
                     'id' => 'code-' . $operatorId,
-                    'required' => true
+                    'name' => 'newOperatorCode' . $operatorId,
+                    'required' => true,
+                    'data-operator-admin-target' => 'newOperatorCode' . $operatorId,
+                    'data-action' => 'keyup->operator-admin#validateNewOperatorCode',
+                    'disabled' => 'disabled'
+
                 ],
                 'row_attr' => [
                     'class' => 'col'
@@ -162,8 +170,6 @@ class OperatorType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Operator::class,
-            // 'data_class' => null,
-
             'operator_id' => null,  // Add a default value for the custom option
         ]);
     }
