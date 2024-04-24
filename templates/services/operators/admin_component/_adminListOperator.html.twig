@@ -1,36 +1,56 @@
-<ul>
-	{% if operatorForms|length > 0 %}
-		{% for operatorId, operatorForm in operatorForms %}
-			{{ form_start(operatorForm, {'attr': {'class': 'row'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
-			{% for field in fields %}
-				{# {% set customId = field ~ '-' ~ operatorId %}
-																								{{ form_row(operatorForm[field], {'id': customId}) }} #}
-				{% set customId = 'newOperator' ~ field|capitalize ~ operatorId %}
-				{{ form_row(operatorForm[field], {'id': customId}) }}
+<turbo-frame
+	id="adminListOperator">
+	<ul>
+		<div
+			class="row">
+			{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
+
+			{% for fieldName in fieldsName %}
+				<div
+					class="col">
+					{{ fieldName }}
+				</div>
 			{% endfor %}
 			<div
-				class="col my-auto mx-auto">
-				<button
-					type="submit"
-					class="btn btn-primary text-uppercase ">
-					MAJ Opérateur
-				</button>
-				<a
-					href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase">
-					Supprimer
-				</a>
+				class="col mx-auto">
+				Actions
 			</div>
-			{{ form_end(operatorForm) }}
+		</div>
+	</ul>
+	<ul>
+		{% if operatorForms|length > 0 %}
+			{% for operatorId, operatorForm in operatorForms %}
+				{{ form_start(operatorForm, {'attr': {'class': 'row'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
+				{% for field in fields %}
+					{# {% set customId = field ~ '-' ~ operatorId %}
+																																		{{ form_row(operatorForm[field], {'id': customId}) }} #}
+					{% set customId = 'newOperator' ~ field|capitalize ~ operatorId %}
+					{{ form_row(operatorForm[field], {'id': customId}) }}
+				{% endfor %}
+				<div
+					class="col my-auto mx-auto">
+					<button
+						type="submit"
+						class="btn btn-primary text-uppercase ">
+						MAJ Opérateur
+					</button>
+					<a
+						href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase">
+						Supprimer
+					</a>
+				</div>
+				{{ form_end(operatorForm) }}
+			{% else %}
+				<div
+					class="card">
+					No operators found
+				</div>
+			{% endfor %}
 		{% else %}
 			<div
 				class="card">
 				No operators found
 			</div>
-		{% endfor %}
-	{% else %}
-		<div
-			class="card">
-			No operators found
-		</div>
-	{% endif %}
-</ul>
+		{% endif %}
+	</ul>
+</turbo-frame>

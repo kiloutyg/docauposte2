@@ -3,15 +3,15 @@
 	Truc des operateurs
 {% endblock %}
 {% block body %}
-{% set fields = ['lastname', 'firstname', 'code', 'team', 'uap', 'isTrainer'] %}
+	{% set fields = ['lastname', 'firstname', 'code', 'team', 'uap', 'isTrainer'] %}
 
-<div
-	class="card bg-secondary container row mb-2"
-	data-controller="operator-admin">
-	<h2>
-		Ajouter un nouvel Opérateur
-	</h2>
-	{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
+	<div
+		class="card bg-secondary container row mb-2"
+		data-controller="operator-admin">
+		<h2>
+			Ajouter un nouvel Opérateur
+		</h2>
+		{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
 
 	<ul>
 		<div
@@ -61,32 +61,22 @@
 	<h2>
 		Liste des Opérateurs
 	</h2>
+	
 	<ul>
-		<div
-			class="row">
-			{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
-
-			{% for fieldName in fieldsName %}
-				<div
-					class="col">
-					{{ fieldName }}
-				</div>
-			{% endfor %}
-			<div
-				class="col mx-auto">
-				Actions
-			</div>
+		<div class="card row m-3">
+			<form 
+			method="get" 
+			action="{{ path('app_operator') }}"
+			data-turbo-frame="adminListOperator"
+			id="adminListOperator-form">
+				<input 			
+				class="form-control col-8"
+				type="text" name="search" placeholder="Search operators..." value="{{ app.request.query.get('search') }}">
+				<input class="btn btn-primary col-2" label="Search" type="submit"></input>
+			</form>
 		</div>
 	</ul>
-	{# <ul>
-		<div class="card">
-			{% for operatorId, operatorForm in operatorForms %}
-				{{ form_start(operatorForm, {'attr': {'class': 'row'}, 'action': path('app_operator')}) }}
-           		{{ form_row(operatorForm.search) }} <!-- Assuming 'search' is the name of your search field -->
-				{{ form_end(operatorForm) }}
-			{% endfor %}
-		</div>
-	</ul> #}
-{% include '/services/operators/admin_component/_adminListOperator.html.twig' %}
-</div>
-{% endblock %}
+	<turbo-frame id="adminListOperator">
+		{% include '/services/operators/admin_component/_adminListOperator.html.twig' %}
+	</turbo-frame>
+</div>{% endblock %}

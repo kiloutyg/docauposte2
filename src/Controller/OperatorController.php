@@ -143,7 +143,6 @@ class OperatorController extends FrontController
     #[Route('/operator', name: 'app_operator')]
     public function operatorBasePage(Request $request): Response
     {
-        $originUrl = $request->headers->get('referer');
 
         // Fetch all operators
         $operators = $this->operatorRepository->findOperatorsSortedByLastNameFirstName();
@@ -151,12 +150,13 @@ class OperatorController extends FrontController
         // Handle search
         $search = $request->query->get('search');
         if (!empty($search)) {
-            $operators = array_filter($operators, function ($operator) use ($search) {
-                return stripos($operator->getLastName(), $search) !== false ||
-                    stripos($operator->getFirstName(), $search) !== false ||
-                    stripos($operator->getTeam()->getName(), $search) !== false ||
-                    stripos($operator->getUap()->getName(), $search) !== false;
-            });
+            // $operators = array_filter($operators, function ($operator) use ($search) {
+            //     return stripos($operator->getLastName(), $search) !== false ||
+            //         stripos($operator->getFirstName(), $search) !== false ||
+            //         stripos($operator->getTeam()->getName(), $search) !== false ||
+            //         stripos($operator->getUap()->getName(), $search) !== false;
+            // });
+            $operators = $this->operatorRepository->findBySearchQuery($request->query->get('search'));
         }
 
         // Create and handle forms
@@ -172,9 +172,7 @@ class OperatorController extends FrontController
         $newOperatorForm->handleRequest($request);
 
         if ($newOperatorForm->isSubmitted() && $newOperatorForm->isValid()) {
-            // Process new operator
             $this->processNewOperator($newOperator, $newOperatorForm, $request);
-            return $this->redirect($originUrl);
         }
 
         return $this->render('services/operators/operators_admin.html.twig', [
@@ -213,7 +211,7 @@ class OperatorController extends FrontController
     #[Route('/operator/edit/{id}', name: 'app_operator_edit')]
     public function editOperatorAction(Request $request, Operator $operator): Response
     {
-        $this->logger->info('Full request', $request->request->all());
+        $this->logger->info('Full request editOperatorAction', $request->request->all());
         $originUrl = $request->headers->get('referer');
 
         $form = $this->createForm(OperatorType::class, $operator, [
@@ -225,10 +223,12 @@ class OperatorController extends FrontController
         if ($form->isSubmitted() && $form->isValid()) {
             $trainerBool = $form->get('isTrainer')->getData();
             if ($trainerBool == true) {
-                $trainer = new Trainer();
-                $trainer->setOperator($operator);
-                $this->em->persist($trainer);
-                $operator->setTrainer($trainer);
+                if ($operator->getTrainer() == null) {
+                    $trainer = new Trainer();
+                    $trainer->setOperator($operator);
+                    $this->em->persist($trainer);
+                    $operator->setTrainer($trainer);
+                }
             } else if ($trainerBool != true) {
                 $trainer = $operator->getTrainer();
                 $operator->setTrainer(null);
@@ -241,15 +241,16 @@ class OperatorController extends FrontController
             $this->em->persist($operator);
             $this->em->flush();
             $this->addFlash('success', 'L\'opérateur a bien été modifié');
-            return $this->redirect($originUrl);
+            return $this->redirectToRoute('app_operator');
         } else {
-            return $this->render($originUrl);
+            return $this->redirectToRoute('app_operator');
             $this->addFlash(
                 'danger',
                 'cdlm'
             );
         }
     }
+
 
     // Route to delete operator from the administrator view
     #[Route('/operator/delete/{id}', name: 'app_operator_delete')]

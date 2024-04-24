@@ -155,7 +155,7 @@ class OperatorType extends AbstractType
 
                 'attr' => [
                     'class' => 'btn-check',
-                    'id' => 'trainer-' . $operatorId,
+                    // 'id' => 'trainer-' . $operatorId,
                     'value' => true,
                 ],
                 'row_attr' => [
@@ -165,7 +165,7 @@ class OperatorType extends AbstractType
 
                     'class' => 'btn btn-outline-primary mb-4',
                     'style' => 'font-weight: bold; color: #ffffff;',
-                    'for' => 'trainer-' . $operatorId,
+                    // 'for' => 'trainer-' . $operatorId,
                 ],
                 'label' => 'Formateur',
             ]);

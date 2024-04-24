@@ -87,13 +87,14 @@ class OperatorRepository extends ServiceEntityRepository
     public function findBySearchQuery($search)
     {
         return $this->createQueryBuilder('o')
-            ->andWhere('o.lastName LIKE :search OR o.firstName LIKE :search OR t.name LIKE :search OR u.name LIKE :search')
+            ->andWhere('LOWER(o.name) LIKE :search OR LOWER(t.name) LIKE :search OR LOWER(u.name) LIKE :search')
             ->leftJoin('o.team', 't')
             ->leftJoin('o.uap', 'u')
-            ->setParameter('search', '%' . $search . '%')
+            ->setParameter('search', '%' . strtolower($search) . '%')
             ->getQuery()
             ->getResult();
     }
+
 
 
     //    /**
