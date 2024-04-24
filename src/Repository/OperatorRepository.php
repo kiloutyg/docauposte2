@@ -42,35 +42,7 @@ class OperatorRepository extends ServiceEntityRepository
     }
 
 
-    public function findSortedOperators()
-    {
 
-        $operators = $this->createQueryBuilder('o')
-            ->join('o.team', 't')
-            ->join('o.uap', 'u')
-            ->select('o, t, u')
-            ->orderBy('t.name', 'ASC')
-            ->addOrderBy('u.name', 'ASC')
-            ->getQuery()
-            ->getResult();
-
-        usort($operators, function ($a, $b) {
-            $nameA = explode('.', $a->getName());
-            $nameB = explode('.', $b->getName());
-
-            $lastNameA = strtolower($nameA[1]);
-            $lastNameB = strtolower($nameB[1]);
-            $firstNameA = strtolower($nameA[0]);
-            $firstNameB = strtolower($nameB[0]);
-
-            if ($lastNameA === $lastNameB) {
-                return $firstNameA <=> $firstNameB;
-            }
-            return $lastNameA <=> $lastNameB;
-        });
-
-        return $operators;
-    }
     public function findOperatorsSortedByLastNameFirstName()
     {
         // Fetch all operators with their team and UAP
@@ -110,6 +82,17 @@ class OperatorRepository extends ServiceEntityRepository
         });
 
         return $operators;
+    }
+
+    public function findBySearchQuery($search)
+    {
+        return $this->createQueryBuilder('o')
+            ->andWhere('o.lastName LIKE :search OR o.firstName LIKE :search OR t.name LIKE :search OR u.name LIKE :search')
+            ->leftJoin('o.team', 't')
+            ->leftJoin('o.uap', 'u')
+            ->setParameter('search', '%' . $search . '%')
+            ->getQuery()
+            ->getResult();
     }
 
 

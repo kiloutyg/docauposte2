@@ -16,6 +16,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\SearchType;
 
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -43,10 +44,12 @@ class OperatorType extends AbstractType
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2 capitalize-all-letters',
                     'placeholder' => 'NOM',
-                    'id' => 'lastname-' . $operatorId,
-                    'name' => 'newOperatorSurname' . $operatorId,
                     'required' => true,
-                    'data-operator-admin-target' => "newOperatorSurname" . $operatorId,
+                    // 'id' => 'lastname-' . $operatorId,
+                    // 'name' => 'newOperatorSurname' . $operatorId,
+                    // 'data-operator-admin-target' => "newOperatorSurname" . $operatorId,
+                    // 'id' => 'newOperatorSurname' . $operatorId,
+                    'data-operator-admin-target' => "newOperatorSurname",
                     'data-action' => "keyup->operator-admin#validateNewOperatorSurname"
                 ],
                 'row_attr' => [
@@ -64,12 +67,15 @@ class OperatorType extends AbstractType
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
                     'placeholder' => 'Prenom',
-                    'id' => 'firstname-' . $operatorId,
-                    'name' => 'newOperatorFirstname' . $operatorId,
                     'required' => true,
-                    'data-operator-admin-target' => 'newOperatorFirstname' . $operatorId,
+                    'data-operator-admin-target' => 'newOperatorFirstname',
                     'data-action' => 'keyup->operator-admin#validateNewOperatorFirstname input->operator-admin#capitalizeFirstLetterMethod',
-                    'disabled' => 'disabled'
+                    // 'name' => 'newOperatorFirstname' . $operatorId,    
+                    // 'id' => 'firstname-' . $operatorId,
+                    // 'data-operator-admin-target' => 'newOperatorFirstname' . $operatorId,
+                    // 'id' => 'newOperatorFirstname' . $operatorId,
+                    // 'disabled' => 'disabled'
+
 
                 ],
                 'row_attr' => [
@@ -86,12 +92,16 @@ class OperatorType extends AbstractType
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
                     'placeholder' => 'Code de l\'opérateur',
-                    'id' => 'code-' . $operatorId,
-                    'name' => 'newOperatorCode' . $operatorId,
                     'required' => true,
-                    'data-operator-admin-target' => 'newOperatorCode' . $operatorId,
+                    'data-operator-admin-target' => 'newOperatorCode',
                     'data-action' => 'keyup->operator-admin#validateNewOperatorCode',
-                    'disabled' => 'disabled'
+                    'maxlength' => '5',
+                    'pattern' => '[0-9]{5}',
+                    // 'disabled' => 'disabled',
+                    // 'id' => 'newOperatorCode' . $operatorId,
+                    // 'name' => 'newOperatorCode' . $operatorId,
+                    // 'data-operator-admin-target' => 'newOperatorCode' . $operatorId,
+                    // 'id' => 'code-' . $operatorId,
 
                 ],
                 'row_attr' => [

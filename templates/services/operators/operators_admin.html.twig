@@ -39,7 +39,8 @@
 			type="submit"
 			class="btn btn-primary text-uppercase col my-auto mx-auto"
 			data-operator-admin-target="newOperatorSubmitButton"
-			disabled>
+			disabled
+			>
 			Ajouter l'Opérateur
 		</button>
 		{{ form_end(newOperatorForm) }}
@@ -77,6 +78,15 @@
 			</div>
 		</div>
 	</ul>
+	{# <ul>
+		<div class="card">
+			{% for operatorId, operatorForm in operatorForms %}
+				{{ form_start(operatorForm, {'attr': {'class': 'row'}, 'action': path('app_operator')}) }}
+           		{{ form_row(operatorForm.search) }} <!-- Assuming 'search' is the name of your search field -->
+				{{ form_end(operatorForm) }}
+			{% endfor %}
+		</div>
+	</ul> #}
 {% include '/services/operators/admin_component/_adminListOperator.html.twig' %}
 </div>
 {% endblock %}

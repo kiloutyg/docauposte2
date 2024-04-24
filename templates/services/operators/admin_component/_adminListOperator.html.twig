@@ -3,7 +3,9 @@
 		{% for operatorId, operatorForm in operatorForms %}
 			{{ form_start(operatorForm, {'attr': {'class': 'row'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
 			{% for field in fields %}
-				{% set customId = field ~ '-' ~ operatorId %}
+				{# {% set customId = field ~ '-' ~ operatorId %}
+																								{{ form_row(operatorForm[field], {'id': customId}) }} #}
+				{% set customId = 'newOperator' ~ field|capitalize ~ operatorId %}
 				{{ form_row(operatorForm[field], {'id': customId}) }}
 			{% endfor %}
 			<div
