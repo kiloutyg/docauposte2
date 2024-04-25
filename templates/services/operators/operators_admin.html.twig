@@ -7,7 +7,7 @@
 
 	<div
 		class="card bg-secondary container row mb-2"
-		data-controller="operator-admin">
+		data-controller="operator-admin-creation opeartor-admin-search">
 		<h2>
 			Ajouter un nouvel Opérateur
 		</h2>
@@ -38,7 +38,7 @@
 		<button
 			type="submit"
 			class="btn btn-primary text-uppercase col my-auto mx-auto"
-			data-operator-admin-target="newOperatorSubmitButton"
+			data-operator-admin-creation-target="newOperatorSubmitButton"
 			disabled
 			>
 			Ajouter l'Opérateur
@@ -47,13 +47,13 @@
 		<div class="card">
 			<input type="hidden" id="newOperatorName" name="newOperatorName">   
 		<div
-			data-operator-admin-target="newOperatorNameMessage"
+			data-operator-admin-creation-target="newOperatorNameMessage"
 			class="newOperatorName-message d-flex justify-content-evenly"></div>
 		<div
-			data-operator-admin-target="newOperatorCodeMessage"
+			data-operator-admin-creation-target="newOperatorCodeMessage"
 			class="newOperatorCode-message d-flex justify-content-evenly"></div>
 		<div
-			data-operator-admin-target="newOperatorTransferMessage"
+			data-operator-admin-creation-target="newOperatorTransferMessage"
 			class="newOperatorTransfer-message d-flex justify-content-evenly"></div>
 		</div>
 	</ul>
@@ -72,7 +72,11 @@
 				<input 			
 				class="form-control col-8"
 				type="text" name="search" placeholder="Search operators..." value="{{ app.request.query.get('search') }}">
-				<input class="btn btn-primary col-2" label="Search" type="submit"></input>
+				<input 
+				data-operator-admin-search-target="operatorAdminSearchSubmit" 
+				class="btn btn-primary col-2" 
+				label="Search" 
+				type="submit"></input>
 			</form>
 		</div>
 	</ul>

@@ -3,7 +3,7 @@ import { Controller } from '@hotwired/stimulus';
 
 import axios from 'axios';
 
-export default class CopyAdminController extends Controller {
+export default class OperatorAdminCreationController extends Controller {
 
 
     static targets = [
