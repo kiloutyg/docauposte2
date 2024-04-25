@@ -28,10 +28,21 @@ class OperatorController extends FrontController
 
 
         if ($request->isMethod('POST')) {
-            $name = $request->request->get('search_name');
-            $code = $request->request->get('search_code');
-            $team = $request->request->get('search_team');
-            $uap = $request->request->get('search_uap');
+            $this->logger->info('is the used method a post');
+            if ($request->getContentTypeFormat() == 'json') {
+                $this->logger->info('is the content type a json');
+                $data = json_decode($request->getContent(), true);
+                $this->logger->info('data', $data);
+                $name = $data['search_name'];
+                $code = $data['search_code'];
+                $team = $data['search_team'];
+                $uap = $data['search_uap'];
+            } else {
+                $name = $request->request->get('search_name');
+                $code = $request->request->get('search_code');
+                $team = $request->request->get('search_team');
+                $uap = $request->request->get('search_uap');
+            }
 
             $operators = $this->operatorRepository->findBySearchQuery($name, $code, $team, $uap);
         } else {
