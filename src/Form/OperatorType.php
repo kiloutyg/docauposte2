@@ -45,12 +45,6 @@ class OperatorType extends AbstractType
                     'class' => 'form-control mx-auto mt-2 capitalize-all-letters',
                     'placeholder' => 'NOM',
                     'required' => true,
-                    // 'id' => 'lastname-' . $operatorId,
-                    // 'name' => 'newOperatorSurname' . $operatorId,
-                    // 'data-operator-admin-target' => "newOperatorSurname" . $operatorId,
-                    // 'id' => 'newOperatorSurname' . $operatorId,
-                    'data-operator-admin-target' => "newOperatorSurname",
-                    'data-action' => "keyup->operator-admin#validateNewOperatorSurname"
                 ],
                 'row_attr' => [
                     'class' => 'col'
@@ -68,15 +62,6 @@ class OperatorType extends AbstractType
                     'class' => 'form-control mx-auto mt-2',
                     'placeholder' => 'Prenom',
                     'required' => true,
-                    'data-operator-admin-target' => 'newOperatorFirstname',
-                    'data-action' => 'keyup->operator-admin#validateNewOperatorFirstname input->operator-admin#capitalizeFirstLetterMethod',
-                    // 'name' => 'newOperatorFirstname' . $operatorId,    
-                    // 'id' => 'firstname-' . $operatorId,
-                    // 'data-operator-admin-target' => 'newOperatorFirstname' . $operatorId,
-                    // 'id' => 'newOperatorFirstname' . $operatorId,
-                    // 'disabled' => 'disabled'
-
-
                 ],
                 'row_attr' => [
                     'class' => 'col'
@@ -93,16 +78,8 @@ class OperatorType extends AbstractType
                     'class' => 'form-control mx-auto mt-2',
                     'placeholder' => 'Code de l\'opérateur',
                     'required' => true,
-                    'data-operator-admin-target' => 'newOperatorCode',
-                    'data-action' => 'keyup->operator-admin#validateNewOperatorCode',
                     'maxlength' => '5',
                     'pattern' => '[0-9]{5}',
-                    // 'disabled' => 'disabled',
-                    // 'id' => 'newOperatorCode' . $operatorId,
-                    // 'name' => 'newOperatorCode' . $operatorId,
-                    // 'data-operator-admin-target' => 'newOperatorCode' . $operatorId,
-                    // 'id' => 'code-' . $operatorId,
-
                 ],
                 'row_attr' => [
                     'class' => 'col'
@@ -155,7 +132,6 @@ class OperatorType extends AbstractType
 
                 'attr' => [
                     'class' => 'btn-check',
-                    // 'id' => 'trainer-' . $operatorId,
                     'value' => true,
                 ],
                 'row_attr' => [
@@ -165,7 +141,6 @@ class OperatorType extends AbstractType
 
                     'class' => 'btn btn-outline-primary mb-4',
                     'style' => 'font-weight: bold; color: #ffffff;',
-                    // 'for' => 'trainer-' . $operatorId,
                 ],
                 'label' => 'Formateur',
             ]);

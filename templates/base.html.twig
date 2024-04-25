@@ -180,13 +180,15 @@ let buttonIdFromServer = null;
 					</div>
 				{% endif %}
 				<div
-					class="ms-auto d-flex align-items-end">
+					class="ms-auto d-flex align-items-center">
 					{% if app.user is null %}
-						<a
-							class="btn btn-primary"
-							href="{{ path('app_login') }}">
-							Connexion
-						</a>
+						<p>
+							<a
+								class="btn btn-primary"
+								href="{{ path('app_login') }}">
+								Connexion
+							</a>
+						</p>
 					{% else %}
 						<p
 							class="d-flex align-items-center">

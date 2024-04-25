@@ -7,7 +7,7 @@ export default class OperatorAdminCreationController extends Controller {
 
 
     static targets = [
-        "newOperatorSurname",
+        "newOperatorLastname",
         "newOperatorFirstname",
         "newOperatorNameMessage",
         "newOperatorCode",
@@ -18,17 +18,17 @@ export default class OperatorAdminCreationController extends Controller {
     ];
 
 
-    validateNewOperatorSurname() {
-        clearTimeout(this.surnameTypingTimeout);
-        this.surnameTypingTimeout = setTimeout(() => {
-            console.log('checking what is carried by the target:', this.newOperatorSurnameTarget);
-            console.log('validating new operator surname:', this.newOperatorSurnameTarget.value);
+    validateNewOperatorLastname() {
+        clearTimeout(this.lastnameTypingTimeout);
+        this.lastnameTypingTimeout = setTimeout(() => {
+            console.log('checking what is carried by the target:', this.newOperatorLastnameTarget);
+            console.log('validating new operator lastname:', this.newOperatorLastnameTarget.value);
             const regex = /^[A-Z][A-Z]+$/;
-            const surname = this.newOperatorSurnameTarget.value.toUpperCase();
-            const isValid = regex.test(surname.trim());
+            const lastname = this.newOperatorLastnameTarget.value.toUpperCase();
+            const isValid = regex.test(lastname.trim());
             this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir un nom valide.");
             if (isValid) {
-                // this.newOperatorSurnameTarget.disabled = true;
+                // this.newOperatorLastnameTarget.disabled = true;
                 this.newOperatorFirstnameTarget.disabled = false;
                 this.newOperatorFirstnameTarget.focus();
             }
@@ -42,11 +42,12 @@ export default class OperatorAdminCreationController extends Controller {
             const firstnameValue = this.newOperatorFirstnameTarget.value;
             this.firstnameValue = this.capitalizeFirstLetter(firstnameValue);
             console.log('validating new operator firstname:', this.newOperatorFirstnameTarget.value);
+            console.log('validating new operator firstname:', this.firstnameValue)
             const regex = /^[A-Z][a-z]+(-[A-Z][a-z]+)*$/;
             const isValid = regex.test(this.firstnameValue.trim());
             this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir un prenom valide.");
             if (isValid) {
-                let combinedName = `${this.newOperatorFirstnameTarget.value.trim()}.${this.newOperatorSurnameTarget.value.trim()}`;
+                let combinedName = `${this.newOperatorFirstnameTarget.value.trim()}.${this.newOperatorLastnameTarget.value.trim()}`;
                 this.newOperatorNameTarget = combinedName.toLowerCase();
                 // this.newOperatorFirstnameTarget.disabled = true;
                 this.validateNewOperatorName();
@@ -222,13 +223,13 @@ export default class OperatorAdminCreationController extends Controller {
         this.validatedTimeout = setTimeout(() => {
             console.log('Resetting new operator form after 10 seconds')
             this.newOperatorCodeTarget.value = "";
-            this.newOperatorSurnameTarget.value = "";
+            this.newOperatorLastnameTarget.value = "";
             this.newOperatorFirstnameTarget.value = "";
             this.newOperatorNameTarget = "";
             this.duplicateCheckResults = { name: null, code: null };
-            this.newOperatorSurnameTarget.disabled = false;
+            this.newOperatorLastnameTarget.disabled = false;
             this.newOperatorCodeTarget.disabled = true;
-            this.newOperatorSurnameTarget.focus();
+            this.newOperatorLastnameTarget.focus();
             this.newOperatorSubmitButtonTarget.disabled = true;
             this.resetUselessMessages();
             this.newOperatorCodeMessageTarget.textContent = "";

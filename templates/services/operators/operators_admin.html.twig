@@ -3,15 +3,15 @@
 	Truc des operateurs
 {% endblock %}
 {% block body %}
-	{% set fields = ['lastname', 'firstname', 'code', 'team', 'uap', 'isTrainer'] %}
 
 	<div
 		class="card bg-secondary container row mb-2"
-		data-controller="operator-admin-creation opeartor-admin-search">
+		data-controller="operator-admin-creation operator-admin-search">
 		<h2>
 			Ajouter un nouvel Opérateur
 		</h2>
 		{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
+		{% set fields = ['lastname', 'firstname', 'code', 'team', 'uap', 'isTrainer'] %}
 
 	<ul>
 		<div
@@ -33,7 +33,13 @@
 		{{ form_start(newOperatorForm, {'attr': {'class': 'row', 'name': 'newOperator', 'id': 'newOperator'}}
 		) }}
 		{% for field in fields %}
-			{{ form_row(newOperatorForm[field]) }}
+			{{ form_row(newOperatorForm[field],{
+				'attr': {
+					'id': 'newOperator' ~ field|capitalize,
+					'data-operator-admin-creation-target': 'newOperator' ~ field|capitalize,
+					'data-action': field == 'firstname' ? 'keyup->operator-admin-creation#validateNewOperator' ~ field|capitalize ~ ' input->operator-admin-creation#capitalizeFirstLetterMethod' : 'keyup->operator-admin-creation#validateNewOperator' ~ field|capitalize,
+				}
+			}) }}
 		{% endfor %}
 		<button
 			type="submit"
@@ -63,20 +69,54 @@
 	</h2>
 	
 	<ul>
-		<div class="card row m-3">
+		<div class="container card m-3">
 			<form 
-			method="get" 
+			class="row mt-2"
+			method="post" 
 			action="{{ path('app_operator') }}"
 			data-turbo-frame="adminListOperator"
 			id="adminListOperator-form">
-				<input 			
-				class="form-control col-8"
-				type="text" name="search" placeholder="Search operators..." value="{{ app.request.query.get('search') }}">
+
+				<input 							
+				data-operator-admin-search-target="operatorAdminSearchNameInput"
+				class="form-control col"
+				type="text" 
+				name="search_name" 
+				placeholder="Search by name" 
+				value="{{ app.request.query.get('search_name') }}">
+
+				<input 							
+				data-operator-admin-search-target="operatorAdminSearchCodeInput"
+				class="form-control col"
+				type="text" 
+				pattern="[0-9]{1-5}"
+				maxlength="5"
+				name="search_code" 
+				placeholder="Search by code" 
+				value="{{ app.request.query.get('search_code') }}">
+
+				<input 							
+				data-operator-admin-search-target="operatorAdminSearchTeamInput"
+				class="form-control col"
+				type="text" 
+				name="search_team" 
+				placeholder="Search by team" 
+				value="{{ app.request.query.get('search_team') }}">
+
+				<input 							
+				data-operator-admin-search-target="operatorAdminSearchUapInput"
+				class="form-control col"
+				type="text" 
+				name="search_uap" 
+				placeholder="Search by UAP" 
+				value="{{ app.request.query.get('search_uap') }}">
+
 				<input 
 				data-operator-admin-search-target="operatorAdminSearchSubmit" 
-				class="btn btn-primary col-2" 
-				label="Search" 
-				type="submit"></input>
+				class="btn btn-primary col" 
+				placeholder="Search" 
+				type="submit">
+
 			</form>
 		</div>
 	</ul>

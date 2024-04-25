@@ -17,146 +17,25 @@ use App\Entity\Trainer;
 
 class OperatorController extends FrontController
 {
-    // // Route to have the basic page being display for dev purpose
-    // #[Route('/operator', name: 'app_operator')]
-    // public function operatorBasePage(Request $request): Response
-    // {
-    //     $originUrl = $request->headers->get('referer');
 
-    //     if ($this->operatorRepository->findAll() != null) {
-    //         $operators = $this->operatorRepository->findOperatorsSortedByLastNameFirstName();
-    //     }
-    //     $operatorForms = [];
-    //     if (isset($operators)) {
-    //         foreach ($operators as $operator) {
-    //             $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
-    //                 'operator_id' => $operator->getId(),
-    //             ])->createView();
-    //         }
-    //     }
-    //     $newOperator = new Operator();
-    //     $newOperatorForm = $this->createForm(OperatorType::class, $newOperator, [
-    //         'operator_id' => $operator->getId(),
-    //     ]);
-    //     if ($request->getMethod() === 'POST') {
-    //         $newOperatorForm->handleRequest($request);
-    //         if ($newOperatorForm->isSubmitted() && $newOperatorForm->isValid()) {
-    //             $trainerBool = $newOperatorForm->get('isTrainer')->getData();
-    //             if ($trainerBool == true) {
-    //                 $trainer = new Trainer();
-    //                 $trainer->setOperator($newOperator);
-    //                 $this->em->persist($trainer);
-    //                 $newOperator->setTrainer($trainer);
-    //             } else if ($trainerBool != true) {
-    //                 $trainer = $operator->getTrainer();
-    //                 $operator->setTrainer(null);
-    //                 if ($trainer != null) {
-    //                     $this->em->remove($trainer);
-    //                 }
-    //             };
-    //             $operator = $newOperatorForm->getData();
-    //             $this->em->persist($operator);
-    //             $this->em->flush();
-    //             $this->addFlash('success', 'L\'opérateur a bien été ajouté');
-    //             return $this->redirect($originUrl);
-    //         }
-    //     } else if ($request->getMethod() === 'GET') {
-    //         return $this->render('services/operators/operators_admin.html.twig', [
-    //             'newOperatorForm' => $newOperatorForm->createView(),
-    //             'operatorForms' => $operatorForms,
-    //         ]);
-    //     }
-    // }
-
-    // #[Route('/operator', name: 'app_operator')]
-    // public function operatorBasePage(Request $request): Response
-    // {
-    //     $originUrl = $request->headers->get('referer');
-
-    //     // Fetch all operators sorted by last name and first name
-    //     $operators = $this->operatorRepository->findOperatorsSortedByLastNameFirstName();
-
-    //     // Create an array to hold the forms for each operator
-    //     $operatorForms = [];
-    //     foreach ($operators as $operator) {
-    //         $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
-    //             'operator_id' => $operator->getId(),
-    //         ])->createView();
-    //     }
-
-    //     // Create a form for a new operator
-    //     $newOperator = new Operator();
-    //     $newOperatorForm = $this->createForm(OperatorType::class, $newOperator, [
-    //         'operator_id' => $operator->getId(),
-    //     ]);
-
-    //     // Handle the request
-    //     $newOperatorForm->handleRequest($request);
-    //     if ($newOperatorForm->isSubmitted() && $newOperatorForm->isValid()) {
-    //         // If the form is submitted and valid, handle the new operator
-
-    //         $trainerBool = $newOperatorForm->get('isTrainer')->getData();
-    //         if ($trainerBool == true) {
-    //             $trainer = new Trainer();
-    //             $trainer->setOperator($newOperator);
-    //             $this->em->persist($trainer);
-    //             $newOperator->setTrainer($trainer);
-    //         } else if ($trainerBool != true) {
-    //             $trainer = $operator->getTrainer();
-    //             $operator->setTrainer(null);
-    //             if ($trainer != null) {
-    //                 $this->em->remove($trainer);
-    //             }
-    //         };
-    //         $operator = $newOperatorForm->getData();
-    //         $this->em->persist($operator);
-    //         $this->em->flush();
-    //         $this->addFlash('success', 'L\'opérateur a bien été ajouté');
-    //         return $this->redirect($originUrl);
-    //     } else if ($request->query->has('search')) {
-    //         // If there is a 'search' query parameter, filter the operators
-
-    //         $search = $request->query->get('search');
-    //         $operators = array_filter($operators, function ($operator) use ($search) {
-    //             return strpos(strtolower($operator->getName()), strtolower($search)) !== false ||
-    //                 strpos(strtolower($operator->getTeam()), strtolower($search)) !== false ||
-    //                 strpos(strtolower($operator->getUap()), strtolower($search)) !== false;
-    //         });
-
-    //         // Recreate the forms for the filtered operators
-    //         $operatorForms = [];
-    //         foreach ($operators as $operator) {
-    //             $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
-    //                 'operator_id' => $operator->getId(),
-    //             ])->createView();
-    //         }
-    //     }
-
-    //     return $this->render('services/operators/operators_admin.html.twig', [
-    //         'newOperatorForm' => $newOperatorForm->createView(),
-    //         'operatorForms' => $operatorForms,
-    //     ]);
-    // }
 
 
 
     #[Route('/operator', name: 'app_operator')]
     public function operatorBasePage(Request $request): Response
     {
+        $this->logger->info('search query with full request', $request->request->all());
 
-        // Fetch all operators
-        $operators = $this->operatorRepository->findOperatorsSortedByLastNameFirstName();
 
-        // Handle search
-        $search = $request->query->get('search');
-        if (!empty($search)) {
-            // $operators = array_filter($operators, function ($operator) use ($search) {
-            //     return stripos($operator->getLastName(), $search) !== false ||
-            //         stripos($operator->getFirstName(), $search) !== false ||
-            //         stripos($operator->getTeam()->getName(), $search) !== false ||
-            //         stripos($operator->getUap()->getName(), $search) !== false;
-            // });
-            $operators = $this->operatorRepository->findBySearchQuery($request->query->get('search'));
+        if ($request->isMethod('POST')) {
+            $name = $request->request->get('search_name');
+            $code = $request->request->get('search_code');
+            $team = $request->request->get('search_team');
+            $uap = $request->request->get('search_uap');
+
+            $operators = $this->operatorRepository->findBySearchQuery($name, $code, $team, $uap);
+        } else {
+            $operators = $this->operatorRepository->findOperatorsSortedByLastNameFirstName();
         }
 
         // Create and handle forms

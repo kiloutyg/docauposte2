@@ -84,15 +84,42 @@ class OperatorRepository extends ServiceEntityRepository
         return $operators;
     }
 
-    public function findBySearchQuery($search)
+    // public function findBySearchQuery($search)
+    // {
+    //     return $this->createQueryBuilder('o')
+    //         ->andWhere('LOWER(o.name) LIKE :search OR LOWER(t.name) LIKE :search OR LOWER(u.name) LIKE :search')
+    //         ->leftJoin('o.team', 't')
+    //         ->leftJoin('o.uap', 'u')
+    //         ->setParameter('search', '%' . strtolower($search) . '%')
+    //         ->getQuery()
+    //         ->getResult();
+    // }
+
+
+    public function findBySearchQuery($name, $code, $team, $uap)
     {
-        return $this->createQueryBuilder('o')
-            ->andWhere('LOWER(o.name) LIKE :search OR LOWER(t.name) LIKE :search OR LOWER(u.name) LIKE :search')
+        $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.team', 't')
-            ->leftJoin('o.uap', 'u')
-            ->setParameter('search', '%' . strtolower($search) . '%')
-            ->getQuery()
-            ->getResult();
+            ->leftJoin('o.uap', 'u');
+
+        if (!empty($name)) {
+            $qb->andWhere('LOWER(o.name) LIKE :name')
+                ->setParameter('name', '%' . strtolower($name) . '%');
+        }
+        if (!empty($code)) {
+            $qb->andWhere('o.code LIKE :code')
+                ->setParameter('code', '%' . $code . '%');
+        }
+        if (!empty($team)) {
+            $qb->andWhere('LOWER(t.name) LIKE :team')
+                ->setParameter('team', '%' . strtolower($team) . '%');
+        }
+        if (!empty($uap)) {
+            $qb->andWhere('LOWER(u.name) LIKE :uap')
+                ->setParameter('uap', '%' . strtolower($uap) . '%');
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
 

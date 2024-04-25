@@ -25,7 +25,13 @@
 					{# {% set customId = field ~ '-' ~ operatorId %}
 																																		{{ form_row(operatorForm[field], {'id': customId}) }} #}
 					{% set customId = 'newOperator' ~ field|capitalize ~ operatorId %}
-					{{ form_row(operatorForm[field], {'id': customId}) }}
+					{{ form_row(operatorForm[field], 
+					{
+					'attr': {
+						'id': customId,
+						'data-operator-admin-edit-target': 'newOperator' ~ field|capitalize
+				}
+			}) }}
 				{% endfor %}
 				<div
 					class="col my-auto mx-auto">
@@ -42,13 +48,13 @@
 				{{ form_end(operatorForm) }}
 			{% else %}
 				<div
-					class="card">
+					class="card alert alert-danger">
 					No operators found
 				</div>
 			{% endfor %}
 		{% else %}
 			<div
-				class="card">
+				class="card alert alert-danger">
 				No operators found
 			</div>
 		{% endif %}
