@@ -18,9 +18,6 @@ use App\Entity\Trainer;
 class OperatorController extends FrontController
 {
 
-
-
-
     #[Route('/operator', name: 'app_operator')]
     public function operatorBasePage(Request $request): Response
     {
@@ -47,9 +44,7 @@ class OperatorController extends FrontController
             }
             $operators = $this->operatorRepository->findBySearchQuery($name, $code, $team, $uap, $trainer);
         }
-        //  else {
-        //     $operators = $this->operatorRepository->findOperatorsSortedByLastNameFirstName();
-        // }
+
 
         // Create and handle forms
         $operatorForms = [];

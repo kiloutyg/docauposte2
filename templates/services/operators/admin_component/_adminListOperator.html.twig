@@ -1,18 +1,16 @@
-<turbo-frame
-	id="adminListOperator">
+<turbo-frame id="adminListOperator">
 	<ul>
-		<div
-			class="row">
+		<div class="row">
 			{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
 
 			{% for fieldName in fieldsName %}
 				<div
-					class="col">
+					class="col " style="color:white;">
 					{{ fieldName }}
 				</div>
 			{% endfor %}
 			<div
-				class="col mx-auto">
+				class="col mx-auto"  style="color:white;">
 				Actions
 			</div>
 		</div>
@@ -45,6 +43,8 @@
 						Supprimer
 					</a>
 				</div>
+
+
 				{{ form_end(operatorForm) }}
 			{% else %}
 				<div
