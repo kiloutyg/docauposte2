@@ -81,19 +81,19 @@ let buttonIdFromServer = null;
 			class="navbar navbar-expand-lg navbar-dark flex-shrink-0"
 			style="background-color: #1f3e52">
 			<div
-				class="container">
+				class="container d-flex flex-column flex-lg-row align-items-end">
 				<a
-					class="navbar-brand"
+					class="navbar-brand mb-lg-0"
 					href="{{ path('app_base') }}">
 					<img
-						class="img-fluid align-center justify-content-center"
+						class="img-fluid"
 						src="{{ asset('Plastic_Omnium.svg') }}" alt="Logo de PlasticOmnium"
 						role="img"
-						width="125"/>
+						width="250"/>
 				</a>
 				<a
-					class="navbar-brand"
-					href="{{ path('app_base') }}">
+					class="navbar-brand mb-lg-0"
+					href="{{ path('app_base') }} ">
 					<h2>
 						<strong>
 							DocAuPoste
@@ -102,7 +102,7 @@ let buttonIdFromServer = null;
 				</a>
 				{% if app.user is not null %}
 					<div
-						class="ms-auto d-flex align-items-center ">
+						class="ms-auto d-flex align-items-end ">
 						<div
 							class="dropdown">
 
@@ -182,16 +182,20 @@ let buttonIdFromServer = null;
 				<div
 					class="ms-auto d-flex align-items-center">
 					{% if app.user is null %}
-						<a
-							class="btn btn-primary"
-							href="{{ path('app_login') }}">
-							Connexion
-						</a>
-					{% else %}
 						<p>
-							<strong>
-								{{app.user.username|capitalize|split('.')|first }}
-								{{app.user.username|upper|split('.')|last }}
+							<a
+								class="btn btn-primary"
+								href="{{ path('app_login') }}">
+								Connexion
+							</a>
+						</p>
+					{% else %}
+						<p
+							class="d-flex align-items-center">
+							<strong
+								class="me-2">
+								{{ app.user.username|capitalize|split('.')|first }}
+								{{ app.user.username|upper|split('.')|last }}
 							</strong>
 							<a
 								class="btn btn-primary"

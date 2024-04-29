@@ -16,6 +16,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\SearchType;
 
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -43,11 +44,7 @@ class OperatorType extends AbstractType
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2 capitalize-all-letters',
                     'placeholder' => 'NOM',
-                    'id' => 'lastname-' . $operatorId,
-                    'name' => 'newOperatorSurname' . $operatorId,
                     'required' => true,
-                    'data-operator-admin-target' => "newOperatorSurname" . $operatorId,
-                    'data-action' => "keyup->operator-admin#validateNewOperatorSurname"
                 ],
                 'row_attr' => [
                     'class' => 'col'
@@ -64,13 +61,7 @@ class OperatorType extends AbstractType
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
                     'placeholder' => 'Prenom',
-                    'id' => 'firstname-' . $operatorId,
-                    'name' => 'newOperatorFirstname' . $operatorId,
                     'required' => true,
-                    'data-operator-admin-target' => 'newOperatorFirstname' . $operatorId,
-                    'data-action' => 'keyup->operator-admin#validateNewOperatorFirstname input->operator-admin#capitalizeFirstLetterMethod',
-                    'disabled' => 'disabled'
-
                 ],
                 'row_attr' => [
                     'class' => 'col'
@@ -86,13 +77,9 @@ class OperatorType extends AbstractType
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
                     'placeholder' => 'Code de l\'opérateur',
-                    'id' => 'code-' . $operatorId,
-                    'name' => 'newOperatorCode' . $operatorId,
                     'required' => true,
-                    'data-operator-admin-target' => 'newOperatorCode' . $operatorId,
-                    'data-action' => 'keyup->operator-admin#validateNewOperatorCode',
-                    'disabled' => 'disabled'
-
+                    'maxlength' => '5',
+                    'pattern' => '[0-9]{5}',
                 ],
                 'row_attr' => [
                     'class' => 'col'
@@ -145,7 +132,6 @@ class OperatorType extends AbstractType
 
                 'attr' => [
                     'class' => 'btn-check',
-                    'id' => 'trainer-' . $operatorId,
                     'value' => true,
                 ],
                 'row_attr' => [
@@ -155,7 +141,6 @@ class OperatorType extends AbstractType
 
                     'class' => 'btn btn-outline-primary mb-4',
                     'style' => 'font-weight: bold; color: #ffffff;',
-                    'for' => 'trainer-' . $operatorId,
                 ],
                 'label' => 'Formateur',
             ]);

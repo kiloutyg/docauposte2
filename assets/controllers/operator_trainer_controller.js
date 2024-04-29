@@ -217,7 +217,7 @@ export default class OperatorTrainerController extends Controller {
                         disabled>
                     <input
                         type="text"
-                        pattern="\\d*"
+                        pattern="[0-9]{5}"
                         maxlength="5"
                         class="form-control"
                         data-operator-training-target="newOperatorCode"

@@ -31,7 +31,7 @@
 
 						{% for operator in operators  %}
 							{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-							{% include 'services/operators/component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
+							{% include 'services/operators/training_component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
 						{% endfor %}
 					{% endfor %}
 				{% endif %}
@@ -48,7 +48,7 @@
 						{% for operator in operators %}
 							{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
 
-							{% include 'services/operators/component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
+							{% include 'services/operators/training_component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
 
 						{% endfor %}
 
@@ -63,7 +63,7 @@
 					</p>
 					{% for operator in untrainedOperators %}
 						{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-						{% include 'services/operators/component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
+						{% include 'services/operators/training_component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
 
 
 					{% endfor %}
@@ -85,7 +85,7 @@
 				Pour modifier ces informations, veuillez sélectionner une équipe et une UAP.
 			</p>
 			{% for record in trainingRecords %}
-				{% include 'services/operators/component/_listOperatorPart_operator_listing.html.twig' with {'operator': record.operator, 'trainingRecord': record} %}
+				{% include 'services/operators/training_component/_listOperatorPart_operator_listing.html.twig' with {'operator': record.operator, 'trainingRecord': record} %}
 
 			{% endfor %}
 			<p
@@ -99,7 +99,7 @@
 				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
 				{% if trainingRecord == null %}
 
-					{% include 'services/operators/component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
+					{% include 'services/operators/training_component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
 
 				{% endif %}
 			{% endfor %}
@@ -111,7 +111,7 @@
 			</p>
 			{% for operator in operators %}
 				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-				{% include 'services/operators/component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
+				{% include 'services/operators/training_component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
 			{% endfor %}
 		{% endif %}
 	{% endif %}
