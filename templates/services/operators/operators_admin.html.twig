@@ -4,9 +4,7 @@
 {% endblock %}
 {% block body %}
 
-	<div
-		class="card bg-secondary container row mb-2"
-		data-controller="operator-admin-creation operator-admin-search">
+	<div class="card bg-secondary container row mb-2" data-controller="operator-admin-creation operator-admin-search">
 		<h2>
 			Ajouter un nouvel Opérateur
 		</h2>
@@ -68,67 +66,9 @@
 		Liste des Opérateurs
 	</h2>
 	
-	<ul>
-		<div class="container mt-3">
-			<form 
-			class="row mt-2"
-			method="post" 
-			action="{{ path('app_operator') }}"
-			data-turbo-frame="adminListOperator"
-			id="adminListOperator-form">
-
-				<input 							
-				data-operator-admin-search-target="operatorAdminSearchNameInput"
-				data-action="keyup->operator-admin-search#submitSearchForm"
-				class="form-control col"
-				type="text" 
-				name="search_name" 
-				id="search_name"
-				placeholder="Search by name" 
-				>
-
-				<input 							
-				data-operator-admin-search-target="operatorAdminSearchCodeInput"
-				data-action="keyup->operator-admin-search#submitSearchForm"
-				class="form-control col"
-				type="text" 
-				pattern="[0-9]"
-				maxlength="5"
-				name="search_code"
-				id="search_code" 
-				placeholder="Search by code" 
-				>
-
-				<input 							
-				data-operator-admin-search-target="operatorAdminSearchTeamInput"
-				data-action="keyup->operator-admin-search#submitSearchForm"
-				class="form-control col"
-				type="text" 
-				name="search_team" 
-				id="search_team"
-				placeholder="Search by team" 
-				>
-
-				<input 							
-				data-operator-admin-search-target="operatorAdminSearchUapInput"
-				data-action="keyup->operator-admin-search#submitSearchForm"
-				class="form-control col"
-				type="text" 
-				name="search_uap"
-				id="search_uap" 
-				placeholder="Search by UAP" 
-				>
-
-				<input 
-				data-operator-admin-search-target="operatorAdminSearchSubmit" 
-				class="btn btn-primary col" 
-				placeholder="Search" 
-				type="submit">
-
-			</form>
-		</div>
-	</ul>
-	<turbo-frame id="adminListOperator">
-		{% include '/services/operators/admin_component/_adminListOperator.html.twig' %}
-	</turbo-frame>
-</div>{% endblock %}
+			{% include '/services/operators/admin_component/_adminListOperatorSearchForm.html.twig' %}
+		<turbo-frame id="adminListOperator">
+			{% include '/services/operators/admin_component/_adminListOperator.html.twig' %}
+		</turbo-frame>
+	</div>
+{% endblock %}

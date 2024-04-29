@@ -26,28 +26,30 @@ class OperatorController extends FrontController
     {
         $this->logger->info('search query with full request', $request->request->all());
 
-
+        $operators = [];
         if ($request->isMethod('POST')) {
             $this->logger->info('is the used method a post');
             if ($request->getContentTypeFormat() == 'json') {
                 $this->logger->info('is the content type a json');
                 $data = json_decode($request->getContent(), true);
                 $this->logger->info('data', $data);
-                $name = $data['search_name'];
-                $code = $data['search_code'];
-                $team = $data['search_team'];
-                $uap = $data['search_uap'];
+                $name       = $data['search_name'];
+                $code       = $data['search_code'];
+                $team       = $data['search_team'];
+                $uap        = $data['search_uap'];
+                $trainer    = $data['search_trainer'];
             } else {
-                $name = $request->request->get('search_name');
-                $code = $request->request->get('search_code');
-                $team = $request->request->get('search_team');
-                $uap = $request->request->get('search_uap');
+                $name       = $request->request->get('search_name');
+                $code       = $request->request->get('search_code');
+                $team       = $request->request->get('search_team');
+                $uap        = $request->request->get('search_uap');
+                $trainer    = $request->request->get('search_trainer');
             }
-
-            $operators = $this->operatorRepository->findBySearchQuery($name, $code, $team, $uap);
-        } else {
-            $operators = $this->operatorRepository->findOperatorsSortedByLastNameFirstName();
+            $operators = $this->operatorRepository->findBySearchQuery($name, $code, $team, $uap, $trainer);
         }
+        //  else {
+        //     $operators = $this->operatorRepository->findOperatorsSortedByLastNameFirstName();
+        // }
 
         // Create and handle forms
         $operatorForms = [];
