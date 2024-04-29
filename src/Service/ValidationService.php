@@ -454,19 +454,20 @@ class ValidationService extends AbstractController
                 $return = false;
                 if (count($uploadsWaitingValidation) > 0) {
                     $return = $this->mailerService->sendReminderEmail($validator, $uploadsWaitingValidation);
-                    // foreach ($uploadsWaitingValidation as $upload) {
-                    //     $uploaders[] = $upload->getUploader();
-                    // }
 
-                    // $badValidators[$validator] = $uploadsWaitingValidation;
-
-                    // $uploadsWaitingValidation = [];
+                    foreach ($uploadsWaitingValidation as $upload) {
+                        $uploaderId = $upload->getUploader()->getId();
+                        $uploaders[$uploaderId] = $upload->getUploader();
+                    }
                 }
             }
 
 
             if ($return) {
                 file_put_contents($filePath, $today->format('Y-m-d'));
+            }
+            foreach ($uploaders as $uploader) {
+                $this->mailerService->sendReminderEmailToUploader($uploader);
             }
         }
     }
