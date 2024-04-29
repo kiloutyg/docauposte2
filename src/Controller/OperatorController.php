@@ -353,7 +353,7 @@ class OperatorController extends FrontController
             $record = $records[0] ?? null;
             if ($record) {
                 $this->logger->info('unorderedTrainingRecords', [$unorderedTrainingRecords]);
-                $trainerName = $record->getTrainer() ? $record->getTrainer()->getOperator()->getName() : 'Non assigné';
+                $trainerName = $record->getTrainer() ? $record->getTrainer()->getOperator()->getName() : 'inconnu.nom';
                 if ($record->isTrained()) {
                     $operatorsByTrainer[$trainerName][] = $operator;
                 } else {
