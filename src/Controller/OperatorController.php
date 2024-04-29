@@ -18,9 +18,6 @@ use App\Entity\Trainer;
 class OperatorController extends FrontController
 {
 
-
-
-
     #[Route('/operator', name: 'app_operator')]
     public function operatorBasePage(Request $request): Response
     {
@@ -47,9 +44,7 @@ class OperatorController extends FrontController
             }
             $operators = $this->operatorRepository->findBySearchQuery($name, $code, $team, $uap, $trainer);
         }
-        //  else {
-        //     $operators = $this->operatorRepository->findOperatorsSortedByLastNameFirstName();
-        // }
+
 
         // Create and handle forms
         $operatorForms = [];
@@ -353,7 +348,7 @@ class OperatorController extends FrontController
             $record = $records[0] ?? null;
             if ($record) {
                 $this->logger->info('unorderedTrainingRecords', [$unorderedTrainingRecords]);
-                $trainerName = $record->getTrainer() ? $record->getTrainer()->getOperator()->getName() : 'Non assigné';
+                $trainerName = $record->getTrainer() ? $record->getTrainer()->getOperator()->getName() : 'inconnu.nom';
                 if ($record->isTrained()) {
                     $operatorsByTrainer[$trainerName][] = $operator;
                 } else {

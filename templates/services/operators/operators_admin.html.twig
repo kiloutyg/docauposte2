@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 {% block title %}
-	Truc des operateurs
+	Admin Operateurs
 {% endblock %}
 {% block body %}
 
 	<div class="card bg-secondary container row mb-2" data-controller="operator-admin-creation operator-admin-search">
-		<h2>
+		<h2 class="mt-2" style="color:white;">
 			Ajouter un nouvel Opérateur
 		</h2>
 		{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
@@ -14,15 +14,14 @@
 	<ul>
 		<div
 			class="row">
-
 			{% for fieldName in fieldsName %}
 				<div
-					class="col">
+					class="col" style="color:white;">
 					{{ fieldName }}
 				</div>
 			{% endfor %}
 			<div
-				class="col mx-auto">
+				class="col mx-auto" style="color:white;">
 				Actions
 			</div>
 		</div>
@@ -62,7 +61,7 @@
 		</div>
 	</ul>
 			
-	<h2>
+	<h2  style="color:white;">
 		Liste des Opérateurs
 	</h2>
 	

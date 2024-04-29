@@ -12,81 +12,45 @@
 <html>
 	{% include "services/_toasts.html.twig" %}
 
-	<body
-		class="d-flex flex-column justify-content-evenly align-items-evenly card"
-		style="background-color: #d3d3d3;">
+	<body class="d-flex flex-column justify-content-evenly align-items-evenly card" style="background-color: #d3d3d3;">
 
-		<form
-			class="mt-2"
-			id="trainingRecord-form"
-			action="{{path('app_training_list_select_record_form', {'uploadId': upload.id})}}" method="post"
-			data-turbo-frame="training-records">
-			<div
-				data-controller="operator-training-select"
-				class="d-flex flex-column mx-2 justify-content-evenly">
-				<div
-					class="d-flex flex-row">
-					<select
-						name="team-trainingRecord-select"
-						id="teamId"
-						class="form-select mx-1"
-						style="flex:0.4;"
-						data-action="change->operator-training-select#validateNewOperatorSelect"
-						data-operator-training-select-target="newOperatorSelectTeam"
-						required>
-						<option
-							value="">
+		<form class="mt-2" id="trainingRecord-form" action="{{path('app_training_list_select_record_form', {'uploadId': upload.id})}}" method="post" data-turbo-frame="training-records">
+			<div data-controller="operator-training-select" class="d-flex flex-column mx-2 justify-content-evenly">
+				<div class="d-flex flex-row">
+					<select name="team-trainingRecord-select" id="teamId" class="form-select mx-1" style="flex:0.4;" data-action="change->operator-training-select#validateNewOperatorSelect" data-operator-training-select-target="newOperatorSelectTeam" required>
+						<option value="">
 							Sélectionner une équipe
 						</option>
 						{% for team in teams %}
-							<option
-								value="{{ team.id }}">
+							<option value="{{ team.id }}">
 								{{ team.name }}
 							</option>
 						{% endfor %}
 					</select>
 
-					<select
-						name="uap-trainingRecord-select"
-						id="uapId"
-						class="form-select mx-1"
-						data-action="change->operator-training-select#validateNewOperatorSelect"
-						data-operator-training-select-target="newOperatorSelectUap"
-						style="flex:0.4;"
-						required>
-						<option
-							value="">
+					<select name="uap-trainingRecord-select" id="uapId" class="form-select mx-1" data-action="change->operator-training-select#validateNewOperatorSelect" data-operator-training-select-target="newOperatorSelectUap" style="flex:0.4;" required>
+						<option value="">
 							Sélectionner une UAP
 						</option>
 						{% for uap in uaps %}
-							<option
-								value="{{ uap.id }}">
+							<option value="{{ uap.id }}">
 								{{ uap.name }}
 							</option>
 						{% endfor %}
 					</select>
-					<input
-						type="submit"
-						data-action="click->operator-training-select#submitButtonClicked"
-						data-operator-training-select-target="submit"
-						class="btn btn-primary"
-						value="Filtrer"
-						style="flex:0.2;">
+					<input type="submit" data-action="click->operator-training-select#submitButtonClicked" data-operator-training-select-target="submit" class="btn btn-primary" value="Filtrer" style="flex:0.2;">
 				</div>
-				<div
-					data-operator-training-select-target="newOperatorSelectMessage"></div>
+				<div data-operator-training-select-target="newOperatorSelectMessage"></div>
 
 			</div>
 
 		</form>
 
-		<turbo-frame
-			data-controller="operator-trainer operator-training"
-			id="training-records"
-			class="d-flex flex-column mx-2 justify-content-evenly card border-2"
-			style="background-color: #c3c3c3;">
+		<turbo-frame data-controller="operator-trainer operator-training" id="training-records" class="d-flex flex-column mx-2 justify-content-evenly card border-2" style="background-color: #c3c3c3;">
 			{% include "services/operators/training_component/_listOperatorContainer.html.twig" %}
 
 		</turbo-frame>
+		<a href="javascript:void(0)" class="btn btn-secondary justify-content-evenly mx-auto mt-2 col-4" onclick="event.preventDefault(); window.history.back();" style="color:black">Retour
+		</a>
 	</body>
 </html>
