@@ -110,8 +110,8 @@
 										{{ approbation.userapprobator.username|upper|split('.')|last }}
 									</u>
 									{% if approbation.approval is not null %}
-										{{ approbation.approval ? ' a validé le document' : ' a refusé de validé le document'}}
-										.
+										{{ approbation.approval ? ' a validé le document.' : ' a refusé de validé le document.'}}
+
 									{% else %}
 										{{ ' n\'a pas encore rendu son avis.' }}
 									{% endif %}
