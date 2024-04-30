@@ -1,0 +1,37 @@
+{% macro buttonHierarchy(pointOfOrigin) %}
+
+	{% set lastZone = null %}
+	{% set lastProductLine = null %}
+	{% set lastCategory = null %}
+	{% set lastButton = null %}
+
+	{# Display the current button hierarchy #}
+	{% if lastZone != pointOfOrigin.button.category.productLine.zone %}
+
+		{% set lastZone = pointOfOrigin.button.category.productLine.zone %}
+
+		{{ lastZone.name|split('.')|first|upper }}
+		>
+	{% endif %}
+	{% if lastProductLine != pointOfOrigin.button.category.productLine %}
+
+		{% set lastProductLine = pointOfOrigin.button.category.productLine %}
+
+		{{ lastProductLine.name|split('.')|first|upper }}
+		>
+	{% endif %}
+	{% if lastCategory != pointOfOrigin.button.category %}
+
+		{% set lastCategory = pointOfOrigin.button.category %}
+
+		{{ lastCategory.name|split('.')|first|upper }}
+		>
+	{% endif %}
+
+	{% if lastButton != pointOfOrigin.button %}
+
+		{% set lastButton = pointOfOrigin.button %}
+
+
+	{% endif %}
+{% endmacro %}
