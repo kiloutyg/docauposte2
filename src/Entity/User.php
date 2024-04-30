@@ -204,6 +204,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
+    public function getUploadsInValidation(): Collection
+    {
+        return $this->uploads->filter(function (Upload $upload) {
+            $validation = $upload->getValidation();
+            // Check if validation is not null and then check if the status is null
+            return $validation !== null && $validation->isStatus() === null;
+        });
+    }
+
+
+    public function getUploadsInRefusedValidation(): Collection
+    {
+        return $this->uploads->filter(function (Upload $upload) {
+            $validation = $upload->getValidation();
+            // Check if validation is not null and then check if the status is null
+            return $validation !== null && $validation->isStatus() === false;
+        });
+    }
+
     /**
      * @return Collection<int, Upload>
      */

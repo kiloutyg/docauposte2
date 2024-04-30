@@ -2,39 +2,39 @@
 
 namespace App\Service;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Doctrine\Common\Collections\Collection;
 
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\Email;
+
+use Psr\Log\LoggerInterface;
 
 use App\Entity\Validation;
 use App\Entity\User;
 use App\Entity\Approbation;
-use App\Entity\Upload;
 
 use App\Repository\ApprobationRepository;
 
 class MailerService extends AbstractController
 {
-    private $security;
     private $mailer;
     private $approbationRepository;
     private $senderEmail;
+    private $logger;
 
     public function __construct(
-        Security $security,
         MailerInterface $mailer,
         ApprobationRepository $approbationRepository,
-        string $senderEmail
+        string $senderEmail,
+        LoggerInterface $logger
     ) {
-        $this->security                 = $security;
         $this->mailer                   = $mailer;
         $this->approbationRepository    = $approbationRepository;
         $this->senderEmail              = $senderEmail;
+        $this->logger                   = $logger;
     }
 
     public function approbationEmail(Validation $validation)
@@ -48,8 +48,7 @@ class MailerService extends AbstractController
 
     public function sendEmail(User $recipient, string $subject, string $html)
     {
-        // $sender = $this->security->getUser();
-        // $senderEmail = $sender->getEmailAddress();
+
         $emailRecipientsAddress = $recipient->getEmailAddress();
         $email = (new Email())
             ->from($this->senderEmail)
@@ -85,7 +84,7 @@ class MailerService extends AbstractController
             ->from($senderEmail)
             ->to($emailRecipientsAddress)
             ->subject('Docauposte - Nouvelle validation à effectuer du document ' . $filename)
-            ->htmlTemplate('email_templates/approbationEmail.html.twig')
+            ->htmlTemplate('services/email_templates/approbationEmail.html.twig')
             ->context([
                 'upload'                    => $upload,
                 'validation'                => $validation,
@@ -120,7 +119,7 @@ class MailerService extends AbstractController
             ->from($senderEmail)
             ->to($emailRecipientsAddress)
             ->subject('Docauposte - Le document ' . $upload->getFilename() . ' a été refusé.')
-            ->htmlTemplate('email_templates/disapprobationEmail.html.twig')
+            ->htmlTemplate('services/email_templates/disapprobationEmail.html.twig')
             ->context([
                 'upload'                    => $upload,
                 'approbations'              => $approbations
@@ -150,7 +149,7 @@ class MailerService extends AbstractController
             ->from($senderEmail)
             ->to($emailRecipientsAddress)
             ->subject('Docauposte - Le document ' . $filename . ' a été corrigé.')
-            ->htmlTemplate('email_templates/disapprovedModifiedEmail.html.twig')
+            ->htmlTemplate('services/email_templates/disapprovedModifiedEmail.html.twig')
             ->context([
                 'upload'                    => $upload,
                 'filename'                  => $filename
@@ -176,7 +175,7 @@ class MailerService extends AbstractController
             ->from($senderEmail)
             ->to($emailRecipientsAddress)
             ->subject('Docauposte - Le document ' . $filename . ' a été validé.')
-            ->htmlTemplate('email_templates/approvalEmail.html.twig')
+            ->htmlTemplate('services/email_templates/approvalEmail.html.twig')
             ->context([
                 'upload'                    => $upload
             ]);
@@ -198,7 +197,7 @@ class MailerService extends AbstractController
             ->from($senderEmail)
             ->to($emailRecipientsAddress)
             ->subject('Docauposte - Rappel de validation en cours')
-            ->htmlTemplate('email_templates/reminderEmail.html.twig')
+            ->htmlTemplate('services/email_templates/reminderEmail.html.twig')
             ->context([
                 'uploads'                    => $uploads
             ]);
@@ -210,9 +209,35 @@ class MailerService extends AbstractController
         }
     }
 
-    // public function sendReminderEmailToUploader(array $badValidators)
-    // {
-    //     $senderEmail = $this->senderEmail;
+    public function sendReminderEmailToUploader(User $uploader)
+    {
+        $senderEmail = $this->senderEmail;
+        $emailRecipientsAddress = $uploader->getEmailAddress();
 
-    // }
+        $inValidationUploads = $uploader->getUploadsInValidation();
+        // $this->logger->info('inValidationUploads', json_decode($inValidationUploads));
+        $refusedValidationUploads = $uploader->getUploadsInRefusedValidation();
+        // $this->logger->info('refusedValidationUploads', $refusedValidationUploads);
+
+        // $totalUploads = array_merge($inValidationUploads, $refusedValidationUploads);
+
+        $email = (new TemplatedEmail())
+            ->from($senderEmail)
+            ->to($emailRecipientsAddress)
+            ->subject('Docauposte - Rappel des documents en cours de validation.')
+            ->htmlTemplate('services/email_templates/reminderEmailToUploader.html.twig')
+            ->context([
+                'uploader'                          => $uploader,
+                'waitingUploads'                    => $inValidationUploads,
+                'refusedUploads'                    => $refusedValidationUploads,
+                // 'totalUploads'                      => $totalUploads
+            ]);
+
+        try {
+            $this->mailer->send($email);
+            return true;
+        } catch (TransportExceptionInterface $e) {
+            return false;
+        }
+    }
 }
