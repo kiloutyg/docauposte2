@@ -107,7 +107,9 @@ class MailerController extends FrontController
     public function reminderToUploader(): Response
     {
 
+        $uploader = $this->userRepository->findOneBy(['username' => 'aamr.fadili']);
         $uploader = $this->userRepository->findOneBy(['username' => 'camille.gindrey']);
+
         $this->logger->info('uploader' . $uploader->getUsername());
         $message = $this->mailerService->sendReminderEmailToUploader($uploader);
 

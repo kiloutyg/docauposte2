@@ -10,27 +10,32 @@
 			{{ refusedUploads|length }}
 			documents refusés.
 			{% for upload in refusedUploads %}
-				<li>
-					<strong>
-						<i>{{upload.filename}}</i>
-					</strong>
-					uploadé le
-					<strong>
-						<i>{{upload.uploadedAt|date('d/m/Y') }}</i>
-					</strong>
-				</li>
-				{% for approbation in upload.validation.approbations %}
-					<li>
-						<strong>{{ approbation.userapprobator.username|capitalize|split('.')|first }}
-							{{ approbation.userapprobator.username|upper|split('.')|last }}
-							{{approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé' : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}
+				<ul>
+					<h3>
+						<strong>
+							<i>{{upload.filename}}</i>
 						</strong>
-						{% if approbation.comment is not empty %}
-							avec le commentaire suivant :
-							<ul>"{{ approbation.comment }}"</ul>
-						{% endif %}
-					</li>
-				{% endfor %}
+						uploadé le
+						<strong>
+							<i>{{upload.uploadedAt|date('d/m/Y') }}</i>
+						</strong>
+					</h3>
+					{% for approbation in upload.validation.approbations %}
+						<ul>
+							<li>
+								<strong>
+									{{ approbation.userapprobator.username|capitalize|split('.')|first }}
+									{{ approbation.userapprobator.username|upper|split('.')|last }}
+									{{approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé' : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}
+								</strong>
+							{% if approbation.comment is not empty %}
+								avec le commentaire suivant :
+								<i>"{{ approbation.comment }}"</i>
+							{% endif %}
+						</li>
+					</ul>
+				{% endfor %}			
+				</ul>
 			{% endfor %}
 		</p>
 	{% endif %}
@@ -52,23 +57,30 @@
 						<i>{{upload.uploadedAt|date('d/m/Y') }}</i>
 					</strong>
 				{% for approbation in upload.validation.approbations %}
-					<li>
-						<strong>{{ approbation.userapprobator.username|capitalize|split('.')|first }}
+					<ul>
+						<li>
+						<strong>
+							{{ approbation.userapprobator.username|capitalize|split('.')|first }}
 							{{ approbation.userapprobator.username|upper|split('.')|last }}
 							{{approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé' : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}
-						</strong>
-						{% if approbation.comment is not empty %}
-							avec le commentaire suivant :
-							<ul>"{{ approbation.comment }}"</ul>
-						{% endif %}
+								</strong>
+								{% if approbation.comment is not empty %}
+									avec le commentaire suivant :
+									<i>"{{ approbation.comment }}"</i>
+								{% endif %}
 
-					</li>
-				{% endfor %}
-			</ul>
+							</li>
+						</ul>
+					{% endfor %}
+				</ul>
 
-		{% endfor %}
-	</p>
-{% endif %}{% endif %}<p>
-Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant :
-<a class='btn-info' href='http://slanlp0040/login'>Page de connexion</a></p><p>
-Cordialement</p>
+			{% endfor %}
+		</p>
+	{% endif %}
+{% endif %}
+<p>
+	Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant :
+	<a class='btn-info' href='http://slanlp0040/login'>Page de connexion</a>
+</p>
+<p>
+	Cordialement</p>
