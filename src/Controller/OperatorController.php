@@ -458,6 +458,7 @@ class OperatorController extends FrontController
     }
 
 
+
     #[Route('/operator/check-duplicate-by-name', name: 'app_operator_check_duplicate_by_name', methods: ['POST'])]
     public function checkDuplicateOperatorByName(Request $request): JsonResponse
     {
@@ -473,6 +474,8 @@ class OperatorController extends FrontController
         $this->logger->info('existingOperator', [$existingOperator]);
 
         if ($existingOperator !== null) {
+
+
             // Found duplicate
             return new JsonResponse([
                 'found' => true,
@@ -486,12 +489,12 @@ class OperatorController extends FrontController
             ]);
         }
 
-
         // No duplicate found
         return new JsonResponse([
             'found' => false, 'field' => 'name', 'value' => $operatorName, 'message' => 'Aucun opérateur avec ce nom n\'existe'
         ]);
     }
+
 
 
     #[Route('/operator/check-duplicate-by-code', name: 'app_operator_check_duplicate_by_code', methods: ['POST'])]

@@ -3,70 +3,30 @@
 	Admin Operateurs
 {% endblock %}
 {% block body %}
-
-	<div class="card bg-secondary container row mb-2" data-controller="operator-admin-creation operator-admin-search">
-		<h2 class="mt-2" style="color:white;">
+	<script>
+		{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
+{% set fields = ['lastname', 'firstname', 'code', 'team', 'uap', 'isTrainer'] %}
+	</script>
+	<div
+		class="card bg-secondary container row mb-2"
+		data-controller="operator-admin-creation operator-admin-search">
+		<h2
+			class="mt-2"
+			style="color:white;">
 			Ajouter un nouvel Opérateur
 		</h2>
-		{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
-		{% set fields = ['lastname', 'firstname', 'code', 'team', 'uap', 'isTrainer'] %}
 
-	<ul>
-		<div
-			class="row">
-			{% for fieldName in fieldsName %}
-				<div
-					class="col" style="color:white;">
-					{{ fieldName }}
-				</div>
-			{% endfor %}
-			<div
-				class="col mx-auto" style="color:white;">
-				Actions
-			</div>
-		</div>
-	</ul>
-	<ul>
-		{{ form_start(newOperatorForm, {'attr': {'class': 'row', 'name': 'newOperator', 'id': 'newOperator'}}
-		) }}
-		{% for field in fields %}
-			{{ form_row(newOperatorForm[field],{
-				'attr': {
-					'id': 'newOperator' ~ field|capitalize,
-					'data-operator-admin-creation-target': 'newOperator' ~ field|capitalize,
-					'data-action': field == 'firstname' ? 'keyup->operator-admin-creation#validateNewOperator' ~ field|capitalize ~ ' input->operator-admin-creation#capitalizeFirstLetterMethod' : 'keyup->operator-admin-creation#validateNewOperator' ~ field|capitalize,
-				}
-			}) }}
-		{% endfor %}
-		<button
-			type="submit"
-			class="btn btn-primary text-uppercase col my-auto mx-auto"
-			data-operator-admin-creation-target="newOperatorSubmitButton"
-			disabled
-			>
-			Ajouter l'Opérateur
-		</button>
-		{{ form_end(newOperatorForm) }}
-		<div class="card">
-			<input type="hidden" id="newOperatorName" name="newOperatorName">   
-		<div
-			data-operator-admin-creation-target="newOperatorNameMessage"
-			class="newOperatorName-message d-flex justify-content-evenly"></div>
-		<div
-			data-operator-admin-creation-target="newOperatorCodeMessage"
-			class="newOperatorCode-message d-flex justify-content-evenly"></div>
-		<div
-			data-operator-admin-creation-target="newOperatorTransferMessage"
-			class="newOperatorTransfer-message d-flex justify-content-evenly"></div>
-		</div>
-	</ul>
-			
-	<h2  style="color:white;">
-		Liste des Opérateurs
-	</h2>
-	
-			{% include '/services/operators/admin_component/_adminListOperatorSearchForm.html.twig' %}
-		<turbo-frame id="adminListOperator">
+		{% include '/services/operators/admin_component/_adminAddOperator.html.twig' %}
+
+
+		<h2
+			style="color:white;">
+			Liste des Opérateurs
+		</h2>
+
+		{% include '/services/operators/admin_component/_adminListOperatorSearchForm.html.twig' %}
+		<turbo-frame
+			id="adminListOperator">
 			{% include '/services/operators/admin_component/_adminListOperator.html.twig' %}
 		</turbo-frame>
 	</div>

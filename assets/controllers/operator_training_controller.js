@@ -54,6 +54,9 @@ export default class OperatorTrainingController extends Controller {
             if (isValid) {
                 let combinedName = `${this.newOperatorFirstnameTarget.value.trim()}.${this.newOperatorSurnameTarget.value.trim()}`;
                 this.newOperatorNameTarget = combinedName.toLowerCase();
+
+                let invertedCombined = `${this.newOperatorSurnameTarget.value.trim()}.${this.newOperatorFirstnameTarget.value.trim()}`;
+                this.newOperatorInvertedNameTarget = invertedCombined.toLowerCase();
                 // this.newOperatorFirstnameTarget.disabled = true;
                 this.validateNewOperatorName();
             }
@@ -135,19 +138,30 @@ export default class OperatorTrainingController extends Controller {
 
     async checkForExistingEntityByName() {
         try {
-            console.log('checking for existing entity by name:', this.newOperatorNameTarget);
+            // Initial log indicating the start of a duplicate check
+            console.log('Checking for existing entity by name:', this.newOperatorNameTarget);
 
-            const response = await this.checkForDuplicate('/docauposte/operator/check-duplicate-by-name', this.newOperatorNameTarget);
-            console.log('response for existing entity by name:', response.data.found);
+            // First check for the default name
+            let response = await this.checkForDuplicate('/docauposte/operator/check-duplicate-by-name', this.newOperatorNameTarget);
+            console.log('Response for existing entity by name:', response.data.found);
+
+            // Only proceed to check the inverted name if no duplicate was found for the first name
+            if (!response.data.found) {
+                console.log('Checking for existing entity by name:', this.newOperatorInvertedNameTarget);
+                response = await this.checkForDuplicate('/docauposte/operator/check-duplicate-by-name', this.newOperatorInvertedNameTarget);
+                console.log('Response for existing entity by name inverted:', response.data.found);
+            }
+
+            // Handle the response based on the last API call made
             this.handleDuplicateResponse(response, this.newOperatorNameMessageTarget, "noms d'opérateurs");
 
         } catch (error) {
+            // Error handling for any issue during the API call or processing
             console.error("Error checking for a duplicate operator name.", error);
             this.manageNewOperatorSubmitButton();
             this.newOperatorNameMessageTarget.textContent = "Erreur lors de la vérification du nom opérateur.";
         }
     }
-
 
 
     async checkForExistingEntityByCode() {
