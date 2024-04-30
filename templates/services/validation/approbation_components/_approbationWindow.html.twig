@@ -1,0 +1,159 @@
+{% import 'services/validation/approbation_components/macros/approbation_macros.html.twig' as approbationMacros %}
+<div
+	class="card-body"
+	style="background-color:#0E3571;">
+	<div
+		class="card ">
+		<div
+			class="card-header">
+			<strong>
+				Page de validation de document par
+				<u>
+					{{user.username|capitalize|split('.')|first }}
+					{{user.username|upper|split('.')|last }}
+				</u>
+
+			</strong>
+			<br>
+		</div>
+		<div
+			class="card-body bg-secondary border shadow ">
+			<div
+				class="card">
+				<div
+					class="card-body">
+					{% if approbation.validation.comment is defined %}
+						<b>
+							Validation faisant suite à modification du document par
+							<u>
+								{{approbation.validation.upload.uploader.username|capitalize|split('.')|first }}
+								{{approbation.validation.upload.uploader.username|upper|split('.')|last }}
+							</u>
+							<br>
+							avec le commentaire suivant  :
+							<br>
+							<blockquote>
+								<i>
+									"
+									{{approbation.validation.comment}}
+									"
+								</i>
+							</blockquote>
+						</b>
+					{% endif %}
+
+					<div
+						class="dropdown">
+						{% set toBeValidated = [] %}
+						{% set currentApprobationId = approbation.id %}
+						{% for approbation in app.user.approbations %}
+							{% if approbation.approval is same as (null) %}
+								{% set toBeValidated = toBeValidated|merge([approbation]) %}
+							{% endif %}
+						{% endfor %}
+						{% if toBeValidated|length - 1 > 0  %}
+							<button
+								class="btn dropdown-toggle"
+								style="background-color:#007AFF; color:white"
+								type="button"
+								data-bs-toggle="dropdown"
+								aria-expanded="false">
+								Il reste
+								<span
+									class="badge bg-danger rounded-pill">
+									{{toBeValidated|length - 1}}
+								</span>
+								document(s) à valider
+							</button>
+
+						{% endif %}
+						<ul
+							class="dropdown-menu dropdown-menu-start shadow shadow-inset"
+							aria-labelledby="dropdownMenuButton1">
+							{% for approbation in app.user.approbations %}
+								{% if approbation.approval is same as (null) %}
+									{% if approbation.id is same as (currentApprobationId) %}
+										{% else %}
+											<li>
+												<a
+													href="{{ path('app_validation_approbation', {'approbationId': approbation.id})}}" class="dropdown-item shadow ">
+													{{ approbation.validation.upload.filename|upper }}
+												</a>
+											</li>
+									{% endif %}
+								{% endif %}
+							{% endfor %}
+						</ul>
+					</div>
+					<h2
+						style="text-align: center;">
+						<strong>
+							{{approbation.validation.upload.filename|split('.')|first|upper}}
+						</strong>
+					</h2>
+
+					{{ approbationMacros.buttonHierarchy(approbation.validation.upload) }}
+
+					<h3
+						style="text-align: center;">
+						{{approbation.validation.upload.button.name|split('.')|first|upper}}
+					</h3>
+
+					{% set validation = approbation.validation %}
+					{% set approbations = validation.approbations %}
+					{% for approbation in approbations %}
+						<ul>
+							<b>
+								{% if app.user != approbation.userapprobator  %}
+									<u>
+										{{ approbation.userapprobator.username|capitalize|split('.')|first }}
+										{{ approbation.userapprobator.username|upper|split('.')|last }}
+									</u>
+									{% if approbation.approval is not null %}
+										{{ approbation.approval ? ' a validé le document.' : ' a refusé de validé le document.'}}
+
+									{% else %}
+										{{ ' n\'a pas encore rendu son avis.' }}
+									{% endif %}
+									{% if approbation.comment is not empty %}
+							
+										<ul>
+										En commentant :
+										<br>
+											- {{ approbation.comment }}
+										</ul>
+									{% endif %}
+				            	{% endif %}
+							</b>
+			            </ul>
+                    {% endfor %}
+                </div>
+                <div class="card">
+                	<div class="card-body border shadow ">
+						<div class="d-flex justify-content-center align-items-center">
+							<form class="d-grid" method="post" action="{{ path('app_validation_approval', { 'approbationId': approbation.id }) }}" enctype="multipart/form-data">
+
+								<input type="radio" class="btn-check" name="approvalRadio" id="success-outlined" autocomplete="off" value="true" checked>
+								<label class="btn btn-outline-success" for="success-outlined">Approuver</label>
+
+								<input type="radio" class="btn-check" name="approvalRadio" id="danger-outlined" autocomplete="off" value="false">
+								<label class="btn btn-outline-danger" for="danger-outlined">Désapprouver</label>
+								<div class="input-group  justify-content-center">
+									<div class="input-group-prepend">
+										<span class="input-group-text">Commentaire</span>
+
+										<textarea class="form-control  " name="approbationComment" aria-label="With textarea"></textarea>
+									</div>
+								</div>
+								<button type="submit" class="btn btn-primary btn-lg submit-approval mt-2">Envoyer
+								</button>
+							</form>
+						</div>
+
+						<a class="btn btn-dark mt-3" href="{{ path('app_logout') }}">Déconnexion</a>
+            		</div>
+				</div>
+			</div>
+		</div>
+	</div>	
+</div>
