@@ -19,13 +19,44 @@
 	{{ form_start(newOperatorForm, {'attr': {'class': 'row', 'name': 'newOperator', 'id': 'newOperator'}}
 	) }}
 	{% for field in fields %}
-		{{ form_row(newOperatorForm[field],{
-				'attr': {
-					'id': 'newOperator' ~ field|capitalize,
-					'data-operator-admin-creation-target': 'newOperator' ~ field|capitalize,
-					'data-action': field == 'firstname' ? 'keyup->operator-admin-creation#validateNewOperator' ~ field|capitalize ~ ' input->operator-admin-creation#capitalizeFirstLetterMethod' : 'keyup->operator-admin-creation#validateNewOperator' ~ field|capitalize,
-				}
-			}) }}
+		{% if field == 'lastname' %}
+			<div
+				class="col position-relative">
+				{{ form_widget(newOperatorForm[field], {
+                'attr': {
+                    'id': 'newOperator' ~ field|capitalize,
+                    'data-operator-admin-creation-target': 'newOperator' ~ field|capitalize,
+                    'data-action': 'keyup->operator-admin-creation#validateNewOperator' ~ field|capitalize ~ ' input->operator-admin-creation#suggest' ~ field|capitalize
+                }
+            }) }}
+				<div
+					data-operator-admin-creation-target="nameSuggestions"
+					class="suggestions-list position-absolute w-100"></div>
+			</div>
+		{% elseif field == 'firstname' %}
+			<div
+				class="col position-relative">
+				{{ form_row(newOperatorForm[field], {
+            'attr': {
+                'id': 'newOperator' ~ field|capitalize,
+                'data-operator-admin-creation-target': 'newOperator' ~ field|capitalize,
+                'data-action': 'keyup->operator-admin-creation#validateNewOperator' ~ field|capitalize ~ ' input->operator-admin-creation#capitalizeFirstLetterMethod input->operator-admin-creation#suggest' ~ field|capitalize,    
+            }
+        }) }}
+				<div
+					data-operator-admin-creation-target="nameSuggestions"
+					class="suggestions-list position-absolute w-100"></div>
+			</div>
+		{% else %}
+			{{ form_row(newOperatorForm[field], {
+            'attr': {
+                'id': 'newOperator' ~ field|capitalize,
+                'data-operator-admin-creation-target': 'newOperator' ~ field|capitalize,
+                'data-action': field == 'code' ? 'keyup->operator-admin-creation#validateNewOperator' ~ field|capitalize : false, 
+				'disabled': field == 'code' ? true : false, 
+            }
+        }) }}
+		{% endif %}
 	{% endfor %}
 	<button
 		type="submit"

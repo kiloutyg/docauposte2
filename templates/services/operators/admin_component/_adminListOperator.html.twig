@@ -1,6 +1,8 @@
-<turbo-frame id="adminListOperator">
+<turbo-frame
+	id="adminListOperator">
 	<ul>
-		<div class="row">
+		<div
+			class="row">
 			{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
 
 			{% for fieldName in fieldsName %}
@@ -20,9 +22,7 @@
 			{% for operatorId, operatorForm in operatorForms %}
 				{{ form_start(operatorForm, {'attr': {'class': 'row'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
 				{% for field in fields %}
-					{# {% set customId = field ~ '-' ~ operatorId %}
-																																		{{ form_row(operatorForm[field], {'id': customId}) }} #}
-					{% set customId = 'newOperator' ~ field|capitalize ~ operatorId %}
+     				{% set customId = 'newOperator' ~ field|capitalize ~ operatorId %}
 					{{ form_row(operatorForm[field], 
 					{
 					'attr': {
@@ -30,6 +30,8 @@
 						'data-operator-admin-edit-target': 'newOperator' ~ field|capitalize
 				}
 			}) }}
+
+			
 				{% endfor %}
 				<div
 					class="col my-auto mx-auto">

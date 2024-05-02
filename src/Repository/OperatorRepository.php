@@ -89,16 +89,6 @@ class OperatorRepository extends ServiceEntityRepository
         return $operators;
     }
 
-    // public function findBySearchQuery($search)
-    // {
-    //     return $this->createQueryBuilder('o')
-    //         ->andWhere('LOWER(o.name) LIKE :search OR LOWER(t.name) LIKE :search OR LOWER(u.name) LIKE :search')
-    //         ->leftJoin('o.team', 't')
-    //         ->leftJoin('o.uap', 'u')
-    //         ->setParameter('search', '%' . strtolower($search) . '%')
-    //         ->getQuery()
-    //         ->getResult();
-    // }
 
 
     public function findBySearchQuery($name, $code, $team, $uap, $trainer)
@@ -190,6 +180,26 @@ class OperatorRepository extends ServiceEntityRepository
 
         return $operators;
     }
+
+    public function findByNameLike(string $name): array
+    {
+        $qb = $this->createQueryBuilder('o');
+        return $qb->where('o.name LIKE :name')
+            ->setParameter('name', '%' . strtolower($name) . '%')
+            ->getQuery()
+            ->getResult();
+    }
+
+    // public function findBySearchQuery($search)
+    // {
+    //     return $this->createQueryBuilder('o')
+    //         ->andWhere('LOWER(o.name) LIKE :search OR LOWER(t.name) LIKE :search OR LOWER(u.name) LIKE :search')
+    //         ->leftJoin('o.team', 't')
+    //         ->leftJoin('o.uap', 'u')
+    //         ->setParameter('search', '%' . strtolower($search) . '%')
+    //         ->getQuery()
+    //         ->getResult();
+    // }
 
     //    /**
     //     * @return Operator[] Returns an array of Operator objects

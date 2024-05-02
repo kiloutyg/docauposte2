@@ -9,12 +9,12 @@ export default class OperatorAdminCreationController extends Controller {
     static targets = [
         "newOperatorLastname",
         "newOperatorFirstname",
-        "newOperatorNameMessage",
         "newOperatorCode",
+        "newOperatorNameMessage",
         "newOperatorCodeMessage",
         "newOperatorTransferMessage",
         "newOperatorSubmitButton",
-
+        "nameSuggestions",
     ];
 
 
@@ -29,8 +29,11 @@ export default class OperatorAdminCreationController extends Controller {
             this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir un nom valide.");
             if (isValid) {
                 // this.newOperatorLastnameTarget.disabled = true;
-                this.newOperatorFirstnameTarget.disabled = false;
-                this.newOperatorFirstnameTarget.focus();
+                if (this.newOperatorFirstnameTarget.value.trim() === "") {
+                    this.newOperatorFirstnameTarget.disabled = false;
+                    this.newOperatorFirstnameTarget.focus();
+                }
+                this.validateNewOperatorFirstname();
             }
         }, 800);
     }
@@ -65,6 +68,7 @@ export default class OperatorAdminCreationController extends Controller {
 
 
     capitalizeFirstLetterMethod(event) {
+        console.log('capitalizing first letter:', event.target);
         const input = event.target;
         if (input.selectionStart <= 1) {
             input.value = input.value.charAt(0).toUpperCase() + input.value.slice(1).toLowerCase();
@@ -247,7 +251,6 @@ export default class OperatorAdminCreationController extends Controller {
             this.newOperatorCodeTarget.disabled = true;
             this.newOperatorLastnameTarget.focus();
             this.newOperatorSubmitButtonTarget.disabled = true;
-            // this.resetUselessMessages();
             this.newOperatorCodeMessageTarget.textContent = "";
             this.newOperatorNameMessageTarget.textContent = "";
         }, 10000);
@@ -293,7 +296,6 @@ export default class OperatorAdminCreationController extends Controller {
             ? "Nom et Code opérateurs correspondent à un même opérateur. Vous pouvez le transferer."
             : "Nom et Code opérateurs ne correspondent pas à un même opérateur. Veuillez saisir un autre nom ou code opérateur";
 
-
         console.log(`Manage submit button to be ${entitiesMatch ? "enabled" : "disabled"} `);
         this.manageNewOperatorSubmitButton(entitiesMatch);
     }
@@ -326,5 +328,73 @@ export default class OperatorAdminCreationController extends Controller {
         return axios.post(`/docauposte/operator/check-if-code-exist`, { code: code });
     }
 
+
+    suggestFirstname(event) {
+        const input = event.target.value;
+        console.log('suggesting firstname:', input);
+        if (input.length > 1) { // Only start suggesting after at least 3 characters have been entered
+            clearTimeout(this.suggestTimeout);
+            this.suggestTimeout = setTimeout(async () => {
+                console.log('fetching suggestions for firstname:', input);
+                const response = await this.fetchNameSuggestions(input);
+                this.displaySuggestions(response.data);
+            }, 300); // Delay to avoid too frequent calls
+        } else {
+            this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions if the input is too short
+        }
+    }
+
+
+    suggestLastname(event) {
+        const input = event.target.value;
+        console.log('suggesting lastname:', input);
+        if (input.length > 1) { // Only start suggesting after at least 3 characters have been entered
+            clearTimeout(this.suggestTimeout);
+            this.suggestTimeout = setTimeout(async () => {
+                console.log('fetching suggestions for lastname:', input);
+                const response = await this.fetchNameSuggestions(input);
+                this.displaySuggestions(response.data);
+            }, 300); // Delay to avoid too frequent calls
+        } else {
+            this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions if the input is too short
+        }
+    }
+
+
+    async fetchNameSuggestions(name) {
+        console.log('fetching name suggestions:', name);
+        return axios.post(`operator/suggest-names`, { name: name });
+    }
+
+    displaySuggestions(response) {
+        console.log('displaying suggestions:', response.data);
+
+
+
+
+        this.nameSuggestionsTarget.innerHTML = names.map(name => {
+            // Simulate Twig's `capitalize` and `upper` filters
+            const parts = name.split('.');
+            const firstName = this.capitalizeFirstLetter(parts[0]);
+            const lastName = parts.length > 1 ? parts[1].toUpperCase() : '';
+            return `		<div
+			class="suggestion-item">${lastName} ${firstName}</div>`;
+        }).join('');
+
+        this.nameSuggestionsTarget.querySelectorAll('.suggestion-item').forEach(item => {
+            item.addEventListener('click', (event) => {
+                console.log('selected suggestion:', event.target.textContent);
+                const [lastName, firstName] = event.target.textContent.trim().split(' ');
+                console.log('selected suggestion firstname, lastname:', firstName, lastName);
+                this.newOperatorFirstnameTarget.value = firstName;
+                this.newOperatorLastnameTarget.value = lastName;
+                this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions after selection
+                this.validateNewOperatorLastname()
+
+            });
+        });
+
+        this.nameSuggestionsTarget.style.display = names.length ? 'block' : 'none';
+    }
 
 }

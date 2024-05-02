@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use App\Form\OperatorType;
@@ -675,5 +677,59 @@ class OperatorController extends FrontController
                 ]);
             }
         }
+    }
+
+    #[Route('operator/suggest-names', name: 'app_suggest_names')]
+    public function suggestNames(Request $request, SerializerInterface $serializer): JsonResponse
+    {
+        $parsedRequest = json_decode($request->getContent(), true);
+        $this->logger->info('app_suggest_names parsedRequest', $parsedRequest);
+
+        $name = $parsedRequest['name'];
+
+        ////////////BASIC//////////
+        // $suggestions = $this->operatorRepository->findByNameLike($name);
+
+        // $suggestedNames = [];
+        // foreach ($suggestions as $suggestion) {
+        //     $suggestedNames[] = $suggestion->getName();
+        // }
+
+        // $this->logger->info('app_suggest_names suggestions', $suggestedNames);
+
+        // return new JsonResponse($suggestedNames);
+
+
+        //////////////////////Requery to have details////////////////////////
+        // $rawSuggestions = $this->operatorRepository->findByNameLike($name);
+
+        // $suggestions = [];
+
+        // foreach ($rawSuggestions as $suggestion) {
+        //     $suggestions[] = [
+        //         'id' => $suggestion->getId(),
+        //         'name' => $suggestion->getName(),
+        //         'code' => $suggestion->getCode(),
+        //         'team' => $suggestion->getTeam()->getName(),
+        //         'uap' => $suggestion->getUap()->getName(),
+        //     ];
+        // }
+        // $this->logger->info('app_suggest_names suggestions', $suggestions);
+
+        // return new JsonResponse($suggestions);
+
+        /////////////// serialized data ////////////////////////
+        $rawSuggestions = $this->operatorRepository->findByNameLike($name);
+        $this->logger->info('app_suggest_names Raw suggestions', $rawSuggestions);
+
+        // Serialize the entire array of entities at once using groups
+        $serializedSuggestions = $serializer->serialize($rawSuggestions, 'json', [
+            'groups' => 'operator_details'
+        ]);
+
+        $this->logger->info('app_suggest_names serialized suggestions', json_decode($serializedSuggestions));
+
+        // Since $serializedSuggestions is a JSON string, return it directly with JsonResponse
+        return new JsonResponse($serializedSuggestions, 200, [], true);
     }
 }

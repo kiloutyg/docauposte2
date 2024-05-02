@@ -302,3 +302,50 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
     -webkit-transform: none;
     transform: none;
 }
+
+.suggestions {
+    position: absolute;
+    border: 1px solid #ccc;
+    border-top: none;
+    z-index: 1000;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: white;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.suggestions-list {
+    display: none;
+    /* Hide by default, shown by JS */
+    background: #fff;
+    /* Background color same as inputs */
+    // border: 1px solid #ccc;
+    /* To mimic a dropdown */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Optional: for better visibility */
+    z-index: 10;
+    /* Make sure it's above other content */
+    max-height: 200px;
+    /* Limit height and make it scrollable */
+    overflow-y: auto;
+    width: 100%;
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
+.nameSuggestions {
+    cursor: pointer;
+}
+
+.nameSuggestions:hover {
+    background-color: #f0f0f0;
+}
