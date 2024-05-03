@@ -324,7 +324,7 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
     /* To mimic a dropdown */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     /* Optional: for better visibility */
-    z-index: 10;
+    z-index: 100;
     /* Make sure it's above other content */
     max-height: 200px;
     /* Limit height and make it scrollable */

@@ -687,39 +687,8 @@ class OperatorController extends FrontController
 
         $name = $parsedRequest['name'];
 
-        ////////////BASIC//////////
-        // $suggestions = $this->operatorRepository->findByNameLike($name);
-
-        // $suggestedNames = [];
-        // foreach ($suggestions as $suggestion) {
-        //     $suggestedNames[] = $suggestion->getName();
-        // }
-
-        // $this->logger->info('app_suggest_names suggestions', $suggestedNames);
-
-        // return new JsonResponse($suggestedNames);
-
-
-        //////////////////////Requery to have details////////////////////////
-        // $rawSuggestions = $this->operatorRepository->findByNameLike($name);
-
-        // $suggestions = [];
-
-        // foreach ($rawSuggestions as $suggestion) {
-        //     $suggestions[] = [
-        //         'id' => $suggestion->getId(),
-        //         'name' => $suggestion->getName(),
-        //         'code' => $suggestion->getCode(),
-        //         'team' => $suggestion->getTeam()->getName(),
-        //         'uap' => $suggestion->getUap()->getName(),
-        //     ];
-        // }
-        // $this->logger->info('app_suggest_names suggestions', $suggestions);
-
-        // return new JsonResponse($suggestions);
-
         /////////////// serialized data ////////////////////////
-        $rawSuggestions = $this->operatorRepository->findByNameLike($name);
+        $rawSuggestions = $this->operatorRepository->findByNameLikeForSuggestions($name);
         $this->logger->info('app_suggest_names Raw suggestions', $rawSuggestions);
 
         // Serialize the entire array of entities at once using groups

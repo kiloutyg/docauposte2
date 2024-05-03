@@ -181,7 +181,7 @@ class OperatorRepository extends ServiceEntityRepository
         return $operators;
     }
 
-    public function findByNameLike(string $name): array
+    public function findByNameLikeForSuggestions(string $name): array
     {
         $qb = $this->createQueryBuilder('o');
         return $qb->where('o.name LIKE :name')

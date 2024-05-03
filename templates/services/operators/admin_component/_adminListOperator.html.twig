@@ -17,17 +17,18 @@
 			</div>
 		</div>
 	</ul>
-	<ul>
+	<ul		
+	data-controller="operator-admin-edit">
 		{% if operatorForms|length > 0 %}
 			{% for operatorId, operatorForm in operatorForms %}
-				{{ form_start(operatorForm, {'attr': {'class': 'row'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
+				{{ form_start(operatorForm, {'attr': {'class': 'row', 'id': 'operatorForm' ~ operatorId}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
 				{% for field in fields %}
-     				{% set customId = 'newOperator' ~ field|capitalize ~ operatorId %}
+     				{% set customId = 'operatorForm' ~ field|capitalize ~ operatorId %}
 					{{ form_row(operatorForm[field], 
-					{
+					{						
+					'id': customId,
 					'attr': {
-						'id': customId,
-						'data-operator-admin-edit-target': 'newOperator' ~ field|capitalize
+						'data-operator-admin-edit-target': field == 'isTrainer' ? 'operatorFormIsTrainer' : 'operatorForm' ~ field|capitalize
 				}
 			}) }}
 
