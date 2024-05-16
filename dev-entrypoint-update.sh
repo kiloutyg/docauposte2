@@ -2,7 +2,9 @@
 
 # Install the app dependencies 
 composer install;
+# composer update -W;
 yarn install;
+# yarn upgrade;
 composer clear-cache;
 
 # Set the permissions

@@ -11,8 +11,11 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: OperatorRepository::class)]
+#[UniqueEntity(fields: 'code', message: 'Un opérateur avec ce code existe déjà42.')]
+#[UniqueEntity(fields: 'name', message: 'Un opérateur avec ce nom existe déjà42.')]
 class Operator
 {
     #[ORM\Id]
@@ -21,7 +24,7 @@ class Operator
 
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 180)]
     #[Assert\Regex(pattern: '/^[a-zA-Z]+\.[a-zA-Z-]+$/', message: 'Le nom d\'opérateur doit être au format prénom.nom')]
@@ -39,7 +42,7 @@ class Operator
     #[ORM\OneToMany(mappedBy: 'operator', targetEntity: TrainingRecord::class)]
     private Collection $trainingRecords;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(5)]
     #[Assert\Regex(pattern: '/[0-9]{5}$/', message: 'Le code Opérateur doit être composé de 5 chiffres.')]

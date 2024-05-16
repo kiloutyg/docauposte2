@@ -2,6 +2,20 @@
 	id="adminListOperator">
 	<ul>
 		<div
+			id="flash-messages">
+
+			{% for label, messages in app.flashes %}
+				<div
+					class="alert alert-{{ label }}">
+					{% for message in messages %}
+						<p>
+							{{ message }}
+						</p>
+					{% endfor %}
+				</div>
+			{% endfor %}
+		</div>
+		<div
 			class="row">
 			{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
 
@@ -62,4 +76,6 @@
 			</div>
 		{% endif %}
 	</ul>
+
+
 </turbo-frame>

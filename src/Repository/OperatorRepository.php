@@ -3,7 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Operator;
+
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+
 use Doctrine\Persistence\ManagerRegistry;
 
 use Psr\Log\LoggerInterface;
@@ -19,10 +22,13 @@ use Psr\Log\LoggerInterface;
 class OperatorRepository extends ServiceEntityRepository
 {
     private $logger;
-    public function __construct(ManagerRegistry $registry, LoggerInterface $logger)
+    private $em;
+
+    public function __construct(ManagerRegistry $registry, LoggerInterface $logger, EntityManagerInterface $em)
     {
         parent::__construct($registry, Operator::class);
         $this->logger = $logger;
+        $this->em = $em;
     }
 
 
@@ -114,7 +120,7 @@ class OperatorRepository extends ServiceEntityRepository
                 ->setParameter('uap', '%' . strtolower($uap) . '%');
         }
 
-        $this->logger->info('Trainer value in repository methods: ' . $trainer);
+        // $this->logger->info('Trainer value in repository methods: ' . $trainer);
         // Handling trainer value based on true, false, or null
         switch ($trainer) {
             case "true":
@@ -128,19 +134,19 @@ class OperatorRepository extends ServiceEntityRepository
                 break;
         }
 
-        $this->logger->info('Trainer value after handling: ' . $trainer);
+        // $this->logger->info('Trainer value after handling: ' . $trainer);
 
         if ($trainer === true) {
-            $this->logger->info('Trainer value true, select those who are trainer.');
+            // $this->logger->info('Trainer value true, select those who are trainer.');
             $qb->setParameter('trainerStatus', true)
                 ->andWhere('o.IsTrainer = :trainerStatus');
         } elseif ($trainer === false) {
-            $this->logger->info('Trainer value false, select those who are not trainers or undefined.');
+            // $this->logger->info('Trainer value false, select those who are not trainers or undefined.');
             $qb->setParameter('trainerStatus', false)
                 ->andWhere('o.IsTrainer = :trainerStatus OR o.IsTrainer IS NULL');
         } elseif ($trainer === null) {
             // If $trainer is null, and you want to select all without any filter on IsTrainer, do not add any where clause related to IsTrainer.
-            $this->logger->info('Trainer value is null, no filter applied on trainer status.');
+            // $this->logger->info('Trainer value is null, no filter applied on trainer status.');
             // No further action needed if you want all records regardless of trainer status.
         }
 
@@ -181,13 +187,45 @@ class OperatorRepository extends ServiceEntityRepository
         return $operators;
     }
 
+    // public function findByNameLikeForSuggestions(string $name): array
+    // {
+    //     $qb = $this->createQueryBuilder('o');
+    //     return $qb->where('o.name LIKE :name')
+    //         ->setParameter('name', '%' . strtolower($name) . '%')
+    //         ->getQuery()
+    //         ->getResult();
+    // }
+
+
     public function findByNameLikeForSuggestions(string $name): array
     {
-        $qb = $this->createQueryBuilder('o');
-        return $qb->where('o.name LIKE :name')
-            ->setParameter('name', '%' . strtolower($name) . '%')
-            ->getQuery()
-            ->getResult();
+
+        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) {
+            throw new \InvalidArgumentException("Invalid name format.");
+        }
+
+        $name = strtolower($name); // Normalize input to lower case
+        $searchPattern = '%' . $name . '%'; // Create a search pattern for LIKE
+
+        // Adjusted query for newer DBAL versions
+        $sql = "SELECT * FROM operator WHERE SOUNDEX(name) = SOUNDEX(:name) OR name LIKE :pattern";
+
+        // Use executeQuery for select statements
+        try {
+            $conn = $this->em->getConnection();
+            $stmt = $conn->executeQuery($sql, [
+                'name' => $name,
+                'pattern' => $searchPattern
+            ]);
+
+            // Use fetchAllAssociative to fetch data
+            return $stmt->fetchAllAssociative();
+        } catch (\Doctrine\DBAL\Exception $exception) {
+
+            // Log the error and possibly rethrow or handle gracefully
+            $this->logger->error('Database query error: ' . $exception->getMessage());
+            throw new \RuntimeException("Database query failed", 0, $exception);
+        }
     }
 
     // public function findBySearchQuery($search)

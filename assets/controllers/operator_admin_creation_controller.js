@@ -38,7 +38,7 @@ export default class OperatorAdminCreationController extends Controller {
                 }
                 this.validateNewOperatorFirstname();
             }
-        }, 500);
+        }, 800);
     }
 
 
@@ -61,7 +61,7 @@ export default class OperatorAdminCreationController extends Controller {
                 // this.newOperatorFirstnameTarget.disabled = true;
                 this.validateNewOperatorName();
             }
-        }, 500);
+        }, 800);
     }
 
 
@@ -110,7 +110,7 @@ export default class OperatorAdminCreationController extends Controller {
                     this.validateNewOperatorCode();
                 }
             }
-        }, 500); // delay in milliseconds
+        }, 800); // delay in milliseconds
     }
 
 
@@ -142,7 +142,7 @@ export default class OperatorAdminCreationController extends Controller {
                 this.duplicateCheckResults.code = null;
                 this.checkForExistingEntityByCode();
             }
-        }, 500);
+        }, 800);
     }
 
 
@@ -262,7 +262,7 @@ export default class OperatorAdminCreationController extends Controller {
             this.newOperatorTeamTarget.value = "";
             this.newOperatorUapTarget.value = "";
             this.newOperatorIsTrainerTarget.checked = null;
-        }, 5000);
+        }, 10000);
 
     }
 
@@ -338,42 +338,60 @@ export default class OperatorAdminCreationController extends Controller {
     }
 
 
-    suggestFirstname(event) {
-        const input = event.target.value;
-        console.log('suggesting firstname:', input);
-        if (input.length > 0) { // Only start suggesting after at least 3 characters have been entered
-            clearTimeout(this.suggestTimeout);
-            this.suggestTimeout = setTimeout(async () => {
-                console.log('fetching suggestions for firstname:', input);
-                const response = await this.fetchNameSuggestions(input);
-                this.displaySuggestions(response.data);
-            }, 300); // Delay to avoid too frequent calls
-        } else {
-            this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions if the input is too short
-        }
-    }
-
-
     suggestLastname(event) {
         const input = event.target.value;
         console.log('suggesting lastname:', input);
-        if (input.length > 0) { // Only start suggesting after at least 3 characters have been entered
+        console.log('suggesting lastname:', input.length > 0);
+
+        if (input.length > 0) { // Only start suggesting after at least 2 characters have been entered
             clearTimeout(this.suggestTimeout);
             this.suggestTimeout = setTimeout(async () => {
-                console.log('fetching suggestions for lastname:', input);
-                const response = await this.fetchNameSuggestions(input);
-                this.displaySuggestions(response.data);
-            }, 300); // Delay to avoid too frequent calls
+                const regex = /^[A-Z]+$/;
+                const upperCasedInput = input.toUpperCase();
+                const isValid = regex.test(upperCasedInput.trim());
+                console.log('is input valid for fetching suggestions for lastname:', isValid);
+                if (isValid) {
+                    console.log('fetching suggestions for lastname:', input);
+                    const response = await this.fetchNameSuggestions(input);
+                    this.displaySuggestions(response.data);
+                } else {
+                    this.manageNewOperatorSubmitButton();
+                }
+            }, 100); // Delay to avoid too frequent calls
         } else {
             this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions if the input is too short
         }
     }
 
+
+    suggestFirstname(event) {
+        const input = event.target.value;
+        console.log('suggesting firstname:', input);
+        if (input.length > 0) { // Only start suggesting after at least 2 characters have been entered
+            clearTimeout(this.suggestTimeout);
+            this.suggestTimeout = setTimeout(async () => {
+                const regex = /^[A-Z][a-z]+(-[A-Z][a-z]+)*$/;
+                const isValid = regex.test(this.input.trim());
+                console.log('is input valid for fetching suggestions for firstname:', isValid);
+
+                if (isValid) {
+                    console.log('fetching suggestions for firstname:', input);
+                    const response = await this.fetchNameSuggestions(input);
+                    this.displaySuggestions(response.data);
+                } else {
+                    this.manageNewOperatorSubmitButton();
+                }
+            }, 100); // Delay to avoid too frequent calls
+        } else {
+            this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions if the input is too short
+        }
+    }
 
     async fetchNameSuggestions(name) {
         console.log('fetching name suggestions:', name);
         return axios.post(`operator/suggest-names`, { name: name });
     }
+
 
     displaySuggestions(responses) {
         console.log('displaying suggestions:', responses);
@@ -382,12 +400,12 @@ export default class OperatorAdminCreationController extends Controller {
             const parts = response.name.split('.'); // Split the 'name' to get firstName and lastName
             const firstName = this.capitalizeFirstLetter(parts[0]); // Capitalize the first name
             const lastName = parts.length > 1 ? this.capitalizeFirstLetter(parts[1]) : ''; // Handle last name if present
-            const teamName = response.team.name; // Get the team name
-            const teamId = response.team.id; // Get the team id
-            const uapName = response.uap.name; // Get the uap name
-            const uapId = response.uap.id; // Get the uap id
+            const teamName = response.team_name; // Get the team name
+            const teamId = response.team_id; // Get the team id
+            const uapName = response.uap_name; // Get the uap name
+            const uapId = response.uap_id; // Get the uap id
             const code = response.code; // Get the code
-            const isTrainerBool = response.IsTrainer; // Get the isTrainer value
+            const isTrainerBool = response.is_trainer; // Get the isTrainer value
             return `<div class="suggestion-item" data-firstname="${firstName}" data-lastname="${lastName}" data-code="${code}" data-team="${teamId}" data-uap="${uapId}" data-istrainer="${isTrainerBool}">
             ${lastName} ${firstName} - ${teamName} - ${uapName} (${code})
         </div>`;
@@ -409,7 +427,7 @@ export default class OperatorAdminCreationController extends Controller {
                 this.newOperatorCodeTarget.value = code;
                 this.newOperatorTeamTarget.value = team;
                 this.newOperatorUapTarget.value = uap;
-                if (isTrainer === 'true') {
+                if (isTrainer === '1') {
                     this.newOperatorIsTrainerTarget.checked = true;
                 } else {
                     this.newOperatorIsTrainerTarget.checked = false;
