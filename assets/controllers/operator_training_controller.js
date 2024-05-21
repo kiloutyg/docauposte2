@@ -19,6 +19,8 @@ export default class OperatorTrainingController extends Controller {
 
     ];
 
+    suggestionsResults = [];
+
     validateNewOperatorSurname() {
         clearTimeout(this.surnameTypingTimeout);
         this.surnameTypingTimeout = setTimeout(() => {
@@ -253,10 +255,13 @@ export default class OperatorTrainingController extends Controller {
             this.newOperatorCodeTarget.disabled = true;
             this.newOperatorSurnameTarget.focus();
             this.newOperatorSubmitButtonTarget.disabled = true;
+            this.newOperatorFirstnameTarget.disabled = true;
             this.resetUselessMessages();
             this.newOperatorCodeMessageTarget.textContent = "";
             this.newOperatorNameMessageTarget.textContent = "";
             this.newOperatorTransferMessageTarget.textContent = "";
+            this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions
+            this.suggestionsResults = [];
         }, 10000);
 
     }
@@ -479,14 +484,17 @@ export default class OperatorTrainingController extends Controller {
                 const regex = /^[A-Z][A-Z]+$/;
                 const isValid = regex.test(input.toUpperCase().trim());
                 console.log('is input valid for fetching suggestions for Surname:', isValid);
+
                 if (isValid) {
                     console.log('fetching suggestions for Surname:', input);
-                    const response = await this.fetchNameSuggestions(input);
-                    this.displaySuggestions(response.data);
+                    const response = await this.fetchNameSuggestions(input, 'surname');
+                    console.log('suggestions response:', response);
+                    this.displaySuggestions(response)
                 } else {
-                    manageNewOperatorSubmitButton();
+                    this.manageNewOperatorSubmitButton();
                 }
-            }, 300); // Delay to avoid too frequent calls
+
+            }, 500); // Delay to avoid too frequent calls
         } else {
             this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions if the input is too short
         }
@@ -499,28 +507,77 @@ export default class OperatorTrainingController extends Controller {
         if (input.length > 0) { // Only start suggesting after at least 3 characters have been entered
             clearTimeout(this.suggestTimeout);
             this.suggestTimeout = setTimeout(async () => {
-                const regex = /^[A-Z][a-z]+(-[A-Z][a-z]+)*$/;
-                const isValid = regex.test(this.input.trim());
+                const regex = /^[A-Z][a-z]*(-[A-Z][a-z]*)*$/;
+                const isValid = regex.test(input.trim());
                 console.log('is input valid for fetching suggestions for firstname:', isValid);
 
                 if (isValid) {
                     console.log('fetching suggestions for firstname:', input);
-                    const response = await this.fetchNameSuggestions(input);
-                    this.displaySuggestions(response.data);
+                    const response = await this.fetchNameSuggestions(input, 'firstname');
+                    console.log('suggestions response:', response);
+                    this.displaySuggestions(response)
                 } else {
-                    manageNewOperatorSubmitButton();
+                    this.manageNewOperatorSubmitButton();
                 }
-            }, 300); // Delay to avoid too frequent calls
+
+            }, 500); // Delay to avoid too frequent calls
         } else {
             this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions if the input is too short
         }
     }
 
+    async fetchNameSuggestions(name, inputField) {
+        console.log('fetching name suggestions:', name, inputField);
+        let response;
 
-    async fetchNameSuggestions(name) {
-        console.log('fetching name suggestions:', name);
-        return axios.post(`/docauposte/operator/suggest-names`, { name: name });
+        if (inputField === 'surname' && this.newOperatorFirstnameTarget.value.trim() != "") {
+            console.log('first name is not empty');
+            const firstNameResponse = await axios.post(`/docauposte/operator/suggest-names`, { name: this.newOperatorFirstnameTarget.value.trim() });
+            this.suggestionsResults = firstNameResponse.data;
+
+        } else if (inputField === 'firstname' && this.newOperatorSurnameTarget.value.trim() != "") {
+            console.log('last name is not empty');
+            const surNameResponse = await axios.post(`/docauposte/operator/suggest-names`, { name: this.newOperatorSurnameTarget.value.trim() });
+            this.suggestionsResults = surNameResponse.data;
+        }
+
+        response = await axios.post(`/docauposte/operator/suggest-names`, { name: name });
+
+        console.log('response for name suggestions:', response.data);
+        return this.checkIfSuggestionsResultsEmpty(response.data);
     }
+
+
+
+
+    async checkIfSuggestionsResultsEmpty(response) {
+        console.log('checking if suggestions results are empty:', this.suggestionsResults);
+        if (this.suggestionsResults.length > 0) {
+            console.log('this.suggestionsResults return TRUE in fetchNameSuggestions')
+            const checkedResponses = await this.checkForDuplicatesuggestionsResults(response);
+            return checkedResponses;
+        } else {
+            console.log('this.suggestionsResults return FALSE in fetchNameSuggestions')
+            this.suggestionsResults = response;
+            return response;
+        }
+    }
+
+
+
+    async checkForDuplicatesuggestionsResults(responses) {
+        console.log('checking for duplicate suggestions results responses:', responses);
+        console.log('checking for duplicate suggestions results suggestionsResults:', this.suggestionsResults);
+
+        const duplicateSuggestions = responses.filter(response => {
+            return this.suggestionsResults.some(suggestion => suggestion.id === response.id);
+        });
+
+        console.log('filtered suggestions:', duplicateSuggestions);
+        return duplicateSuggestions;
+    }
+
+
 
 
     displaySuggestions(responses) {
@@ -529,7 +586,7 @@ export default class OperatorTrainingController extends Controller {
         this.nameSuggestionsTarget.innerHTML = responses.map(response => {
             const parts = response.name.split('.'); // Split the 'name' to get firstName and lastName
             const firstName = this.capitalizeFirstLetter(parts[0]); // Capitalize the first name
-            const lastName = parts.length > 1 ? this.toUpperCase(parts[1]) : ''; // Handle last name if present
+            const lastName = parts.length > 1 ? parts[1].toUpperCase() : ''; // Handle last name if present
             const teamName = response.team_name; // Get the team name
             const teamId = response.team_id; // Get the team id
             const uapName = response.uap_name; // Get the uap name
@@ -557,6 +614,7 @@ export default class OperatorTrainingController extends Controller {
 
                 this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions after selection
                 this.validateNewOperatorSurname()
+                this.suggestionsResults = [];
 
 
             });
