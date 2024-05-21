@@ -240,7 +240,10 @@ export default class OperatorTrainingController extends Controller {
 
     manageNewOperatorSubmitButton(enableButton = false, submitValue = "Ajouter") {
         console.log(`Setting new operator submit button - Enabled: ${enableButton}, Value: ${submitValue}`);
-        this.newOperatorSubmitButtonTarget.disabled = !enableButton;
+        console.log('suggestionsResults length:', this.suggestionsResults.length)
+        if (this.suggestionsResults.length === 0) {
+            this.newOperatorSubmitButtonTarget.disabled = !enableButton;
+        }
         document.getElementById('newOperatorName').value = this.newOperatorNameTarget;
         this.newOperatorSubmitButtonTarget.value = submitValue;
         clearTimeout(this.validatedTimeout);
@@ -530,12 +533,12 @@ export default class OperatorTrainingController extends Controller {
         console.log('fetching name suggestions:', name, inputField);
         let response;
 
-        if (inputField === 'surname' && this.newOperatorFirstnameTarget.value.trim() != "") {
+        if (inputField === 'surname' && this.newOperatorFirstnameTarget.value.trim() !== "") {
             console.log('first name is not empty');
             const firstNameResponse = await axios.post(`/docauposte/operator/suggest-names`, { name: this.newOperatorFirstnameTarget.value.trim() });
             this.suggestionsResults = firstNameResponse.data;
 
-        } else if (inputField === 'firstname' && this.newOperatorSurnameTarget.value.trim() != "") {
+        } else if (inputField === 'firstname' && this.newOperatorSurnameTarget.value.trim() !== "") {
             console.log('last name is not empty');
             const surNameResponse = await axios.post(`/docauposte/operator/suggest-names`, { name: this.newOperatorSurnameTarget.value.trim() });
             this.suggestionsResults = surNameResponse.data;
@@ -574,7 +577,11 @@ export default class OperatorTrainingController extends Controller {
         });
 
         console.log('filtered suggestions:', duplicateSuggestions);
+        if (duplicateSuggestions.length === 0) {
+            this.suggestionsResults = [];
+        }
         return duplicateSuggestions;
+
     }
 
 
