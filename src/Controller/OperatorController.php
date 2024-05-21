@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use App\Form\OperatorType;
@@ -23,9 +25,25 @@ class OperatorController extends FrontController
     {
         $this->logger->info('search query with full request', $request->request->all());
 
+        $newOperator = new Operator();
+        $newOperatorForm = $this->createForm(OperatorType::class, $newOperator);
+        $newOperatorForm->handleRequest($request);
+
+        if ($newOperatorForm->isSubmitted() && $newOperatorForm->isValid()) {
+            try {
+                $this->processNewOperator($newOperator, $newOperatorForm, $request);
+                $this->addFlash('success', 'L\'opérateur a bien été ajouté');
+                return $this->redirectToRoute('app_operator');
+            } catch (\Exception $e) {
+                $this->addFlash('danger', 'L\'opérateur n\'a pas pu être ajouté' . $e->getMessage());
+                return $this->redirectToRoute('app_operator');
+            }
+        }
+
+
         $operators = [];
-        if ($request->isMethod('POST')) {
-            $this->logger->info('is the used method a post');
+        if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
+            $this->logger->info(' the used method is a post');
             if ($request->getContentTypeFormat() == 'json') {
                 $this->logger->info('is the content type a json');
                 $data = json_decode($request->getContent(), true);
@@ -36,6 +54,7 @@ class OperatorController extends FrontController
                 $uap        = $data['search_uap'];
                 $trainer    = $data['search_trainer'];
             } else {
+                $this->logger->info('is the content type a form');
                 $name       = $request->request->get('search_name');
                 $code       = $request->request->get('search_code');
                 $team       = $request->request->get('search_team');
@@ -46,21 +65,27 @@ class OperatorController extends FrontController
         }
 
 
-        // Create and handle forms
         $operatorForms = [];
+        // Create and handle forms
         foreach ($operators as $operator) {
             $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
                 'operator_id' => $operator->getId(),
             ])->createView();
         }
+        $types = [];
+        $flashMessages = [];
 
-        $newOperator = new Operator();
-        $newOperatorForm = $this->createForm(OperatorType::class, $newOperator);
-        $newOperatorForm->handleRequest($request);
-
-        if ($newOperatorForm->isSubmitted() && $newOperatorForm->isValid()) {
-            $this->processNewOperator($newOperator, $newOperatorForm, $request);
+        // Log all flash messages
+        foreach ($request->getSession()->getFlashBag()->all() as $type => $messages) {
+            foreach ($messages as $message) {
+                $types[] = $type;
+                $flashMessages[] = $message;
+                $this->logger->info(sprintf('Flash message of type %s: %s', $type, $message));
+            }
         }
+        $this->logger->info('Flash types', $types);
+        $this->logger->info('Flash messages', $flashMessages);
+
 
         return $this->render('services/operators/operators_admin.html.twig', [
             'newOperatorForm' => $newOperatorForm->createView(),
@@ -87,19 +112,17 @@ class OperatorController extends FrontController
         $operator = $form->getData();
         $this->em->persist($operator);
         $this->em->flush();
-        $this->addFlash('success', 'L\'opérateur a bien été ajouté');
-        return $this->redirectToRoute('app_operator');
     }
 
 
 
 
-    // individual operator modification controller, used in dev purpose
+
+    // Individual operator modification controller, used in dev purpose
     #[Route('/operator/edit/{id}', name: 'app_operator_edit')]
     public function editOperatorAction(Request $request, Operator $operator): Response
     {
         $this->logger->info('Full request editOperatorAction', $request->request->all());
-        $originUrl = $request->headers->get('referer');
 
         $form = $this->createForm(OperatorType::class, $operator, [
             'operator_id' => $operator->getId(),
@@ -116,43 +139,53 @@ class OperatorController extends FrontController
                     $this->em->persist($trainer);
                     $operator->setTrainer($trainer);
                 }
-            } else if ($trainerBool != true) {
+            } else {
                 $trainer = $operator->getTrainer();
                 $operator->setTrainer(null);
                 if ($trainer != null) {
                     $this->em->remove($trainer);
                 }
-            };
-
-            $operator = $form->getData();
-            $this->em->persist($operator);
-            $this->em->flush();
-            $this->addFlash('success', 'L\'opérateur a bien été modifié');
-            return $this->redirectToRoute('app_operator');
-        } else {
-            return $this->redirectToRoute('app_operator');
-            $this->addFlash(
-                'danger',
-                'cdlm'
-            );
+            }
+            try {
+                $this->em->persist($operator);
+                $this->em->flush();
+                $this->logger->info('operator, operateur bien modifié', [$operator]);
+                $this->addFlash('success', 'L\'opérateur a bien été modifié');
+                return $this->redirectToRoute('app_operator');
+            } catch (\Exception $e) {
+                $this->addFlash('danger', 'L\'opérateur n\'a pas pu être modifié. Erreur: ' . $e->getMessage());
+                $this->logger->error('Error while editing operator in try catch', [$e->getMessage()]);
+                return $this->redirectToRoute('app_operator');
+            }
         }
+
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            $this->logger->error('Error in submitting form while editing operator');
+            $this->addFlash('danger', 'Erreur lors de la soumission du formulaire');
+            return $this->redirectToRoute('app_operator');
+        }
+        $this->logger->info('editoperatoraction reach return to template"');
+        return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
+            'form' => $form->createView(),
+            'operator' => $operator
+        ]);
     }
+
 
 
     // Route to delete operator from the administrator view
     #[Route('/operator/delete/{id}', name: 'app_operator_delete')]
-    public function deleteOperatorAction(Request $request, int $id): Response
+    public function deleteOperatorAction(int $id): Response
     {
-        $originUrl = $request->headers->get('referer');
 
         $result = $this->entitydeletionService->deleteEntity('operator', $id);
 
         if (!$result) {
             $this->addFlash('danger', 'L\'opérateur n\'a pas pu être supprimé');
-            return $this->redirect($originUrl);
+            return $this->redirectToRoute('app_operator');
         } else {
             $this->addFlash('success', 'L\'opérateur a bien été supprimé');
-            return $this->redirect($originUrl);
+            return $this->redirectToRoute('app_operator');
         }
     }
 
@@ -163,7 +196,6 @@ class OperatorController extends FrontController
     #[Route('/operator/visual/{validationId}', name: 'app_test_document')]
     public function documentAndOperator(Request $request, int $validationId): Response
     {
-        $originUrl = $request->headers->get('referer');
         $validation = $this->validationRepository->find($validationId);
         $upload = $validation->getUpload();
 
@@ -183,7 +215,6 @@ class OperatorController extends FrontController
     #[Route('operator/traininglist/{uploadId}', name: 'app_training_list')]
     public function trainingList(int $uploadId): Response
     {
-
 
         // Handle the GET request
         $upload = $this->uploadRepository->find($uploadId);
@@ -458,6 +489,7 @@ class OperatorController extends FrontController
     }
 
 
+
     #[Route('/operator/check-duplicate-by-name', name: 'app_operator_check_duplicate_by_name', methods: ['POST'])]
     public function checkDuplicateOperatorByName(Request $request): JsonResponse
     {
@@ -473,6 +505,8 @@ class OperatorController extends FrontController
         $this->logger->info('existingOperator', [$existingOperator]);
 
         if ($existingOperator !== null) {
+
+
             // Found duplicate
             return new JsonResponse([
                 'found' => true,
@@ -486,12 +520,12 @@ class OperatorController extends FrontController
             ]);
         }
 
-
         // No duplicate found
         return new JsonResponse([
             'found' => false, 'field' => 'name', 'value' => $operatorName, 'message' => 'Aucun opérateur avec ce nom n\'existe'
         ]);
     }
+
 
 
     #[Route('/operator/check-duplicate-by-code', name: 'app_operator_check_duplicate_by_code', methods: ['POST'])]
@@ -672,5 +706,60 @@ class OperatorController extends FrontController
                 ]);
             }
         }
+    }
+
+    #[Route('operator/suggest-names', name: 'app_suggest_names')]
+    public function suggestNames(Request $request, SerializerInterface $serializer): JsonResponse
+    {
+        $parsedRequest = json_decode($request->getContent(), true);
+        $this->logger->info('app_suggest_names parsedRequest', $parsedRequest);
+
+        $name = $parsedRequest['name'];
+
+        /////////////// serialized data ////////////////////////
+        $rawSuggestions = $this->operatorRepository->findByNameLikeForSuggestions($name);
+        $this->logger->info('app_suggest_names Raw suggestions', $rawSuggestions);
+
+        $teams = $this->teamRepository->findAll();
+        $teamIndex = [];
+        foreach ($teams as $team) {
+            $teamIndex[$team->getId()] = $team->getName();
+        }
+
+        $uaps = $this->uapRepository->findAll();
+        $uapIndex = [];
+        foreach ($uaps as $uap) {
+            $uapIndex[$uap->getId()] = $uap->getName();
+        }
+
+
+        foreach ($rawSuggestions as $key => &$suggestion) {
+            // Check and assign team name if available
+            if (isset($suggestion['team_id']) && isset($teamIndex[$suggestion['team_id']])) {
+                $suggestion['team_name'] = $teamIndex[$suggestion['team_id']];
+            } else {
+                $suggestion['team_name'] = 'nope'; // Or handle it as appropriate
+            }
+
+            // Check and assign UAP name if available
+            if (isset($suggestion['uap_id']) && isset($uapIndex[$suggestion['uap_id']])) {
+                $suggestion['uap_name'] = $uapIndex[$suggestion['uap_id']];
+            } else {
+                $suggestion['uap_name'] = 'nope'; // Or handle it as appropriate
+            }
+        }
+
+        $this->logger->info('app_suggest_names rawSuggestions', $rawSuggestions);
+        // Serialize the entire array of entities at once using groups
+        $serializedSuggestions = json_encode($rawSuggestions);
+        // $serializedSuggestions = $serializer->serialize($rawSuggestions, 'json', [
+        //     'groups' => 'operator_details'
+        // ]);
+
+        // $this->logger->info('app_suggest_names serialized suggestions', json_decode($serializedSuggestions));
+        // $this->logger->info('app_suggest_names serialized suggestions', json_decode($serializedSuggestions));
+
+        // Since $serializedSuggestions is a JSON string, return it directly with JsonResponse
+        return new JsonResponse($serializedSuggestions, 200, [], true);
     }
 }

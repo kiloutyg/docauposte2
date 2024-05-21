@@ -3,9 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\TeamRepository;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+
 use Doctrine\ORM\Mapping as ORM;
+
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TeamRepository::class)]
 class Team
@@ -13,12 +17,14 @@ class Team
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['operator_details'])]
     private ?int $id = null;
 
     #[ORM\OneToMany(mappedBy: 'team', targetEntity: Operator::class)]
     private Collection $operators;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['operator_details'])]
     private ?string $name = null;
 
     public function __construct()

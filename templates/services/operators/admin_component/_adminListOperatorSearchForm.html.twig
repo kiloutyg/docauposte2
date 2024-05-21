@@ -1,24 +1,87 @@
 <ul>
-	<div class="card container mt-3">
-		<form class="row mt-2" method="post" action="{{ path('app_operator') }}" data-turbo-frame="adminListOperator" id="adminListOperator-form">
+	<div
+		class="card container mt-3"
+		data-controller="operator-admin-search">
+		<form
+			class="row mt-2"
+			method="post"
+			action="{{ path('app_operator') }}" data-turbo-frame="adminListOperator"
+			id="adminListOperator-form">
 
-			<input data-operator-admin-search-target="operatorAdminSearchNameInput" data-action="keyup->operator-admin-search#submitSearchForm" class="form-control shadow col" type="text" name="search_name" id="search_name" placeholder="Search by name">
+			<input
+				type="hidden"
+				name="search"
+				value="true">
 
-			<input data-operator-admin-search-target="operatorAdminSearchCodeInput" data-action="keyup->operator-admin-search#submitSearchForm" class="form-control shadow col" type="text" pattern="\d{1,5}" maxlength="5" name="search_code" id="search_code" placeholder="Search by code">
+			<input
+				data-operator-admin-search-target="operatorAdminSearchNameInput"
+				data-action="keyup->operator-admin-search#submitSearchForm"
+				class="form-control shadow col"
+				type="text"
+				name="search_name"
+				id="search_name"
+				placeholder="Recherche par nom">
 
-			<input data-operator-admin-search-target="operatorAdminSearchTeamInput" data-action="keyup->operator-admin-search#submitSearchForm" class="form-control shadow col" type="text" name="search_team" id="search_team" placeholder="Search by team">
+			<input
+				data-operator-admin-search-target="operatorAdminSearchCodeInput"
+				data-action="keyup->operator-admin-search#submitSearchForm"
+				class="form-control shadow col"
+				type="text"
+				pattern="\d{1,5}"
+				maxlength="5"
+				name="search_code"
+				id="search_code"
+				placeholder="Recherche par CodeOpé">
 
-			<input data-operator-admin-search-target="operatorAdminSearchUapInput" data-action="keyup->operator-admin-search#submitSearchForm" class="form-control shadow col" type="text" name="search_uap" id="search_uap" placeholder="Search by UAP">
+			<input
+				data-operator-admin-search-target="operatorAdminSearchTeamInput"
+				data-action="keyup->operator-admin-search#submitSearchForm"
+				class="form-control shadow col"
+				type="text"
+				name="search_team"
+				id="search_team"
+				placeholder="Recherche par Equipe">
 
-			<select data-operator-admin-search-target="operatorAdminSearchIsTrainerInput" data-action="change->operator-admin-search#submitSearchForm" class="form-select shadow col " name="search_trainer" id="search_trainer">
-				<option selected value="">Est-il Formateur?</option>
-				<option value="all">Tous</option>
-				<option value="true">Formateur</option>
-				<option value="false">Non Formateur</option>
+			<input
+				data-operator-admin-search-target="operatorAdminSearchUapInput"
+				data-action="keyup->operator-admin-search#submitSearchForm"
+				class="form-control shadow col"
+				type="text"
+				name="search_uap"
+				id="search_uap"
+				placeholder="Recherche par UAP">
+
+			<select
+				data-operator-admin-search-target="operatorAdminSearchIsTrainerInput"
+				data-action="change->operator-admin-search#submitSearchForm"
+				class="form-select shadow col "
+				name="search_trainer"
+				id="search_trainer">
+				<option
+					selected
+					value="">
+					Est-il Formateur?
+				</option>
+				<option
+					value="all">
+					Tous
+				</option>
+				<option
+					value="true">
+					Formateur
+				</option>
+				<option
+					value="false">
+					Non Formateur
+				</option>
 			</select>
 
 
-			<input data-operator-admin-search-target="operatorAdminSearchSubmit" class="btn btn-primary col" placeholder="Search" type="submit">
+			<input
+				data-operator-admin-search-target="operatorAdminSearchSubmit"
+				class="btn btn-primary col"
+				placeholder="Search"
+				type="submit">
 
 		</form>
 	</div>

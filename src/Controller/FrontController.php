@@ -172,4 +172,9 @@ class FrontController extends BaseController
             return $uploadController->downloadFile($uploadId, $request);
         }
     }
+    #[Route('/flash-messages', name: 'flash_messages')]
+    public function flashMessages(Request $request): Response
+    {
+        return $this->render('services/_toasts.html.twig');
+    }
 }

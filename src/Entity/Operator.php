@@ -3,12 +3,19 @@
 namespace App\Entity;
 
 use App\Repository\OperatorRepository;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+
 use Doctrine\ORM\Mapping as ORM;
+
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: OperatorRepository::class)]
+#[UniqueEntity(fields: 'code', message: 'Un opérateur avec ce code existe déjà42.')]
+#[UniqueEntity(fields: 'name', message: 'Un opérateur avec ce nom existe déjà42.')]
 class Operator
 {
     #[ORM\Id]
@@ -17,32 +24,36 @@ class Operator
 
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 180)]
     #[Assert\Regex(pattern: '/^[a-zA-Z]+\.[a-zA-Z-]+$/', message: 'Le nom d\'opérateur doit être au format prénom.nom')]
-
+    #[Groups(['operator_details'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'operators')]
+    #[Groups(['operator_details'])]
     private ?Team $team = null;
 
     #[ORM\ManyToOne(inversedBy: 'operators')]
+    #[Groups(['operator_details'])]
     private ?Uap $uap = null;
 
     #[ORM\OneToMany(mappedBy: 'operator', targetEntity: TrainingRecord::class)]
     private Collection $trainingRecords;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(5)]
     #[Assert\Regex(pattern: '/[0-9]{5}$/', message: 'Le code Opérateur doit être composé de 5 chiffres.')]
+    #[Groups(['operator_details'])]
     private ?string $code = null;
 
     #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist', 'remove'])]
     private ?Trainer $trainer = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['operator_details'])]
     private ?bool $IsTrainer = null;
 
 

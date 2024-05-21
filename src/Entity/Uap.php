@@ -3,9 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\UapRepository;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+
 use Doctrine\ORM\Mapping as ORM;
+
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UapRepository::class)]
 class Uap
@@ -13,9 +17,11 @@ class Uap
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['operator_details'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['operator_details'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'uap', targetEntity: Operator::class)]

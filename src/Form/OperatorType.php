@@ -97,7 +97,6 @@ class OperatorType extends AbstractType
 
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
-                    'id' => 'name-' . $operatorId,
                     'required' => true
                 ],
                 'row_attr' => [
@@ -116,7 +115,6 @@ class OperatorType extends AbstractType
 
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
-                    'id' => 'name-' . $operatorId,
                     'required' => true
                 ],
                 'row_attr' => [

@@ -1,6 +1,22 @@
-<turbo-frame id="adminListOperator">
+<turbo-frame
+	id="adminListOperator">
 	<ul>
-		<div class="row">
+		<div
+			id="flash-messages">
+
+			{% for label, messages in app.flashes %}
+				<div
+					class="alert alert-{{ label }}">
+					{% for message in messages %}
+						<p>
+							{{ message }}
+						</p>
+					{% endfor %}
+				</div>
+			{% endfor %}
+		</div>
+		<div
+			class="row">
 			{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
 
 			{% for fieldName in fieldsName %}
@@ -15,21 +31,22 @@
 			</div>
 		</div>
 	</ul>
-	<ul>
+	<ul		
+	data-controller="operator-admin-edit">
 		{% if operatorForms|length > 0 %}
 			{% for operatorId, operatorForm in operatorForms %}
-				{{ form_start(operatorForm, {'attr': {'class': 'row'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
+				{{ form_start(operatorForm, {'attr': {'class': 'row', 'id': 'operatorForm' ~ operatorId}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
 				{% for field in fields %}
-					{# {% set customId = field ~ '-' ~ operatorId %}
-																																		{{ form_row(operatorForm[field], {'id': customId}) }} #}
-					{% set customId = 'newOperator' ~ field|capitalize ~ operatorId %}
+     				{% set customId = 'operatorForm' ~ field|capitalize ~ operatorId %}
 					{{ form_row(operatorForm[field], 
-					{
+					{						
+					'id': customId,
 					'attr': {
-						'id': customId,
-						'data-operator-admin-edit-target': 'newOperator' ~ field|capitalize
+						'data-operator-admin-edit-target': field == 'isTrainer' ? 'operatorFormIsTrainer' : 'operatorForm' ~ field|capitalize
 				}
 			}) }}
+
+			
 				{% endfor %}
 				<div
 					class="col my-auto mx-auto">
@@ -59,4 +76,6 @@
 			</div>
 		{% endif %}
 	</ul>
+
+
 </turbo-frame>
