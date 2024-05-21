@@ -529,7 +529,7 @@ export default class OperatorTrainingController extends Controller {
         this.nameSuggestionsTarget.innerHTML = responses.map(response => {
             const parts = response.name.split('.'); // Split the 'name' to get firstName and lastName
             const firstName = this.capitalizeFirstLetter(parts[0]); // Capitalize the first name
-            const lastName = parts.length > 1 ? this.capitalizeFirstLetter(parts[1]) : ''; // Handle last name if present
+            const lastName = parts.length > 1 ? this.toUpperCase(parts[1]) : ''; // Handle last name if present
             const teamName = response.team_name; // Get the team name
             const teamId = response.team_id; // Get the team id
             const uapName = response.uap_name; // Get the uap name

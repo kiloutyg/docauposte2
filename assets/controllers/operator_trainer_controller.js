@@ -192,25 +192,25 @@ export default class OperatorTrainerController extends Controller {
 
             <div>
                 <div
-                    class="d-flex flex-fill"
+                    class="row"
                     >
-                    <div class="position-relative" style="flex: 0.5;">
-                    <input
-                        type="text"
-                        class="form-control capitalize-all-letters"
-                        data-operator-training-target="newOperatorSurname"
-                        data-action="keyup->operator-training#validateNewOperatorSurname input->operator-training#suggestSurname"
-                        placeholder="NOM"
-                        id="newOperatorSurname"
-                        name="newOperatorSurname"
-                        required>
+                    <div class=" col-4">
+                        <input
+                            type="text"
+                            class="form-control capitalize-all-letters"
+                            data-operator-training-target="newOperatorSurname"
+                            data-action="keyup->operator-training#validateNewOperatorSurname input->operator-training#suggestSurname"
+                            placeholder="NOM"
+                            id="newOperatorSurname"
+                            name="newOperatorSurname"
+                            required>
                     <div
                         data-operator-training-target="nameSuggestions"
-                        class="traininglist-suggestions-list position-absolute w-100 rounded-bottom"></div>
+                        class="traininglist-suggestions-list rounded-bottom"></div>
                 </div>
                 
                     <div
-                        style="flex:0.5;"
+                        class="col-3"
                         >
                         <input
                             type="text"
@@ -224,7 +224,7 @@ export default class OperatorTrainerController extends Controller {
                             disabled>
                     </div>
                     <div
-                        style="flex:0.3;"
+                        class="col-2"
                         >
                         <input
                             type="text"
@@ -241,7 +241,7 @@ export default class OperatorTrainerController extends Controller {
                     </div>
                         <input type="hidden" id="newOperatorName" name="newOperatorName">           
                     <div
-                        style="flex:0.2;"
+                        class="col-2"
                         >
                         <input
                             type="submit"
@@ -317,3 +317,79 @@ export default class OperatorTrainerController extends Controller {
     }
 
 }
+//   <div>
+// <div
+//     class="d-flex flex-fill"
+//     >
+//     <div class="position-relative" style="flex: 0.5;">
+//     <input
+//         type="text"
+//         class="form-control capitalize-all-letters"
+//         data-operator-training-target="newOperatorSurname"
+//         data-action="keyup->operator-training#validateNewOperatorSurname input->operator-training#suggestSurname"
+//         placeholder="NOM"
+//         id="newOperatorSurname"
+//         name="newOperatorSurname"
+//         required>
+//     <div
+//         data-operator-training-target="nameSuggestions"
+//         class="traininglist-suggestions-list position-absolute w-100 rounded-bottom"></div>
+// </div>
+
+//     <div
+//         style="flex:0.5;"
+//         >
+//         <input
+//             type="text"
+//             class="form-control capitalize-first-letter::first-letter "
+//             data-operator-training-target="newOperatorFirstname"
+//             data-action="keyup->operator-training#validateNewOperatorFirstname input->operator-training#suggestFirstname"
+//             placeholder="Prenom"
+//             id="newOperatorFirstname"
+//             name="newOperatorFirstname"
+//             required
+//             disabled>
+//     </div>
+//     <div
+//         style="flex:0.3;"
+//         >
+//         <input
+//             type="text"
+//             pattern="[0-9]{5}"
+//             maxlength="5"
+//             class="form-control"
+//             data-operator-training-target="newOperatorCode"
+//             data-action="keyup->operator-training#validateNewOperatorCode"
+//             placeholder="Code Opérateur"
+//             id="newOperatorCode"
+//             name="newOperatorCode"
+//             required
+//             disabled>
+//     </div>
+//         <input type="hidden" id="newOperatorName" name="newOperatorName">           
+//     <div
+//         style="flex:0.2;"
+//         >
+//         <input
+//             type="submit"
+//             class="btn btn-primary "
+//             data-operator-training-target="newOperatorSubmitButton"
+//             data-action="click->operator-trainer#resetFollowingSubmit"
+//             id="newOperatorSubmitButton"
+//             name="newOperatorSubmitButton"
+//             value="Ajouter"
+//             disabled>
+//     </div>
+
+// </div>
+
+// <div
+//     data-operator-training-target="newOperatorNameMessage"
+//     class="newOperatorName-message d-flex justify-content-evenly"></div>
+// <div
+//     data-operator-training-target="newOperatorCodeMessage"
+//     class="newOperatorCode-message d-flex justify-content-evenly"></div>
+// <div
+//     data-operator-training-target="newOperatorTransferMessage"
+//     class="newOperatorTransfer-message d-flex justify-content-evenly"></div>
+// </div>
