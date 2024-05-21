@@ -198,6 +198,7 @@ class OperatorController extends FrontController
     {
         $validation = $this->validationRepository->find($validationId);
         $upload = $validation->getUpload();
+        $this->operatorService->operatorCheckForAutoDelete();
 
         if ($request->getMethod() === 'GET') {
             return $this->render('services/operators/docAndOperator.html.twig', [
@@ -423,11 +424,12 @@ class OperatorController extends FrontController
         $trainerEntityWithUpload = $this->trainerRepository->findOneBy(['operator' => $trainerId, 'upload' => $upload]);
         if ($trainerEntityWithUpload == null) {
             $this->logger->info('operator ID', [$trainerId]);
-            $trainerOperatorId = $this->operatorRepository->find($trainerId);
-            $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $trainerOperatorId]);
+            $trainerOperator = $this->operatorRepository->find($trainerId);
+            $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $trainerOperator]);
             $this->logger->info('trainerEntity', [$trainerEntity]);
         } else {
             $this->logger->info('trainerEntityWithUpload', [$trainerEntityWithUpload]);
+            $trainerOperator = $this->operatorRepository->find($trainerId);
         };
 
         foreach ($operators as $operator) {
@@ -464,6 +466,8 @@ class OperatorController extends FrontController
                         $existingTrainingRecord->setTrainer($trainerEntity);
                         $existingTrainingRecord->setDate(new \DateTime());
                         $this->em->persist($existingTrainingRecord);
+                        $operatorEntity->setLasttraining(new \DateTime());
+                        $this->em->persist($operatorEntity);
                     }
                 } else {
                     // If the collection was empty, create a new TrainingRecord
@@ -474,12 +478,18 @@ class OperatorController extends FrontController
                     $trainingRecord->setTrained($trained);
                     $trainingRecord->setTrainer($trainerEntity);
                     $this->em->persist($trainingRecord);
+                    $operatorEntity->setLasttraining(new \DateTime());
+                    $this->em->persist($operatorEntity);
                 }
 
                 // Flush changes for each operator
                 $this->em->flush();
             }
         }
+
+        $trainerOperator->setLasttraining(new \DateTime());
+        $this->em->persist($trainerOperator);
+        $this->em->flush();
 
         return $this->redirectToRoute('app_render_training_records', [
             'uploadId' => $uploadId,

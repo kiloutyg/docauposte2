@@ -187,6 +187,51 @@ class OperatorRepository extends ServiceEntityRepository
         return $operators;
     }
 
+
+    public function findOperatorWithNoRecentTraining()
+    {
+        $oneYearAgo = new \DateTime();
+        $oneYearAgo->modify('-1 year');
+
+        $operators = $this->createQueryBuilder('o')
+            ->where('o.lasttraining < :oneYearAgo')
+            ->setParameter('oneYearAgo', $oneYearAgo)
+            ->andWhere('o.tobedeleted IS NULL')
+            ->getQuery()
+            ->getResult();
+
+        return $operators;
+    }
+
+    // public function findOperatorToBeDeleted()
+    // {
+    //     $sixMonthAgo = new \DateTime();
+    //     $sixMonthAgo->modify('-6 month');
+
+    //     $operators = $this->createQueryBuilder('o')
+    //         ->where('o.tobedeleted < :sixMonthAgo')
+    //         ->setParameter('sixMonthAgo', $sixMonthAgo)
+    //         ->getQuery()
+    //         ->getResult();
+
+    //     return $operators;
+    // }
+    public function findOperatorToBeDeleted()
+    {
+        $sixMonthsAgo = new \DateTime();
+        $sixMonthsAgo->modify('-6 months');
+
+        $operatorIds = $this->createQueryBuilder('o')
+            ->select('o.id')
+            ->where('o.lastTrainingDate < :sixMonthsAgo OR o.lastTrainingDate IS NULL')
+            ->setParameter('sixMonthsAgo', $sixMonthsAgo)
+            ->getQuery()
+            ->getScalarResult();
+
+        // Extract IDs from the result
+        return array_column($operatorIds, 'id');
+    }
+
     // public function findByNameLikeForSuggestions(string $name): array
     // {
     //     $qb = $this->createQueryBuilder('o');

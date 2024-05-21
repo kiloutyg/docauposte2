@@ -60,6 +60,9 @@ class Operator
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $lasttraining = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $tobedeleted = null;
+
 
     public function __construct()
     {
@@ -219,6 +222,18 @@ class Operator
     public function setLasttraining(?\DateTimeInterface $lasttraining): static
     {
         $this->lasttraining = $lasttraining;
+
+        return $this;
+    }
+
+    public function getTobedeleted(): ?\DateTimeInterface
+    {
+        return $this->tobedeleted;
+    }
+
+    public function setTobedeleted(?\DateTimeInterface $tobedeleted): static
+    {
+        $this->tobedeleted = $tobedeleted;
 
         return $this;
     }
