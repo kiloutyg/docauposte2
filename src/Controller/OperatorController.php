@@ -24,8 +24,13 @@ class OperatorController extends FrontController
     public function operatorBasePage(Request $request): Response
     {
         $this->logger->info('search query with full request', $request->request->all());
-        $this->operatorService->operatorCheckForAutoDelete();
-
+        $countArray = $this->operatorService->operatorCheckForAutoDelete();
+        if ($countArray != null) {
+            if ($countArray != null) {
+                $this->addFlash('info', ($countArray['unActiveOperators'] === 1 ? $countArray['unActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['unActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
+                    ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
+            }
+        }
         $newOperator = new Operator();
         $newOperatorForm = $this->createForm(OperatorType::class, $newOperator);
         $newOperatorForm->handleRequest($request);
@@ -73,19 +78,7 @@ class OperatorController extends FrontController
                 'operator_id' => $operator->getId(),
             ])->createView();
         }
-        // $types = [];
-        // $flashMessages = [];
 
-        // // Log all flash messages
-        // foreach ($request->getSession()->getFlashBag()->all() as $type => $messages) {
-        //     foreach ($messages as $message) {
-        //         $types[] = $type;
-        //         $flashMessages[] = $message;
-        //         $this->logger->info(sprintf('Flash message of type %s: %s', $type, $message));
-        //     }
-        // }
-        // $this->logger->info('Flash types', $types);
-        // $this->logger->info('Flash messages', $flashMessages);
 
 
         return $this->render('services/operators/operators_admin.html.twig', [
@@ -199,7 +192,13 @@ class OperatorController extends FrontController
     {
         $validation = $this->validationRepository->find($validationId);
         $upload = $validation->getUpload();
-        $this->operatorService->operatorCheckForAutoDelete();
+        $countArray = $this->operatorService->operatorCheckForAutoDelete();
+        if ($countArray != null) {
+            if ($countArray != null) {
+                $this->addFlash('info', ($countArray['unActiveOperators'] === 1 ? $countArray['unActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['unActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
+                    ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
+            }
+        }
 
         if ($request->getMethod() === 'GET') {
             return $this->render('services/operators/docAndOperator.html.twig', [
