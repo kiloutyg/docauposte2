@@ -27,7 +27,7 @@ class OperatorController extends FrontController
         $countArray = $this->operatorService->operatorCheckForAutoDelete();
         if ($countArray != null) {
             if ($countArray != null) {
-                $this->addFlash('info', ($countArray['unActiveOperators'] === 1 ? $countArray['unActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['unActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
+                $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
                     ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
             }
         }
@@ -79,13 +79,13 @@ class OperatorController extends FrontController
             ])->createView();
         }
 
-        $this->logger->info('in operatorBasePage is operatorForms empty' . count($operatorForms));
+        $this->logger->info('in operatorBasePage is operatorForms empty: ' . count($operatorForms));
 
         if (count($operatorForms) === 0) {
-            $unActiveOperators = $this->operatorRepository->findOperatorWithNoRecentTraining();
-            $this->logger->info('in operatorBasePage is unActiveOperators empty' . json_encode($unActiveOperators));
+            $inActiveOperators = $this->operatorRepository->findInActiveOperators();
+            $this->logger->info('in operatorBasePage is inActiveOperators : ' . count($inActiveOperators));
 
-            foreach ($unActiveOperators as $operator) {
+            foreach ($inActiveOperators as $operator) {
                 $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
                     'operator_id' => $operator->getId(),
                 ])->createView();
@@ -206,7 +206,7 @@ class OperatorController extends FrontController
         $countArray = $this->operatorService->operatorCheckForAutoDelete();
         if ($countArray != null) {
             if ($countArray != null) {
-                $this->addFlash('info', ($countArray['unActiveOperators'] === 1 ? $countArray['unActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['unActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
+                $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
                     ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
             }
         }

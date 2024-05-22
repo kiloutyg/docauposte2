@@ -244,9 +244,25 @@ class OperatorRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
+        $this->logger->info('Unactive operators: ' . json_encode($operators));
         return $operators;
     }
+    public function findInActiveOperators()
+    {
+        $this->logger->info('Finding operators with no recent training.');
+        $oneYearAgo = new \DateTime();
+        $oneYearAgo->modify('-1 year');
 
+        $operators = $this->createQueryBuilder('o')
+            ->where('o.lasttraining < :oneYearAgo')
+            ->setParameter('oneYearAgo', $oneYearAgo)
+            ->andWhere('o.tobedeleted IS NOT NULL')
+            ->getQuery()
+            ->getResult();
+
+        $this->logger->info('inactive operators: ' . json_encode($operators));
+        return $operators;
+    }
 
     public function findOperatorToBeDeleted()
     {
@@ -261,6 +277,7 @@ class OperatorRepository extends ServiceEntityRepository
             ->getQuery()
             ->getScalarResult();
 
+        $this->logger->info('To be deleted operators: ' . json_encode($operatorIds));
         // Extract IDs from the result
         return array_column($operatorIds, 'id');
     }
