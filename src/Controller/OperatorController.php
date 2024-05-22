@@ -73,19 +73,19 @@ class OperatorController extends FrontController
                 'operator_id' => $operator->getId(),
             ])->createView();
         }
-        $types = [];
-        $flashMessages = [];
+        // $types = [];
+        // $flashMessages = [];
 
-        // Log all flash messages
-        foreach ($request->getSession()->getFlashBag()->all() as $type => $messages) {
-            foreach ($messages as $message) {
-                $types[] = $type;
-                $flashMessages[] = $message;
-                $this->logger->info(sprintf('Flash message of type %s: %s', $type, $message));
-            }
-        }
-        $this->logger->info('Flash types', $types);
-        $this->logger->info('Flash messages', $flashMessages);
+        // // Log all flash messages
+        // foreach ($request->getSession()->getFlashBag()->all() as $type => $messages) {
+        //     foreach ($messages as $message) {
+        //         $types[] = $type;
+        //         $flashMessages[] = $message;
+        //         $this->logger->info(sprintf('Flash message of type %s: %s', $type, $message));
+        //     }
+        // }
+        // $this->logger->info('Flash types', $types);
+        // $this->logger->info('Flash messages', $flashMessages);
 
 
         return $this->render('services/operators/operators_admin.html.twig', [
@@ -467,6 +467,7 @@ class OperatorController extends FrontController
                         $existingTrainingRecord->setDate(new \DateTime());
                         $this->em->persist($existingTrainingRecord);
                         $operatorEntity->setLasttraining(new \DateTime());
+                        $operatorEntity->setTobedeleted(null);
                         $this->em->persist($operatorEntity);
                     }
                 } else {
@@ -479,6 +480,7 @@ class OperatorController extends FrontController
                     $trainingRecord->setTrainer($trainerEntity);
                     $this->em->persist($trainingRecord);
                     $operatorEntity->setLasttraining(new \DateTime());
+                    $operatorEntity->setTobedeleted(null);
                     $this->em->persist($operatorEntity);
                 }
 

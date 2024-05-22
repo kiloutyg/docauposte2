@@ -19,8 +19,8 @@ class FrontController extends BaseController
     public function base(): Response
     {
         $this->validationService->remindCheck($this->users);
-        $this->operatorService->operatorCheckForAutoDelete();
-
+        $countArray = $this->operatorService->operatorCheckForAutoDelete();
+        $this->addFlash('info', $countArray['unActiveOperators'] . ' opérateurs inactifs sont à supprimer' .  $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés.');
         return $this->render(
             'base.html.twig',
             []

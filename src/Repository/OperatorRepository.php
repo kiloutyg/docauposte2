@@ -204,19 +204,7 @@ class OperatorRepository extends ServiceEntityRepository
         return $operators;
     }
 
-    // public function findOperatorToBeDeleted()
-    // {
-    //     $sixMonthAgo = new \DateTime();
-    //     $sixMonthAgo->modify('-6 month');
 
-    //     $operators = $this->createQueryBuilder('o')
-    //         ->where('o.tobedeleted < :sixMonthAgo')
-    //         ->setParameter('sixMonthAgo', $sixMonthAgo)
-    //         ->getQuery()
-    //         ->getResult();
-
-    //     return $operators;
-    // }
     public function findOperatorToBeDeleted()
     {
         $this->logger->info('Finding operators to be deleted.');
@@ -225,7 +213,7 @@ class OperatorRepository extends ServiceEntityRepository
 
         $operatorIds = $this->createQueryBuilder('o')
             ->select('o.id')
-            ->where('o.lasttraining < :sixMonthsAgo OR o.lasttraining IS NULL')
+            ->where('o.tobedeleted < :sixMonthsAgo')
             ->setParameter('sixMonthsAgo', $sixMonthsAgo)
             ->getQuery()
             ->getScalarResult();
@@ -234,14 +222,6 @@ class OperatorRepository extends ServiceEntityRepository
         return array_column($operatorIds, 'id');
     }
 
-    // public function findByNameLikeForSuggestions(string $name): array
-    // {
-    //     $qb = $this->createQueryBuilder('o');
-    //     return $qb->where('o.name LIKE :name')
-    //         ->setParameter('name', '%' . strtolower($name) . '%')
-    //         ->getQuery()
-    //         ->getResult();
-    // }
 
 
     public function findByNameLikeForSuggestions(string $name): array

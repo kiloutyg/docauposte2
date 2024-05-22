@@ -3,11 +3,12 @@
 namespace App\Service;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Psr\Log\LoggerInterface;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Doctrine\ORM\EntityManagerInterface;
 
+use Psr\Log\LoggerInterface;
+
+use Doctrine\ORM\EntityManagerInterface;
 
 use App\Repository\OperatorRepository;
 
@@ -15,24 +16,26 @@ use App\Service\EntityDeletionService;
 
 class OperatorService extends AbstractController
 {
-    protected $logger;
-    protected $operatorRepository;
-    protected $projectDir;
-    protected $em;
-    private $entityDeletionService;
+    protected   $logger;
+    protected   $operatorRepository;
+    protected   $projectDir;
+    protected   $em;
+    private     $entityDeletionService;
+
 
     public function __construct(
-        LoggerInterface $logger,
-        OperatorRepository $operatorRepository,
-        ParameterBagInterface $params,
-        EntityManagerInterface $em,
-        EntityDeletionService $entityDeletionService
+        LoggerInterface         $logger,
+        OperatorRepository      $operatorRepository,
+        ParameterBagInterface   $params,
+        EntityManagerInterface  $em,
+        EntityDeletionService   $entityDeletionService
+
     ) {
-        $this->logger               = $logger;
-        $this->operatorRepository   = $operatorRepository;
-        $this->projectDir           = $params->get('kernel.project_dir');
-        $this->em                   = $em;
-        $this->entityDeletionService = $entityDeletionService;
+        $this->logger                   = $logger;
+        $this->operatorRepository       = $operatorRepository;
+        $this->projectDir               = $params->get('kernel.project_dir');
+        $this->em                       = $em;
+        $this->entityDeletionService    = $entityDeletionService;
     }
 
 
@@ -41,7 +44,7 @@ class OperatorService extends AbstractController
         $this->logger->info('Checking from operatorCheckForAutoDelete()');
 
         $today = new \DateTime();
-        $fileName = 'email_sent.txt';
+        $fileName = 'checked_for_unactive_operator.txt';
         $filePath = $this->projectDir . '/public/doc/' . $fileName;
 
 
@@ -77,6 +80,11 @@ class OperatorService extends AbstractController
             if ($return) {
                 file_put_contents($filePath, $today->format('Y-m-d'));
             }
+            $countArray = [
+                'unActiveOperators' => count($unActiveOperators),
+                'toBeDeletedOperators' => count($toBeDeletedOperatorsIds)
+            ];
+            return $countArray;
         }
     }
 }

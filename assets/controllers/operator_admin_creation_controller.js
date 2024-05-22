@@ -30,7 +30,7 @@ export default class OperatorAdminCreationController extends Controller {
             const regex = /^[A-Z][A-Z]+$/;
             const lastname = this.newOperatorLastnameTarget.value.toUpperCase();
             const isValid = regex.test(lastname.trim());
-            this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir un nom valide.");
+            this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir un nom valide(sans accent, ni caractères spéciaux).");
             if (isValid) {
                 // this.newOperatorLastnameTarget.disabled = true;
                 if (this.newOperatorFirstnameTarget.value.trim() === "") {
@@ -52,7 +52,7 @@ export default class OperatorAdminCreationController extends Controller {
             console.log('validating new operator firstname:', this.firstnameValue)
             const regex = /^[A-Z][a-z]+(-[A-Z][a-z]+)*$/;
             const isValid = regex.test(this.firstnameValue.trim());
-            this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir un prenom valide.");
+            this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir un prenom valide(sans accent, ni caractères spéciaux).");
             if (isValid) {
                 let combinedName = `${this.newOperatorFirstnameTarget.value.trim()}.${this.newOperatorLastnameTarget.value.trim()}`;
                 this.newOperatorNameTarget = combinedName.toLowerCase();
