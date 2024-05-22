@@ -6,6 +6,9 @@ use  \Psr\Log\LoggerInterface;
 
 use Doctrine\ORM\EntityManagerInterface;
 
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -66,6 +69,9 @@ use App\Service\OperatorService;
 
 class BaseController extends AbstractController
 {
+
+    private   $cache;
+
     protected $em;
     protected $request;
     protected $security;
@@ -130,6 +136,8 @@ class BaseController extends AbstractController
 
     public function __construct(
 
+        CacheInterface                  $cache,
+
         EntityManagerInterface          $em,
         RequestStack                    $requestStack,
         Security                        $security,
@@ -172,6 +180,7 @@ class BaseController extends AbstractController
         OperatorService                 $operatorService
 
     ) {
+        $this->cache                        = $cache;
 
         $this->em                           = $em;
         $this->requestStack                 = $requestStack;
@@ -218,21 +227,134 @@ class BaseController extends AbstractController
         $this->operatorService              = $operatorService;
 
         // Variables used in the twig templates to display all the entities
-        $this->zones                        = $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']);
-        $this->productLines                 = $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']);
-        $this->categories                   = $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']);
-        $this->buttons                      = $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']);
-        $this->users                        = $this->userRepository->findAll();
-        $this->uploads                      = $this->uploadRepository->findAll();
-        $this->incidents                    = $this->incidentRepository->findAll();
-        $this->incidentCategories           = $this->incidentCategoryRepository->findAll();
-        $this->departments                  = $this->departmentRepository->findAll();
-        $this->validations                  = $this->validationRepository->findAll();
-        $this->teams                        = $this->teamRepository->findAll();
-        $this->operators                    = $this->operatorRepository->findAllOrdered();
-        $this->uaps                         = $this->uapRepository->findAll();
+        // $this->zones                        = $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']);
+        // $this->productLines                 = $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']);
+        // $this->categories                   = $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']);
+        // $this->buttons                      = $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']);
+        // $this->users                        = $this->userRepository->findAll();
+        // $this->uploads                      = $this->uploadRepository->findAll();
+        // $this->incidents                    = $this->incidentRepository->findAll();
+        // $this->incidentCategories           = $this->incidentCategoryRepository->findAll();
+        // $this->departments                  = $this->departmentRepository->findAll();
+        // $this->validations                  = $this->validationRepository->findAll();
+        // $this->teams                        = $this->teamRepository->findAll();
+        // $this->operators                    = $this->operatorRepository->findAllOrdered();
+        // $this->uaps                         = $this->uapRepository->findAll();
+        $this->cachingAppVariable();
     }
 
+    // public function cachingAppVariable()
+    // {
+    //     $zones = $this->cache->get('zones_cache', function (ItemInterface $item) {
+    //         $item->expiresAfter(3600); // Cache for 1 hour
+    //         return $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']);
+    //     });
+    //     $this->zones = $zones;
+
+    //     $productLines = $this->cache->get('productLines_cache', function (ItemInterface $item) {
+    //         $item->expiresAfter(3600); // Cache for 1 hour
+    //         return $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']);
+    //     });
+    //     $this->productLines = $productLines;
+
+    //     $categories = $this->cache->get('categories_cache', function (ItemInterface $item) {
+    //         $item->expiresAfter(3600); // Cache for 1 hour
+    //         return $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']);
+    //     });
+    //     $this->categories = $categories;
+
+    //     $buttons = $this->cache->get('buttons_cache', function (ItemInterface $item) {
+    //         $item->expiresAfter(3600); // Cache for 1 hour
+    //         return $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']);
+    //     });
+    //     $this->buttons = $buttons;
+
+    //     $users = $this->cache->get('users_cache', function (ItemInterface $item) {
+    //         $item->expiresAfter(3600); // Cache for 1 hour
+    //         return $this->userRepository->findAll();
+    //     });
+    //     $this->users = $users;
+
+    //     $uploads = $this->cache->get('uploads_cache', function (ItemInterface $item) {
+    //         $item->expiresAfter(3600); // Cache for 1 hour
+    //         return $this->uploadRepository->findAll();
+    //     });
+    //     $this->uploads = $uploads;
+
+    //     $incidents = $this->cache->get('incidents_cache', function (ItemInterface $item) {
+    //         $item->expiresAfter(3600); // Cache for 1 hour
+    //         return $this->incidentRepository->findAll();
+    //     });
+    //     $this->incidents = $incidents;
+
+    //     $incidentCategories = $this->cache->get('incidentCategories_cache', function (ItemInterface $item) {
+    //         $item->expiresAfter(3600); // Cache for 1 hour
+    //         return $this->incidentCategoryRepository->findAll();
+    //     });
+    //     $this->incidentCategories = $incidentCategories;
+
+    //     $departments = $this->cache->get('departments_cache', function (ItemInterface $item) {
+    //         $item->expiresAfter(3600); // Cache for 1 hour
+    //         return $this->departmentRepository->findAll();
+    //     });
+    //     $this->departments = $departments;
+
+    //     $validations = $this->cache->get('validations_cache', function (ItemInterface $item) {
+    //         $item->expiresAfter(3600); // Cache for 1 hour
+    //         return $this->validationRepository->findAll();
+    //     });
+    //     $this->validations = $validations;
+
+    //     $teams = $this->cache->get('teams_cache', function (ItemInterface $item) {
+    //         $item->expiresAfter(3600); // Cache for 1 hour
+    //         return $this->teamRepository->findAll();
+    //     });
+    //     $this->teams = $teams;
+
+    //     $uaps = $this->cache->get('uaps_cache', function (ItemInterface $item) {
+    //         $item->expiresAfter(3600); // Cache for 1 hour
+    //         return $this->uapRepository->findAll();
+    //     });
+    //     $this->uaps = $uaps;
+
+    //     $operators = $this->cache->get('operators_cache', function (ItemInterface $item) {
+    //         $item->expiresAfter(3600); // Cache for 1 hour
+    //         return $this->operatorRepository->findAllOrdered();
+    //     });
+    //     $this->operators = $operators;
+
+
+    //     return $this;
+    // }
+    public function cachingAppVariable()
+    {
+        $variables = [
+            'zones' => fn () => $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']),
+            'productLines' => fn () => $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']),
+            'categories' => fn () => $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']),
+            'buttons' => fn () => $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']),
+            'users' => fn () => $this->userRepository->findAll(),
+            'uploads' => fn () => $this->uploadRepository->findAll(),
+            'incidents' => fn () => $this->incidentRepository->findAll(),
+            'incidentCategories' => fn () => $this->incidentCategoryRepository->findAll(),
+            'departments' => fn () => $this->departmentRepository->findAll(),
+            'validations' => fn () => $this->validationRepository->findAll(),
+            'teams' => fn () => $this->teamRepository->findAll(),
+            'uaps' => fn () => $this->uapRepository->findAll(),
+            'operators' => fn () => $this->operatorRepository->findAllOrdered()
+        ];
+
+        foreach ($variables as $key => $value) {
+            try {
+                $this->$key = $this->cache->get("{$key}_cache", function (ItemInterface $item) use ($value) {
+                    $item->expiresAfter(3600); // Cache for 1 hour
+                    return $value();
+                });
+            } catch (\Exception $e) {
+                $this->logger->error("Error caching {$key}: " . $e->getMessage());
+            }
+        }
+    }
     protected function render(string $view, array $parameters = [], Response $response = null): Response
     {
         $commonParameters = [
