@@ -44,7 +44,6 @@ security:
         - { path: ^/modify_account_view, roles: ROLE_SUPER_ADMIN }
         - { path: ^/department, roles: ROLE_SUPER_ADMIN }
 
-        - { path: ^/operator, roles: ROLE_SUPER_ADMIN }
         - { path: ^/mail, roles: ROLE_SUPER_ADMIN }
 
         - { path: ^/zone_admin, roles: ROLE_ADMIN }
@@ -63,6 +62,7 @@ security:
 
         - { path: ^/category_manager, roles: ROLE_MANAGER }
         - { path: ^/tutorial, roles: ROLE_MANAGER }
+        - { path: ^/operator, roles: ROLE_MANAGER }
 
 
 

@@ -53,7 +53,7 @@
 					<button
 						type="submit"
 						class="btn btn-primary text-uppercase ">
-						MAJ Opérateur
+						Modifier Opérateur
 					</button>
 					<a
 						href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase">
@@ -66,13 +66,13 @@
 			{% else %}
 				<div
 					class="card alert alert-danger">
-					No operators found
+					Aucun opérateur n'a été trouvé.
 				</div>
 			{% endfor %}
 		{% else %}
 			<div
 				class="card alert alert-danger">
-				No operators found
+				Aucun opérateur n'a été trouvé.
 			</div>
 		{% endif %}
 	</ul>

@@ -34,7 +34,9 @@ class OperatorRepository extends ServiceEntityRepository
 
     public function findAllOrdered()
     {
-        $operators = $this->findAll();
+        $this->logger->info('Finding all operators ordered.');
+
+        $operators = $this->findOperatorsSortedByLastNameFirstName();
 
         usort($operators, function ($a, $b) {
             // Compare by 'team'
@@ -45,8 +47,6 @@ class OperatorRepository extends ServiceEntityRepository
             if ($a->getUap()->getId() != $b->getUap()->getId()) {
                 return strcmp($a->getUap()->getName(), $b->getUap()->getName());
             }
-            // If 'uap' is also the same, finally compare by 'name'
-            return strcmp($a->getName(), $b->getName());
         });
 
         return $operators;
@@ -56,6 +56,9 @@ class OperatorRepository extends ServiceEntityRepository
 
     public function findOperatorsSortedByLastNameFirstName()
     {
+        $this->logger->info('Finding operators sorted last name, and first name.');
+
+
         // Fetch all operators with their team and UAP
         $operators = $this->createQueryBuilder('o')
             ->join('o.team', 't')
@@ -99,6 +102,9 @@ class OperatorRepository extends ServiceEntityRepository
 
     public function findBySearchQuery($name, $code, $team, $uap, $trainer)
     {
+
+        $this->logger->info('Finding operators by search query.');
+
         $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.team', 't')
             ->leftJoin('o.uap', 'u');
@@ -157,6 +163,9 @@ class OperatorRepository extends ServiceEntityRepository
 
     public function orderOperator($operators)
     {
+
+        $this->logger->info('Ordering operators by team, UAP, last name, and first name.');
+
         usort($operators, function ($a, $b) {
             // Split names to separate first name and last name
             list($firstNameA, $lastNameA) = explode('.', $a->getName());
@@ -185,6 +194,40 @@ class OperatorRepository extends ServiceEntityRepository
         });
 
         return $operators;
+    }
+
+
+
+    public function findByNameLikeForSuggestions(string $name): array
+    {
+        $this->logger->info('Finding operators by name for suggestions.');
+
+        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) {
+            throw new \InvalidArgumentException("Invalid name format.");
+        }
+
+        $name = strtolower($name); // Normalize input to lower case
+        $searchPattern = '%' . $name . '%'; // Create a search pattern for LIKE
+
+        // Adjusted query for newer DBAL versions
+        $sql = "SELECT * FROM operator WHERE SOUNDEX(name) = SOUNDEX(:name) OR name LIKE :pattern";
+
+        // Use executeQuery for select statements
+        try {
+            $conn = $this->em->getConnection();
+            $stmt = $conn->executeQuery($sql, [
+                'name' => $name,
+                'pattern' => $searchPattern
+            ]);
+
+            // Use fetchAllAssociative to fetch data
+            return $stmt->fetchAllAssociative();
+        } catch (\Doctrine\DBAL\Exception $exception) {
+
+            // Log the error and possibly rethrow or handle gracefully
+            $this->logger->error('Database query error: ' . $exception->getMessage());
+            throw new \RuntimeException("Database query failed", 0, $exception);
+        }
     }
 
 
@@ -221,40 +264,6 @@ class OperatorRepository extends ServiceEntityRepository
         // Extract IDs from the result
         return array_column($operatorIds, 'id');
     }
-
-
-
-    public function findByNameLikeForSuggestions(string $name): array
-    {
-
-        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) {
-            throw new \InvalidArgumentException("Invalid name format.");
-        }
-
-        $name = strtolower($name); // Normalize input to lower case
-        $searchPattern = '%' . $name . '%'; // Create a search pattern for LIKE
-
-        // Adjusted query for newer DBAL versions
-        $sql = "SELECT * FROM operator WHERE SOUNDEX(name) = SOUNDEX(:name) OR name LIKE :pattern";
-
-        // Use executeQuery for select statements
-        try {
-            $conn = $this->em->getConnection();
-            $stmt = $conn->executeQuery($sql, [
-                'name' => $name,
-                'pattern' => $searchPattern
-            ]);
-
-            // Use fetchAllAssociative to fetch data
-            return $stmt->fetchAllAssociative();
-        } catch (\Doctrine\DBAL\Exception $exception) {
-
-            // Log the error and possibly rethrow or handle gracefully
-            $this->logger->error('Database query error: ' . $exception->getMessage());
-            throw new \RuntimeException("Database query failed", 0, $exception);
-        }
-    }
-
     // public function findBySearchQuery($search)
     // {
     //     return $this->createQueryBuilder('o')

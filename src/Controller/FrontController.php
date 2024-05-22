@@ -19,6 +19,7 @@ class FrontController extends BaseController
     public function base(): Response
     {
         $this->validationService->remindCheck($this->users);
+
         $countArray = $this->operatorService->operatorCheckForAutoDelete();
         if ($countArray != null) {
             $this->addFlash('info', ($countArray['unActiveOperators'] === 1 ? $countArray['unActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['unActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .

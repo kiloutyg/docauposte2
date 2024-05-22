@@ -122,9 +122,42 @@
 				class=" mx-2 card">
 				Aucune liste correspondant aux critéres n'a été trouvé, sélectionnez d'autres critéres ou ajouté des opérateurs à la liste.
 			</p>
+			<p
+				style="flex:1;"
+				class="  mt-2 mx-2 card text-center">
+				Opérateurs formés.
+			</p>
 			{% for operator in operators %}
 				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-				{% include 'services/operators/training_component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
+				{% if trainingRecord == true %}
+					{% if trainingRecord.trained == true %}
+						{% include 'services/operators/training_component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+			<p
+				style="flex:1;"
+				class=" mt-2  mx-2 card text-center">
+				Opérateurs à requalifier
+			</p>
+			{% for operator in operators %}
+				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+				{% if trainingRecord == true %}
+					{% if trainingRecord.trained == false %}
+						{% include 'services/operators/training_component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+			<p
+				style="flex:1;"
+				class=" mt-2  mx-2 card text-center">
+				Opérateurs Non-formés.
+			</p>
+			{% for operator in operators %}
+				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+				{% if trainingRecord != true %}
+					{% include 'services/operators/training_component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
+				{% endif %}
 			{% endfor %}
 		{% endif %}
 	{% endif %}
