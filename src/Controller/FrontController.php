@@ -19,6 +19,7 @@ class FrontController extends BaseController
     public function base(): Response
     {
         $this->validationService->remindCheck($this->users);
+        $this->operatorService->operatorCheckForAutoDelete();
 
         return $this->render(
             'base.html.twig',

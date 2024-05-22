@@ -190,6 +190,7 @@ class OperatorRepository extends ServiceEntityRepository
 
     public function findOperatorWithNoRecentTraining()
     {
+        $this->logger->info('Finding operators with no recent training.');
         $oneYearAgo = new \DateTime();
         $oneYearAgo->modify('-1 year');
 
@@ -218,12 +219,13 @@ class OperatorRepository extends ServiceEntityRepository
     // }
     public function findOperatorToBeDeleted()
     {
+        $this->logger->info('Finding operators to be deleted.');
         $sixMonthsAgo = new \DateTime();
         $sixMonthsAgo->modify('-6 months');
 
         $operatorIds = $this->createQueryBuilder('o')
             ->select('o.id')
-            ->where('o.lastTrainingDate < :sixMonthsAgo OR o.lastTrainingDate IS NULL')
+            ->where('o.lasttraining < :sixMonthsAgo OR o.lasttraining IS NULL')
             ->setParameter('sixMonthsAgo', $sixMonthsAgo)
             ->getQuery()
             ->getScalarResult();

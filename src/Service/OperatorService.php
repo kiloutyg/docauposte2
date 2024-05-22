@@ -38,15 +38,21 @@ class OperatorService extends AbstractController
 
     public function operatorCheckForAutoDelete()
     {
+        $this->logger->info('Checking from operatorCheckForAutoDelete()');
+
         $today = new \DateTime();
         $fileName = 'email_sent.txt';
         $filePath = $this->projectDir . '/public/doc/' . $fileName;
 
 
-        if ($today->format('d') % 4 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
+        // if ($today->format('d') % 4 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
+        if (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false) {
+
             $return = false;
 
             $unActiveOperators = $this->operatorRepository->findOperatorWithNoRecentTraining();
+
+            $this->logger->info('Unactive operators: ' . json_encode($unActiveOperators));
             if (count($unActiveOperators) > 0) {
                 foreach ($unActiveOperators as $operator) {
                     $operator->setTobedeleted($today);
@@ -56,15 +62,10 @@ class OperatorService extends AbstractController
                 $return = true;
             }
 
-            // $toBeDeletedOperators = $this->operatorRepository->findOperatorToBeDeleted();
-            // if (count($toBeDeletedOperators) > 0) {
-            //     foreach ($toBeDeletedOperators as $operator) {
-            //         $this->entityDeletionService->deleteEntity('operator', $operator->getId());
-            //     };
-            //     $this->em->flush();
-            //     $return = true;
-            // }
+
             $toBeDeletedOperatorsIds = $this->operatorRepository->findOperatorToBeDeleted();
+            $this->logger->info('To be deleted operators: ' . json_encode($toBeDeletedOperatorsIds));
+
             if (count($toBeDeletedOperatorsIds) > 0) {
                 foreach ($toBeDeletedOperatorsIds as $operatorId) {
                     $this->entityDeletionService->deleteEntity('operator', $operatorId);

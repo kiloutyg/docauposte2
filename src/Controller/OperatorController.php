@@ -24,6 +24,7 @@ class OperatorController extends FrontController
     public function operatorBasePage(Request $request): Response
     {
         $this->logger->info('search query with full request', $request->request->all());
+        $this->operatorService->operatorCheckForAutoDelete();
 
         $newOperator = new Operator();
         $newOperatorForm = $this->createForm(OperatorType::class, $newOperator);
@@ -203,7 +204,6 @@ class OperatorController extends FrontController
         if ($request->getMethod() === 'GET') {
             return $this->render('services/operators/docAndOperator.html.twig', [
                 'upload' => $upload,
-
             ]);
         }
     }
