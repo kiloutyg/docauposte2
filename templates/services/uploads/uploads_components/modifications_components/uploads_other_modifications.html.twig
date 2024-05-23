@@ -1,0 +1,156 @@
+<div
+	class="accordion mx-auto col-8 mb-1 justify-content-center"
+	id="accordionOtherModifications">
+	<div
+		class="accordion-item">
+		<div
+			class="accordion-header"
+			id="otherModifications-header">
+			<label
+				class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed"
+				for="otherModifications"
+				data-bs-toggle="collapse"
+				data-bs-target="#otherModifications"
+				aria-expanded="false"
+				aria-controls="otherModifications"
+				id="otherModificationsSelect">
+				<strong>
+					Autres modifications
+				</strong>
+				&nbsp; (Ouvrez ce menu pour acceder aux autres modifications)
+			</label>
+		</div>
+		<div
+			id="otherModifications"
+			aria-labelledby="otherModifications"
+			data-bs-parent="#accordionOtherModifications"
+			class="accordion-collapse collapse ">
+			<div
+				class="col-10 mx-auto">
+				<div
+					class="mb-3">
+					{{ form_label(form.filename, 'Nouveau nom du fichier:', {'label_attr': {'class': 'form-label', 'style': 'color:black'}}
+					) }}
+					{{ form_widget(form.filename, {'attr': {'class': 'form-control', 'id': 'filename', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)', 'maxlength': '30'}}
+					) }}
+				</div>
+				<div
+					style='color:black'>
+					{# Display the current button hierarchy #}
+					{% if lastZone != upload.button.category.productLine.zone %}
+						{% set lastZone = upload.button.category.productLine.zone %}
+						Zone:
+						{{ lastZone.name|split('.')|first|upper }}
+						>
+					{% endif %}
+					{% if lastProductLine != upload.button.category.productLine %}
+						{% set lastProductLine = upload.button.category.productLine %}
+						Produit:
+						{{ lastProductLine.name|split('.')|first|upper }}
+						>
+					{% endif %}
+					{% if lastCategory != upload.button.category %}
+						{% set lastCategory = upload.button.category %}
+						Categorie:
+						{{ lastCategory.name|split('.')|first|upper }}
+						>
+					{% endif %}
+					{% if lastButton != upload.button %}
+						{% set lastButton = upload.button %}
+						Bouton:
+						{{ lastButton.name|split('.')|first|upper }}
+						:
+					{% endif %}
+				</div>
+				<div
+					class="row">
+					<div
+						class="col-md-2 col-sm-2 mt-2 mb-2">
+						<label
+							for="zone"
+							style="color:black">
+							Zone:
+						</label>
+					</div>
+					<div
+						class="col-md-10 col-sm-10 mt-2 mb-2">
+						<select
+							name="zone"
+							id="zone"
+							class="form-select"
+							required>
+							<option
+								value=""
+								selected
+								disabled
+								hidden>
+								Choisir une Zone
+							</option>
+						</select>
+					</div>
+					<div
+						class="col-md-2 col-sm-2 mt-2 mb-2">
+						<label
+							for="productline"
+							style="color:black">
+							Ligne:
+						</label>
+					</div>
+					<div
+						class="col-md-10 col-sm-10 mt-2 mb-2">
+						<select
+							name="productline"
+							id="productline"
+							class="form-select"
+							required>
+							<option
+								value=""
+								selected
+								disabled
+								hidden>
+								Choisir une Ligne
+							</option>
+						</select>
+					</div>
+					<div
+						class="col-md-2 col-sm-2 mt-2 mb-2">
+						<label
+							for="category"
+							style="color:black">
+							Categorie:
+						</label>
+					</div>
+					<div
+						class="col-md-10 col-sm-10 mt-2 mb-2">
+						<select
+							name="category"
+							id="category"
+							class="form-select"
+							required>
+							<option
+								value=""
+								selected
+								disabled
+								hidden>
+								Choisir une Catégorie
+							</option>
+						</select>
+					</div>
+					<div
+						class="col-md-2 col-sm-2 mt-2 mb-2">
+						<label
+							for="button"
+							style="color:black">
+							Bouton:
+						</label>
+					</div>
+					<div
+						class="col-md-10 col-sm-10 mt-2 mb-4">
+						{{ form_widget(form.button,{'attr': {'class': 'form-select', 'name': 'button', 'id': 'upload_button', 'required': true}}
+						) }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
