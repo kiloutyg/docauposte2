@@ -24,7 +24,13 @@ class OperatorController extends FrontController
     public function operatorBasePage(Request $request): Response
     {
         $this->logger->info('search query with full request', $request->request->all());
-
+        $countArray = $this->operatorService->operatorCheckForAutoDelete();
+        if ($countArray != null) {
+            if ($countArray != null) {
+                $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
+                    ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
+            }
+        }
         $newOperator = new Operator();
         $newOperatorForm = $this->createForm(OperatorType::class, $newOperator);
         $newOperatorForm->handleRequest($request);
@@ -72,20 +78,19 @@ class OperatorController extends FrontController
                 'operator_id' => $operator->getId(),
             ])->createView();
         }
-        $types = [];
-        $flashMessages = [];
 
-        // Log all flash messages
-        foreach ($request->getSession()->getFlashBag()->all() as $type => $messages) {
-            foreach ($messages as $message) {
-                $types[] = $type;
-                $flashMessages[] = $message;
-                $this->logger->info(sprintf('Flash message of type %s: %s', $type, $message));
+        $this->logger->info('in operatorBasePage is operatorForms empty: ' . count($operatorForms));
+
+        if (count($operatorForms) === 0) {
+            $inActiveOperators = $this->operatorRepository->findInActiveOperators();
+            $this->logger->info('in operatorBasePage is inActiveOperators : ' . count($inActiveOperators));
+
+            foreach ($inActiveOperators as $operator) {
+                $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
+                    'operator_id' => $operator->getId(),
+                ])->createView();
             }
         }
-        $this->logger->info('Flash types', $types);
-        $this->logger->info('Flash messages', $flashMessages);
-
 
         return $this->render('services/operators/operators_admin.html.twig', [
             'newOperatorForm' => $newOperatorForm->createView(),
@@ -146,6 +151,10 @@ class OperatorController extends FrontController
                     $this->em->remove($trainer);
                 }
             }
+            if ($operator->getTobedeleted() != null) {
+                $operator->setTobedeleted(null);
+                $operator->setLasttraining(new \DateTime());
+            }
             try {
                 $this->em->persist($operator);
                 $this->em->flush();
@@ -193,16 +202,42 @@ class OperatorController extends FrontController
 
 
     //first test of actual page rendering with a validated document and a dynamic form and list of operators and stuff
-    #[Route('/operator/visual/{validationId}', name: 'app_test_document')]
-    public function documentAndOperator(Request $request, int $validationId): Response
+    #[Route('/operator/frontByVal/{validationId}', name: 'app_training_front_by_validation')]
+    public function documentAndOperatorByValidation(Request $request, int $validationId): Response
     {
         $validation = $this->validationRepository->find($validationId);
         $upload = $validation->getUpload();
+        $countArray = $this->operatorService->operatorCheckForAutoDelete();
+        if ($countArray != null) {
+            if ($countArray != null) {
+                $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
+                    ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
+            }
+        }
 
         if ($request->getMethod() === 'GET') {
             return $this->render('services/operators/docAndOperator.html.twig', [
                 'upload' => $upload,
+            ]);
+        }
+    }
 
+    //first test of actual page rendering with a validated document and a dynamic form and list of operators and stuff
+    #[Route('/operator/frontByUpl/{uploadId}', name: 'app_training_front_by_upload')]
+    public function documentAndOperatorByUpload(Request $request, int $uploadId): Response
+    {
+        $upload = $this->uploadRepository->getUpload($uploadId);
+        $countArray = $this->operatorService->operatorCheckForAutoDelete();
+        if ($countArray != null) {
+            if ($countArray != null) {
+                $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
+                    ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
+            }
+        }
+
+        if ($request->getMethod() === 'GET') {
+            return $this->render('services/operators/docAndOperator.html.twig', [
+                'upload' => $upload,
             ]);
         }
     }
@@ -423,11 +458,12 @@ class OperatorController extends FrontController
         $trainerEntityWithUpload = $this->trainerRepository->findOneBy(['operator' => $trainerId, 'upload' => $upload]);
         if ($trainerEntityWithUpload == null) {
             $this->logger->info('operator ID', [$trainerId]);
-            $trainerOperatorId = $this->operatorRepository->find($trainerId);
-            $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $trainerOperatorId]);
+            $trainerOperator = $this->operatorRepository->find($trainerId);
+            $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $trainerOperator]);
             $this->logger->info('trainerEntity', [$trainerEntity]);
         } else {
             $this->logger->info('trainerEntityWithUpload', [$trainerEntityWithUpload]);
+            $trainerOperator = $this->operatorRepository->find($trainerId);
         };
 
         foreach ($operators as $operator) {
@@ -464,6 +500,9 @@ class OperatorController extends FrontController
                         $existingTrainingRecord->setTrainer($trainerEntity);
                         $existingTrainingRecord->setDate(new \DateTime());
                         $this->em->persist($existingTrainingRecord);
+                        $operatorEntity->setLasttraining(new \DateTime());
+                        $operatorEntity->setTobedeleted(null);
+                        $this->em->persist($operatorEntity);
                     }
                 } else {
                     // If the collection was empty, create a new TrainingRecord
@@ -474,12 +513,19 @@ class OperatorController extends FrontController
                     $trainingRecord->setTrained($trained);
                     $trainingRecord->setTrainer($trainerEntity);
                     $this->em->persist($trainingRecord);
+                    $operatorEntity->setLasttraining(new \DateTime());
+                    $operatorEntity->setTobedeleted(null);
+                    $this->em->persist($operatorEntity);
                 }
 
                 // Flush changes for each operator
                 $this->em->flush();
             }
         }
+
+        $trainerOperator->setLasttraining(new \DateTime());
+        $this->em->persist($trainerOperator);
+        $this->em->flush();
 
         return $this->redirectToRoute('app_render_training_records', [
             'uploadId' => $uploadId,

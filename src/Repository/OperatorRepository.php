@@ -34,7 +34,9 @@ class OperatorRepository extends ServiceEntityRepository
 
     public function findAllOrdered()
     {
-        $operators = $this->findAll();
+        $this->logger->info('Finding all operators ordered.');
+
+        $operators = $this->findOperatorsSortedByLastNameFirstName();
 
         usort($operators, function ($a, $b) {
             // Compare by 'team'
@@ -45,8 +47,6 @@ class OperatorRepository extends ServiceEntityRepository
             if ($a->getUap()->getId() != $b->getUap()->getId()) {
                 return strcmp($a->getUap()->getName(), $b->getUap()->getName());
             }
-            // If 'uap' is also the same, finally compare by 'name'
-            return strcmp($a->getName(), $b->getName());
         });
 
         return $operators;
@@ -56,6 +56,9 @@ class OperatorRepository extends ServiceEntityRepository
 
     public function findOperatorsSortedByLastNameFirstName()
     {
+        $this->logger->info('Finding operators sorted last name, and first name.');
+
+
         // Fetch all operators with their team and UAP
         $operators = $this->createQueryBuilder('o')
             ->join('o.team', 't')
@@ -99,6 +102,9 @@ class OperatorRepository extends ServiceEntityRepository
 
     public function findBySearchQuery($name, $code, $team, $uap, $trainer)
     {
+
+        $this->logger->info('Finding operators by search query.');
+
         $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.team', 't')
             ->leftJoin('o.uap', 'u');
@@ -157,6 +163,9 @@ class OperatorRepository extends ServiceEntityRepository
 
     public function orderOperator($operators)
     {
+
+        $this->logger->info('Ordering operators by team, UAP, last name, and first name.');
+
         usort($operators, function ($a, $b) {
             // Split names to separate first name and last name
             list($firstNameA, $lastNameA) = explode('.', $a->getName());
@@ -187,18 +196,11 @@ class OperatorRepository extends ServiceEntityRepository
         return $operators;
     }
 
-    // public function findByNameLikeForSuggestions(string $name): array
-    // {
-    //     $qb = $this->createQueryBuilder('o');
-    //     return $qb->where('o.name LIKE :name')
-    //         ->setParameter('name', '%' . strtolower($name) . '%')
-    //         ->getQuery()
-    //         ->getResult();
-    // }
 
 
     public function findByNameLikeForSuggestions(string $name): array
     {
+        $this->logger->info('Finding operators by name for suggestions.');
 
         if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) {
             throw new \InvalidArgumentException("Invalid name format.");
@@ -228,6 +230,57 @@ class OperatorRepository extends ServiceEntityRepository
         }
     }
 
+
+    public function findOperatorWithNoRecentTraining()
+    {
+        $this->logger->info('Finding operators with no recent training.');
+        $oneYearAgo = new \DateTime();
+        $oneYearAgo->modify('-1 year');
+
+        $operators = $this->createQueryBuilder('o')
+            ->where('o.lasttraining < :oneYearAgo')
+            ->setParameter('oneYearAgo', $oneYearAgo)
+            ->andWhere('o.tobedeleted IS NULL')
+            ->getQuery()
+            ->getResult();
+
+        $this->logger->info('Unactive operators: ' . json_encode($operators));
+        return $operators;
+    }
+    public function findInActiveOperators()
+    {
+        $this->logger->info('Finding operators with no recent training.');
+        $oneYearAgo = new \DateTime();
+        $oneYearAgo->modify('-1 year');
+
+        $operators = $this->createQueryBuilder('o')
+            ->where('o.lasttraining < :oneYearAgo')
+            ->setParameter('oneYearAgo', $oneYearAgo)
+            ->andWhere('o.tobedeleted IS NOT NULL')
+            ->getQuery()
+            ->getResult();
+
+        $this->logger->info('inactive operators: ' . json_encode($operators));
+        return $operators;
+    }
+
+    public function findOperatorToBeDeleted()
+    {
+        $this->logger->info('Finding operators to be deleted.');
+        $sixMonthsAgo = new \DateTime();
+        $sixMonthsAgo->modify('-6 months');
+
+        $operatorIds = $this->createQueryBuilder('o')
+            ->select('o.id')
+            ->where('o.tobedeleted < :sixMonthsAgo')
+            ->setParameter('sixMonthsAgo', $sixMonthsAgo)
+            ->getQuery()
+            ->getScalarResult();
+
+        $this->logger->info('To be deleted operators: ' . json_encode($operatorIds));
+        // Extract IDs from the result
+        return array_column($operatorIds, 'id');
+    }
     // public function findBySearchQuery($search)
     // {
     //     return $this->createQueryBuilder('o')

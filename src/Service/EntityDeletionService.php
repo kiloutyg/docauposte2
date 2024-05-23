@@ -200,6 +200,9 @@ class EntityDeletionService
             foreach ($entity->getTrainingRecords() as $trainingRecord) {
                 $this->deleteEntity('trainingRecord', $trainingRecord->getId());
             }
+        } elseif ($entityType === 'trainingRecord') {
+            $trainer = $entity->getTrainer();
+            $trainer->removeTrainingRecord($entity);
         }
 
         $this->em->remove($entity);
