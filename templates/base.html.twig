@@ -1,13 +1,19 @@
 <html>
 	<head>
-		<meta charset="UTF-8"/>
+		<meta
+			charset="UTF-8"/>
 		<title>
 			{% block title %}
 				DocAuPoste
 			{% endblock %}
 		</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="icon" type="image/ico" href="{{ asset('OPmobility_icon.svg') }}"/>
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1">
+		<link
+			rel="icon"
+			type="image/ico"
+			href="{{ asset('OPmobility_icon.svg') }}"/>
 
 		{% block stylesheets %}
 			{{
@@ -70,21 +76,34 @@ let buttonIdFromServer = null;
 	<body
 		class="d-flex flex-column  min-vh-100 ">
 		<!-- Main Navigation -->
-		<nav class="navbar navbar-expand-lg navbar-dark flex-shrink-0" style="background-color: #1f3e52">
-			<div class="container d-flex flex-column flex-lg-row align-items-end">
-				<a class="navbar-brand mb-lg-0" href="{{ path('app_base') }}">
-					<img class="img-fluid" src="{{ asset('OPmobility_white.svg') }}" alt="Logo de OPmobility" role="img" width="250"/>
+		<nav
+			class="navbar navbar-expand-lg navbar-dark flex-shrink-0"
+			style="background-color: #1f3e52">
+			<div
+				class="container d-flex flex-column flex-lg-row align-items-end">
+				<a
+					class="navbar-brand mb-lg-0"
+					href="{{ path('app_base') }}">
+					<img
+						class="img-fluid"
+						src="{{ asset('OPmobility_white.svg') }}" alt="Logo de OPmobility"
+						role="img"
+						width="250"/>
 				</a>
-				<a class="navbar-brand mb-lg-0" href="{{ path('app_base') }} ">
-					<h2>
+				<a
+					class="navbar-brand mb-lg-0"
+					href="{{ path('app_base') }} ">
+					<h1>
 						<strong>
 							DocAuPoste
 						</strong>
-					</h2>
+					</h1>
 				</a>
 				{% if app.user is not null %}
-					<div class="ms-auto d-flex align-items-end ">
-						<div class="dropdown">
+					<div
+						class="ms-auto d-flex align-items-end ">
+						<div
+							class="dropdown">
 
 							{% set inValidations = [] %}
 							{% set DisapprovedFile = [] %}
@@ -99,17 +118,26 @@ let buttonIdFromServer = null;
 								{% endif %}
 							{% endfor %}
 							{% if inValidations|length > 0 %}
-								<button class="btn dropdown-toggle" style="background-color:#007AFF; color:white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-									<span class="badge bg-danger rounded-pill">
+								<button
+									class="btn dropdown-toggle"
+									style="background-color:#007AFF; color:white"
+									type="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false">
+									<span
+										class="badge bg-danger rounded-pill">
 										{{ inValidations|length }}
 									</span>
 									Documents en cours de validation
 								</button>
-								<ul class="dropdown-menu dropdown-menu-start shadow shadow-inset" aria-labelledby="dropdownMenuButton1">
+								<ul
+									class="dropdown-menu dropdown-menu-start shadow shadow-inset"
+									aria-labelledby="dropdownMenuButton1">
 									{% for upload in inValidations %}
 										{% if upload.isValidated is same as(null) %}
 											<li>
-												<a href="{{ path('app_modify_file', {'uploadId': upload.id})}}" class="dropdown-item shadow ">
+												<a
+													href="{{ path('app_modify_file', {'uploadId': upload.id})}}" class="dropdown-item shadow ">
 													{{ upload.filename|upper }}
 												</a>
 											</li>
@@ -118,18 +146,27 @@ let buttonIdFromServer = null;
 								</ul>
 							{% endif %}
 							{% if DisapprovedFile|length > 0 %}
-								<button class="btn dropdown-toggle" style="background-color:#007AFF; color:white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-									<span class="badge bg-danger rounded-pill">
+								<button
+									class="btn dropdown-toggle"
+									style="background-color:#007AFF; color:white"
+									type="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false">
+									<span
+										class="badge bg-danger rounded-pill">
 										{{ DisapprovedFile|length }}
 									</span>
 									Documents refusés
 								</button>
-								<ul class="dropdown-menu dropdown-menu-start shadow shadow-inset" aria-labelledby="dropdownMenuButton1">
+								<ul
+									class="dropdown-menu dropdown-menu-start shadow shadow-inset"
+									aria-labelledby="dropdownMenuButton1">
 									{% for upload in DisapprovedFile %}
 										{% for approbation in upload.validation.approbations %}
 											{% if approbation.isApproval is same as(false) %}
 												<li>
-													<a href="{{ path('app_validation_disapproved_modify', {'approbationId': approbation.id})}}" class="dropdown-item shadow ">
+													<a
+														href="{{ path('app_validation_disapproved_modify', {'approbationId': approbation.id})}}" class="dropdown-item shadow ">
 														{{ upload.filename|upper }}
 													</a>
 												</li>
@@ -141,26 +178,36 @@ let buttonIdFromServer = null;
 						</div>
 					</div>
 				{% endif %}
-				<div class="ms-auto d-flex align-items-center">
+				<div
+					class="ms-auto d-flex align-items-center">
 					{% if app.user is null %}
 						<p>
-							<a class="btn btn-primary" href="{{ path('app_login') }}">
+							<a
+								class="btn btn-primary"
+								href="{{ path('app_login') }}">
 								Connexion
 							</a>
 						</p>
 					{% else %}
-						<p class="d-flex align-items-center">
-							<strong class="me-2">
+						<p
+							class="d-flex align-items-center">
+							<strong
+								class="me-2">
 								{{ app.user.username|capitalize|split('.')|first }}
 								{{ app.user.username|upper|split('.')|last }}
 							</strong>
-							<a class="btn btn-primary" href="{{ path('app_logout') }}">
+							<a
+								class="btn btn-primary"
+								href="{{ path('app_logout') }}">
 								Déconnexion
 							</a>
 						</p>
-						<div style="width: 10px"></div>
+						<div
+							style="width: 10px"></div>
 						<p>
-							<a class="btn btn-outline-info" href="{{path('app_tutorial')}}">
+							<a
+								class="btn btn-outline-info"
+								href="{{path('app_tutorial')}}">
 								TUTO
 							</a>
 						</p>
@@ -169,18 +216,24 @@ let buttonIdFromServer = null;
 			</div>
 		</nav>
 		<!-- End Main Navigation -->
-		<div class="container ">
+		<div
+			class="container ">
 			{% if users is defined %}
 				{% if users is empty %}
-					<h5 class="my-5">
+					<h5
+						class="my-5">
 						<strong>
 							Pour commencer à utiliser l'application, veuillez créer le superadministrateur :
 						</strong>
 					</h5>
-					<div class="card border-0 shadow rounded-3 my-5">
-						<div class="card-body">
-							<div class="row">
-								<form action="{{ path('app_create_super_admin') }}" method="post">
+					<div
+						class="card border-0 shadow rounded-3 my-5">
+						<div
+							class="card-body">
+							<div
+								class="row">
+								<form
+									action="{{ path('app_create_super_admin') }}" method="post">
 									{% include "services/accountservices/create_account.html.twig" %}
 								</form>
 							</div>
@@ -189,17 +242,24 @@ let buttonIdFromServer = null;
 				{% endif %}
 			{% endif %}
 		</div>
-		<div class="container flex-grow-1 d-flex flex-column">
+		<div
+			class="container flex-grow-1 d-flex flex-column">
 			{% include "services/navbarservices/navbarservices.html.twig" %}
 			{% block body %}
-				<div class="inner-container flex-grow-1 d-flex flex-column">
+				<div
+					class="inner-container flex-grow-1 d-flex flex-column">
 					{% if app.user %}
 						{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
-							<aside class="position-absolute end-0">
-								<a href="{{ path('app_super_admin') }}" class="btn shadow bg-dark" style="color:white;">
-									<span class="fa fa-gear"></span>
+							<aside
+								class="position-absolute end-0">
+								<a
+									href="{{ path('app_super_admin') }}" class="btn shadow bg-dark"
+									style="color:white;">
+									<span
+										class="fa fa-gear"></span>
 									<strong>
-										<span class="button-text">
+										<span
+											class="button-text">
 											Centre de Super-Administration
 										</span>
 									</strong>
@@ -208,23 +268,35 @@ let buttonIdFromServer = null;
 
 						{% endif %}
 					{% endif %}
+
+
 					<p>
-						<h1 class="text-justify mb-2 mt-4 flex-shrink-0">
+						<h1
+							class="text-justify mb-2 mt-4 flex-shrink-0">
 							<strong>
 								Doc Au Poste
 							</strong>
 						</h1>
 					</p>
-					<h3 class="text-justify flex-shrink-0">
+					<h3
+						class="text-justify flex-shrink-0">
 						<strong>
 							Le site qui vous permet de trouver les documents dont vous avez besoin.
 						</strong>
 					</h3>
-					<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
-						<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
+					<div
+						class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+						<div
+							class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 							{% for zone in zones %}
-								<a class="btn btn-primary btn-lg m-5 " role="button" aria-pressed="true" style="color:white" href="{{path('app_zone', {zoneId: zone.id})}}">
-									<span class="line-details text-justify">
+								<a
+									class="btn btn-primary btn-lg m-5 "
+									role="button"
+									aria-pressed="true"
+									style="color:white"
+									href="{{path('app_zone', {zoneId: zone.id})}}">
+									<span
+										class="line-details text-justify">
 										{{ zone.name|split('.')|first|upper }}
 									</span>
 								</a>
@@ -235,27 +307,47 @@ let buttonIdFromServer = null;
 			{% endblock body %}
 		</div>
 		<!-- Footer -->
-		<footer class="container py-3 border-top  flex-shrink-0">
-			<div class="d-flex flex-wrap justify-content-between">
-				<div class="col-md-5 d-flex align-items-center">
-					<span class="me-1" style="color: red">
-						<i class="fas fa-copyright"></i>
+		<footer
+			class="container py-3 border-top  flex-shrink-0">
+			<div
+				class="d-flex flex-wrap justify-content-between">
+				<div
+					class="col-md-5 d-flex align-items-center">
+					<span
+						class="me-1"
+						style="color: red">
+						<i
+							class="fas fa-copyright"></i>
 					</span>
-					<a target="_blank" href="http://topnet.corp.ponet/" style="color: #25a1dd" class="mb-3  mb-md-0 text-decoration-none lh-1">
+					<a
+						target="_blank"
+						href="http://topnet.corp.ponet/"
+						style="color: #25a1dd"
+						class="mb-3  mb-md-0 text-decoration-none lh-1">
 						OPmobility Langres
 					</a>
 				</div>
 				<div>
-					<a href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
-						<i class="fa fa-arrow-circle-o-left" 'aria-hidden="false"'>
+					<a
+						href="javascript:void(0)"
+						onclick="event.preventDefault(); window.history.back();">
+						<i
+							class="fa fa-arrow-circle-o-left"
+							'aria-hidden="false"'>
 							Retour
 						</i>
 					</a>
 				</div>
-				<ul class="nav col-md-5 justify-content-end list-unstyled d-flex">
-					<li class="ms-3">
-						<a class="text-muted" target="_blank" href="https://github.com/kiloutyg/">
-							<i class="fab fa-github"></i>
+				<ul
+					class="nav col-md-5 justify-content-end list-unstyled d-flex">
+					<li
+						class="ms-3">
+						<a
+							class="text-muted"
+							target="_blank"
+							href="https://github.com/kiloutyg/">
+							<i
+								class="fab fa-github"></i>
 						</a>
 					</li>
 				</ul>

@@ -6,8 +6,14 @@ composer install --no-dev --optimize-autoloader;
 yarn install --production;
 composer clear-cache;
 
+
+
+mkdir -p /var/cache/prod/pools/app;
+# chown -R www-data:www-data /var/cache;
 # Set the permissions and clear the cache
 chmod 777 . -R ;
+chmod -R 775 /var/www/var/cache/prod/pools;
+chown -R www-data:www-data /var/www/var/cache/prod/pools;
 php bin/console cache:clear --no-warmup --env=prod;
 
 # Warm up the cache
