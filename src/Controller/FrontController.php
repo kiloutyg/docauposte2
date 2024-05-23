@@ -22,7 +22,7 @@ class FrontController extends BaseController
 
         $countArray = $this->operatorService->operatorCheckForAutoDelete();
         if ($countArray != null) {
-            $this->addFlash('info', ($countArray['unActiveOperators'] === 1 ? $countArray['unActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['unActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
+            $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
                 ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
         }
         return $this->render(

@@ -53,11 +53,11 @@ class OperatorService extends AbstractController
 
             $return = false;
 
-            $unActiveOperators = $this->operatorRepository->findOperatorWithNoRecentTraining();
+            $inActiveOperators = $this->operatorRepository->findOperatorWithNoRecentTraining();
 
-            $this->logger->info('Unactive operators: ' . json_encode($unActiveOperators));
-            if (count($unActiveOperators) > 0) {
-                foreach ($unActiveOperators as $operator) {
+            $this->logger->info('Inactive operators: ' . json_encode($inActiveOperators));
+            if (count($inActiveOperators) > 0) {
+                foreach ($inActiveOperators as $operator) {
                     $operator->setTobedeleted($today);
                     $this->em->persist($operator);
                 };
@@ -80,8 +80,10 @@ class OperatorService extends AbstractController
             if ($return) {
                 file_put_contents($filePath, $today->format('Y-m-d'));
             }
+
+
             $countArray = [
-                'unActiveOperators' => count($unActiveOperators),
+                'inActiveOperators' => count($this->operatorRepository->findInActiveOperators()),
                 'toBeDeletedOperators' => count($toBeDeletedOperatorsIds)
             ];
             return $countArray;

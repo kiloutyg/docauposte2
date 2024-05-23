@@ -198,11 +198,31 @@ class OperatorController extends FrontController
 
 
     //first test of actual page rendering with a validated document and a dynamic form and list of operators and stuff
-    #[Route('/operator/visual/{validationId}', name: 'app_test_document')]
-    public function documentAndOperator(Request $request, int $validationId): Response
+    #[Route('/operator/frontByVal/{validationId}', name: 'app_training_front_by_validation')]
+    public function documentAndOperatorByValidation(Request $request, int $validationId): Response
     {
         $validation = $this->validationRepository->find($validationId);
         $upload = $validation->getUpload();
+        $countArray = $this->operatorService->operatorCheckForAutoDelete();
+        if ($countArray != null) {
+            if ($countArray != null) {
+                $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
+                    ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
+            }
+        }
+
+        if ($request->getMethod() === 'GET') {
+            return $this->render('services/operators/docAndOperator.html.twig', [
+                'upload' => $upload,
+            ]);
+        }
+    }
+
+    //first test of actual page rendering with a validated document and a dynamic form and list of operators and stuff
+    #[Route('/operator/frontByUpl/{uploadId}', name: 'app_training_front_by_upload')]
+    public function documentAndOperatorByUpload(Request $request, int $uploadId): Response
+    {
+        $upload = $this->uploadRepository->getUpload($uploadId);
         $countArray = $this->operatorService->operatorCheckForAutoDelete();
         if ($countArray != null) {
             if ($countArray != null) {

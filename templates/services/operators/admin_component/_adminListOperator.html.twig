@@ -52,8 +52,8 @@
 					class="col my-auto mx-auto">
 					<button
 						type="submit"
-						class="btn btn-primary text-uppercase ">
-						Modifier Opérateur
+						class="btn btn-danger text-uppercase ">
+						Modifier l'Opé
 					</button>
 					<a
 						href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase">
@@ -64,18 +64,15 @@
 
 				{{ form_end(operatorForm) }}
 			{% else %}
-				<div
-					class="card alert alert-danger">
-					Aucun opérateur n'a été trouvé.
-				</div>
-			{% endfor %}
-		{% else %}
 			<div
 				class="card alert alert-danger">
 				Aucun opérateur n'a été trouvé.
 			</div>
-		{% endif %}
-	</ul>
-
-
-</turbo-frame>
+		{% endfor %}
+	{% else %}
+		<div
+			class="card alert alert-danger">
+			Aucun opérateur n'a été trouvé.
+		</div>
+	{% endif %}
+</ul></turbo-frame>
