@@ -151,6 +151,10 @@ class OperatorController extends FrontController
                     $this->em->remove($trainer);
                 }
             }
+            if ($operator->getTobedeleted() != null) {
+                $operator->setTobedeleted(null);
+                $operator->setLasttraining(new \DateTime());
+            }
             try {
                 $this->em->persist($operator);
                 $this->em->flush();

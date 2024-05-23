@@ -35,35 +35,53 @@
 	data-controller="operator-admin-edit">
 		{% if operatorForms|length > 0 %}
 			{% for operatorId, operatorForm in operatorForms %}
-				{{ form_start(operatorForm, {'attr': {'class': 'row', 'id': 'operatorForm' ~ operatorId}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
+				{% if operatorForm.vars.data.tobedeleted is not empty %}
+
+					{{ form_start(operatorForm, {'attr': {'class': 'row bg-dark', 'id': 'operatorForm' ~ operatorId}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
+				{% else %}
+					{{ form_start(operatorForm, {'attr': {'class': 'row', 'id': 'operatorForm' ~ operatorId}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
+
+				{% endif %}
 				{% for field in fields %}
      				{% set customId = 'operatorForm' ~ field|capitalize ~ operatorId %}
 					{{ form_row(operatorForm[field], 
 					{						
 					'id': customId,
 					'attr': {
-						'data-operator-admin-edit-target': field == 'isTrainer' ? 'operatorFormIsTrainer' : 'operatorForm' ~ field|capitalize
-				}
-			}) }}
-
-			
+						'data-operator-admin-edit-target': field == 'isTrainer' ? 'operatorFormIsTrainer' : 'operatorForm' ~ field|capitalize}}) }}
 				{% endfor %}
-				<div
-					class="col my-auto mx-auto">
-					<button
-						type="submit"
-						class="btn btn-danger text-uppercase ">
-						Modifier l'Opé
-					</button>
-					<a
-						href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase">
-						Supprimer
-					</a>
-				</div>
+				{% if operatorForm.vars.data.tobedeleted is not empty %}
+
+					<div
+						class="col my-auto mx-auto">
+						<button
+							type="submit"
+							class="btn btn-primary text-uppercase ">
+							Réactualiser
+						</button>
+						<a
+							href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase">
+							Supprimer
+						</a>
+					</div>
+				{% else %}
+			<div
+				class="col my-auto mx-auto">
+				<button
+					type="submit"
+					class="btn btn-primary text-uppercase ">
+					Modifier l'Opé
+				</button>
+				<a
+					href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase">
+					Supprimer
+				</a>
+			</div>
+		{% endif %}
 
 
-				{{ form_end(operatorForm) }}
-			{% else %}
+			{{ form_end(operatorForm) }}
+		{% else %}
 			<div
 				class="card alert alert-danger">
 				Aucun opérateur n'a été trouvé.
