@@ -123,6 +123,7 @@ class MailerController extends FrontController
         // Persist and flush after all updates
         if (!empty($usersUpdated)) {
             foreach ($usersUpdated as $updatedUser) {
+                $this->logger->info('updatedUser: ' . [$updatedUser]);
                 $this->em->persist($updatedUser);
             }
             $this->em->flush();
