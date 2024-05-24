@@ -347,7 +347,7 @@ class BaseController extends AbstractController
         foreach ($variables as $key => $value) {
             try {
                 $this->$key = $this->cache->get("{$key}_cache", function (ItemInterface $item) use ($value) {
-                    $item->expiresAfter(3600); // Cache for 1 hour
+                    $item->expiresAfter(300); // Cache for 5 min
                     return $value();
                 });
             } catch (\Exception $e) {
