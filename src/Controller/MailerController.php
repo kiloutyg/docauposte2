@@ -101,7 +101,7 @@ class MailerController extends FrontController
             // Check if the new email already exists in the database
             $existingUser = $this->userRepository->findOneBy(['emailAddress' => $newEmail]);
             if ($existingUser && $existingUser->getId() !== $user->getId()) {
-                $this->logger->warning("Email $newEmail already exists for another user.");
+                $this->logger->warning("Email $newEmail already exists for another user. Skipping update for user $username.");
                 continue; // Skip this user to avoid duplication
             }
 
@@ -123,7 +123,7 @@ class MailerController extends FrontController
         // Persist and flush after all updates
         if (!empty($usersUpdated)) {
             foreach ($usersUpdated as $updatedUser) {
-                $this->logger->info('updatedUser: ' . [$updatedUser]);
+                $this->logger->info('updatedUser: ', [$updatedUser]);
                 $this->em->persist($updatedUser);
             }
             $this->em->flush();
