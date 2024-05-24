@@ -243,89 +243,6 @@ class BaseController extends AbstractController
         $this->cachingAppVariable();
     }
 
-    // public function cachingAppVariable()
-    // {
-    //     $zones = $this->cache->get('zones_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']);
-    //     });
-    //     $this->zones = $zones;
-
-    //     $productLines = $this->cache->get('productLines_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']);
-    //     });
-    //     $this->productLines = $productLines;
-
-    //     $categories = $this->cache->get('categories_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']);
-    //     });
-    //     $this->categories = $categories;
-
-    //     $buttons = $this->cache->get('buttons_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']);
-    //     });
-    //     $this->buttons = $buttons;
-
-    //     $users = $this->cache->get('users_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->userRepository->findAll();
-    //     });
-    //     $this->users = $users;
-
-    //     $uploads = $this->cache->get('uploads_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->uploadRepository->findAll();
-    //     });
-    //     $this->uploads = $uploads;
-
-    //     $incidents = $this->cache->get('incidents_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->incidentRepository->findAll();
-    //     });
-    //     $this->incidents = $incidents;
-
-    //     $incidentCategories = $this->cache->get('incidentCategories_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->incidentCategoryRepository->findAll();
-    //     });
-    //     $this->incidentCategories = $incidentCategories;
-
-    //     $departments = $this->cache->get('departments_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->departmentRepository->findAll();
-    //     });
-    //     $this->departments = $departments;
-
-    //     $validations = $this->cache->get('validations_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->validationRepository->findAll();
-    //     });
-    //     $this->validations = $validations;
-
-    //     $teams = $this->cache->get('teams_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->teamRepository->findAll();
-    //     });
-    //     $this->teams = $teams;
-
-    //     $uaps = $this->cache->get('uaps_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->uapRepository->findAll();
-    //     });
-    //     $this->uaps = $uaps;
-
-    //     $operators = $this->cache->get('operators_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->operatorRepository->findAllOrdered();
-    //     });
-    //     $this->operators = $operators;
-
-
-    //     return $this;
-    // }
     public function cachingAppVariable()
     {
         $variables = [
@@ -355,6 +272,18 @@ class BaseController extends AbstractController
             }
         }
     }
+
+
+    public function clearAndRebuildCaches()
+    {
+        // Clear the cache
+        foreach (['zones', 'productLines', 'categories', 'buttons', 'uploads', 'incidents', 'incidentCategories', 'departments', 'validations', 'teams', 'operators', 'uaps'] as $key) {
+            $this->cache->delete("{$key}_cache");
+        }
+        $this->cachingAppVariable();
+    }
+
+
     protected function render(string $view, array $parameters = [], Response $response = null): Response
     {
         $commonParameters = [

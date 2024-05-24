@@ -30,7 +30,10 @@ class FrontController extends BaseController
 
         return $this->render(
             'base.html.twig',
-            []
+            [
+                'cachedUsers' => $this->users,
+                'nonCachedUsers' => $this->userRepository->findAll()
+            ]
         );
     }
 
