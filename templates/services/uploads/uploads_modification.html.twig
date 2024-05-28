@@ -37,7 +37,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 				<div
 					class="fallback">
 
-					{% include "services/uploads/uploads_components/uploads_modifications_components/uploads_downloads_display.html.twig" %}
+					{% include "services/uploads/uploads_components/modifications_components/uploads_downloads_display.html.twig" %}
 					<div
 						class="mb-3 mt-3">
 						{{ form_label(form.file, 'Choisissez un nouveau ficher:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}
@@ -46,8 +46,8 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						) }}
 					</li>
 				</div>
-				{% include "services/uploads/uploads_components/uploads_modifications_components/uploads_other_modifications.html.twig" %}
-				{% include "services/uploads/uploads_components/uploads_modifications_components/uploads_modification_validation.html.twig" %}
+				{% include "services/uploads/uploads_components/modifications_components/uploads_other_modifications.html.twig" %}
+				{% include "services/uploads/uploads_components/modifications_components/uploads_modification_validation.html.twig" %}
 				<div
 					class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
 					<button

@@ -32,7 +32,7 @@ class MailerController extends FrontController
         $usersUpdated = [];
         $htmlContent = "<h1>Email Address Updates</h1>"; // Start your HTML content
 
-        foreach ($this->users as $user) {
+        foreach ($this->userRepository->findAll() as $user) {
             $username = $user->getUsername();
             $this->logger->info('username: ' . $username);
             $newEmail = "{$username}@opmobility.com";

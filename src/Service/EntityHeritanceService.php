@@ -8,6 +8,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Doctrine\ORM\EntityManagerInterface;
 
+use Psr\Log\LoggerInterface;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 use App\Repository\ZoneRepository;
 use App\Repository\ProductLineRepository;
 use App\Repository\CategoryRepository;
@@ -19,12 +24,16 @@ use App\Repository\OldUploadRepository;
 
 use App\Service\UploadService;
 use App\Service\IncidentService;
+use App\Service\CacheService;
 
 
 // This class is responsible for the logic of getting the related entities of a given entity
 class EntityHeritanceService extends AbstractController
 {
     private $em;
+
+    private $logger;
+
     private $zoneRepository;
     private $productLineRepository;
     private $categoryRepository;
@@ -37,8 +46,15 @@ class EntityHeritanceService extends AbstractController
     private $uploadService;
     private $incidentService;
 
+
+
+    private $cacheService;
+
     public function __construct(
         EntityManagerInterface $em,
+
+        LoggerInterface $logger,
+
         ZoneRepository $zoneRepository,
         ProductLineRepository $productLineRepository,
         CategoryRepository $categoryRepository,
@@ -49,9 +65,13 @@ class EntityHeritanceService extends AbstractController
         OldUploadRepository $oldUploadRepository,
 
         UploadService $uploadService,
-        IncidentService $incidentService
+        IncidentService $incidentService,
+        CacheService $cacheService
     ) {
         $this->em = $em;
+
+        $this->logger = $logger;
+
         $this->zoneRepository = $zoneRepository;
         $this->productLineRepository = $productLineRepository;
         $this->categoryRepository = $categoryRepository;
@@ -63,53 +83,39 @@ class EntityHeritanceService extends AbstractController
 
         $this->uploadService = $uploadService;
         $this->incidentService = $incidentService;
+        $this->cacheService = $cacheService;
     }
 
     // This function returns an array of all the related uploads entities of a given entity
-    public function uploadsByParentEntity($entityType, $id)
+    public function uploadsByParentEntity($parentEntityType, $parentId)
     {
         $uploads = [];
-
-        // Get the repository of the entity type
-        $repository = null;
-        switch ($entityType) {
-            case 'zone':
-                $repository = $this->zoneRepository;
-                break;
-            case 'productline':
-                $repository = $this->productLineRepository;
-                break;
-            case 'category':
-                $repository = $this->categoryRepository;
-                break;
-            case 'button':
-                $repository = $this->buttonRepository;
-                break;
-        }
-        // If the entity type is not valid, return an empty array
-        if (!$repository) {
-            return [];
-        }
-        // Get the entity from the database and return an empty array if it doesn't exist
-        $entity = $repository->find($id);
+        $entity = $this->cacheService->getEntityById($parentEntityType, $parentId);
         if (!$entity) {
             return [];
         }
+
+
         // Depending on the entity type, get the related entities
-        if ($entityType === 'zone') {
-            foreach ($entity->getProductLines() as $productLine) {
-                $uploads = array_merge($uploads, $this->uploadsByParentEntity('productline', $productLine->getId()));
+        if ($parentEntityType === 'zone') {
+            $productLines = $this->cacheService->getEntitiesByParentId('productLine', $parentId);
+            foreach ($productLines as $productLine) {
+                $uploads = array_merge($uploads, $this->uploadsByParentEntity('productLine', $productLine->getId()));
             }
-        } elseif ($entityType === 'productline') {
-            foreach ($entity->getCategories() as $category) {
+        } elseif ($parentEntityType === 'productLine') {
+            $categories = $this->cacheService->getEntitiesByParentId('category', $parentId);
+            foreach ($categories as $category) {
                 $uploads = array_merge($uploads, $this->uploadsByParentEntity('category', $category->getId()));
             }
-        } elseif ($entityType === 'category') {
-            foreach ($entity->getButtons() as $button) {
+        } elseif ($parentEntityType === 'category') {
+            $buttons = $this->cacheService->getEntitiesByParentId('button', $parentId);
+            foreach ($buttons as $button) {
                 $uploads = array_merge($uploads, $this->uploadsByParentEntity('button', $button->getId()));
             }
-        } elseif ($entityType === 'button') {
-            foreach ($entity->getUploads() as $upload) {
+        } elseif ($parentEntityType === 'button') {
+            $uploadsArray = $this->cacheService->getEntitiesByParentId('upload', $parentId);
+            $uploadsArray = $uploadsArray->toArray();
+            foreach ($uploadsArray as $upload) {
                 $uploads[] = $upload;
             }
         }
@@ -117,60 +123,76 @@ class EntityHeritanceService extends AbstractController
         return $uploads;
     }
 
+
+
     // This function returns an array of all the related incidents entities of a given entity
-    public function incidentsByParentEntity($entityType, $id)
+    public function incidentsByParentEntity($parentEntityType, $parentId)
     {
         $incidents = [];
 
-        // Get the repository of the entity type
-        $repository = null;
-        switch ($entityType) {
-            case 'zone':
-                $repository = $this->zoneRepository;
-                break;
-            case 'productline':
-                $repository = $this->productLineRepository;
-                break;
-            case 'category':
-                $repository = $this->categoryRepository;
-                break;
-            case 'button':
-                $repository = $this->buttonRepository;
-                break;
-            case 'upload':
-                $repository = $this->uploadRepository;
-                break;
-            case 'incident':
-                $repository = $this->incidentRepository;
-                break;
-            case 'incidentCategory':
-                $repository = $this->incidentCategoryRepository;
-                break;
-        }
-        // If the entity type is not valid, return an empty array
-        if (!$repository) {
-            return [];
-        }
-        // Get the entity from the database and return an empty array if it doesn't exist
-        $entity = $repository->find($id);
+        $entity = $this->cacheService->getEntityById($parentEntityType, $parentId);
         if (!$entity) {
             return [];
         }
         // Depending on the entity type, get the related entities
-        if ($entityType === 'zone') {
-            foreach ($entity->getProductLines() as $productLine) {
-                $incidents = array_merge($incidents, $this->incidentsByParentEntity('productline', $productLine->getId()));
+        if ($parentEntityType === 'zone') {
+            $productLines = $this->cacheService->getEntitiesByParentId('productLine', $parentId);
+            foreach ($productLines as $productLine) {
+                $incidents = array_merge($incidents, $this->incidentsByParentEntity('productLine', $productLine->getId()));
             }
-        } elseif ($entityType === 'productline') {
-            foreach ($entity->getIncidents() as $incident) {
+        } elseif ($parentEntityType === 'productLine') {
+            $incidentsArray = $this->cacheService->getEntitiesByParentId('incident', $parentId);
+            $incidentsArray = $incidentsArray->toArray();
+            foreach ($incidentsArray as $incident) {
                 $incidents[] = $incident;
             }
-        } elseif ($entityType === 'category') {
+        } elseif ($parentEntityType === 'category') {
             if ($productLineId = $entity->getProductLine()->getId()) {
-                $incidents = array_merge($incidents, $this->incidentsByParentEntity('productline', $productLineId));
+                $incidents = array_merge($incidents, $this->incidentsByParentEntity('productLine', $productLineId));
             }
         }
 
         return $incidents;
+    }
+
+
+
+    // This function returns an array of all the related uploads entities of a given entity
+    public function validatedUploadsByParentEntity($parentEntityType, $parentId)
+    {
+        $uploads = [];
+        $entity = $this->cacheService->getEntityById($parentEntityType, $parentId);
+        if (!$entity) {
+            return [];
+        }
+
+
+        // Depending on the entity type, get the related entities
+        if ($parentEntityType === 'zone') {
+            $productLines = $this->cacheService->getEntitiesByParentId('productLine', $parentId);
+            foreach ($productLines as $productLine) {
+                $uploads = array_merge($uploads, $this->validatedUploadsByParentEntity('productLine', $productLine->getId()));
+            }
+        } elseif ($parentEntityType === 'productLine') {
+            $categories = $this->cacheService->getEntitiesByParentId('category', $parentId);
+            foreach ($categories as $category) {
+                $uploads = array_merge($uploads, $this->validatedUploadsByParentEntity('category', $category->getId()));
+            }
+        } elseif ($parentEntityType === 'category') {
+            $buttons = $this->cacheService->getEntitiesByParentId('button', $parentId);
+            foreach ($buttons as $button) {
+                $uploads = array_merge($uploads, $this->validatedUploadsByParentEntity('button', $button->getId()));
+            }
+        } elseif ($parentEntityType === 'button') {
+            $uploadsArray = $this->cacheService->getEntitiesByParentId('upload', $parentId);
+            $uploadsArray = $uploadsArray->toArray();
+            foreach ($uploadsArray as $upload) {
+                if ($upload->getValidation() != null) {
+                    $uploads[] = $upload;
+                }
+            }
+        }
+
+        return $uploads;
     }
 }

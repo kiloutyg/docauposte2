@@ -5,22 +5,31 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-	<div class="inner-container flex-grow-1 d-flex flex-column">
+	<div
+		class="inner-container flex-grow-1 d-flex flex-column">
 
 		{% if app.user %}
-			{% if  is_granted('ROLE_ADMIN') %}
-				<aside class="position-absolute end-0">
-					<a href="{{ path('app_zone_admin', {zoneId: zone.id}) }}" class="btn shadow  bg-dark " style="color:white">
-						<span class="fa fa-gear"></span>
+			{% if is_granted('ROLE_ADMIN') %}
+				<aside
+					class="position-absolute end-0">
+					<a
+						href="{{ path('app_zone_admin', {zoneId: zone.id}) }}" class="btn shadow  bg-dark "
+						style="color:white">
+						<span
+							class="fa fa-gear"></span>
 						<strong>
-							<span class="button-text">Centre d'Administration de Zone</span>
+							<span
+								class="button-text">
+								Centre d'Administration de Zone
+							</span>
 						</strong>
 					</a>
 				</aside>
 			{% endif %}
 		{% endif %}
 		<p>
-			<h2 class="text-justify mb-2 mt-4">
+			<h2
+				class="text-justify mb-2 mt-4">
 				<strong>
 					{{ zone.name|split('.')|first|upper }}
 				</strong>
@@ -28,8 +37,11 @@
 		</p>
 
 		<div>
-			<h3 class=" text-justify">Les lignes de la zone
-				{{zone.name|split('.')|first|upper}}:
+			<h3
+				class=" text-justify">
+				Les lignes de la zone
+				{{zone.name|split('.')|first|upper}}
+				:
 			</h3>
 			{% set matchingProductLines = [] %}
 			{% for productLine in productLines %}
@@ -39,13 +51,21 @@
 			{% endfor %}
 		</div>
 
-		<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+		<div
+			class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
 			{% if matchingProductLines|length > 0 %}
-				<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
+				<div
+					class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 
 					{% for productLine in matchingProductLines %}
-						<a class="btn btn-primary btn-lg m-5" role="button" aria-pressed="true" style="color:white" href="{{path('app_productline', {productlineId: productLine.id, zoneId: productLine.zone.id,} )}}">
-							<span class="line-details text-justify">
+						<a
+							class="btn btn-primary btn-lg m-5"
+							role="button"
+							aria-pressed="true"
+							style="color:white"
+							href="{{path('app_productline', {productlineId: productLine.id, zoneId: productLine.zone.id,} )}}">
+							<span
+								class="line-details text-justify">
 								{{ productLine.name|split('.')|first|upper }}
 							</span>
 						</a>
@@ -53,8 +73,11 @@
 				</div>
 
 			{% else %}
-				<div class="alert alert-danger">
-					<a href="#" onclick="event.preventDefault(); window.history.back();">
+				<div
+					class="alert alert-danger">
+					<a
+						href="#"
+						onclick="event.preventDefault(); window.history.back();">
 						Il n'y a pas de lignes dans cette zone.
 					</a>
 				</div>
