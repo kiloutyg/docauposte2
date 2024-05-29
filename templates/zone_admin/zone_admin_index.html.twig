@@ -10,9 +10,35 @@
 		class="my-4">
 		<strong>
 			Page d'administration des Lignes de la Zone
-			{{zone.name|split('.')|first|upper}}
+			<div
+				class="zoneAdminDropdown">
+				<button
+					class="btn dropdown-toggle"
+					data-bs-toggle="zoneAdminDropdown"
+					aria-expanded="false"
+					type="button"
+					id="zoneDropdown">
+					{{zone.name|split('.')|first|upper}}
+				</button>
+				<ul
+					class="dropdown-menu shadow shadow-inset"
+					aria-labelledby="zoneDropdown">
+					{% for zoneExt in zones %}
+						{% if zoneExt != zone %}
+							<li>
+								<a
+									href="{{ path('app_zone_admin', {zoneId: zoneExt.id}) }}" class="dropdown-item shadow ">
+									{{zone.name|split('.')|first|upper}}
+								</a>
+							</li>
+						{% endif %}
+					{% endfor %}
+				</ul>
+			</div>
+
 		</strong>
 	</h1>
+
 	<div
 		class="accordion"
 		id="accordionAdmin">
