@@ -30,7 +30,11 @@ class FrontController extends BaseController
 
         return $this->render(
             'base.html.twig',
-            []
+            [
+                "zonesBase" => $this->zones,
+                "zonesServices" => $this->cacheService->zones,
+                "zoneRepo" => $this->zoneRepository->findAll(),
+            ]
         );
     }
 
@@ -67,7 +71,12 @@ class FrontController extends BaseController
     #[Route('/zone/{zoneId}', name: 'zone')]
     public function zone(int $zoneId = null): Response
     {
-        $zone = $this->zoneRepository->find($zoneId);
+
+        // $zone = $this->cacheService->zones->filter(function ($zone) use ($zoneId) {
+        //     return $zone->getId() === $zoneId;
+        // })->first();
+
+        $zone = $this->cacheService->getEntityById('zone', $zoneId);
 
         return $this->render(
             'zone.html.twig',
@@ -83,8 +92,11 @@ class FrontController extends BaseController
     public function productline(int $zoneId = null, int $productlineId = null): Response
     {
 
-        $productLine = $this->productLineRepository->find($productlineId);
-        $zone        = $productLine->getZone();
+        // $productLine = $this->productLineRepository->find($productlineId);
+        // $zone        = $productLine->getZone();
+        $productLine = $this->cacheService->getEntityById('productLine', $productlineId);
+
+        $zone = $this->cacheService->getEntityById('zone', $zoneId);
 
         $incidents = [];
         $incidents = $this->incidentRepository->findBy(

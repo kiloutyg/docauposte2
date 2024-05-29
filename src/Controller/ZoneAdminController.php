@@ -17,7 +17,9 @@ class ZoneAdminController extends FrontController
     #[Route('/zone_admin/{zoneId}', name: 'app_zone_admin')]
     public function index(int $zoneId = null): Response
     {
-        $zone = $this->zoneRepository->find($zoneId);
+        $zone = $this->cacheService->getEntityById('zone', $zoneId);
+        $productLines = $this->cacheService->getEntitiesByParentId('productLine', $zoneId);
+
         $uploads = $this->entityHeritanceService->uploadsByParentEntity('zone', $zoneId);
         $incidents = $this->entityHeritanceService->incidentsByParentEntity('zone', $zoneId);
 
@@ -26,20 +28,23 @@ class ZoneAdminController extends FrontController
         $groupedValidatedUploads = $this->uploadService->groupValidatedUploads($uploads);
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
 
+
         return $this->render('zone_admin/zone_admin_index.html.twig', [
             'groupedUploads'            => $groupedUploads,
             'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'            => $groupIncidents,
-            'zone'                      => $zone
+            'zone'                      => $zone,
+            'zoneProductLines'          => $productLines,
+
         ]);
     }
+
 
 
     // Creation of new user account destined to the zone admin but only accessible by the super admin
     #[Route('/zone_admin/create_line_admin/{zoneId}', name: 'app_zone_admin_create_line_admin')]
     public function createLineAdmin(int $zoneId = null, Request $request): Response
     {
-        $zone = $this->zoneRepository->find($zoneId);
 
         $error = null;
         $result = $this->accountService->createAccount(
@@ -66,7 +71,7 @@ class ZoneAdminController extends FrontController
     public function createProductLine(Request $request, int $zoneId = null)
     {
         // 
-        $zone = $this->zoneRepository->find($zoneId);
+        $zone = $this->cacheService->getEntityById('zone', $zoneId);
 
         if (!preg_match("/^[^.]+$/", $request->request->get('productlinename'))) {
             // Handle the case when productlinne name contains disallowed characters

@@ -1,33 +1,25 @@
 #!/bin/sh
 
-# Entrypoint scritp destined to the production environment
-# Install the app dependencies 
-composer install --no-dev --optimize-autoloader;
-yarn install --production;
-composer clear-cache;
+# Entrypoint script destined to the production environment
+
+# Install the app dependencies
+composer install --no-dev --optimize-autoloader
+yarn install --production
+composer clear-cache
+
+# Clear and warm up the cache
+php bin/console cache:clear --no-warmup --env=prod
+php bin/console cache:warmup --env=prod
 
 
+# Set the permissions 
+chmod -R 777 /var/www/var/cache/prod/pools
+chown -R www-data:www-data /var/www/var/cache/prod
 
-mkdir -p /var/cache/prod/pools/app;
-# chown -R www-data:www-data /var/cache;
-# Set the permissions and clear the cache
-chmod 777 . -R ;
-chmod -R 775 /var/www/var/cache/prod/pools;
-chown -R www-data:www-data /var/www/var/cache/prod/pools;
-php bin/console cache:clear --no-warmup --env=prod;
-
-# Warm up the cache
-php bin/console cache:warmup --env=prod;
-
-# # Create the migrations directory
-# mkdir -p migrations;
-
-# # Create the database and run the migrations
-# php bin/console make:migration;
-# php bin/console doctrine:migrations:migrate;
+chmod -R 777 .
 
 # Build the assets
-yarn run encore production --progress;
+yarn run encore production --progress
 
 # Start the server
-exec apache2-foreground;
+exec apache2-foreground

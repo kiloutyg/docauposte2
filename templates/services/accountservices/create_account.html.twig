@@ -1,74 +1,62 @@
 {% block body %}
-	<div class="accordion mx-auto justify-content-center" id="accordionAccountView">
-		<div class="col-12 border-0 shadow rounded-3 my-5 bg-secondary">
-			<div class="card-body ">
-				<div class="align-items-center gy-lg-0 gy-5">
+	<div
+		class="accordion mx-auto justify-content-center"
+		id="accordionAccountView">
+		<div
+			class="col-12 border-0 shadow rounded-3 my-5 bg-secondary">
+			<div
+				class="card-body ">
+				<div
+					class="align-items-center gy-lg-0 gy-5">
 
-					<div class="col-8 mx-auto">
+					<div
+						class="col-8 mx-auto">
 						<br>
-						<h3 class="card-title text-center mb-5" style="color:white">
-							<strong>Création de compte</strong>
-						</h3>
-						{% if error is defined %}
-							{% if error %}
-								<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-							{% endif %}
-						{% endif %}
-
-						<div class="form-control mb-3">
-							<label for="username">Nom d'utilisateur</label>
-							<div data-controller="username-validation">
-								<input type="text" class="form-control" data-username-validation-target="username" data-action="keyup->username-validation#validateUsername" placeholder="prénom.nom" id="username" name="username" required>
-
-								<div data-username-validation-target="message" class="username-message"></div>
-							</div>
-						</div>
-						<div class="form-control mb-3">
-							<label for="floatingPassword">Mot de passe</label>
-							<input type="password" id="floatingPassword" placeholder="Mot de passe" name="password" required class="form-control">
-
-						</div>
-						<div class="form-control mb-3">
-							<label for="emailAddress">Adresse Mail</label>
-							<input type="email" id="emailAddress" placeholder="Adresse Mail" name="emailAddress" required class="form-control">
-						</div>
-						<div class="form-control mb-3">
-							{% include 'services/accountservices/role_affectation.html.twig' %}
-						</div>
-						<div class="form-control mb-3">
-							<div>
-								<label for="department" style="color:black">Service :</label>
-							</div>
-							<div>
-								<select name="department" id="department" class="form-select">
-									<option value="" selected disabled hidden>Choisir un Service</option>
-								</select>
-							</div>
-						</div>
-						<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-						<div class="d-grid col-6 mx-auto">
-							<button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Création du compte</button>
-						</div>
-						<hr class="my-4">
+						{% include "services/accountservices/account_tool_components/account_crea_mod.html.twig" %}
+						<hr
+							class="my-4">
 						{% if is_granted('ROLE_SUPER_ADMIN') %}
 
-							<div class="row mb-3">
-								<label for="department_Name" class="form-label" style="color:white">Nouveau Service :</label>
-								<div class="col-sm">
-									<input type="text" class="form-control" id="department_name" name="department_name" placeholder="Nom du nouveau Service">
+							<div
+								class="row mb-3">
+								<label
+									for="department_Name"
+									class="form-label"
+									style="color:white">
+									Nouveau Service :
+								</label>
+								<div
+									class="col-sm">
+									<input
+										type="text"
+										class="form-control"
+										id="department_name"
+										name="department_name"
+										placeholder="Nom du nouveau Service">
 								</div>
 
-								<div class="col-sm-auto">
-									<input type="button" id="create_department" class="btn btn-secondary shadow border border-dark-subtle" value="Ajouter un nouveau service">
+								<div
+									class="col-sm-auto">
+									<input
+										type="button"
+										id="create_department"
+										class="btn btn-secondary shadow border border-dark-subtle"
+										value="Ajouter un nouveau service">
 								</div>
 							</div>
 
 							{% for department in departments %}
 
-								<div class="col-10 mx-auto mb-3">
-									<li class="form-control shadow d-flex justify-content-between align-items-center">
+								<div
+									class="col-10 mx-auto mb-3">
+									<li
+										class="form-control shadow d-flex justify-content-between align-items-center">
 										{{department.name|upper}}
-										<a href="{{ path('app_department_deletion', {departmentId : department.id}) }}" type="button" class="btn btn-danger shadow border border-dark-subtle delete-department">supprimer</a>
+										<a
+											href="{{ path('app_department_deletion', {departmentId : department.id}) }}" type="button"
+											class="btn btn-danger shadow border border-dark-subtle delete-department">
+											supprimer
+										</a>
 									</li>
 								</div>
 
@@ -76,64 +64,107 @@
 
 						{% endif %}
 
-						<hr class="my-4">
+						<hr
+							class="my-4">
 					</div>
 
 				</div>
 
-				<div class=" d-flex align-items-center gy-lg-0 gy-5">
+				<div
+					class=" d-flex align-items-center gy-lg-0 gy-5">
 
-					<div class="col-12 mx-auto">
-						<div class="form-control">
-							<div class="table-responsive">
-								<table class="table table-striped text-center">
+					<div
+						class="col-12 mx-auto">
+						<div
+							class="form-control">
+							<div
+								class="table-responsive">
+								<table
+									class="table table-striped text-center">
 									<thead>
 										<tr>
-											<th scope="col">Nom d'utilisateur</th>
-											<th scope="col">Role</th>
-											<th scope="col">service</th>
-											<th scope="col">Email</th>
-											<th scope="col">Supprimer</th>
-											<th scope="col">Modifier</th>
+											<th
+												scope="col">
+												Nom d'utilisateur
+											</th>
+											<th
+												scope="col">
+												Role
+											</th>
+											<th
+												scope="col">
+												service
+											</th>
+											<th
+												scope="col">
+												Email
+											</th>
+											<th
+												scope="col">
+												Supprimer
+											</th>
+											<th
+												scope="col">
+												Modifier
+											</th>
 										</tr>
 									</thead>
 									<tbody>
 										{% for user in users %}
 											{% if app.user.id != user.id and compare_roles(app.user.roles, user.roles) %}
 												<tr>
-													<td>{{user.username|capitalize|split('.')|first }}
-														{{user.username|upper|split('.')|last }}</td>
-													<td>{{ user.roles|json_encode|convert_encoding('UTF-8', 'UTF-8') }}</td>
 													<td>
-														{% if user.department.name is defined%}
-															{{ user.department.name }}{% else %}inconnu
+														{{user.username|capitalize|split('.')|first }}
+														{{user.username|upper|split('.')|last }}
+													</td>
+													<td>
+														{{ user.roles|json_encode|convert_encoding('UTF-8', 'UTF-8') }}
+													</td>
+													<td>
+														{% set matchingDepartments ="" %}
+
+														{% if user.department is not null %}
+															{% for department in departments %}
+																{% if user.department.id is same as(department.id) %}
+																	{{department.name|upper}}
+																{% endif %}
+															{% endfor %}
+
+														{% else %}
+															inconnu
 														{% endif %}
 													</td>
 													<td>
 														{% if user.emailAddress %}
-															{{ user.emailAddress }}{% else %}inconnu
+															{{ user.emailAddress }}
+														{% else %}
+															inconnu
 														{% endif %}
 													</td>
 													<td>
 														{% if user.blocked ? true %}
 															{% if user.uploads is not empty or user.incidents is not empty %}
-																<a href="{{path('app_modify_account', {userId: user.id})}}" class="btn btn-danger">
+																<a
+																	href="{{path('app_modify_account', {userId: user.id})}}" class="btn btn-danger">
 																	Transfer of works
 																</a>
 															{% else %}
-																<a href="{{path('app_delete_account', {userId: user.id})}}" class="btn btn-danger definitively-delete-user">
+																<a
+																	href="{{path('app_delete_account', {userId: user.id})}}" class="btn btn-danger definitively-delete-user">
 																	Supprimer definitivement
 																</a>
 															{% endif %}
 
 														{% else %}
-															<a href="{{path('app_delete_account_basic', {userId: user.id})}}" class="btn btn-danger delete-user">
+															<a
+																href="{{path('app_delete_account_basic', {userId: user.id})}}" class="btn btn-danger delete-user">
 																Bloquer
 															</a>
 														{% endif %}
 													</td>
 													<td>
-														<a href="{{path('app_modify_account', {userId: user.id})}}" class="btn btn-danger">
+														<a
+															href="{{path('app_modify_account', {userId: user.id})}}" class="btn btn-danger">
 															modifier
 														</a>
 													</td>

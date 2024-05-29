@@ -27,12 +27,13 @@ class IncidentController extends FrontController
     {
         $incidentEntity = null;
         if ($incidentId != null) {
-            $incidentEntity = $this->incidentRepository->find($incidentId);
+            // $incidentEntity = $this->incidentRepository->find($incidentId);
+            $incidentEntity = $this->cacheService->getEntityById('incident', $incidentId);
         }
 
-        // If the incident does not exist, we get the productline entity from the productline name
+        // If the incident does not exist, we get the productline entity from the productline id
         if (!$incidentEntity) {
-            $productLine = $this->productLineRepository->find($productlineId);
+            $productLine = $this->cacheService->getEntityById('productLine', $productlineId);
         } else {
             $productLine = $incidentEntity->getProductLine();
         }

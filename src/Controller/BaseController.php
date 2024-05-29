@@ -25,7 +25,6 @@ use App\Repository\ProductLineRepository;
 use App\Repository\UserRepository;
 use App\Repository\UploadRepository;
 use App\Repository\CategoryRepository;
-
 use App\Repository\ButtonRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
@@ -62,6 +61,7 @@ use App\Service\OldUploadService;
 use App\Service\ViewsModificationService;
 use App\Service\TrainingRecordService;
 use App\Service\OperatorService;
+use App\Service\CacheService;
 
 #[Route('/', name: 'app_')]
 
@@ -116,6 +116,7 @@ class BaseController extends AbstractController
     protected $viewsModificationService;
     protected $trainingRecordService;
     protected $operatorService;
+    protected $cacheService;
 
     // Variables used in the twig templates to display all the entities
     protected $departments;
@@ -131,7 +132,10 @@ class BaseController extends AbstractController
     protected $teams;
     protected $operators;
     protected $uaps;
-
+    protected $approbations;
+    protected $oldUploads;
+    protected $trainingRecords;
+    protected $trainers;
 
 
     public function __construct(
@@ -144,7 +148,6 @@ class BaseController extends AbstractController
         UserPasswordHasherInterface     $passwordHasher,
         LoggerInterface                 $loggerInterface,
         ParameterBagInterface           $params,
-        IncidentRepository              $incidentRepository,
         AuthorizationCheckerInterface   $authChecker,
 
         // Repository methods
@@ -164,6 +167,8 @@ class BaseController extends AbstractController
         OperatorRepository              $operatorRepository,
         TrainingRecordRepository        $trainingRecordRepository,
         TrainerRepository               $trainerRepository,
+        IncidentRepository              $incidentRepository,
+
 
         // Services methods
         ValidationService               $validationService,
@@ -177,7 +182,8 @@ class BaseController extends AbstractController
         OldUploadService                $oldUploadService,
         ViewsModificationService        $viewsModificationService,
         TrainingRecordService           $trainingRecordService,
-        OperatorService                 $operatorService
+        OperatorService                 $operatorService,
+        CacheService                    $cacheService
 
     ) {
         $this->cache                        = $cache;
@@ -225,108 +231,13 @@ class BaseController extends AbstractController
         $this->viewsModificationService     = $viewsModificationService;
         $this->trainingRecordService        = $trainingRecordService;
         $this->operatorService              = $operatorService;
+        $this->cacheService                 = $cacheService;
 
-        // Variables used in the twig templates to display all the entities
-        // $this->zones                        = $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']);
-        // $this->productLines                 = $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']);
-        // $this->categories                   = $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']);
-        // $this->buttons                      = $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']);
-        // $this->users                        = $this->userRepository->findAll();
-        // $this->uploads                      = $this->uploadRepository->findAll();
-        // $this->incidents                    = $this->incidentRepository->findAll();
-        // $this->incidentCategories           = $this->incidentCategoryRepository->findAll();
-        // $this->departments                  = $this->departmentRepository->findAll();
-        // $this->validations                  = $this->validationRepository->findAll();
-        // $this->teams                        = $this->teamRepository->findAll();
-        // $this->operators                    = $this->operatorRepository->findAllOrdered();
-        // $this->uaps                         = $this->uapRepository->findAll();
-        $this->cachingAppVariable();
+        $this->cachingAppVariableAsArray();
+        $this->cacheService->cachingAppVariable();
     }
 
-    // public function cachingAppVariable()
-    // {
-    //     $zones = $this->cache->get('zones_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']);
-    //     });
-    //     $this->zones = $zones;
-
-    //     $productLines = $this->cache->get('productLines_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']);
-    //     });
-    //     $this->productLines = $productLines;
-
-    //     $categories = $this->cache->get('categories_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']);
-    //     });
-    //     $this->categories = $categories;
-
-    //     $buttons = $this->cache->get('buttons_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']);
-    //     });
-    //     $this->buttons = $buttons;
-
-    //     $users = $this->cache->get('users_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->userRepository->findAll();
-    //     });
-    //     $this->users = $users;
-
-    //     $uploads = $this->cache->get('uploads_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->uploadRepository->findAll();
-    //     });
-    //     $this->uploads = $uploads;
-
-    //     $incidents = $this->cache->get('incidents_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->incidentRepository->findAll();
-    //     });
-    //     $this->incidents = $incidents;
-
-    //     $incidentCategories = $this->cache->get('incidentCategories_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->incidentCategoryRepository->findAll();
-    //     });
-    //     $this->incidentCategories = $incidentCategories;
-
-    //     $departments = $this->cache->get('departments_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->departmentRepository->findAll();
-    //     });
-    //     $this->departments = $departments;
-
-    //     $validations = $this->cache->get('validations_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->validationRepository->findAll();
-    //     });
-    //     $this->validations = $validations;
-
-    //     $teams = $this->cache->get('teams_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->teamRepository->findAll();
-    //     });
-    //     $this->teams = $teams;
-
-    //     $uaps = $this->cache->get('uaps_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->uapRepository->findAll();
-    //     });
-    //     $this->uaps = $uaps;
-
-    //     $operators = $this->cache->get('operators_cache', function (ItemInterface $item) {
-    //         $item->expiresAfter(3600); // Cache for 1 hour
-    //         return $this->operatorRepository->findAllOrdered();
-    //     });
-    //     $this->operators = $operators;
-
-
-    //     return $this;
-    // }
-    public function cachingAppVariable()
+    public function cachingAppVariableAsArray()
     {
         $variables = [
             'zones' => fn () => $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']),
@@ -341,13 +252,16 @@ class BaseController extends AbstractController
             'validations' => fn () => $this->validationRepository->findAll(),
             'teams' => fn () => $this->teamRepository->findAll(),
             'uaps' => fn () => $this->uapRepository->findAll(),
-            'operators' => fn () => $this->operatorRepository->findAllOrdered()
+            'operators' => fn () => $this->operatorRepository->findAllOrdered(),
+            'approbations' => fn () => $this->approbationRepository->findAll(),
+            'trainingRecords' => fn () => $this->trainingRecordRepository->findAll(),
+            'trainers' => fn () => $this->trainerRepository->findAll(),
         ];
 
         foreach ($variables as $key => $value) {
             try {
                 $this->$key = $this->cache->get("{$key}_cache", function (ItemInterface $item) use ($value) {
-                    $item->expiresAfter(3600); // Cache for 1 hour
+                    $item->expiresAfter(300); // Cache for 5 min
                     return $value();
                 });
             } catch (\Exception $e) {
@@ -355,6 +269,18 @@ class BaseController extends AbstractController
             }
         }
     }
+
+
+    public function clearAndRebuildCachesArrays()
+    {
+        // Clear the cache
+        foreach (['zones', 'productLines', 'categories', 'buttons', 'uploads', 'incidents', 'incidentCategories', 'departments', 'validations', 'teams', 'operators', 'uaps', 'approbations'] as $key) {
+            $this->cache->delete("{$key}_cache");
+        }
+        $this->cachingAppVariableAsArray();
+    }
+
+
     protected function render(string $view, array $parameters = [], Response $response = null): Response
     {
         $commonParameters = [
@@ -370,8 +296,14 @@ class BaseController extends AbstractController
             'validations'           => $this->validations,
             'teams'                 => $this->teams,
             'operators'             => $this->operators,
-            'uaps'                  => $this->uaps
+            'uaps'                  => $this->uaps,
+            'approbations'          => $this->approbations,
+            'trainingRecords'       => $this->trainingRecords,
+            'trainers'              => $this->trainers,
+
         ];
+
+
 
         $parameters = array_merge($commonParameters, $parameters);
 

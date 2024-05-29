@@ -24,8 +24,8 @@ class OperatorController extends FrontController
     public function operatorBasePage(Request $request): Response
     {
         $this->logger->info('search query with full request', $request->request->all());
-        if ($app . user)
-            $countArray = $this->operatorService->operatorCheckForAutoDelete();
+        // if ($app . user) Was doing somthing here and i don't remember what
+        $countArray = $this->operatorService->operatorCheckForAutoDelete();
         if ($countArray != null) {
             if ($countArray != null) {
                 $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .

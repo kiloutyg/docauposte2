@@ -3,218 +3,483 @@
 	Tutoriel DocAuPoste2
 {% endblock %}
 {% block body %}
-	<div class="inner-container flex-grow-1 d-flex flex-column">
+	<div
+		class="inner-container flex-grow-1 d-flex flex-column">
 		<div>
 			<h1>
-				<strong>Tutoriel</strong>
+				<strong>
+					Tutoriel
+				</strong>
 			</h1>
-			<p>Vous trouverez ici un tutoriel pour vous aider à utiliser DocAuPoste2.
-				<br>Si vous avez des questions, n'hésitez pas à contacter le service informatique.
+			<p>
+				Vous trouverez ici un tutoriel pour vous aider à utiliser DocAuPoste2.
+				<br>
+				Si vous avez des questions, n'hésitez pas à contacter le service informatique.
 			</p>
 		</div>
-		<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
-			<div class="accordion" id="accordionTuto">
+		<div
+			class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+			<div
+				class="accordion"
+				id="accordionTuto">
 
-				<div class="accordion-item">
-					<h4 class="accordion-header" id="headingFirstStep">
-						<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFirstStep" aria-expanded="true" aria-controls="collapseFirstStep">
-							<strong>1. Prise en Main</strong>
+				<div
+					class="accordion-item">
+					<h4
+						class="accordion-header"
+						id="headingFirstStep">
+						<button
+							class="accordion-button fs-3 collapsed"
+							type="button"
+							data-bs-toggle="collapse"
+							data-bs-target="#collapseFirstStep"
+							aria-expanded="true"
+							aria-controls="collapseFirstStep">
+							<strong>
+								1. Prise en Main
+							</strong>
 						</button>
 					</h4>
-					<div id="collapseFirstStep" class="accordion-collapse collapse " aria-labelledby="headingFirstStep" data-bs-parent="#accordionTuto">
-						<div class="accordion-body accordion-bg shadow shadow-inset">
-							<img src="{{ asset('/TutoImage/AccueilPostConnexion.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+					<div
+						id="collapseFirstStep"
+						class="accordion-collapse collapse "
+						aria-labelledby="headingFirstStep"
+						data-bs-parent="#accordionTuto">
+						<div
+							class="accordion-body accordion-bg shadow shadow-inset">
+							<img
+								src="{{ asset('TutoImage/AccueilPostConnexion.png') }}" class="img-fluid align-center justify-content-center"
+								alt="1">
 							Capture d'écran d'accueil après connexion
-							<br><br>
+							<br>
+							<br>
 						</div>
 						<ul>
-							<li class="black-text">A : Bouton d'accès rapide à l'accueil (Page présentée sur la capture d'écran).</li>
-							<li class="black-text">B : Bouton de retour à la page précédente.</li>
-							<li class="black-text">C : Bouton de navigation, ici pour accéder à une zone.</li>
-							<li class="black-text">D : Notification. Verte : Bonne nouvelle // Rouge : Mauvaise nouvelle // Blanche : N'a pas compris</li>
-							<li class="black-text">E : Bouton de déconnexion.</li>
-							<li class="black-text">F : Bouton de navigation, ici, pour accéder au tutoriel.</li>
+							<li
+								class="black-text">
+								A : Bouton d'accès rapide à l'accueil (Page présentée sur la capture d'écran).
+							</li>
+							<li
+								class="black-text">
+								B : Bouton de retour à la page précédente.
+							</li>
+							<li
+								class="black-text">
+								C : Bouton de navigation, ici pour accéder à une zone.
+							</li>
+							<li
+								class="black-text">
+								D : Notification. Verte : Bonne nouvelle // Rouge : Mauvaise nouvelle // Blanche : N'a pas compris
+							</li>
+							<li
+								class="black-text">
+								E : Bouton de déconnexion.
+							</li>
+							<li
+								class="black-text">
+								F : Bouton de navigation, ici, pour accéder au tutoriel.
+							</li>
 						</ul>
-						<div style="height: 5vh;"></div>
-						<div class="accordion-body accordion-bg shadow shadow-inset">
+						<div
+							style="height: 5vh;"></div>
+						<div
+							class="accordion-body accordion-bg shadow shadow-inset">
 
 
-							<img src="{{ asset('/TutoImage/ZoneConnexionAdmin.png') }}" class="img-fluid align-center justify-content-center" alt="1">
-							<em class="black-text">
-								Capture d'écran de la page d'une zone</em>
+							<img
+								src="{{ asset('TutoImage/ZoneConnexionAdmin.png') }}" class="img-fluid align-center justify-content-center"
+								alt="1">
+							<em
+								class="black-text">
+								Capture d'écran de la page d'une zone
+							</em>
 						</div>
 
 
 						<ul>
-							<li class="black-text">A : Bouton d'accès au menu d'administration, ici, de Zone.</li>
-							<li class="black-text">B : Bouton de navigation, ici pour accéder à un Produit.</li>
+							<li
+								class="black-text">
+								A : Bouton d'accès au menu d'administration, ici, de Zone.
+							</li>
+							<li
+								class="black-text">
+								B : Bouton de navigation, ici pour accéder à un Produit.
+							</li>
 						</ul>
 					</div>
 				</div>
 
 				{% if is_granted('ROLE_SUPER_ADMIN') %}
-					<div class="accordion-item ">
-						<h4 class="accordion-header" id="headingSecondStep">
-							<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSecondStep" aria-expanded="true" aria-controls="collapseSecondStep">
-								<strong>2. Création et modification d'une entité d'organisation (Zone/Produit/Catégorie/Bouton)
+					<div
+						class="accordion-item ">
+						<h4
+							class="accordion-header"
+							id="headingSecondStep">
+							<button
+								class="accordion-button fs-3 collapsed"
+								type="button"
+								data-bs-toggle="collapse"
+								data-bs-target="#collapseSecondStep"
+								aria-expanded="true"
+								aria-controls="collapseSecondStep">
+								<strong>
+									2. Création et modification d'une entité d'organisation (Zone/Produit/Catégorie/Bouton)
 								</strong>
 							</button>
 						</h4>
-						<div id="collapseSecondStep" class="accordion-collapse collapse " aria-labelledby="headingSecondStep" data-bs-parent="#accordionTuto">
-							<div class="accordion-body accordion-bg shadow shadow-inset">
-								<img src="{{ asset('/TutoImage/FormulaireCreationEntite.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+						<div
+							id="collapseSecondStep"
+							class="accordion-collapse collapse "
+							aria-labelledby="headingSecondStep"
+							data-bs-parent="#accordionTuto">
+							<div
+								class="accordion-body accordion-bg shadow shadow-inset">
+								<img
+									src="{{ asset('TutoImage/FormulaireCreationEntite.png') }}" class="img-fluid align-center justify-content-center"
+									alt="1">
 								Capture d'écran du formulaire de création d'une zone
-								<br><br>
+								<br>
+								<br>
 							</div>
 							<ul>
-								<li class="black-text">A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.</li>
-								<li class="black-text">B : Formulaire de création de l'entité. Entrer le nom de la Ligne/Produit puis valider sa création.</li>
-								<li class="black-text">C : Bouton de navigation, ici pour accéder aux Lignes/Produits qui ont été crée.</li>
-								<li class="black-text">D : Bouton de suppression de l'entité.
-									<strong>En cas d'erreur ou de fin d'existence du projet/produit/ligne contacter le Service Informatique</strong>.</li><br>
+								<li
+									class="black-text">
+									A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.
+								</li>
+								<li
+									class="black-text">
+									B : Formulaire de création de l'entité. Entrer le nom de la Ligne/Produit puis valider sa création.
+								</li>
+								<li
+									class="black-text">
+									C : Bouton de navigation, ici pour accéder aux Lignes/Produits qui ont été crée.
+								</li>
+								<li
+									class="black-text">
+									D : Bouton de suppression de l'entité.
+									<strong>
+										En cas d'erreur ou de fin d'existence du projet/produit/ligne contacter le Service Informatique
+									</strong>
+									.
+								</li>
+								<br>
 							</ul>
 							<p>
-								Lors de la validation de cette étape identique dans chacune des entités, vous serez redirigé vers la même page. Vous pourrez ensuite accéder au menu d'administration de l'entité que vous venez de créer(Correspond au point C).</p>
+								Lors de la validation de cette étape identique dans chacune des entités, vous serez redirigé vers la même page. Vous pourrez ensuite accéder au menu d'administration de l'entité que vous venez de créer(Correspond au point C).
+							</p>
 							<p>
-								Il est necessaire d'aller jusqu'a la création d'un bouton pour pouvoir charger un fichier.</p>
+								Il est necessaire d'aller jusqu'a la création d'un bouton pour pouvoir charger un fichier.
+							</p>
 						</div>
 					</div>
 				{% else %}
-					<div class="accordion-item ">
-						<h4 class="accordion-header" id="headingSecondStep">
-							<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSecondStep" aria-expanded="true" aria-controls="collapseSecondStep">
-								<strong>2. Création d'une entité d'organisation (Zone/Produit/Catégorie/Bouton)
+					<div
+						class="accordion-item ">
+						<h4
+							class="accordion-header"
+							id="headingSecondStep">
+							<button
+								class="accordion-button fs-3 collapsed"
+								type="button"
+								data-bs-toggle="collapse"
+								data-bs-target="#collapseSecondStep"
+								aria-expanded="true"
+								aria-controls="collapseSecondStep">
+								<strong>
+									2. Création d'une entité d'organisation (Zone/Produit/Catégorie/Bouton)
 								</strong>
 							</button>
 						</h4>
-						<div id="collapseSecondStep" class="accordion-collapse collapse " aria-labelledby="headingSecondStep" data-bs-parent="#accordionTuto">
-							<div class="accordion-body accordion-bg shadow shadow-inset">
-								<img src="{{ asset('/TutoImage/FormulaireCreationEntite.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+						<div
+							id="collapseSecondStep"
+							class="accordion-collapse collapse "
+							aria-labelledby="headingSecondStep"
+							data-bs-parent="#accordionTuto">
+							<div
+								class="accordion-body accordion-bg shadow shadow-inset">
+								<img
+									src="{{ asset('TutoImage/FormulaireCreationEntite.png') }}" class="img-fluid align-center justify-content-center"
+									alt="1">
 								Capture d'écran du formulaire de création d'une zone
-								<br><br>
+								<br>
+								<br>
 							</div>
 							<ul>
-								<li class="black-text">A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.</li>
-								<li class="black-text">B : Formulaire de création de l'entité. Entrer le nom de la Ligne/Produit puis valider sa création.</li>
-								<li class="black-text">C : Bouton de navigation, ici pour accéder aux Lignes/Produits qui ont été crée.</li>
-								<li class="black-text">D : Bouton de suppression de l'entité. En cas d'erreur ou de fin d'existence du projet/produit le bouton permet de supprimer l'entité et tout ce qui y est relié.</li><br>
+								<li
+									class="black-text">
+									A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.
+								</li>
+								<li
+									class="black-text">
+									B : Formulaire de création de l'entité. Entrer le nom de la Ligne/Produit puis valider sa création.
+								</li>
+								<li
+									class="black-text">
+									C : Bouton de navigation, ici pour accéder aux Lignes/Produits qui ont été crée.
+								</li>
+								<li
+									class="black-text">
+									D : Bouton de suppression de l'entité. En cas d'erreur ou de fin d'existence du projet/produit le bouton permet de supprimer l'entité et tout ce qui y est relié.
+								</li>
+								<br>
 							</ul>
 							<p>
-								Lors de la validation de cette étape identique dans chacune des entités, vous serez redirigé vers la même page. Vous pourrez ensuite accéder au menu d'administration de l'entité que vous venez de créer(Correspond au point C).</p>
+								Lors de la validation de cette étape identique dans chacune des entités, vous serez redirigé vers la même page. Vous pourrez ensuite accéder au menu d'administration de l'entité que vous venez de créer(Correspond au point C).
+							</p>
 							<p>
-								Il est necessaire d'aller jusqu'a la création d'un bouton pour pouvoir charger un fichier.</p>
+								Il est necessaire d'aller jusqu'a la création d'un bouton pour pouvoir charger un fichier.
+							</p>
 						</div>
 					</div>
 
 				{% endif %}
-				<div class="accordion-item ">
-					<h4 class="accordion-header" id="headingThirdStep">
-						<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThirdStep" aria-expanded="true" aria-controls="collapseThirdStep">
-							<strong>3. Chargement d'un fichier
+				<div
+					class="accordion-item ">
+					<h4
+						class="accordion-header"
+						id="headingThirdStep">
+						<button
+							class="accordion-button fs-3 collapsed"
+							type="button"
+							data-bs-toggle="collapse"
+							data-bs-target="#collapseThirdStep"
+							aria-expanded="true"
+							aria-controls="collapseThirdStep">
+							<strong>
+								3. Chargement d'un fichier
 							</strong>
 						</button>
 					</h4>
-					<div id="collapseThirdStep" class="accordion-collapse collapse " aria-labelledby="headingThirdStep" data-bs-parent="#accordionTuto">
-						<div class="accordion-body accordion-bg shadow shadow-inset">
-							<img src="{{ asset('/TutoImage/FormulaireUpload.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+					<div
+						id="collapseThirdStep"
+						class="accordion-collapse collapse "
+						aria-labelledby="headingThirdStep"
+						data-bs-parent="#accordionTuto">
+						<div
+							class="accordion-body accordion-bg shadow shadow-inset">
+							<img
+								src="{{ asset('TutoImage/FormulaireUpload.png') }}" class="img-fluid align-center justify-content-center"
+								alt="1">
 							Capture d'écran du formulaire de chargement de fichier
-							<br><br>
+							<br>
+							<br>
 						</div>
 						<ul>
-							<li class="black-text">A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.</li>
-							<li class="black-text">B : Formulaire de selection du fichier. Cliquer dessus ouvrira la page de selection de fichier.</li>
-							<li class="black-text">C :
-								<em>(Optionnel)</em>
-								Cartouche de modification de nom de fichier, au cas où le nom doit être modifier.</li>
-							<li class="black-text">D : Menu deroulant en cascade de selection du bouton.
-								<em>(Pour rappel : Sans bouton selectionner le chargement echouera)</em>
+							<li
+								class="black-text">
+								A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.
 							</li>
-							<li class="black-text">E : Bouton de validation de formulaire.</li>
-							<li class="black-text">F : Bouton accordeon activant le processus de validation SWI et la selection des valideurs.</li>
+							<li
+								class="black-text">
+								B : Formulaire de selection du fichier. Cliquer dessus ouvrira la page de selection de fichier.
+							</li>
+							<li
+								class="black-text">
+								C :
+								<em>
+									(Optionnel)
+								</em>
+								Cartouche de modification de nom de fichier, au cas où le nom doit être modifier.
+							</li>
+							<li
+								class="black-text">
+								D : Menu deroulant en cascade de selection du bouton.
+								<em>
+									(Pour rappel : Sans bouton selectionner le chargement echouera)
+								</em>
+							</li>
+							<li
+								class="black-text">
+								E : Bouton de validation de formulaire.
+							</li>
+							<li
+								class="black-text">
+								F : Bouton accordeon activant le processus de validation SWI et la selection des valideurs.
+							</li>
 							<br>
 						</ul>
-						<div style="height: 5vh;"></div>
+						<div
+							style="height: 5vh;"></div>
 
-						<div class="accordion-body accordion-bg shadow shadow-inset">
+						<div
+							class="accordion-body accordion-bg shadow shadow-inset">
 
 
-							<img src="{{ asset('/TutoImage/FormulaireValidation.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+							<img
+								src="{{ asset('TutoImage/FormulaireValidation.png') }}" class="img-fluid align-center justify-content-center"
+								alt="1">
 							Capture d'écran du formulaire d'activation de process de validation SWI
-							<br><br>
+							<br>
+							<br>
 						</div>
 
 
 						<ul>
-							<li class="black-text">A : Bouton d'activation du process de validation ( Actif dans l'illustration ).</li>
-							<li class="black-text">B : Menu deroulant de selection de valideur.</li>
-							<li class="black-text">C : Bouton de validation du formulaire de chargement de fichiers, dans ce contexte il lancera le processus de validation SWI.</li>
+							<li
+								class="black-text">
+								A : Bouton d'activation du process de validation ( Actif dans l'illustration ).
+							</li>
+							<li
+								class="black-text">
+								B : Menu deroulant de selection de valideur.
+							</li>
+							<li
+								class="black-text">
+								C : Bouton de validation du formulaire de chargement de fichiers, dans ce contexte il lancera le processus de validation SWI.
+							</li>
 
 							<br>
 						</ul>
 					</div>
 				</div>
-				<div class="accordion-item ">
-					<h4 class="accordion-header" id="headingFourthStep">
-						<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFourthStep" aria-expanded="true" aria-controls="collapseFourthStep">
-							<strong>4. Chargement d'un Incident
+				<div
+					class="accordion-item ">
+					<h4
+						class="accordion-header"
+						id="headingFourthStep">
+						<button
+							class="accordion-button fs-3 collapsed"
+							type="button"
+							data-bs-toggle="collapse"
+							data-bs-target="#collapseFourthStep"
+							aria-expanded="true"
+							aria-controls="collapseFourthStep">
+							<strong>
+								4. Chargement d'un Incident
 							</strong>
 						</button>
 					</h4>
-					<div id="collapseFourthStep" class="accordion-collapse collapse " aria-labelledby="headingFourthStep" data-bs-parent="#accordionTuto">
-						<div class="accordion-body accordion-bg shadow shadow-inset">
-							<img src="{{ asset('/TutoImage/FormulaireIncident.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+					<div
+						id="collapseFourthStep"
+						class="accordion-collapse collapse "
+						aria-labelledby="headingFourthStep"
+						data-bs-parent="#accordionTuto">
+						<div
+							class="accordion-body accordion-bg shadow shadow-inset">
+							<img
+								src="{{ asset('TutoImage/FormulaireIncident.png') }}" class="img-fluid align-center justify-content-center"
+								alt="1">
 							Capture d'écran du formulaire de chargement d'Incident
 							<br>
 						</div>
 						<ul>
-							<li class="black-text">A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.</li>
-							<li class="black-text">B : Formulaire de selection du fichier. Cliquer dessus ouvrira la page de selection de fichier.</li>
-							<li class="black-text">C :
-								<em>(Optionnel)</em>
-								Cartouche de modification de nom de fichier, au cas où le nom doit être modifier.</li>
-							<li class="black-text">D : Menu deroulant en cascade de selection du bouton.
-								<em>(Pour rappel : Sans bouton selectionner le chargement echouera)</em>
+							<li
+								class="black-text">
+								A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.
 							</li>
-							<li class="black-text">E : Menu deroulant en cascade de selection du type d'incident.</li>
-							<li class="black-text">F : Formulaire de création de types d'incidents. Permet de créer de nouvelles catégories d'alerte et d'incidents. Entrez le nom du type d'incident et validez pour l'ajouter à la liste du menu deroulant.</li>
-							<li class="black-text">G : Liste des incidents actif dans la zone.</li>
-							<li class="black-text">H : Bouton de validation de formulaire.</li>
-							<li class="black-text">I : Liste des catégories d'alertes et incidents.</li>
+							<li
+								class="black-text">
+								B : Formulaire de selection du fichier. Cliquer dessus ouvrira la page de selection de fichier.
+							</li>
+							<li
+								class="black-text">
+								C :
+								<em>
+									(Optionnel)
+								</em>
+								Cartouche de modification de nom de fichier, au cas où le nom doit être modifier.
+							</li>
+							<li
+								class="black-text">
+								D : Menu deroulant en cascade de selection du bouton.
+								<em>
+									(Pour rappel : Sans bouton selectionner le chargement echouera)
+								</em>
+							</li>
+							<li
+								class="black-text">
+								E : Menu deroulant en cascade de selection du type d'incident.
+							</li>
+							<li
+								class="black-text">
+								F : Formulaire de création de types d'incidents. Permet de créer de nouvelles catégories d'alerte et d'incidents. Entrez le nom du type d'incident et validez pour l'ajouter à la liste du menu deroulant.
+							</li>
+							<li
+								class="black-text">
+								G : Liste des incidents actif dans la zone.
+							</li>
+							<li
+								class="black-text">
+								H : Bouton de validation de formulaire.
+							</li>
+							<li
+								class="black-text">
+								I : Liste des catégories d'alertes et incidents.
+							</li>
 							<br>
 						</ul>
 
 					</div>
 				</div>
-				<div class="accordion-item ">
-					<h4 class="accordion-header" id="headingFifthStep">
-						<button class="accordion-button fs-3 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFifthStep" aria-expanded="true" aria-controls="collapseFifthStep">
-							<strong>5. Listes des fichiers chargés et des fichiers validés
+				<div
+					class="accordion-item ">
+					<h4
+						class="accordion-header"
+						id="headingFifthStep">
+						<button
+							class="accordion-button fs-3 collapsed"
+							type="button"
+							data-bs-toggle="collapse"
+							data-bs-target="#collapseFifthStep"
+							aria-expanded="true"
+							aria-controls="collapseFifthStep">
+							<strong>
+								5. Listes des fichiers chargés et des fichiers validés
 							</strong>
 						</button>
 					</h4>
-					<div id="collapseFifthStep" class="accordion-collapse collapse " aria-labelledby="headingFifthStep" data-bs-parent="#accordionTuto">
-						<div class="accordion-body accordion-bg shadow shadow-inset">
-							<img src="{{ asset('/TutoImage/ListeFichierUpload.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+					<div
+						id="collapseFifthStep"
+						class="accordion-collapse collapse "
+						aria-labelledby="headingFifthStep"
+						data-bs-parent="#accordionTuto">
+						<div
+							class="accordion-body accordion-bg shadow shadow-inset">
+							<img
+								src="{{ asset('TutoImage/ListeFichierUpload.png') }}" class="img-fluid align-center justify-content-center"
+								alt="1">
 							Capture d'écran de la liste de tous les fichiers chargés
 							<br>
 						</div>
 						<ul>
-							<li class="black-text">A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.</li>
-							<li class="black-text">B : Emplacement du fichier, cliquer dessus permet l'ouverture des niveaux.</li>
+							<li
+								class="black-text">
+								A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.
+							</li>
+							<li
+								class="black-text">
+								B : Emplacement du fichier, cliquer dessus permet l'ouverture des niveaux.
+							</li>
 
-							<li class="black-text">C : Cartouche indiquant, dans l'ordre: le nom du fichier, le nom du chargeur, la révision, le statut de validation, la date de chargement ou de dernière mis à jour, le bouton de modification ( seulement accessible au chargeur ) puis le bouton de suppression du fichier.<br>
+							<li
+								class="black-text">
+								C : Cartouche indiquant, dans l'ordre: le nom du fichier, le nom du chargeur, la révision, le statut de validation, la date de chargement ou de dernière mis à jour, le bouton de modification ( seulement accessible au chargeur ) puis le bouton de suppression du fichier.
+								<br>
 							</li>
 						</ul>
-						<div class="accordion-body accordion-bg shadow shadow-inset">
-							<img src="{{ asset('/TutoImage/ListeFichierValidation.png') }}" class="img-fluid align-center justify-content-center" alt="1">
+						<div
+							class="accordion-body accordion-bg shadow shadow-inset">
+							<img
+								src="{{ asset('TutoImage/ListeFichierValidation.png') }}" class="img-fluid align-center justify-content-center"
+								alt="1">
 							Capture d'écran de la liste des fichiers passés par le processus de validation
 							<br>
 						</div>
 						<ul>
-							<li class="black-text">A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.</li>
-							<li class="black-text">B : Emplacement du fichier, cliquer dessus permet l'ouverture des niveaux..</li>
+							<li
+								class="black-text">
+								A : Titre du formulaire, cliquer dessus permet l'ouverture du dit formulaire. Appuyez une seconde fois ferme le formulaire.
+							</li>
+							<li
+								class="black-text">
+								B : Emplacement du fichier, cliquer dessus permet l'ouverture des niveaux..
+							</li>
 
-							<li class="black-text">C : Cartouche indiquant, dans l'ordre: le nom du fichier, la révision, le nom du chargeur, la date de chargement ou mis a jour. En-dessous: la liste des valideurs avec leurs prénoms et noms et la date de leurs validations.<br></li>
+							<li
+								class="black-text">
+								C : Cartouche indiquant, dans l'ordre: le nom du fichier, la révision, le nom du chargeur, la date de chargement ou mis a jour. En-dessous: la liste des valideurs avec leurs prénoms et noms et la date de leurs validations.
+								<br>
+							</li>
 
 						</li>
 					</ul>
