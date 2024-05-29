@@ -59,6 +59,9 @@ class Upload
     #[ORM\OneToMany(mappedBy: 'upload', targetEntity: Trainer::class)]
     private Collection $trainers;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $training = null;
+
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
@@ -257,6 +260,18 @@ class Upload
                 $trainer->setUpload(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isTraining(): ?bool
+    {
+        return $this->training;
+    }
+
+    public function setTraining(?bool $training): static
+    {
+        $this->training = $training;
 
         return $this;
     }

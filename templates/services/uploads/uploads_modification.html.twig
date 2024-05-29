@@ -15,7 +15,8 @@
 zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
 	</script>
 	<div
-		class="card border-0 shadow rounded-3 my-5 bg-secondary">
+		class="card border-0 shadow rounded-3 my-5 bg-secondary"
+		data-controller="document-training">
 		<div
 			class="card-body ">
 			<div
@@ -48,7 +49,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						<div
 							class="d-flex align-items-left mt-2 ">
 
-							{{include('services/operators/training_toggles/training_toggle_component.html.twig', {checkStatus: true})}}
+							{{include('services/operators/training_toggles/training_toggle_component.html.twig', {checkStatus: false})}}
 
 						</div>
 					</div>
