@@ -1,0 +1,148 @@
+{% if user is defined %}
+
+	<h3
+		class="card-title text-center mb-2"
+		style="color:white">
+		<strong>
+			Modification de compte de
+			{{user.username|capitalize|split('.')|first }}
+			{{user.username|upper|split('.')|last }}
+		</strong>
+
+	</h3>
+	<form
+		class="form col-sm-10 col-md-9 col-lg-8 mx-auto"
+		method="post"
+		action="{{path('app_modify_account', {userId: user.id})}}">
+
+	{% else %}
+		<h3
+			class="card-title text-center mb-5"
+			style="color:white">
+			<strong>
+				Création de compte
+			</strong>
+		</h3>
+		<form
+			class="form col-sm-10 col-md-9 col-lg-8 mx-auto"
+			method="POST"
+			action="{{ path('app_super_admin_create_admin') }}">
+		{% endif %}
+
+		{% if error is defined %}
+			{% if error %}
+				<div
+					class="alert alert-danger">
+					{{ error.messageKey|trans(error.messageData, 'security') }}
+				</div>
+			{% endif %}
+		{% endif %}
+
+		<div
+			class="form-control mb-3">
+			<label
+				for="username">
+				Nom d'utilisateur
+			</label>
+			<div
+				data-controller="username-validation">
+				<input
+					type="text"
+					class="form-control"
+					data-username-validation-target="username"
+					data-action="keyup->username-validation#validateUsername"
+					placeholder="prénom.nom"
+					id="username"
+					name="username"
+					{% if user is defined %} placeholder="{{user.username}}" {% else %} required
+					{% endif %}>
+
+				<div
+					data-username-validation-target="message"
+					class="username-message"></div>
+			</div>
+		</div>
+		<div
+			class="form-control mb-3">
+			<label
+				for="floatingPassword">
+				Mot de passe
+			</label>
+			<input
+				type="password"
+				id="floatingPassword"
+				placeholder="Mot de passe"
+				name="password"
+				required
+				class="form-control">
+
+		</div>
+		<div
+			class="form-control mb-3">
+			<label
+				for="emailAddress">
+				Adresse Mail
+			</label>
+			<input
+				type="email"
+				id="emailAddress"
+				placeholder="Adresse Mail"
+				name="emailAddress"
+				{% if user is defined %} placeholder="{{user.emailAddress}}" {% else %} required
+				{% endif %} class="form-control">
+		</div>
+		<div
+			class="form-control mb-3">
+			{% include 'services/accountservices/role_affectation.html.twig' %}
+		</div>
+		<div
+			class="form-control mb-3">
+			<div>
+				<label
+					for="department"
+					style="color:black">
+					Service :
+				</label>
+			</div>
+			<div>
+				<select
+					name="department"
+					id="department"
+					class="form-select">
+					<option
+						value=""
+						selected
+						disabled
+						hidden>
+						Choisir un Service
+					</option>
+				</select>
+			</div>
+		</div>
+		<input
+			type="hidden"
+			name="_csrf_token"
+			value="{{ csrf_token('authenticate') }}">
+		{% if user is defined %}
+			<div
+				class="d-grid">
+				<button
+					class="btn btn-primary btn-login text-uppercase fw-bold"
+					type="submit">
+					Modification du compte
+				</button>
+			</div>
+		{% else %}
+			<div
+				class="d-grid col-6 mx-auto">
+				<button
+					class="btn btn-primary btn-login text-uppercase fw-bold"
+					type="submit">
+					Création du compte
+				</button>
+			</div>
+		{% endif %}
+
+		<hr
+			class="my-4">
+	</form>
