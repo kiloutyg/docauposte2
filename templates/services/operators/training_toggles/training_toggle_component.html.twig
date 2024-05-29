@@ -1,13 +1,28 @@
+{% if updateMenu is not defined %}
+	{% set labelColValue = "col-lg-3" %}
+	{% set inputColValue = "col-lg-9" %}
+{% else %}
+	{% set labelColValue = "col-lg-2" %}
+	{% set inputColValue = "col-lg-10" %}
+{% endif %}
 <div
-	class=" row">
+	class="col-md-2 col-sm-2 {{labelColValue}} ">
 	<label
 		for="training-needed"
-		class="form-label col-4"
+		class=" col-form-label  tooltips"
+		aria-label="Si la formation et la signature des opérateurs et nécéssaire"
 		style="color:white">
 		Formation nécessaire :
 	</label>
+</div>
+
+<div
+	class="col-md-10 col-sm-10 {{inputColValue}}">
 	<input
 		id="training-needed"
 		type="checkbox"
-		class="training-toggle-input col-8">
+		class="training-toggle-input col-8"
+		data-document-training-target="trainingNeededToggle"
+		{{checkStatus is defined ? (checkStatus ? "checked" : "") : ""}}>
+
 </div>
