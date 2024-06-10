@@ -1,3 +1,4 @@
+# config/services.yaml
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
 
@@ -30,4 +31,16 @@ services:
     App\Service\MailerService:
         arguments:
             $senderEmail: "%env(MAILER_SENDER_EMAIL)%"
+    
+    app.cache.tag_aware:
+        class: Symfony\Component\Cache\Adapter\TagAwareAdapter
+        arguments:
+            - '@cache.app'
 
+    App\EventListener\CacheInvalidationListener:
+        arguments:
+            $cache: '@app.cache.tag_aware'
+        tags:
+            - { name: doctrine.event_listener, event: postPersist }
+            - { name: doctrine.event_listener, event: postUpdate }
+            - { name: doctrine.event_listener, event: postRemove }

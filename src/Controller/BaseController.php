@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -140,7 +141,7 @@ class BaseController extends AbstractController
 
     public function __construct(
 
-        CacheInterface                  $cache,
+        TagAwareCacheInterface          $cache,
 
         EntityManagerInterface          $em,
         RequestStack                    $requestStack,
@@ -260,7 +261,8 @@ class BaseController extends AbstractController
 
         foreach ($variables as $key => $value) {
             try {
-                $this->$key = $this->cache->get("{$key}_cache", function (ItemInterface $item) use ($value) {
+                $this->$key = $this->cache->get("{$key}_cache_array", function (ItemInterface $item) use ($value, $key) {
+                    $item->tag(["{$key}_tag_array"]);
                     $item->expiresAfter(300); // Cache for 5 min
                     return $value();
                 });
@@ -275,7 +277,7 @@ class BaseController extends AbstractController
     {
         // Clear the cache
         foreach (['zones', 'productLines', 'categories', 'buttons', 'uploads', 'incidents', 'incidentCategories', 'departments', 'validations', 'teams', 'operators', 'uaps', 'approbations'] as $key) {
-            $this->cache->delete("{$key}_cache");
+            $this->cache->delete("{$key}_cache_array");
         }
         $this->cachingAppVariableAsArray();
     }
