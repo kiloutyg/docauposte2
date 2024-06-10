@@ -5,21 +5,22 @@
 {% endblock %}
 
 {% block body %}
+	<div
+		class="dropdown">
+		<h1
+			class="my-4">
+			<strong>
+				Page d'administration des Lignes de la Zone
 
-	<h1
-		class="my-4">
-		<strong>
-			Page d'administration des Lignes de la Zone
-			<div
-				class="zoneAdminDropdown">
 				<button
-					class="btn dropdown-toggle"
-					data-bs-toggle="zoneAdminDropdown"
+					class="dropdown-toggle"
+					data-bs-toggle="dropdown"
 					aria-expanded="false"
 					type="button"
 					id="zoneDropdown">
 					{{zone.name|split('.')|first|upper}}
 				</button>
+
 				<ul
 					class="dropdown-menu shadow shadow-inset"
 					aria-labelledby="zoneDropdown">
@@ -28,16 +29,16 @@
 							<li>
 								<a
 									href="{{ path('app_zone_admin', {zoneId: zoneExt.id}) }}" class="dropdown-item shadow ">
-									{{zone.name|split('.')|first|upper}}
+									{{zoneExt.name|split('.')|first|upper}}
 								</a>
 							</li>
 						{% endif %}
 					{% endfor %}
 				</ul>
-			</div>
 
-		</strong>
-	</h1>
+			</strong>
+		</h1>
+	</div>
 
 	<div
 		class="accordion"
