@@ -101,12 +101,13 @@
 											</th>
 											<th
 												scope="col">
-												Supprimer
+												Modifier
 											</th>
 											<th
 												scope="col">
-												Modifier
+												Supprimer
 											</th>
+
 										</tr>
 									</thead>
 									<tbody>
@@ -141,6 +142,13 @@
 															inconnu
 														{% endif %}
 													</td>
+
+													<td>
+														<a
+															href="{{path('app_modify_account', {userId: user.id})}}" class="btn btn-danger">
+															Modifier
+														</a>
+													</td>
 													<td>
 														{% if user.blocked ? true %}
 															{% if user.uploads is not empty or user.incidents is not empty %}
@@ -161,12 +169,6 @@
 																Bloquer
 															</a>
 														{% endif %}
-													</td>
-													<td>
-														<a
-															href="{{path('app_modify_account', {userId: user.id})}}" class="btn btn-danger">
-															modifier
-														</a>
 													</td>
 												</tr>
 											{% endif %}

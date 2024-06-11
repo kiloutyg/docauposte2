@@ -92,7 +92,15 @@ class UploadType extends AbstractType
             //         'empty_data' => null,
             //     ]
             // )
-          
+            // Adds a boolean field for training statuses
+            // ->add('training', ChoiceType::class, [
+            //     'choices'  => [
+            //         'Non' => false,
+            //         'Oui' => true,
+            //     ],
+            //     'label' => 'Formation',
+            //     'required' => true,
+            // ])
         ;
 
         // Event listener triggered before form submission 

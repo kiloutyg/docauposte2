@@ -61,6 +61,12 @@ class CacheInvalidationListener
             $tags = ['uaps_tag', 'uaps_tag_array'];
         } elseif ($entity instanceof \App\Entity\Operator) {
             $tags = ['operators_tag', 'operators_tag_array'];
+        } elseif ($entity instanceof \App\Entity\Approbation) {
+            $tags = ['approbations_tag', 'approbations_tag_array'];
+        } elseif ($entity instanceof \App\Entity\Trainer) {
+            $tags = ['trainers_tag', 'trainers_tag_array'];
+        } elseif ($entity instanceof \App\Entity\TrainingRecord) {
+            $tags = ['trainingRecords_tag', 'trainingRecords_tag_array'];
         }
 
         if (!empty($tags)) {

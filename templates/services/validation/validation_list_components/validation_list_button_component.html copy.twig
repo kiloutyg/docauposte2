@@ -1,0 +1,92 @@
+{% for upload in buttonKey %}
+	<ul
+		class="list-group-item d-flex justify-content-between align-items-start mb-3 shadow-lg ">
+		<a
+			href="{{ path('app_download_file', { 'uploadId': upload.id }) }}" class="btn btn-outline-primary order-3"
+			target="_blank">
+			{{ upload.filename|upper }}
+		</a>
+		<div
+			class="order-2 ml-auto"></div>
+		<div
+			class="order-1 col-8">
+			Mis en ligne de la Rev.
+			{{upload.revision}}
+			par:
+			<strong>
+
+				{% set uploader = users|filter(user => user.id == upload.uploader.id)|first %}
+				{% if uploader is not empty %}
+					{{uploader.username|capitalize|split('.')|first }}
+					{{uploader.username|upper|split('.')|last }}
+				{% else %}
+					inconnu
+				{% endif %}
+			</strong>
+			| le
+			{{ upload.uploadedAt|date('d/m/Y') }}
+			<br>
+
+
+			{% set validation = validations|filter(validation => validation.id == upload.validation.id)|first %}
+
+			{% set filtered_approbations = approbations|filter(approbation => approbation.validation.id == validation.id) %}
+
+			{% if validation.Status %}
+
+				{% for approbation in filtered_approbations %}
+					-
+					<strong>
+						{% set approbator = users|filter(user => user.id == approbation.userapprobator.id)|first %}
+						{% if approbator %}
+							{{ approbator.username|capitalize|split('.')|first }}
+							{{ approbator.username|upper|split('.')|last }}
+						{% else %}
+							inconnu
+						{% endif %}
+					</strong>
+					{{ approbation.approval ? ' a validé ce document le ' ~ approbation.approvedAt|date('d/m/Y') ~ ' à ' ~ approbation.approvedAt|date('H') ~ 'h' ~ approbation.approvedAt|date('i') }}
+					.
+					<br>
+					{% if approbation.comment %}
+						<ul>
+							<li>
+								Commentaire:
+								{{ approbation.comment }}
+							</li>
+						</ul>
+					{% endif %}
+				{% endfor %}
+			{% else %}
+				<strong>
+					- Document en cours de validation
+				</strong>
+				{% for approbation in validation.approbations %}
+					-
+					<strong>
+						{% set approbator = users|filter(user => user.id == approbation.userapprobator.id)|first %}
+						{% if approbator %}
+							{{ dump(approbator) }}
+							{{ approbator.username|capitalize|split('.')|first }}
+							{{ approbator.username|upper|split('.')|last }}
+						{% else %}
+							inconnu
+						{% endif %}
+					</strong>
+					{{ approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé le ' ~ approbation.approvedAt|date('d/m/Y') : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}
+					.
+					<br>
+					{% if approbation.comment %}
+						<ul>
+							<li>
+								{{ approbation.comment }}
+							</li>
+						</ul>
+					{% endif %}
+				{% endfor %}
+			{% endif %}
+
+
+		</div>
+	</ul>
+{% endfor %}

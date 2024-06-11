@@ -19,6 +19,8 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 		data-controller="document-training">
 		<div
 			class="card-body ">
+			{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm', 'method': 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_modifying_file', {'uploadId': upload.id})}) }}
+
 			<div
 				class="row d-flex align-items-center gy-lg-0 gy-5">
 				<h3
@@ -34,7 +36,6 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					Revision n°
 					{{upload.revision}}
 				</h5>
-				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm', 'method': 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_modifying_file', {'uploadId': upload.id})}) }}
 				<div
 					class="row justify-content-center ">
 

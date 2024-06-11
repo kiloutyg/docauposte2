@@ -23,21 +23,22 @@
 			{% endif %}
 			Les validations en cours:
 			<br>
-			<ul>
-				{% for approbation in upload.validation.approbations %}
+			{% for approbation in upload.validation.approbations %}
+				<ul>
 					<strong>
+						-
 						{{approbation.userapprobator.username|capitalize|split('.')|first }}
 						{{approbation.userapprobator.username|upper|split('.')|last }}
 					</strong>
 					{{approbation.approval is same as(true) ? ' a validé' : (approbation.approval is same as(false) ? ' a refusé' : (approbation.approval is same as(null) ? ' n\'a pas rendu son avis')) }}
-                        {% if approbation.comment is not empty %}
-                            <ul>
-                                <li>{{ approbation.comment }}
-                                </li>
-                            </ul>
-                        {% endif %}
-                {% endfor %}
-            </ul>
+                    {% if approbation.comment is not empty %}
+                        <ul>
+                            <li>{{ approbation.comment }}
+                            </li>
+                        </ul>
+                    {% endif %}         
+                </ul>
+            {% endfor %}
             {% if upload.revision is same as(1) %}
             {% else %}
                 Le fichier a été modifié le {{upload.uploadedAt|date('d/m/y')}} 

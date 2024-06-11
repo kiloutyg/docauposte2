@@ -37,7 +37,13 @@ class FrontController extends BaseController
             ]
         );
     }
-
+    #[Route('/cache', name: 'cache')]
+    public function resetCache(): Response
+    {
+        $this->clearAndRebuildCachesArrays();
+        $this->cacheService->clearAndRebuildCaches();
+        return $this->redirectToRoute('app_base');
+    }
 
     // This function is responsible for creating the super-admin account at the first connection of the application.
     #[Route('/createSuperAdmin', name: 'create_super_admin')]

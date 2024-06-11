@@ -98,61 +98,8 @@
 																			Bouton:
 																		</strong>
 																		{{ buttonName|split('.')|first|upper }}
-																		{% for upload in buttonKey %}
-																			<li
-																				class="list-group-item d-flex justify-content-between align-items-center mb-3 shadow-lg">
-																				<a
-																					href="{{ path('app_download_file', { 'uploadId': upload.id }) }}" class="btn btn-link"
-																					target="_blank">
-																					-
-																					{{ upload.filename|upper }}
-																				</a>
-																				{% if  is_granted('ROLE_LINE_ADMIN') %}
-																					<div
-																						class="ml-auto">
-																						<strong>
-																							{% if upload.uploader is not empty %}
-																								{{upload.uploader.username|capitalize|split('.')|first }}
-																								{{upload.uploader.username|upper|split('.')|last }}
-																							{% else %}
-																								inconnu
-																							{% endif %}
-																							|
-																						</strong>
-																						Rev.
-																						{{upload.revision}}
-																						|
-																						{% if upload.validation.status is defined %}
-																							{% if upload.validated is same as(false) %}
-																								<a
-																									href="{{path('app_validation', {'uploadId' : upload.id} )}}">
-																									{{upload.validated ? 'Validé' : 'Refusé'}}
-																								</a>
+																		{% include "services/uploads/uploads_list_components/upload_list_button_component.html.twig" %}
 
-																							{% else  %}
-																								{{upload.validated ? 'Validé' : 'En cours de validation'}}
-																								|
-																							{% endif %}
-																						{% else %}
-																							Sans validation |
-																						{% endif %}
-																						{{ upload.uploadedAt|date('d/m/Y') }}
-																						{% if app.user is same as(upload.uploader) or (upload.uploader) is empty or is_granted
-																						('ROLE_LINE_ADMIN')  %}
-																							<a
-																								href="{{ path('app_modify_file', {'uploadId': upload.id}) }}" class="btn btn-modify shadow ">
-																								Modifier
-																							</a>
-
-																							<a
-																								href="{{ path('app_delete_file', { uploadId: upload.id }) }}" class="btn btn-danger delete-upload shadow">
-																								Supprimer
-																							</a>
-																						{% endif %}
-																					</div>
-																				{% endif %}
-																			</li>
-																		{% endfor %}
 																	{% endfor %}
 																</div>
 															</div>

@@ -255,6 +255,12 @@ class UploadService extends AbstractController
         } else {
             $validated = true;
         };
+
+        if ($request->request->get('training-needed') === 'true') {
+            $upload->setTraining(true);
+        } else {
+            $upload->setTraining(false);
+        }
         // If new file exists, process it and delete the old one
         if ($newFile) {
 
@@ -342,6 +348,8 @@ class UploadService extends AbstractController
             if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
                 $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
             }
+            // $upload = $this->uploadRepository->findOneBy(['id' => $upload->getId()]);
+
             $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
         }
         return $groupedUploads;
