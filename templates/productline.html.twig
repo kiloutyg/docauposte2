@@ -63,7 +63,7 @@
 							role="button"
 							aria-pressed="true"
 							style="color:white"
-							href="{{path('app_category', {categoryId: category.id, productlineId: category.productLine.id, zoneId: category.productLine.zone.id} )}}">
+							href="{{path('app_category', {categoryId: category.id, productlineId: productLine.id, zoneId: zone.id} )}}">
 							<span
 								class="line-details text-justify">
 								{{ category.name|split('.')|first|upper }}

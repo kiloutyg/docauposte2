@@ -134,7 +134,7 @@ class CacheService
             try {
                 $this->{$key} = new ArrayCollection($this->cache->get("{$key}_cache", function (ItemInterface $item) use ($repository, $key) {
                     $item->tag(["{$key}_tag"]);
-                    $item->expiresAfter(300); // Cache for 5 min
+                    $item->expiresAfter(43200); // Cache for 12 hours
                     if (in_array($key, ['zones', 'productLines', 'categories', 'buttons'])) {
                         return $repository->findBy([], ['SortOrder' => 'ASC']);
                     }
@@ -175,6 +175,8 @@ class CacheService
 
         return $entity === false ? null : $entity;
     }
+
+
     public function getEntityByName(string $entityType, string $name)
     {
         $collectionName = $this->getCollectionName($entityType);

@@ -263,7 +263,7 @@ class BaseController extends AbstractController
             try {
                 $this->$key = $this->cache->get("{$key}_cache_array", function (ItemInterface $item) use ($value, $key) {
                     $item->tag(["{$key}_tag_array"]);
-                    $item->expiresAfter(300); // Cache for 5 min
+                    $item->expiresAfter(43200); // Cache for 12 hours
                     return $value();
                 });
             } catch (\Exception $e) {

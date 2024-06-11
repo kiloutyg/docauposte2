@@ -23,8 +23,13 @@ class SuperAdminController extends FrontController
     #[Route('/super_admin', name: 'app_super_admin')]
     public function index(): Response
     {
-        $incidents = $this->incidents;
-        $uploads = $this->uploads;
+        // $incidents = $this->incidents;
+        // $incidents = $this->incidentRepository->findAll();
+        $incidents = $this->cacheService->incidents;
+
+        // $uploads = $this->uploads;
+        // $uploads = $this->uploadRepository->findAll();
+        $uploads = $this->cacheService->uploads;
 
         // Group the uploads and incidents by parent entity
         $groupedUploads = $this->uploadService->groupUploads($uploads);
