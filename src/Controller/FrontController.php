@@ -94,6 +94,7 @@ class FrontController extends BaseController
 
         // $productLine = $this->productLineRepository->find($productlineId);
         // $zone        = $productLine->getZone();
+
         $productLine = $this->cacheService->getEntityById('productLine', $productlineId);
 
         $zone = $this->cacheService->getEntityById('zone', $zoneId);
@@ -131,11 +132,22 @@ class FrontController extends BaseController
 
     public function category(int $categoryId = null): Response
     {
-        $category    = $this->categoryRepository->find($categoryId);
-        $productLine = $category->getProductLine();
-        $zone        = $productLine->getZone();
-        $buttons = [];
-        $buttons = $this->buttonRepository->findBy(['Category' => $categoryId]);
+        // $category    = $this->categoryRepository->find($categoryId);
+        // $productLine = $category->getProductLine();
+        // $zone        = $productLine->getZone();
+        // $buttons = [];
+        // $buttons = $this->buttonRepository->findBy(['Category' => $categoryId]);
+
+        $category = $this->cacheService->getEntityById('category', $categoryId);
+        $productLine = $this->cacheService->getEntityById('productLine', $category->getProductLine()->getId());
+        $zone = $this->cacheService->getEntityById('zone', $productLine->getZone()->getId());
+
+        $buttonsAC = $this->cacheService->getEntitiesByParentId('button', $categoryId);
+        $this->logger->info('buttons', [$buttonsAC]);
+        $buttons = $buttonsAC->toArray();
+        $this->logger->info('buttons', [$buttons]);
+
+        // $buttons = $this->cacheService->getEntitiesByParentId('button', $categoryId);
 
         if (count($buttons) != 1) {
 
@@ -148,7 +160,8 @@ class FrontController extends BaseController
                 ]
             );
         } else {
-            $buttonId = $buttons[0]->getId();
+            $key = array_key_first($buttons);
+            $buttonId = $buttons[$key]->getId();
             return $this->redirectToRoute('app_button', [
                 'zoneId'        => $zone->getId(),
                 'productlineId' => $productLine->getId(),

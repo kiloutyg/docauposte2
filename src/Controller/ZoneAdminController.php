@@ -71,7 +71,8 @@ class ZoneAdminController extends FrontController
     public function createProductLine(Request $request, int $zoneId = null)
     {
         // 
-        $zone = $this->cacheService->getEntityById('zone', $zoneId);
+        $zoneCached = $this->cacheService->getEntityById('zone', $zoneId);
+        $zone = $this->zoneRepository->find($zoneCached);
 
         if (!preg_match("/^[^.]+$/", $request->request->get('productlinename'))) {
             // Handle the case when productlinne name contains disallowed characters

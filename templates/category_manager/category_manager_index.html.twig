@@ -165,7 +165,7 @@
 																<li
 																	class="form-control d-flex justify-content-between align-items-center mb-2">
 																	<a
-																		href="{{path('app_button', {buttonId: button.id, categoryId: button.category.id, productlineId: button.category.productLine.id, zoneId: button.category.productLine.zone.id})}}" class="btn btn-dark">
+																		href="{{path('app_button', {buttonId: button.id, categoryId: category.id, productlineId: productLine.id, zoneId: zone.id})}}" class="btn btn-dark">
 																		{{ button.name|split('.')|first|upper }}
 																	</a>
 																	{% if is_granted ('ROLE_LINE_ADMIN') or app.user is same as( button.creator) %}

@@ -9,7 +9,7 @@
 	class="col-md-2 col-sm-2 {{labelColValue}} ">
 	<label
 		for="training-needed"
-		class=" col-form-label  tooltips"
+		class=" col-form-label tooltips"
 		aria-label="Si la formation et la signature des opérateurs et nécéssaire"
 		style="color:white">
 		Formation nécessaire :
@@ -20,9 +20,11 @@
 	class="col-md-10 col-sm-10 {{inputColValue}}">
 	<input
 		id="training-needed"
+		name="training-needed"
 		type="checkbox"
 		class="training-toggle-input col-8"
 		data-document-training-target="trainingNeededToggle"
+		value="true"
 		{{checkStatus is defined ? (checkStatus ? "checked" : "") : ""}}>
 
 </div>

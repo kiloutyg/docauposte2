@@ -23,8 +23,8 @@ class CategoryManagerController extends FrontController
     {
         $category    = $this->cacheService->getEntityById('category', $categoryId);
         $buttons     = $this->cacheService->getEntitiesByParentId('button', $categoryId);
-        $productLine = $category->getProductLine();
-        $zone        = $productLine->getZone();
+        $productLine = $this->cacheService->getEntityById('productLine', $category->getProductLine()->getId());
+        $zone        = $this->cacheService->getEntityById('zone', $productLine->getZone()->getId());
 
         // These functions are responsible for retrieving the uploads and incidents children of the current category, it depends on the EntityHeritanceService class.
         $uploads = $this->entityHeritanceService->uploadsByParentEntity(

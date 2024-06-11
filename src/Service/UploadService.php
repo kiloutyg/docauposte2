@@ -82,6 +82,13 @@ class UploadService extends AbstractController
             } else {
                 $validated = true;
             };
+
+            if ($request->request->get('training-needed') === 'true') {
+                $trainingNeeded = true;
+            } else {
+                $trainingNeeded = false;
+            }
+
             // Dynamic folder creation and file upload
             // Get the name of the button
             $buttonname = $button->getName();
@@ -142,6 +149,8 @@ class UploadService extends AbstractController
             $upload->setValidated($validated);
             // Set the revision property
             $upload->setRevision($revision);
+            // Set the training property
+            $upload->setTraining($trainingNeeded);
             // Persist the upload object
             $this->manager->persist($upload);
         }
@@ -300,15 +309,20 @@ class UploadService extends AbstractController
 
 
     // This function is responsible for the logic of grouping the uploads files by parent entities
-    public function groupUploads(array $uploads)
+    public function groupUploads($uploads)
     {
         $groupedUploads = [];
-
         // Group uploads by zone, productLine, category, and button
         foreach ($uploads as $upload) {
+
             $button = $upload->getButton();
+            $button = $this->cacheService->getEntityById('button', $button->getId());
+
             $category = $button->getCategory();
+
             $productLine = $category->getProductLine();
+            $productLine = $this->cacheService->getEntityById('productLine', $productLine->getId());
+
             $zone = $productLine->getZone();
 
             $zoneName        = $zone->getName();
@@ -338,14 +352,17 @@ class UploadService extends AbstractController
     public function groupValidatedUploads($uploads)
     {
         $groupedValidatedUploads = [];
-
         // Group uploads by zone, productLine, category, and button
         foreach ($uploads as $upload) {
             if ($upload->getValidation()) {
-
                 $button = $upload->getButton();
+                $button = $this->cacheService->getEntityById('button', $button->getId());
+
                 $category = $button->getCategory();
+
                 $productLine = $category->getProductLine();
+                $productLine = $this->cacheService->getEntityById('productLine', $productLine->getId());
+
                 $zone = $productLine->getZone();
 
                 $zoneName        = $zone->getName();

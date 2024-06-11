@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 use App\Repository\ZoneRepository;
 use App\Repository\ProductLineRepository;
@@ -29,7 +30,7 @@ use App\Repository\TrainerRepository;
 
 class CacheService
 {
-    private CacheInterface $cache;
+    private TagAwareCacheInterface $cache;
 
     // Repositories
     private array $repositories;
@@ -75,7 +76,7 @@ class CacheService
 
 
     public function __construct(
-        CacheInterface                  $cache,
+        TagAwareCacheInterface          $cache,
         LoggerInterface                 $logger,
         ZoneRepository                  $zoneRepository,
         ProductLineRepository           $productLineRepository,
@@ -131,9 +132,13 @@ class CacheService
     {
         foreach ($this->repositories as $key => $repository) {
             try {
-                $this->{$key} = new ArrayCollection($this->cache->get("{$key}_cache", function (ItemInterface $item) use ($repository) {
-                    $item->expiresAfter(300); // Cache for 5 min
-                    return $repository->findBy([], ['SortOrder' => 'ASC']);
+                $this->{$key} = new ArrayCollection($this->cache->get("{$key}_cache", function (ItemInterface $item) use ($repository, $key) {
+                    $item->tag(["{$key}_tag"]);
+                    $item->expiresAfter(43200); // Cache for 12 hours
+                    if (in_array($key, ['zones', 'productLines', 'categories', 'buttons'])) {
+                        return $repository->findBy([], ['SortOrder' => 'ASC']);
+                    }
+                    return $repository->findBy([]);
                 }));
             } catch (\Exception $e) {
                 $this->logger->error("Error caching {$key}: " . $e->getMessage());
@@ -154,9 +159,14 @@ class CacheService
         $collectionName = $this->getCollectionName($entityType);
         $collection = $this->$collectionName;
 
+        // if ($collection->isEmpty()) {
+        //     $this->cachingAppVariable();
+        //     $collection = $this->{$entityType};
+        // }
+
         if ($collection->isEmpty()) {
             $this->cachingAppVariable();
-            $collection = $this->{$entityType};
+            $collection = $this->{$collectionName};
         }
 
         $entity = $collection->filter(function ($entity) use ($id) {
@@ -165,6 +175,8 @@ class CacheService
 
         return $entity === false ? null : $entity;
     }
+
+
     public function getEntityByName(string $entityType, string $name)
     {
         $collectionName = $this->getCollectionName($entityType);
@@ -172,7 +184,7 @@ class CacheService
 
         if ($collection->isEmpty()) {
             $this->cachingAppVariable();
-            $collection = $this->{$entityType};
+            $collection = $this->{$collectionName};
         }
 
         $entity = $collection->filter(function ($entity) use ($name) {
