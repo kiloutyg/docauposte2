@@ -134,8 +134,8 @@ class CacheService
             try {
                 $this->{$key} = new ArrayCollection($this->cache->get("{$key}_cache", function (ItemInterface $item) use ($repository, $key) {
                     $item->tag(["{$key}_tag"]);
-                    // $item->expiresAfter(43200); // Cache for 12 hours
-                    $item->expiresAfter(60); // Cache for 12 hours
+                    $item->expiresAfter(43200); // Cache for 12 hours
+                    // $item->expiresAfter(60); // Cache for 12 hours
 
                     if (in_array($key, ['zones', 'productLines', 'categories', 'buttons'])) {
                         return $repository->findBy([], ['SortOrder' => 'ASC']);
