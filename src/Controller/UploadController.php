@@ -90,14 +90,19 @@ class UploadController extends FrontController
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $file = $upload;
         if (!$file->isValidated()) {
-            $this->addFlash('error', 'Le nouveau fichier est en cours de validation.');
             if ($file->getOldUpload() != null) {
                 $oldUploadId = $file->getOldUpload()->getId();
                 $oldUpload = $this->oldUploadRepository->findOneBy(['id' => $oldUploadId]);
                 $path = $oldUpload->getPath();
                 $file = new File($path);
                 return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
+            } else {
+                $path = $file->getPath();
+                $file = new File($path);
+                $this->addFlash('error', 'Le fichier est en cours de validation.');
+                return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
             }
+            $this->addFlash('error', 'Le nouveau fichier est en cours de validation.');
             return $this->redirect($originUrl);
         }
         $path = $file->getPath();

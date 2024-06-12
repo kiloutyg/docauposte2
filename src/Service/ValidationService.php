@@ -451,7 +451,7 @@ class ValidationService extends AbstractController
                 foreach ($approbationsNotAnswered as $approbationNotAnswered) {
                     $upload = $approbationNotAnswered->getValidation()->getUpload();
                     $uploadedAt = $upload->getUploadedAt();
-                    if (date_diff($today, $uploadedAt)->days >= 15) {
+                    if (date_diff($today, $uploadedAt)->days >= 1) {
                         $uploadsWaitingValidation[] = $upload;
                     }
                 }

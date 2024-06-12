@@ -1,11 +1,23 @@
 <p>
-	<div class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+	<div
+		class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
 		<p>
 			{% if button.uploads|length > 0 %}
-				<div class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
+				<div
+					class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 					{% for upload in button.uploads %}
-						<a class="btn btn-primary btn-lg m-5" role="button" aria-pressed="true" style="color:white" href="{{path('app_download_file', {uploadId:upload.id })}}">
-							<span class="line-details">
+						{% set validated = '' %}
+						{% if upload.validation.status != true %}
+							{% set validated = 'download-non-validated-upload' %}
+						{% endif %}
+						<a
+							class="btn btn-primary btn-lg m-5 {{validated}}"
+							role="button"
+							aria-pressed="true"
+							style="color:white"
+							href="{{path('app_download_file', {uploadId:upload.id })}}">
+							<span
+								class="line-details">
 								{{ upload.filename|split('.')|first|upper }}
 							</span>
 						</a>
@@ -13,18 +25,28 @@
 				</div>
 			{% else %}
 				{% if is_granted('ROLE_LINE_ADMIN') %}
-					<div class="card border-0 shadow rounded-3 my-5">
-						<div class="card-body">
-							<div class="row">
-								<form action="{{path('app_generic_upload_files')}}" method="POST" enctype="multipart/form-data">
+					<div
+						class="card border-0 shadow rounded-3 my-5">
+						<div
+							class="card-body">
+							<div
+								class="row">
+								<form
+									action="{{path('app_generic_upload_files')}}" method="POST"
+									enctype="multipart/form-data">
 									{% include "services/uploads/upload.html.twig" %}
 								</form>
 							</div>
 						</div>
 					</div>
 				{% else %}
-					<a class="btn-warning btn btn-lg fa fa-arrow-circle-o-left" style="color:red" href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
-						Retour</a>
+					<a
+						class="btn-warning btn btn-lg fa fa-arrow-circle-o-left"
+						style="color:red"
+						href="javascript:void(0)"
+						onclick="event.preventDefault(); window.history.back();">
+						Retour
+					</a>
 				{% endif %}
 			{% endif %}
 		</p>
