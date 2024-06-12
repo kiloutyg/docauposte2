@@ -122,6 +122,20 @@ class OperatorController extends FrontController
 
 
 
+    #[Route('/operator/pdf/{operatorId}', name: 'operator_pdf')]
+    public function generatePdf(int $operatorId): Response
+    {
+        $operator = $this->cacheService->getEntityById('operator', $operatorId);
+        $this->logger->info('operator', [$operator]);
+
+        $pdfContent = $this->pdfGeneratorService->generateOperatorPdf($operator);
+
+        return new Response($pdfContent, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="operator_' . $operator->getId() . '.pdf"',
+        ]);
+    }
+
 
 
     // Individual operator modification controller, used in dev purpose

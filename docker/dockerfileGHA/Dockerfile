@@ -4,7 +4,7 @@ COPY php.ini /usr/local/etc/php/php.ini
 RUN a2enmod rewrite \
   && service apache2 restart
 RUN apt-get update -y \
-  && apt-get install -y ca-certificates curl libxslt-dev libzip-dev git wget gnupg --no-install-recommends \
+  && apt-get install -y ca-certificates curl libxslt-dev libzip-dev git wget gnupg php-gd php-imagick --no-install-recommends \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN docker-php-ext-install pdo mysqli pdo_mysql zip opcache xsl \

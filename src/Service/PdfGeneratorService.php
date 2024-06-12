@@ -6,6 +6,7 @@ use TCPDF;
 use Picqer\Barcode\BarcodeGeneratorPNG;
 use Picqer\Barcode\BarcodeGenerator;
 
+
 class PdfGeneratorService
 {
     public function generateOperatorPdf($operator)
