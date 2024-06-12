@@ -41,6 +41,7 @@ fi
 APP_CONTEXT="dev"
 sed -i "s|^APP_ENV=prod.*|APP_ENV=dev|" .env
 sed -i "s|^# MAILER_DSN=.*|MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0|" .env
+sed -i "s|^# MAILER_SENDER_EMAIL=.* |MAILER_SENDER_EMAIL=lan.docauposte@opmobility.com|" .env
 cat > src/Kernel.php <<EOL
 <?php
 

@@ -23,7 +23,7 @@ class Zone
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'zone', targetEntity: ProductLine::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'zone', targetEntity: ProductLine::class)]
     private Collection $productLines;
 
     #[ORM\Column(nullable: true)]

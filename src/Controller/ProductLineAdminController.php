@@ -23,11 +23,11 @@ class ProductLineAdminController extends FrontController
 
         // Get all the uploads and incidents related to the productline
         $uploads = $this->entityHeritanceService->uploadsByParentEntity(
-            'productline',
+            'productLine',
             $productLine->getId()
         );
         $incidents = $this->entityHeritanceService->incidentsByParentEntity(
-            'productline',
+            'productLine',
             $productLine->getId()
         );
 

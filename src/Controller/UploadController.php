@@ -45,6 +45,8 @@ class UploadController extends FrontController
     #[Route('/uploading', name: 'generic_upload_files')]
     public function generic_upload_files(Request $request): Response
     {
+        $this->logger->info('fullrequest', ['request' => $request]);
+
         // Get the URL of the page from which the request originated
         $originUrl = $request->headers->get('Referer');
         // Retrieve the User object
@@ -88,14 +90,19 @@ class UploadController extends FrontController
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $file = $upload;
         if (!$file->isValidated()) {
-            $this->addFlash('error', 'Le nouveau fichier est en cours de validation.');
             if ($file->getOldUpload() != null) {
                 $oldUploadId = $file->getOldUpload()->getId();
                 $oldUpload = $this->oldUploadRepository->findOneBy(['id' => $oldUploadId]);
                 $path = $oldUpload->getPath();
                 $file = new File($path);
                 return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
+            } else {
+                $path = $file->getPath();
+                $file = new File($path);
+                $this->addFlash('error', 'Le fichier est en cours de validation.');
+                return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
             }
+            $this->addFlash('error', 'Le nouveau fichier est en cours de validation.');
             return $this->redirect($originUrl);
         }
         $path = $file->getPath();
@@ -146,8 +153,8 @@ class UploadController extends FrontController
     // 
     // 
     // create a route to modify a file and or display the modification page
-    #[Route('/modify/{uploadId}', name: 'modify_file')]
-    public function modifyFile(Request $request, int $uploadId): Response
+    #[Route('/modification/view/{uploadId}', name: 'modify_file')]
+    public function fileModificationView(Request $request, int $uploadId): Response
     {
         // Retrieve the current upload entity based on the uploadId
         $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
@@ -182,9 +189,12 @@ class UploadController extends FrontController
     // 
     // Testing separting the post and get in two different method to see if the issue of not reloading the pages and persisting the comments can be resolved through
     // the reorganization of the code
-    #[Route('/modifying/{uploadId}', name: 'modifying_file')]
+    #[Route('/modification/modifying/{uploadId}', name: 'modifying_file')]
     public function modifyingFile(Request $request, int $uploadId): Response
     {
+        // Log the request
+        $this->logger->info('fullrequest', ['request' => $request->request->all()]);
+        $this->logger->info('training needed', ['training' => $request->request->get('training-needed')]);
         // Retrieve the current upload entity based on the uploadId
         $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $oldFileName = $upload->getFilename();

@@ -1,37 +1,77 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!
+{% block title %}
+	Log in!
 {% endblock %}
 
 {% block body %}
-	<div class="container">
-		<div class="row">
-			<div class="col-sm-9 col-md-7 col-lg-5 mx-auto rounded bg-secondary">
-				<div class="card border-0 shadow rounded-3 my-4 ">
-					<h3 class="card-title text-center shadow mb-4 mt-4 fw-light fs-5">
-						<strong style="color:black">Formulaire de connexion</strong>
+	<div
+		class="container">
+		<div
+			class="row">
+			<div
+				class="col-sm-9 col-md-7 col-lg-5 mx-auto rounded bg-secondary">
+				<div
+					class="card border-0 shadow rounded-3 my-4 ">
+					<h3
+						class="card-title text-center shadow mb-4 mt-4 fw-light fs-5">
+						<strong
+							style="color:black">
+							Formulaire de connexion
+						</strong>
 					</h3>
-					<form class="form-control" method="post">
+					<form
+						class="form-control"
+						method="post">
 						{% if error %}
-							<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+							<div
+								class="alert alert-danger">
+								{{ error.messageKey|trans(error.messageData, 'security') }}
+							</div>
 						{% endif %}
 
-						<div class="form-control shadow mb-3">
-							<label for="username">Nom d'utilisateur</label>
-
-							<input type="text" value="{{ last_username }}" name="name" id="name" class="form-control" placeholder="Nom d'Utilisateur">
+						<div
+							class="form-control shadow mb-3">
+							<label
+								for="username">
+								Nom d'utilisateur
+							</label>
+							<input
+								type="text"
+								value="{{ last_username }}" name="name"
+								id="name"
+								class="form-control"
+								placeholder="Nom d'Utilisateur">
 						</div>
-						<div class="form-control shadow mb-3">
-							<label for="floatingPassword">Mot de passe</label>
+						<div
+							class="form-control shadow mb-3">
+							<label
+								for="floatingPassword">
+								Mot de passe
+							</label>
 
-							<input type="password" class="form-control" id="floatingPassword" placeholder="Mot de Passe" name="password">
+							<input
+								type="password"
+								class="form-control"
+								id="floatingPassword"
+								placeholder="Mot de Passe"
+								name="password">
 						</div>
 
-						<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-						<div class="d-grid">
-							<button class="btn btn-primary shadow btn-login text-uppercase fw-bold" type="submit">Connexion</button>
+						<input
+							type="hidden"
+							name="_csrf_token"
+							value="{{ csrf_token('authenticate') }}">
+						<div
+							class="d-grid">
+							<button
+								class="btn btn-primary shadow btn-login text-uppercase fw-bold"
+								type="submit">
+								Connexion
+							</button>
 						</div>
-						<hr class="my-4">
+						<hr
+							class="my-4">
 
 					</form>
 				</div>

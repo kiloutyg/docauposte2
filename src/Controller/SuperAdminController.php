@@ -21,10 +21,15 @@ class SuperAdminController extends FrontController
 
     // This function is responsible for rendering the super admin interface
     #[Route('/super_admin', name: 'app_super_admin')]
-    public function index(AuthenticationUtils $authenticationUtils): Response
+    public function index(): Response
     {
-        $incidents = $this->incidents;
-        $uploads = $this->uploads;
+        // $incidents = $this->incidents;
+        // $incidents = $this->incidentRepository->findAll();
+        $incidents = $this->cacheService->incidents;
+
+        // $uploads = $this->uploads;
+        // $uploads = $this->uploadRepository->findAll();
+        $uploads = $this->cacheService->uploads;
 
         // Group the uploads and incidents by parent entity
         $groupedUploads = $this->uploadService->groupUploads($uploads);
@@ -32,15 +37,13 @@ class SuperAdminController extends FrontController
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
 
         // Get the error and last username using AuthenticationUtils
-        $error = $authenticationUtils->getLastAuthenticationError();
-        $lastUsername = $authenticationUtils->getLastUsername();
+
 
         return $this->render('super_admin/super_admin_index.html.twig', [
             'groupedUploads'            => $groupedUploads,
             'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'            => $groupIncidents,
-            'error'                     => $error,
-            'last_username'             => $lastUsername
+
         ]);
     }
 

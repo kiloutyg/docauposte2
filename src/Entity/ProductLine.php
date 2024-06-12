@@ -28,7 +28,6 @@ class ProductLine
     private ?zone $zone = null;
 
 
-
     #[ORM\OneToMany(mappedBy: 'ProductLine', targetEntity: Category::class)]
     private Collection $categories;
 

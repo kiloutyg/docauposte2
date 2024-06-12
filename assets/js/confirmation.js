@@ -26,6 +26,7 @@ window.addEventListener("turbo:load", () => {
     ".submit-incident-modification");
   const submitViewsModifcationButtons = document.querySelectorAll(
     ".submit-views-modification");
+  const downloadNonValidatedUploadButtons = document.querySelectorAll(".download-non-validated-upload");
 
   const confirmationHandler = (event, message) => {
     const confirmed = confirm(message);
@@ -152,6 +153,14 @@ window.addEventListener("turbo:load", () => {
       confirmationHandler(
         event,
         "Êtes vous sûr de vouloir soumettre ces modifications?"
+      );
+    });
+  });
+  downloadNonValidatedUploadButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "CE DOCUMENT N'A PAS ETE VALIDE, CONTINUER DE TOUTE MANIERE? EN CAS DE QUESTION CONTACTER VOTRE RESPONSABLE."
       );
     });
   });

@@ -1,0 +1,99 @@
+{% if upload.validation is not empty %}
+	{% if upload.validated is same as(null) %}
+		<div
+			class=" alert alert-danger mb-1 justify-content-center"
+			id="validation_cycle"
+			name="validation_cycle">
+			<h5>
+				<strong>
+					Fichier en cours de validation.
+				</strong>
+			</h5>
+			{% if upload.validation.comment is not empty %}
+				Document posté avec le commentaire suivant :
+				<ul>
+					<li>
+						<i>
+							"
+							{{ upload.validation.comment }}
+							"
+						</i>
+					</li>
+				</ul>
+			{% endif %}
+			Les validations en cours:
+			<br>
+			{% for approbation in upload.validation.approbations %}
+				<ul>
+					<strong>
+						-
+						{{approbation.userapprobator.username|capitalize|split('.')|first }}
+						{{approbation.userapprobator.username|upper|split('.')|last }}
+					</strong>
+					{{approbation.approval is same as(true) ? ' a validé' : (approbation.approval is same as(false) ? ' a refusé' : (approbation.approval is same as(null) ? ' n\'a pas rendu son avis')) }}
+                    {% if approbation.comment is not empty %}
+                        <ul>
+                            <li>{{ approbation.comment }}
+                            </li>
+                        </ul>
+                    {% endif %}         
+                </ul>
+            {% endfor %}
+            {% if upload.revision is same as(1) %}
+            {% else %}
+                Le fichier a été modifié le {{upload.uploadedAt|date('d/m/y')}} 
+                {% if upload.validation.comment is defined %}
+                    avec le commentaire suivant: 				
+                    <ul><blockquote><i>"{{upload.validation.comment}}"</i></blockquote></ul>
+                {% endif %}
+            {% endif %}
+        </div>
+        <iframe src="{{ path('app_download_invalidation_file', { 'uploadId': upload.id }) }}" width="100%" height="750" target="_blank"></iframe>
+    {% elseif upload.validated is same as(false) %}
+        <div class=" alert alert-danger m-1 justify-content-center" id="validation_cycle" name="validation_cycle">
+            <h5>
+                <strong>
+                    Fichier refusé.
+                </strong>
+            </h5>
+        </div>
+        <iframe src="{{ path('app_download_invalidation_file', { 'uploadId': upload.id }) }}" width="100%" height="750" target="_blank">
+        </iframe>
+    {% elseif upload.validated is same as(true) %}
+        <div class=" alert alert-info m-1 justify-content-center" id="validation_cycle" name="validation_cycle">
+            {% if upload.revision is same as(1) %}
+            {% else %}
+            Le fichier a été modifié le {{upload.uploadedAt|date('d/m/y')}} 
+                {% if upload.validation.comment is defined %}
+                    avec le commentaire suivant: 				
+                    <ul><blockquote><i>"{{upload.validation.comment}}"</i></blockquote></ul>
+                {% endif %}
+            {% endif %}
+            {% for approbation in upload.validation.approbations %}
+                <ul>
+                    <strong>
+                    {{ approbation.userapprobator.username|capitalize|split('.')|first }} 
+                    {{ approbation.userapprobator.username|upper|split('.')|last }}
+                    </strong>
+                    {{ approbation.approval is same as(true) ? ' a validé ce document le ' ~ approbation.approvedAt|date('d/m/Y') ~ ' à ' ~ approbation.approvedAt|date('H') ~ 'h' ~ approbation.approvedAt|date('i')}}.
+                    {% if approbation.comment is not empty %}
+                        <ul> 
+                            <li>Commentaire: {{ approbation.comment }}
+                            </li>
+                        </ul>
+                    {% endif %}
+                </ul>
+            {% endfor %}	
+        </div>
+        <iframe src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" width="100%" height="750" target="_blank">
+        </iframe>
+    {% endif %}
+{% else %}
+    <div class="alert alert-info">
+        Ce document n'a pas necessité de validation.
+    </div>
+    <iframe src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" width="100%" height="750" target="_blank">
+    </iframe>
+{% endif %}
+<hr
+	class="my-4">

@@ -21,9 +21,10 @@ class CategoryManagerController extends FrontController
     // This function is responsible for rendering the category's admin interface. 
     public function index(int $categoryId = null): Response
     {
-        $category    = $this->categoryRepository->find($categoryId);
-        $productLine = $category->getProductLine();
-        $zone        = $productLine->getZone();
+        $category    = $this->cacheService->getEntityById('category', $categoryId);
+        $buttons     = $this->cacheService->getEntitiesByParentId('button', $categoryId);
+        $productLine = $this->cacheService->getEntityById('productLine', $category->getProductLine()->getId());
+        $zone        = $this->cacheService->getEntityById('zone', $productLine->getZone()->getId());
 
         // These functions are responsible for retrieving the uploads and incidents children of the current category, it depends on the EntityHeritanceService class.
         $uploads = $this->entityHeritanceService->uploadsByParentEntity(
@@ -49,6 +50,7 @@ class CategoryManagerController extends FrontController
             'category'                  => $category,
             'uploads'                   => $uploads,
             'incidents'                 => $incidents,
+            'categoryButtons'           => $buttons
 
         ]);
     }

@@ -23,19 +23,28 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 	</script>
 
 
-	<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
-		<div class="card-body ">
+	<div
+		class="card border-0 shadow rounded-3 my-5 bg-secondary">
+		<div
+			class="card-body ">
 			{% if DisapprovedFile|length > 0 %}
 				{% if app.user %}
 					{% if is_granted('ROLE_LINE_ADMIN') %}
-						<aside class="position-absolute end-0">
-							<a href="{{ path('app_productline_admin', {productlineId: upload.button.category.productline.id}) }}" class="btn shadow  bg-dark " style="color:white">
-								<span class="fa fa-gear"></span>
+						<aside
+							class="position-absolute end-0">
+							<a
+								href="{{ path('app_productline_admin', {productlineId: upload.button.category.productline.id}) }}" class="btn shadow  bg-dark "
+								style="color:white">
+								<span
+									class="fa fa-gear"></span>
 								<strong>
-									<span class="button-text">Centre d'Administration de la ligne
+									<span
+										class="button-text">
+										Centre d'Administration de la ligne
 										{{upload.button.category.productline.name|split('.')|first|upper}}
 										de la zone
-										{{upload.button.category.productline.zone.name|split('.')|first|upper}}</span>
+										{{upload.button.category.productline.zone.name|split('.')|first|upper}}
+									</span>
 
 
 								</strong>
@@ -45,18 +54,24 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 				{% endif %}
 			{% endif %}
 
-			<div class="row d-flex align-items-center gy-lg-0 gy-5">
-				<p class="text-white m-0">
-					<h3 style="color:white">
+			<div
+				class="row d-flex align-items-center gy-lg-0 gy-5">
+				<p
+					class="text-white m-0">
+					<h3
+						style="color:white">
 						Modification du fichier
-						<strong>{{upload.filename}}</strong>
+						<strong>
+							{{upload.filename}}
+						</strong>
 						:
 					</h3>
 				</p>
 
 				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyDisapprovedForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_validation_disapproved_modify', {'approbationId': approbation.id})}) }}
 
-				<div class="fallback">
+				<div
+					class="fallback">
 
 
 					{% set toBeCorrected = [] %}
@@ -68,47 +83,79 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					{% if toBeCorrected|length - 1 > 0  %}
 
 
-						<div class=" alert alert-info">
+						<div
+							class=" alert alert-info">
 							<strong>
 								Il reste
-								<span class="badge bg-danger rounded-pill">
+								<span
+									class="badge bg-danger rounded-pill">
 									{{toBeCorrected|length - 1}}
 								</span>
 								document(s) à modifier
 							</strong>
 						</div>
 					{% endif %}
-					<div class="alert alert-info">
+					<div
+						class="alert alert-info">
 						{% if approbation.validation.comment is defined %}
 							Refus faisant suite à la modification du document par
-							<u>{{approbation.validation.upload.uploader.username|capitalize|split('.')|first }}
-								{{approbation.validation.upload.uploader.username|upper|split('.')|last }}</u>
+							<u>
+								{{approbation.validation.upload.uploader.username|capitalize|split('.')|first }}
+								{{approbation.validation.upload.uploader.username|upper|split('.')|last }}
+							</u>
 							le
 							{{approbation.validation.upload.uploadedAt|date('d/m/y')}}
 							avec le commentaire suivant  :
 							<br>
 							<blockquote>
-								<i>"{{approbation.validation.comment}}"</i>
+								<i>
+									"
+									{{approbation.validation.comment}}
+									"
+								</i>
 							</blockquote>
 						{% endif %}
 					</div>
-					<div class="alert alert-danger">
+					<div
+						class="alert alert-danger">
 						{% for approbation in approbations %}
 							{% if approbation.comment is not empty and approbation.approval is same as (false) %}
-								<blockquote class="blockquote text-center">
-									<cite title="Source Title" style="color:black">Commentaire de refus</cite>
-									<p class="mb-2">{{approbation.comment}}</p>
-									<footer class="blockquote-footer" style="color:black">{{approbation.UserApprobator.username|capitalize|split('.')|first }}
+								<blockquote
+									class="blockquote text-center">
+									<cite
+										title="Source Title"
+										style="color:black">
+										Commentaire de refus
+									</cite>
+									<p
+										class="mb-2">
+										{{approbation.comment}}
+									</p>
+									<footer
+										class="blockquote-footer"
+										style="color:black">
+										{{approbation.UserApprobator.username|capitalize|split('.')|first }}
 										{{approbation.UserApprobator.username|upper|split('.')|last }}
 
 									</footer>
 								</blockquote>
 							{% endif %}
 							{% if approbation.comment is not empty and approbation.approval is same as (true) %}
-								<blockquote class="blockquote text-center">
-									<cite title="Source Title" style="color:black">Commentaire de Validation</cite>
-									<p class="mb-2">{{approbation.comment}}</p>
-									<footer class="blockquote-footer" style="color:black">{{approbation.UserApprobator.username|capitalize|split('.')|first }}
+								<blockquote
+									class="blockquote text-center">
+									<cite
+										title="Source Title"
+										style="color:black">
+										Commentaire de Validation
+									</cite>
+									<p
+										class="mb-2">
+										{{approbation.comment}}
+									</p>
+									<footer
+										class="blockquote-footer"
+										style="color:black">
+										{{approbation.UserApprobator.username|capitalize|split('.')|first }}
 										{{approbation.UserApprobator.username|upper|split('.')|last }}
 									</footer>
 								</blockquote>
@@ -116,152 +163,173 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						{% endfor %}
 					</div>
 
-					<iframe src="{{ path('app_validation_approbation_file', { 'approbationId': approbation.id }) }}" width="100%" height="750" target="_blank"></iframe>
+					<iframe
+						src="{{ path('app_validation_approbation_file', { 'approbationId': approbation.id }) }}" width="100%"
+						height="750"
+						target="_blank"></iframe>
+					<hr
+						class="my-4">
+					<div
+						class="row justify-content-center ">
+						<div
+							class="col-8">
+							{{ form_label(form.file, 'Choisissez un ficher à ajouter :', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}
+							) }}
+							{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}
+							) }}
+							<div
+								class="d-flex align-items-left mt-2 ">
 
-					<div class="mb-3 mt-3">
-						{{ form_label(form.file, 'Choisissez un ficher à ajouter :', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
-						{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}) }}
-					</div>
+								{{ include('services/operators/training_toggles/training_toggle_component.html.twig', {checkStatus: true}) }}
 
-					<div class="accordion mx-auto col-11 justify-content-center" id="accordionOtherDisapprovedModifications">
-						<div class="accordion-item">
-							<div class="accordion-header" id="otherDisapprovedModifications-header">
-								<label class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed" for="otherDisapprovedModifications" data-bs-toggle="collapse" data-bs-target="#otherDisapprovedModifications" aria-expanded="false" aria-controls="otherDisapprovedModifications" id="otherDisapprovedModificationsSelect">
-									<strong>Autres modifications</strong>
-									&nbsp; (Ouvrez ce menu pour acceder aux autres modifications)</label>
-							</div>
-							<div id="otherDisapprovedModifications" aria-labelledby="otherDisapprovedModifications" data-bs-parent="#accordionOtherDisapprovedModifications" class="accordion-collapse collapse ">
-								<div class="col-10 mx-auto">
-									<div class="mb-3">
-										{{ form_label(form.filename, 'Nouveau nom du fichier :', {'label_attr': {'class': 'form-label', 'style': 'color:black'}}) }}
-										{{ form_widget(form.filename, {'attr': {'class': 'form-control', 'id': 'filename', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)'}}) }}
-									</div>
-									{# Display the current button hierarchy #}
-									{% if lastZone != upload.button.category.productLine.zone %}
-										{% set lastZone = upload.button.category.productLine.zone %}
-										Zone:
-										{{ lastZone.name|split('.')|first|upper }}
-										>
-									{% endif %}
-									{% if lastProductLine != upload.button.category.productLine %}
-										{% set lastProductLine = upload.button.category.productLine %}
-										Produit:
-										{{ lastProductLine.name|split('.')|first|upper }}
-										>
-									{% endif %}
-									{% if lastCategory != upload.button.category %}
-										{% set lastCategory = upload.button.category %}
-										Categorie:
-										{{ lastCategory.name|split('.')|first|upper }}
-										>
-									{% endif %}
-									{% if lastButton != upload.button %}
-										{% set lastButton = upload.button %}
-										Bouton:
-										{{ lastButton.name|split('.')|first|upper }}
-										:
-									{% endif %}
-
-									<div class="row">
-										<div class="col-md-2 col-sm-2 mt-2 mb-2">
-											<label for="zone" style="color:black">Zone :</label>
-										</div>
-										<div class="col-md-10 col-sm-10 mt-2 mb-2">
-											<select name="zone" id="zone" class="form-select" required>
-												<option value="" selected disabled hidden>Choisir une Zone</option>
-											</select>
-										</div>
-										<div class="col-md-2 col-sm-2 mt-2 mb-2">
-											<label for="productline" style="color:black">Ligne :</label>
-										</div>
-										<div class="col-md-10 col-sm-10 mt-2 mb-2">
-											<select name="productline" id="productline" class="form-select" required>
-												<option value="" selected disabled hidden>Choisir une Ligne</option>
-											</select>
-										</div>
-										<div class="col-md-2 col-sm-2 mt-2 mb-2">
-											<label for="category" style="color:black">Categorie :</label>
-										</div>
-										<div class="col-md-10 col-sm-10 mt-2 mb-2">
-											<select name="category" id="category" class="form-select" required>
-												<option value="" selected disabled hidden>Choisir une Catégorie</option>
-											</select>
-										</div>
-										<div class="col-md-2 col-sm-2 mt-2 mb-2">
-											<label for="button" style="color:black">Bouton :</label>
-										</div>
-										<div class="col-md-10 col-sm-10 mt-2 mb-2">
-											{{ form_widget(form.button,{'attr': {'class': 'form-select', 'name': 'button', 'id': 'upload_button', 'required': true}}) }}
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="d-grid col-8 mt-2 mx-auto">
-						<div class="input-group  justify-content-center">
-							<div class="input-group-prepend">
-								<span class="input-group-text">Commentaire</span>
-								<textarea class="form-control" name="modificationComment" aria-label="With textarea" rows="2" cols="50" required></textarea>
 							</div>
 						</div>
 					</div>
 
-					<div class="d-grid w-75 mx-auto">
-						<div class="card border-5 shadow rounded-3 mt-2 " style="display: inline-block;">
-							<div class="card-body d-flex ">
-								<div class="container text-center">
-									<div class="row">
-										<div class="col-12">Modification de</div>
+					{% include "services/uploads/uploads_components/modifications_components/uploads_other_modifications.html.twig" %}
+
+					<div
+						class="d-grid col-8 mt-2 mx-auto">
+						<div
+							class="input-group  justify-content-center">
+							<div
+								class="input-group-prepend">
+								<span
+									class="input-group-text">
+									Commentaire
+								</span>
+								<textarea
+									class="form-control"
+									name="modificationComment"
+									aria-label="With textarea"
+									rows="2"
+									cols="50"
+									required></textarea>
+							</div>
+						</div>
+					</div>
+
+					<div
+						class="d-grid w-75 mx-auto">
+						<div
+							class="card border-5 shadow rounded-3 mt-2 "
+							style="display: inline-block;">
+							<div
+								class="card-body d-flex ">
+								<div
+									class="container text-center">
+									<div
+										class="row">
+										<div
+											class="col-12">
+											Modification de
+										</div>
 									</div>
-									<div class="row">
-										<div class="col-6 right-line"></div>
-										<div class="col-6"></div>
+									<div
+										class="row">
+										<div
+											class="col-6 right-line"></div>
+										<div
+											class="col-6"></div>
 									</div>
-									<div class="row">
-										<div class="col-2 right-line"></div>
-										<div class="col-4 top-line"></div>
-										<div class="col-4 right-line top-line"></div>
-										<div class="col-2"></div>
+									<div
+										class="row">
+										<div
+											class="col-2 right-line"></div>
+										<div
+											class="col-4 top-line"></div>
+										<div
+											class="col-4 right-line top-line"></div>
+										<div
+											class="col-2"></div>
 									</div>
-									<div class="row">
-										<div class="col-1"></div>
-										<div class="col-2 d-flex align-items-center justify-content-center ">
+									<div
+										class="row">
+										<div
+											class="col-1"></div>
+										<div
+											class="col-2 d-flex align-items-center justify-content-center ">
 											Semantique
-											<br>Orthographe
-											<br>Grammaire
-											<br>Pb. Majuscule
+											<br>
+											Orthographe
+											<br>
+											Grammaire
+											<br>
+											Pb. Majuscule
 										</div>
-										<div class="col-1"></div>
-										<div class="col-4"></div>
-										<div class="col-1"></div>
-										<div class="col-2">Processus
-											<div class="col-6 right-line"></div>
-											<div class="col-6 right-line"></div>
-											<div class="col-6 right-line"></div>
+										<div
+											class="col-1"></div>
+										<div
+											class="col-4"></div>
+										<div
+											class="col-1"></div>
+										<div
+											class="col-2">
+											Processus
+											<div
+												class="col-6 right-line"></div>
+											<div
+												class="col-6 right-line"></div>
+											<div
+												class="col-6 right-line"></div>
 										</div>
-										<div class="col-1"></div>
+										<div
+											class="col-1"></div>
 									</div>
-									<div class="row">
-										<div class="col-2 right-line"></div>
-										<div class="col-4 "></div>
-										<div class="col-4 right-line "></div>
-										<div class="col-2"></div>
+									<div
+										class="row">
+										<div
+											class="col-2 right-line"></div>
+										<div
+											class="col-4 "></div>
+										<div
+											class="col-4 right-line "></div>
+										<div
+											class="col-2"></div>
 									</div>
-									<div class="row">
-										<div class="col-1"></div>
-										<div class="col-2">
-											<input type="radio" class=" btn-check" name="modification-outlined" id="success-outlined" autocomplete="off" value="light-modification" checked>
-											<label class="btn btn-outline-success mb-0 mt-0" for="success-outlined">Modification Mineure</label>
+									<div
+										class="row">
+										<div
+											class="col-1"></div>
+										<div
+											class="col-2">
+											<input
+												type="radio"
+												class=" btn-check"
+												name="modification-outlined"
+												id="success-outlined"
+												autocomplete="off"
+												value="light-modification"
+												checked>
+											<label
+												class="btn btn-outline-success mb-0 mt-0"
+												for="success-outlined">
+												Modification Mineure
+											</label>
 										</div>
-										<div class="col-1"></div>
-										<div class="col-4"></div>
-										<div class="col-1"></div>
-										<div class="col-2">
-											<input type="radio" class=" btn-check" name="modification-outlined" id="danger-outlined" autocomplete="off" value="heavy-modification">
-											<label class="btn btn-outline-danger mb-0 mt-0" for="danger-outlined">Modification Majeure</label>
+										<div
+											class="col-1"></div>
+										<div
+											class="col-4"></div>
+										<div
+											class="col-1"></div>
+										<div
+											class="col-2">
+											<input
+												type="radio"
+												class=" btn-check"
+												name="modification-outlined"
+												id="danger-outlined"
+												autocomplete="off"
+												value="heavy-modification">
+											<label
+												class="btn btn-outline-danger mb-0 mt-0"
+												for="danger-outlined">
+												Modification Majeure
+											</label>
 										</div>
-										<div class="col-1"></div>
+										<div
+											class="col-1"></div>
 									</div>
 								</div>
 							</div>
@@ -269,8 +337,11 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					</div>
 
 
-					<div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
-						<button type="submit" class="btn btn-primary mb-5 submit-disapproval-modification">
+					<div
+						class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
+						<button
+							type="submit"
+							class="btn btn-primary mb-5 submit-disapproval-modification">
 							Modifier
 						</button>
 					</div>

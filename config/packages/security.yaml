@@ -50,10 +50,8 @@ security:
 
         - { path: ^/incident, roles: ROLE_LINE_ADMIN }
         - { path: ^/productline_admin, roles: ROLE_LINE_ADMIN }
-        - { path: ^/modify, roles: ROLE_LINE_ADMIN }
-        - { path: ^/modifyingfile, roles: ROLE_LINE_ADMIN }
+        - { path: ^/modification, roles: ROLE_LINE_ADMIN }
         - { path: ^/delete, roles: ROLE_LINE_ADMIN }
-        - { path: ^/modifyfile, roles: ROLE_LINE_ADMIN }
         - { path: ^/uploading, roles: ROLE_LINE_ADMIN }
         - { path: ^/upload, roles: ROLE_LINE_ADMIN }
         - { path: ^/uploaded, roles: ROLE_LINE_ADMIN }

@@ -20,6 +20,7 @@ use App\Entity\OldUpload;
 use App\Service\FolderCreationService;
 use App\Service\ValidationService;
 use App\Service\OldUploadService;
+use App\Service\CacheService;
 
 // This class is used to manage the uploads files and logic
 class UploadService extends AbstractController
@@ -32,6 +33,7 @@ class UploadService extends AbstractController
     protected $folderCreationService;
     protected $validationService;
     protected $oldUploadService;
+    private $cacheService;
 
 
     public function __construct(
@@ -42,7 +44,8 @@ class UploadService extends AbstractController
         UploadRepository $uploadRepository,
         LoggerInterface $logger,
         ValidationService $validationService,
-        OldUploadService $oldUploadService
+        OldUploadService $oldUploadService,
+        CacheService $cacheService
     ) {
         $this->uploadRepository      = $uploadRepository;
         $this->manager               = $manager;
@@ -52,6 +55,7 @@ class UploadService extends AbstractController
         $this->folderCreationService = $folderCreationService;
         $this->validationService     = $validationService;
         $this->oldUploadService      = $oldUploadService;
+        $this->cacheService          = $cacheService;
     }
 
     // This function is responsible for the logic of uploading the uploads files
@@ -78,6 +82,13 @@ class UploadService extends AbstractController
             } else {
                 $validated = true;
             };
+
+            if ($request->request->get('training-needed') === 'true') {
+                $trainingNeeded = true;
+            } else {
+                $trainingNeeded = false;
+            }
+
             // Dynamic folder creation and file upload
             // Get the name of the button
             $buttonname = $button->getName();
@@ -138,6 +149,8 @@ class UploadService extends AbstractController
             $upload->setValidated($validated);
             // Set the revision property
             $upload->setRevision($revision);
+            // Set the training property
+            $upload->setTraining($trainingNeeded);
             // Persist the upload object
             $this->manager->persist($upload);
         }
@@ -242,6 +255,12 @@ class UploadService extends AbstractController
         } else {
             $validated = true;
         };
+
+        if ($request->request->get('training-needed') === 'true') {
+            $upload->setTraining(true);
+        } else {
+            $upload->setTraining(false);
+        }
         // If new file exists, process it and delete the old one
         if ($newFile) {
 
@@ -299,12 +318,17 @@ class UploadService extends AbstractController
     public function groupUploads($uploads)
     {
         $groupedUploads = [];
-
         // Group uploads by zone, productLine, category, and button
         foreach ($uploads as $upload) {
+
             $button = $upload->getButton();
+            $button = $this->cacheService->getEntityById('button', $button->getId());
+
             $category = $button->getCategory();
+
             $productLine = $category->getProductLine();
+            $productLine = $this->cacheService->getEntityById('productLine', $productLine->getId());
+
             $zone = $productLine->getZone();
 
             $zoneName        = $zone->getName();
@@ -324,6 +348,8 @@ class UploadService extends AbstractController
             if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
                 $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
             }
+            // $upload = $this->uploadRepository->findOneBy(['id' => $upload->getId()]);
+
             $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
         }
         return $groupedUploads;
@@ -334,15 +360,17 @@ class UploadService extends AbstractController
     public function groupValidatedUploads($uploads)
     {
         $groupedValidatedUploads = [];
-
         // Group uploads by zone, productLine, category, and button
         foreach ($uploads as $upload) {
-
             if ($upload->getValidation()) {
-
                 $button = $upload->getButton();
+                $button = $this->cacheService->getEntityById('button', $button->getId());
+
                 $category = $button->getCategory();
+
                 $productLine = $category->getProductLine();
+                $productLine = $this->cacheService->getEntityById('productLine', $productLine->getId());
+
                 $zone = $productLine->getZone();
 
                 $zoneName        = $zone->getName();
@@ -362,6 +390,9 @@ class UploadService extends AbstractController
                 if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
                     $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
                 }
+
+                $upload = $this->uploadRepository->findOneBy(['id' => $upload->getId()]);
+
                 $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
             }
         }

@@ -76,13 +76,9 @@
 				<div
 					class="accordion-body accordion-bg shadow shadow-inset">
 					<div
-						class="card border-0 shadow rounded-3 my-5">
-						<form
-							class="form-floating row mx-auto"
-							method="POST"
-							action="{{ path('app_super_admin_create_admin') }}">
-							{% include "services/accountservices/create_account.html.twig" %}
-						</form>
+						class="card border-0 shadow rounded-3 my-5 form-floating row mx-auto">
+
+						{% include "services/accountservices/create_account.html.twig" %}
 					</div>
 				</div>
 			</div>

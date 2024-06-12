@@ -1,0 +1,110 @@
+<div
+	class="row justify-content-center"
+	data-controller="document-training">
+
+
+	<div
+		class="col-md-2 col-sm-2 mt-2 mb-2">
+		<label
+			for="zone"
+			style="color:white">
+			Zone :
+		</label>
+	</div>
+	<div
+		class="col-md-10 col-sm-10 mt-2 mb-2">
+		<select
+			name="zone"
+			id="zone"
+			class="form-select"
+			required>
+			<option
+				value=""
+				selected
+				disabled
+				hidden>
+				Choisir une Zone
+			</option>
+		</select>
+	</div>
+	<div
+		class="col-md-2 col-sm-2 mt-2 mb-2">
+		<label
+			for="productline"
+			style="color:white">
+			Ligne :
+		</label>
+	</div>
+	<div
+		class="col-md-10 col-sm-10 mt-2 mb-2">
+		<select
+			name="productline"
+			id="productline"
+			class="form-select"
+			required>
+			<option
+				value=""
+				selected
+				disabled
+				hidden>
+				Choisir une Ligne
+			</option>
+		</select>
+	</div>
+	<div
+		class="col-md-2 col-sm-2 mt-2 mb-2">
+		<label
+			for="category"
+			style="color:white">
+			Categorie :
+		</label>
+	</div>
+	<div
+		class="col-md-10 col-sm-10 mt-2 mb-2">
+		<select
+			name="category"
+			id="category"
+			class="form-select"
+			required>
+			<option
+				value=""
+				selected
+				disabled
+				hidden>
+				Choisir une Catégorie
+			</option>
+		</select>
+	</div>
+	<div
+		class="col-md-2 col-sm-2 mt-2 mb-2">
+		<label
+			for="button"
+			style="color:white">
+			Bouton :
+		</label>
+	</div>
+
+	<div
+		class="col-md-10 col-sm-10 mt-2 mb-2">
+		<select
+			name="button"
+			id="upload_button"
+			class="form-select"
+			required>
+			<option
+				value=""
+				selected
+				disabled
+				hidden>
+				Choisir un bouton
+			</option>
+		</select>
+
+	</div>
+	<div
+		class="d-flex align-items-left mt-2">
+		{{ include('services/operators/training_toggles/training_toggle_component.html.twig', {uploadMenu: true}) }}
+	</div>
+	{% include "services/uploads/uploads_components/cascading_dropdowns_components/validator_selection.html.twig" %}
+
+</div>
