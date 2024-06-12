@@ -320,16 +320,17 @@ class UploadService extends AbstractController
         $groupedUploads = [];
         // Group uploads by zone, productLine, category, and button
         foreach ($uploads as $upload) {
-
             $button = $upload->getButton();
             $button = $this->cacheService->getEntityById('button', $button->getId());
 
             $category = $button->getCategory();
+            $category = $this->cacheService->getEntityById('category', $category->getId());
 
             $productLine = $category->getProductLine();
             $productLine = $this->cacheService->getEntityById('productLine', $productLine->getId());
 
             $zone = $productLine->getZone();
+            $zone = $this->cacheService->getEntityById('zone', $zone->getId());
 
             $zoneName        = $zone->getName();
             $productLineName = $productLine->getName();
@@ -367,11 +368,13 @@ class UploadService extends AbstractController
                 $button = $this->cacheService->getEntityById('button', $button->getId());
 
                 $category = $button->getCategory();
+                $category = $this->cacheService->getEntityById('category', $category->getId());
 
                 $productLine = $category->getProductLine();
                 $productLine = $this->cacheService->getEntityById('productLine', $productLine->getId());
 
                 $zone = $productLine->getZone();
+                $zone = $this->cacheService->getEntityById('zone', $zone->getId());
 
                 $zoneName        = $zone->getName();
                 $productLineName = $productLine->getName();

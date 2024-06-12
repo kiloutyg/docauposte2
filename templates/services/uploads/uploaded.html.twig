@@ -31,11 +31,8 @@
 							class="card-body">
 							<div
 								class="row">
-								<form
-									action="{{path('app_generic_upload_files')}}" method="POST"
-									enctype="multipart/form-data">
-									{% include "services/uploads/upload.html.twig" %}
-								</form>
+
+								{% include "services/uploads/upload.html.twig" %}
 							</div>
 						</div>
 					</div>
