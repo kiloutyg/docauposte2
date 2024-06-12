@@ -10,9 +10,15 @@
 		<div
 			class="ml-auto">
 			<strong>
-				{% if upload.uploader is not empty %}
-					{{upload.uploader.username|capitalize|split('.')|first }}
-					{{upload.uploader.username|upper|split('.')|last }}
+
+				{% set uploader = null %}
+				{% if upload.uploader %}
+					{% set uploader = users|filter(user => user.id == upload.uploader.id)|first %}
+				{% endif %}
+				{% if uploader %}
+					{# {{ dump(uploader) }} #}
+					{{uploader.username|capitalize|split('.')|first }}
+					{{uploader.username|upper|split('.')|last }}
 				{% else %}
 					inconnu
 				{% endif %}

@@ -5,6 +5,9 @@
 	{% set labelColValue = "col-lg-2" %}
 	{% set inputColValue = "col-lg-10" %}
 {% endif %}
+{% if upload.training is defined and upload.training == true %}
+	{% set checkStatus = true %}
+{% endif %}
 <div
 	class="col-md-2 col-sm-2 {{labelColValue}} ">
 	<label
