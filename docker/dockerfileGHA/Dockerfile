@@ -4,7 +4,12 @@ COPY php.ini /usr/local/etc/php/php.ini
 RUN a2enmod rewrite \
   && service apache2 restart
 RUN apt-get update -y \
-  && apt-get install -y ca-certificates curl libxslt-dev libzip-dev git wget gnupg php-gd php-imagick --no-install-recommends \
+  && apt-get install -y ca-certificates curl libxslt-dev libzip-dev git wget gnupg \
+  # && wget http://ftp.de.debian.org/debian/pool/main/p/php-defaults/php-common_93+nmu1_all.deb
+  # && wget http://ftp.de.debian.org/debian/pool/main/p/php-imagick/php8.2-imagick_3.7.0-4+b2_amd64.deb
+  # && wget http://ftp.fr.debian.org/debian/pool/main/p/php-imagick/php-imagick_3.7.0-4+b2_amd64.deb
+  # $$ wget 
+  # && apt-get install -y apt-utils psmisc libmagicwand libpng-dev libjpeg-dev libfreetype6-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN docker-php-ext-install pdo mysqli pdo_mysql zip opcache xsl \
