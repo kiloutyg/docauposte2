@@ -4,11 +4,19 @@ namespace App\Service;
 
 use TCPDF;
 use Picqer\Barcode\BarcodeGeneratorPNG;
-use Picqer\Barcode\BarcodeGenerator;
+// use Picqer\Barcode\BarcodeGenerator;
 
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+
+use TomasVotruba\BarcodeBundle\Base2DBarcode;
+// use TomasVotruba\BarcodeBundle\Generator\BarcodeGenerator;
 
 class PdfGeneratorService
 {
+
+
+
     public function generateOperatorPdf($operator)
     {
         // Create a new PDF document
@@ -45,10 +53,20 @@ class PdfGeneratorService
         // Add barcode to PDF
         $pdf->Image($barcodePath, 10, 50, 100, 20);
 
+        // Generate Data Matrix barcode using endroid/qr-code
+        // $qrCode = new QrCode($operator->getCode());
+        // $writer = new PngWriter();
+        // $dataMatrix = $writer->write($qrCode);
+        // $dataMatrixPath = sys_get_temp_dir() . '/datamatrix.png';
+        // file_put_contents($dataMatrixPath, $dataMatrix->getString());
+
         // Generate Data Matrix barcode
-        $dataMatrix = $generator->getBarcode($operator->getCode(), $generator::TYPE_DATAMATRIX);
-        $dataMatrixPath = sys_get_temp_dir() . '/datamatrix.png';
-        file_put_contents($dataMatrixPath, $dataMatrix);
+        $dataMatrix = new Base2DBarcode();
+
+        $dataMatrix->savePath = sys_get_temp_dir() . '/';
+
+
+        $dataMatrixPath = $dataMatrix->getBarcodePNGPath($operator->getCode(), 'DATAMATRIX', 10, 10);
 
         // Add Data Matrix barcode to PDF
         $pdf->Image($dataMatrixPath, 10, 80, 100, 100);
