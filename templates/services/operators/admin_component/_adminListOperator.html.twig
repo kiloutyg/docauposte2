@@ -26,7 +26,7 @@
 				</div>
 			{% endfor %}
 			<div
-				class="col mx-auto"  style="color:white;">
+				class="col-2 mx-auto"  style="color:white;">
 				Actions
 			</div>
 		</div>
@@ -65,27 +65,27 @@
 						</a>
 					</div>
 				{% else %}
-			<div
-				class="col my-auto mx-auto">
-				<button
-					type="submit"
-					class="btn btn-primary text-uppercase ">
-					Modifier l'Opé
-				</button>
-				<a
-					href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase">
-					Supprimer
-				</a>
-			</div>
-		{% endif %}
+					<div
+						class="col-2 my-auto mx-auto">
+						<button
+							type="submit"
+							class="btn btn-primary text-uppercase ">
+							Modifier l'Opé
+						</button>
+						<a
+							href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase">
+							Supprimer
+						</a>
+						<a
+							href="{{ path('app_operator_detail', {'operatorId': operatorId}) }}" class="btn btn-light text-uppercase"  target="_blank">
+							Code
+						</a>
+					</div>
+				{% endif %}
 
 
 			{{ form_end(operatorForm) }}
-		{% else %}
-			<div
-				class="card alert alert-danger">
-				Aucun opérateur n'a été trouvé.
-			</div>
+
 		{% endfor %}
 	{% else %}
 		<div
