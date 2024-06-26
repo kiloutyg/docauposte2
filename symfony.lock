@@ -285,6 +285,9 @@
             "webpack.config.js"
         ]
     },
+    "tomasvotruba/barcode-bundle": {
+        "version": "1.5.0"
+    },
     "twig/extra-bundle": {
         "version": "v3.6.1"
     }

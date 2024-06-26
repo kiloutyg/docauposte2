@@ -1,15 +1,18 @@
 FROM php:8.2-apache-bookworm
 
+# ENV http_proxy='http://10.0.0.1:80'
 COPY php.ini /usr/local/etc/php/php.ini
 RUN a2enmod rewrite \
   && service apache2 restart
 RUN apt-get update -y \
-  && apt-get install -y ca-certificates curl libxslt-dev libzip-dev git wget gnupg --no-install-recommends \
+  && apt-get install -y ca-certificates curl libxslt-dev libzip-dev git wget gnupg \
+  && apt install -y libmagickwand-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN docker-php-ext-install pdo mysqli pdo_mysql zip opcache xsl \
-  && pecl install xdebug \
-  && docker-php-ext-enable xdebug mysqli pdo_mysql pdo zip opcache xsl
+RUN docker-php-ext-install pdo mysqli pdo_mysql zip opcache xsl gd \
+  && pecl install xdebug imagick\
+  && docker-php-ext-enable xdebug mysqli pdo_mysql pdo zip opcache xsl imagick gd
+
 
 # fix git author
 RUN git config --global user.email "floriandkhissi@gmail.com"
