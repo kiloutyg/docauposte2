@@ -122,20 +122,6 @@ class OperatorController extends FrontController
 
 
 
-    #[Route('/operator/pdf/{operatorId}', name: 'operator_pdf')]
-    public function generatePdf(int $operatorId): Response
-    {
-        $operator = $this->cacheService->getEntityById('operator', $operatorId);
-        $this->logger->info('operator', [$operator]);
-
-        $pdfContent = $this->pdfGeneratorService->generateOperatorPdf($operator);
-
-        return new Response($pdfContent, 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="operator_' . $operator->getId() . '.pdf"',
-        ]);
-    }
-
 
 
     // Individual operator modification controller, used in dev purpose
@@ -822,5 +808,17 @@ class OperatorController extends FrontController
 
         // Since $serializedSuggestions is a JSON string, return it directly with JsonResponse
         return new JsonResponse($serializedSuggestions, 200, [], true);
+    }
+
+    // Route to print the operator detail in a pdf
+    #[Route('/operator/detail/{operatorId}', name: 'app_operator_detail')]
+    public function printOpeDetail(int $operatorId)
+    {
+        $operator = $this->cacheService->getEntityById('operator', $operatorId);
+        $this->logger->info('operator', [$operator]);
+
+        $pdfContent = $this->pdfGeneratorService->generateOperatorPdf($operator);
+
+        return true;
     }
 }
