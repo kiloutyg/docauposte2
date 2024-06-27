@@ -9,6 +9,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use App\Form\OperatorType;
 
@@ -820,5 +821,102 @@ class OperatorController extends FrontController
         $pdfContent = $this->pdfGeneratorService->generateOperatorPdf($operator);
 
         return true;
+    }
+
+    // Route to import operators from a csv file
+    #[Route('/operator/import', name: 'app_operator_import')]
+    public function importOpe(Request $request)
+    {
+        $existingTeams = $this->teamRepository->findAll();
+        $existingUaps = $this->uapRepository->findAll();
+
+        // Handle the file upload
+        $file = $request->files->get('operator-import-file');
+        $ope_data = [];
+        if ($file instanceof UploadedFile) {
+            // Open the file
+            if (($handle = fopen($file->getPathname(), 'r')) !== false) {
+                // Process the CSV data
+                while (($data = fgetcsv($handle, 1000, ';', '"')) !== false) {
+                    // $data is an array of the CSV elements
+                    // Process the CSV row
+                    // For example, you can print the data:
+                    $ope_data[] = $data;
+                }
+                // Close the file handle
+                fclose($handle);
+
+                // Print the data
+
+                // $this->logger->info('ope_data', [$ope_data]);
+            } else {
+                return new Response('Failed to open the file.', Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            return new Response('No file uploaded or invalid file.', Response::HTTP_BAD_REQUEST);
+        }
+
+        //Process the data
+
+        foreach ($ope_data as $data) {
+            $code = $data[1];
+            $firstname = $data[2];
+            $surname = $data[3];
+            $name = strtolower($firstname . '.' . $surname);
+            // $this->teamRepository->findOneBy(['name' => $data[4]]) ? $team = $this->teamRepository->findOneBy(['name' => $data[4]]) : $team = $this->teamRepository->findOneBy(['name' => 'INDEFINI']);
+            // $this->uapRepository->findOneBy(['name' => $data[5]]) ? $uap = $this->uapRepository->findOneBy(['name' => $data[5]]) : ($this->uapRepository->findOneBy(['name' => $data[4]]) ? $uap = $this->uapRepository->findOneBy(['name' => $data[4]])  : $uap = $this->uapRepository->findOneBy(['name' => 'INDEFINI']));
+
+            // Find or default to 'INDEFINI' for team
+            $team = $this->findEntityByName($existingTeams, $data[4], "INDEFINI");
+
+            // Find or default to 'INDEFINI' for UAP
+            $uap = $this->findEntityByName($existingUaps, $data[5], "INDEFINI");
+            if ($uap->getName() === 'INDEFINI') {
+                $uap = $this->findEntityByName($existingUaps, $data[4], "INDEFINI");
+            }
+
+            $this->logger->info(
+
+                'code: %s, firstname: %s, surname: %s, name: %s, team: %s, uap: %s',
+                [
+                    $code,
+                    $firstname,
+                    $surname,
+                    $name,
+                    $team->getName(),
+                    $uap->getName()
+                ]
+
+            );
+        }
+
+        return new Response('File processed successfully.', Response::HTTP_OK);
+    }
+
+    /**
+     * Helper function to find an entity by name or return a default.
+     *
+     * @param array  $entities
+     * @param string $name
+     * @param string $defaultName
+     *
+     * @return object
+     */
+    private function findEntityByName(array $entities, string $name, string $defaultName)
+    {
+        foreach ($entities as $entity) {
+            if ($entity->getName() === $name) {
+                return $entity;
+            }
+        }
+
+        // Return the entity with the default name
+        foreach ($entities as $entity) {
+            if ($entity->getName() === $defaultName) {
+                return $entity;
+            }
+        }
+
+        throw new \Exception('Default entity not found');
     }
 }
