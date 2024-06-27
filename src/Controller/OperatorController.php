@@ -2,6 +2,10 @@
 
 namespace App\Controller;
 
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -16,15 +20,24 @@ use App\Form\OperatorType;
 use App\Entity\Operator;
 use App\Entity\TrainingRecord;
 use App\Entity\Trainer;
+use App\Entity\Team;
+use App\Entity\Uap;
 
 
 class OperatorController extends FrontController
 {
+    // private $validator;
+
+    // public function __construct(ValidatorInterface $validator)
+    // {
+    //     $this->validator = $validator;
+    // }
+
 
     #[Route('/operator', name: 'app_operator')]
     public function operatorBasePage(Request $request): Response
     {
-        $this->logger->info('search query with full request', $request->request->all());
+        // $this->logger->info('search query with full request', $request->request->all());
         // if ($app . user) Was doing somthing here and i don't remember what
         $countArray = $this->operatorService->operatorCheckForAutoDelete();
         if ($countArray != null) {
@@ -823,10 +836,371 @@ class OperatorController extends FrontController
         return true;
     }
 
-    // Route to import operators from a csv file
+    // // Route to import operators from a csv file
+    // #[Route('/operator/import', name: 'app_operator_import')]
+    // public function importOpe(Request $request, ValidatorInterface $validator, ManagerRegistry $doctrine)
+    // {
+    //     $em = $doctrine->getManager();
+
+    //     if (!$this->teamRepository->findOneBy(['name' => 'INDEFINI'])) {
+    //         $team = new Team();
+    //         $team->setName('INDEFINI');
+    //         $this->em->persist($team);
+    //         $this->em->flush();
+    //     }
+
+    //     if (!$this->uapRepository->findOneBy(['name' => 'INDEFINI'])) {
+    //         $uap = new Uap();
+    //         $uap->setName('INDEFINI');
+    //         $this->em->persist($uap);
+    //         $this->em->flush();
+    //     }
+
+    //     // Get all existing teams and UAPs
+    //     $existingTeams = $this->teamRepository->findAll();
+    //     $existingUaps = $this->uapRepository->findAll();
+
+    //     // Handle the file upload
+    //     $file = $request->files->get('operator-import-file');
+    //     $ope_data = [];
+    //     if ($file instanceof UploadedFile) {
+    //         // Open the file
+    //         if (($handle = fopen($file->getPathname(), 'r')) !== false) {
+    //             // Process the CSV data
+    //             while (($data = fgetcsv($handle, 1000, ';', '"')) !== false) {
+    //                 // Store $data in an array
+    //                 $ope_data[] = $data;
+    //             }
+    //             // Close the file handle
+    //             fclose($handle);
+    //         } else {
+    //             return new Response('Failed to open the file.', Response::HTTP_INTERNAL_SERVER_ERROR);
+    //         }
+    //     } else {
+    //         return new Response('No file uploaded or invalid file.', Response::HTTP_BAD_REQUEST);
+    //     }
+
+    //     // Begin a transaction
+    //     $this->em->beginTransaction();
+    //     try {
+    //         //Process the data
+    //         foreach ($ope_data as $data) {
+    //             $code = $data[1];
+    //             $firstname = $data[2];
+    //             $surname = $data[3];
+    //             $name = strtolower($surname . '.' . $firstname);
+
+    //             // Find or default to 'INDEFINI' for team
+    //             $team = $this->findEntityByName($existingTeams, $data[4], "INDEFINI");
+
+    //             // Find or default to 'INDEFINI' for UAP
+    //             $uap = $this->findEntityByName($existingUaps, $data[5], "INDEFINI");
+    //             if ($uap->getName() === 'INDEFINI') {
+    //                 $uap = $this->findEntityByName($existingUaps, $data[4], "INDEFINI");
+    //             }
+
+
+    //             $operator = new Operator;
+    //             $operator->setCode($code);
+    //             $operator->setName($name);
+    //             $operator->setTeam($team);
+    //             $operator->setUap($uap);
+    //             $this->em->persist($operator);
+    //             // Validate the operator
+    //             $errors = $validator->validate($operator);
+
+    //             // Handle validation errors
+    //             if (count($errors) > 0) {
+    //                 foreach ($errors as $error) {
+    //                     $this->addFlash('error', $error->getMessage());
+    //                 }
+    //                 continue; // Skip this operator if there are validation errors
+    //             }
+
+    //             $suffix = 1;
+    //             while (true) {
+    //                 try {
+    //                     $this->em->persist($operator);
+    //                     // $this->em->flush();
+    //                     break; // Exit loop if successful
+    //                 } catch (UniqueConstraintViolationException $e) {
+    //                     // Modify the violating field and retry
+    //                     $operator->setName($name . '_' . $suffix);
+    //                     $suffix++;
+    //                 }
+    //             }
+    //             $this->logger->info(
+    //                 'code: %s, firstname: %s, surname: %s, name: %s, team: %s, uap: %s',
+    //                 [
+    //                     $code,
+    //                     $firstname,
+    //                     $surname,
+    //                     $name,
+    //                     $team->getName(),
+    //                     $uap->getName()
+    //                 ]
+    //             );
+    //         }
+    //         // Commit the transaction
+    //         $this->em->commit();
+    //     } catch (\Exception $e) {
+    //         $this->logger->error($e->getMessage());
+    //         // Rollback the transaction if something goes wrong
+    //         $this->em->rollback();
+
+    //         // Reset the EntityManager if it's closed
+    //         if (!$this->em->isOpen()) {
+    //             $em = $doctrine->resetManager();
+    //         }
+
+    //         // Re-throw the exception for further handling
+    //         throw $e;
+    //     }
+    //     $this->addFlash('success', 'Les opérateurs ont bien été importés');
+    //     return  $this->redirectToRoute('app_operator');
+    // }
+
+
+
+
+    // #[Route('/operator/import', name: 'app_operator_import')]
+    // public function importOpe(Request $request, ValidatorInterface $validator, ManagerRegistry $doctrine)
+    // {
+    //     $em = $doctrine->getManager();
+
+    //     $unknownTeam = $this->teamRepository->findOneBy(['name' => 'INDEFINI']);
+    //     $unknownUap = $this->uapRepository->findOneBy(['name' => 'INDEFINI']);
+    //     if ($unknownTeam == null) {
+    //         $unknownTeam = new Team();
+    //         $unknownTeam->setName('INDEFINI');
+    //         $em->persist($unknownTeam);
+    //         $em->flush();
+    //     }
+    //     if ($unknownUap == null) {
+    //         $unknownUap = new Uap();
+    //         $unknownUap->setName('INDEFINI');
+    //         $em->persist($unknownUap);
+    //         $em->flush();
+    //     }
+
+    //     // Get all existing teams and UAPs
+    //     $existingTeams = $this->teamRepository->findAll();
+    //     $existingUaps = $this->uapRepository->findAll();
+
+    //     // Handle the file upload
+    //     $file = $request->files->get('operator-import-file');
+    //     $ope_data = [];
+    //     if ($file instanceof UploadedFile) {
+    //         // Open the file
+    //         if (($handle = fopen($file->getPathname(), 'r')) !== false) {
+    //             // Process the CSV data
+    //             while (($data = fgetcsv($handle, 1000, ';', '"')) !== false) {
+    //                 // Store $data in an array
+    //                 $ope_data[] = $data;
+    //             }
+    //             // Close the file handle
+    //             fclose($handle);
+    //         } else {
+    //             return new Response('Failed to open the file.', Response::HTTP_INTERNAL_SERVER_ERROR);
+    //         }
+    //     } else {
+    //         return new Response('No file uploaded or invalid file.', Response::HTTP_BAD_REQUEST);
+    //     }
+
+    //     // Begin a transaction
+    //     $em->beginTransaction();
+    //     try {
+    //         // Process the data
+    //         foreach ($ope_data as $data) {
+    //             $code = $data[1];
+    //             $firstname = $data[2];
+    //             $surname = $data[3];
+    //             $name = strtolower($firstname . '.' . $surname);
+
+    //             // Find or default to 'INDEFINI' for team
+    //             $team = $this->findEntityByName($existingTeams, $data[4], "INDEFINI");
+
+    //             // Find or default to 'INDEFINI' for UAP
+    //             $uap = $this->findEntityByName($existingUaps, $data[5], "INDEFINI");
+    //             if ($uap->getName() === 'INDEFINI') {
+    //                 $uap = $this->findEntityByName($existingUaps, $data[4], "INDEFINI");
+    //             }
+
+    //             $operator = new Operator();
+    //             $operator->setCode($code);
+    //             $operator->setName($name);
+    //             $operator->setTeam($team);
+    //             $operator->setUap($uap);
+
+    //             // Validate the operator
+    //             $errors = $validator->validate($operator);
+
+    //             // Handle validation errors
+    //             if (count($errors) > 0) {
+    //                 foreach ($errors as $error) {
+    //                     $this->addFlash('error', $error->getMessage());
+    //                 }
+    //                 continue; // Skip this operator if there are validation errors
+    //             }
+
+    //             $suffix = 1;
+    //             while (true) {
+    //                 try {
+    //                     $em->persist($operator);
+    //                     $em->flush();
+    //                     break; // Exit loop if successful
+    //                 } catch (UniqueConstraintViolationException $e) {
+    //                     // Modify the violating field and retry
+    //                     $operator->setName($name . '_' . $suffix);
+    //                     $suffix++;
+    //                 }
+    //             }
+
+    //             $this->logger->info(sprintf(
+    //                 'code: %s, firstname: %s, surname: %s, name: %s, team: %s, uap: %s',
+    //                 $code,
+    //                 $firstname,
+    //                 $surname,
+    //                 $name,
+    //                 $team->getName(),
+    //                 $uap->getName()
+    //             ));
+    //         }
+
+    //         // Commit the transaction
+    //         $em->commit();
+    //     } catch (\Exception $e) {
+    //         // Rollback the transaction if something goes wrong
+    //         $em->rollback();
+
+    //         // Reset the EntityManager if it's closed
+    //         if (!$em->isOpen()) {
+    //             $em = $doctrine->resetManager();
+    //         }
+
+    //         // Re-throw the exception for further handling
+    //         throw $e;
+    //     }
+
+    //     $this->addFlash('success', 'Les opérateurs ont bien été importés');
+    //     return $this->redirectToRoute('app_operator');
+    // }
+
+
+    // // Route to import operators from a csv file
+    // #[Route('/operator/import', name: 'app_operator_import')]
+    // public function importOpe(Request $request)
+    // {
+    //     $unknownTeam = $this->teamRepository->findOneBy(['name' => 'INDEFINI']);
+    //     $unknownUap = $this->uapRepository->findOneBy(['name' => 'INDEFINI']);
+    //     if ($unknownTeam == null) {
+    //         $unknownTeam = new Team();
+    //         $unknownTeam->setName('INDEFINI');
+    //         $this->em->persist($unknownTeam);
+    //         $this->em->flush();
+    //     }
+    //     if ($unknownUap == null) {
+    //         $unknownUap = new Uap();
+    //         $unknownUap->setName('INDEFINI');
+    //         $this->em->persist($unknownUap);
+    //         $this->em->flush();
+    //     }
+
+    //     // Get all existing teams and UAPs
+    //     $existingTeams = $this->teamRepository->findAll();
+    //     $existingUaps = $this->uapRepository->findAll();
+
+    //     // Handle the file upload
+    //     $file = $request->files->get('operator-import-file');
+    //     $ope_data = [];
+    //     if ($file instanceof UploadedFile) {
+    //         // Open the file
+    //         if (($handle = fopen($file->getPathname(), 'r')) !== false) {
+    //             // Process the CSV data
+    //             while (($data = fgetcsv($handle, 1000, ';', '"')) !== false) {
+    //                 // $data is an array of the CSV elements
+    //                 // Process the CSV row
+    //                 // For example, you can print the data:
+    //                 $ope_data[] = $data;
+    //             }
+    //             // Close the file handle
+    //             fclose($handle);
+
+    //             // Print the data
+
+    //             // $this->logger->info('ope_data', [$ope_data]);
+    //         } else {
+    //             return new Response('Failed to open the file.', Response::HTTP_INTERNAL_SERVER_ERROR);
+    //         }
+    //     } else {
+    //         return new Response('No file uploaded or invalid file.', Response::HTTP_BAD_REQUEST);
+    //     }
+
+    //     //Process the data
+
+    //     foreach ($ope_data as $data) {
+    //         $code = $data[1];
+    //         $firstname = $data[2];
+    //         $surname = $data[3];
+    //         $name = strtolower($surname . '.' . $firstname);
+
+    //         // Find or default to 'INDEFINI' for team
+    //         $team = $this->findEntityByName($existingTeams, $data[4], "INDEFINI");
+
+    //         // Find or default to 'INDEFINI' for UAP
+    //         $uap = $this->findEntityByName($existingUaps, $data[5], "INDEFINI");
+    //         if ($uap->getName() === 'INDEFINI') {
+    //             $uap = $this->findEntityByName($existingUaps, $data[4], "INDEFINI");
+    //         }
+
+    //         // $this->logger->info(
+
+    //         //     'code: %s, firstname: %s, surname: %s, name: %s, team: %s, uap: %s',
+    //         //     [
+    //         //         $code,
+    //         //         $firstname,
+    //         //         $surname,
+    //         //         $name,
+    //         //         $team->getName(),
+    //         //         $uap->getName()
+    //         //     ]
+
+    //         // );
+    //         $operator = new Operator();
+    //         $operator->setCode($code);
+    //         $operator->setName($name);
+    //         $operator->setTeam($team);
+    //         $operator->setUap($uap);
+    //         $this->em->persist($operator);
+    //     }
+    //     $this->em->flush();
+    //     $this->addFlash('success', 'Les opérateurs ont bien été importés');
+    //     return $this->redirectToRoute('app_operator');
+    // }
+
+
     #[Route('/operator/import', name: 'app_operator_import')]
-    public function importOpe(Request $request)
+    public function importOpe(Request $request, ValidatorInterface $validator, ManagerRegistry $doctrine)
     {
+        /** @var EntityManagerInterface $em */
+        $em = $doctrine->getManager();
+
+        $unknownTeam = $this->teamRepository->findOneBy(['name' => 'INDEFINI']);
+        $unknownUap = $this->uapRepository->findOneBy(['name' => 'INDEFINI']);
+        if ($unknownTeam == null) {
+            $unknownTeam = new Team();
+            $unknownTeam->setName('INDEFINI');
+            $em->persist($unknownTeam);
+            $em->flush();
+        }
+        if ($unknownUap == null) {
+            $unknownUap = new Uap();
+            $unknownUap->setName('INDEFINI');
+            $em->persist($unknownUap);
+            $em->flush();
+        }
+
+        // Get all existing teams and UAPs
         $existingTeams = $this->teamRepository->findAll();
         $existingUaps = $this->uapRepository->findAll();
 
@@ -838,17 +1212,11 @@ class OperatorController extends FrontController
             if (($handle = fopen($file->getPathname(), 'r')) !== false) {
                 // Process the CSV data
                 while (($data = fgetcsv($handle, 1000, ';', '"')) !== false) {
-                    // $data is an array of the CSV elements
-                    // Process the CSV row
-                    // For example, you can print the data:
+                    // Store $data in an array
                     $ope_data[] = $data;
                 }
                 // Close the file handle
                 fclose($handle);
-
-                // Print the data
-
-                // $this->logger->info('ope_data', [$ope_data]);
             } else {
                 return new Response('Failed to open the file.', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
@@ -856,42 +1224,86 @@ class OperatorController extends FrontController
             return new Response('No file uploaded or invalid file.', Response::HTTP_BAD_REQUEST);
         }
 
-        //Process the data
+        // Begin a transaction
+        $em->beginTransaction();
+        try {
+            // Process the data
+            foreach ($ope_data as $data) {
+                $code = $data[1];
+                $firstname = $data[2];
+                $surname = $data[3];
+                $name = strtolower($firstname . '.' . $surname);
 
-        foreach ($ope_data as $data) {
-            $code = $data[1];
-            $firstname = $data[2];
-            $surname = $data[3];
-            $name = strtolower($firstname . '.' . $surname);
-            // $this->teamRepository->findOneBy(['name' => $data[4]]) ? $team = $this->teamRepository->findOneBy(['name' => $data[4]]) : $team = $this->teamRepository->findOneBy(['name' => 'INDEFINI']);
-            // $this->uapRepository->findOneBy(['name' => $data[5]]) ? $uap = $this->uapRepository->findOneBy(['name' => $data[5]]) : ($this->uapRepository->findOneBy(['name' => $data[4]]) ? $uap = $this->uapRepository->findOneBy(['name' => $data[4]])  : $uap = $this->uapRepository->findOneBy(['name' => 'INDEFINI']));
+                // Find or default to 'INDEFINI' for team
+                $team = $this->findEntityByName($existingTeams, $data[4], "INDEFINI");
 
-            // Find or default to 'INDEFINI' for team
-            $team = $this->findEntityByName($existingTeams, $data[4], "INDEFINI");
+                // Find or default to 'INDEFINI' for UAP
+                $uap = $this->findEntityByName($existingUaps, $data[5], "INDEFINI");
+                if ($uap->getName() === 'INDEFINI') {
+                    $uap = $this->findEntityByName($existingUaps, $data[4], "INDEFINI");
+                }
 
-            // Find or default to 'INDEFINI' for UAP
-            $uap = $this->findEntityByName($existingUaps, $data[5], "INDEFINI");
-            if ($uap->getName() === 'INDEFINI') {
-                $uap = $this->findEntityByName($existingUaps, $data[4], "INDEFINI");
-            }
+                $operator = new Operator();
+                $operator->setCode($code);
+                $operator->setName($name);
+                $operator->setTeam($team);
+                $operator->setUap($uap);
 
-            $this->logger->info(
+                // Validate the operator
+                $errors = $validator->validate($operator);
 
-                'code: %s, firstname: %s, surname: %s, name: %s, team: %s, uap: %s',
-                [
+                // Handle validation errors
+                if (count($errors) > 0) {
+                    foreach ($errors as $error) {
+                        $this->addFlash('error', $error->getMessage());
+                    }
+                    continue; // Skip this operator if there are validation errors
+                }
+
+                $suffix = 1;
+                while (true) {
+                    try {
+                        $em->persist($operator);
+                        $em->flush();
+                        break; // Exit loop if successful
+                    } catch (UniqueConstraintViolationException $e) {
+                        // Modify the violating field and retry
+                        $operator->setName($name . '_' . $suffix);
+                        $suffix++;
+                    }
+                }
+
+                $this->logger->info(sprintf(
+                    'code: %s, firstname: %s, surname: %s, name: %s, team: %s, uap: %s',
                     $code,
                     $firstname,
                     $surname,
                     $name,
                     $team->getName(),
                     $uap->getName()
-                ]
+                ));
+            }
 
-            );
+            // Commit the transaction
+            $em->commit();
+        } catch (\Exception $e) {
+            // Rollback the transaction if something goes wrong
+            $em->rollback();
+
+            // Reset the EntityManager if it's closed
+            if (!$em->isOpen()) {
+                $em = $doctrine->resetManager();
+            }
+
+            // Re-throw the exception for further handling
+            throw $e;
         }
 
-        return new Response('File processed successfully.', Response::HTTP_OK);
+        $this->addFlash('success', 'Les opérateurs ont bien été importés');
+        return $this->redirectToRoute('app_operator');
     }
+
+
 
     /**
      * Helper function to find an entity by name or return a default.

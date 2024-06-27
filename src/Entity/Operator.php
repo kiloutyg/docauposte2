@@ -15,8 +15,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: OperatorRepository::class)]
-#[UniqueEntity(fields: 'code', message: 'Un opérateur avec ce code existe déjà42.')]
-#[UniqueEntity(fields: 'name', message: 'Un opérateur avec ce nom existe déjà42.')]
+#[UniqueEntity(fields: 'code', message: 'Un opérateur avec ce code existe déjà.')]
+#[UniqueEntity(fields: 'name', message: 'Un opérateur avec ce nom existe déjà.')]
 class Operator
 {
     #[ORM\Id]
@@ -28,7 +28,7 @@ class Operator
     #[ORM\Column(length: 255, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 180)]
-    #[Assert\Regex(pattern: '/^[a-zA-Z]+\.[a-zA-Z-]+$/', message: 'Le nom d\'opérateur doit être au format prénom.nom')]
+    #[Assert\Regex(pattern: '/^(?!-)(?!.*--)[a-zA-Z-]+(?<!-)\.(?!-)(?!.*--)[a-zA-Z-]+(?<!-)$/', message: 'Le nom d\'opérateur doit être au format prénom.nom')]
     #[Groups(['operator_details'])]
     private ?string $name = null;
 
