@@ -91,6 +91,7 @@ done
             fi
             cd docauposte2;
             sg docker -c "docker compose stop";
+            sg docker -c "docker system prune -fa";
             git remote remove origin;
             git remote add origin ${GIT_ADDRESS};
             git fetch origin --force;
