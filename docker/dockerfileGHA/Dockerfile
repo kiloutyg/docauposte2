@@ -9,7 +9,7 @@ RUN apt-get update -y \
   && apt install -y libmagickwand-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN docker-php-ext-install pdo mysqli pdo_mysql zip opcache xsl gd \
+RUN docker-php-ext-install pdo mysqli pdo_mysql zip opcache xsl gd bcmath \
   && pecl install xdebug imagick\
   && docker-php-ext-enable xdebug mysqli pdo_mysql pdo zip opcache xsl imagick gd
 
