@@ -7,25 +7,7 @@
 		{% set fieldsName = ['Nom de l\'opérateur', 'Prenom de l\'opérateur', 'Code de l\'opérateur', 'Equipe de l\'opérateur', 'UAP de l\'opérateur', 'Est-il un formateur?'] %}
 {% set fields = ['lastname', 'firstname', 'code', 'team', 'uap', 'isTrainer'] %}
 	</script>
-	<span>
-		<form
-			class="justify-content-center "
-			id="operator-import-form"
-			action="{{path('app_operator_import')}}" method="POST"
-			enctype="multipart/form-data">
-			<input
-				type="file"
-				class="form-control"
-				id="operator-import-file"
-				name="operator-import-file"
-				accept=".csv">
-			<button
-				type="submit"
-				class="btn btn-primary">
-				send
-			</button>
-		</form>
-	</span>
+
 	<div
 		class="card bg-secondary container row mb-2">
 		<h2
@@ -35,12 +17,46 @@
 		</h2>
 
 		{% include '/services/operators/admin_component/_adminAddOperator.html.twig' %}
+		<div
+			class="container">
+
+			<form
+				class=" justify-content-center row mt-3 mb-0"
+				id="operator-import-form"
+				action="{{path('app_operator_import')}}" method="POST"
+				enctype="multipart/form-data">
+
+				<div
+					class="col-8">
+					<h2
+						style="color:white;">
+						Liste des Opérateurs
+					</h2>
+				</div>
+				<div
+					class="col-3">
+					<input
+						type="file"
+						class="form-control"
+						id="operator-import-file"
+						name="operator-import-file"
+						aria-label="Importer un fichier CSV contenant une liste d'operateurs existant sous la forme ID;CodeOPE;PRENOM;NOM;EQUIPE;UAP"
+						accept=".csv"
+						placeholder="Importer un fichier CSV">
+				</div>
+				<div
+					class="col-1  align-self-center">
+					<button
+						type="submit"
+						class="btn btn-primary">
+						send
+					</button>
+				</div>
+
+			</form>
 
 
-		<h2
-			style="color:white;">
-			Liste des Opérateurs
-		</h2>
+		</div>
 
 		{% include '/services/operators/admin_component/_adminListOperatorSearchForm.html.twig' %}
 		<turbo-frame
