@@ -56,8 +56,14 @@
 				<div
 					class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 					{% for button in matchingButtons %}
+						{% set validated = '' %}
+						{% if button.uploads|length == 1 %}
+							{% if upload.validation.status != true %}
+								{% set validated = 'download-non-validated-upload' %}
+							{% endif %}
+						{% endif %}
 						<a
-							class="btn btn-primary btn-lg m-5"
+							class="btn btn-primary btn-lg m-5 {{validated}}"
 							role="button"
 							aria-pressed="true"
 							style="color:white"

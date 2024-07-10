@@ -6,7 +6,8 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-	<div class="container">
+	<div
+		class="container">
 		{% set matchinguploads = [] %}
 		{% for upload in uploads %}
 			{% if upload.button.id is same as(button.id)  %}
@@ -15,7 +16,8 @@
 		{% endfor %}
 		{% if matchinguploads|length > 1 %}
 			<div>
-				<div class="justify-content-between align-items-center ">
+				<div
+					class="justify-content-between align-items-center ">
 					<h2>
 						<strong>
 							Documents pour
@@ -26,7 +28,8 @@
 				</div>
 			</div>
 		{% elseif matchinguploads|length < 1 %}
-			<div class="justify-content-between align-items-center ">
+			<div
+				class="justify-content-between align-items-center ">
 				<h2>
 					<strong>
 						Document pour
@@ -35,7 +38,7 @@
 				</h2>
 				<p>
 					<strong>
-						Aucun document pour ce bouton
+						Aucun document validé pour ce bouton
 					</strong>
 				</p>
 				{% include 'services/uploads/uploaded.html.twig' %}
