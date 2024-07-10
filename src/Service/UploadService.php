@@ -269,6 +269,13 @@ class UploadService extends AbstractController
         } else {
             $upload->setTraining(false);
         }
+
+        if ($request->request->get('display-needed') === 'true') {
+            $upload->setForcedDisplay(true);
+        } else {
+            $upload->setForcedDisplay(false);
+        }
+
         // If new file exists, process it and delete the old one
         if ($newFile) {
 
