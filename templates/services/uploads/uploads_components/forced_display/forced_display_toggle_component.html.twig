@@ -5,7 +5,7 @@
 	{% set labelColValue = "col-lg-2" %}
 	{% set inputColValue = "col-lg-10" %}
 {% endif %}
-{% if upload.display is defined and upload.display == true %}
+{% if upload.forcedDisplay is defined and upload.forcedDisplay == true %}
 	{% set checkStatus = true %}
 {% endif %}
 <div
@@ -14,7 +14,7 @@
 		for="display-needed"
 		class=" col-form-label tooltips"
 		aria-label="Si l'affichage d'un document non validé est nécéssaire"
-		style="color:black">
+		style="color:white">
 		Forcer l'affichage en production :
 	</label>
 </div>
