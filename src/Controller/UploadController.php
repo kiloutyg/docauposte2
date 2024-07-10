@@ -106,9 +106,13 @@ class UploadController extends FrontController
             return $this->downloadFileFromMethods($path);
             // }
         }
+        // if ($file->isTraining() === true) {
+        //     return $this->redirectToRoute('app_training_front_by_upload', ['uploadId' => $uploadId]);
+        // } else {
         $this->logger->info('is validated', ['validated' => $file->isValidated()]);
         $path = $file->getPath();
         return $this->downloadFileFromMethods($path);
+        // }
     }
     //
     //
