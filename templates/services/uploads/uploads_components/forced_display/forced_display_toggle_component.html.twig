@@ -5,28 +5,28 @@
 	{% set labelColValue = "col-lg-2" %}
 	{% set inputColValue = "col-lg-10" %}
 {% endif %}
-{% if upload.training is defined and upload.training == true %}
+{% if upload.forcedDisplay is defined and upload.forcedDisplay == true %}
 	{% set checkStatus = true %}
 {% endif %}
 <div
 	class="col-md-2 col-sm-2 {{labelColValue}} ">
 	<label
-		for="training-needed"
+		for="display-needed"
 		class=" col-form-label tooltips"
-		aria-label="Si la formation et la signature des opérateurs est nécéssaire"
+		aria-label="Si l'affichage d'un document non validé est nécéssaire"
 		style="color:white">
-		Formation nécessaire :
+		Forcer l'affichage en production :
 	</label>
 </div>
 
 <div
 	class="col-md-10 col-sm-10 {{inputColValue}}">
 	<input
-		id="training-needed"
-		name="training-needed"
+		id="display-needed"
+		name="display-needed"
 		type="checkbox"
 		class="training-toggle-input col-8"
-		data-document-training-target="trainingNeededToggle"
+		data-document-display-target="displayNeededToggle"
 		value="true"
 		{{checkStatus is defined ? (checkStatus ? "checked" : "") : ""}}>
 

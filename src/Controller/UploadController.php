@@ -90,6 +90,12 @@ class UploadController extends FrontController
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $file = $upload;
         if (!$file->isValidated()) {
+            if ($file->isForcedDisplay() == true) {
+                $path = $file->getPath();
+                $file = new File($path);
+                $this->addFlash('error', 'Le fichier est en cours de validation.');
+                return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
+            } else
             if ($file->getOldUpload() != null) {
                 $oldUploadId = $file->getOldUpload()->getId();
                 $oldUpload = $this->oldUploadRepository->findOneBy(['id' => $oldUploadId]);
@@ -194,7 +200,7 @@ class UploadController extends FrontController
     {
         // Log the request
         $this->logger->info('fullrequest', ['request' => $request->request->all()]);
-        $this->logger->info('training needed', ['training' => $request->request->get('training-needed')]);
+
         // Retrieve the current upload entity based on the uploadId
         $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $oldFileName = $upload->getFilename();
@@ -213,6 +219,12 @@ class UploadController extends FrontController
             ]);
         }
 
+        $trainingNeeded =  $request->request->get('training-needed');
+        $forcedDisplay = $request->request->get('forced-display');
+
+        $this->logger->info('training needed', ['training' => $trainingNeeded]);
+        $this->logger->info('forced display', ['forced-display' => $forcedDisplay]);
+
         $comment = $request->request->get('modificationComment');
         $newValidation = $request->request->get('validatorRequired');
         $enoughValidator = false;
@@ -223,17 +235,18 @@ class UploadController extends FrontController
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
-                if ($upload->getFile() && $upload->getValidation() != null && $comment == null && $comment == "") {
-                    $this->addFlash('error', 'Le commentaire est vide. Commenter votre modification est obligatoire.');
-                    return $this->redirectToRoute('app_modify_file', [
-                        'uploadId' => $uploadId
-                    ]);
-                }
-                if ($newValidation == "true" && $enoughValidator == false) {
-                    $this->addFlash('error', 'Selectionner au moins 4 validateurs pour valider le fichier.');
-                    return $this->redirectToRoute('app_modify_file', [
-                        'uploadId' => $uploadId
-                    ]);
+                if ($trainingNeeded == null || $forcedDisplay == null) {
+                    if ($upload->getFile() && $upload->getValidation() != null && $comment == null && $comment == "") {
+                        $this->addFlash('error', 'Le commentaire est vide. Commenter votre modification est obligatoire.');
+                        return $this->redirectToRoute('app_modify_file', [
+                            'uploadId' => $uploadId
+                        ]);
+                    } elseif ($newValidation == "true" && $enoughValidator == false) {
+                        $this->addFlash('error', 'Selectionner au moins 4 validateurs pour valider le fichier.');
+                        return $this->redirectToRoute('app_modify_file', [
+                            'uploadId' => $uploadId
+                        ]);
+                    }
                 }
                 $this->uploadService->modifyFile($upload, $user, $request, $oldFileName);
                 $this->addFlash('success', 'Le fichier a été modifié.');
@@ -243,33 +256,6 @@ class UploadController extends FrontController
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
 
-                // $backtrace = debug_backtrace();
-                // $origin = sprintf(
-                //     'Error at %s line %d',
-                //     $backtrace[0]['file'],
-                //     $backtrace[0]['line']
-                // );
-                // $this->addFlash('error', $e->getMessage() . ' ' . $origin);
-                // // Function to format the debug backtrace as a string
-                // $formatBacktrace = function ($backtrace) {
-                //     $output = '';
-                //     foreach ($backtrace as $entry) {
-                //         $file = isset($entry['file']) ? $entry['file'] : 'Unknown file';
-                //         $line = isset($entry['line']) ? $entry['line'] : 'Unknown line';
-                //         $function = isset($entry['function']) ? $entry['function'] : 'Unknown function';
-                //         $output .= sprintf("File: %s, Line: %d, Function: %s\n", $file, $line, $function);
-                //     }
-                //     return $output;
-                // };
-
-                // // Use the function to get a formatted string of the backtrace
-                // $formattedBacktrace = $formatBacktrace($backtrace);
-
-                // // Log the detailed error internally
-                // $this->logger->error($e->getMessage(), ['exception' => $e, 'backtrace' => $formattedBacktrace]);
-
-
-                // $this->addFlash('error', 'Une erreur est survenue lors de la modification du fichier.');
                 return $this->redirectToRoute('app_modify_file', [
                     'uploadId' => $uploadId
                 ]);

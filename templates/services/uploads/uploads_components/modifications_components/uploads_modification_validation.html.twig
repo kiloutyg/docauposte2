@@ -19,8 +19,9 @@
 				id="validatorRequired"
 				autocomplete="off"
 				value="true"
-				data-action="click->document-training#modificationDocumentValidatorCheckboxClicked"
-				data-document-training-target="modificationDocumentTrainingValidatorCheckbox">
+				data-action="click->document-training#modificationDocumentValidatorCheckboxClicked click->document-display#modificationDocumentValidatorCheckboxClickedForcedDisplay"
+				data-document-training-target="modificationDocumentTrainingValidatorCheckbox"
+				data-document-display-target="modificationDocumentDisplayValidatorCheckboxForcedDisplay">
 			<label
 				class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed"
 				for="validatorRequired"
@@ -59,6 +60,7 @@
 						id="validator_user"></select>
 				</div>
 			</div>
+
 			{% if upload.validation is null %}
 				<div
 					class="d-grid col-8 mt-2 mb-2 mx-auto">

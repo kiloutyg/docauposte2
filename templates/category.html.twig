@@ -43,12 +43,7 @@
 				{{ category.name|split('.')|first|upper}}
 				:
 			</h3>
-			{% set matchingButtons = [] %}
-			{% for button in buttons %}
-				{% if button.category.id is same as(category.id)  %}
-					{% set matchingButtons = matchingButtons|merge([button]) %}
-				{% endif %}
-			{% endfor %}
+
 		</div>
 		<div
 			class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
@@ -56,8 +51,16 @@
 				<div
 					class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 					{% for button in matchingButtons %}
+						{% set validated = '' %}
+						{% if button.uploads|length == 1 %}
+							{% for upload in button.uploads %}
+								{% if upload.validation.status != true and upload.forcedDisplay == true %}
+									{% set validated = 'download-non-validated-upload' %}
+								{% endif %}
+							{% endfor %}
+						{% endif %}
 						<a
-							class="btn btn-primary btn-lg m-5"
+							class="btn btn-primary btn-lg m-5 {{validated}}"
 							role="button"
 							aria-pressed="true"
 							style="color:white"

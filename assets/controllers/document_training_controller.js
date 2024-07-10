@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 
 import axios from 'axios';
 
-export default class DocumentTrainingCOntroller extends Controller {
+export default class DocumentTrainingController extends Controller {
 
     static targets = [
         "trainingNeededToggle",
@@ -11,28 +11,28 @@ export default class DocumentTrainingCOntroller extends Controller {
     ];
 
     newDocumentValidatorCheckboxClicked() {
-        console.log("validatorCheckboxClicked");
+        console.log("training needed validatorCheckboxClicked");
         console.log(this.newDocumentTrainingValidatorCheckboxTarget.checked);
-        console.log('toggle ', this.trainingNeededToggleTarget.value);
+        console.log('training needed toggle ', this.trainingNeededToggleTarget.value);
         if (this.newDocumentTrainingValidatorCheckboxTarget.checked === true) {
             this.trainingNeededToggleTarget.checked = true;
-            console.log("checked ", this.trainingNeededToggleTarget.checked);
+            console.log("training needed checked ", this.trainingNeededToggleTarget.checked);
         } else {
             this.trainingNeededToggleTarget.checked = false;
-            console.log("unchecked ", this.trainingNeededToggleTarget.unchecked);
+            console.log("training needed unchecked ", this.trainingNeededToggleTarget.unchecked);
         }
     }
 
     modificationDocumentValidatorCheckboxClicked() {
-        console.log("validatorCheckboxClicked");
+        console.log("training needed validatorCheckboxClicked");
         console.log(this.modificationDocumentTrainingValidatorCheckboxTarget.checked);
-        console.log('toggle ', this.trainingNeededToggleTarget.value);
+        console.log('training needed toggle ', this.trainingNeededToggleTarget.value);
         if (this.modificationDocumentTrainingValidatorCheckboxTarget.checked === true) {
             this.trainingNeededToggleTarget.checked = true;
-            console.log("checked ", this.trainingNeededToggleTarget.checked);
+            console.log("training needed checked ", this.trainingNeededToggleTarget.checked);
         } else {
             this.trainingNeededToggleTarget.checked = false;
-            console.log("unchecked ", this.trainingNeededToggleTarget.unchecked);
+            console.log("training needed unchecked ", this.trainingNeededToggleTarget.unchecked);
         }
     }
 }
