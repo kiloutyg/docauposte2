@@ -21,7 +21,9 @@
 				autocomplete="off"
 				value="true"
 				data-action="click->document-training#newDocumentValidatorCheckboxClicked"
-				data-document-training-target="newDocumentTrainingValidatorCheckbox">
+				data-document-training-target="newDocumentTrainingValidatorCheckbox"
+				data-action="click->document-display#newDocumentValidatorCheckboxClickedForcedDisplay"
+				data-document-display-target="newDocumentDisplayValidatorCheckboxForcedDisplay">
 			<label
 				class="accordion-button m-0 mt-0 mb-0 btn btn-outline-primary collapsed"
 				for="validatorRequired"
@@ -84,7 +86,11 @@
 					</div>
 				</div>
 			</div>
+			<div
+				class="d-flex align-items-left m-2">
+				{{ include('services/uploads/uploads_components/forced_display/forced_display_toggle_component.html.twig', {uploadMenu: true}) }}
 
+			</div>
 		</div>
 
 	</div>

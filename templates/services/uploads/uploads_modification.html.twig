@@ -16,7 +16,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 	</script>
 	<div
 		class="card border-0 shadow rounded-3 my-5 bg-secondary"
-		data-controller="document-training">
+		data-controller="document-training document-display">
 		<div
 			class="card-body ">
 			{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm', 'method': 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_modifying_file', {'uploadId': upload.id})}) }}
