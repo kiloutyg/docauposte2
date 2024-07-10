@@ -1,0 +1,33 @@
+{% if updateMenu is not defined %}
+	{% set labelColValue = "col-lg-3" %}
+	{% set inputColValue = "col-lg-9" %}
+{% else %}
+	{% set labelColValue = "col-lg-2" %}
+	{% set inputColValue = "col-lg-10" %}
+{% endif %}
+{% if upload.display is defined and upload.display == true %}
+	{% set checkStatus = true %}
+{% endif %}
+<div
+	class="col-md-2 col-sm-2 {{labelColValue}} ">
+	<label
+		for="display-needed"
+		class=" col-form-label tooltips"
+		aria-label="Si la formation et la signature des opérateurs et nécéssaire"
+		style="color:white">
+		Formation nécessaire :
+	</label>
+</div>
+
+<div
+	class="col-md-10 col-sm-10 {{inputColValue}}">
+	<input
+		id="display-needed"
+		name="display-needed"
+		type="checkbox"
+		class="display-toggle-input col-8"
+		data-document-display-target="displayNeededToggle"
+		value="true"
+		{{checkStatus is defined ? (checkStatus ? "checked" : "") : ""}}>
+
+</div>
