@@ -89,6 +89,12 @@ class UploadService extends AbstractController
                 $trainingNeeded = false;
             }
 
+            if ($request->request->get('display-needed') === 'true') {
+                $displayNeeded = true;
+            } else {
+                $displayNeeded = false;
+            }
+
             // Dynamic folder creation and file upload
             // Get the name of the button
             $buttonname = $button->getName();
@@ -151,6 +157,8 @@ class UploadService extends AbstractController
             $upload->setRevision($revision);
             // Set the training property
             $upload->setTraining($trainingNeeded);
+            // Set the display property
+            $upload->setForcedDisplay($displayNeeded);
             // Persist the upload object
             $this->manager->persist($upload);
         }

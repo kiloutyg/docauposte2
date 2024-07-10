@@ -62,6 +62,9 @@ class Upload
     #[ORM\Column(nullable: true)]
     private ?bool $training = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $forcedDisplay = null;
+
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
@@ -272,6 +275,18 @@ class Upload
     public function setTraining(?bool $training): static
     {
         $this->training = $training;
+
+        return $this;
+    }
+
+    public function isForcedDisplay(): ?bool
+    {
+        return $this->forcedDisplay;
+    }
+
+    public function setForcedDisplay(?bool $forcedDisplay): static
+    {
+        $this->forcedDisplay = $forcedDisplay;
 
         return $this;
     }
