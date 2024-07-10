@@ -6,15 +6,15 @@ export default class DocumentDisplayController extends Controller {
 
     static targets = [
         "displayNeededToggle",
-        "newDocumentDisplayValidatorCheckbox",
-        "modificationDocumentDisplayValidatorCheckbox",
+        "newDocumentDisplayValidatorCheckboxForcedDisplay",
+        "modificationDocumentDisplayValidatorCheckboxForcedDisplay",
     ];
 
     newDocumentValidatorCheckboxClickedForcedDisplay() {
         console.log("forced display validatorCheckboxClicked");
-        console.log(this.newDocumentDisplayValidatorCheckboxTarget.checked);
+        console.log(this.newDocumentDisplayValidatorCheckboxForcedDisplayTarget.checked);
         console.log('forced display toggle ', this.displayNeededToggleTarget.value);
-        if (this.newDocumentDisplayValidatorCheckboxTarget.checked === true) {
+        if (this.newDocumentDisplayValidatorCheckboxForcedDisplayTarget.checked === true) {
             this.displayNeededToggleTarget.checked = true;
             console.log("forced display checked ", this.displayNeededToggleTarget.checked);
         } else {
@@ -25,9 +25,9 @@ export default class DocumentDisplayController extends Controller {
 
     modificationDocumentValidatorCheckboxClickedForcedDisplay() {
         console.log("forced display validatorCheckboxClicked");
-        console.log(this.modificationDocumentDisplayValidatorCheckboxTarget.checked);
+        console.log(this.modificationDocumentDisplayValidatorCheckboxForcedDisplayTarget.checked);
         console.log('forced display toggle ', this.displayNeededToggleTarget.value);
-        if (this.modificationDocumentDisplayValidatorCheckboxTarget.checked === true) {
+        if (this.modificationDocumentDisplayValidatorCheckboxForcedDisplayTarget.checked === true) {
             this.displayNeededToggleTarget.checked = true;
             console.log("forced display checked ", this.displayNeededToggleTarget.checked);
         } else {
