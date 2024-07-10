@@ -138,22 +138,15 @@ class FrontController extends BaseController
 
     public function category(int $categoryId = null): Response
     {
-        // $category    = $this->categoryRepository->find($categoryId);
-        // $productLine = $category->getProductLine();
-        // $zone        = $productLine->getZone();
-        // $buttons = [];
-        // $buttons = $this->buttonRepository->findBy(['Category' => $categoryId]);
+
+        $buttons = [];
+        $buttons = $this->buttonRepository->findBy(['Category' => $categoryId]);
 
         $category = $this->cacheService->getEntityById('category', $categoryId);
         $productLine = $this->cacheService->getEntityById('productLine', $category->getProductLine()->getId());
         $zone = $this->cacheService->getEntityById('zone', $productLine->getZone()->getId());
 
-        $buttonsAC = $this->cacheService->getEntitiesByParentId('button', $categoryId);
-        $this->logger->info('buttons', [$buttonsAC]);
-        $buttons = $buttonsAC->toArray();
         $this->logger->info('buttons', [$buttons]);
-
-        // $buttons = $this->cacheService->getEntitiesByParentId('button', $categoryId);
 
         if (count($buttons) != 1) {
 
@@ -162,7 +155,8 @@ class FrontController extends BaseController
                 [
                     'zone'        => $zone,
                     'productLine' => $productLine,
-                    'category'    => $category
+                    'category'    => $category,
+                    'matchingButtons' => $buttons,
                 ]
             );
         } else {
