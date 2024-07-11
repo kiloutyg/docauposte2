@@ -60,9 +60,10 @@ security:
 
         - { path: ^/category_manager, roles: ROLE_MANAGER }
         - { path: ^/tutorial, roles: ROLE_MANAGER }
-        - { path: ^/operator, roles: ROLE_MANAGER }
+        - { path: ^/operator/admin, roles: ROLE_MANAGER }
 
 
+        # - { path: ^/operator, roles: ROLE_MANAGER }
 
 
 when@test:

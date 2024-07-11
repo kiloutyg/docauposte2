@@ -202,7 +202,8 @@ class FrontController extends BaseController
             );
         } else {
             $uploadId = $uploads[0]->getId();
-            return $uploadController->downloadFileFromPath($uploadId, $request);
+            $this->logger->info('uploadId', [$uploadId]);
+            return $uploadController->filterDownloadFile($uploadId, $request);
         }
     }
     #[Route('/flash-messages', name: 'flash_messages')]

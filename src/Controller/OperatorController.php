@@ -34,7 +34,7 @@ class OperatorController extends FrontController
     // }
 
 
-    #[Route('/operator', name: 'app_operator')]
+    #[Route('/operator/admin', name: 'app_operator')]
     public function operatorBasePage(Request $request): Response
     {
         // $this->logger->info('search query with full request', $request->request->all());
@@ -241,7 +241,9 @@ class OperatorController extends FrontController
     #[Route('/operator/frontByUpl/{uploadId}', name: 'app_training_front_by_upload')]
     public function documentAndOperatorByUpload(Request $request, int $uploadId): Response
     {
-        $upload = $this->uploadRepository->getUpload($uploadId);
+        $this->logger->info('Full request', $request->request->all());
+        $this->logger->info('uploadId', [$uploadId]);
+        $upload = $this->uploadRepository->find($uploadId);
         $countArray = $this->operatorService->operatorCheckForAutoDelete();
         // if ($countArray != null) {
         //     if ($countArray != null) {
