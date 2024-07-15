@@ -243,6 +243,7 @@ class UploadController extends FrontController
 
         // Retrieve the current upload entity based on the uploadId
         $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $categoryId  = $upload->getButton()->getCategory()->getId();
         $oldFileName = $upload->getFilename();
 
         // Create a form to modify the Upload entity
@@ -254,8 +255,8 @@ class UploadController extends FrontController
         // Check if there is a file to modify
         if (!$upload) {
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
-            return $this->redirectToRoute('app_modify_file', [
-                'uploadId' => $uploadId
+            return $this->redirectToRoute('app_category_manager', [
+                'categoryId' => $categoryId
             ]);
         }
 
@@ -278,26 +279,26 @@ class UploadController extends FrontController
                 if ($trainingNeeded == null || $forcedDisplay == null) {
                     if ($upload->getFile() && $upload->getValidation() != null && $comment == null && $comment == "" && $request->request->get('modification-outlined' == '')) {
                         $this->addFlash('error', 'Le commentaire est vide. Commenter votre modification est obligatoire.');
-                        return $this->redirectToRoute('app_modify_file', [
-                            'uploadId' => $uploadId
+                        return $this->redirectToRoute('app_category_manager', [
+                            'categoryId' => $categoryId
                         ]);
                     } elseif ($newValidation == "true" && $enoughValidator == false) {
                         $this->addFlash('error', 'Selectionner au moins 4 validateurs pour valider le fichier.');
-                        return $this->redirectToRoute('app_modify_file', [
-                            'uploadId' => $uploadId
+                        return $this->redirectToRoute('app_category_manager', [
+                            'categoryId' => $categoryId
                         ]);
                     }
                 }
                 $this->uploadService->modifyFile($upload, $user, $request, $oldFileName);
                 $this->addFlash('success', 'Le fichier a été modifié.');
-                return $this->redirectToRoute('app_modify_file', [
-                    'uploadId' => $uploadId
+                return $this->redirectToRoute('app_category_manager', [
+                    'categoryId' => $categoryId
                 ]);
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
 
-                return $this->redirectToRoute('app_modify_file', [
-                    'uploadId' => $uploadId
+                return $this->redirectToRoute('app_category_manager', [
+                    'categoryId' => $categoryId
                 ]);
             }
         }
@@ -305,8 +306,8 @@ class UploadController extends FrontController
         if ($form->isSubmitted() && !$form->isValid()) {
             // Return the errors in the JSON response
             $this->addFlash('error', 'Invalid form. Check the entered data.');
-            return $this->redirectToRoute('app_modify_file', [
-                'uploadId' => $uploadId
+            return $this->redirectToRoute('app_category_manager', [
+                'categoryId' => $categoryId
             ]);
         }
     }
