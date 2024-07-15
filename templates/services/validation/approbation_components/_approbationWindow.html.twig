@@ -17,11 +17,11 @@
 			<br>
 		</div>
 		<div
-			class="card-body bg-secondary border shadow ">
+			class="card-body bg-secondary shadow p-2 ">
 			<div
 				class="card">
 				<div
-					class="card-body">
+					class="card-body p-1">
 					{% if approbation.validation.comment is defined %}
 						<b>
 							Validation faisant suite à modification du document par
@@ -32,7 +32,8 @@
 							<br>
 							avec le commentaire suivant  :
 							<br>
-							<blockquote>
+							<blockquote
+								class="mb-1">
 								<i>
 									"
 									{{approbation.validation.comment}}
@@ -85,24 +86,27 @@
 							{% endfor %}
 						</ul>
 					</div>
-					<h2
-						style="text-align: center;">
+					<h3
+						style="text-align: center;"
+						class="mb-1">
 						<strong>
 							{{approbation.validation.upload.filename|split('.')|first|upper}}
 						</strong>
-					</h2>
+					</h3>
 
 					{{ approbationMacros.buttonHierarchy(approbation.validation.upload) }}
 
-					<h3
-						style="text-align: center;">
+					<h4
+						style="text-align: center;"
+						class="mb-1">
 						{{approbation.validation.upload.button.name|split('.')|first|upper}}
-					</h3>
+					</h4>
 
 					{% set validation = approbation.validation %}
 					{% set approbations = validation.approbations %}
 					{% for approbation in approbations %}
-						<ul>
+						<ul
+							class="mb-1">
 							<b>
 								{% if app.user != approbation.userapprobator  %}
 									<u>
@@ -111,7 +115,6 @@
 									</u>
 									{% if approbation.approval is not null %}
 										{{ approbation.approval ? ' a validé le document.' : ' a refusé de validé le document.'}}
-
 									{% else %}
 										{{ ' n\'a pas encore rendu son avis.' }}
 									{% endif %}
@@ -128,16 +131,16 @@
 			            </ul>
                     {% endfor %}
                 </div>
-                <div class="card">
-                	<div class="card-body border shadow" style="background-color:f0f0f0;">
+                <div class="card p-0">
+                	<div class="card-body border shadow p-1" style="background-color:f0f0f0;">
 						<div class="d-flex justify-content-center align-items-center">
-							<form class="d-grid" method="post" action="{{ path('app_validation_approval', { 'approbationId': approbation.id }) }}" enctype="multipart/form-data">
+							<form class="d-grid mb-1" method="post" action="{{ path('app_validation_approval', { 'approbationId': approbation.id }) }}" enctype="multipart/form-data">
+                				<div class="btn-group d-flex justify-content-center" role="group">									<input type="radio" class="btn-check" name="approvalRadio" id="success-outlined" autocomplete="off" value="true" checked>
+									<label class="btn btn-outline-success" for="success-outlined">Approuver</label>
 
-								<input type="radio" class="btn-check" name="approvalRadio" id="success-outlined" autocomplete="off" value="true" checked>
-								<label class="btn btn-outline-success" for="success-outlined">Approuver</label>
-
-								<input type="radio" class="btn-check" name="approvalRadio" id="danger-outlined" autocomplete="off" value="false">
-								<label class="btn btn-outline-danger" for="danger-outlined">Désapprouver</label>
+									<input type="radio" class="btn-check" name="approvalRadio" id="danger-outlined" autocomplete="off" value="false">
+									<label class="btn btn-outline-danger" for="danger-outlined">Désapprouver</label>
+								</div>
 								<div class="input-group  justify-content-center">
 									<div class="input-group-prepend">
 										<span class="input-group-text">Commentaire</span>
@@ -150,7 +153,7 @@
 							</form>
 						</div>
 
-						<a class="btn btn-dark mt-3" href="{{ path('app_logout') }}">Déconnexion</a>
+						<a class="btn btn-dark mt-1" href="{{ path('app_logout') }}">Déconnexion</a>
             		</div>
 				</div>
 			</div>
