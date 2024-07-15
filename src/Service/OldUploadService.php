@@ -48,9 +48,21 @@ class OldUploadService extends AbstractController
     {
         $upload = $this->uploadRepository->findOneBy(['path' => $OldFilePath]);
 
-        if ($upload->getOldUpload() !== null) {
+        $this->logger->info('OldUploadService: retireOldUpload: upload: ' . $upload->getId());
+        $this->logger->info('OldUploadService: retireOldUpload: OldFilePath: ' . $OldFilePath);
+        $this->logger->info('OldUploadService: retireOldUpload: OldFileName: ' . $OldFileName);
+        $currentOldUpload = $upload->getOldUpload();
+        if ($currentOldUpload !== null) {
+            $this->logger->info('OldUploadService: retireOldUpload: currentOldUpload: ' . $currentOldUpload->getId());
+            $currendOldUploadEntity = $this->oldUploadRepository->find($currentOldUpload);
+        }
+
+        if ($currentOldUpload !== null && (file_get_contents($currendOldUploadEntity->getPath()) === file_get_contents($OldFilePath)) === true) {
+
+            $this->logger->info('OldUploadService: retireOldUpload: File exist and is the same as the current old file');
             return;
         } else {
+            $this->logger->info('OldUploadService: retireOldUpload: File is different from the current old file');
 
             $button             = $upload->getButton();
             $uploader           = $upload->getUploader();
