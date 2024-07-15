@@ -14,8 +14,17 @@
 	{{ encore_entry_script_tags('cascading-dropdowns') }}
 	{{ encore_entry_script_tags('department-creation') }}
 {% endblock %}
-
-
+<head>
+	<meta
+		charset="UTF-8"/>
+	<meta
+		name="viewport"
+		content="width=device-width, initial-scale=1">
+	<link
+		rel="icon"
+		type="image/ico"
+		href="{{ asset('OPmobility_icon.svg') }}"/>
+</head>
 {% block body %}
 
 
@@ -28,9 +37,9 @@
 			width="69%"
 			target="_blank"></iframe>
 		<div
-			style="width: 31%"
-			class="text-center card border border-0">
+			style="width: 32%"
+			class="text-center">
 			{% include 'services/validation/approbation_components/_approbationWindow.html.twig' %}
 		</div>
-
-	{% endblock %}
+	</div>
+{% endblock %}
