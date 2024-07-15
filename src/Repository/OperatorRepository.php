@@ -230,50 +230,53 @@ class OperatorRepository extends ServiceEntityRepository
         }
     }
 
-
+    // Used in the methods that add the tobedeleted datetime value in the appropriate field to the operator entity
     public function findOperatorWithNoRecentTraining()
     {
         $this->logger->info('Finding operators with no recent training.');
-        $oneYearAgo = new \DateTime();
-        $oneYearAgo->modify('-1 year');
+        $sixMonthsAgo = new \DateTime();
+        $sixMonthsAgo->modify('-6 months');
 
         $operators = $this->createQueryBuilder('o')
-            ->where('o.lasttraining < :oneYearAgo')
-            ->setParameter('oneYearAgo', $oneYearAgo)
+            ->where('o.lasttraining < :sixMonthsAgo')
+            ->setParameter('sixMonthsAgo', $sixMonthsAgo)
             ->andWhere('o.tobedeleted IS NULL')
             ->getQuery()
             ->getResult();
 
-        $this->logger->info('Unactive operators: ' . json_encode($operators));
+        $this->logger->info('Unactive operators: ', [$operators]);
         return $operators;
     }
+
+    // Used in the methods that check for operators to be deleted, count them, display them in appropriate views etc
     public function findInActiveOperators()
     {
         $this->logger->info('Finding operators with no recent training.');
-        $oneYearAgo = new \DateTime();
-        $oneYearAgo->modify('-1 year');
+        $sixMonthsAgo = new \DateTime();
+        $sixMonthsAgo->modify('-3 months');
 
         $operators = $this->createQueryBuilder('o')
-            ->where('o.lasttraining < :oneYearAgo')
-            ->setParameter('oneYearAgo', $oneYearAgo)
+            ->where('o.lasttraining < :sixMonthsAgo')
+            ->setParameter('sixMonthsAgo', $sixMonthsAgo)
             ->andWhere('o.tobedeleted IS NOT NULL')
             ->getQuery()
             ->getResult();
 
-        $this->logger->info('inactive operators: ' . json_encode($operators));
+        $this->logger->info('inactive operators: ', [$operators]);
         return $operators;
     }
 
+    // Used in the methods that delete the operator entity
     public function findOperatorToBeDeleted()
     {
         $this->logger->info('Finding operators to be deleted.');
-        $sixMonthsAgo = new \DateTime();
-        $sixMonthsAgo->modify('-6 months');
+        $threeMonthsAgo = new \DateTime();
+        $threeMonthsAgo->modify('-3 months');
 
         $operatorIds = $this->createQueryBuilder('o')
             ->select('o.id')
-            ->where('o.tobedeleted < :sixMonthsAgo')
-            ->setParameter('sixMonthsAgo', $sixMonthsAgo)
+            ->where('o.tobedeleted < :threeMonthsAgo')
+            ->setParameter('threeMonthsAgo', $threeMonthsAgo)
             ->getQuery()
             ->getScalarResult();
 

@@ -33,25 +33,37 @@
 						Liste des Opérateurs
 					</h2>
 				</div>
-				<div
-					class="col-3">
-					<input
-						type="file"
-						class="form-control"
-						id="operator-import-file"
-						name="operator-import-file"
-						aria-label="Importer un fichier CSV contenant une liste d'operateurs existant sous la forme ID;CodeOPE;PRENOM;NOM;EQUIPE;UAP"
-						accept=".csv"
-						placeholder="Importer un fichier CSV">
-				</div>
-				<div
-					class="col-1  align-self-center">
-					<button
-						type="submit"
-						class="btn btn-primary">
-						send
-					</button>
-				</div>
+				{% if is_granted('ROLE_ADMIN', object = null, field = null) %}
+
+					<div
+						class="col-3">
+						<input
+							type="file"
+							class="form-control"
+							id="operator-import-file"
+							name="operator-import-file"
+							aria-label="Importer un fichier CSV contenant une liste d'operateurs existant sous la forme ID;CodeOPE;PRENOM;NOM;EQUIPE;UAP"
+							accept=".csv"
+							placeholder="Importer un fichier CSV">
+					</div>
+					<div
+						class="col-1  align-self-center">
+						<button
+							type="submit"
+							class="btn btn-primary">
+							send
+						</button>
+					</div>
+				{% else %}
+					<div
+						class="col-4">
+						<p
+							style="color:white;">
+							Seul un administrateur peut importer des opérateurs
+						</p>
+					</div>
+
+				{% endif %}
 
 			</form>
 

@@ -52,7 +52,6 @@
 					class="form-control"
 					data-username-validation-target="username"
 					data-action="keyup->username-validation#validateUsername"
-					placeholder="prénom.nom"
 					id="username"
 					name="username"
 					{% if user is defined %} placeholder="{{user.username}}" {% else %} required
@@ -72,10 +71,10 @@
 			<input
 				type="password"
 				id="floatingPassword"
-				placeholder="Mot de passe"
 				name="password"
-				required
-				class="form-control">
+				{% if user is defined %} placeholder="Mot de passe"
+				{% else %} required
+				{% endif %} class="form-control">
 
 		</div>
 		<div
@@ -87,7 +86,6 @@
 			<input
 				type="email"
 				id="emailAddress"
-				placeholder="Adresse Mail"
 				name="emailAddress"
 				{% if user is defined %} placeholder="{{user.emailAddress}}" {% else %} required
 				{% endif %} class="form-control">
