@@ -1,0 +1,28 @@
+{% if updateMenu is not defined %}
+	{% set labelColValue = "col-lg-3" %}
+	{% set inputColValue = "col-lg-9" %}
+{% else %}
+	{% set labelColValue = "col-lg-2" %}
+	{% set inputColValue = "col-lg-10" %}
+{% endif %}
+
+<div
+	class="col-md-2 col-sm-2 {{labelColValue}} ">
+	<label
+		for="modification-outlined"
+		class=" col-form-label tooltips"
+		aria-label="Si modificaition de semantique, grammaire, mise en page, orthographe ou probleme de majuscule."
+		style="color:white">
+		Modification mineure :
+	</label>
+</div>
+
+<div
+	class="col-md-10 col-sm-10 {{inputColValue}}">
+	<input
+		id="modification-outlined"
+		name="modification-outlined"
+		type="checkbox"
+		class="training-toggle-input col-8"
+		value="minor-modification">
+</div>

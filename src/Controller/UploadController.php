@@ -21,6 +21,8 @@ use App\Entity\Upload;
 #[Route('/', name: 'app_')]
 class UploadController extends FrontController
 {
+
+
     // This function is responsible for rendering the upload interface
     #[Route('/upload', name: 'upload')]
     public function index(): Response
@@ -81,39 +83,77 @@ class UploadController extends FrontController
     // 
     // 
     // 
-    // create a route to download a file in more simple terms to display the file
+    // create a route to redirect to the correct views of a file
     #[Route('/download/{uploadId}', name: 'download_file')]
-    public function downloadFile(int $uploadId, Request $request): Response
+    public function filterDownloadFile(int $uploadId, Request $request): response
     {
-        // Retrieve the origin URL
-        $originUrl = $request->headers->get('Referer');
-        $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
-        $file = $upload;
+        $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         if (!$file->isValidated()) {
+            $this->logger->info('is validated', ['validated' => $file->isValidated()]);
+
             if ($file->isForcedDisplay() == true) {
                 $path = $file->getPath();
-                $file = new File($path);
-                $this->addFlash('error', 'Le fichier est en cours de validation.');
-                return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
-            } else
-            if ($file->getOldUpload() != null) {
+            } elseif ($file->getOldUpload() != null) {
                 $oldUploadId = $file->getOldUpload()->getId();
                 $oldUpload = $this->oldUploadRepository->findOneBy(['id' => $oldUploadId]);
                 $path = $oldUpload->getPath();
-                $file = new File($path);
-                return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
             } else {
                 $path = $file->getPath();
-                $file = new File($path);
-                $this->addFlash('error', 'Le fichier est en cours de validation.');
-                return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
             }
-            $this->addFlash('error', 'Le nouveau fichier est en cours de validation.');
-            return $this->redirect($originUrl);
+            if ($file->isTraining() === true) {
+                return $this->redirectToRoute('app_training_front_by_validation', ['validationId' => $file->getValidation()->getId()]);
+            } else {
+                $this->addFlash('error', 'Le nouveau fichier est en cours de validation.');
+                // return $this->downloadFileFromMethods($path);
+                return $this->downloadFileFromPath($uploadId);
+            }
+        } elseif ($file->isValidated() === true) {
+            if ($file->isTraining() === true) {
+                return $this->redirectToRoute('app_training_front_by_upload', ['uploadId' => $uploadId]);
+            } else {
+                $path = $file->getPath();
+            }
         }
+        $this->logger->info('is validated', ['validated' => $file->isValidated()]);
         $path = $file->getPath();
+        return $this->downloadFileFromMethods($path);
+    }
+    //
+    //
+    //
+    //
+    //
+    // create a route to download a file in more simple terms to display the file
+    public function downloadFileFromMethods(string $path): Response
+    {
         $file = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
+    }
+    // 
+    // 
+    // 
+    // 
+    // create a route to redirect to the correct views of a file
+    #[Route('/downloadByPath/{uploadId}', name: 'download_file_from_path')]
+    public function downloadFileFromPath(int $uploadId): response
+    {
+        $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $this->logger->info('is the file validated', ['validated: ' => $file->isValidated()]);
+        if (!$file->isValidated()) {
+            if ($file->isForcedDisplay() == true) {
+                $this->logger->info('is forced display', ['forced display' => $file->isForcedDisplay()]);
+                $path = $file->getPath();
+            } elseif ($file->getOldUpload() != null) {
+                $this->logger->info('does it have an old upload', ['old upload' => $file->getOldUpload()]);
+                // $oldUploadId = $file->getOldUpload()->getId();
+                // $file = $this->oldUploadRepository->findOneBy(['id' => $oldUploadId]);
+                $oldUpload = $file->getOldUpload();
+                $path = $oldUpload->getPath();
+            }
+        } else {
+            $path = $file->getPath();
+        }
+        return $this->downloadFileFromMethods($path);
     }
     // 
     // 
@@ -236,7 +276,7 @@ class UploadController extends FrontController
             // Process the form data and modify the Upload entity
             try {
                 if ($trainingNeeded == null || $forcedDisplay == null) {
-                    if ($upload->getFile() && $upload->getValidation() != null && $comment == null && $comment == "") {
+                    if ($upload->getFile() && $upload->getValidation() != null && $comment == null && $comment == "" && $request->request->get('modification-outlined' == '')) {
                         $this->addFlash('error', 'Le commentaire est vide. Commenter votre modification est obligatoire.');
                         return $this->redirectToRoute('app_modify_file', [
                             'uploadId' => $uploadId

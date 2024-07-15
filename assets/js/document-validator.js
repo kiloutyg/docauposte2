@@ -279,7 +279,19 @@ document.addEventListener("turbo:load", function () {
   const validationCycleInput = document.querySelector('div[name="validation_cycle"]');
   let isValidationCycle = validationCycleInput !== null;
 
+  // Modification level needed by the upload
+  let modificationLevel = document.getElementById('modification-outlined');
+  console.log(modificationLevel.checked);
+  console.log(modificationLevel.value);
+  modificationLevel.addEventListener('change', function () {
+    console.log(modificationLevel.checked);
+    console.log(modificationLevel.value);
+    if (modificationLevel.checked || modificationLevel.value == "minor-modification" && textareaComment === document.querySelector('textarea[name="modificationComment"]')) {
+      textareaComment.required = false;
+      console.log('Textarea is now not required');
 
+    }
+  });
   // This code selects the file input element with the id 'upload_file' and assigns it to the variable fileInput
   let fileInput = document.getElementById('upload_file') || document.getElementById('file');
 
@@ -301,7 +313,8 @@ document.addEventListener("turbo:load", function () {
       textareaComment.required = true;
       // Log a message to the console indicating that the textarea is now required
       console.log('Textarea is now required');
-    } else {
+    } // Add a test to insure the modification level is enough to require a commentary
+    else {
       // If either condition is false, set the 'required' attribute of the textarea to false
       textareaComment.required = false;
       // Log a message to the console indicating that the textarea is not required

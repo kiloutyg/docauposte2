@@ -211,6 +211,8 @@ class UploadService extends AbstractController
     // This function is responsible for the logic of modifying the uploads files
     public function modifyFile(Upload $upload, User $user, Request $request, string $oldFileName)
     {
+
+        $this->logger->info('fullrequest inside upload service', ['request' => $request->request->all()]);
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
 
@@ -251,7 +253,7 @@ class UploadService extends AbstractController
             $upload->setUploader($user);
             // Set the revision 
             $upload->setRevision(1);
-            if ($preExistingValidation) {
+            if ($preExistingValidation && ($request->request->get('modification-outlined') == '' || $request->request->get('modification-outlined') == 'heavy-modification')) {
                 if ($validated === null) {
                     $this->validationService->updateValidation($upload, $request);
                 }
@@ -302,13 +304,17 @@ class UploadService extends AbstractController
             $upload->setPath($Path);
             // Update the uploader in the upload object
             $upload->setUploader($user);
-            // Reset the validation and approbation property
-            $request->request->set('modification-outlined', 'heavy-modification');
+
             // If the modification is heavy, increment the revision number
             $upload->setRevision($upload->getRevision() + 1);
-            // If the modification is heavy, reset the approbation and set the $globalModification flag to true
-            $globalModification = true;
-            if ($preExistingValidation) {
+            if ($request->request->get('modification-outlined') == '') {
+                // If the modification is heavy, reset the approbation and set the $globalModification flag to true
+                $globalModification = true;
+                // Reset the validation and approbation property
+                $request->request->set('modification-outlined', 'heavy-modification');
+            }
+
+            if ($preExistingValidation  && ($request->request->get('modification-outlined') == '' || $request->request->get('modification-outlined') == 'heavy-modification')) {
                 $this->validationService->resetApprobation($upload, $request, $globalModification);
             }
         } else {

@@ -85,14 +85,14 @@
                 </ul>
             {% endfor %}	
         </div>
-        <iframe src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" width="100%" height="750" target="_blank">
+        <iframe src="{{ path('app_download_file_from_path', { 'uploadId': upload.id }) }}" width="100%" height="750" target="_blank">
         </iframe>
     {% endif %}
 {% else %}
     <div class="alert alert-info">
         Ce document n'a pas necessité de validation.
     </div>
-    <iframe src="{{ path('app_download_file', { 'uploadId': upload.id }) }}" width="100%" height="750" target="_blank">
+    <iframe src="{{ path('app_download_file_from_path', { 'uploadId': upload.id }) }}" width="100%" height="750" target="_blank">
     </iframe>
 {% endif %}
 <hr
