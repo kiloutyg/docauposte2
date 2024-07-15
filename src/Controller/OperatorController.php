@@ -992,4 +992,27 @@ class OperatorController extends FrontController
 
         throw new \Exception('Default entity not found');
     }
+
+    // Route to delete UAP or Team without breaking operators and training records database
+    #[Route('/operator/delete-uap-or-team/{entityType}/{entityId}', name: 'app_delete_uap_or_team')]
+    public function deleteUapTeamProperly(string $entityType, int $entityId)
+    {
+        try {
+            switch ($entityType) {
+                case 'team':
+                    $entity = $this->teamRepository->find($entityId);
+                    $this->operatorService->deleteTeam($entity);
+                    break;
+                case 'uap':
+                    $entity = $this->uapRepository->find($entityId);
+                    $this->operatorService->deleteUap($entity);
+                    break;
+                default:
+                    throw new \Exception('Invalid entity type');
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('danger', 'Erreur lors de la suppression de l\'entité' . $e->getMessage());
+            return $this->redirectToRoute('app_operator');
+        }
+    }
 }
