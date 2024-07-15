@@ -51,9 +51,17 @@
 											class="list-group">
 											{% for team in teams %}
 												<li
-													class="list-group-item bg-white text-dark">
-													{{ team.name }}
+													class="list-group-item bg-white text-dark row ">
+													<strong
+														class="col-4 ">
+														{{ team.name }}
+													</strong>
+													<a
+														href="{{path('app_delete_uap_or_team', {'entityType': 'team', 'entityId': team.id})}}" class="btn btn-danger delete-team col-4 shadow">
+														Supprimer
+													</a>
 												</li>
+
 											{% endfor %}
 										</ul>
 									</div>
@@ -107,8 +115,15 @@
 											class="list-group">
 											{% for uap in uaps %}
 												<li
-													class="list-group-item bg-white text-dark">
-													{{ uap.name }}
+													class="list-group-item bg-white text-dark row">
+													<strong
+														class="col-4 ">
+														{{ uap.name }}
+													</strong>
+													<a
+														href="{{path('app_delete_uap_or_team', {'entityType': 'uap', 'entityId': uap.id})}}" class="btn btn-danger delete-uap col-4 shadow">
+														Supprimer
+													</a>
 												</li>
 											{% endfor %}
 										</ul>
@@ -135,6 +150,4 @@
 
 		</div>
 	</div>
-
-
 {% endblock %}
