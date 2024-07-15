@@ -10,6 +10,11 @@ use Psr\Log\LoggerInterface;
 
 use Doctrine\ORM\EntityManagerInterface;
 
+use App\Entity\UAP;
+use App\Entity\Team;
+
+use App\Repository\UAPRepository;
+use App\Repository\TeamRepository;
 use App\Repository\OperatorRepository;
 
 use App\Service\EntityDeletionService;
@@ -18,6 +23,8 @@ class OperatorService extends AbstractController
 {
     protected   $logger;
     protected   $operatorRepository;
+    protected   $uapRepository;
+    protected   $teamRepository;
     protected   $projectDir;
     protected   $em;
     private     $entityDeletionService;
@@ -26,6 +33,8 @@ class OperatorService extends AbstractController
     public function __construct(
         LoggerInterface         $logger,
         OperatorRepository      $operatorRepository,
+        UAPRepository           $uapRepository,
+        TeamRepository          $teamRepository,
         ParameterBagInterface   $params,
         EntityManagerInterface  $em,
         EntityDeletionService   $entityDeletionService
@@ -33,6 +42,8 @@ class OperatorService extends AbstractController
     ) {
         $this->logger                   = $logger;
         $this->operatorRepository       = $operatorRepository;
+        $this->uapRepository            = $uapRepository;
+        $this->teamRepository           = $teamRepository;
         $this->projectDir               = $params->get('kernel.project_dir');
         $this->em                       = $em;
         $this->entityDeletionService    = $entityDeletionService;
@@ -88,5 +99,31 @@ class OperatorService extends AbstractController
             ];
             return $countArray;
         }
+    }
+
+    public function deleteUAP(UAP $uap)
+    {
+        $unDefinedUap = $this->uapRepository->findOneBy(['name' => 'IDEFINI']);
+        $uapOperators = $uap->getOperator();
+
+        foreach ($uapOperators as $operator) {
+            $operator->setUap($unDefinedUap);
+            $this->em->persist($operator);
+        }
+        $this->em->flush();
+        return true;
+    }
+
+    public function deleteTeam(Team $team)
+    {
+        $unDefinedTeam = $this->teamRepository->findOneBy(['name' => 'IDEFINI']);
+        $teamOperators = $team->getOperator();
+
+        foreach ($teamOperators as $operator) {
+            $operator->setTeam($unDefinedTeam);
+            $this->em->persist($operator);
+        }
+        $this->em->flush();
+        return true;
     }
 }
