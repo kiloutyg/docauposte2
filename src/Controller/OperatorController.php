@@ -1067,7 +1067,7 @@ class OperatorController extends FrontController
                 }
             }
         } else if ($request->getMethod() == 'GET') {
-            return $this->render('services/operators/team_uap_management.html.twig', [
+            return $this->render('services/operators/team_uap_operator_management.html.twig', [
                 'teamForm' => $teamForm->createView(),
                 'uapForm' => $uapForm->createView()
             ]);

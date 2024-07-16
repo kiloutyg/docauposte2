@@ -63,43 +63,9 @@
 			{% include "zone_admin/zone_admin_components/line_creation_form.html.twig" %}
 
 		</div>
-		<div
-			class="accordion-item">
-			<h2
-				class="accordion-header"
-				id="headingOperatorMannagement">
-				<button
-					class="accordion-button fs-3 collapsed"
-					type="button"
-					data-bs-toggle="collapse"
-					data-bs-target="#collapseOperatorMannagement"
-					aria-expanded="false"
-					aria-controls="collapseOperatorMannagement">
-					<strong>
-						Formulaire de gestions Operateurs :
-					</strong>
-				</button>
-			</h2>
-			<div
-				id="collapseOperatorMannagement"
-				class="accordion-collapse collapse"
-				aria-labelledby="headingOperatorMannagement"
-				data-bs-parent="#accordionSuperAdmin">
-				<div
-					class="accordion-body accordion-bg shadow shadow-inset">
-					<div
-						class="card border-0 shadow rounded-3 my-5">
-						<div
-							class="card-body">
-							<div
-								class="row">
-								{{ render(controller('App\\Controller\\OperatorController::operatorManagement'), options = []) }}
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+
+		{{ render(controller('App\\Controller\\OperatorController::operatorManagement'), options = []) }}
+
 		<div
 			class="accordion-item">
 			<h2
