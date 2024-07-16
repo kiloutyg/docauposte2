@@ -1020,8 +1020,8 @@ class OperatorController extends FrontController
         if (count($this->teamRepository->findAll()) == 0 || count($this->uapRepository->findAll()) == 0) {
             $team = new Team();
             $uap = new Uap();
-            $team->setName('IDEFINI');
-            $uap->setName('IDEFINI');
+            $team->setName('INDEFINI');
+            $uap->setName('INDEFINI');
             $this->em->persist($team);
             $this->em->persist($uap);
             $this->em->flush();
