@@ -50,7 +50,18 @@ class UploadController extends FrontController
         $this->logger->info('fullrequest', ['request' => $request]);
 
         // Get the URL of the page from which the request originated
-        $originUrl = $request->headers->get('Referer');
+        $originUrl = $request->headers->get('referer');
+
+        // Check if the URL contains the word "button" to bypass issue when uploading stuff directly from a button page
+        if (strpos($originUrl, 'button') !== false) {    // Find the position of the word "button"
+            $buttonPos = strpos($originUrl, 'button');
+
+            // Find the position of the last '/' before "button"
+            $slashPos = strrpos(substr($originUrl, 0, $buttonPos), '/');
+
+            // Truncate the string to remove everything after the last '/'
+            $originUrl = substr($originUrl, 0, $slashPos);
+        }
         // Retrieve the User object
         $user = $this->getUser();
         // Retrieve the button and the newFileName from the request
@@ -76,6 +87,7 @@ class UploadController extends FrontController
             // Use the UploadService to handle file uploads
             $name = $this->uploadService->uploadFiles($request, $buttonEntity, $user, $newFileName);
             $this->addFlash('success', 'Le document ' . $name . ' a été correctement chargé');
+            $this->logger->info('originURL', ['originURL' => $originUrl]);
             return $this->redirect($originUrl);
         }
     }
