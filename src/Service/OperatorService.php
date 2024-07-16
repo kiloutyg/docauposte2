@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\UAP;
 use App\Entity\Team;
 
-use App\Repository\UAPRepository;
+use App\Repository\UapRepository;
 use App\Repository\TeamRepository;
 use App\Repository\OperatorRepository;
 
@@ -33,7 +33,7 @@ class OperatorService extends AbstractController
     public function __construct(
         LoggerInterface         $logger,
         OperatorRepository      $operatorRepository,
-        UAPRepository           $uapRepository,
+        UapRepository           $uapRepository,
         TeamRepository          $teamRepository,
         ParameterBagInterface   $params,
         EntityManagerInterface  $em,
@@ -99,31 +99,5 @@ class OperatorService extends AbstractController
             ];
             return $countArray;
         }
-    }
-
-    public function deleteUAP(UAP $uap)
-    {
-        $unDefinedUap = $this->uapRepository->findOneBy(['name' => 'IDEFINI']);
-        $uapOperators = $uap->getOperator();
-
-        foreach ($uapOperators as $operator) {
-            $operator->setUap($unDefinedUap);
-            $this->em->persist($operator);
-        }
-        $this->em->flush();
-        return true;
-    }
-
-    public function deleteTeam(Team $team)
-    {
-        $unDefinedTeam = $this->teamRepository->findOneBy(['name' => 'IDEFINI']);
-        $teamOperators = $team->getOperator();
-
-        foreach ($teamOperators as $operator) {
-            $operator->setTeam($unDefinedTeam);
-            $this->em->persist($operator);
-        }
-        $this->em->flush();
-        return true;
     }
 }

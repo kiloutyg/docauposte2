@@ -9,11 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 use App\Entity\Zone;
-use App\Entity\Team;
-use App\Entity\Uap;
 
-use App\Form\TeamType;
-use App\Form\UapType;
 
 // This controller is responsible for rendering the super admin interface an managing the logic of the super admin interface
 class SuperAdminController extends FrontController
@@ -121,55 +117,6 @@ class SuperAdminController extends FrontController
         } else {
             $this->addFlash('danger',  $entityType . '  does not exist');
             return $this->redirectToRoute('app_super_admin');
-        }
-    }
-
-    #[Route('/super_admin/operator_management', name: 'app_super_admin_operator_management')]
-    public function operatorManagement(Request $request): Response
-    {
-        $team = new Team();
-        $uap = new Uap();
-        $teamForm = $this->createForm(TeamType::class, $team);
-        $uapForm = $this->createForm(UapType::class, $uap);
-
-        $originUrl = $this->request->headers->get('referer');
-
-        if ($request->getMethod() == 'POST') {
-            $teamForm->handleRequest($request);
-            $uapForm->handleRequest($request);
-            if ($teamForm->isSubmitted()) {
-                if ($teamForm->isValid()) {
-                    $team = $teamForm->getData();
-                    $this->em->persist($team);
-                    $this->em->flush();
-                    $this->addFlash('success', 'team has been created');
-                    return $this->redirect($originUrl);
-                } else {
-                    // Validation failed, get the error message and display it
-                    $errorMessageTeam = $teamForm->getErrors(true)->current()->getMessage();
-                    $this->addFlash('danger', $errorMessageTeam);
-                    return $this->redirect($originUrl);
-                }
-            }
-            if ($uapForm->isSubmitted()) {
-                if ($uapForm->isValid()) {
-                    $uap = $uapForm->getData();
-                    $this->em->persist($uap);
-                    $this->em->flush();
-                    $this->addFlash('success', 'Uap has been created');
-                    return $this->redirect($originUrl);
-                } else {
-                    // Validation failed, get the error message and display it
-                    $errorMessageUap = $uapForm->getErrors(true)->current()->getMessage();
-                    $this->addFlash('danger', $errorMessageUap);
-                    return $this->redirect($originUrl);
-                }
-            }
-        } else if ($request->getMethod() == 'GET') {
-            return $this->render('services/operators/team_uap_management.html.twig', [
-                'teamForm' => $teamForm->createView(),
-                'uapForm' => $uapForm->createView()
-            ]);
         }
     }
 }
