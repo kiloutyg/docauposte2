@@ -281,17 +281,19 @@ document.addEventListener("turbo:load", function () {
 
   // Modification level needed by the upload
   let modificationLevel = document.getElementById('modification-outlined');
-  console.log(modificationLevel.checked);
-  console.log(modificationLevel.value);
-  modificationLevel.addEventListener('change', function () {
+  if (modificationLevel) {
     console.log(modificationLevel.checked);
     console.log(modificationLevel.value);
-    if (modificationLevel.checked || modificationLevel.value == "minor-modification" && textareaComment === document.querySelector('textarea[name="modificationComment"]')) {
-      textareaComment.required = false;
-      console.log('Textarea is now not required');
+    modificationLevel.addEventListener('change', function () {
+      console.log(modificationLevel.checked);
+      console.log(modificationLevel.value);
+      if (modificationLevel.checked || modificationLevel.value == "minor-modification" && textareaComment === document.querySelector('textarea[name="modificationComment"]')) {
+        textareaComment.required = false;
+        console.log('Textarea is now not required');
 
-    }
-  });
+      }
+    });
+  }
   // This code selects the file input element with the id 'upload_file' and assigns it to the variable fileInput
   let fileInput = document.getElementById('upload_file') || document.getElementById('file');
 
