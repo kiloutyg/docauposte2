@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use App\Form\OperatorType;
+use App\Form\TeamType;
+use App\Form\UapType;
 
 use App\Entity\Operator;
 use App\Entity\TrainingRecord;
@@ -995,24 +997,80 @@ class OperatorController extends FrontController
 
     // Route to delete UAP or Team without breaking operators and training records database
     #[Route('/operator/delete-uap-or-team/{entityType}/{entityId}', name: 'app_delete_uap_or_team')]
-    public function deleteUapTeamProperly(string $entityType, int $entityId)
+    public function deleteUapTeamProperly(string $entityType, int $entityId, Request $request): Response
     {
+        $this->logger->info('entityType', [$entityType]);
+
+        $originUrl = $request->headers->get('referer');
         try {
-            switch ($entityType) {
-                case 'team':
-                    $entity = $this->teamRepository->find($entityId);
-                    $this->operatorService->deleteTeam($entity);
-                    break;
-                case 'uap':
-                    $entity = $this->uapRepository->find($entityId);
-                    $this->operatorService->deleteUap($entity);
-                    break;
-                default:
-                    throw new \Exception('Invalid entity type');
-            }
+            $this->entitydeletionService->deleteEntity($entityType, $entityId);
         } catch (\Exception $e) {
             $this->addFlash('danger', 'Erreur lors de la suppression de l\'entité' . $e->getMessage());
             return $this->redirectToRoute('app_operator');
+        }
+        return $this->redirect($originUrl);
+    }
+
+
+
+    #[Route('/operator/operator_management_base_page', name: 'app_operator_team_or_uap_management')]
+    public function operatorManagement(Request $request): Response
+    {
+
+        if (count($this->teamRepository->findAll()) == 0 || count($this->uapRepository->findAll()) == 0) {
+            $team = new Team();
+            $uap = new Uap();
+            $team->setName('IDEFINI');
+            $uap->setName('IDEFINI');
+            $this->em->persist($team);
+            $this->em->persist($uap);
+            $this->em->flush();
+        }
+
+
+        $team = new Team();
+        $uap = new Uap();
+        $teamForm = $this->createForm(TeamType::class, $team);
+        $uapForm = $this->createForm(UapType::class, $uap);
+
+        $originUrl = $this->request->headers->get('referer');
+
+        if ($request->getMethod() == 'POST') {
+            $teamForm->handleRequest($request);
+            $uapForm->handleRequest($request);
+            if ($teamForm->isSubmitted()) {
+                if ($teamForm->isValid()) {
+                    $team = $teamForm->getData();
+                    $this->em->persist($team);
+                    $this->em->flush();
+                    $this->addFlash('success', 'team has been created');
+                    return $this->redirect($originUrl);
+                } else {
+                    // Validation failed, get the error message and display it
+                    $errorMessageTeam = $teamForm->getErrors(true)->current()->getMessage();
+                    $this->addFlash('danger', $errorMessageTeam);
+                    return $this->redirect($originUrl);
+                }
+            }
+            if ($uapForm->isSubmitted()) {
+                if ($uapForm->isValid()) {
+                    $uap = $uapForm->getData();
+                    $this->em->persist($uap);
+                    $this->em->flush();
+                    $this->addFlash('success', 'Uap has been created');
+                    return $this->redirect($originUrl);
+                } else {
+                    // Validation failed, get the error message and display it
+                    $errorMessageUap = $uapForm->getErrors(true)->current()->getMessage();
+                    $this->addFlash('danger', $errorMessageUap);
+                    return $this->redirect($originUrl);
+                }
+            }
+        } else if ($request->getMethod() == 'GET') {
+            return $this->render('services/operators/team_uap_management.html.twig', [
+                'teamForm' => $teamForm->createView(),
+                'uapForm' => $uapForm->createView()
+            ]);
         }
     }
 }

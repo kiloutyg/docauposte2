@@ -100,30 +100,4 @@ class OperatorService extends AbstractController
             return $countArray;
         }
     }
-
-    public function deleteUAP(UAP $uap)
-    {
-        $unDefinedUap = $this->uapRepository->findOneBy(['name' => 'IDEFINI']);
-        $uapOperators = $uap->getOperator();
-
-        foreach ($uapOperators as $operator) {
-            $operator->setUap($unDefinedUap);
-            $this->em->persist($operator);
-        }
-        $this->em->flush();
-        return true;
-    }
-
-    public function deleteTeam(Team $team)
-    {
-        $unDefinedTeam = $this->teamRepository->findOneBy(['name' => 'IDEFINI']);
-        $teamOperators = $team->getOperator();
-
-        foreach ($teamOperators as $operator) {
-            $operator->setTeam($unDefinedTeam);
-            $this->em->persist($operator);
-        }
-        $this->em->flush();
-        return true;
-    }
 }

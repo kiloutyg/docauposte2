@@ -14,7 +14,7 @@
 													style:'flex: 1;', 
 													method: 'POST', 
 													enctype: 'multipart/form-data' }, 
-													action: path('app_super_admin_operator_management') }) }}
+													action: path('app_operator_team_or_uap_management') }) }}
 
 					{{ form_end(teamForm) }}
 
@@ -57,7 +57,7 @@
 														{{ team.name }}
 													</strong>
 													<a
-														href="{{path('app_delete_uap_or_team', {'entityType': 'team', 'entityId': team.id})}}" class="btn btn-danger delete-team col-4 shadow">
+														href="{{path('app_delete_uap_or_team', {'entityType': 'team', 'entityId': team.id})}}" class="btn btn-danger  col-4 shadow">
 														Supprimer
 													</a>
 												</li>
@@ -79,7 +79,7 @@
 													style:'flex: 1;', 
 													method: 'POST', 
 													enctype: 'multipart/form-data' }, 
-													action: path('app_super_admin_operator_management') }) }}
+													action: path('app_operator_team_or_uap_management') }) }}
 
 					{{ form_end(uapForm) }}
 					{% if uaps is not empty %}

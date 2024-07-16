@@ -80,11 +80,11 @@ class OperatorRepository extends ServiceEntityRepository
             $firstNameB = strtolower($firstNameB);
 
             // Compare by team name
-            if ($teamComparison = strcmp($a->getTeam()->getName(), $b->getTeam()->getName())) {
+            if ($a->getTeam() !== null && $b->getTeam() !== null && $teamComparison = strcmp($a->getTeam()->getName(), $b->getTeam()->getName())) {
                 return $teamComparison;
             }
             // If team name is the same, compare by UAP name
-            if ($uapComparison = strcmp($a->getUap()->getName(), $b->getUap()->getName())) {
+            if ($a->getUap() !== null && $b->getUap() !== null && $uapComparison = strcmp($a->getUap()->getName(), $b->getUap()->getName())) {
                 return $uapComparison;
             }
             // If UAP name is the same, compare by last name
@@ -178,11 +178,11 @@ class OperatorRepository extends ServiceEntityRepository
             $firstNameB = strtolower($firstNameB);
 
             // Compare by team name
-            if ($teamComparison = strcmp($a->getTeam()->getName(), $b->getTeam()->getName())) {
+            if ($a->getTeam() !== null && $b->getTeam() !== null && $teamComparison = strcmp($a->getTeam()->getName(), $b->getTeam()->getName())) {
                 return $teamComparison;
             }
             // If team name is the same, compare by UAP name
-            if ($uapComparison = strcmp($a->getUap()->getName(), $b->getUap()->getName())) {
+            if ($a->getUap() !== null && $b->getUap() !== null && $uapComparison = strcmp($a->getUap()->getName(), $b->getUap()->getName())) {
                 return $uapComparison;
             }
             // If UAP name is the same, compare by last name
