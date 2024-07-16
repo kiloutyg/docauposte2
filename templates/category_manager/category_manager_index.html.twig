@@ -6,6 +6,12 @@
 {% endblock %}
 
 {% block body %}
+	{% set matchingCategories = [] %}
+	{% for category in categories %}
+		{% if category.productLine.id is same as(productLine.id) %}
+			{% set matchingCategories = matchingCategories|merge([category]) %}
+		{% endif %}
+	{% endfor %}
 
 
 	{% if zoneIdFromServer is not defined %}
@@ -61,7 +67,31 @@
 		class="my-4">
 		<strong>
 			Page d'administration de la catégorie
-			{{ category.name|split('.')|first|upper }}
+			<button
+				class="dropdown-toggle"
+				data-bs-toggle="dropdown"
+				aria-expanded="false"
+				type="button"
+				id="categoryDropdown">
+				{{category.name|split('.')|first|upper}}
+			</button>
+			<ul
+				class="dropdown-menu shadow shadow-inset"
+				aria-labelledby="categoryDropdown">
+				{% for categoryExt in matchingCategories %}
+					{% if categoryExt != category %}
+						<li>
+							<a
+								href="{{ path('app_category_manager', {categoryId: categoryExt.id}) }}" class="dropdown-item shadow ">
+								{{categoryExt.name|split('.')|first|upper}}
+							</a>
+						</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+			de la Ligne
+			{{category.productLine.name|split('.')|first|upper}}
+
 		</strong>
 	</h1>
 

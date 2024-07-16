@@ -23,7 +23,7 @@ class IncidentController extends FrontController
 {
     // Render the incidents page and filter the incidents by productline and sort them by id ascending to display them in the right order
     #[Route('/zone/{zoneId}/productline/{productlineId}/incident/{incidentId}', name: 'mandatory_incident')]
-    public function mandatoryIncident(int $productlineId = null, int $incidentId = null): Response
+    public function mandatoryIncident(int $zoneId, int $productlineId = null, int $incidentId = null): Response
     {
         $incidentEntity = null;
         if ($incidentId != null) {
@@ -38,7 +38,7 @@ class IncidentController extends FrontController
             $productLine = $incidentEntity->getProductLine();
         }
 
-        $zone        = $productLine->getZone();
+        $zone        = $this->cacheService->getEntityById('zone', $zoneId);
         $incidents   = [];
 
         // Get all the incidents of the productline and sort them by id ascending
@@ -79,7 +79,7 @@ class IncidentController extends FrontController
                     'incidentCategory'  => $incident ? $incident->getIncidentCategory() : null,
                     'incidents'         => $incidents,
                     'productlineId'     => $productLine->getId(),
-                    'zoneId'            => $zone->getId(),
+                    'zoneId'            => $zoneId,
                     'nextIncidentId'    => $nextIncident ? $nextIncident->getId() : null
                 ]
             );
