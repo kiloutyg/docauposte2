@@ -1020,8 +1020,8 @@ class OperatorController extends FrontController
         if (count($this->teamRepository->findAll()) == 0 || count($this->uapRepository->findAll()) == 0) {
             $team = new Team();
             $uap = new Uap();
-            $team->setName('IDEFINI');
-            $uap->setName('IDEFINI');
+            $team->setName('INDEFINI');
+            $uap->setName('INDEFINI');
             $this->em->persist($team);
             $this->em->persist($uap);
             $this->em->flush();
@@ -1067,7 +1067,7 @@ class OperatorController extends FrontController
                 }
             }
         } else if ($request->getMethod() == 'GET') {
-            return $this->render('services/operators/team_uap_management.html.twig', [
+            return $this->render('services/operators/team_uap_operator_management.html.twig', [
                 'teamForm' => $teamForm->createView(),
                 'uapForm' => $uapForm->createView()
             ]);

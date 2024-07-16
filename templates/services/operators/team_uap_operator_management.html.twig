@@ -1,0 +1,192 @@
+{% block body %}
+
+	<div
+		class="accordion-item">
+		<h2
+			class="accordion-header"
+			id="headingOperatorMannagement">
+			<button
+				class="accordion-button fs-3 collapsed"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target="#collapseOperatorMannagement"
+				aria-expanded="false"
+				aria-controls="collapseOperatorMannagement">
+				<strong>
+					Formulaire de gestions Operateurs :
+				</strong>
+			</button>
+		</h2>
+		<div
+			id="collapseOperatorMannagement"
+			class="accordion-collapse collapse"
+			aria-labelledby="headingOperatorMannagement"
+			data-bs-parent="#accordionSuperAdmin">
+			<div
+				class="accordion-body accordion-bg shadow shadow-inset">
+				<div
+					class="card border-0 shadow rounded-3 my-5">
+					<div
+						class="card-body">
+						<div
+							class="row">
+
+							<div
+								class="card border-0 shadow rounded-3 my-5 bg-secondary">
+								<div
+									class="card-body ">
+									<div
+										class="d-flex align-items-center gy-lg-0 gy-5">
+										<div
+											style="flex: 1;">
+											{{ form_start(teamForm, { attr: { class: 'd-flex flex-column', 
+													id: 'teamCreationForm',
+													style:'flex: 1;', 
+													method: 'POST', 
+													enctype: 'multipart/form-data' }, 
+													action: path('app_operator_team_or_uap_management') }) }}
+
+											{{ form_end(teamForm) }}
+
+											{% if teams is not empty %}
+
+												<div
+													class="mt-auto mb-auto accordion"
+													id="accordionTeamList">
+													<div
+														class="accordion-item shadow-lg shadow-lg-inset border border-dark">
+														<h2
+															class="accordion-header"
+															id="headingTeamList">
+															<button
+																class="accordion-button bg-white text-dark"
+																type="button"
+																data-bs-toggle="collapse"
+																data-bs-target="#collapseTeamList"
+																aria-expanded="false"
+																aria-controls="collapseTeamList">
+																<strong>
+																	Liste des équipes
+																</strong>
+															</button>
+														</h2>
+														<div
+															id="collapseTeamList"
+															class="accordion-collapse collapse "
+															aria-labelledby="headingTeamList"
+															data-bs-parent="#accordionTeamList">
+															<div
+																class="accordion-body bg-white text-dark">
+																<ul
+																	class="list-group">
+																	{% for team in teams %}
+																		<li
+																			class="list-group-item bg-white text-dark row ">
+																			<strong
+																				class="col-4 ">
+																				{{ team.name }}
+																			</strong>
+																			<a
+																				href="{{path('app_delete_uap_or_team', {'entityType': 'team', 'entityId': team.id})}}" class="btn btn-danger delete-team col-4 shadow">
+																				Supprimer
+																			</a>
+																		</li>
+
+																	{% endfor %}
+																</ul>
+															</div>
+														</div>
+													</div>
+												</div>
+											{% endif %}
+										</div>
+										<div
+											style="flex: 0.2;"></div>
+										<div
+											style="flex: 1;">
+											{{ form_start(uapForm, { attr: { class: 'd-flex flex-column', 
+													id: 'uapCreationForm', 
+													style:'flex: 1;', 
+													method: 'POST', 
+													enctype: 'multipart/form-data' }, 
+													action: path('app_operator_team_or_uap_management') }) }}
+
+											{{ form_end(uapForm) }}
+											{% if uaps is not empty %}
+
+												<div
+													class="mt-auto mb-auto accordion"
+													id="accordionUapList">
+													<div
+														class="accordion-item shadow-lg shadow-lg-inset border border-dark">
+														<h2
+															class="accordion-header"
+															id="headingUapList">
+															<button
+																class="accordion-button bg-white text-dark"
+																type="button"
+																data-bs-toggle="collapse"
+																data-bs-target="#collapseUapList"
+																aria-expanded="false"
+																aria-controls="collapseUapList">
+																<strong>
+																	Liste des UAP
+																</strong>
+															</button>
+														</h2>
+														<div
+															id="collapseUapList"
+															class="accordion-collapse collapse "
+															aria-labelledby="headingUapList"
+															data-bs-parent="#accordionUapList">
+															<div
+																class="accordion-body bg-white text-dark">
+																<ul
+																	class="list-group">
+																	{% for uap in uaps %}
+																		<li
+																			class="list-group-item bg-white text-dark row">
+																			<strong
+																				class="col-4 ">
+																				{{ uap.name }}
+																			</strong>
+																			<a
+																				href="{{path('app_delete_uap_or_team', {'entityType': 'uap', 'entityId': uap.id})}}" class="btn btn-danger delete-uap col-4 shadow">
+																				Supprimer
+																			</a>
+																		</li>
+																	{% endfor %}
+																</ul>
+															</div>
+														</div>
+													</div>
+												</div>
+											{% endif %}
+										</div>
+									</div>
+									<div>
+										<a
+											href="{{ path('app_operator') }}" class="btn btn-primary col-12 mx-2 my-2">
+											Administration des Opérateurs
+										</a>
+
+									</div>
+									{% if is_granted('ROLE_SUPER_ADMIN') %}
+										<div>
+											<a
+												href="{{ path('app_training_front_by_validation', {validationId: 1}) }}" class="btn btn-primary col-12 mx-2 my-2">
+												Test Document
+											</a>
+										</div>
+									{% endif %}
+
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

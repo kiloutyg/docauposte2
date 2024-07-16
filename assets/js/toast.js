@@ -15,5 +15,5 @@ document.addEventListener('DOMContentLoaded', (event) => {
       message.style.opacity = '0';
       setTimeout(() => message.remove(), 300); // Remove from DOM after fade out
     });
-  }, 3000); // 5 seconds
+  }, 2000); // 2 seconds
 });
