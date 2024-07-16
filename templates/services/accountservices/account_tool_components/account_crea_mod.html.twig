@@ -54,7 +54,8 @@
 					data-action="keyup->username-validation#validateUsername"
 					id="username"
 					name="username"
-					{% if user is defined %} placeholder="{{user.username}}" {% else %} required
+					{% if user is defined %} placeholder="{{user.username}}" {% else %} placeholder="prenom.nom"
+					required
 					{% endif %}>
 
 				<div
@@ -73,7 +74,8 @@
 				id="floatingPassword"
 				name="password"
 				{% if user is defined %} placeholder="Mot de passe"
-				{% else %} required
+				{% else %} placeholder="Mot de passe"
+				required
 				{% endif %} class="form-control">
 
 		</div>
@@ -87,7 +89,8 @@
 				type="email"
 				id="emailAddress"
 				name="emailAddress"
-				{% if user is defined %} placeholder="{{user.emailAddress}}" {% else %} required
+				{% if user is defined %} placeholder="{{user.emailAddress}}" {% else %} placeholder="prenom.nom@opmobility.com"
+				required
 				{% endif %} class="form-control">
 		</div>
 		<div

@@ -54,7 +54,7 @@
 						{% set validated = '' %}
 						{% if button.uploads|length == 1 %}
 							{% for upload in button.uploads %}
-								{% if upload.validation.status != true and upload.forcedDisplay == true %}
+								{% if upload.validation != null and upload.validation.status != true and upload.forcedDisplay == true %}
 									{% set validated = 'download-non-validated-upload' %}
 								{% endif %}
 							{% endfor %}

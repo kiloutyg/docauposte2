@@ -203,6 +203,9 @@ class EntityDeletionService
                 $this->deleteEntity('incident', $incident->getId());
             }
         } elseif ($entityType === 'upload') {
+            foreach ($entity->getTrainingRecords() as $trainingRecord) {
+                $this->deleteEntity('trainingRecord', $trainingRecord->getId());
+            }
             $this->uploadService->deleteFile($entity->getId());
             // $this->deleteEntity('validation', $entity->getValidation()->getId());
         } elseif ($entityType === 'incident') {
