@@ -45,7 +45,7 @@
 			</script>
 		{% endif %}
 	{% endif %}
-	{% if  is_granted('ROLE_LINE_ADMIN') %}
+	{% if  is_granted('ROLE_MANAGER') %}
 		<aside
 			class="position-absolute end-0 mt-2">
 			<a
@@ -230,8 +230,10 @@
 					</div>
 				</div>
 			</div>
+		{% endif %}
 
-			{{ render(controller('App\\Controller\\OperatorController::operatorManagement'), options = []) }}
+		{{ render(controller('App\\Controller\\OperatorController::operatorManagement'), options = []) }}
+		{% if is_granted('ROLE_LINE_ADMIN') %}
 
 			<div
 				class="accordion-item">
@@ -355,41 +357,40 @@
 					</div>
 				</div>
 			</div>
+		{% endif %}
+
+		<div
+			class="accordion-item">
+			<h2
+				class="accordion-header"
+				id="headingValidatedList">
+				<button
+					class="accordion-button fs-3 collapsed"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#collapseValidatedList"
+					aria-expanded="false"
+					aria-controls="collapseValidatedList">
+					<strong>
+						Liste des validations :
+					</strong>
+				</button>
+			</h2>
 			<div
-				class="accordion-item">
-				<h2
-					class="accordion-header"
-					id="headingValidatedList">
-					<button
-						class="accordion-button fs-3 collapsed"
-						type="button"
-						data-bs-toggle="collapse"
-						data-bs-target="#collapseValidatedList"
-						aria-expanded="false"
-						aria-controls="collapseValidatedList">
-						<strong>
-							Liste des validations :
-						</strong>
-					</button>
-				</h2>
+				id="collapseValidatedList"
+				class="accordion-collapse collapse"
+				aria-labelledby="headingValidatedList"
+				data-bs-parent="#accordionCategory">
 				<div
-					id="collapseValidatedList"
-					class="accordion-collapse collapse"
-					aria-labelledby="headingValidatedList"
-					data-bs-parent="#accordionCategory">
+					class="accordion-body accordion-bg shadow shadow-inset">
 					<div
-						class="accordion-body accordion-bg shadow shadow-inset">
-						<div
-							class="row">
-							<div>
-								{% include "services/validation/validation_list.html.twig" %}
-							</div>
+						class="row">
+						<div>
+							{% include "services/validation/validation_list.html.twig" %}
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-
-	{% endif %}
-
+	</div>
 {% endblock %}
