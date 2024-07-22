@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-	SupAdmin!
+	AdminPage
 {% endblock %}
 
 {% block body %}
@@ -40,329 +40,196 @@
 	{% endif %}
 
 
-	<h1
-		class="my-4">
-		<strong>
-			Page de Super-Administration
-		</strong>
-	</h1>
+	{% if pageLevel is same as('super') %}
+		<h1
+			class="my-4">
+			<strong>
+				Page de Super-Administration
+			</strong>
+		</h1>
+
+	{% elseif pageLevel is same as('zone') %}
+		<h1
+			class="my-4">
+			<strong>
+				Page d'administration des Lignes de la Zone
+
+				<button
+					class="dropdown-toggle"
+					data-bs-toggle="dropdown"
+					aria-expanded="false"
+					type="button"
+					id="zoneDropdown">
+					{{zone.name|split('.')|first|upper}}
+				</button>
+
+				<ul
+					class="dropdown-menu shadow shadow-inset"
+					aria-labelledby="zoneDropdown">
+					{% for zoneExt in zones %}
+						{% if zoneExt != zone %}
+							<li>
+								<a
+									href="{{ path('app_zone_admin', {zoneId: zoneExt.id}) }}" class="dropdown-item shadow ">
+									{{zoneExt.name|split('.')|first|upper}}
+								</a>
+							</li>
+						{% endif %}
+					{% endfor %}
+				</ul>
+			</strong>
+		</h1>
+
+	{% elseif pageLevel is same as('productLine') %}
+
+		{% if  is_granted('ROLE_ADMIN') %}
+			<aside
+				class="position-absolute end-0 mt-2">
+				<a
+					href="{{ path('app_zone_admin', {zoneId: zone.id}) }}" class="btn shadow bg-dark "
+					style="color:white">
+					<span
+						class="fa fa-gear"></span>
+					<strong>
+						<span
+							class="button-text">
+							Centre d'Administration de la Zone
+						</span>
+					</strong>
+				</a>
+			</aside>
+		{% endif %}
+		<h1
+			class="my-4">
+			<strong>
+				Page d'administration de la ligne
+
+				<button
+					class="dropdown-toggle"
+					data-bs-toggle="dropdown"
+					aria-expanded="false"
+					type="button"
+					id="productLineDropdown">
+					{{productLine.name|split('.')|first|upper}}
+				</button>
+				<ul
+					class="dropdown-menu shadow shadow-inset"
+					aria-labelledby="productLineDropdown">
+					{% set matchingProductLines = [] %}
+					{% for productLine in productLines %}
+						{% if productLine.zone.id is same as(zone.id)  %}
+							{% set matchingProductLines = matchingProductLines|merge([productLine]) %}
+						{% endif %}
+					{% endfor %}
+					{% for productLineExt in matchingProductLines %}
+						{% if productLineExt != productLine %}
+							<li>
+								<a
+									href="{{ path('app_productline_admin', {productlineId: productLineExt.id}) }}" class="dropdown-item shadow ">
+									{{productLineExt.name|split('.')|first|upper}}
+								</a>
+							</li>
+						{% endif %}
+					{% endfor %}
+				</ul>
+				de la Zone
+				{{productLine.zone.name|split('.')|first|upper}}
+			</strong>
+		</h1>
+
+	{% elseif pageLevel is same as('category') %}
+
+		{% if  is_granted('ROLE_LINE_ADMIN') %}
+			<aside
+				class="position-absolute end-0 mt-2">
+				<a
+					href="{{ path('app_productline_admin', {productlineId: productLine.id}) }}" class="btn shadow  bg-dark "
+					style="color:white">
+					<span
+						class="fa fa-gear"></span>
+					<strong>
+						<span
+							class="button-text">
+							Centre d'Administration de la Ligne
+						</span>
+					</strong>
+				</a>
+			</aside>
+		{% endif %}
+		<h1
+			class="my-4">
+			<strong>
+				Page d'administration de la catégorie
+				<button
+					class="dropdown-toggle"
+					data-bs-toggle="dropdown"
+					aria-expanded="false"
+					type="button"
+					id="categoryDropdown">
+					{{category.name|split('.')|first|upper}}
+				</button>
+				<ul
+					class="dropdown-menu shadow shadow-inset"
+					aria-labelledby="categoryDropdown">
+					{% set matchingCategories = [] %}
+					{% for category in categories %}
+						{% if category.productLine.id is same as(productLine.id) %}
+							{% set matchingCategories = matchingCategories|merge([category]) %}
+						{% endif %}
+					{% endfor %}
+					{% for categoryExt in matchingCategories %}
+						{% if categoryExt != category %}
+							<li>
+								<a
+									href="{{ path('app_category_admin', {categoryId: categoryExt.id}) }}" class="dropdown-item shadow ">
+									{{categoryExt.name|split('.')|first|upper}}
+								</a>
+							</li>
+						{% endif %}
+					{% endfor %}
+				</ul>
+				de la Ligne
+				{{category.productLine.name|split('.')|first|upper}}
+			</strong>
+		</h1>
+
+	{% endif %}
+
 
 	<div
 		class="accordion"
-		id="accordionSuperAdmin">
+		id="AccordionAdmin">
 
-		<div
-			class="accordion-item">
-			<h2
-				class="accordion-header"
-				id="headingAccount">
-				<button
-					class="accordion-button fs-3 collapsed"
-					type="button"
-					data-bs-toggle="collapse"
-					data-bs-target="#collapseAccount"
-					aria-expanded="false"
-					aria-controls="collapseAccount">
-					<strong>
-						Formulaire de creation de compte utilisateur :
-					</strong>
-				</button>
-			</h2>
-			<div
-				id="collapseAccount"
-				class="accordion-collapse collapse"
-				aria-labelledby="headingAccount"
-				data-bs-parent="#accordionSuperAdmin">
-				<div
-					class="accordion-body accordion-bg shadow shadow-inset">
-					<div
-						class="card border-0 shadow rounded-3 my-5 form-floating row mx-auto">
+		{% if pageLevel is same as('super')  %}
 
-						{% include "services/accountservices/create_account.html.twig" %}
-					</div>
-				</div>
-			</div>
-		</div>
+			{% include "admin_template/admin_template_component/zone_creation_form.html.twig" %}
+		{% elseif pageLevel is same as('zone') %}
+			{% include "admin_template/admin_template_component/line_creation_form.html.twig" %}
 
-		<div
-			class="accordion-item">
-			<h2
-				class="accordion-header"
-				id="headingZone">
-				<button
-					class="accordion-button fs-3 collapsed"
-					type="button"
-					data-bs-toggle="collapse"
-					data-bs-target="#collapseZone"
-					aria-expanded="false"
-					aria-controls="collapseZone">
-					<strong>
-						Formulaire de création de zones :
-					</strong>
-				</button>
-			</h2>
-			<div
-				id="collapseZone"
-				class="accordion-collapse collapse"
-				aria-labelledby="headingZone"
-				data-bs-parent="#accordionSuperAdmin">
-				<div
-					class="accordion-body accordion-bg shadow shadow-inset">
+		{% elseif pageLevel is same as('productLine') %}
+			{% include "admin_template/admin_template_component/category_creation_form.html.twig" %}
 
-					<div
-						class="card border-0 shadow rounded-3 my-5">
-						<div
-							class="card-body">
-							<div
-								class="row ">
-								<form
-									method="POST"
-									action="{{ path('app_super_admin_create_zone') }}">
+		{% elseif pageLevel is same as('category') %}
+			{% include "admin_template/admin_template_component/button_creation_form.html.twig" %}
 
-									<div
-										class="card border-0 shadow rounded-3 my-5 bg-secondary">
-										<div
-											class="card-body">
-											<div
-												class="row d-flex align-items-center gy-lg-0 gy-5">
-												<div
-													class="col-md-6">
+		{% endif %}
 
-													<h3
-														class="card-title text-center mb-5 fw-light fs-5">
-														<strong>
-															Création de Zones
-														</strong>
-													</h3>
+		{% include "services/accountservices/create_account.html.twig" %}
 
-													<form
-														class="form-floating"
-														method="post">
-
-														<div
-															class="form-control mb-3">
-															<label
-																for="zonename">
-																Nom de la zone
-															</label>
-															<input
-																type="text"
-																name="zonename"
-																placeholder="Nom de la zone"
-																required
-																class="form-control"
-																id="zonename">
-														</div>
-
-														<div
-															class="d-grid">
-															<button
-																class="btn btn-primary btn-login text-first|uppercase fw-bold"
-																type="submit">
-																Valider
-															</button>
-														</div>
-
-													</form>
-													<hr
-														class="my-4">
-
-												</div>
-												<div
-													class="col-md-6">
-													<h5
-														class="card-title text-center mb-5 fw-light fs-5">
-														<strong>
-															Liste des zones :
-														</strong>
-													</h5>
-													<ul
-														class="list-unstyled">
-														{% for zone in zones %}
-															<li
-																class="form-control d-flex justify-content-between align-items-center mb-2">
-																<a
-																	href="{{path('app_zone_admin', {zoneId: zone.id})}}" class="btn btn-dark">
-																	{{ zone.name|split('.')|first|upper }}
-																</a>
-																<a
-																	href="{{path('app_base_views_modification')}}" class="btn btn-info">
-																	Modifier
-																</a>
-																<a
-																	href="{{path('app_super_admin_delete_zone', {zoneId: zone.id})}}" class="btn btn-danger delete-zone">
-																	Supprimer
-																</a>
-															</li>
-														{% endfor %}
-													</ul>
-												</div>
-											</div>
-										</div>
-									</div>
-								</form>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
 
 		{{ render(controller('App\\Controller\\OperatorController::operatorManagement'), options = []) }}
 
-		<div
-			class="accordion-item">
-			<h2
-				class="accordion-header"
-				id="headingUpload">
-				<button
-					class="accordion-button fs-3 collapsed"
-					type="button"
-					data-bs-toggle="collapse"
-					data-bs-target="#collapseUpload"
-					aria-expanded="false"
-					aria-controls="collapseUpload">
-					<strong>
-						Formulaire d'upload :
-					</strong>
-				</button>
-			</h2>
-			<div
-				id="collapseUpload"
-				class="accordion-collapse collapse"
-				aria-labelledby="headingUpload"
-				data-bs-parent="#accordionSuperAdmin">
-				<div
-					class="accordion-body accordion-bg shadow shadow-inset">
-					<div
-						class="card border-0 shadow rounded-3 my-5">
-						<div
-							class="card-body">
-							<div
-								class="row">
-								<form
-									action="{{path('app_generic_upload_files')}}" method="POST"
-									enctype="multipart/form-data">
-									{% include "services/uploads/upload.html.twig" %}
-								</form>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+
+		{% include "services/uploads/upload.html.twig" %}
 
 
-		<div
-			class="accordion-item">
-			<h2
-				class="accordion-header"
-				id="headingIncident">
-				<button
-					class="accordion-button fs-3 collapsed"
-					type="button"
-					data-bs-toggle="collapse"
-					data-bs-target="#collapseIncident"
-					aria-expanded="false"
-					aria-controls="collapseIncident">
-					<strong>
-						Formulaire d'ajout d'Incident :
-					</strong>
-				</button>
-			</h2>
-			<div
-				id="collapseIncident"
-				class="accordion-collapse collapse"
-				aria-labelledby="headingIncident"
-				data-bs-parent="#accordionSuperAdmin">
-				<div
-					class="accordion-body accordion-bg shadow shadow-inset">
-					<div
-						class="card border-0 shadow rounded-3 my-5">
-						<div
-							class="card-body">
-							<div
-								class="row">
-								<form
-									action="{{path('app_generic_upload_incident_files')}}" method="POST"
-									enctype="multipart/form-data">
-									{% include "services/incidents/incidents.html.twig" %}
-								</form>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+		{% include "services/incidents/incidents.html.twig" %}
 
 
-		<div
-			class="accordion-item">
-			<h2
-				class="accordion-header"
-				id="headingUploadedList">
-				<button
-					class="accordion-button fs-3 collapsed"
-					type="button"
-					data-bs-toggle="collapse"
-					data-bs-target="#collapseUploadedList"
-					aria-expanded="false"
-					aria-controls="collapseUploadedList">
-					<strong>
-						Liste des fichiers chargés :
-					</strong>
-				</button>
-			</h2>
-			<div
-				id="collapseUploadedList"
-				class="accordion-collapse collapse"
-				aria-labelledby="headingUploadedList"
-				data-bs-parent="#accordionSuperAdmin">
-				<div
-					class="accordion-body accordion-bg shadow shadow-inset">
-					<div
-						class="row">
-						<div>
-							{% include "services/uploads/uploaded_list.html.twig" %}
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+		{% include "services/uploads/uploaded_list.html.twig" %}
 
 
-		<div
-			class="accordion-item">
-			<h2
-				class="accordion-header"
-				id="headingValidatedList">
-				<button
-					class="accordion-button fs-3 collapsed"
-					type="button"
-					data-bs-toggle="collapse"
-					data-bs-target="#collapseValidatedList"
-					aria-expanded="false"
-					aria-controls="collapseValidatedList">
-					<strong>
-						Liste des validations :
-					</strong>
-				</button>
-			</h2>
-			<div
-				id="collapseValidatedList"
-				class="accordion-collapse collapse"
-				aria-labelledby="headingValidatedList"
-				data-bs-parent="#accordionSuperAdmin">
-				<div
-					class="accordion-body accordion-bg shadow shadow-inset">
-					<div
-						class="row">
-						<div>
-							{% include "services/validation/validation_list.html.twig" %}
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+		{% include "services/validation/validation_list.html.twig" %}
+
 	</div>
 {% endblock %}

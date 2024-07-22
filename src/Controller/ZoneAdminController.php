@@ -17,6 +17,7 @@ class ZoneAdminController extends FrontController
     #[Route('/zone_admin/{zoneId}', name: 'app_zone_admin')]
     public function index(int $zoneId = null): Response
     {
+        $pageLevel = 'zone';
         $zone = $this->cacheService->getEntityById('zone', $zoneId);
         $productLines = $this->cacheService->getEntitiesByParentId('productLine', $zoneId);
 
@@ -29,13 +30,13 @@ class ZoneAdminController extends FrontController
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
 
 
-        return $this->render('zone_admin/zone_admin_index.html.twig', [
+        return $this->render('admin_template/admin_index.html.twig', [
+            'pageLevel'                 => $pageLevel,
             'groupedUploads'            => $groupedUploads,
             'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'            => $groupIncidents,
             'zone'                      => $zone,
             'zoneProductLines'          => $productLines,
-
         ]);
     }
 

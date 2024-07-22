@@ -21,6 +21,8 @@ class CategoryAdminController extends FrontController
     // This function is responsible for rendering the category's admin interface. 
     public function index(int $categoryId = null): Response
     {
+        $pageLevel = 'category';
+
         $category    = $this->cacheService->getEntityById('category', $categoryId);
         $buttons     = $this->cacheService->getEntitiesByParentId('button', $categoryId);
         $productLine = $this->cacheService->getEntityById('productLine', $category->getProductLine()->getId());
@@ -41,7 +43,8 @@ class CategoryAdminController extends FrontController
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
         $groupedValidatedUploads = $this->uploadService->groupValidatedUploads($uploads);
 
-        return $this->render('category_admin/category_admin_index.html.twig', [
+        return $this->render('admin_template/admin_index.html.twig', [
+            'pageLevel'                 => $pageLevel,
             'groupedUploads'            => $groupedUploads,
             'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'            => $groupIncidents,

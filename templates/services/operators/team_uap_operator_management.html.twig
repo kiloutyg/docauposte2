@@ -1,4 +1,4 @@
-{% block body %}
+{% if is_granted('ROLE_MANAGER') %}
 
 	<div
 		class="accordion-item">
@@ -21,7 +21,7 @@
 			id="collapseOperatorMannagement"
 			class="accordion-collapse collapse"
 			aria-labelledby="headingOperatorMannagement"
-			data-bs-parent="#accordionSuperAdmin">
+			data-bs-parent="#accordionAdmin">
 			<div
 				class="accordion-body accordion-bg shadow shadow-inset">
 				<div
@@ -182,15 +182,6 @@
 										</a>
 
 									</div>
-									{% if is_granted('ROLE_SUPER_ADMIN') %}
-										<div>
-											<a
-												href="{{ path('app_training_front_by_validation', {validationId: 1}) }}" class="btn btn-primary col-12 mx-2 my-2">
-												Test Document
-											</a>
-										</div>
-									{% endif %}
-
 
 								</div>
 							</div>
@@ -200,4 +191,4 @@
 			</div>
 		</div>
 	</div>
-{% endblock %}
+{% endif %}

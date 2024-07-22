@@ -25,6 +25,9 @@ class TeamType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Nom de l\'équipe',
+                'label_attr' => [
+                    'style' => 'color: #ffffff;'
+                ],
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'Nom de l\'équipe',

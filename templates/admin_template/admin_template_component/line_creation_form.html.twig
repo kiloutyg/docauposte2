@@ -1,0 +1,136 @@
+{% if is_granted('ROLE_LINE_ADMIN') %}
+	<div
+		class="accordion-item">
+		<h2
+			class="accordion-header"
+			id="headingProductLine">
+			<button
+				class="accordion-button fs-3 collapsed"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target="#collapseProductLine"
+				aria-expanded="false"
+				aria-controls="collapseProductLine">
+				<strong>
+					Formulaire de création de Lignes :
+				</strong>
+			</button>
+
+		</h2>
+		<div
+			id="collapseProductline"
+			class="accordion-collapse collapse "
+			aria-labelledby="headingProductline"
+			data-bs-parent="#accordionAdmin">
+			<div
+				class="accordion-body accordion-bg shadow shadow-inset">
+				<div
+					class="card border-0 shadow rounded-3 my-5">
+					<div
+						class="card-body">
+						<div
+							class="row">
+							<form
+								method="POST"
+								action="{{ path('app_zone_admin_create_productline', {zoneId: zone.id}) }}">
+
+								<div
+									class="card border-0 shadow rounded-3 my-5 bg-secondary">
+									<div
+										class="card-body">
+										<div
+											class="row d-flex align-items-center gy-lg-0 gy-5 ">
+											<div
+												class="col-md-6">
+
+												<h3
+													class="card-title text-center mb-5 fw-light fs-5">
+													<strong>
+														Création de Lignes
+													</strong>
+												</h3>
+												<form
+													class="form-floating"
+													method='POST'>
+													<div
+														class="form-control mb-3">
+														<label
+															for="productlinename">
+															Nom de la Ligne
+														</label>
+														<input
+															type="text"
+															name="productlinename"
+															placeholder="Nom de la Ligne"
+															required
+															class="form-control"
+															id="productlinename">
+													</div>
+													<div
+														class="d-grid">
+														<button
+															class="btn btn-primary btn-login text-first|uppercase fw-bold"
+															type="submit">
+															Valider
+														</button>
+													</div>
+
+												</form>
+												<hr
+													class="my-4">
+
+											</div>
+											<div
+												class="col-md-6">
+												<h5
+													class="card-title text-center mb-5 fw-light fs-5">
+													<strong>
+														Liste des Lignes de la zone
+														{{zone.name|split('.')|first|upper}}
+														:
+													</strong>
+												</h5>
+												<ul
+													class="list-unstyled">
+
+													{% for productLine in zoneProductLines %}
+														<li
+															class="form-control d-flex justify-content-between align-items-center mb-2">
+															<a
+																href="{{path('app_productline_admin', {productlineId: productLine.Id})}}" class="btn btn-dark">
+																{{ productLine.name|split('.')|first|upper}}
+															</a>
+															{% if is_granted ('ROLE_LINE_ADMIN') or app.user is same as( productLine.creator) %}
+																<a
+																	href="{{path('app_base_views_modification')}}" class="btn btn-info">
+																	Modifier
+																</a>
+																<a
+																	href="{{path('app_zone_admin_delete_productline', {productlineId: productLine.id})}}" class="btn btn-danger delete-productline">
+																	Supprimer
+																</a>
+															{% endif %}
+														</li>
+
+													{% else %}
+														<li
+															class="alert alert-danger">
+															<a
+																href="{{path('app_base')}}">
+																Il n'y a pas de lignes dans cette zone.
+															</a>
+														</li>
+													{% endfor %}
+												</ul>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endif %}

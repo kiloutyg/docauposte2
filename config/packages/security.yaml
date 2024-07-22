@@ -28,7 +28,7 @@ security:
         ROLE_ADMIN: [ROLE_LINE_ADMIN]
         ROLE_ADMIN_VALIDATOR: [ROLE_ADMIN]
         ROLE_SUPER_ADMIN:
-            [ROLE_ADMIN_VALIDATOR, ROLE_ALLOWED_TO_SWITCH]
+            [ROLE_ADMIN_VALIDATOR, ROLE_ALLOWED_TO_SWITCH, ROLE_ADMIN, ROLE_LINE_ADMIN, ROLE_LINE_ADMIN_VALIDATOR, ROLE_MANAGER, ROLE_USER]
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
@@ -60,6 +60,8 @@ security:
         - { path: ^/category_admin, roles: ROLE_MANAGER }
         - { path: ^/tutorial, roles: ROLE_MANAGER }
         - { path: ^/operator/admin, roles: ROLE_MANAGER }
+
+        - { path: ^/admin, roles: ROLE_MANAGER }
 
 
         # - { path: ^/operator, roles: ROLE_MANAGER }
