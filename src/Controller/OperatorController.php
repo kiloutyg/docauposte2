@@ -999,9 +999,12 @@ class OperatorController extends FrontController
     #[Route('/operator/delete-uap-or-team/{entityType}/{entityId}', name: 'app_delete_uap_or_team')]
     public function deleteUapTeamProperly(string $entityType, int $entityId, Request $request): Response
     {
-        $this->logger->info('entityType', [$entityType]);
-
         $originUrl = $request->headers->get('referer');
+
+        if (!$this->authChecker->IsGranted('ROLE_ADMIN')) {
+            $this->addFlash('danger', 'Vous n\'avez pas les droits pour effectuer cette action');
+            return $this->redirect($originUrl);
+        }
         try {
             $this->entitydeletionService->deleteEntity($entityType, $entityId);
         } catch (\Exception $e) {
@@ -1036,6 +1039,10 @@ class OperatorController extends FrontController
         $originUrl = $this->request->headers->get('referer');
 
         if ($request->getMethod() == 'POST') {
+            if (!$this->authChecker->IsGranted('ROLE_ADMIN')) {
+                $this->addFlash('danger', 'Vous n\'avez pas les droits pour effectuer cette action');
+                return $this->redirect($originUrl);
+            }
             $teamForm->handleRequest($request);
             $uapForm->handleRequest($request);
             if ($teamForm->isSubmitted()) {

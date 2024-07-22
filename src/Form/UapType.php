@@ -21,6 +21,9 @@ class UapType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Nom de l\'Uap',
+                'label_attr' => [
+                    'style' => 'color: #ffffff;'
+                ],
                 'attr' => [
                     'class' => 'form-control',
                     'placeholder' => 'Nom de l\'Uap',

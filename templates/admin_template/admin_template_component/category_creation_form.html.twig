@@ -1,0 +1,132 @@
+{% if is_granted('ROLE_LINE_ADMIN') %}
+	<div
+		class="accordion-item">
+		<h2
+			class="accordion-header"
+			id="headingCategories">
+			<button
+				class="accordion-button fs-3 collapsed"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target="#collapseCategory"
+				aria-expanded="false"
+				aria-controls="collapseCategory">
+				<strong>
+					Formulaire de création de Categories :
+				</strong>
+			</button>
+
+		</h2>
+		<div
+			id="collapseCategory"
+			class="accordion-collapse collapse "
+			aria-labelledby="headingCategory"
+			data-bs-parent="#accordionAdmin">
+			<div
+				class="accordion-body accordion-bg shadow shadow-inset">
+				<div
+					class="card border-0 shadow rounded-3 my-5">
+					<div
+						class="card-body">
+						<div
+							class="row">
+							<form
+								method="POST"
+								action="{{ path('app_productline_admin_create_category', {productlineId: productLine.id}) }}">
+
+								<div
+									class="card border-0 shadow rounded-3 my-5  bg-secondary">
+									<div
+										class="card-body">
+										<div
+											class="row d-flex align-items-center gy-lg-0 gy-5">
+											<div
+												class="col-md-6">
+
+												<h5
+													class="card-title text-center mb-5 fw-light fs-5">
+													<strong>
+														Création de Catégories
+													</strong>
+												</h5>
+												<form
+													class="form-floating"
+													method='POST'>
+													<div
+														class="form-control mb-3">
+														<label
+															for="categoryname">
+															Nom de la Catégorie
+														</label>
+														<input
+															type="text"
+															name="categoryname"
+															placeholder="Nom de la Catégorie"
+															required
+															class="form-control"
+															id="categoryname">
+													</div>
+													<div
+														class="d-grid">
+														<button
+															class="btn btn-primary btn-login text-first|uppercase fw-bold"
+															type="submit">
+															Valider
+														</button>
+													</div>
+
+
+												</form>
+												<hr
+													class="my-4">
+											</div>
+
+											<div
+												class="col-md-6">
+												<h5
+													class="card-title text-center mb-5 fw-light fs-5">
+													<strong>
+														Liste des Catégories de la Ligne
+														{{productLine.name|split('.')|first|upper}}
+														:
+													</strong>
+												</h5>
+												<ul
+													class="list-unstyled">
+
+													{% for category in productLine.categories %}
+														<li
+															class="form-control d-flex justify-content-between align-items-center mb-2">
+															<a
+																href="{{path('app_category_admin', {categoryId: category.id} )}}" class="btn btn-dark">
+																{{ category.name|split('.')|first|upper }}
+															</a>
+															{% if is_granted ('ROLE_LINE_ADMIN') or app.user is same as( category.creator) %}
+																<a
+																	href="{{path('app_productline_admin_delete_category', {categoryId: category.id})}}" class="btn btn-danger delete-category">
+																	Supprimer
+																</a>
+															{% endif %}
+														</li>
+													{% else %}
+														<li
+															class="alert alert-danger">
+															<a
+																href="{{path('app_base')}}">
+																Il n'y a pas de catégories dans cette ligne.
+															</a>
+														</li>
+													{% endfor %}
+												</ul>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endif %}

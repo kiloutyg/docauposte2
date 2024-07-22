@@ -1,76 +1,116 @@
-{% block body %}
-
+{% if is_granted('ROLE_LINE_ADMIN') %}
 	<div
-		class="card border-0 shadow rounded-3 my-5 bg-secondary">
-		<div
-			class="card-body ">
-			<h4
-				class="card-title text-white m-0">
+		class="accordion-item">
+		<h2
+			class="accordion-header"
+			id="headingUpload">
+			<button
+				class="accordion-button fs-3 collapsed"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target="#collapseUpload"
+				aria-expanded="false"
+				aria-controls="collapseUpload">
 				<strong>
-					Ajouter un fichier :
+					Formulaire d'upload :
 				</strong>
-			</h4>
-			<form
-				class="form-floating justify-content-center "
-				id="upload-form"
-				action="{{path('app_generic_upload_files')}}" method="POST"
-				enctype="multipart/form-data">
+			</button>
+		</h2>
+		<div
+			id="collapseUpload"
+			class="accordion-collapse collapse"
+			aria-labelledby="headingUpload"
+			data-bs-parent="#accordionAdmin">
+			<div
+				class="accordion-body accordion-bg shadow shadow-inset">
 				<div
-					class="row d-flex align-items-center gy-5">
+					class="card border-0 shadow rounded-3 my-5">
 					<div
-						class="fallback">
-						<label
-							for="file"
-							class="form-label"
-							style="color:white">
-							Choisissez un fichier :
-						</label>
-						<input
-							type="file"
-							class="form-control"
-							id="file"
-							name="file"
-							accept=".pdf"
-							required>
-
+						class="card-body">
 						<div
-							class="mb-3">
-							<label
-								for="newFileName"
-								class="form-label"
-								style="color:white">
-								Nom du fichier :
-							</label>
-							<input
-								type="text"
-								class="form-control"
-								id="newFileName"
-								name="newFileName"
-								placeholder="Entrer un nouveau nom de fichier (optionnel)">
-						</div>
-						{% include 'services/uploads/uploads_components/cascading_dropdowns.html.twig' %}
-					</div>
-				</div>
-				<div
-					class="row justify-content-center">
-					<div
-						class="d-grid col-md-8">
-						<button
-							type="submit"
-							class="btn btn-primary text-uppercase fw-bold ">
-							Charger
-						</button>
-					</div>
-				</div>
-			</form>
+							class="row">
+							<form
+								action="{{path('app_generic_upload_files')}}" method="POST"
+								enctype="multipart/form-data">
+								<div
+									class="card border-0 shadow rounded-3 my-5 bg-secondary">
+									<div
+										class="card-body ">
+										<h4
+											class="card-title text-white m-0">
+											<strong>
+												Ajouter un fichier :
+											</strong>
+										</h4>
+										<form
+											class="form-floating justify-content-center "
+											id="upload-form"
+											action="{{path('app_generic_upload_files')}}" method="POST"
+											enctype="multipart/form-data">
+											<div
+												class="row d-flex align-items-center gy-5">
+												<div
+													class="fallback">
+													<label
+														for="file"
+														class="form-label"
+														style="color:white">
+														Choisissez un fichier :
+													</label>
+													<input
+														type="file"
+														class="form-control"
+														id="file"
+														name="file"
+														accept=".pdf"
+														required>
 
+													<div
+														class="mb-3">
+														<label
+															for="newFileName"
+															class="form-label"
+															style="color:white">
+															Nom du fichier :
+														</label>
+														<input
+															type="text"
+															class="form-control"
+															id="newFileName"
+															name="newFileName"
+															placeholder="Entrer un nouveau nom de fichier (optionnel)">
+													</div>
+													{% include 'services/uploads/uploads_components/cascading_dropdowns.html.twig' %}
+												</div>
+											</div>
+											<div
+												class="row justify-content-center">
+												<div
+													class="d-grid col-md-8">
+													<button
+														type="submit"
+														class="btn btn-primary text-uppercase fw-bold ">
+														Charger
+													</button>
+												</div>
+											</div>
+										</form>
+
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
-{% endblock %}
-{% block javascripts %}
 
-	{{ encore_entry_script_tags('cascading-dropdowns') }}
-	{% block javascript_data %}
-	{% endblock %}
-
-{% endblock %}
+{% endif %}
+{# {% block javascripts %}
+	
+		{{ encore_entry_script_tags('cascading-dropdowns') }}
+		{% block javascript_data %}
+		{% endblock %}
+	
+	{% endblock %} #}

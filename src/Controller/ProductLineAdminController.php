@@ -18,6 +18,8 @@ class ProductLineAdminController extends FrontController
     // This function is responsible for rendering the productline's admin interface
     public function index(int $productlineId = null): Response
     {
+        $pageLevel = 'productLine';
+
         $productLine = $this->productLineRepository->find($productlineId);
         $zone = $productLine->getZone();
 
@@ -36,9 +38,8 @@ class ProductLineAdminController extends FrontController
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
         $groupedValidatedUploads = $this->uploadService->groupValidatedUploads($uploads);
 
-
-
-        return $this->render('productline_admin/productline_admin.html.twig', [
+        return $this->render('admin_template/admin_index.html.twig', [
+            'pageLevel'                 => $pageLevel,
             'groupedUploads'            => $groupedUploads,
             'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'            => $groupIncidents,

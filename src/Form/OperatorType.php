@@ -51,7 +51,7 @@ class OperatorType extends AbstractType
                 ],
                 'label_attr' => [
                     'class' => 'form-label mb-4',
-                    'style' => 'font-weight:  color: #ffffff;'
+                    'style' => ' color: #ffffff;'
                 ]
 
             ])
@@ -68,7 +68,7 @@ class OperatorType extends AbstractType
                 ],
                 'label_attr' => [
                     'class' => 'form-label mb-4',
-                    'style' => 'font-weight:  color: #ffffff;'
+                    'style' => ' color: #ffffff;'
                 ]
 
             ])

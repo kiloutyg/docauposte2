@@ -264,7 +264,7 @@ class UploadController extends FrontController
         // Check if there is a file to modify
         if (!$upload) {
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
-            return $this->redirectToRoute('app_category_manager', [
+            return $this->redirectToRoute('app_category_admin', [
                 'categoryId' => $categoryId
             ]);
         }
@@ -288,25 +288,25 @@ class UploadController extends FrontController
                 if ($trainingNeeded == null || $forcedDisplay == null) {
                     if ($upload->getFile() && $upload->getValidation() != null && $comment == null && $comment == "" && $request->request->get('modification-outlined' == '')) {
                         $this->addFlash('error', 'Le commentaire est vide. Commenter votre modification est obligatoire.');
-                        return $this->redirectToRoute('app_category_manager', [
+                        return $this->redirectToRoute('app_category_admin', [
                             'categoryId' => $categoryId
                         ]);
                     } elseif ($newValidation == "true" && $enoughValidator == false) {
                         $this->addFlash('error', 'Selectionner au moins 4 validateurs pour valider le fichier.');
-                        return $this->redirectToRoute('app_category_manager', [
+                        return $this->redirectToRoute('app_category_admin', [
                             'categoryId' => $categoryId
                         ]);
                     }
                 }
                 $this->uploadService->modifyFile($upload, $user, $request, $oldFileName);
                 $this->addFlash('success', 'Le fichier a été modifié.');
-                return $this->redirectToRoute('app_category_manager', [
+                return $this->redirectToRoute('app_category_admin', [
                     'categoryId' => $categoryId
                 ]);
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
 
-                return $this->redirectToRoute('app_category_manager', [
+                return $this->redirectToRoute('app_category_admin', [
                     'categoryId' => $categoryId
                 ]);
             }
@@ -315,7 +315,7 @@ class UploadController extends FrontController
         if ($form->isSubmitted() && !$form->isValid()) {
             // Return the errors in the JSON response
             $this->addFlash('error', 'Invalid form. Check the entered data.');
-            return $this->redirectToRoute('app_category_manager', [
+            return $this->redirectToRoute('app_category_admin', [
                 'categoryId' => $categoryId
             ]);
         }

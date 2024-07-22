@@ -300,16 +300,16 @@ _______________________________________________
                         - api_incidents_cascading_dropdown_data
             - app_category : 
                 - [/templates/category.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/category.html.twig)
-                - app_category_manager : 
-                    - [/templates/category_manager/category_manager_index.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/category_manager/category_manager_index.html.twig)
-                    - app_category_manager_create_user
+                - app_category_admin : 
+                    - [/templates/category_admin/category_admin_index.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/category_admin/category_admin_index.html.twig)
+                    - app_category_admin_create_user
                         - app_modify_account_view
                             - app_modify_account
                         - app_delete_account
-                    - app_category_manager_create_button : 
-                        - [/templates/category_manager/category_manager_index.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/category_manager/category_manager_index.html.twig)
-                    - app_category_manager_delete_button : 
-                        - [/templates/category_manager/category_manager_index.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/category_manager/category_manager_index.html.twig)
+                    - app_category_admin_create_button : 
+                        - [/templates/category_admin/category_admin_index.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/category_admin/category_admin_index.html.twig)
+                    - app_category_admin_delete_button : 
+                        - [/templates/category_admin/category_admin_index.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/category_admin/category_admin_index.html.twig)
                     - app_generic_upload_files
                             - api_cascading_dropdown_data
                         - app_uploaded_files
@@ -355,8 +355,8 @@ The method resides in each of the Controller managing the mother page :
             - [/src/Controller/ZoneAdminController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/ZoneAdminController.php)
             - app_productline_admin_create_manager :
                 - [/src/Controller/ProductLineAdminController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/ProductLineAdminController.php)
-                - app_category_manager_create_user :
-                    - [/src/Controller/CategoryManagerController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/CategoryManagerController.php)
+                - app_category_admin_create_user :
+                    - [/src/Controller/CategoryAdminController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/CategoryAdminController.php)
 - ⇒ Each of those methods passes their request to the service createAccount in the AccountService : 
     - [/src/Service/AccountService.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Service/AccountService.php)
 
@@ -390,8 +390,8 @@ The method resides in each of the Controller managing the mother page :
         - [/src/Controller/ZoneAdminController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/ZoneAdminController.php)
         - app_productline_admin_create_category - app_productline_admin_delete_category :
             - [/src/Controller/ProductLineAdminController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/ProductLineAdminController.php)
-            - app_category_manager_create_button - app_category_manager_delete_button : 
-                - [/src/Controller/CategoryManagerController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/CategoryManagerController.php)
+            - app_category_admin_create_button - app_category_admin_delete_button : 
+                - [/src/Controller/CategoryAdminController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/CategoryAdminController.php)
 - ⇒ Each of the creation methods lives entirely in those controllers.
 - ⇒ To ensure the complete deletion of all hereditary objects, the deletion methods utilize the deleteEntity function provided by the EntityDeletionService.php service:
     - [/src/Service/EntityDeletionService.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Service/EntityDeletionService.php)

@@ -19,12 +19,11 @@ class SuperAdminController extends FrontController
     #[Route('/super_admin', name: 'app_super_admin')]
     public function index(): Response
     {
-        // $incidents = $this->incidents;
-        // $incidents = $this->incidentRepository->findAll();
+
+        $pageLevel = 'super';
+
         $incidents = $this->cacheService->incidents;
 
-        // $uploads = $this->uploads;
-        // $uploads = $this->uploadRepository->findAll();
         $uploads = $this->cacheService->uploads;
 
         // Group the uploads and incidents by parent entity
@@ -35,13 +34,19 @@ class SuperAdminController extends FrontController
         // Get the error and last username using AuthenticationUtils
 
 
-        return $this->render('super_admin/super_admin_index.html.twig', [
+        return $this->render('admin_template/admin_index.html.twig', [
+            'pageLevel'                 => $pageLevel,
             'groupedUploads'            => $groupedUploads,
             'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'            => $groupIncidents,
 
         ]);
     }
+
+
+
+
+
 
     // Creation of new user account destined to the super admin
     #[Route('/super_admin/create_admin', name: 'app_super_admin_create_admin')]
