@@ -37,43 +37,48 @@
 
 					<div
 						class="col-3">
-						<input
-							type="file"
-							class="form-control"
-							id="operator-import-file"
-							name="operator-import-file"
+						<label
+							for="operator-import-file"
+							class="form-label tooltips"
 							aria-label="Importer un fichier CSV contenant une liste d'operateurs existant sous la forme ID;CodeOPE;PRENOM;NOM;EQUIPE;UAP"
-							accept=".csv"
-							placeholder="Importer un fichier CSV">
-					</div>
-					<div
-						class="col-1  align-self-center">
-						<button
-							type="submit"
-							class="btn btn-primary">
-							send
-						</button>
-					</div>
-				{% else %}
-					<div
-						class="col-4">
-						<p
 							style="color:white;">
-							Seul un administrateur peut importer des opérateurs
-						</p>
-					</div>
+							<input
+								type="file"
+								class="form-control "
+								id="operator-import-file"
+								name="operator-import-file"
+								aria-label="Importer un fichier CSV contenant une liste d'operateurs existant sous la forme ID;CodeOPE;PRENOM;NOM;EQUIPE;UAP"
+								accept=".csv"
+								placeholder="Importer un fichier CSV">
+						</div>
+						<div
+							class="col-1  align-self-center">
+							<button
+								type="submit"
+								class="btn btn-primary">
+								send
+							</button>
+						</div>
+					{% else %}
+						<div
+							class="col-4">
+							<p
+								style="color:white;">
+								Seul un administrateur peut importer des opérateurs
+							</p>
+						</div>
 
-				{% endif %}
+					{% endif %}
 
-			</form>
+				</form>
 
 
+			</div>
+
+			{% include '/services/operators/admin_component/_adminListOperatorSearchForm.html.twig' %}
+			<turbo-frame
+				id="adminListOperator">
+				{% include '/services/operators/admin_component/_adminListOperator.html.twig' %}
+			</turbo-frame>
 		</div>
-
-		{% include '/services/operators/admin_component/_adminListOperatorSearchForm.html.twig' %}
-		<turbo-frame
-			id="adminListOperator">
-			{% include '/services/operators/admin_component/_adminListOperator.html.twig' %}
-		</turbo-frame>
-	</div>
-{% endblock %}
+	{% endblock %}
