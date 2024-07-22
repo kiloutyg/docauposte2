@@ -82,7 +82,7 @@
 					{% if categoryExt != category %}
 						<li>
 							<a
-								href="{{ path('app_category_manager', {categoryId: categoryExt.id}) }}" class="dropdown-item shadow ">
+								href="{{ path('app_category_admin', {categoryId: categoryExt.id}) }}" class="dropdown-item shadow ">
 								{{categoryExt.name|split('.')|first|upper}}
 							</a>
 						</li>
@@ -95,10 +95,10 @@
 		</strong>
 	</h1>
 
-	{% if is_granted('ROLE_LINE_ADMIN') %}
-		<div
-			class="accordion"
-			id="accordionCategory">
+	<div
+		class="accordion"
+		id="accordionCategory">
+		{% if is_granted('ROLE_LINE_ADMIN') %}
 
 			<div
 				class="accordion-item">
@@ -134,7 +134,7 @@
 									<form
 										class="form-control"
 										method="POST"
-										action="{{ path('app_category_manager_create_button', {categoryId: category.id}) }}">
+										action="{{ path('app_category_admin_create_button', {categoryId: category.id}) }}">
 
 										<div
 											class="card border-0 shadow rounded-3 my-5  bg-secondary">
@@ -200,7 +200,7 @@
 																	</a>
 																	{% if is_granted ('ROLE_LINE_ADMIN') or app.user is same as( button.creator) %}
 																		<a
-																			href="{{path('app_category_manager_delete_button', {buttonId: button.id})}}" class="btn btn-danger delete-button">
+																			href="{{path('app_category_admin_delete_button', {buttonId: button.id})}}" class="btn btn-danger delete-button">
 																			Supprimer
 																		</a>
 																	{% endif %}
@@ -231,8 +231,10 @@
 				</div>
 			</div>
 		{% endif %}
+		{% if is_granted('ROLE_MANAGER') %}
 
-		{{ render(controller('App\\Controller\\OperatorController::operatorManagement'), options = []) }}
+			{{ render(controller('App\\Controller\\OperatorController::operatorManagement'), options = []) }}
+		{% endif %}
 		{% if is_granted('ROLE_LINE_ADMIN') %}
 
 			<div
@@ -277,6 +279,8 @@
 					</div>
 				</div>
 			</div>
+		{% endif %}
+		{% if is_granted('ROLE_LINE_ADMIN') %}
 
 			<div
 				class="accordion-item">
@@ -321,7 +325,9 @@
 					</div>
 				</div>
 			</div>
+		{% endif %}
 
+		{% if is_granted('ROLE_LINE_ADMIN') %}
 
 			<div
 				class="accordion-item">

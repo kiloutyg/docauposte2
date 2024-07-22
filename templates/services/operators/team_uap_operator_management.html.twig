@@ -39,17 +39,18 @@
 										class="d-flex align-items-center gy-lg-0 gy-5">
 										<div
 											style="flex: 1;">
-											{{ form_start(teamForm, { attr: { class: 'd-flex flex-column', 
+
+											{% if is_granted('ROLE_ADMIN') %}
+												{{ form_start(teamForm, { attr: { class: 'd-flex flex-column', 
 													id: 'teamCreationForm',
 													style:'flex: 1;', 
 													method: 'POST', 
 													enctype: 'multipart/form-data' }, 
 													action: path('app_operator_team_or_uap_management') }) }}
-
-											{{ form_end(teamForm) }}
+												{{ form_end(teamForm) }}
+											{% endif %}
 
 											{% if teams is not empty %}
-
 												<div
 													class="mt-auto mb-auto accordion"
 													id="accordionTeamList">
@@ -59,7 +60,7 @@
 															class="accordion-header"
 															id="headingTeamList">
 															<button
-																class="accordion-button bg-white text-dark"
+																class="accordion-button bg-white text-dark collapsed"
 																type="button"
 																data-bs-toggle="collapse"
 																data-bs-target="#collapseTeamList"
@@ -86,10 +87,12 @@
 																				class="col-4 ">
 																				{{ team.name }}
 																			</strong>
-																			<a
-																				href="{{path('app_delete_uap_or_team', {'entityType': 'team', 'entityId': team.id})}}" class="btn btn-danger delete-team col-4 shadow">
-																				Supprimer
-																			</a>
+																			{% if is_granted('ROLE_ADMIN') %}
+																				<a
+																					href="{{path('app_delete_uap_or_team', {'entityType': 'team', 'entityId': team.id})}}" class="btn btn-danger delete-team col-4 shadow">
+																					Supprimer
+																				</a>
+																			{% endif %}
 																		</li>
 
 																	{% endfor %}
@@ -104,14 +107,18 @@
 											style="flex: 0.2;"></div>
 										<div
 											style="flex: 1;">
-											{{ form_start(uapForm, { attr: { class: 'd-flex flex-column', 
+
+											{% if is_granted('ROLE_ADMIN') %}
+												{{ form_start(uapForm, { attr: { class: 'd-flex flex-column', 
 													id: 'uapCreationForm', 
 													style:'flex: 1;', 
 													method: 'POST', 
 													enctype: 'multipart/form-data' }, 
 													action: path('app_operator_team_or_uap_management') }) }}
 
-											{{ form_end(uapForm) }}
+												{{ form_end(uapForm) }}
+											{% endif %}
+
 											{% if uaps is not empty %}
 
 												<div
@@ -123,7 +130,7 @@
 															class="accordion-header"
 															id="headingUapList">
 															<button
-																class="accordion-button bg-white text-dark"
+																class="accordion-button bg-white text-dark collapsed"
 																type="button"
 																data-bs-toggle="collapse"
 																data-bs-target="#collapseUapList"
@@ -150,10 +157,14 @@
 																				class="col-4 ">
 																				{{ uap.name }}
 																			</strong>
-																			<a
-																				href="{{path('app_delete_uap_or_team', {'entityType': 'uap', 'entityId': uap.id})}}" class="btn btn-danger delete-uap col-4 shadow">
-																				Supprimer
-																			</a>
+
+																			{% if is_granted('ROLE_ADMIN') %}
+																				<a
+																					href="{{path('app_delete_uap_or_team', {'entityType': 'uap', 'entityId': uap.id})}}" class="btn btn-danger delete-uap col-4 shadow">
+																					Supprimer
+																				</a>
+																			{% endif %}
+
 																		</li>
 																	{% endfor %}
 																</ul>

@@ -43,145 +43,153 @@
 	<div
 		class="accordion"
 		id="accordionAdmin">
-		<div
-			class="accordion-item">
-			<h2
-				class="accordion-header"
-				id="headingProductLine">
-				<button
-					class="accordion-button fs-3 collapsed"
-					type="button"
-					data-bs-toggle="collapse"
-					data-bs-target="#collapseProductLine"
-					aria-expanded="false"
-					aria-controls="collapseProductLine">
-					<strong>
-						Formulaire de création de Ligne :
-					</strong>
-				</button>
-			</h2>
-			{% include "zone_admin/zone_admin_components/line_creation_form.html.twig" %}
+		{% if is_granted('ROLE_LINE_ADMIN') %}
+			<div
+				class="accordion-item">
+				<h2
+					class="accordion-header"
+					id="headingProductLine">
+					<button
+						class="accordion-button fs-3 collapsed"
+						type="button"
+						data-bs-toggle="collapse"
+						data-bs-target="#collapseProductLine"
+						aria-expanded="false"
+						aria-controls="collapseProductLine">
+						<strong>
+							Formulaire de création de Ligne :
+						</strong>
+					</button>
+				</h2>
+				{% include "zone_admin/zone_admin_components/line_creation_form.html.twig" %}
 
-		</div>
+			</div>
+		{% endif %}
 
 		{{ render(controller('App\\Controller\\OperatorController::operatorManagement'), options = []) }}
 
-		<div
-			class="accordion-item">
-			<h2
-				class="accordion-header"
-				id="headingUpload">
-				<button
-					class="accordion-button fs-3 collapsed"
-					type="button"
-					data-bs-toggle="collapse"
-					data-bs-target="#collapseUpload"
-					aria-expanded="false"
-					aria-controls="collapseUpload">
-					<strong>
-						Formulaire de chargement de fichier :
-					</strong>
-				</button>
-			</h2>
+		{% if is_granted('ROLE_LINE_ADMIN') %}
 			<div
-				id="collapseUpload"
-				class="accordion-collapse collapse"
-				aria-labelledby="headingUpload"
-				data-bs-parent="#accordionAdmin">
+				class="accordion-item">
+				<h2
+					class="accordion-header"
+					id="headingUpload">
+					<button
+						class="accordion-button fs-3 collapsed"
+						type="button"
+						data-bs-toggle="collapse"
+						data-bs-target="#collapseUpload"
+						aria-expanded="false"
+						aria-controls="collapseUpload">
+						<strong>
+							Formulaire de chargement de fichier :
+						</strong>
+					</button>
+				</h2>
 				<div
-					class="accordion-body accordion-bg shadow shadow-inset">
+					id="collapseUpload"
+					class="accordion-collapse collapse"
+					aria-labelledby="headingUpload"
+					data-bs-parent="#accordionAdmin">
 					<div
-						class="card border-0 shadow rounded-3 my-5">
+						class="accordion-body accordion-bg shadow shadow-inset">
 						<div
-							class="card-body">
+							class="card border-0 shadow rounded-3 my-5">
 							<div
-								class="row">
-								<form
-									action="{{path('app_generic_upload_files')}}" method="POST"
-									enctype="multipart/form-data">
-									{% include "services/uploads/upload.html.twig" %}
-								</form>
+								class="card-body">
+								<div
+									class="row">
+									<form
+										action="{{path('app_generic_upload_files')}}" method="POST"
+										enctype="multipart/form-data">
+										{% include "services/uploads/upload.html.twig" %}
+									</form>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div
-			class="accordion-item">
-			<h2
-				class="accordion-header"
-				id="headingIncident">
-				<button
-					class="accordion-button fs-3 collapsed"
-					type="button"
-					data-bs-toggle="collapse"
-					data-bs-target="#collapseIncident"
-					aria-expanded="false"
-					aria-controls="collapseIncident">
-					<strong>
-						Formulaire d'ajout d'Incident :
-					</strong>
-				</button>
-			</h2>
+		{% endif %}
+		{% if is_granted('ROLE_LINE_ADMIN') %}
 			<div
-				id="collapseIncident"
-				class="accordion-collapse collapse"
-				aria-labelledby="headingIncident"
-				data-bs-parent="#accordionAdmin">
+				class="accordion-item">
+				<h2
+					class="accordion-header"
+					id="headingIncident">
+					<button
+						class="accordion-button fs-3 collapsed"
+						type="button"
+						data-bs-toggle="collapse"
+						data-bs-target="#collapseIncident"
+						aria-expanded="false"
+						aria-controls="collapseIncident">
+						<strong>
+							Formulaire d'ajout d'Incident :
+						</strong>
+					</button>
+				</h2>
 				<div
-					class="accordion-body accordion-bg shadow shadow-inset">
+					id="collapseIncident"
+					class="accordion-collapse collapse"
+					aria-labelledby="headingIncident"
+					data-bs-parent="#accordionAdmin">
 					<div
-						class="card border-0 shadow rounded-3 my-5">
+						class="accordion-body accordion-bg shadow shadow-inset">
 						<div
-							class="card-body">
+							class="card border-0 shadow rounded-3 my-5">
 							<div
-								class="row">
+								class="card-body">
+								<div
+									class="row">
 
-								<form
-									action="{{path('app_generic_upload_incident_files')}}" method="POST"
-									enctype="multipart/form-data">
-									{% include "services/incidents/incidents.html.twig" %}
-								</form>
+									<form
+										action="{{path('app_generic_upload_incident_files')}}" method="POST"
+										enctype="multipart/form-data">
+										{% include "services/incidents/incidents.html.twig" %}
+									</form>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div
-			class="accordion-item">
-			<h2
-				class="accordion-header"
-				id="headingUploadedList">
-				<button
-					class="accordion-button fs-3 collapsed"
-					type="button"
-					data-bs-toggle="collapse"
-					data-bs-target="#collapseUploadedList"
-					aria-expanded="false"
-					aria-controls="collapseUploadedList">
-					<strong>
-						Liste des fichiers chargés :
-					</strong>
-				</button>
-			</h2>
+		{% endif %}
+		{% if is_granted('ROLE_LINE_ADMIN') %}
 			<div
-				id="collapseUploadedList"
-				class="accordion-collapse collapse"
-				aria-labelledby="headingUploadedList"
-				data-bs-parent="#accordionAdmin">
+				class="accordion-item">
+				<h2
+					class="accordion-header"
+					id="headingUploadedList">
+					<button
+						class="accordion-button fs-3 collapsed"
+						type="button"
+						data-bs-toggle="collapse"
+						data-bs-target="#collapseUploadedList"
+						aria-expanded="false"
+						aria-controls="collapseUploadedList">
+						<strong>
+							Liste des fichiers chargés :
+						</strong>
+					</button>
+				</h2>
 				<div
-					class="accordion-body accordion-bg shadow shadow-inset">
+					id="collapseUploadedList"
+					class="accordion-collapse collapse"
+					aria-labelledby="headingUploadedList"
+					data-bs-parent="#accordionAdmin">
 					<div
-						class="row">
-						<div>
-							{% include "services/uploads/uploaded_list.html.twig" %}
+						class="accordion-body accordion-bg shadow shadow-inset">
+						<div
+							class="row">
+							<div>
+								{% include "services/uploads/uploaded_list.html.twig" %}
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		{% endif %}
 		<div
 			class="accordion-item">
 			<h2
