@@ -15,6 +15,9 @@ window.addEventListener("turbo:load", () => {
   const submitIncidentModifcationButtons = document.querySelectorAll(".submit-incident-modification");
   const submitViewsModifcationButtons = document.querySelectorAll(".submit-views-modification");
   const downloadNonValidatedUploadButtons = document.querySelectorAll(".download-non-validated-upload");
+  const downloadRefusedUploadButtons = document.querySelectorAll(".download-refused-upload");
+  const downloadRefusedButOldButtons = document.querySelectorAll(".download-refused-but-old");
+
   const deleteTeamButtons = document.querySelectorAll(".delete-team");
   const deleteUapButtons = document.querySelectorAll(".delete-uap");
   const deleteOperatorsButtons = document.querySelectorAll(".delete-operator");
@@ -152,11 +155,26 @@ window.addEventListener("turbo:load", () => {
     button.addEventListener("click", (event) => {
       confirmationHandler(
         event,
-        "CE DOCUMENT N'A PAS ETE VALIDE, CONTINUER DE TOUTE MANIERE? EN CAS DE QUESTION CONTACTER VOTRE RESPONSABLE."
+        "CE DOCUMENT N'A PAS ÉTÉ VALIDÉ. CONTINUER DE TOUTE MANIÈRE? EN CAS DE QUESTION, CONTACTER VOTRE RESPONSABLE."
       );
     });
   });
-
+  downloadRefusedUploadButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "CE DOCUMENT A ÉTÉ REFUSÉ. CONTINUER DE TOUTE MANIÈRE? EN CAS DE QUESTION, CONTACTEZ VOTRE RESPONSABLE."
+      );
+    });
+  });
+  downloadRefusedButOldButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "LE NOUVEAU DOCUMENT A ÉTÉ REFUSÉ, LE PRÉCÉDENT SERA AFFICHÉ. EN CAS DE QUESTION, CONTACTEZ VOTRE RESPONSABLE."
+      );
+    });
+  });
   deleteTeamButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
       confirmationHandler(

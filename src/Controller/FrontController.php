@@ -148,27 +148,27 @@ class FrontController extends BaseController
 
         $this->logger->info('buttons', [$buttons]);
 
-        if (count($buttons) != 1) {
+        // if (count($buttons) != 1) {
 
-            return $this->render(
-                'category.html.twig',
-                [
-                    'zone'        => $zone,
-                    'productLine' => $productLine,
-                    'category'    => $category,
-                    'matchingButtons' => $buttons,
-                ]
-            );
-        } else {
-            $key = array_key_first($buttons);
-            $buttonId = $buttons[$key]->getId();
-            return $this->redirectToRoute('app_button', [
-                'zoneId'        => $zone->getId(),
-                'productlineId' => $productLine->getId(),
-                'categoryId'    => $category->getId(),
-                'buttonId'      => $buttonId
-            ]);
-        }
+        return $this->render(
+            'category.html.twig',
+            [
+                'zone'        => $zone,
+                'productLine' => $productLine,
+                'category'    => $category,
+                'matchingButtons' => $buttons,
+            ]
+        );
+        // } else {
+        //     $key = array_key_first($buttons);
+        //     $buttonId = $buttons[$key]->getId();
+        //     return $this->redirectToRoute('app_button', [
+        //         'zoneId'        => $zone->getId(),
+        //         'productlineId' => $productLine->getId(),
+        //         'categoryId'    => $category->getId(),
+        //         'buttonId'      => $buttonId
+        //     ]);
+        // }
     }
 
 
@@ -202,7 +202,6 @@ class FrontController extends BaseController
             );
         } else {
             $uploadId = $uploads[0]->getId();
-            $this->logger->info('uploadId', [$uploadId]);
             return $uploadController->filterDownloadFile($uploadId, $request);
         }
     }
