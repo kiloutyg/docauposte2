@@ -93,7 +93,7 @@ class OperatorType extends AbstractType
                 'class' => Team::class,
                 'label' => false,
                 'choice_label' => 'name',
-                'placeholder' => 'Choisir une équipe',
+                'placeholder' => 'Équipe',
 
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
@@ -111,7 +111,7 @@ class OperatorType extends AbstractType
                 'class' => Uap::class,
                 'label' => false,
                 'choice_label' => 'name',
-                'placeholder' => 'Choisir une UAP',
+                'placeholder' => 'UAP',
 
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
