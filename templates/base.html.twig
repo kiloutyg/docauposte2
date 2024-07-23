@@ -158,17 +158,27 @@ let buttonIdFromServer = null;
 							<ul
 								class="dropdown-menu dropdown-menu-start shadow shadow-inset"
 								aria-labelledby="dropdownMenuButton1">
+								{# {% for upload in DisapprovedFile %}
+																	{% for approbation in upload.validation.approbations %}
+																		{% if approbation.isApproval is same as(false) %}
+																			<li>
+																				<a
+																					href="{{ path('app_validation_disapproved_modify', {'approbationId': approbation.id})}}" class="dropdown-item shadow ">
+																					{{ upload.filename|upper }}
+																				</a>
+																			</li>
+																		{% endif %}
+																	{% endfor %}
+																{% endfor %} #}
 								{% for upload in DisapprovedFile %}
-									{% for approbation in upload.validation.approbations %}
-										{% if approbation.isApproval is same as(false) %}
-											<li>
-												<a
-													href="{{ path('app_validation_disapproved_modify', {'approbationId': approbation.id})}}" class="dropdown-item shadow ">
-													{{ upload.filename|upper }}
-												</a>
-											</li>
-										{% endif %}
-									{% endfor %}
+
+									<li>
+										<a
+											href="{{ path('app_validation_disapproved_modify_by_upload', {'uploadId': upload.id})}}" class="dropdown-item shadow ">
+											{{ upload.filename|upper }}
+										</a>
+									</li>
+
 								{% endfor %}
 							</ul>
 						{% endif %}
