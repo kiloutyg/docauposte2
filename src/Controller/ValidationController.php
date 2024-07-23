@@ -101,7 +101,6 @@ class ValidationController extends FrontController
 
 
     #[Route('/validation/disapproved/modify/{approbationId}', name: 'app_validation_disapproved_modify')]
-
     public function disapprovedValidationModification(int $approbationId = null, Request $request): Response
     {
         $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
@@ -150,7 +149,67 @@ class ValidationController extends FrontController
             return $this->redirect($originUrl);
         }
     }
+    // 
+    // 
+    // 
+    // 
+    #[Route('/validation/disapproved/modifyByUpload/{uploadId}', name: 'app_validation_disapproved_modify_by_upload')]
+    public function disapprovedValidationModificationByUpload(int $uploadId = null, Request $request): Response
+    {
+        // $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
+        // $validation  = $approbation->getValidation();
+        // $upload      = $validation->getUpload();
+        $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $validation = $upload->getValidation();
 
+
+        $approbations = [];
+        $approbations = $validation->getApprobations(['Approval' => false]);
+
+        $currentUser = $this->getUser();
+        $user        = $this->userRepository->find($currentUser);
+
+        // Retrieve the origin URL
+        $originUrl = $request->headers->get('Referer');
+
+        $form = $this->createForm(UploadType::class, $upload, [
+            'current_user_id'        => $user->getId(),
+            'current_upload_id'      => $upload->getId(),
+            // 'current_approbation_id' => $approbationId,
+        ]);
+
+        $form->remove('approbator');
+        $form->remove('modificationType');
+
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
+
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $this->uploadService->modifyDisapprovedFile($upload, $user, $request);
+                $this->addFlash('success', 'Le fichier a été modifié.');
+                return $this->redirectToRoute('app_base');
+            }
+        }
+        if ($validation->isStatus() === false) {
+            return $this->render('services/validation/disapprovedModificationByUpload.html.twig', [
+                // 'approbation'  => $approbation,
+                'upload'       => $upload,
+                'user'         => $this->getUser(),
+                'form'         => $form->createView(),
+                'approbations' => $approbations,
+
+            ]);
+        } else {
+            $this->addFlash('error', 'Le fichier a bien été modifié.');
+            return $this->redirect($originUrl);
+        }
+    }
+
+    // 
+    // 
+    // 
+    // 
 
     // public function validatedListUploadsRender(array $uploads = null): Response
     // {
