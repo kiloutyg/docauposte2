@@ -44,15 +44,16 @@
 				{{ productLine.name|split('.')|first|upper }}
 				:
 			</h3>
+
+		</div>
+		<div
+			class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
 			{% set matchingCategories = [] %}
 			{% for category in categories %}
 				{% if category.productLine.id is same as(productLine.id)  %}
 					{% set matchingCategories = matchingCategories|merge([category]) %}
 				{% endif %}
 			{% endfor %}
-		</div>
-		<div
-			class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
 			{% if matchingCategories|length > 0 %}
 				<div
 					class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
