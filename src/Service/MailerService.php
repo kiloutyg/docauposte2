@@ -17,24 +17,32 @@ use App\Entity\User;
 use App\Entity\Approbation;
 
 use App\Repository\ApprobationRepository;
+use App\Repository\UserRepository;
 
 class MailerService extends AbstractController
 {
     private $mailer;
-    private $approbationRepository;
+
     private $senderEmail;
     private $logger;
 
+    private $userRepository;
+    private $approbationRepository;
+
+
     public function __construct(
         MailerInterface $mailer,
-        ApprobationRepository $approbationRepository,
         string $senderEmail,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        UserRepository $userRepository,
+        ApprobationRepository $approbationRepository
     ) {
         $this->mailer                   = $mailer;
-        $this->approbationRepository    = $approbationRepository;
         $this->senderEmail              = $senderEmail;
         $this->logger                   = $logger;
+
+        $this->userRepository           = $userRepository;
+        $this->approbationRepository   = $approbationRepository;
     }
 
     public function approbationEmail(Validation $validation)
@@ -231,6 +239,50 @@ class MailerService extends AbstractController
                 'waitingUploads'                    => $inValidationUploads,
                 'refusedUploads'                    => $refusedValidationUploads,
                 // 'totalUploads'                      => $totalUploads
+            ]);
+
+        try {
+            $this->mailer->send($email);
+            return true;
+        } catch (TransportExceptionInterface $e) {
+            return false;
+        }
+    }
+
+    // Function to send a reminder email to all users listing uploads in validation entire status
+    public function sendReminderEmailToAllUsers(array $uploads)
+    {
+        $this->logger->info('uploads: ', [$uploads]);
+
+        $usersRaw = $this->userRepository->findAll();
+        foreach ($usersRaw as $user) {
+            if (!in_array('ROLE_SUPER_ADMIN', $user->getRoles()))
+                $users[] = $user;
+        };
+        $uploaders = [];
+        foreach ($uploads as $upload) {
+            if (!in_array($upload->getUploader(), $uploaders)) {
+                $uploaders[] = $upload->getUploader();
+            }
+        }
+
+        $this->logger->info('users: ', [$users]);
+
+
+        $senderEmail = $this->senderEmail;
+
+        foreach ($users as $user) {
+            $emailRecipientsAddresses[] = $user->getEmailAddress();
+        }
+
+        $email = (new TemplatedEmail())
+            ->from($senderEmail)
+            ->to(...$emailRecipientsAddresses)
+            ->subject('Docauposte - Rappel de toutes les actions en cours.')
+            ->htmlTemplate('services/email_templates/reminderEmailToAll.html.twig')
+            ->context([
+                'uploads'                    => $uploads,
+                'uploaders'                  => $uploaders
             ]);
 
         try {

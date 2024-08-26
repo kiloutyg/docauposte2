@@ -431,10 +431,19 @@ class ValidationService extends AbstractController
         $today = new \DateTime();
         $fileName = 'email_sent.txt';
         $filePath = $this->projectDir . '/public/doc/' . $fileName;
-        $uploadsWaitingValidation = [];
+        $uploadsWaitingValidationRaw = [];
         // $badValidators = [];
 
         if ($today->format('d') % 2 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
+
+            $nonValidatedValidations = $this->validationRepository->findNonValidatedValidations();
+
+            foreach ($nonValidatedValidations as $validation) {
+                $uploadedAt = $validation->getUpload()->getUploadedAt();
+                if (date_diff($today, $uploadedAt)->days >= 14) {
+                    $uploadsWaitingValidationRaw[] = $validation->getUpload();
+                }
+            }
 
             $rolesToCheck = ['ROLE_LINE_ADMIN_VALIDATOR', 'ROLE_ADMIN_VALIDATOR'];
             foreach ($users as $user) {
@@ -447,7 +456,9 @@ class ValidationService extends AbstractController
 
             foreach ($validators as $validator) {
                 $uploadsWaitingValidation = [];
+                $uploadsRefused = [];
                 $approbationsNotAnswered = $this->approbationRepository->findBy(['UserApprobator' => $validator, 'Approval' => null]);
+                $approbationsRefused = $this->approbationRepository->findBy(['UserApprobator' => $validator, 'Approval' => false]);
                 foreach ($approbationsNotAnswered as $approbationNotAnswered) {
                     $upload = $approbationNotAnswered->getValidation()->getUpload();
                     $uploadedAt = $upload->getUploadedAt();
@@ -457,15 +468,29 @@ class ValidationService extends AbstractController
                 }
                 if (count($uploadsWaitingValidation) > 0) {
                     $return = $this->mailerService->sendReminderEmail($validator, $uploadsWaitingValidation);
-                    $this->logger->info('return value after reminder email sent: ' . $return);
+
                     foreach ($uploadsWaitingValidation as $upload) {
+                        $uploaderId = $upload->getUploader()->getId();
+                        $uploaders[$uploaderId] = $upload->getUploader();
+                    }
+                }
+
+                foreach ($approbationsRefused as $approbationRefused) {
+                    $upload = $approbationRefused->getValidation()->getUpload();
+                    $uploadedAt = $upload->getUploadedAt();
+                    if (date_diff($today, $uploadedAt)->days >= 1) {
+                        $uploadsRefused[] = $upload;
+                    }
+                }
+
+                if (count($uploadsRefused) > 0) {
+                    foreach ($uploadsRefused as $upload) {
                         $uploaderId = $upload->getUploader()->getId();
                         $uploaders[$uploaderId] = $upload->getUploader();
                     }
                 }
             }
 
-            $this->logger->info('return value after all reminder email sent: ' . $return);
 
             if ($return) {
                 $fileWriting = file_put_contents($filePath, $today->format('Y-m-d'));
@@ -473,6 +498,10 @@ class ValidationService extends AbstractController
             }
             foreach ($uploaders as $uploader) {
                 $this->mailerService->sendReminderEmailToUploader($uploader);
+            }
+
+            if (count($uploadsWaitingValidationRaw) > 0) {
+                $this->mailerService->sendReminderEmailToAllUsers($uploadsWaitingValidationRaw);
             }
         }
     }
