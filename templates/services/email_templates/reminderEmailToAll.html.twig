@@ -1,0 +1,57 @@
+<p>
+	Bonjour,
+</p>
+{% for uploader in uploaders %}
+	<br>
+	<br>
+	Documents mis en ligne par :
+	<strong>
+		{{ uploader.username|capitalize|split('.')|first }}
+		{{ uploader.username|upper|split('.')|last  }}
+	</strong>
+	<br>
+
+	{% for upload in uploads %}
+		{% if uploader.id == upload.uploader.id %}
+
+			<p>
+				Le document
+				<strong>
+					{{ upload.filename }}
+				</strong>
+				est
+				{% if upload.validation.status %}
+					<br>
+					<strong>
+						Validé le
+						{{ upload.validation.validatedAt|date('d/m/Y') }}
+					</strong>
+				{% elseif upload.validation.status is same as(false) %}
+					<strong
+						style="color: red;">
+						refusé depuis le
+						{{ upload.validation.validatedAt|date('d/m/Y') }}
+					</strong>
+					est en attente de corrections.
+
+				{% else %}
+					<strong
+						style="color: orange;">
+						en attente de validation depuis le
+						{{ upload.uploadedAt|date('d/m/Y') }}
+					</strong>
+					par :
+					{% for approbation in upload.validation.approbations %}
+						{% if approbation.approval is same as NULL %}
+							<li>
+								{{ approbation.UserApprobator.username|capitalize|split('.')|first}}
+								{{ approbation.UserApprobator.username|upper|split('.')|last }}
+							</li>
+						{% endif %}
+					{% endfor %}
+					<br>
+				{% endif %}
+			</p>
+		{% endif %}
+	{% endfor %}
+{% endfor %}

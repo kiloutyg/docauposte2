@@ -158,4 +158,22 @@ class MailerController extends FrontController
         $this->addFlash('alert', $message);
         return $this->redirectToRoute('app_base');
     }
+
+
+    // A route to test the sendReminderEmailToAllUsers method
+    #[Route('/mail/mail_test_reminder', name: 'mail_test_reminder')]
+    public function testReminderEmailToUploader(): Response
+    {
+        // $nonValidatedValidations[] = $this->validationRepository->findBy(['status' => !true]);
+        $nonValidatedValidations = $this->validationRepository->findNonValidatedValidations();
+        $this->logger->info('nonValidatedValidations: ', [$nonValidatedValidations]);
+        
+        foreach ($nonValidatedValidations as $validation) {
+            $uploads[] = $validation->getUpload();
+        }
+        $this->logger->info('uploads: ', [$uploads]);
+
+        $this->mailerService->sendReminderEmailToAllUsers($uploads);
+        return $this->redirectToRoute('app_base');
+    }
 }

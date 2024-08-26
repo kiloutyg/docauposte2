@@ -21,6 +21,17 @@ class ValidationRepository extends BaseRepository
         parent::__construct($registry, Validation::class);
     }
 
+
+    public function findNonValidatedValidations()
+    {
+        $nonValidatedValidations = $this->createQueryBuilder('v')
+            ->where('v.Status != true OR v.Status IS NULL')
+            ->getQuery()
+            ->getResult();
+
+        return $nonValidatedValidations;
+    }
+
     //    /**
     //     * @return Validation[] Returns an array of Validation objects
     //     */
