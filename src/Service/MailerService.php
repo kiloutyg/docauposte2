@@ -278,7 +278,7 @@ class MailerService extends AbstractController
         $email = (new TemplatedEmail())
             ->from($senderEmail)
             ->to(...$emailRecipientsAddresses)
-            ->subject('Docauposte - Rappel des documents en cours de validation.')
+            ->subject('Docauposte - Rappel de toutes les actions en cours.')
             ->htmlTemplate('services/email_templates/reminderEmailToAll.html.twig')
             ->context([
                 'uploads'                    => $uploads,

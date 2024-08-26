@@ -19,7 +19,6 @@
 				<strong>
 					{{ upload.filename }}
 				</strong>
-				est
 				{% if upload.validation.status %}
 					<br>
 					<strong>
@@ -37,19 +36,20 @@
 				{% else %}
 					<strong
 						style="color: orange;">
-						en attente de validation depuis le
+						est en attente de validation depuis le
 						{{ upload.uploadedAt|date('d/m/Y') }}
 					</strong>
 					par :
-					{% for approbation in upload.validation.approbations %}
-						{% if approbation.approval is same as NULL %}
-							<li>
-								{{ approbation.UserApprobator.username|capitalize|split('.')|first}}
-								{{ approbation.UserApprobator.username|upper|split('.')|last }}
-							</li>
-						{% endif %}
-					{% endfor %}
-					<br>
+					<ul>
+						{% for approbation in upload.validation.approbations %}
+							{% if approbation.approval is same as NULL %}
+								<li>
+									{{ approbation.UserApprobator.username|capitalize|split('.')|first}}
+									{{ approbation.UserApprobator.username|upper|split('.')|last }}
+								</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
 				{% endif %}
 			</p>
 		{% endif %}
