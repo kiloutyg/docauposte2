@@ -456,7 +456,9 @@ class ValidationService extends AbstractController
 
             foreach ($validators as $validator) {
                 $uploadsWaitingValidation = [];
+                $uploadsRefused = [];
                 $approbationsNotAnswered = $this->approbationRepository->findBy(['UserApprobator' => $validator, 'Approval' => null]);
+                $approbationsRefused = $this->approbationRepository->findBy(['UserApprobator' => $validator, 'Approval' => false]);
                 foreach ($approbationsNotAnswered as $approbationNotAnswered) {
                     $upload = $approbationNotAnswered->getValidation()->getUpload();
                     $uploadedAt = $upload->getUploadedAt();
@@ -468,6 +470,21 @@ class ValidationService extends AbstractController
                     $return = $this->mailerService->sendReminderEmail($validator, $uploadsWaitingValidation);
 
                     foreach ($uploadsWaitingValidation as $upload) {
+                        $uploaderId = $upload->getUploader()->getId();
+                        $uploaders[$uploaderId] = $upload->getUploader();
+                    }
+                }
+
+                foreach ($approbationsRefused as $approbationRefused) {
+                    $upload = $approbationRefused->getValidation()->getUpload();
+                    $uploadedAt = $upload->getUploadedAt();
+                    if (date_diff($today, $uploadedAt)->days >= 1) {
+                        $uploadsRefused[] = $upload;
+                    }
+                }
+
+                if (count($uploadsRefused) > 0) {
+                    foreach ($uploadsRefused as $upload) {
                         $uploaderId = $upload->getUploader()->getId();
                         $uploaders[$uploaderId] = $upload->getUploader();
                     }

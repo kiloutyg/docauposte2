@@ -104,9 +104,11 @@ class UploadController extends FrontController
         $this->logger->info('is validated', ['validated' => $file->isValidated()]);
 
         if ($file->isValidated() === false && $file->isForcedDisplay() === false) {
-            if ($file->isTraining() === true) {
-                return $this->redirectToRoute('app_training_front_by_validation', ['validationId' => $file->getValidation()->getId()]);
-            } elseif ($file->getOldUpload() != null) {
+            // if ($file->isTraining() === true) {
+            //     return $this->redirectToRoute('app_training_front_by_validation', ['validationId' => $file->getValidation()->getId()]);
+            // } elseif ($file->getOldUpload() != null) {
+            // Either use the elseif or the if depending on the activation of the training feature
+            if ($file->getOldUpload() != null) {
                 $this->downloadFileFromPath($uploadId);
             } else {
                 $originUrl = $request->headers->get('Referer');
@@ -120,20 +122,20 @@ class UploadController extends FrontController
             $this->addFlash('Danger', 'Le fichier est en cours de validation et son affichage n\'est pas forcé. Contacter votre responsable pour plus d\'informations.');
             return $this->redirect($originUrl, 307);
         } elseif ($file->isValidated() === true) {
-            if ($file->isTraining() === true) {
-                return $this->redirectToRoute('app_training_front_by_upload', ['uploadId' => $uploadId]);
-            } else {
-                $path = $file->getPath();
-            }
+            // if ($file->isTraining() === true) {
+            //     return $this->redirectToRoute('app_training_front_by_upload', ['uploadId' => $uploadId]);
+            // } else {
+            $path = $file->getPath();
+            // }
         } elseif ($file->isValidated() === null) {
             $this->logger->info('is validated', ['validated' => $file->isValidated()]);
 
-            if ($file->isTraining() === true) {
-                return $this->redirectToRoute('app_training_front_by_validation', ['validationId' => $file->getValidation()->getId()]);
-            } else {
-                $this->addFlash('error', 'Le nouveau fichier est en cours de validation.');
-                return $this->downloadFileFromPath($uploadId);
-            }
+            // if ($file->isTraining() === true) {
+            //     return $this->redirectToRoute('app_training_front_by_validation', ['validationId' => $file->getValidation()->getId()]);
+            // } else {
+            $this->addFlash('error', 'Le nouveau fichier est en cours de validation.');
+            return $this->downloadFileFromPath($uploadId);
+            // }
         }
 
         return $this->downloadFileFromMethods($path);
