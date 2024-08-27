@@ -56,7 +56,6 @@ class ValidationController extends FrontController
     #[Route('/validation/approbation/download/{approbationId}', name: 'app_validation_approbation_file')]
     public function validationDownloadFile(int $approbationId = null): Response
     {
-
         $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
         $validation  = $approbation->getValidation();
         $file        = $validation->getUpload();

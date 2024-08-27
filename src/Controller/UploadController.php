@@ -133,7 +133,6 @@ class UploadController extends FrontController
             // if ($file->isTraining() === true) {
             //     return $this->redirectToRoute('app_training_front_by_validation', ['validationId' => $file->getValidation()->getId()]);
             // } else {
-            $this->addFlash('error', 'Le nouveau fichier est en cours de validation.');
             return $this->downloadFileFromPath($uploadId);
             // }
         }

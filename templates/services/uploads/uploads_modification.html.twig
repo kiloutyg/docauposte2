@@ -22,7 +22,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 			{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm', 'method': 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_modifying_file', {'uploadId': upload.id})}) }}
 
 			<div
-				class="row d-flex align-items-center gy-lg-0 gy-5">
+				class="row align-items-center gy-lg-0 gy-5">
 				<h3
 					class="text-white m-0"
 					style="color:white">
@@ -36,13 +36,13 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					Revision n°
 					{{upload.revision}}
 				</h5>
-				<div
-					class="row justify-content-center ">
+				{# <div
+					class=" "> #}
 
 					{% include "services/uploads/uploads_components/modifications_components/uploads_downloads_display.html.twig" %}
 
 					<div
-						class="col-8">
+						class="col-8 mx-auto">
 						{{ form_label(form.file, 'Choisissez un nouveau ficher:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}
 						) }}
 						{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}
@@ -65,7 +65,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						</div>
 					</div>
 
-				</div>
+				{# </div> #}
 
 			</div>
 

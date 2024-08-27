@@ -1,15 +1,15 @@
 {% if updateMenu is not defined %}
+	{% set labelColValue = "col-lg-4" %}
+	{% set inputColValue = "col-lg-8" %}
+{% else %}
 	{% set labelColValue = "col-lg-3" %}
 	{% set inputColValue = "col-lg-9" %}
-{% else %}
-	{% set labelColValue = "col-lg-2" %}
-	{% set inputColValue = "col-lg-10" %}
 {% endif %}
 {% if upload.forcedDisplay is defined and upload.forcedDisplay == true %}
 	{% set checkStatus = true %}
 {% endif %}
 <div
-	class="col-md-2 col-sm-2 {{labelColValue}} ">
+	class="col-md-3 col-sm-3 {{labelColValue}} ">
 	<label
 		for="display-needed"
 		class=" col-form-label tooltips"
@@ -20,7 +20,7 @@
 </div>
 
 <div
-	class="col-md-10 col-sm-10 {{inputColValue}}">
+	class="col-md-9 col-sm-9 {{inputColValue}}">
 	<input
 		id="display-needed"
 		name="display-needed"

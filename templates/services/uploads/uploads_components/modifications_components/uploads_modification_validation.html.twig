@@ -4,7 +4,8 @@
 	<div
 		class="accordion-item">
 		<div
-			class="accordion-header"
+			class="accordion-header tooltips"
+			aria-label="Ouvrez ce menu pour activer la validation de document, fermez le pour la désactiver. ATTENTION : Si le document a déjà nécessité une validation il n'est pas nécessaire de sélectionner à nouveau les validateurs."
 			id="validatorNeeded-header">
 			{% if upload.validation is null %}
 				<input
@@ -33,7 +34,7 @@
 				<strong>
 					Validation du Document
 				</strong>
-				&nbsp; (Ouvrez ce menu pour activer la validation de document, fermez le pour la désactiver. Si le document a déjà nécessité une validation il n'est pas nécessaire de sélectionner à nouveau les validateurs.)
+
 			</label>
 		</div>
 		<div
@@ -67,7 +68,8 @@
 					<div
 						class="input-group justify-content-center">
 						<div
-							class="input-group-prepend">
+							class="input-group-prepend tooltips"
+							aria-label="Commentaire obligatoire uniquement en cas de modification majeure.">
 							<span
 								class="input-group-text">
 								Commentaire
@@ -75,7 +77,7 @@
 							<textarea
 								class="form-control"
 								name="modificationComment"
-								aria-label="With textarea"
+								aria-label="textarea"
 								rows="2"
 								cols="50"></textarea>
 						</div>
@@ -93,15 +95,15 @@
 		<div
 			class="input-group justify-content-center">
 			<div
-				class="input-group-prepend">
+				class="input-group-prepend tooltips"
+				aria-label="Commentaire obligatoire uniquement en cas de modification majeure.">
 				<span
-					class="input-group-text">
+					class="input-group-text ">
 					Commentaire
 				</span>
 				<textarea
 					class="form-control"
 					name="modificationComment"
-					aria-label="With textarea"
 					rows="2"
 					cols="50"></textarea>
 			</div>
