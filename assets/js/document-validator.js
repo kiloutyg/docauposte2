@@ -143,10 +143,8 @@ document.addEventListener('turbo:load', function () {
 // and then calls the createNewSelect function.
 
 function createNewSelect(selectedValue, selectId) {
-  console.log('createNewSelect called');
   // Check if the selected value is not empty
   if (selectedValue !== '') {
-    console.log('Creating a new select');  // Debug line
     // Get all the selected options from other select elements
     var lastSelectId = document.querySelectorAll('.userSelect:last-child')[0].id;
 
@@ -174,7 +172,6 @@ function createNewSelect(selectedValue, selectId) {
 // (up to the number of users in the usersData array), it calls the createSelectElement function.
 
 function createSelectElement() {
-  console.log('Creating a new select element createSelectElement called');  // Debug line
   // Create a new select element
   var newSelect = document.createElement('select');
   // Add classes to the new select element
@@ -249,7 +246,6 @@ document.addEventListener("turbo:load", function () {
       if (this.checked) {
         // Make the textarea required if "Désapprouver" is checked
         textareaComment.required = true;
-        console.log('required');
       }
     });
   }
@@ -263,7 +259,6 @@ document.addEventListener("turbo:load", function () {
       if (this.checked) {
         // Remove the 'required' attribute when "Approuver" is checked
         textareaComment.required = false;
-        console.log('not required');
       }
     });
   }
@@ -278,20 +273,24 @@ document.addEventListener("turbo:load", function () {
   // Check if the input element for validation cycle exists and set the flag accordingly
   const validationCycleInput = document.querySelector('div[name="validation_cycle"]');
   let isValidationCycle = validationCycleInput !== null;
-
+  const validatorNeededDropdown = document.getElementById('accordionValidator')
   // Modification level needed by the upload
   let modificationLevel = document.getElementById('modification-outlined');
   if (modificationLevel) {
-    console.log(modificationLevel.checked);
-    console.log(modificationLevel.value);
+
     modificationLevel.addEventListener('change', function () {
       console.log(modificationLevel.checked);
       console.log(modificationLevel.value);
-      if (modificationLevel.checked || modificationLevel.value == "minor-modification" && textareaComment === document.querySelector('textarea[name="modificationComment"]')) {
+      if (modificationLevel.checked == false || modificationLevel.value == '') {
+        validatorNeededDropdown.hidden = false;
+        console.log('not hidden anymore');
+      } else if (modificationLevel.checked || modificationLevel.value == "minor-modification" && textareaComment === document.querySelector('textarea[name="modificationComment"]')) {
         textareaComment.required = false;
-        console.log('Textarea is now not required');
-
+        validatorNeededDropdown.hidden = true;
+        console.log('hidden and not required');
       }
+
+
     });
   }
   // This code selects the file input element with the id 'upload_file' and assigns it to the variable fileInput
@@ -307,20 +306,17 @@ document.addEventListener("turbo:load", function () {
     // Check if there are any files selected in the file input and if the textarea is the modificationComment
     if (isValidationCycle && fileInput.files.length > 0 && textareaComment === document.querySelector('textarea[name="modificationComment"]')) {
       textareaComment.required = true;
-      console.log('Textarea is now required');
     }
     // Check if there are any files selected in the file input and if the validator checkbox is checked
     else if (validatorCheckbox.checked) {
       // If both conditions are true, set the 'required' attribute of the textarea to true
       textareaComment.required = true;
       // Log a message to the console indicating that the textarea is now required
-      console.log('Textarea is now required');
     } // Add a test to insure the modification level is enough to require a commentary
     else {
       // If either condition is false, set the 'required' attribute of the textarea to false
       textareaComment.required = false;
       // Log a message to the console indicating that the textarea is not required
-      console.log('Textarea is not required');
     }
   }
 
@@ -334,12 +330,10 @@ document.addEventListener("turbo:load", function () {
       // If both conditions are true, set the 'required' attribute of the Select to true
       validatorUser.required = true;
       // Log a message to the console indicating that the Select is now required
-      console.log('Select validatorUser is now required');
     } else {
       // If either condition is false, set the 'required' attribute of the Select to false
       validatorUser.required = false;
       // Log a message to the console indicating that the Select is not required
-      console.log('Select validatorUser is not required');
     }
   }
 

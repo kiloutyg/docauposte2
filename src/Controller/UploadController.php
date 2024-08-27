@@ -107,8 +107,8 @@ class UploadController extends FrontController
             // if ($file->isTraining() === true) {
             //     return $this->redirectToRoute('app_training_front_by_validation', ['validationId' => $file->getValidation()->getId()]);
             // } elseif ($file->getOldUpload() != null) {
-                // Either use the elseif or the if depending on the activation of the training feature
-                if ($file->getOldUpload() != null) {
+            // Either use the elseif or the if depending on the activation of the training feature
+            if ($file->getOldUpload() != null) {
                 $this->downloadFileFromPath($uploadId);
             } else {
                 $originUrl = $request->headers->get('Referer');
@@ -125,7 +125,7 @@ class UploadController extends FrontController
             // if ($file->isTraining() === true) {
             //     return $this->redirectToRoute('app_training_front_by_upload', ['uploadId' => $uploadId]);
             // } else {
-                $path = $file->getPath();
+            $path = $file->getPath();
             // }
         } elseif ($file->isValidated() === null) {
             $this->logger->info('is validated', ['validated' => $file->isValidated()]);
@@ -133,8 +133,7 @@ class UploadController extends FrontController
             // if ($file->isTraining() === true) {
             //     return $this->redirectToRoute('app_training_front_by_validation', ['validationId' => $file->getValidation()->getId()]);
             // } else {
-                $this->addFlash('error', 'Le nouveau fichier est en cours de validation.');
-                return $this->downloadFileFromPath($uploadId);
+            return $this->downloadFileFromPath($uploadId);
             // }
         }
 
