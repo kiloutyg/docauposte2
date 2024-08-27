@@ -1,15 +1,15 @@
 {% if updateMenu is not defined %}
+	{% set labelColValue = "col-lg-4" %}
+	{% set inputColValue = "col-lg-8" %}
+{% else %}
 	{% set labelColValue = "col-lg-3" %}
 	{% set inputColValue = "col-lg-9" %}
-{% else %}
-	{% set labelColValue = "col-lg-2" %}
-	{% set inputColValue = "col-lg-10" %}
 {% endif %}
 {% if upload.training is defined and upload.training == true %}
 	{% set checkStatus = true %}
 {% endif %}
 <div
-	class="col-md-2 col-sm-2 {{labelColValue}} ">
+	class="col-md-3 col-sm-3 {{labelColValue}} ">
 	<label
 		for="training-needed"
 		class=" col-form-label tooltips"
@@ -20,12 +20,12 @@
 </div>
 
 <div
-	class="col-md-10 col-sm-10 {{inputColValue}}">
+	class="col-md-9 col-sm-9 {{inputColValue}}">
 	<input
 		id="training-needed"
 		name="training-needed"
 		type="checkbox"
-		class="training-toggle-input col-8"
+		class="training-toggle-input"
 		data-document-training-target="trainingNeededToggle"
 		value="true"
 		{{checkStatus is defined ? (checkStatus ? "checked" : "") : ""}}>

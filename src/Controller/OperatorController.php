@@ -246,6 +246,7 @@ class OperatorController extends FrontController
         $this->logger->info('Full request', $request->request->all());
         $this->logger->info('uploadId', [$uploadId]);
         $upload = $this->uploadRepository->find($uploadId);
+        
         // $countArray = $this->operatorService->operatorCheckForAutoDelete();
         // if ($countArray != null) {
         //     if ($countArray != null) {
