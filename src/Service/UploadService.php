@@ -264,6 +264,15 @@ class UploadService extends AbstractController
             }
         } else {
             $validated = true;
+            if ($preExistingValidation && $comment != null) {
+                if ($request->request->get('modification-outlined') == 'minor-modification') {
+                    $comment = $comment . ' (modification mineure)';
+                }
+                $preExistingValidationEntity = $upload->getValidation();
+                $preExistingValidationEntity->setComment($comment);
+                $this->manager->persist($preExistingValidationEntity);
+                $this->manager->flush();
+            }
         };
 
         if ($request->request->get('training-needed') === 'true') {
