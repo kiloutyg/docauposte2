@@ -180,16 +180,19 @@ class FrontController extends BaseController
         $category    = $buttonEntity->getCategory();
         $productLine = $category->getProductLine();
         $zone        = $productLine->getZone();
-        $uploads = [];
 
         $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonId]);
-        foreach ($buttonUploads as $buttonUpload) {
-            if ($buttonUpload->isValidated() || $buttonUpload->getOldUpload() != null) {
-                $uploads[] = $buttonUpload;
-            }
-        }
+        $this->logger->info('buttonUploads', [$buttonUploads]);
 
-        if (count($uploads) != 1) {
+        // foreach ($buttonUploads as $buttonUpload) {
+
+        //     if ($buttonUpload->isValidated() || $buttonUpload->getValidation() != null || $buttonUpload->getOldUpload() != null) {
+        //         $uploads[] = $buttonUpload;
+        //     }
+        // }
+
+
+        if (count($buttonUploads) != 1) {
             return $this->render(
                 'button.html.twig',
                 [
@@ -197,14 +200,17 @@ class FrontController extends BaseController
                     'productLine' => $productLine,
                     'category'    => $category,
                     'button'      => $buttonEntity,
-                    'uploads'     => $uploads,
+                    'uploads'     => $buttonUploads,
                 ]
             );
         } else {
-            $uploadId = $uploads[0]->getId();
+            $uploadId = $buttonUploads[0]->getId();
             return $uploadController->filterDownloadFile($uploadId, $request);
         }
     }
+
+
+
     #[Route('/flash-messages', name: 'flash_messages')]
     public function flashMessages(Request $request): Response
     {

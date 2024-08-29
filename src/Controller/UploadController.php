@@ -101,40 +101,42 @@ class UploadController extends FrontController
     {
         $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $path = $file->getPath();
-        $this->logger->info('is validated', ['validated' => $file->isValidated()]);
 
         if ($file->isValidated() === false && $file->isForcedDisplay() === false) {
-            // if ($file->isTraining() === true) {
-            //     return $this->redirectToRoute('app_training_front_by_validation', ['validationId' => $file->getValidation()->getId()]);
-            // } elseif ($file->getOldUpload() != null) {
-            // Either use the elseif or the if depending on the activation of the training feature
-            if ($file->getOldUpload() != null) {
+            if ($file->isTraining() === true) {
+                return $this->redirectToRoute('app_training_front_by_validation', ['validationId' => $file->getValidation()->getId()]);
+            } elseif ($file->getOldUpload() != null) {
+                // Either use the elseif or the if depending on the activation of the training feature
+                // if ($file->getOldUpload() != null) {
                 $this->downloadFileFromPath($uploadId);
             } else {
                 $originUrl = $request->headers->get('Referer');
                 $this->addFlash('Danger', 'Le fichier a été refusé par les validateurs et son affichage NON FORCÉ. Contacter votre responsable pour plus d\'informations.');
                 return $this->redirect($originUrl, 307);
             }
-
             // Commented till we determine if we need a strict policy.
         } elseif ($file->isValidated() === null && $file->isForcedDisplay() === false) {
-            $originUrl = $request->headers->get('Referer');
-            $this->addFlash('Danger', 'Le fichier est en cours de validation et son affichage n\'est pas forcé. Contacter votre responsable pour plus d\'informations.');
-            return $this->redirect($originUrl, 307);
+            if ($file->getOldUpload() != null) {
+                return $this->downloadFileFromPath($uploadId);
+            } else {
+                $originUrl = $request->headers->get('Referer');
+                $this->addFlash('Danger', 'Le fichier est en cours de validation et son affichage n\'est pas forcé. Contacter votre responsable pour plus d\'informations.');
+                return $this->redirect($originUrl, 307);
+            }
         } elseif ($file->isValidated() === true) {
-            // if ($file->isTraining() === true) {
-            //     return $this->redirectToRoute('app_training_front_by_upload', ['uploadId' => $uploadId]);
-            // } else {
-            $path = $file->getPath();
-            // }
+            if ($file->isTraining() === true) {
+                return $this->redirectToRoute('app_training_front_by_upload', ['uploadId' => $uploadId]);
+            } else {
+                $path = $file->getPath();
+            }
         } elseif ($file->isValidated() === null) {
             $this->logger->info('is validated', ['validated' => $file->isValidated()]);
 
-            // if ($file->isTraining() === true) {
-            //     return $this->redirectToRoute('app_training_front_by_validation', ['validationId' => $file->getValidation()->getId()]);
-            // } else {
-            return $this->downloadFileFromPath($uploadId);
-            // }
+            if ($file->isTraining() === true) {
+                return $this->redirectToRoute('app_training_front_by_validation', ['validationId' => $file->getValidation()->getId()]);
+            } else {
+                return $this->downloadFileFromPath($uploadId);
+            }
         }
 
         return $this->downloadFileFromMethods($path);
@@ -146,7 +148,9 @@ class UploadController extends FrontController
     // create a route to download a file in more simple terms to display the file
     public function downloadFileFromMethods(string $path): Response
     {
+        $this->logger->info('path', ['path' => $path]);
         $file = new File($path);
+        $this->logger->info('file', ['file' => $file]);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
     // 
@@ -158,9 +162,9 @@ class UploadController extends FrontController
     public function downloadFileFromPath(int $uploadId): Response
     {
         $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
-        $this->logger->info('is the file validated', ['validated: ' => $file->isValidated()]);
 
         $path = $this->determineFilePath($file);
+        $this->logger->info('path', ['path' => $path]);
         return $this->downloadFileFromMethods($path);
     }
     // 
@@ -172,9 +176,12 @@ class UploadController extends FrontController
     {
 
         if (!$file->isValidated()) {
+            $this->logger->info('is validated', ['validated' => $file->isValidated()]);
             if ($file->isForcedDisplay() === true || $file->isForcedDisplay() === null) {
+                $this->logger->info('is forced display on or null', ['forcedDisplay' => $file->isForcedDisplay()]);
                 return $file->getPath();
             } elseif ($file->getOldUpload() != null) {
+                $this->logger->info('is old upload', ['oldUpload' => $file->getOldUpload()]);
                 $oldUpload = $file->getOldUpload();
                 return $oldUpload->getPath();
             }
