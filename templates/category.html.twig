@@ -54,12 +54,14 @@
 						{% set validated = '' %}
 						{% if button.uploads|length == 1 %}
 							{% for upload in button.uploads %}
-								{% if upload.validation != null and upload.validation.status != true and upload.forcedDisplay == true %}
-									{% set validated = 'download-non-validated-upload' %}
-								{% elseif upload.validation != null and upload.validation.status == false and upload.forcedDisplay == true %}
-									{% set validated = 'download-refused-upload' %}
-								{% elseif  upload.validation != null and upload.validation.status == false and upload.oldUpload != null %}
+								{% if upload.oldUpload != null and  upload.validation != null and upload.validation.status is same as(null)%}
+									{% set validated = 'download-non-validated-but-old' %}
+								{% elseif upload.oldUpload != null and upload.validation.status is same as(false) %}
 									{% set validated = 'download-refused-but-old' %}
+								{% elseif upload.validation.status is same as(null)  %}
+									{% set validated = 'download-non-validated-upload' %}
+								{% elseif upload.validation.status is same as(false) %}
+									{% set validated = 'download-refused-upload' %}
 								{% endif %}
 							{% endfor %}
 						{% endif %}
