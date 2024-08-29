@@ -17,6 +17,7 @@ window.addEventListener("turbo:load", () => {
   const downloadNonValidatedUploadButtons = document.querySelectorAll(".download-non-validated-upload");
   const downloadRefusedUploadButtons = document.querySelectorAll(".download-refused-upload");
   const downloadRefusedButOldButtons = document.querySelectorAll(".download-refused-but-old");
+  const downloadNonValidatedButOldUploadButtons = document.querySelectorAll(".download-non-validated-but-old");
 
   const deleteTeamButtons = document.querySelectorAll(".delete-team");
   const deleteUapButtons = document.querySelectorAll(".delete-uap");
@@ -155,7 +156,15 @@ window.addEventListener("turbo:load", () => {
     button.addEventListener("click", (event) => {
       confirmationHandler(
         event,
-        "CE DOCUMENT N'A PAS ÉTÉ VALIDÉ. CONTINUER DE TOUTE MANIÈRE? EN CAS DE QUESTION, CONTACTER VOTRE RESPONSABLE."
+        "CE DOCUMENT N'A PAS ENCORE ÉTÉ VALIDÉ. CONTINUER DE TOUTE MANIÈRE? EN CAS DE QUESTION, CONTACTER VOTRE RESPONSABLE."
+      );
+    });
+  });
+  downloadNonValidatedButOldUploadButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "CE DOCUMENT N'A PAS ENCORE ÉTÉ VALIDÉ. LE PRÉCÉDENT SERA AFFICHÉ. EN CAS DE QUESTION, CONTACTEZ VOTRE RESPONSABLE."
       );
     });
   });
@@ -175,6 +184,7 @@ window.addEventListener("turbo:load", () => {
       );
     });
   });
+
   deleteTeamButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
       confirmationHandler(
