@@ -56,11 +56,11 @@
 							{% for upload in button.uploads %}
 								{% if upload.oldUpload != null and  upload.validation != null and upload.validation.status is same as(null)%}
 									{% set validated = 'download-non-validated-but-old' %}
-								{% elseif upload.oldUpload != null and upload.validation.status is same as(false) %}
+								{% elseif upload.oldUpload != null and  upload.validation != null and upload.validation.status is same as(false) %}
 									{% set validated = 'download-refused-but-old' %}
-								{% elseif upload.validation.status is same as(null)  %}
+								{% elseif  upload.validation != null and upload.validation.status is same as(null)  %}
 									{% set validated = 'download-non-validated-upload' %}
-								{% elseif upload.validation.status is same as(false) %}
+								{% elseif  upload.validation != null and upload.validation.status is same as(false) %}
 									{% set validated = 'download-refused-upload' %}
 								{% endif %}
 							{% endfor %}
