@@ -42,12 +42,12 @@ class OperatorController extends FrontController
         // $this->logger->info('search query with full request', $request->request->all());
         // if ($app . user) Was doing somthing here and i don't remember what
         $countArray = $this->operatorService->operatorCheckForAutoDelete();
-        if ($countArray != null) {
-            if ($countArray != null) {
-                $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
-                    ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
-            }
-        }
+        // if ($countArray != null) {
+        //     if ($countArray != null) {
+        //         $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
+        //             ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
+        //     }
+        // }
         $newOperator = new Operator();
         $newOperatorForm = $this->createForm(OperatorType::class, $newOperator);
         $newOperatorForm->handleRequest($request);
@@ -246,7 +246,7 @@ class OperatorController extends FrontController
         $this->logger->info('Full request', $request->request->all());
         $this->logger->info('uploadId', [$uploadId]);
         $upload = $this->uploadRepository->find($uploadId);
-        
+
         // $countArray = $this->operatorService->operatorCheckForAutoDelete();
         // if ($countArray != null) {
         //     if ($countArray != null) {
@@ -588,7 +588,10 @@ class OperatorController extends FrontController
 
         // No duplicate found
         return new JsonResponse([
-            'found' => false, 'field' => 'name', 'value' => $operatorName, 'message' => 'Aucun opérateur avec ce nom n\'existe'
+            'found' => false,
+            'field' => 'name',
+            'value' => $operatorName,
+            'message' => 'Aucun opérateur avec ce nom n\'existe'
         ]);
     }
 
@@ -624,7 +627,10 @@ class OperatorController extends FrontController
 
         // No duplicate found
         return new JsonResponse([
-            'found' => false, 'field' => 'code', 'value' => $operatorCode, 'message' => "Aucun opérateur avec ce codeOpé n'existe"
+            'found' => false,
+            'field' => 'code',
+            'value' => $operatorCode,
+            'message' => "Aucun opérateur avec ce codeOpé n'existe"
         ]);
     }
 

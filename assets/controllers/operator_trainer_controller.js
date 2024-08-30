@@ -190,11 +190,8 @@ export default class OperatorTrainerController extends Controller {
         // You would fetch this content via an API or similar.
         const content = `
 
-            <div>
-                <div
-                    class="row"
-                    >
-                    <div class=" col-4">
+                <div class="d-flex">
+                    <div class="col-4 mx-1">
                         <input
                             type="text"
                             class="form-control capitalize-all-letters"
@@ -207,14 +204,14 @@ export default class OperatorTrainerController extends Controller {
                     <div
                         data-operator-training-target="nameSuggestions"
                         class="traininglist-suggestions-list rounded-bottom"></div>
-                </div>
+                    </div>
                 
                     <div
-                        class="col-3"
+                        class="col-3 mx-0"
                         >
                         <input
                             type="text"
-                            class="form-control capitalize-first-letter::first-letter "
+                            class="form-control capitalize-first-letter::first-letter"
                             data-operator-training-target="newOperatorFirstname"
                             data-action="keyup->operator-training#validateNewOperatorFirstname input->operator-training#suggestFirstname"
                             placeholder="Prenom"
@@ -224,7 +221,7 @@ export default class OperatorTrainerController extends Controller {
                             disabled>
                     </div>
                     <div
-                        class="col-2"
+                        class="col-2 mx-1"
                         >
                         <input
                             type="text"
@@ -241,11 +238,11 @@ export default class OperatorTrainerController extends Controller {
                     </div>
                         <input type="hidden" id="newOperatorName" name="newOperatorName">           
                     <div
-                        class="col-2"
+                        class="col-1 mx-0"
                         >
                         <input
                             type="submit"
-                            class="btn btn-primary "
+                            class="btn btn-primary"
                             data-operator-training-target="newOperatorSubmitButton"
                             data-action="click->operator-trainer#resetFollowingSubmit"
                             id="newOperatorSubmitButton"
@@ -253,7 +250,6 @@ export default class OperatorTrainerController extends Controller {
                             value="Ajouter"
                             disabled>
                     </div>
-
                 </div>
 
                 <div
@@ -265,8 +261,6 @@ export default class OperatorTrainerController extends Controller {
                 <div
                     data-operator-training-target="newOperatorTransferMessage"
                     class="newOperatorTransfer-message d-flex justify-content-evenly"></div>
-            </div>
-
         `;
 
         container.innerHTML = content;
