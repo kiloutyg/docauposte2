@@ -71,7 +71,7 @@ done
     
     cd docauposte2;
 
-    bash ./env_create.sh;
+    bash ./env_create.sh ${GITHUB_USER};
 
 # Build the docker containers
     sg docker -c "docker compose up --build -d"
@@ -117,7 +117,7 @@ done
             git fetch origin --force;
             git reset --hard origin/main;
             git pull --rebase origin main;
-            bash ./env_update.sh;
+            bash ./env_update.sh ${GITHUB_USER};
             sg docker -c "docker compose up --build -d"
         fi
     fi
