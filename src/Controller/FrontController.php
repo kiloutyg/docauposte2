@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 use App\Controller\UploadController;
 
+use App\Entity\Department;
+
 // This controller manage the logic of the front interface, it is the main controller of the application and is responsible for rendering the front interface.
 // It is also responsible for creating the super-admin account.
 
@@ -18,7 +20,15 @@ class FrontController extends BaseController
     #[Route('/', name: 'base')]
     public function base(): Response
     {
+        if ($this->validationRepository->findAll() != null) {
         $this->validationService->remindCheck($this->users);
+        }
+        if ($this->departmentRepository->findAll() == null) {
+            $Department = new Department();
+            $Department->setName('I.T.');
+            $this->em->persist($Department);
+            $this->em->flush();
+        }
 
         if ($this->authChecker->isGranted('ROLE_MANAGER')) {
             $countArray = $this->operatorService->operatorCheckForAutoDelete();
