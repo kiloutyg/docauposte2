@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Get the github user from the argument
+GITHUB_USER=$1
+echo "GitHub User: $GITHUB_USER"
+
 # Function to check for uppercase characters
 contains_uppercase() {
     [[ "$1" =~ [A-Z] ]]

@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# Prompt for database details
+# Get the github user from the argument
+GITHUB_USER=$1
+echo "GitHub User: $GITHUB_USER"
+
 # Function to check for uppercase characters
 contains_uppercase() {
     [[ "$1" =~ [A-Z] ]]
@@ -15,6 +18,8 @@ while true; do
         break
     fi
 done
+
+# Prompt for database details
 read -p "Please enter your MySQL root password: " MYSQL_ROOT_PASSWORD
 read -p "Please enter your MySQL username: " MYSQL_USER
 read -p "Please enter your MySQL password: " MYSQL_PASSWORD
