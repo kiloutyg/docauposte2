@@ -1,6 +1,20 @@
 #!/bin/bash
 
 # Prompt for database details
+# Function to check for uppercase characters
+contains_uppercase() {
+    [[ "$1" =~ [A-Z] ]]
+}
+
+# Prompt for plant trigram
+while true; do
+    read -p "Please enter your plant trigram (example: lan): " PLANT_TRIGRAM
+    if contains_uppercase "$PLANT_TRIGRAM"; then
+        echo "The plant trigram should not contain uppercase characters. Please try again."
+    else
+        break
+    fi
+done
 read -p "Please enter your MySQL root password: " MYSQL_ROOT_PASSWORD
 read -p "Please enter your MySQL username: " MYSQL_USER
 read -p "Please enter your MySQL password: " MYSQL_PASSWORD
@@ -53,11 +67,9 @@ APP_SECRET=$(openssl rand -hex 16)
 
 # Create docker-compose.override.yml file to use the good entrypoint
 cat > docker-compose.override.yml <<EOL
-version: '3.8'
-
 services:
   web:
-    image: ghcr.io/polangres/docauposte2:main
+    image: ghcr.io/${GITHUB_USER}/docauposte2:main
     restart: unless-stopped 
     entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
     environment:
@@ -114,6 +126,8 @@ MYSQL_DATABASE=${MYSQL_DATABASE}
 MYSQL_USER=${MYSQL_USER}
 MYSQL_PASSWORD=${MYSQL_PASSWORD}
 HOSTNAME=${HOSTNAME}
+PLANT_TRIGRAM=${PLANT_TRIGRAM}
+GITHUB_USER=${GITHUB_USER}
 
 ###> symfony/framework-bundle ###
 APP_ENV=${APP_CONTEXT}
@@ -144,7 +158,7 @@ DATABASE_URL=mysql://root:\${MYSQL_ROOT_PASSWORD}@database/\${MYSQL_DATABASE}?se
 
 ###> symfony/mailer ###
 MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0
-MAILER_SENDER_EMAIL=lan.docauposte@opmobility.com
+MAILER_SENDER_EMAIL=${PLANT_TRIGRAM}.docauposte@opmobility.com
 ###< symfony/mailer ###
 EOL
 
@@ -160,11 +174,9 @@ sed -i "s|^# MAILER_DSN=.*|MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0|" 
 
 # Create docker-compose.override.yml file to use the good entrypoint
 cat > docker-compose.override.yml <<EOL
-version: '3.8'
-
 services:
   web:
-    image: ghcr.io/polangres/docauposte2:main
+    image: ghcr.io/${GITHUB_USER}/docauposte2:main
     restart: unless-stopped 
     entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
     environment:
@@ -208,11 +220,9 @@ APP_CONTEXT="prod"
 
 # Create docker-compose.override.yml file to use the good entrypoint
 cat > docker-compose.override.yml <<EOL
-version: '3.8'
-
 services:
   web:
-    image: ghcr.io/polangres/docauposte2:main
+    image: ghcr.io/${GITHUB_USER}/docauposte2:main
     restart: unless-stopped 
     entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
     environment:
