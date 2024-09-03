@@ -74,7 +74,7 @@ done
     bash ./env_create.sh ${GITHUB_USER};
 
 # Build the docker containers
-    sg docker -c "docker compose up --build &"
+    sg docker -c "docker compose up --build -d"
 else
 
 # If the user answered no, we will ask if he wants to launch the app or if he wants to update it
