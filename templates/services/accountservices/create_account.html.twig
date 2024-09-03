@@ -1,16 +1,24 @@
-{% if is_granted('ROLE_SUPER_ADMIN') %}
-
+{% if is_granted('ROLE_SUPER_ADMIN') or users is empty %}
+{% if users is empty %}
+{% set superAdminCreationButton = "" %}
+{% set superAdminCreationAria = "true" %}
+{% set superAdminCreationDiv = "show" %}
+{% else %}
+{% set superAdminCreationButton = "collapsed" %}
+{% set superAdminCreationAria = "false" %}
+{% set superAdminCreationDiv = "collapse" %}
+{% endif %}
 	<div
 		class="accordion-item">
 		<h2
 			class="accordion-header"
 			id="headingAccount">
 			<button
-				class="accordion-button fs-3 collapsed"
+				class="accordion-button fs-3 {{superAdminCreationButton}}"
 				type="button"
 				data-bs-toggle="collapse"
 				data-bs-target="#collapseAccount"
-				aria-expanded="false"
+				aria-expanded="{{superAdminCreationAria}}"
 				aria-controls="collapseAccount">
 				<strong>
 					Formulaire de creation de compte utilisateur :
@@ -19,7 +27,7 @@
 		</h2>
 		<div
 			id="collapseAccount"
-			class="accordion-collapse collapse"
+			class="accordion-collapse {{superAdminCreationDiv}}"
 			aria-labelledby="headingAccount"
 			data-bs-parent="#accordionAdmin">
 			<div
@@ -41,9 +49,10 @@
 										class="col-8 mx-auto">
 										<br>
 										{% include "services/accountservices/account_tool_components/account_crea_mod.html.twig" %}
+										{% if is_granted('ROLE_SUPER_ADMIN') %}
+
 										<hr
 											class="my-4">
-										{% if is_granted('ROLE_SUPER_ADMIN') %}
 
 											<div
 												class="row mb-3">
@@ -89,14 +98,13 @@
 												</div>
 
 											{% endfor %}
-
-										{% endif %}
-
 										<hr
 											class="my-4">
+									{% endif %}
 									</div>
 
 								</div>
+							{% if is_granted('ROLE_SUPER_ADMIN') %}
 
 								<div
 									class=" d-flex align-items-center gy-lg-0 gy-5">
@@ -207,6 +215,7 @@
 										</div>
 									</div>
 								</div>
+							{% endif %}
 							</div>
 						</div>
 					</div>
