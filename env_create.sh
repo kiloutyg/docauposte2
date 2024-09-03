@@ -10,7 +10,7 @@ contains_uppercase() {
 }
 # function to check if the site name is valid and has the first letter uppercase
 is_FACILITY_name_valid() {
-    [[ "$1" =~ ^[A-Z] ]]
+    [[ "$1" = ^[A-Z] ]]
 }
 
 # Prompt for plant trigram
