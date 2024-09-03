@@ -108,14 +108,6 @@ ${PROXY_ENV}
     networks:
       vpcbr:
         ipv4_address: 172.21.0.4
-networks:
-  vpcbr:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.21.0.0/16
-          gateway: 172.21.0.1
-
 EOL
 
 # Change the src/Kernel.php to set the good timezone.
@@ -216,14 +208,6 @@ ${PROXY_ENV}
     networks:
       vpcbr:
         ipv4_address: 172.21.0.4
-networks:
-  vpcbr:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.21.0.0/16
-          gateway: 172.21.0.1
-
 EOL
 
 
@@ -262,14 +246,6 @@ ${PROXY_ENV}
     networks:
       vpcbr:
         ipv4_address: 172.21.0.4
-networks:
-  vpcbr:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.21.0.0/16
-          gateway: 172.21.0.1
-
 EOL
 
 fi
