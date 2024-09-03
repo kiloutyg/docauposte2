@@ -126,8 +126,8 @@ done
             sg docker -c "docker compose stop";
             sg docker -c "docker system prune -fa";
             git remote remove origin;
-            # Remove all the string before https://github.com/ in the GIT_ADDRESS
-            GIT_ADDRESS=$(echo ${GIT_ADDRESS} | sed 's|^https://github.com/||')
+            # Remove every before https in the GIT_ADDRESS
+            GIT_ADDRESS=$(echo ${GIT_ADDRESS} | sed 's|.*\(https\)|\1|')
             git remote add origin ${GIT_ADDRESS};
             git fetch origin --force;
             git reset --hard origin/main;
