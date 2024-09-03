@@ -76,6 +76,7 @@ done
 # Build the docker containers
     sg docker -c "docker compose up --build &"
 else
+
 # If the user answered no, we will ask if he wants to launch the app or if he wants to update it
 while true; do
     read -p "Do you wish to launch the app ? (yes/no) " LAUNCH_ANSWER;
@@ -85,6 +86,7 @@ while true; do
             echo "Please answer by yes or no";
     fi
 done
+
 # If the user answered yes, we launch the app
     if [ "${LAUNCH_ANSWER}" == "yes" ]; then
         cd docauposte2;
@@ -98,6 +100,7 @@ done
                         echo "Please answer by yes or no";
                 fi
             done
+
         if [ "${UPDATE_ANSWER}" == "yes" ]; then
 
             # Function to check for uppercase characters
@@ -115,7 +118,6 @@ done
                 fi
             done
 
-
         # Ask the user for the git repository address either in ssh or http
             read -p "Address of the git repository (ssh or http // default: https://github.com/${GITHUB_USER}/docauposte2 ) :  " GIT_ADDRESS;
             if [ -z "${GIT_ADDRESS}" ]
@@ -126,7 +128,7 @@ done
             sg docker -c "docker compose stop";
             sg docker -c "docker system prune -fa";
             git remote remove origin;
-            # Remove every before https in the GIT_ADDRESS
+            # Remove everything before https in the GIT_ADDRESS
             GIT_ADDRESS=$(echo ${GIT_ADDRESS} | sed 's|.*\(https\)|\1|')
             git remote add origin ${GIT_ADDRESS};
             git fetch origin --force;
