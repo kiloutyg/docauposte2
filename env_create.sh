@@ -227,7 +227,7 @@ networks:
 EOL
 
 
-sg docker -c "docker compose up --build -d"
+sg docker -c "docker compose up --build"
 
 sleep 90
 
