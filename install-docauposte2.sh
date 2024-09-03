@@ -99,6 +99,7 @@ done
                 fi
             done
         if [ "${UPDATE_ANSWER}" == "yes" ]; then
+        
             # Function to check for uppercase characters
             contains_uppercase() {
                 [[ "$1" =~ [A-Z] ]]
