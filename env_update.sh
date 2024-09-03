@@ -133,7 +133,7 @@ networks:
 EOL
 
 
-sg docker -c "docker compose up --build"
+sg docker -c "docker compose up --build &"
 
 sleep 90
 
