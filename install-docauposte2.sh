@@ -101,7 +101,15 @@ done
         if [ "${UPDATE_ANSWER}" == "yes" ]; then
             
             # Ask the user for name of its github user 
-            read -p "Name of your github user (example: polangres) :  " GITHUB_USER;
+            while true; do
+                read -p "Name of your github user (example: polangres) :  " GITHUB_USER
+                if contains_uppercase "$GITHUB_USER"; then
+                    echo "The github user name should not contain uppercase characters. Please try again."
+                else
+                    break
+                fi
+            done
+
 
         # Ask the user for the git repository address either in ssh or http
             read -p "Address of the git repository (ssh or http // default: https://github.com/${GITHUB_USER}/docauposte2 ) :  " GIT_ADDRESS;

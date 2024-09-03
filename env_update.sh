@@ -4,6 +4,21 @@
 GITHUB_USER=$1
 echo "GitHub User: $GITHUB_USER"
 
+# function to check if the site name is valid and has the first letter uppercase
+is_FACILITY_name_valid() {
+    [[ "$1" =~ ^[A-Z] ]]
+}
+
+# Ask the name of the site or plant
+while true; do
+read -p "Please enter the name of the facility or plant (example: Langres or Andance): " FACILITY_NAME
+if is_FACILITY_name_valid "$FACILITY_NAME"; then
+    echo "The site name should contain the first letter uppercase. Please try again."
+else
+        break
+    fi
+done
+
 # Function to check for uppercase characters
 contains_uppercase() {
     [[ "$1" =~ [A-Z] ]]
@@ -55,6 +70,13 @@ APP_CONTEXT="dev"
 sed -i "s|^APP_ENV=prod.*|APP_ENV=dev|" .env
 sed -i "s|^# MAILER_DSN=.*|MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0|" .env
 sed -i "s|^# MAILER_SENDER_EMAIL=.* |MAILER_SENDER_EMAIL=${PLANT_TRIGRAM}.docauposte@opmobility.com|" .env
+sed -i '/^HOSTNAME=/a\
+PLANT_TRIGRAM='"$PLANT_TRIGRAM"'\
+GITHUB_USER='"$GITHUB_USER"'\
+FACILITY_NAME='"$FACILITY_NAME"'' .env
+
+
+
 cat > src/Kernel.php <<EOL
 <?php
 

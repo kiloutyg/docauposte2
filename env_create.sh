@@ -8,6 +8,10 @@ echo "GitHub User: $GITHUB_USER"
 contains_uppercase() {
     [[ "$1" =~ [A-Z] ]]
 }
+# function to check if the site name is valid and has the first letter uppercase
+is_FACILITY_name_valid() {
+    [[ "$1" =~ ^[A-Z] ]]
+}
 
 # Prompt for plant trigram
 while true; do
@@ -18,6 +22,17 @@ while true; do
         break
     fi
 done
+
+# Ask the name of the site or plant
+while true; do
+read -p "Please enter the name of the facility or plant (example: Langres or Andance): " FACILITY_NAME
+if is_FACILITY_name_valid "$FACILITY_NAME"; then
+    echo "The site name should contain the first letter uppercase. Please try again."
+else
+        break
+    fi
+done
+
 
 # Prompt for database details
 read -p "Please enter your MySQL root password: " MYSQL_ROOT_PASSWORD
@@ -133,6 +148,7 @@ MYSQL_PASSWORD=${MYSQL_PASSWORD}
 HOSTNAME=${HOSTNAME}
 PLANT_TRIGRAM=${PLANT_TRIGRAM}
 GITHUB_USER=${GITHUB_USER}
+FACILITY_NAME=${FACILITY_NAME}
 
 ###> symfony/framework-bundle ###
 APP_ENV=${APP_CONTEXT}
