@@ -6,7 +6,7 @@ echo "GitHub User: $GITHUB_USER"
 
 # function to check if the site name is valid and has the first letter uppercase
 is_FACILITY_name_valid() {
-    [[ "$1" =~ ^[A-Z] ]]
+    [[ "$1" = ^[A-Z] ]]
 }
 
 # Ask the name of the site or plant
