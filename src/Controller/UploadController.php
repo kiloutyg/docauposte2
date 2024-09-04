@@ -295,10 +295,10 @@ class UploadController extends FrontController
         }
 
         $trainingNeeded =  $request->request->get('training-needed');
-        $forcedDisplay = $request->request->get('forced-display');
+        $forcedDisplay = $request->request->get('display-needed');
 
         $this->logger->info('training needed', ['training' => $trainingNeeded]);
-        $this->logger->info('forced display', ['forced-display' => $forcedDisplay]);
+        $this->logger->info('forced display', ['display-needed' => $forcedDisplay]);
 
         $comment = $request->request->get('modificationComment');
         $newValidation = $request->request->get('validatorRequired');
