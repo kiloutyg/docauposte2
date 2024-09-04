@@ -33,13 +33,19 @@ class TrainingRecordService extends AbstractController
 
     public function updateTrainingRecord(Upload $upload)
     {
+        $this->logger->info('TrainingRecordService: updateTrainingRecord: upload: ' . $upload->getId());
         $trainingRecords = $upload->getTrainingRecords();
         $trained = false;
-        foreach ($trainingRecords as $trainingRecord) {
-            $this->logger->info('TrainingRecordService: updateTrainingRecord: trainingRecord: ' . $trainingRecord->getId());
-            $trainingRecord->setTrained($trained);
-            $this->em->persist($trainingRecord);
-            $this->em->flush($trainingRecord);
+        if ($trainingRecords->isEmpty()) {
+            $this->logger->info('TrainingRecordService: updateTrainingRecord: trainingRecords is empty');
+            return;
+        } else {
+            foreach ($trainingRecords as $trainingRecord) {
+                $this->logger->info('TrainingRecordService: updateTrainingRecord: trainingRecord: ' . $trainingRecord->getId());
+                $trainingRecord->setTrained($trained);
+                $this->em->persist($trainingRecord);
+                $this->em->flush($trainingRecord);
+            }
         }
         return;
     }
