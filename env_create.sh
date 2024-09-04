@@ -211,7 +211,7 @@ ${PROXY_ENV}
 EOL
 
 
-sg docker -c "docker compose up --build &"
+sg docker -c "docker compose up --build -d"
 
 sleep 90
 
