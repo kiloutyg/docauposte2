@@ -17,6 +17,10 @@ if is_FACILITY_name_valid "$FACILITY_NAME"; then
 else
         break
     fi
+    if [ -z "${FACILITY_NAME}" ]
+    then
+        echo "The site name should not be empty. Please try again."
+    fi
 done
 
 # Function to check for uppercase characters
@@ -32,7 +36,12 @@ while true; do
     else
         break
     fi
+    if [ -z "${PLANT_TRIGRAM}" ]
+    then
+        echo "The plant trigram should not be empty. Please try again."
+    fi
 done
+
 read -p "What Timezone to use? (default Europe/Paris) " TIMEZONE
 if [ -z "${TIMEZONE}" ]
   then

@@ -57,6 +57,10 @@ while true; do
     else
         break
     fi
+    if [ -z "${GITHUB_USER}" ]
+    then
+        echo "The github user name should not be empty. Please try again."
+    fi
 done
 
 # Ask the user for the git repository address either in ssh or http
@@ -115,6 +119,10 @@ done
                     echo "The github user name should not contain uppercase characters. Please try again."
                 else
                     break
+                fi
+                if [ -z "${GITHUB_USER}" ]
+                then
+                    echo "The github user name should not be empty. Please try again."
                 fi
             done
 

@@ -21,6 +21,10 @@ while true; do
     else
         break
     fi
+    if [ -z "${PLANT_TRIGRAM}" ]
+    then
+        echo "The plant trigram should not be empty. Please try again."
+    fi
 done
 
 # Ask the name of the site or plant
@@ -30,6 +34,10 @@ if is_FACILITY_name_valid "$FACILITY_NAME"; then
     echo "The site name should contain the first letter uppercase. Please try again."
 else
         break
+    fi
+    if [ -z "${FACILITY_NAME}" ]
+    then
+        echo "The site name should not be empty. Please try again."
     fi
 done
 
