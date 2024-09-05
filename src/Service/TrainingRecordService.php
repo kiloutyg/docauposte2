@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use App\Entity\Upload;
 
 use App\Repository\TrainingRecordRepository;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 class TrainingRecordService extends AbstractController
 {
@@ -96,5 +97,22 @@ class TrainingRecordService extends AbstractController
 
 
         return $orderedTrainingRecords;
+    }
+
+    public function cheatTrain(string $date)
+    {
+        $this->logger->info('TrainingRecordService: cheatTrain: date: ' . $date);
+
+        $date = (new \DateTime($date));
+        $trainingRecords = $this->trainingRecordRepository->findBy(['date' => $date]);
+        $this->logger->info('TrainingRecordService: cheatTrain: trainingRecords: ' . count($trainingRecords));
+        foreach ($trainingRecords as $trainingRecord) {
+            if ($trainingRecord->isTrained() === false) {
+                $trainingRecord->setTrained(true);
+                $this->em->persist($trainingRecord);
+                $this->em->flush($trainingRecord);
+            }
+        }
+        return;
     }
 }

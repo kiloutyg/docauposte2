@@ -623,7 +623,6 @@ export default class OperatorTrainingController extends Controller {
                 this.validateNewOperatorSurname()
                 this.suggestionsResults = [];
 
-
             });
         });
 
