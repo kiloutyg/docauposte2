@@ -124,4 +124,19 @@ class SuperAdminController extends FrontController
             return $this->redirectToRoute('app_super_admin');
         }
     }
+
+
+    // A route that use a method to revalid automatically every training records of a certain date
+    #[Route('super_admin/cheattrain/{year}/{month}/{day}', name: 'app_super_admin_cheat_train')]
+    public function cheatTrain(string $year, string $month, string $day)
+    {
+        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
+            $date = $year . '-' . $month . '-' . $day;
+            $this->trainingRecordService->cheatTrain($date);
+            return $this->redirectToRoute('app_super_admin');
+        } else {
+            $this->addFlash('danger', 'Vous n\'êtes pas autorisé à accéder à cette page');
+            return $this->redirectToRoute('app_login');
+        }
+    }
 }
