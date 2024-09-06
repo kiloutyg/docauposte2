@@ -14,6 +14,38 @@ done
 if [ "${ANSWER}" == "yes" ]
 then 
 
+
+# Function to check for uppercase characters
+contains_uppercase() {
+    [[ "$1" =~ [A-Z] ]]
+}
+
+# Ask the user for name of its github user 
+while true; do
+    read -p "Name of your github user (example: polangres) :  " GITHUB_USER
+    if contains_uppercase "$GITHUB_USER"; then
+        echo "The github user name should not contain uppercase characters. Please try again."
+    else
+        break
+    fi
+    if [ -z "${GITHUB_USER}" ]
+    then
+        echo "The github user name should not be empty. Please try again."
+    fi
+done
+
+# Ask the user for its github token
+# while true; do
+#     read -p "Github Personal Access Token ( ):  " GITHUB_TOKEN;
+#     if [ -z "${GITHUB_TOKEN}" ]
+#     then
+#         echo "The github token should not be empty. Please try again."
+#     else
+#         break
+#     fi
+# done
+
+
 # Install git and PlasticOmnium docker repo
     sudo yum install -y git yum-utils;
     sudo yum-config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo;
@@ -36,6 +68,10 @@ then
     sudo groupadd docker;
     sudo usermod -aG docker $USER;
 
+
+# Connect to the github docker registry
+    # docker login ghcr.io -u $GITHUB_USER -p $GITHUB_TOKEN;
+
 # Start docker and enable it inside a prompt with the docker group
 sg docker -c "
     sudo systemctl start docker;
@@ -44,24 +80,7 @@ sg docker -c "
     sudo systemctl enable containerd.service;"
 
 
-# Function to check for uppercase characters
-contains_uppercase() {
-    [[ "$1" =~ [A-Z] ]]
-}
 
-# Ask the user for name of its github user 
-while true; do
-    read -p "Name of your github user (example: polangres) :  " GITHUB_USER
-    if contains_uppercase "$GITHUB_USER"; then
-        echo "The github user name should not contain uppercase characters. Please try again."
-    else
-        break
-    fi
-    if [ -z "${GITHUB_USER}" ]
-    then
-        echo "The github user name should not be empty. Please try again."
-    fi
-done
 
 # Ask the user for the git repository address either in ssh or http
     read -p "Address of the git repository (ssh or http // default: https://github.com/${GITHUB_USER}/docauposte2 ) :  " GIT_ADDRESS;
