@@ -38,7 +38,7 @@ export default class OperatorTrainingController extends Controller {
                 this.validateNewOperatorFirstname();
             }
 
-        }, 800);
+        }, 1500);
     }
 
     validateNewOperatorFirstname() {
@@ -66,7 +66,7 @@ export default class OperatorTrainingController extends Controller {
                 // this.newOperatorFirstnameTarget.disabled = true;
                 this.validateNewOperatorName();
             }
-        }, 800);
+        }, 1500);
     }
 
     capitalizeFirstLetter(string) {
@@ -103,7 +103,7 @@ export default class OperatorTrainingController extends Controller {
             if (isValid) {
                 this.checkForExistingEntityByName();
             }
-        }, 800); // delay in milliseconds
+        }, 1500); // delay in milliseconds
     }
 
 
@@ -137,7 +137,7 @@ export default class OperatorTrainingController extends Controller {
                 this.duplicateCheckResults.code = null;
                 this.checkForExistingEntityByCode();
             }
-        }, 800);
+        }, 1500);
     }
 
 
@@ -358,7 +358,7 @@ export default class OperatorTrainingController extends Controller {
                 this.trainingOperatorCodeTarget.value = "";
                 this.trainingOperatorCodeTarget.placeholder = "Invalide";
             }
-        }, 800);
+        }, 1500);
     }
 
 
