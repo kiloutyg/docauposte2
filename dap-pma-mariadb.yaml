@@ -19,14 +19,14 @@ spec:
     - name: docauposte
       image: docker.io/library/mariadb:latest
       env:
-        - name: MARIADB_ROOT_PASSWORD
-          value: "${MYSQL_ROOT_PASSWORD}"
-        - name: MARIADB_DATABASE
-          value: "${MYSQL_DATABASE}"
-        - name: MARIADB_USER
-          value: "${MYSQL_USER}"
-        - name: MARIADB_PASSWORD
-          value: "${MYSQL_PASSWORD}"
+        - name: MARIADB_ROOT_PASSWORD_FILE
+          value: ./secrets/root_password
+        - name: MARIADB_DATABASE_FILE
+          value: ./secrets/database_name
+        - name: MARIADB_USER_FILE
+          value: ./secrets/database_user
+        - name: MARIADB_PASSWORD_FILE
+          value: ./secrets/database_user_password
       ports:
         - containerPort: 3306
       volumeMounts :
