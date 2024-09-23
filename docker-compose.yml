@@ -1,8 +1,6 @@
-version: "3.8"
-
 services:
   database:
-    image: mariadb:latest
+    image: docker.io/mariadb:latest
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -20,7 +18,7 @@ services:
         ipv4_address: 172.21.0.2
 
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+    image: docker.io/phpmyadmin/phpmyadmin
     restart: unless-stopped
     labels:
       - "traefik.enable=true"

@@ -34,7 +34,7 @@ export default class OperatorTrainerController extends Controller {
             } else {
                 this.updateMessage(this.trainerOperatorNameMessageTarget, isValid, "Veuillez saisir sous la forme prenom.nom.");
             }
-        }, 800);
+        }, 1800);
     }
 
 
@@ -57,7 +57,7 @@ export default class OperatorTrainerController extends Controller {
                     this.updateMessage(this.trainerOperatorCodeMessageTarget, isValid, "Veuillez saisir un code valide: XXXXX.");
                 }
             }
-        }, 800);
+        }, 1800);
     }
 
 
@@ -114,8 +114,10 @@ export default class OperatorTrainerController extends Controller {
                 console.log('response.data.uploadTrainer:', response.data.uploadTrainer)
                 if (response.data.uploadTrainer === false) {
                     this.trainerOperatorNameMessageTarget.style.fontWeight = "bold";
-                    this.trainerOperatorNameMessageTarget.style.color = "red";
-                    this.trainerOperatorNameMessageTarget.textContent = "Formateur trouvé. Non habilité sur ce process.";
+                    // this.trainerOperatorNameMessageTarget.style.color = "red";
+                    this.trainerOperatorNameMessageTarget.style.color = "green";
+                    // this.trainerOperatorNameMessageTarget.textContent = "Formateur trouvé. Non habilité sur ce process.";
+                    this.trainerOperatorNameMessageTarget.textContent = "Formateur trouvé.";
                 } else {
                     this.trainerOperatorNameMessageTarget.textContent = "";
                 }

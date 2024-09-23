@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use App\Entity\Upload;
 
 use App\Repository\TrainingRecordRepository;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 class TrainingRecordService extends AbstractController
 {
@@ -33,13 +34,19 @@ class TrainingRecordService extends AbstractController
 
     public function updateTrainingRecord(Upload $upload)
     {
+        $this->logger->info('TrainingRecordService: updateTrainingRecord: upload: ' . $upload->getId());
         $trainingRecords = $upload->getTrainingRecords();
         $trained = false;
-        foreach ($trainingRecords as $trainingRecord) {
-            $this->logger->info('TrainingRecordService: updateTrainingRecord: trainingRecord: ' . $trainingRecord->getId());
-            $trainingRecord->setTrained($trained);
-            $this->em->persist($trainingRecord);
-            $this->em->flush($trainingRecord);
+        if ($trainingRecords->isEmpty()) {
+            $this->logger->info('TrainingRecordService: updateTrainingRecord: trainingRecords is empty');
+            return;
+        } else {
+            foreach ($trainingRecords as $trainingRecord) {
+                $this->logger->info('TrainingRecordService: updateTrainingRecord: trainingRecord: ' . $trainingRecord->getId());
+                $trainingRecord->setTrained($trained);
+                $this->em->persist($trainingRecord);
+                $this->em->flush($trainingRecord);
+            }
         }
         return;
     }
@@ -90,5 +97,22 @@ class TrainingRecordService extends AbstractController
 
 
         return $orderedTrainingRecords;
+    }
+
+    public function cheatTrain(string $date)
+    {
+        $this->logger->info('TrainingRecordService: cheatTrain: date: ' . $date);
+
+        $date = (new \DateTime($date));
+        $trainingRecords = $this->trainingRecordRepository->findBy(['date' => $date]);
+        $this->logger->info('TrainingRecordService: cheatTrain: trainingRecords: ' . count($trainingRecords));
+        foreach ($trainingRecords as $trainingRecord) {
+            if ($trainingRecord->isTrained() === false) {
+                $trainingRecord->setTrained(true);
+                $this->em->persist($trainingRecord);
+                $this->em->flush($trainingRecord);
+            }
+        }
+        return;
     }
 }

@@ -186,38 +186,45 @@ let buttonIdFromServer = null;
 				{% endif %}
 				<div
 					class="ms-auto d-flex align-items-center">
-					{% if app.user is null %}
-						<p>
-							<a
-								class="btn btn-primary"
-								href="{{ path('app_login') }}">
-								Connexion
-							</a>
-						</p>
+				{% if users is defined %}
+					{% if users is empty %}
+					
 					{% else %}
-						<p
-							class="d-flex align-items-center">
-							<strong
-								class="me-2">
-								{{ app.user.username|capitalize|split('.')|first }}
-								{{ app.user.username|upper|split('.')|last }}
-							</strong>
-							<a
-								class="btn btn-primary"
-								href="{{ path('app_logout') }}">
-								Déconnexion
-							</a>
-						</p>
-						<div
-							style="width: 10px"></div>
-						<p>
-							<a
-								class="btn btn-outline-info"
-								href="{{path('app_tutorial')}}">
-								TUTO
-							</a>
-						</p>
+							{% if app.user is null %}
+								<p>
+									<a
+										class="btn btn-primary"
+										href="{{ path('app_login') }}">
+										Connexion
+									</a>
+								</p>
+							{% else %}
+								<p
+									class="d-flex align-items-center">
+									<strong
+										class="me-2">
+										{{ app.user.username|capitalize|split('.')|first }}
+										{{ app.user.username|upper|split('.')|last }}
+									</strong>
+									<a
+										class="btn btn-primary"
+										href="{{ path('app_logout') }}">
+										Déconnexion
+									</a>
+								</p>
+								<div
+									style="width: 10px"></div>
+								<p>
+									<a
+										class="btn btn-outline-info"
+										href="{{path('app_tutorial')}}">
+										TUTO
+									</a>
+								</p>
+							{% endif %}
+						{% endif %}
 					{% endif %}
+
 				</div>
 			</div>
 		</nav>
@@ -329,7 +336,7 @@ let buttonIdFromServer = null;
 						href="http://topnet.corp.ponet/"
 						style="color: #25a1dd"
 						class="mb-3  mb-md-0 text-decoration-none lh-1">
-						OPmobility Langres
+						OPmobility {{ facilityName|capitalize }}
 					</a>
 				</div>
 				<div>

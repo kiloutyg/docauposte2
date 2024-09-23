@@ -38,7 +38,7 @@ export default class OperatorTrainingController extends Controller {
                 this.validateNewOperatorFirstname();
             }
 
-        }, 800);
+        }, 1200);
     }
 
     validateNewOperatorFirstname() {
@@ -66,7 +66,7 @@ export default class OperatorTrainingController extends Controller {
                 // this.newOperatorFirstnameTarget.disabled = true;
                 this.validateNewOperatorName();
             }
-        }, 800);
+        }, 1200);
     }
 
     capitalizeFirstLetter(string) {
@@ -103,7 +103,7 @@ export default class OperatorTrainingController extends Controller {
             if (isValid) {
                 this.checkForExistingEntityByName();
             }
-        }, 800); // delay in milliseconds
+        }, 1200); // delay in milliseconds
     }
 
 
@@ -137,7 +137,7 @@ export default class OperatorTrainingController extends Controller {
                 this.duplicateCheckResults.code = null;
                 this.checkForExistingEntityByCode();
             }
-        }, 800);
+        }, 1200);
     }
 
 
@@ -358,7 +358,7 @@ export default class OperatorTrainingController extends Controller {
                 this.trainingOperatorCodeTarget.value = "";
                 this.trainingOperatorCodeTarget.placeholder = "Invalide";
             }
-        }, 800);
+        }, 1200);
     }
 
 
@@ -497,7 +497,7 @@ export default class OperatorTrainingController extends Controller {
                     this.manageNewOperatorSubmitButton();
                 }
 
-            }, 500); // Delay to avoid too frequent calls
+            }, 1200); // Delay to avoid too frequent calls
         } else {
             this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions if the input is too short
         }
@@ -523,7 +523,7 @@ export default class OperatorTrainingController extends Controller {
                     this.manageNewOperatorSubmitButton();
                 }
 
-            }, 500); // Delay to avoid too frequent calls
+            }, 1200); // Delay to avoid too frequent calls
         } else {
             this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions if the input is too short
         }
@@ -622,7 +622,6 @@ export default class OperatorTrainingController extends Controller {
                 this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions after selection
                 this.validateNewOperatorSurname()
                 this.suggestionsResults = [];
-
 
             });
         });
