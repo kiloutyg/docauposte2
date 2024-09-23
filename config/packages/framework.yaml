@@ -20,7 +20,7 @@ framework:
 
 
     # the IP address (or range) of your proxy
-    trusted_proxies: '172.21.0.254/16'
+    # trusted_proxies: '10.89.0.2/16'
     # trust *all* "X-Forwarded-*" headers
     trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix']
     # or, if your proxy instead uses the "Forwarded" header
