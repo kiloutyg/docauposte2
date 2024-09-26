@@ -93,7 +93,7 @@ if [ "${ANSWER}" == "yes" ]; then
 
         bash ./env_create_podman.sh ${GITHUB_USER};
 
-        podman play kube ./dap-pma-mariadb.yml;
+        podman play kube ./dap.yml;
 
     fi
 
@@ -115,7 +115,7 @@ done
         if [ "${PODMAN}" == "no" ]; then
             sg docker -c "docker compose up -d"
         else
-            podman play kube --replace ./dap-pma-mariadb.yml;
+            podman play kube --replace ./dap.yml;
         fi
     else
         while true; do
@@ -146,7 +146,7 @@ done
             sg docker -c "docker compose stop";
                 sg docker -c "docker system prune -fa";
             else
-                podman play kube --down ./dap-pma-mariadb.yml;
+                podman play kube --down ./dap.yml;
                 podman system prune -fa;
             fi
 
@@ -163,7 +163,7 @@ done
                 sg docker -c "docker compose up --build -d"
             else
                 bash ./env_update_podman.sh ${GITHUB_USER};
-                podman play kube --replace ./dap-pma-mariadb.yml;
+                podman play kube --replace ./dap.yml;
             fi
         fi
     fi
