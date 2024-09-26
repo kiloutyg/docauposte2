@@ -92,8 +92,8 @@ metadata:
 spec:
   containers:
     - name: docauposte
-      image: ghcr.io/kiloutyg/docauposte2:main
-      command: ["./dev-entrypoint.sh"]
+      image: ghcr.io/${GITHUB_USER}/docauposte2:main
+      command: ["./${APP_CONTEXT}-entrypoint.sh"]
       env:
         - name: no_proxy
           value: .ponet

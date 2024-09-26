@@ -85,7 +85,7 @@ if [ "${PROXY_ANSWER}" == "yes" ]
         then
         PROXY_PORT="80"
       fi
-    PROXY_ENV="      http_proxy: ${PROXY_ADDRESS}:${PROXY_PORT}"
+    PROXY_ENV="${PROXY_ADDRESS}:${PROXY_PORT}"
     PROXY_DOCKERFILE="ENV http_proxy=\'${PROXY_ADDRESS}:${PROXY_PORT}\'"
     sed -i "3s|.*|$PROXY_DOCKERFILE|" docker/dockerfile/Dockerfile
 fi
@@ -93,30 +93,21 @@ fi
 # Generate a new secret key
 APP_SECRET=$(openssl rand -hex 16)
 
-# Create docker-compose.override.yml file to use the good entrypoint
-cat > docker-compose.override.yml <<EOL
-services:
-  web:
-    image: ghcr.io/${GITHUB_USER}/docauposte2:main
-    restart: unless-stopped 
-    entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
-    environment:
-${PROXY_ENV}
-      APP_TIMEZONE: ${TIMEZONE}
-    volumes:
-      - ./:/var/www
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.webdap.rule=PathPrefix(\`/docauposte\`)
-      - traefik.http.routers.webdap.middlewares=strip-webdap-prefix
-      - traefik.http.middlewares.strip-webdap-prefix.stripprefix.prefixes=/docauposte
-      - traefik.http.routers.webdap.entrypoints=web
-    depends_on:
-      - database
-    networks:
-      vpcbr:
-        ipv4_address: 172.21.0.4
+cat > ./secrets/root_password <<EOL
+${MYSQL_ROOT_PASSWORD}
 EOL
+
+cat > ./secrets/database_name <<EOL
+${MYSQL_DATABASE}
+EOL
+
+cat > ./secrets/database_user <<EOL
+${MYSQL_USER}
+EOL
+
+cat > ./secrets/database_password <<EOL
+${MYSQL_PASSWORD}
+EOL 
 
 # Change the src/Kernel.php to set the good timezone.
 cat > src/Kernel.php <<EOL
@@ -193,67 +184,36 @@ APP_CONTEXT="dev"
 sed -i "s|^APP_ENV=prod.*|APP_ENV=dev|" .env
 sed -i "s|^# MAILER_DSN=.*|MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0|" .env
 
+
+set -a
+APP_CONTEXT=${APP_CONTEXT}
+PROXY_ENV=${PROXY_ENV}
+APP_TIMEZONE=${TIMEZONE}
+GITHUB_USER=${GITHUB_USER}
+set +a
+
 # Create docker-compose.override.yml file to use the good entrypoint
-cat > docker-compose.override.yml <<EOL
-services:
-  web:
-    image: ghcr.io/${GITHUB_USER}/docauposte2:main
-    restart: unless-stopped 
-    entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
-    environment:
-${PROXY_ENV}
-      APP_TIMEZONE: ${TIMEZONE}
-    volumes:
-      - ./:/var/www
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.webdap.rule=PathPrefix(\`/docauposte\`)
-      - traefik.http.routers.webdap.middlewares=strip-webdap-prefix
-      - traefik.http.middlewares.strip-webdap-prefix.stripprefix.prefixes=/docauposte
-      - traefik.http.routers.webdap.entrypoints=web
-    depends_on:
-      - database
-    networks:
-      vpcbr:
-        ipv4_address: 172.21.0.4
-EOL
+envsubst < ./template.yml > ./dap.yml
 
-
-sg docker -c "docker compose up --build &"
+podman play kube --replace ./dap.yml
 
 sleep 180
 
-sg docker -c "docker compose stop"
+podman play kube --down ./dap.yml
 
 sleep 60
 
 sed -i "s|^APP_ENV=dev.*|APP_ENV=prod|" .env
 APP_CONTEXT="prod"
 
+set -a
+APP_CONTEXT=${APP_CONTEXT}
+PROXY_ENV=${PROXY_ENV}
+APP_TIMEZONE=${TIMEZONE}
+GITHUB_USER=${GITHUB_USER}
+set +a
 
 # Create docker-compose.override.yml file to use the good entrypoint
-cat > docker-compose.override.yml <<EOL
-services:
-  web:
-    image: ghcr.io/${GITHUB_USER}/docauposte2:main
-    restart: unless-stopped 
-    entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
-    environment:
-${PROXY_ENV}
-      APP_TIMEZONE: ${TIMEZONE}
-    volumes:
-      - ./:/var/www
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.webdap.rule=PathPrefix(\`/docauposte\`)
-      - traefik.http.routers.webdap.middlewares=strip-webdap-prefix
-      - traefik.http.middlewares.strip-webdap-prefix.stripprefix.prefixes=/docauposte
-      - traefik.http.routers.webdap.entrypoints=web
-    depends_on:
-      - database
-    networks:
-      vpcbr:
-        ipv4_address: 172.21.0.4
-EOL
+envsubst < ./template.yml > ./dap.yml
 
 fi
