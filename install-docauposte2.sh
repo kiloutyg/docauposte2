@@ -93,7 +93,7 @@ if [ "${ANSWER}" == "yes" ]; then
 
         bash ./env_create_podman.sh ${GITHUB_USER};
 
-        podman play kube ./dap.yml;
+        podman play kube --replace ./dap.yml;
 
     fi
 
