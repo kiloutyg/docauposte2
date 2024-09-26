@@ -90,6 +90,9 @@ if [ "${PROXY_ANSWER}" == "yes" ]
     sed -i "3s|.*|$PROXY_DOCKERFILE|" docker/dockerfile/Dockerfile
 fi
 
+# Create the secrets directory
+mkdir -p ./secrets;
+
 # Generate a new secret key
 APP_SECRET=$(openssl rand -hex 16)
 
