@@ -4,6 +4,9 @@
 GITHUB_USER=$1
 PODMAN=$2
 
+echo "github user: ${GITHUB_USER}"
+echo "podman: ${PODMAN}"
+
 # Ask the user if they have already run the app
 while true; do
 read -p "Are you running the app for the first Time ? (yes/no) " ANSWER;
