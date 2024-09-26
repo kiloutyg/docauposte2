@@ -153,7 +153,7 @@ document.addEventListener("turbo:load", function () {
         .value.trim();
 
       let xhr = new XMLHttpRequest();
-      xhr.open("POST", "/incident/incident_incidentsCategory_creation");
+      xhr.open("POST", "/docauposte/incident/incident_incidentsCategory_creation");
       xhr.setRequestHeader("Content-Type", "application/json");
 
       xhr.onload = function () {

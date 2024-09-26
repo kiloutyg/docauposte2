@@ -100,7 +100,7 @@ class SuperAdminController extends FrontController
                 $this->em->persist($zone);
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($zonename);
-                $this->addFlash('success', 'La zone a été créee');
+                $this->addFlash('success', 'La zone a été créée');
                 return $this->redirectToRoute('app_super_admin');
             }
         }

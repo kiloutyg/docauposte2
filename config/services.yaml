@@ -7,7 +7,9 @@
 parameters:
     app.timezone: "%env(APP_TIMEZONE)%"
     router.request_context.host: "%env(HOSTNAME)%"
-    router.request_context.base_url: /docauposte
+    # router.request_context.base_url: /docauposte
+    # router.request_context.prefix: /docauposte
+
 services:
     # default configuration for services in *this* file
     _defaults:
