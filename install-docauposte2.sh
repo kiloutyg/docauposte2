@@ -24,7 +24,7 @@ sudo yum install -y git yum-utils;
 if [ "${ANSWER}" == "yes" ]; then 
 
     # Ask the user for the git repository address either in ssh or http
-    read -p "Address of the git repository (ssh or http // default: https://github.com/${GITHUB_USER}/docauposte2 ) :  " GIT_ADDRESS;
+    read -p "Address of the git repository (default: https://github.com/${GITHUB_USER}/docauposte2 ) :  " GIT_ADDRESS;
     if [ -z "${GIT_ADDRESS}" ]
     then
         GIT_ADDRESS="https://github.com/${GITHUB_USER}/docauposte2"
@@ -135,7 +135,7 @@ done
             }
 
         # Ask the user for the git repository address either in ssh or http
-            read -p "Address of the git repository (ssh or http // default: https://github.com/${GITHUB_USER}/docauposte2 ) :  " GIT_ADDRESS;
+            read -p "Address of the git repository (default: https://github.com/${GITHUB_USER}/docauposte2 ) :  " GIT_ADDRESS;
             if [ -z "${GIT_ADDRESS}" ]
             then
                 GIT_ADDRESS="https://github.com/${GITHUB_USER}/docauposte2"
