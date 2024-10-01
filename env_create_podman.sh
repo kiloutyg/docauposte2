@@ -180,8 +180,7 @@ EOL
 
 echo ".env file created successfully!"
 
-if [ "${APP_CONTEXT}" == "prod" ]
-  then
+
 
 APP_CONTEXT="dev"
 sed -i "s|^APP_ENV=prod.*|APP_ENV=dev|" .env
@@ -197,6 +196,9 @@ set +a
 
 # Create docker-compose.override.yml file to use the good entrypoint
 envsubst < ./template.yml > ./dap.yml
+
+if [ "${APP_CONTEXT}" == "prod" ]
+  then
 
 podman play kube --replace ./dap.yml
 
