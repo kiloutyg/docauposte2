@@ -451,7 +451,8 @@ class ValidationService extends AbstractController
         $filePath = $this->projectDir . '/public/doc/' . $fileName;
         $uploadsWaitingValidationRaw = [];
         // $badValidators = [];
-
+        $uploaders = [];
+        
         if ($today->format('d') % 2 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
 
             $nonValidatedValidations = $this->validationRepository->findNonValidatedValidations();

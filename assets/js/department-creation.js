@@ -106,7 +106,7 @@ document.addEventListener("turbo:load", function () {
 
       // Create a new XMLHttpRequest object
       let xhr = new XMLHttpRequest();
-      xhr.open("POST", "/department/department_creation");
+      xhr.open("POST", "/docauposte/department/department_creation");
       xhr.setRequestHeader("Content-Type", "application/json");
 
       // Set the onload event handler for the XMLHttpRequest

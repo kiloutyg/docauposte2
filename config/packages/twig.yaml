@@ -4,6 +4,7 @@ twig:
     globals:
         facilityName: "%env(FACILITY_NAME)%"
         hostname: "%env(HOSTNAME)%"
+        # base_path: '/docauposte'
 when@test:
     twig:
         strict_variables: true
