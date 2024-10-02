@@ -48,8 +48,8 @@ read -p "Please enter your MySQL username: " MYSQL_USER
 read -p "Please enter your MySQL password: " MYSQL_PASSWORD
 read -p "Please enter your database name: " MYSQL_DATABASE
 while true; do
-    read -p "Please enter your app context (prod or dev): " APP_CONTEXT
-    if [ "${APP_CONTEXT}" == "prod" ] || [ "${APP_CONTEXT}" == "dev" ]; then
+    read -p "Please enter your app context (prod or dev): " APP_CONTEXT_SH
+    if [ "${APP_CONTEXT_SH}" == "prod" ] || [ "${APP_CONTEXT_SH}" == "dev" ]; then
         # If the context is valid, break the loop and continue with the rest of your script
         break
     else
@@ -145,7 +145,7 @@ GITHUB_USER=${GITHUB_USER}
 FACILITY_NAME=${FACILITY_NAME}
 
 ###> symfony/framework-bundle ###
-APP_ENV=${APP_CONTEXT}
+APP_ENV=${APP_CONTEXT_SH}
 APP_SECRET=${APP_SECRET}
 ###< symfony/framework-bundle ###
 
@@ -179,46 +179,61 @@ EOL
 
 
 echo ".env file created successfully!"
+if [ "${APP_CONTEXT_SH}" == "prod" ]
+    then
 
+        APP_CONTEXT_SH="dev"
+        sed -i "s|^APP_ENV=prod.*|APP_ENV=dev|" .env
+        sed -i "s|^# MAILER_DSN=.*|MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0|" .env
 
+        set -a
+        APP_CONTEXT=${APP_CONTEXT_SH}
+        PROXY_ENV=${PROXY_ENV}
+        APP_TIMEZONE=${TIMEZONE}
+        GITHUB_USER=${GITHUB_USER}
+        set +a
 
-APP_CONTEXT="dev"
-sed -i "s|^APP_ENV=prod.*|APP_ENV=dev|" .env
-sed -i "s|^# MAILER_DSN=.*|MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0|" .env
+        # Create docker-compose.override.yml file to use the good entrypoint
+        envsubst < ./template.yml > ./dap.yml;
 
+        podman play kube --replace ./dap.yml
 
-set -a
-APP_CONTEXT=${APP_CONTEXT}
-PROXY_ENV=${PROXY_ENV}
-APP_TIMEZONE=${TIMEZONE}
-GITHUB_USER=${GITHUB_USER}
-set +a
+        sleep 180
 
-# Create docker-compose.override.yml file to use the good entrypoint
-envsubst < ./template.yml > ./dap.yml
+        podman play kube --down ./dap.yml
 
-if [ "${APP_CONTEXT}" == "prod" ]
-  then
+        sleep 60
 
-podman play kube --replace ./dap.yml
+        sed -i "s|^APP_ENV=dev.*|APP_ENV=prod|" .env
+        APP_CONTEXT_SH="prod"
 
-sleep 180
+        set -a
+        APP_CONTEXT=${APP_CONTEXT_SH}
+        PROXY_ENV=${PROXY_ENV}
+        APP_TIMEZONE=${TIMEZONE}
+        GITHUB_USER=${GITHUB_USER}
+        set +a
 
-podman play kube --down ./dap.yml
+        # Create docker-compose.override.yml file to use the good entrypoint
+        envsubst < ./template.yml > ./dap.yml
+        echo "Production dap.yml file created successfully!";
+        cat ./dap.yml;
 
-sleep 60
+    else
 
-sed -i "s|^APP_ENV=dev.*|APP_ENV=prod|" .env
-APP_CONTEXT="prod"
+        APP_CONTEXT_SH="dev"
+        sed -i "s|^APP_ENV=prod.*|APP_ENV=dev|" .env
+        sed -i "s|^# MAILER_DSN=.*|MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0|" .env
 
-set -a
-APP_CONTEXT=${APP_CONTEXT}
-PROXY_ENV=${PROXY_ENV}
-APP_TIMEZONE=${TIMEZONE}
-GITHUB_USER=${GITHUB_USER}
-set +a
+        set -a
+        APP_CONTEXT=${APP_CONTEXT_SH}
+        PROXY_ENV=${PROXY_ENV}
+        APP_TIMEZONE=${TIMEZONE}
+        GITHUB_USER=${GITHUB_USER}
+        set +a
 
-# Create docker-compose.override.yml file to use the good entrypoint
-envsubst < ./template.yml > ./dap.yml
-
+        # Create docker-compose.override.yml file to use the good entrypoint
+        envsubst < ./template.yml > ./dap.yml;
+        echo "Development dap.yml file created successfully!";
+        cat ./dap.yml;
 fi
