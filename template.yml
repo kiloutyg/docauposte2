@@ -15,6 +15,7 @@ metadata:
   labels:
     app: docauposte
 spec:
+  restartPolicy: Always
   containers:
     - name: docauposte
       image: docker.io/library/mariadb:latest
@@ -59,6 +60,7 @@ metadata:
     traefik.http.services.phpmyadmin.loadbalancer.server.port: 80
     traefik.http.middlewares.strip-phpmyadmin-prefix.stripPrefix.prefixes: /dappma
 spec:
+  restartPolicy: Always
   containers:
     - name: docauposte
       image: docker.io/phpmyadmin/phpmyadmin
@@ -90,6 +92,7 @@ metadata:
     traefik.http.services.webdap.loadbalancer.server.port: 80
     traefik.http.middlewares.strip-webdap-prefix.stripPrefix.prefixes: /docauposte
 spec:
+  restartPolicy: Always
   containers:
     - name: docauposte
       image: ghcr.io/${GITHUB_USER}/docauposte2:main
