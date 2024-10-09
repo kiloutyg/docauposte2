@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: database
+  name: dap-db-service
 spec:
   selector:
-    app: database
+    app: database-docauposte
   ports:
     - port: 3306
 ---
@@ -13,7 +13,7 @@ kind: Pod
 metadata:
   name: database
   labels:
-    app: docauposte
+    app: database-docauposte
 spec:
   restartPolicy: Always
   containers:
