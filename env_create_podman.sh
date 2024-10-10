@@ -98,19 +98,19 @@ APP_SECRET=$(openssl rand -hex 16)
 
 cat > ./secrets/root_password <<EOL
 ${MYSQL_ROOT_PASSWORD}
-EOL;
+EOL
 
 cat > ./secrets/database_name <<EOL
 ${MYSQL_DATABASE}
-EOL;
+EOL
 
 cat > ./secrets/database_user <<EOL
 ${MYSQL_USER}
-EOL;
+EOL
 
 cat > ./secrets/database_password <<EOL
 ${MYSQL_PASSWORD}
-EOL;
+EOL
 
 # Change the src/Kernel.php to set the good timezone.
 cat > ./src/Kernel.php <<EOL
