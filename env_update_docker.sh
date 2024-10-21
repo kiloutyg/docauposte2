@@ -70,7 +70,8 @@ if [ "${PROXY_ANSWER}" == "yes" ]
         then
         PROXY_PORT="80"
       fi
-    PROXY_ENV="      http_proxy: ${PROXY_ADDRESS}:${PROXY_PORT}"
+    HTTP_PROXY_ENV="      http_proxy: ${PROXY_ADDRESS}:${PROXY_PORT}"
+    HTTPS_PROXY_ENV="      https_proxy: ${PROXY_ADDRESS}:${PROXY_PORT}"
     PROXY_DOCKERFILE="ENV http_proxy=\'${PROXY_ADDRESS}:${PROXY_PORT}\'"
     sed -i "3s|.*|$PROXY_DOCKERFILE|" docker/dockerfile/Dockerfile
 fi
@@ -114,7 +115,8 @@ services:
     restart: unless-stopped 
     entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
     environment:
-${PROXY_ENV}
+${HTTP_PROXY_ENV}
+${HTTPS_PROXY_ENV}
       APP_TIMEZONE: ${TIMEZONE}
     volumes:
       - ./:/var/www
@@ -152,7 +154,8 @@ services:
     restart: unless-stopped 
     entrypoint: "./${APP_CONTEXT}-entrypoint.sh"
     environment:
-${PROXY_ENV}
+${HTTP_PROXY_ENV}
+${HTTPS_PROXY_ENV}
       APP_TIMEZONE: ${TIMEZONE}
     volumes:
       - ./:/var/www
