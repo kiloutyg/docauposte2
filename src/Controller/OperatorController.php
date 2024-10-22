@@ -222,20 +222,16 @@ class OperatorController extends FrontController
     #[Route('/operator/frontByVal/{validationId}', name: 'app_training_front_by_validation')]
     public function documentAndOperatorByValidation(Request $request, int $validationId): Response
     {
+        $referer = $request->headers->get('referer');
         $validation = $this->validationRepository->find($validationId);
         $upload = $validation->getUpload();
-        // $countArray = $this->operatorService->operatorCheckForAutoDelete();
-        // if ($countArray != null) {
-        //     if ($countArray != null) {
-        //         $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
-        //             ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
-        //     }
-        // }
 
         if ($request->getMethod() === 'GET') {
             return $this->render('services/operators/docAndOperator.html.twig', [
                 'upload' => $upload,
             ]);
+        } else {
+            return $this->redirect($referer);
         }
     }
 
@@ -243,22 +239,15 @@ class OperatorController extends FrontController
     #[Route('/operator/frontByUpl/{uploadId}', name: 'app_training_front_by_upload')]
     public function documentAndOperatorByUpload(Request $request, int $uploadId): Response
     {
-        $this->logger->info('Full request', $request->request->all());
-        $this->logger->info('uploadId', [$uploadId]);
+        $referer = $request->headers->get('referer');
         $upload = $this->uploadRepository->find($uploadId);
-
-        // $countArray = $this->operatorService->operatorCheckForAutoDelete();
-        // if ($countArray != null) {
-        //     if ($countArray != null) {
-        //         $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
-        //             ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
-        //     }
-        // }
 
         if ($request->getMethod() === 'GET') {
             return $this->render('services/operators/docAndOperator.html.twig', [
                 'upload' => $upload,
             ]);
+        } else {
+            return $this->redirect($referer);
         }
     }
 

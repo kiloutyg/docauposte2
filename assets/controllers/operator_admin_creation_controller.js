@@ -247,7 +247,7 @@ export default class OperatorAdminCreationController extends Controller {
         document.getElementById('newOperatorName').value = this.newOperatorNameTarget;
         clearTimeout(this.validatedTimeout);
         this.validatedTimeout = setTimeout(() => {
-            console.log('Resetting new operator form after 10 seconds')
+            console.log('Resetting new operator form after 15 seconds')
             this.newOperatorCodeTarget.value = "";
             this.newOperatorLastnameTarget.value = "";
             this.newOperatorFirstnameTarget.value = "";
@@ -265,7 +265,7 @@ export default class OperatorAdminCreationController extends Controller {
             this.newOperatorIsTrainerTarget.checked = null;
             this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions 
             this.suggestionsResults = [];
-        }, 10000);
+        }, 15000);
 
     }
 
@@ -317,22 +317,81 @@ export default class OperatorAdminCreationController extends Controller {
         this.manageNewOperatorSubmitButton(unMatchedFound);
     }
 
+    async codeGenerator() {
+        console.log('Generating a code');
 
-    codeGenerator() {
-        console.log('generating a code');
-        const code = Math.floor(10000 + Math.random() * 90000);
-        const response = this.generatedCodeChecker(code);
-        console.log('response for generated code:', response.data);
-        if (response.data) {
-            console.log('Code already exists, generating another code');
-            this.codeGenerator();
-        } else {
-            this.newOperatorCodeTarget.value = code;
-            this.newOperatorCodeTarget.disabled = true;
-            this.newOperatorCodeTarget.focus();
-            this.validateNewOperatorCode();
+        // Generate a random integer between 1 and 999
+        const code = Math.floor(1 + Math.random() * 999);
+
+        // Sum the digits of the 'code' integer
+        const sumOfDigits = code
+            .toString()
+            .split('')
+            .reduce((sum, digit) => sum + Number(digit), 0);
+
+        if (sumOfDigits.length < 2) {
+            console.log('sumOfDigits is less than 2, adding a leading zero:', sumOfDigits);
+            sumOfDigits = '0' + sumOfDigits;
+        }
+
+        // Combine the original code and the sum of its digits
+        let newCode = code.toString() + sumOfDigits.toString();
+        console.log('newCode combined:', newCode);
+
+
+        // Convert 'newCode' back to an integer
+        // newCode = parseInt(newCode, 10);
+        // console.log('newCode converted back to integer:', newCode);
+
+        // Ensure 'newCode' has exactly 5 digits
+        if (newCode.length < 5) {
+            // Pad with leading zeros if less than 5 digits
+            newCode = newCode.padStart(5, '0');
+            console.log('newCode padded with leading zeros:', newCode);
+        } else if (newCode.length > 5) {
+            // If more than 5 digits, use the last 5 digits
+            newCode = newCode.slice(-5);
+            console.log('newCode truncated to 5 digits:', newCode);
+        }
+
+
+        console.log('generated code:', newCode);
+
+        // Check if the generated code already exists
+        try {
+            const response = await this.generatedCodeChecker(newCode);
+            console.log('Response for generated code:', response.data);
+
+            if (response.data.found) {
+                console.log('Code already exists, generating another code');
+                await this.codeGenerator(); // Recursively generate a new code
+            } else {
+                // Set the new code to the input field and proceed
+                this.newOperatorCodeTarget.value = newCode;
+                this.newOperatorCodeTarget.disabled = true;
+                this.newOperatorCodeTarget.focus();
+                this.validateNewOperatorCode();
+            }
+        } catch (error) {
+            console.error('Error checking for duplicate operator code.', error);
+            // Handle error accordingly
         }
     }
+    // codeGenerator() {
+    //     console.log('generating a code');
+    //     const code = Math.floor(1 + Math.random() * 999);
+    //     const response = this.generatedCodeChecker(code);
+    //     console.log('response for generated code:', response.data);
+    //     if (response.data) {
+    //         console.log('Code already exists, generating another code');
+    //         this.codeGenerator();
+    //     } else {
+    //         this.newOperatorCodeTarget.value = code;
+    //         this.newOperatorCodeTarget.disabled = true;
+    //         this.newOperatorCodeTarget.focus();
+    //         this.validateNewOperatorCode();
+    //     }
+    // }
 
 
     generatedCodeChecker(code) {
@@ -406,16 +465,16 @@ export default class OperatorAdminCreationController extends Controller {
 
         if (inputField === 'lastname' && this.newOperatorFirstnameTarget.value.trim() != "") {
             console.log('first name is not empty');
-            const firstNameResponse = await axios.post(`operator/suggest-names`, { name: this.newOperatorFirstnameTarget.value.trim() });
+            const firstNameResponse = await axios.post(`suggest-names`, { name: this.newOperatorFirstnameTarget.value.trim() });
             this.suggestionsResults = firstNameResponse.data;
 
         } else if (inputField === 'firstname' && this.newOperatorLastnameTarget.value.trim() != "") {
             console.log('last name is not empty');
-            const lastNameResponse = await axios.post(`operator/suggest-names`, { name: this.newOperatorLastnameTarget.value.trim() });
+            const lastNameResponse = await axios.post(`suggest-names`, { name: this.newOperatorLastnameTarget.value.trim() });
             this.suggestionsResults = lastNameResponse.data;
         }
 
-        response = await axios.post(`operator/suggest-names`, { name: name });
+        response = await axios.post(`suggest-names`, { name: name });
 
         console.log('response for name suggestions:', response.data);
         return this.checkIfSuggestionsResultsEmpty(response.data);
