@@ -32,26 +32,27 @@
 		</div>
 	</ul>
 	<ul		
-	data-controller="operator-admin-edit">
+	>
 		{% if operatorForms|length > 0 %}
 			{% for operatorId, operatorForm in operatorForms %}
+
 				{% if operatorForm.vars.data.tobedeleted is not empty %}
-
-					{{ form_start(operatorForm, {'attr': {'class': 'row bg-dark', 'id': 'operatorForm' ~ operatorId}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
+					{{ form_start(operatorForm, {'attr': {'class': 'row bg-dark', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
 				{% else %}
-					{{ form_start(operatorForm, {'attr': {'class': 'row', 'id': 'operatorForm' ~ operatorId}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
-
+					{{ form_start(operatorForm, {'attr': {'class': 'row', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
 				{% endif %}
+
 				{% for field in fields %}
      				{% set customId = 'operatorForm' ~ field|capitalize ~ operatorId %}
 					{{ form_row(operatorForm[field], 
 					{						
 					'id': customId,
 					'attr': {
+						'data-action': field == 'code' ? 'keyup->operator-admin-edit#editedCodeChecker' : null,
 						'data-operator-admin-edit-target': field == 'isTrainer' ? 'operatorFormIsTrainer' : 'operatorForm' ~ field|capitalize}}) }}
 				{% endfor %}
-				{% if operatorForm.vars.data.tobedeleted is not empty %}
 
+				{% if operatorForm.vars.data.tobedeleted is not empty %}
 					<div
 						class="col my-auto mx-auto">
 						<button

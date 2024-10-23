@@ -6,6 +6,7 @@ import axios from 'axios';
 export default class OperatorAdminCreationController extends Controller {
 
 
+
     static targets = [
         "newOperatorLastname",
         "newOperatorFirstname",
@@ -20,7 +21,11 @@ export default class OperatorAdminCreationController extends Controller {
         "nameSuggestions",
     ];
 
+
+
     suggestionsResults = [];
+
+
 
     validateNewOperatorLastname() {
         clearTimeout(this.lastnameTypingTimeout);
@@ -41,6 +46,7 @@ export default class OperatorAdminCreationController extends Controller {
             }
         }, 800);
     }
+
 
 
     validateNewOperatorFirstname() {
@@ -66,9 +72,11 @@ export default class OperatorAdminCreationController extends Controller {
     }
 
 
+
     capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
+
 
 
     capitalizeFirstLetterMethod(event) {
@@ -78,6 +86,7 @@ export default class OperatorAdminCreationController extends Controller {
             input.value = input.value.charAt(0).toUpperCase() + input.value.slice(1).toLowerCase();
         }
     }
+
 
 
     validateNewOperatorName() {
@@ -115,6 +124,7 @@ export default class OperatorAdminCreationController extends Controller {
     }
 
 
+
     validateNewOperatorCode() {
         clearTimeout(this.codeTypingTimeout);
         this.codeTypingTimeout = setTimeout(() => {
@@ -131,7 +141,14 @@ export default class OperatorAdminCreationController extends Controller {
                     return;
                 } else {
                     this.duplicateCheckResults.code = null;
-                    isValid = regex.test(this.newOperatorCodeTarget.value.trim());
+                    const code = this.newOperatorCodeTarget.value
+                    const sumOfFirstThreeDigit = code.toString.split('').slice(0, 3).reduce((sum, digit) => sum + Number(digit), 0);
+                    console.log('sum of first three digits:', sumOfFirstThreeDigit);
+                    const valueOfLastTwoDigit = code.toString.split('').slice(3).join('');
+                    console.log('value of last two digits:', valueOfLastTwoDigit);
+                    if (sumOfFirstThreeDigit === valueOfLastTwoDigit) {
+                        isValid = regex.test(this.newOperatorCodeTarget.value.trim());
+                    }
                 }
             } else {
                 isValid = regex.test(this.newOperatorCodeTarget.value.trim());
@@ -145,6 +162,7 @@ export default class OperatorAdminCreationController extends Controller {
             }
         }, 800);
     }
+
 
 
     async checkForExistingEntityByName() {
@@ -191,6 +209,7 @@ export default class OperatorAdminCreationController extends Controller {
     }
 
 
+
     updateMessage(targetElement, isValid, errorMessage) {
         console.log(`Updating message: isValid: ${isValid}`);
         if (isValid) {
@@ -204,7 +223,9 @@ export default class OperatorAdminCreationController extends Controller {
     }
 
 
+
     duplicateCheckResults = { name: null, code: null };
+
 
 
     handleDuplicateResponse(response, messageTarget, fieldName) {
@@ -232,7 +253,7 @@ export default class OperatorAdminCreationController extends Controller {
             console.log('No duplicate found, generating a code and allowing to write it.' + response.data.field);
             if (response.data.field === "name") {
                 console.log('No duplicate found, generating a code and allowing to write it.');
-                this.codeGenerator();
+                this.codeGeneratorInitiator();
             }
             this.newOperatorCodeTarget.disabled = false;
             this.newOperatorCodeTarget.focus();
@@ -247,7 +268,7 @@ export default class OperatorAdminCreationController extends Controller {
         document.getElementById('newOperatorName').value = this.newOperatorNameTarget;
         clearTimeout(this.validatedTimeout);
         this.validatedTimeout = setTimeout(() => {
-            console.log('Resetting new operator form after 10 seconds')
+            console.log('Resetting new operator form after 15 seconds')
             this.newOperatorCodeTarget.value = "";
             this.newOperatorLastnameTarget.value = "";
             this.newOperatorFirstnameTarget.value = "";
@@ -265,15 +286,17 @@ export default class OperatorAdminCreationController extends Controller {
             this.newOperatorIsTrainerTarget.checked = null;
             this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions 
             this.suggestionsResults = [];
-        }, 10000);
+        }, 15000);
 
     }
+
 
 
     checkForDuplicate(url, value) {
         console.log(`Checking for duplicate at ${url} with value:`, value);
         return axios.post(url, { value: value });
     }
+
 
 
     checkForCorrespondingEntity() {
@@ -297,6 +320,7 @@ export default class OperatorAdminCreationController extends Controller {
     }
 
 
+
     executeEntityMatchingLogic(matchesFound) {
         console.log('Executing entity matching logic:', matchesFound);
 
@@ -313,26 +337,79 @@ export default class OperatorAdminCreationController extends Controller {
     }
 
 
+
     executeEntityNonMatchingLogic(unMatchedFound) {
         this.manageNewOperatorSubmitButton(unMatchedFound);
     }
 
 
     codeGenerator() {
-        console.log('generating a code');
-        const code = Math.floor(10000 + Math.random() * 90000);
-        const response = this.generatedCodeChecker(code);
-        console.log('response for generated code:', response.data);
-        if (response.data) {
-            console.log('Code already exists, generating another code');
-            this.codeGenerator();
-        } else {
-            this.newOperatorCodeTarget.value = code;
-            this.newOperatorCodeTarget.disabled = true;
-            this.newOperatorCodeTarget.focus();
-            this.validateNewOperatorCode();
+        console.log('Generating a code');
+
+        // Generate a random integer between 1 and 999
+        const code = Math.floor(1 + Math.random() * 999);
+
+        // Sum the digits of the 'code' integer
+        let sumOfDigits = code
+            .toString()
+            .split('')
+            .reduce((sum, digit) => sum + Number(digit), 0);
+
+        console.log('sumOfDigits:', sumOfDigits);
+
+        const sumOfDigitsString = sumOfDigits.toString();
+
+        console.log('sumOfDigits Length:', sumOfDigitsString.length);
+
+        if (sumOfDigitsString.length < 2) {
+            console.log('sumOfDigits is less than 2, adding a leading zero:', sumOfDigits);
+            sumOfDigits = '0' + sumOfDigits;
+            console.log('sumOfDigits after adding a leading zero:', sumOfDigits);
+        }
+
+        // Combine the original code and the sum of its digits
+        let newCode = code.toString() + sumOfDigits.toString();
+        console.log('newCode combined:', newCode);
+
+        // Ensure 'newCode' has exactly 5 digits
+        if (newCode.length < 5) {
+            // Pad with leading zeros if less than 5 digits
+            newCode = newCode.padStart(5, '0');
+            console.log('newCode padded with leading zeros:', newCode);
+        } else if (newCode.length > 5) {
+            // If more than 5 digits, use the last 5 digits
+            newCode = newCode.slice(-5);
+            console.log('newCode truncated to 5 digits:', newCode);
+        }
+
+        console.log('generated code:', newCode);
+        return newCode;
+    }
+
+    async codeGeneratorInitiator() {
+        console.log('initiating code generator');
+        const newCode = this.codeGenerator();
+        // Check if the generated code already exists
+        try {
+            const response = await this.generatedCodeChecker(newCode);
+            console.log('Response for generated code:', response.data);
+
+            if (response.data.found) {
+                console.log('Code already exists, generating another code');
+                await this.codeGeneratorInitiator(); // Recursively generate a new code
+            } else {
+                // Set the new code to the input field and proceed
+                this.newOperatorCodeTarget.value = newCode;
+                this.newOperatorCodeTarget.disabled = true;
+                this.newOperatorCodeTarget.focus();
+                this.validateNewOperatorCode();
+            }
+        } catch (error) {
+            console.error('Error checking for duplicate operator code.', error);
+            // Handle error accordingly
         }
     }
+
 
 
     generatedCodeChecker(code) {
@@ -373,6 +450,7 @@ export default class OperatorAdminCreationController extends Controller {
     }
 
 
+
     suggestFirstname(event) {
         const input = event.target.value;
         console.log('suggesting firstname:', input);
@@ -399,23 +477,22 @@ export default class OperatorAdminCreationController extends Controller {
 
 
 
-
     async fetchNameSuggestions(name, inputField) {
         console.log('fetching name suggestions:', name, inputField);
         let response;
 
         if (inputField === 'lastname' && this.newOperatorFirstnameTarget.value.trim() != "") {
             console.log('first name is not empty');
-            const firstNameResponse = await axios.post(`operator/suggest-names`, { name: this.newOperatorFirstnameTarget.value.trim() });
+            const firstNameResponse = await axios.post(`suggest-names`, { name: this.newOperatorFirstnameTarget.value.trim() });
             this.suggestionsResults = firstNameResponse.data;
 
         } else if (inputField === 'firstname' && this.newOperatorLastnameTarget.value.trim() != "") {
             console.log('last name is not empty');
-            const lastNameResponse = await axios.post(`operator/suggest-names`, { name: this.newOperatorLastnameTarget.value.trim() });
+            const lastNameResponse = await axios.post(`suggest-names`, { name: this.newOperatorLastnameTarget.value.trim() });
             this.suggestionsResults = lastNameResponse.data;
         }
 
-        response = await axios.post(`operator/suggest-names`, { name: name });
+        response = await axios.post(`suggest-names`, { name: name });
 
         console.log('response for name suggestions:', response.data);
         return this.checkIfSuggestionsResultsEmpty(response.data);
@@ -450,7 +527,6 @@ export default class OperatorAdminCreationController extends Controller {
         console.log('filtered suggestions:', duplicateSuggestions);
         return duplicateSuggestions;
     }
-
 
 
 
@@ -501,9 +577,7 @@ export default class OperatorAdminCreationController extends Controller {
                 this.suggestionsResults = [];
             });
         });
-
         this.nameSuggestionsTarget.style.display = responses.length ? 'block' : 'none';
-
     }
 
 }

@@ -106,7 +106,10 @@ export default class OperatorTrainerController extends Controller {
 
 
     handleTrainerExistenceResponse(response, field, fieldName) {
+        console.log('response.data.found', response.data.found)
+        console.log('fieldName', fieldName)
         if (response.data.found) {
+            console.log('response.data.found is true, field:', field)
             if (field === 'name') {
                 this.validateTrainerOperatorCode();
             } else {
@@ -114,25 +117,25 @@ export default class OperatorTrainerController extends Controller {
                 console.log('response.data.uploadTrainer:', response.data.uploadTrainer)
                 if (response.data.uploadTrainer === false) {
                     this.trainerOperatorNameMessageTarget.style.fontWeight = "bold";
-                    // this.trainerOperatorNameMessageTarget.style.color = "red";
                     this.trainerOperatorNameMessageTarget.style.color = "green";
-                    // this.trainerOperatorNameMessageTarget.textContent = "Formateur trouvé. Non habilité sur ce process.";
                     this.trainerOperatorNameMessageTarget.textContent = "Formateur trouvé.";
                 } else {
                     this.trainerOperatorNameMessageTarget.textContent = "";
                 }
             }
+            console.log('response.data.found is true, field:', field)
             this[`${fieldName}Target`].disabled = true;
             this[`${fieldName}MessageTarget`].textContent = "";
             this[`${fieldName}MessageTarget`].style.fontWeight = "bold";
             this[`${fieldName}MessageTarget`].style.color = "green";
             this[`${fieldName}MessageTarget`].textContent = "Formateur trouvé.";
         } else {
+            console.log('response.data.found is false, field:', field)
             this[`${fieldName}Target`].value = "";
             this[`${fieldName}MessageTarget`].textContent = "";
             this[`${fieldName}MessageTarget`].style.fontWeight = "bold";
             this[`${fieldName}MessageTarget`].style.color = "red";
-            this[`${fieldName}MessageTarget`].textContent = "Formateur non trouvé. "[field];
+            this[`${fieldName}MessageTarget`].textContent = field === 'name' ? "Formateur non trouvé." : "Code Opé Formateur erroné.";
             // Stop the repeating validation since we found the trainer
         };
     }

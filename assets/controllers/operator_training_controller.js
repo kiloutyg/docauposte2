@@ -1,6 +1,6 @@
 
-import { Controller } from '@hotwired/stimulus';
 
+import { Controller } from '@hotwired/stimulus';
 import axios from 'axios';
 
 export default class OperatorTrainingController extends Controller {
@@ -135,7 +135,13 @@ export default class OperatorTrainingController extends Controller {
             if (isValid) {
                 console.log('Code is valid, clearing duplicate check results and checking for existing entity by code')
                 this.duplicateCheckResults.code = null;
+                // if (this.duplicateCheckResults.name === null) {
+                //     this.checkForExistingEntityByCode();
+                // } else {
+                //     this.checkForCorrespondingEntity();
+                // };
                 this.checkForExistingEntityByCode();
+
             }
         }, 1200);
     }
@@ -170,10 +176,10 @@ export default class OperatorTrainingController extends Controller {
     }
 
 
+
     async checkForExistingEntityByCode() {
         try {
             console.log('checking for existing entity by code:', this.newOperatorCodeTarget.value);
-
             const response = await this.checkForDuplicate('/docauposte/operator/check-duplicate-by-code', this.newOperatorCodeTarget.value);
             console.log('response for existing entity by code:', response.data.found);
             this.handleDuplicateResponse(response, this.newOperatorCodeMessageTarget, "codes opérateurs");
@@ -187,15 +193,18 @@ export default class OperatorTrainingController extends Controller {
 
 
     updateMessage(targetElement, isValid, errorMessage) {
-        console.log(`Updating message: isValid: ${isValid}`);
-        if (isValid) {
-            targetElement.textContent = "";
-        } else {
-            targetElement.textContent = errorMessage;
-            targetElement.style.fontWeight = "bold";
-            targetElement.style.color = "red";
-            this.manageNewOperatorSubmitButton();
-        }
+        clearTimeout(this.messageTimeout);
+        this.messageTimeout = setTimeout(() => {
+            console.log(`Updating message: isValid: ${isValid}`);
+            if (isValid) {
+                targetElement.textContent = "";
+            } else {
+                targetElement.textContent = errorMessage;
+                targetElement.style.fontWeight = "bold";
+                targetElement.style.color = "red";
+                this.manageNewOperatorSubmitButton();
+            }
+        }, 800);
     }
 
 
@@ -228,7 +237,7 @@ export default class OperatorTrainingController extends Controller {
             console.log('No duplicate found, generating a code and allowing to write it.' + response.data.field);
             if (response.data.field === "name") {
                 console.log('No duplicate found, generating a code and allowing to write it.');
-                this.codeGenerator();
+                this.proposeCompliantNewCode();
             }
             this.newOperatorCodeTarget.disabled = false;
             this.newOperatorCodeTarget.focus();
@@ -448,14 +457,17 @@ export default class OperatorTrainingController extends Controller {
 
 
 
-    codeGenerator() {
+    async proposeCompliantNewCode() {
         console.log('generating a code');
-        const code = Math.floor(10000 + Math.random() * 90000);
-        const response = this.generatedCodeChecker(code);
-        console.log('response for generated code:', response.data);
-        if (response.data) {
+
+        const code = this.codeGenerator();
+        console.log('generated code:', code);
+        const response = await this.generatedTrainingCodeChecker(code);
+
+        console.log('response.object.data.found for generated code:', response);
+        if (response) {
             console.log('Code already exists, generating another code');
-            this.codeGenerator();
+            this.proposeCompliantNewCode();
         } else {
             this.newOperatorCodeTarget.value = code;
             this.newOperatorCodeTarget.disabled = true;
@@ -466,9 +478,22 @@ export default class OperatorTrainingController extends Controller {
 
 
 
-    generatedCodeChecker(code) {
-        console.log('checking generated code');
-        return axios.post(`/docauposte/operator/check-if-code-exist`, { code: code });
+    async generatedTrainingCodeChecker(code) {
+        // Since axios.post is asynchronous, we need to handle it with async/await or promises
+        console.log('checking if code already exists, code:', code);
+        return axios.post('/docauposte/operator/check-if-code-exist', { code })
+            .then(response => {
+                console.log('response', response)
+                console.log('response.data.found', response.data.found)
+                const found = response.data.found;
+                console.log('found', found)
+                return found;
+            })
+            .catch(error => {
+                console.error('Error checking for duplicate operator code.', error);
+                // Handle error appropriately
+                return false;
+            });
     }
 
 
@@ -586,7 +611,6 @@ export default class OperatorTrainingController extends Controller {
 
 
 
-
     displaySuggestions(responses) {
         console.log('displaying suggestions:', responses);
         // Assuming 'responses' is an array of objects each with 'name', 'code', 'team', and 'uap'
@@ -629,5 +653,49 @@ export default class OperatorTrainingController extends Controller {
         this.nameSuggestionsTarget.style.display = responses.length ? 'block' : 'none';
 
     }
-}
 
+
+
+    codeGenerator() {
+        console.log('Generating a code');
+
+        // Generate a random integer between 1 and 999
+        const code = Math.floor(1 + Math.random() * 999);
+
+        // Sum the digits of the 'code' integer
+        let sumOfDigits = code
+            .toString()
+            .split('')
+            .reduce((sum, digit) => sum + Number(digit), 0);
+
+        console.log('sumOfDigits:', sumOfDigits);
+
+        const sumOfDigitsString = sumOfDigits.toString();
+
+        console.log('sumOfDigits Length:', sumOfDigitsString.length);
+
+        if (sumOfDigitsString.length < 2) {
+            console.log('sumOfDigits is less than 2, adding a leading zero:', sumOfDigits);
+            sumOfDigits = '0' + sumOfDigits;
+            console.log('sumOfDigits after adding a leading zero:', sumOfDigits);
+        }
+
+        // Combine the original code and the sum of its digits
+        let newCode = code.toString() + sumOfDigits.toString();
+        console.log('newCode combined:', newCode);
+
+        // Ensure 'newCode' has exactly 5 digits
+        if (newCode.length < 5) {
+            // Pad with leading zeros if less than 5 digits
+            newCode = newCode.padStart(5, '0');
+            console.log('newCode padded with leading zeros:', newCode);
+        } else if (newCode.length > 5) {
+            // If more than 5 digits, use the last 5 digits
+            newCode = newCode.slice(-5);
+            console.log('newCode truncated to 5 digits:', newCode);
+        }
+
+        console.log('generated code:', newCode);
+        return newCode;
+    }
+}
