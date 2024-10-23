@@ -350,14 +350,21 @@ export default class OperatorAdminCreationController extends Controller {
         const code = Math.floor(1 + Math.random() * 999);
 
         // Sum the digits of the 'code' integer
-        const sumOfDigits = code
+        let sumOfDigits = code
             .toString()
             .split('')
             .reduce((sum, digit) => sum + Number(digit), 0);
 
-        if (sumOfDigits.length < 2) {
+        console.log('sumOfDigits:', sumOfDigits);
+
+        const sumOfDigitsString = sumOfDigits.toString();
+
+        console.log('sumOfDigits Length:', sumOfDigitsString.length);
+
+        if (sumOfDigitsString.length < 2) {
             console.log('sumOfDigits is less than 2, adding a leading zero:', sumOfDigits);
             sumOfDigits = '0' + sumOfDigits;
+            console.log('sumOfDigits after adding a leading zero:', sumOfDigits);
         }
 
         // Combine the original code and the sum of its digits
