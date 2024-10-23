@@ -43,6 +43,7 @@ security:
         - { path: ^/modify_account, roles: ROLE_SUPER_ADMIN }
         - { path: ^/modify_account_view, roles: ROLE_SUPER_ADMIN }
         - { path: ^/department, roles: ROLE_SUPER_ADMIN }
+        - { path: ^/operator/delete-uap-or-team, roles: ROLE_SUPER_ADMIN }
 
         - { path: ^/mail, roles: ROLE_SUPER_ADMIN }
 

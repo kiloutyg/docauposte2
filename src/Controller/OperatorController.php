@@ -997,7 +997,7 @@ class OperatorController extends FrontController
     {
         $originUrl = $request->headers->get('referer');
 
-        if (!$this->authChecker->IsGranted('ROLE_ADMIN')) {
+        if (!$this->authChecker->IsGranted('ROLE_SUPER_ADMIN')) {
             $this->addFlash('danger', 'Vous n\'avez pas les droits pour effectuer cette action');
             return $this->redirect($originUrl);
         }
