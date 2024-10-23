@@ -40,7 +40,7 @@
 										<div
 											style="flex: 1;">
 
-											{% if is_granted('ROLE_ADMIN') %}
+											{% if is_granted('ROLE_SUPER_ADMIN') %}
 												{{ form_start(teamForm, { attr: { class: 'd-flex flex-column', 
 													id: 'teamCreationForm',
 													style:'flex: 1;', 
@@ -87,7 +87,7 @@
 																				class="col-4 ">
 																				{{ team.name }}
 																			</strong>
-																			{% if is_granted('ROLE_ADMIN') %}
+																			{% if is_granted('ROLE_SUPER_ADMIN') %}
 																				<a
 																					href="{{path('app_delete_uap_or_team', {'entityType': 'team', 'entityId': team.id})}}" class="btn btn-danger delete-team col-4 shadow">
 																					Supprimer
@@ -108,7 +108,7 @@
 										<div
 											style="flex: 1;">
 
-											{% if is_granted('ROLE_ADMIN') %}
+											{% if is_granted('ROLE_SUPER_ADMIN') %}
 												{{ form_start(uapForm, { attr: { class: 'd-flex flex-column', 
 													id: 'uapCreationForm', 
 													style:'flex: 1;', 
@@ -158,7 +158,7 @@
 																				{{ uap.name }}
 																			</strong>
 
-																			{% if is_granted('ROLE_ADMIN') %}
+																			{% if is_granted('ROLE_SUPER_ADMIN') %}
 																				<a
 																					href="{{path('app_delete_uap_or_team', {'entityType': 'uap', 'entityId': uap.id})}}" class="btn btn-danger delete-uap col-4 shadow">
 																					Supprimer
