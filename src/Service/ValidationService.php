@@ -19,7 +19,7 @@ use App\Entity\User;
 use App\Entity\Department;
 use App\Entity\Validation;
 use App\Entity\Approbation;
-use App\Entity\TrainingRecord;
+
 use App\Service\MailerService;
 use App\Service\OldUploadService;
 use App\Service\TrainingRecordService;
@@ -40,7 +40,7 @@ class ValidationService extends AbstractController
 
     protected $mailerService;
     protected $oldUploadService;
-    protected $TrainingRecordService;
+    private $TrainingRecordService;
 
 
     public function __construct(

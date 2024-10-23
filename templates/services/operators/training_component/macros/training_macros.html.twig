@@ -3,7 +3,18 @@
 		<li
 			style="flex:0.25; text-align: right;"
 			class="mx-auto">
-			{{ trainingRecord.trained ? 'Formé le ' ~ trainingRecord.date|date('d/m/Y') : 'À requalifier' }}
+			{% if trainingRecord.trained %}
+				{{'Formé le ' ~ trainingRecord.date|date('d/m/Y')}}
+				{% if date(trainingRecord.date) > date('now - 1 week') and is_granted('ROLE_MANAGER') %}
+					<a
+						href="{{path('app_training_record_delete_weeks_old', {'trainingRecordId': trainingRecord.id, 'uploadId': trainingRecord.Upload.id, 'teamId': teamId, 'uapId': uapId})}}" class="btn btn-danger" disabled
+						>
+						Supprimer
+					</a>
+				{% endif %}
+			{% else %}
+				{{'À requalifier'}}
+			{% endif %}
 		</li>
 		{% if not trainingRecord.trained %}
 			{# Additional elements for training in progress #}

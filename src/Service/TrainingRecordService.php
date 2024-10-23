@@ -7,8 +7,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
 
 use App\Entity\Upload;
+use App\Entity\TrainingRecord;
 
 use App\Repository\TrainingRecordRepository;
+
+use App\Service\EntityDeletionService;
+
 use Symfony\Component\Validator\Constraints\DateTime;
 
 class TrainingRecordService extends AbstractController
@@ -18,18 +22,24 @@ class TrainingRecordService extends AbstractController
 
     protected $trainingRecordRepository;
 
+    private $entityDeletionService;
+
 
     public function __construct(
         LoggerInterface                 $logger,
         EntityManagerInterface          $em,
 
-        TrainingRecordRepository        $trainingRecordRepository
+        TrainingRecordRepository        $trainingRecordRepository,
+
+        EntityDeletionService           $entityDeletionService
 
     ) {
-        $this->logger                = $logger;
-        $this->em                    = $em;
+        $this->logger                       = $logger;
+        $this->em                           = $em;
 
-        $this->trainingRecordRepository = $trainingRecordRepository;
+        $this->trainingRecordRepository     = $trainingRecordRepository;
+
+        $this->entityDeletionService        = $entityDeletionService;
     }
 
     public function updateTrainingRecord(Upload $upload)
@@ -108,11 +118,33 @@ class TrainingRecordService extends AbstractController
         $this->logger->info('TrainingRecordService: cheatTrain: trainingRecords: ' . count($trainingRecords));
         foreach ($trainingRecords as $trainingRecord) {
             if ($trainingRecord->isTrained() === false) {
-                $trainingRecord->setTrained(true);
+                $trainingRecord->setTrained(trained: true);
                 $this->em->persist($trainingRecord);
                 $this->em->flush($trainingRecord);
             }
         }
         return;
+    }
+
+    public function deleteWeeksOldTrainingRecords(int $trainingRecordId)
+    {
+        $trainingRecord = $this->trainingRecordRepository->find($trainingRecordId);
+
+        $this->logger->info('TrainingRecordService: deleteWeeksOldTrainingRecords', ['trainingRecordId' => $trainingRecord->getId()]);
+        $today = new \DateTime();
+
+        if ($trainingRecord->getDate() < $today->modify('-1 week')) {
+            $this->logger->info('TrainingRecordService: deleteWeeksOldTrainingRecords: trainingRecord is too old');
+            return false;
+        } else {
+            $response = $this->entityDeletionService->deleteEntity('trainingRecord', $trainingRecord->getId());
+        }
+
+        if ($response != '' || $response != null) {
+            $this->logger->info('TrainingRecordService: deleteWeeksOldTrainingRecords: response: ' . $response);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

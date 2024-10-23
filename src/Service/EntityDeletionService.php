@@ -7,6 +7,9 @@ namespace App\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+
+
 use App\Repository\ZoneRepository;
 use App\Repository\ProductLineRepository;
 use App\Repository\CategoryRepository;
@@ -23,8 +26,6 @@ use App\Repository\TrainingRecordRepository;
 use App\Repository\TeamRepository;
 use App\Repository\UapRepository;
 
-use App\Service\UploadService;
-use App\Service\OldUploadService;
 use App\Service\IncidentService;
 use App\Service\FolderCreationService;
 
@@ -35,13 +36,15 @@ class EntityDeletionService
 {
     private $em;
     private $logger;
+    protected $projectDir;
+
+    protected $params;
 
     private $zoneRepository;
     private $productLineRepository;
     private $categoryRepository;
     private $buttonRepository;
     private $uploadRepository;
-    private $uploadService;
     private $incidentRepository;
     private $incidentCategoryRepository;
     private $incidentService;
@@ -61,13 +64,15 @@ class EntityDeletionService
         EntityManagerInterface          $em,
         LoggerInterface                 $logger,
 
+        ParameterBagInterface           $params,
+
+
         ZoneRepository                  $zoneRepository,
         ProductLineRepository           $productLineRepository,
         CategoryRepository              $categoryRepository,
         ButtonRepository                $buttonRepository,
         UploadRepository                $uploadRepository,
         IncidentRepository              $incidentRepository,
-        UploadService                   $uploadService,
         IncidentCategoryRepository      $incidentCategoryRepository,
         IncidentService                 $incidentService,
         FolderCreationService           $folderCreationService,
@@ -83,12 +88,13 @@ class EntityDeletionService
         $this->em                           = $em;
         $this->logger                       = $logger;
 
+        $this->projectDir                   = $params->get(name: 'kernel.project_dir');
+
         $this->zoneRepository               = $zoneRepository;
         $this->productLineRepository        = $productLineRepository;
         $this->categoryRepository           = $categoryRepository;
         $this->buttonRepository             = $buttonRepository;
         $this->uploadRepository             = $uploadRepository;
-        $this->uploadService                = $uploadService;
         $this->incidentRepository           = $incidentRepository;
         $this->incidentCategoryRepository   = $incidentCategoryRepository;
         $this->incidentService              = $incidentService;
@@ -203,7 +209,7 @@ class EntityDeletionService
                 $this->deleteEntity('incident', $incident->getId());
             }
         } elseif ($entityType === 'upload') {
-            $this->uploadService->deleteFile($entity->getId());
+            $this->deleteFile($entity->getId());
         } elseif ($entityType === 'incident') {
             $this->incidentService->deleteIncidentFile($entity, $entity->getProductLine());
         } elseif ($entityType === 'department') {
@@ -237,5 +243,55 @@ class EntityDeletionService
         $this->em->flush();
 
         return true;
+    }
+
+
+
+    // This function is responsible for the logic of deleting the uploads files
+    public function deleteFile(int $uploadId)
+    {
+        $upload     = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        if ($upload->getOldUpload() != null) {
+            $oldUploadId = $upload->getOldUpload()->getId();
+            $this->deleteOldFile($oldUploadId);
+        }
+        $filename   = $upload->getFilename();
+        $name       = $filename;
+        $public_dir = $this->projectDir . '/public';
+        $button     = $upload->getButton();
+
+        // Dynamic folder and file deletion
+        $buttonname = $button->getName();
+        $parts      = explode('.', $buttonname);
+        $parts      = array_reverse($parts);
+        $folderPath = $public_dir . '/doc';
+
+        foreach ($parts as $part) {
+            $folderPath .= '/' . $part;
+        }
+        $path = $folderPath . '/' . $filename;
+
+        if (file_exists($path)) {
+            unlink($path);
+        }
+        $this->em->remove($upload);
+        $this->em->flush();
+        return $name;
+    }
+
+
+         // This function is responsible for the logic of deleting the OldUploads files
+    public function deleteOldFile(int $oldUploadId)
+    {
+
+        $oldUpload = $this->OldUploadRepository->findOneBy(['id' => $oldUploadId]);
+
+        $path = $oldUpload->getPath();
+        if (file_exists($path)) {
+            unlink($path);
+        }
+        $this->em->remove($oldUpload);
+        $this->em->flush();
+        return;
     }
 }

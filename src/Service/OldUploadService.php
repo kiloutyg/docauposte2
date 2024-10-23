@@ -112,18 +112,5 @@ class OldUploadService extends AbstractController
 
 
 
-    // This function is responsible for the logic of deleting the OldUploads files
-    public function deleteOldFile(int $oldUploadId)
-    {
-
-        $oldUpload      = $this->oldUploadRepository->findOneBy(['id' => $oldUploadId]);
-
-        $path = $oldUpload->getPath();
-        if (file_exists($path)) {
-            unlink($path);
-        }
-        $this->manager->remove($oldUpload);
-        $this->manager->flush();
-        return;
-    }
+   
 }
