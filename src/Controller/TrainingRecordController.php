@@ -18,8 +18,16 @@ class TrainingRecordController extends OperatorController
     {
 
         $this->logger->info('TrainingRecordController: deleteWeeksOldTrainingRecords', ['trainingRecordId' => $trainingRecordId]);
-        
-        $response = $this->trainingRecordService->deleteWeeksOldTrainingRecords($trainingRecordId);
+        if ($this->authChecker->isGranted('ROLE_MANAGER')) {
+            $response = $this->trainingRecordService->deleteWeeksOldTrainingRecords($trainingRecordId);
+        } else {
+            $this->addFlash(type: 'error', message: 'You are not authorized to delete training records');
+            return $this->redirectToRoute(route: 'app_render_training_records', parameters: [
+                'uploadId' => $uploadId,
+                'teamId' => $teamId,
+                'uapId' => $uapId,
+            ]);
+        }
 
         if ($response) {
             $this->addFlash(type: 'success', message: 'Training record deleted');
