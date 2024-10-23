@@ -15,7 +15,6 @@ use App\Repository\UploadRepository;
 
 use App\Entity\Upload;
 use App\Entity\User;
-use App\Entity\OldUpload;
 
 use App\Service\FolderCreationService;
 use App\Service\ValidationService;
@@ -31,7 +30,7 @@ class UploadService extends AbstractController
     protected $logger;
     protected $buttonRepository;
     protected $folderCreationService;
-    protected $validationService;
+    private $validationService;
     protected $oldUploadService;
     private $cacheService;
 
@@ -49,7 +48,7 @@ class UploadService extends AbstractController
     ) {
         $this->uploadRepository      = $uploadRepository;
         $this->manager               = $manager;
-        $this->projectDir            = $params->get('kernel.project_dir');
+        $this->projectDir            = $params->get(name: 'kernel.project_dir');
         $this->logger                = $logger;
         $this->buttonRepository      = $buttonRepository;
         $this->folderCreationService = $folderCreationService;
@@ -175,37 +174,7 @@ class UploadService extends AbstractController
     }
 
 
-    // This function is responsible for the logic of deleting the uploads files
-    public function deleteFile(int $uploadId)
-    {
-        $upload     = $this->uploadRepository->findOneBy(['id' => $uploadId]);
-        if ($upload->getOldUpload() != null) {
-            $oldUploadId = $upload->getOldUpload()->getId();
-            $this->oldUploadService->deleteOldFile($oldUploadId);
-        }
-        $filename   = $upload->getFilename();
-        $name       = $filename;
-        $public_dir = $this->projectDir . '/public';
-        $button     = $upload->getButton();
 
-        // Dynamic folder and file deletion
-        $buttonname = $button->getName();
-        $parts      = explode('.', $buttonname);
-        $parts      = array_reverse($parts);
-        $folderPath = $public_dir . '/doc';
-
-        foreach ($parts as $part) {
-            $folderPath .= '/' . $part;
-        }
-        $path = $folderPath . '/' . $filename;
-
-        if (file_exists($path)) {
-            unlink($path);
-        }
-        $this->manager->remove($upload);
-        $this->manager->flush();
-        return $name;
-    }
 
 
     // This function is responsible for the logic of modifying the uploads files
