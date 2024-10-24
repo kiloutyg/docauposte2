@@ -42,17 +42,6 @@ if [ "${ANSWER}" == "yes" ]; then
             [[ "$1" =~ [A-Z] ]]
         }
 
-        # Ask the user for its github token
-        # while true; do
-        #     read -p "Github Personal Access Token ( ):  " GITHUB_TOKEN;
-        #     if [ -z "${GITHUB_TOKEN}" ]
-        #     then
-        #         echo "The github token should not be empty. Please try again."
-        #     else
-        #         break
-        #     fi
-        # done
-
         # Install git and PlasticOmnium docker repo
         sudo yum-config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo;
 
@@ -73,9 +62,6 @@ if [ "${ANSWER}" == "yes" ]; then
         # Add the user to the docker group
         sudo groupadd docker;
         sudo usermod -aG docker $USER;
-
-        # Connect to the github docker registry
-        # docker login ghcr.io -u $GITHUB_USER -p $GITHUB_TOKEN;
 
         # Start docker and enable it inside a prompt with the docker group
         sg docker -c "
@@ -164,6 +150,12 @@ done
             if [ "${PODMAN}" == "no" ]; then
                 bash ./env_update_docker.sh ${GITHUB_USER};
                 sg docker -c "docker compose up --build -d"
+                # Wait until the webpack compiled successfully
+                until docker compose logs --since 10s --tail 10 web 2>&1 | grep -q "webpack compiled successfully"; do
+                    echo "Waiting for the webpack to be compiled" 
+                    sleep 10
+                done
+                echo "Docauposte2 updated successfully";
             else
                 bash ./env_update_podman.sh ${GITHUB_USER};
                 podman play kube --replace ./dap.yml;

@@ -193,16 +193,27 @@ if [ "${APP_CONTEXT_SH}" == "prod" ]
         GITHUB_USER=${GITHUB_USER}
         set +a
 
-        # Create docker-compose.override.yml file to use the good entrypoint
+        # Create app.yml file to use the template and the good variables
         envsubst < ./template.yml > ./dap.yml;
 
         podman play kube --replace ./dap.yml
 
-        sleep 180
 
+        # Wait until the container is listed as running
+        until [ "$(podman ps -q -f name=web-docauposte)" ]; do
+        echo "Waiting for container web-docauposte to start..."
+        sleep 1
+        done
+
+        # Wait until the webpack compiled successfully
+        until podman logs --since 10s --tail 10 web-docauposte 2>&1 | grep -q "webpack compiled successfully"; do
+        echo "Waiting for the webpack to be compiled" 
+        sleep 10
+        done
+        
         podman play kube --down ./dap.yml
 
-        sleep 60
+        sleep 30
 
         sed -i "s|^APP_ENV=dev.*|APP_ENV=prod|" .env
         APP_CONTEXT_SH="prod"
