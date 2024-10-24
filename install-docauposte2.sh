@@ -164,6 +164,12 @@ done
             if [ "${PODMAN}" == "no" ]; then
                 bash ./env_update_docker.sh ${GITHUB_USER};
                 sg docker -c "docker compose up --build -d"
+                # Wait until the webpack compiled successfully
+                until docker compose logs --since 10s --tail 10 web 2>&1 | grep -q "webpack compiled successfully"; do
+                    echo "Waiting for the webpack to be compiled" 
+                    sleep 10
+                done
+                echo "Docauposte2 updated successfully";
             else
                 bash ./env_update_podman.sh ${GITHUB_USER};
                 podman play kube --replace ./dap.yml;
