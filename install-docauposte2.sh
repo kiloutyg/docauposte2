@@ -140,10 +140,11 @@ done
             then
                 GIT_ADDRESS="https://github.com/${GITHUB_USER}/docauposte2"
             fi
+
             cd docauposte2;
 
             if [ "${PODMAN}" == "no" ]; then
-            sg docker -c "docker compose stop";
+                sg docker -c "docker compose stop";
                 sg docker -c "docker system prune -fa";
             else
                 podman play kube --down ./dap.yml;
@@ -151,8 +152,10 @@ done
             fi
 
             git remote remove origin;
+
             # Remove everything before https in the GIT_ADDRESS
             GIT_ADDRESS=$(echo ${GIT_ADDRESS} | sed 's|.*\(https\)|\1|')
+            
             git remote add origin ${GIT_ADDRESS};
             git fetch origin --force;
             git reset --hard origin/main;
