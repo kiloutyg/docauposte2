@@ -193,7 +193,7 @@ if [ "${APP_CONTEXT_SH}" == "prod" ]
         GITHUB_USER=${GITHUB_USER}
         set +a
 
-        # Create docker-compose.override.yml file to use the good entrypoint
+        # Create app.yml file to use the template and the good variables
         envsubst < ./template.yml > ./dap.yml;
 
         podman play kube --replace ./dap.yml
