@@ -152,7 +152,7 @@ done
                 sg docker -c "docker compose up --build -d"
                 # Wait until the webpack compiled successfully
                 until docker compose logs --since 10s --tail 10 web 2>&1 | grep -q "webpack compiled successfully"; do
-                    echo "Waiting for the webpack to be compiled" 
+                    echo "Waiting for the app to be updated" 
                     sleep 10
                 done
                 echo "Docauposte2 updated successfully";
@@ -161,7 +161,7 @@ done
                 podman play kube --replace ./dap.yml;
                 # Wait until the webpack compiled successfully
                 until podman logs --since 10s --tail 10 web-docauposte 2>&1 | grep -q "webpack compiled successfully"; do
-                echo "Waiting for the webpack to be compiled" 
+                echo "Waiting for the app to be updated" 
                 sleep 10
                 done
                 echo "Docauposte2 updated successfully";
