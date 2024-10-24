@@ -82,7 +82,7 @@ if [ "${PROXY_ANSWER}" == "yes" ]
         then
         PROXY_PORT="80"
       fi
-    HTTP_PROXY_ENV="      http_proxy: ${PROXY_ADDRESS}:${PROXY_PORT}"
+    PROXY_ENV="${PROXY_ADDRESS}:${PROXY_PORT}"
     PROXY_podmanFILE="ENV http_proxy=\'${PROXY_ADDRESS}:${PROXY_PORT}\'"
     sed -i "3s|.*|$PROXY_podmanFILE|" podman/podmanfile/podmanfile
 fi
