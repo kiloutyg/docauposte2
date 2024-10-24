@@ -11,16 +11,16 @@ is_FACILITY_name_valid() {
 }
 
 
-add_to_file() {
-    local file="$1"
-    local entry="$2"
-    if ! grep -q "^${entry}$" "$file"; then
-        echo "$entry" | tee -a "$file" > /dev/null
-        echo "Added $entry to $file"
-    else
-        echo "$entry already exists in $file"
-    fi
-}
+# add_to_file() {
+#     local file="$1"
+#     local entry="$2"
+#     if ! grep -q "^${entry}$" "$file"; then
+#         echo "$entry" | tee -a "$file" > /dev/null
+#         echo "Added $entry to $file"
+#     else
+#         echo "$entry already exists in $file"
+#     fi
+# }
 
 
 # Ask the name of the site or plant
@@ -95,10 +95,36 @@ sed -i "s|^APP_ENV=prod.*|APP_ENV=dev|" .env;
 sed -i "s|^# MAILER_DSN=.*|MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0|" .env;
 sed -i "s|^# MAILER_SENDER_EMAIL=.* |MAILER_SENDER_EMAIL=${PLANT_TRIGRAM}.docauposte@opmobility.com|" .env;
 
-add_to_file ".env" "HOSTNAME=${HOSTNAME}";
-add_to_file ".env" "PLANT_TRIGRAM=${PLANT_TRIGRAM}";
-add_to_file ".env" "GITHUB_USER=${GITHUB_USER}";
-add_to_file ".env" "FACILITY_NAME=${FACILITY_NAME}";
+# add_to_file ".env" "HOSTNAME=${HOSTNAME}";
+# add_to_file ".env" "PLANT_TRIGRAM=${PLANT_TRIGRAM}";
+# add_to_file ".env" "GITHUB_USER=${GITHUB_USER}";
+# add_to_file ".env" "FACILITY_NAME=${FACILITY_NAME}";
+
+
+variables=(
+    "HOSTNAME=${HOSTNAME}"
+    "PLANT_TRIGRAM=${PLANT_TRIGRAM}"
+    "GITHUB_USER=${GITHUB_USER}"
+    "FACILITY_NAME=${FACILITY_NAME}"
+)
+
+for var in "${variables[@]}"; do
+    key="${var%%=*}"
+    value="${var#*=}"
+
+    # Escape special characters for sed
+    escaped_key=$(printf '%s\n' "$key" | sed 's/[]\/$*.^|[]/\\&/g')
+    escaped_value=$(printf '%s\n' "$value" | sed 's/[\/&$*.^|]/\\&/g')
+
+    if grep -q "^${escaped_key}=" .env; then
+        sed -i "s|^${escaped_key}=.*|${escaped_key}=${escaped_value}|" .env
+        echo "Updated ${key} in .env"
+    else
+        sed -i "/^MYSQL_PASSWORD=/a\\
+${escaped_key}=${escaped_value}" .env
+        echo "Added ${key} to .env"
+    fi
+done
 
 
 cat > src/Kernel.php <<EOL
