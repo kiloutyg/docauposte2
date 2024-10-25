@@ -38,6 +38,7 @@ use App\Repository\TeamRepository;
 use App\Repository\OperatorRepository;
 use App\Repository\TrainingRecordRepository;
 use App\Repository\TrainerRepository;
+use App\Repository\SettingsRepository;
 
 // use App\Entity\Zone;
 // use App\Entity\ProductLine;
@@ -104,7 +105,7 @@ class BaseController extends AbstractController
     protected $operatorRepository;
     protected $trainingRecordRepository;
     protected $trainerRepository;
-
+    protected $settingsRepository;
     // Services methods
     protected $validationService;
     protected $incidentService;
@@ -139,6 +140,7 @@ class BaseController extends AbstractController
     protected $oldUploads;
     protected $trainingRecords;
     protected $trainers;
+    protected $settings;
 
 
     public function __construct(
@@ -170,6 +172,7 @@ class BaseController extends AbstractController
         OperatorRepository              $operatorRepository,
         TrainingRecordRepository        $trainingRecordRepository,
         TrainerRepository               $trainerRepository,
+        SettingsRepository              $settingsRepository,
         IncidentRepository              $incidentRepository,
 
 
@@ -221,6 +224,7 @@ class BaseController extends AbstractController
         $this->operatorRepository           = $operatorRepository;
         $this->trainingRecordRepository     = $trainingRecordRepository;
         $this->trainerRepository            = $trainerRepository;
+        $this->settingsRepository           = $settingsRepository;
 
         // Variables related to the services
         $this->mailerService                = $mailerService;
@@ -261,6 +265,7 @@ class BaseController extends AbstractController
             'approbations' => fn () => $this->approbationRepository->findAll(),
             'trainingRecords' => fn () => $this->trainingRecordRepository->findAll(),
             'trainers' => fn () => $this->trainerRepository->findAll(),
+            'settings' => fn () => $this->settingsRepository->findAll(),
         ];
 
         foreach ($variables as $key => $value) {
@@ -307,7 +312,7 @@ class BaseController extends AbstractController
             'approbations'          => $this->approbations,
             'trainingRecords'       => $this->trainingRecords,
             'trainers'              => $this->trainers,
-
+            'settings'              => $this->settings,
         ];
 
 

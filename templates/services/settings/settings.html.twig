@@ -1,0 +1,59 @@
+{% if is_granted('ROLE_SUPER_ADMIN') %}
+
+	<div
+		class="accordion-item">
+
+		<h2
+			class="accordion-header"
+			id="headingSettings">
+			<button
+				class="accordion-button fs-3 collapsed"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target="#collapseSettings"
+				aria-expanded="true"
+				aria-controls="collapseSettings">
+				<strong>
+					Formulaire de paramétrage :
+				</strong>
+			</button>
+		</h2>
+		<div
+			id="collapseSettings"
+			class="accordion-collapse collapse"
+			aria-labelledby="headingSettings"
+			data-bs-parent="#accordionSettings">
+			<div
+				class="accordion-body accordion-bg shadow shadow-inset">
+				<div
+					class="card border-0 shadow rounded-3 my-5">
+					<div
+						class="card-body">
+						<div
+							class="row">
+							<form
+								class="form-control"
+								method="POST"
+								action="{{ path('app_settings_update') }}">
+
+								<div
+									class="card border-0 shadow rounded-3 my-5  bg-secondary">
+									<div
+										class="card-body">
+										<div
+											class="row d-flex align-items-center gy-lg-0 gy-5">
+											{{form_start(settingsForm)}}
+											{{form_end(settingsForm)}}
+										</div>
+										<hr
+											class="my-4">
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endif %}

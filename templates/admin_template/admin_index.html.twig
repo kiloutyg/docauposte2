@@ -201,7 +201,7 @@
 		id="AccordionAdmin">
 
 		{% if pageLevel is same as('super')  %}
-
+			{{ render(controller('App\\Controller\\SettingsController::settingsIndex'), options = []) }}
 			{% include "admin_template/admin_template_component/zone_creation_form.html.twig" %}
 		{% elseif pageLevel is same as('zone') %}
 			{% include "admin_template/admin_template_component/line_creation_form.html.twig" %}
