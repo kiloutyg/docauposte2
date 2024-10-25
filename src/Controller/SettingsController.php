@@ -24,6 +24,10 @@ class SettingsController extends SuperAdminController
     {
         $settings = $this->settingsRepository->findOneBy(['id' => 1]);
 
+        if (!$settings) {
+            $settings = new Settings();
+        }
+
         $settingsForm = $this->createForm(SettingsType::class, $settings);
 
         return $this->render('services/settings/settings.html.twig', [
@@ -33,8 +37,27 @@ class SettingsController extends SuperAdminController
 
     // This function is responsible to pass the settings to the settingsService interface
     #[Route('/settings/update', name: 'app_settings_update')]
-    public function settingsUpdate(): Response
+    public function settingsUpdate(Request $request): Response
     {
+
+        $this->logger->info('Full request', [
+            'request' => $request->request->all()
+        ]);
+
+        $referer = $request->headers->get('referer');
+
+        if ($request->isMethod('POST')) {
+            try {
+                $this->settingsService->updateSettings($request);
+            } catch (\Exception $e) {
+                $this->logger->error('Error updating settings', [
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
+
+        return $this->redirect($referer);
+
     }
 
     // This function is responsible to communicate the settings to the Hotwired/Stimulus controllers

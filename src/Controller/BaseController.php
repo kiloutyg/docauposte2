@@ -65,6 +65,7 @@ use App\Service\TrainingRecordService;
 use App\Service\OperatorService;
 use App\Service\CacheService;
 use App\Service\PdfGeneratorService;
+use App\Service\SettingsService;
 
 #[Route('/', name: 'app_')]
 
@@ -121,7 +122,7 @@ class BaseController extends AbstractController
     protected $operatorService;
     protected $cacheService;
     protected $pdfGeneratorService;
-
+    protected $settingsService;
     // Variables used in the twig templates to display all the entities
     protected $departments;
     protected $zones;
@@ -190,7 +191,8 @@ class BaseController extends AbstractController
         TrainingRecordService           $trainingRecordService,
         OperatorService                 $operatorService,
         CacheService                    $cacheService,
-        PdfGeneratorService             $pdfGeneratorService
+        PdfGeneratorService             $pdfGeneratorService,
+        SettingsService                 $settingsService
 
     ) {
         $this->cache                        = $cache;
@@ -241,6 +243,7 @@ class BaseController extends AbstractController
         $this->operatorService              = $operatorService;
         $this->cacheService                 = $cacheService;
         $this->pdfGeneratorService          = $pdfGeneratorService;
+        $this->settingsService              = $settingsService;
 
         $this->cachingAppVariableAsArray();
         $this->cacheService->cachingAppVariable();

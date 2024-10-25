@@ -42,7 +42,20 @@
 										class="card-body">
 										<div
 											class="row d-flex align-items-center gy-lg-0 gy-5">
-											{{form_start(settingsForm)}}
+											{{form_start(settingsForm, {'attr': {'class': 'form-control', 'action' : path('app_settings_update')}})}}
+
+											{{form_row(settingsForm.ValidatorNumber)}}
+
+											{{form_row(settingsForm.Training)}}
+
+											{{form_row(settingsForm.AutoDisplayIncident)}}
+
+											{{form_row(settingsForm.AutoDisplayIncidentTimer)}}
+
+											{{form_row(settingsForm.AutoDeleteOperatorDelay)}}
+
+											{{form_row(settingsForm.submit)}}
+
 											{{form_end(settingsForm)}}
 										</div>
 										<hr
