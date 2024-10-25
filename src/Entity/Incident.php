@@ -48,6 +48,12 @@ class Incident
     #[ORM\ManyToOne(inversedBy: 'incidents')]
     private ?User $Uploader = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $ActivateAutoDisplay = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $AutoDisplayPriority = null;
+
     #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
 
     public function setFile(?File $file = null): void
@@ -150,6 +156,30 @@ class Incident
     public function setUploader(?User $Uploader): static
     {
         $this->Uploader = $Uploader;
+
+        return $this;
+    }
+
+    public function isActivateAutoDisplay(): ?bool
+    {
+        return $this->ActivateAutoDisplay;
+    }
+
+    public function setActivateAutoDisplay(?bool $ActivateAutoDisplay): static
+    {
+        $this->ActivateAutoDisplay = $ActivateAutoDisplay;
+
+        return $this;
+    }
+
+    public function getAutoDisplayPriority(): ?int
+    {
+        return $this->AutoDisplayPriority;
+    }
+
+    public function setAutoDisplayPriority(?int $AutoDisplayPriority): static
+    {
+        $this->AutoDisplayPriority = $AutoDisplayPriority;
 
         return $this;
     }
