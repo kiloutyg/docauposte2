@@ -15,6 +15,9 @@ class Settings
     private ?int $id = null;
 
     #[ORM\Column(nullable: true)]
+    private ?bool $UploadValidation = null;
+
+    #[ORM\Column(nullable: true)]
     private ?int $ValidatorNumber = null;
 
     #[ORM\Column(nullable: true)]
@@ -23,15 +26,27 @@ class Settings
     #[ORM\Column(nullable: true)]
     private ?bool $AutoDisplayIncident = null;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $AutoDisplayIncidentTimer = null;
+    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
+    private ?\DateInterval $AutoDisplayIncidentTimer = null;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $AutoDeleteOperatorDelay = null;
+    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
+    private ?\DateInterval $AutoDeleteOperatorDelay = null;
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function isUploadValidation(): ?bool
+    {
+        return $this->UploadValidation;
+    }
+
+    public function setUploadValidation(?bool $UploadValidation): static
+    {
+        $this->UploadValidation = $UploadValidation;
+
+        return $this;
     }
 
     public function getValidatorNumber(): ?int
@@ -70,27 +85,28 @@ class Settings
         return $this;
     }
 
-    public function getAutoDisplayIncidentTimer(): ?\DateTimeInterface
+    public function getAutoDisplayIncidentTimer(): ?\DateInterval
     {
         return $this->AutoDisplayIncidentTimer;
     }
 
-    public function setAutoDisplayIncidentTimer(?\DateTimeInterface $AutoDisplayIncidentTimer): static
+    public function setAutoDisplayIncidentTimer(?\DateInterval $AutoDisplayIncidentTimer): static
     {
         $this->AutoDisplayIncidentTimer = $AutoDisplayIncidentTimer;
 
         return $this;
     }
 
-    public function getAutoDeleteOperatorDelay(): ?\DateTimeInterface
+    public function getAutoDeleteOperatorDelay(): ?\DateInterval
     {
         return $this->AutoDeleteOperatorDelay;
     }
 
-    public function setAutoDeleteOperatorDelay(?\DateTimeInterface $AutoDeleteOperatorDelay): static
+    public function setAutoDeleteOperatorDelay(?\DateInterval $AutoDeleteOperatorDelay): static
     {
         $this->AutoDeleteOperatorDelay = $AutoDeleteOperatorDelay;
 
         return $this;
     }
+
 }

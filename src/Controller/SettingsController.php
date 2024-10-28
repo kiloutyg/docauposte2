@@ -10,8 +10,6 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 use App\Entity\Settings;
 
-use App\Form\SettingsType;
-
 
 #[Route('/super_admin')]
 // This controller is responsible for rendering the settings interface an managing the logic of the settings interface
@@ -22,14 +20,8 @@ class SettingsController extends SuperAdminController
     #[Route('/settings', name: 'app_settings')]
     public function settingsIndex(): Response
     {
-        $settings = $this->settingsRepository->findOneBy(['id' => 1]);
-
-        if (!$settings) {
-            $settings = new Settings();
-        }
-
-        $settingsForm = $this->createForm(SettingsType::class, $settings);
-
+        $settingsForm = $this->settingsService->getSettingsFrom();
+        
         return $this->render('services/settings/settings.html.twig', [
             'settingsForm' => $settingsForm->createView()
         ]);
@@ -40,15 +32,16 @@ class SettingsController extends SuperAdminController
     public function settingsUpdate(Request $request): Response
     {
 
-        $this->logger->info('Full request', [
-            'request' => $request->request->all()
-        ]);
+        // $this->logger->info('Full request', [
+        //     'request' => $request->request->all()
+        // ]);
 
         $referer = $request->headers->get('referer');
 
         if ($request->isMethod('POST')) {
             try {
                 $this->settingsService->updateSettings($request);
+
             } catch (\Exception $e) {
                 $this->logger->error('Error updating settings', [
                     'error' => $e->getMessage()

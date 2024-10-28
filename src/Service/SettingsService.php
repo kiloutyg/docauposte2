@@ -5,6 +5,8 @@ namespace App\Service;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use Symfony\Component\Form\FormInterface;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
@@ -13,6 +15,7 @@ use App\Entity\Settings;
 
 use App\Repository\SettingsRepository;
 
+use App\Form\SettingsType;
 
 class SettingsService extends AbstractController
 {
@@ -34,56 +37,54 @@ class SettingsService extends AbstractController
         $this->settingsRepository = $settingsRepository;
     }
 
+    // This function is responsible for getting the settings from the database and creating a form
+    public function getSettingsFrom(): FormInterface
+    {
+
+        $settingsEntity = $this->settingsRepository->findOneBy(['id' => 1]);
+
+        if ($settingsEntity === null) {
+            $settingsEntity = new Settings();
+        }
+
+        $settingsForm = $this->createForm(SettingsType::class, $settingsEntity);
+
+        return $settingsForm;
+    }
+
+    // This function is responsible for getting all the settings from the database
     protected function getSettings(): array
     {
         return $this->settingsRepository->findAll();
     }
 
+
+    // This function is responsible for updating the settings in the database
     public function updateSettings(Request $request): void
-{        
-    $this->logger->info('Update settings service', [
-        'request' => $request->request->all()
-    ]);
+    {        
+        // $this->logger->info('Update settings service', [
+        //     'request' => $request->request->all()
+        // ]);
 
-    $settingsEntity = $this->settingsRepository->findOneBy(['id' => 1]);
+        $settingsEntity = $this->settingsRepository->findOneBy(['id' => 1]);
 
-    if ($settingsEntity === null) {
-        $settingsEntity = new Settings();
+        if ($settingsEntity === null) {
+            $settingsEntity = new Settings();
+        }
+
+        $settingsForm = $this->createForm(SettingsType::class, $settingsEntity);
+
+        $settingsForm->handleRequest($request);
+
+        if ($settingsForm->isSubmitted() && $settingsForm->isValid()) {
+            $settingsEntity = $settingsForm->getData();
+        }
+
+        // $this->logger->info('Settings updated', [
+        //     'settingsEntity' => $settingsEntity
+        // ]);
+
+        $this->em->persist($settingsEntity);
+        $this->em->flush();
     }
-
-    $allRequest = $request->request->all();
-    $settings = $allRequest['settings'] ?? [];
-
-    $validatorNumber = $settings['ValidatorNumber'] ?? null;
-    $training = $settings['Training'] ?? null;
-    $autoDisplayIncident = $settings['AutoDisplayIncident'] ?? null;
-
-    $autoDisplayIncidentTimerInHours = $settings['AutoDisplayIncidentTimer']['hour'] ?? 0;
-    $autoDisplayIncidentTimerInMinutes = $settings['AutoDisplayIncidentTimer']['minute'] ?? 0;
-
-    $autoDeleteOperatorDelayInMonths = $settings['AutoDeleteOperatorDelay'] ?? null;
-
-    $autoDisplayIncidentTimer = new \DateTime();
-    $autoDisplayIncidentTimer->setTime($autoDisplayIncidentTimerInHours, $autoDisplayIncidentTimerInMinutes, 0);
-
-    $autoDeleteOperatorDelay = new \DateTime();
-    $autoDeleteOperatorDelay->modify('-' . $autoDeleteOperatorDelayInMonths . ' months');
-
-    $this->logger->info('Settings updated', [
-        'validatorNumber' => $validatorNumber,
-        'training' => $training,
-        'autoDisplayIncident' => $autoDisplayIncident,
-        'autoDisplayIncidentTimer' => $autoDisplayIncidentTimer,
-        'autoDeleteOperatorDelay' => $autoDeleteOperatorDelay,
-    ]);
-
-    $settingsEntity->setValidatorNumber($validatorNumber);
-    $settingsEntity->setTraining($training);
-    $settingsEntity->setAutoDisplayIncident($autoDisplayIncident);
-    $settingsEntity->setAutoDisplayIncidentTimer($autoDisplayIncidentTimer);
-    $settingsEntity->setAutoDeleteOperatorDelay($autoDeleteOperatorDelay);
-    
-    $this->em->persist($settingsEntity);
-    $this->em->flush();
-}
 }
