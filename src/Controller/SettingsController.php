@@ -20,7 +20,7 @@ class SettingsController extends SuperAdminController
     #[Route('/settings', name: 'app_settings')]
     public function settingsIndex(): Response
     {
-        $settingsForm = $this->settingsService->getSettingsFrom();
+        $settingsForm = $this->settingsService->getSettingsForm();
         
         return $this->render('services/settings/settings.html.twig', [
             'settingsForm' => $settingsForm->createView()

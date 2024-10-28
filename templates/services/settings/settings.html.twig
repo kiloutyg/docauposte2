@@ -22,47 +22,75 @@
 			id="collapseSettings"
 			class="accordion-collapse collapse"
 			aria-labelledby="headingSettings"
-			data-bs-parent="#accordionSettings">
+			data-bs-parent="#accordionAdmin">
 			<div
 				class="accordion-body accordion-bg shadow shadow-inset">
 				<div
 					class="card border-0 shadow rounded-3 my-5">
 					<div
 						class="card-body">
+
 						<div
-							class="row">
-							<form
-								class="form-control"
-								method="POST"
-								action="{{ path('app_settings_update') }}">
+							class="card border-0 shadow rounded-3 my-5  mx-auto  bg-secondary">
+							<div
+								class="card-body">
 
-								<div
-									class="card border-0 shadow rounded-3 my-5  bg-secondary">
-									<div
-										class="card-body">
-										<div
-											class="row d-flex align-items-center gy-lg-0 gy-5">
-											{{form_start(settingsForm, {'attr': {'class': 'form-control', 'action' : path('app_settings_update')}})}}
+								{{ form_start(settingsForm, {'attr': {'class': 'd-flex flex-column justify-content-center', 'id': 'settingsForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_settings_update')}) }}
+									<hr
+										class="my-4">
 
-											{{form_row(settingsForm.ValidatorNumber)}}
+									<h2 style="color: white;">Paramètres de la validation</h2>
 
-											{{form_row(settingsForm.Training)}}
-
-											{{form_row(settingsForm.AutoDisplayIncident)}}
-
-											{{form_row(settingsForm.AutoDisplayIncidentTimer)}}
-
-											{{form_row(settingsForm.AutoDeleteOperatorDelay)}}
-
-											{{form_row(settingsForm.submit)}}
-
-											{{form_end(settingsForm)}}
+									<div class=" d-flex justify-content-around mb-3">
+										<div class="col-4">
+											{{ form_label(settingsForm.UploadValidation, 'Validation des fichiers chargés: ', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
+											{{form_widget(settingsForm.UploadValidation) }}
 										</div>
-										<hr
-											class="my-4">
+										
+										<div class="col-4">
+											<label style="color: white;">Nombre de validateurs: </label> {{ form_widget(settingsForm.ValidatorNumber, {'attr' : {'class' : 'align-self-end'}}) }}
+										</div>
 									</div>
-								</div>
-							</form>
+
+									<hr
+										class="my-4">
+
+									<h2 style="color: white;">Paramètres des Incidents</h2>
+
+									<div class=" d-flex justify-content-around mb-3 flex-wrap">
+										<div class="col-4">
+											<label style="color: white;">Affichage automatique des incidents: </label> {{ form_widget(settingsForm.AutoDisplayIncident) }}
+										</div>
+										<div class="col-4">
+											<label style="color: white;">Délai d'affichage automatique des incidents: </label> {{ form_widget(settingsForm.AutoDisplayIncidentTimer, {'attr' : {'class' : 'align-self-end'}}) }}
+										</div>
+									</div>
+
+									<hr
+										class="my-4">
+
+									<h2 style="color: white;">Paramètres des Opérateurs</h2>
+
+									<div
+										class=" d-flex justify-content-around mb-3 flex-wrap">
+										<div class="col-4">
+											<label style="color: white;">Activation des signatures Opérateur: </label> {{ form_widget(settingsForm.Training) }}
+										</div>
+										<div class="col-4">
+											<label style="color: white;">Délai de suppression automatique des opérateurs après inactivité: </label> {{ form_widget(settingsForm.AutoDeleteOperatorDelay, {'attr' : {'class' : 'align-self-end'}}) }}
+										</div>
+										<div class="col-4">
+											<label style="color: white;">Délai de déqualification des opérateurs : </label> {{ form_widget(settingsForm.OperatorRetrainingDelay, {'attr' : {'class' : 'align-self-end'}}) }}
+										</div>
+									</div>			
+
+									<hr
+										class="my-4">
+									{{ form_widget(settingsForm.submit, {'attr': {'class': 'btn btn-primary mb-5 mx-auto submit-settings-modification'}}) }}
+
+								{{ form_end(settingsForm) }}
+
+							</div>
 						</div>
 					</div>
 				</div>

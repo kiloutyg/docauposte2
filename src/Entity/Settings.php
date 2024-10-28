@@ -9,11 +9,16 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: SettingsRepository::class)]
 class Settings
 {
+    // #[ORM\Id]
+    // #[ORM\GeneratedValue]
+    // #[ORM\Column]
+    // private ?int $id = null;
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
+    // Remove the GeneratedValue attribute to set the ID manually
+    // #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = 1;
+    
     #[ORM\Column(nullable: true)]
     private ?bool $UploadValidation = null;
 
@@ -30,7 +35,15 @@ class Settings
     private ?\DateInterval $AutoDisplayIncidentTimer = null;
 
     #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
+    private ?\DateInterval $OperatorRetrainingDelay = null;
+
+    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
     private ?\DateInterval $AutoDeleteOperatorDelay = null;
+
+    public function __construct()
+    {
+        $this->id = 1;
+    }
 
     public function getId(): ?int
     {
@@ -93,6 +106,18 @@ class Settings
     public function setAutoDisplayIncidentTimer(?\DateInterval $AutoDisplayIncidentTimer): static
     {
         $this->AutoDisplayIncidentTimer = $AutoDisplayIncidentTimer;
+
+        return $this;
+    }
+
+    public function getOperatorRetrainingDelay(): ?\DateInterval
+    {
+        return $this->OperatorRetrainingDelay;
+    }
+
+    public function setOperatorRetrainingDelay(?\DateInterval $OperatorRetrainingDelay): static
+    {
+        $this->OperatorRetrainingDelay = $OperatorRetrainingDelay;
 
         return $this;
     }

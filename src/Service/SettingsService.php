@@ -38,14 +38,10 @@ class SettingsService extends AbstractController
     }
 
     // This function is responsible for getting the settings from the database and creating a form
-    public function getSettingsFrom(): FormInterface
+    public function getSettingsForm(): FormInterface
     {
 
-        $settingsEntity = $this->settingsRepository->findOneBy(['id' => 1]);
-
-        if ($settingsEntity === null) {
-            $settingsEntity = new Settings();
-        }
+        $settingsEntity = $this->getSettings();
 
         $settingsForm = $this->createForm(SettingsType::class, $settingsEntity);
 
@@ -53,9 +49,15 @@ class SettingsService extends AbstractController
     }
 
     // This function is responsible for getting all the settings from the database
-    protected function getSettings(): array
+    protected function getSettings(): Settings
     {
-        return $this->settingsRepository->findAll();
+        $settingsEntity = $this->settingsRepository->getSettings();
+
+        if (!$settingsEntity) {
+            $settingsEntity = new Settings();
+        }
+
+        return $settingsEntity;    
     }
 
 
@@ -66,11 +68,7 @@ class SettingsService extends AbstractController
         //     'request' => $request->request->all()
         // ]);
 
-        $settingsEntity = $this->settingsRepository->findOneBy(['id' => 1]);
-
-        if ($settingsEntity === null) {
-            $settingsEntity = new Settings();
-        }
+        $settingsEntity = $this->getSettings();
 
         $settingsForm = $this->createForm(SettingsType::class, $settingsEntity);
 

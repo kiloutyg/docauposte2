@@ -16,6 +16,11 @@ class SettingsRepository extends ServiceEntityRepository
         parent::__construct($registry, Settings::class);
     }
 
+    public function getSettings(): ?Settings
+    {
+        return $this->find(1);
+    }
+    
     //    /**
     //     * @return Settings[] Returns an array of Settings objects
     //     */

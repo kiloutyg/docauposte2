@@ -12,10 +12,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 
 class SettingsType extends AbstractType
 {
@@ -25,112 +23,69 @@ class SettingsType extends AbstractType
 
             ->add('UploadValidation', CheckboxType::class, [
                 'required' => false,
-                'row_attr' => [
-                    'class' => ''
-                ],
-                'label_attr' => [
-                    'class' => 'mb-4',
-                ],
-                'label' => 'Validation des fichiers chargés',
-                'attr' => [
-                    'class' => 'training-toggle-input',
-                ],
+                'label' => 'stuff',
+                'attr' => ['class' => 'pretty-toggle'],
             ])
-
             ->add('ValidatorNumber', ChoiceType::class, [
-                'choices' => [
-                    '1' => 1,
-                    '2' => 2,
-                    '3' => 3,
-                    '4' => 4,
-                    '5' => 5,
-                    '6' => 6,
-                    '7' => 7,
-                    '8' => 8,
-                    '9' => 9,
-                    '10' => 10,
-                ],
-                'row_attr' => [
-                    'class' => ''
-                ],
-                'label_attr' => [
-                    'class' => 'mb-4',
-                ],
-                'label' => 'Nombre de validateurs',
-            ])
-
-            ->add('Training', CheckboxType::class, [
-                'required' => false,
-                'row_attr' => [
-                    'class' => ''
-                ],
-                'label_attr' => [
-                    'class' => 'mb-4',
-                ],
-                'label' => 'Signature Operateur',
-                'attr' => [
-                    'class' => 'training-toggle-input',
-                ],
+                'required' => true,
+                'choices' => array_combine(range(1, 10), range(1, 10)),
+                'label' => false,
+                'placeholder' => 'Sélectionner le nombre de validateurs',
             ])
 
             ->add('AutoDisplayIncident', CheckboxType::class, [
                 'required' => false,
-                'row_attr' => [
-                    'class' => ''
-                ],
-                'label_attr' => [
-                    'class' => 'mb-4',
-                ],
-                'label' => 'Affichage automatique des incidents/alertes',
-                'attr' => [
-                    'class' => 'training-toggle-input',
-                ],
-            ])
-
+                'label' => false,
+                'attr' => ['class' => 'pretty-toggle'],
+                ])
             ->add('AutoDisplayIncidentTimer', DateIntervalType::class, [
-                'required' => false,
-                'placeholder' => 'Select time interval',
-                'attr' => [],
-                'row_attr' => [
-                    'class' => ''
-                ],
-                'label_attr' => [
-                    'class' => 'mb-4',
-                ],
-                'label' => 'Delai d\'affichage automatique des incidents/alertes',
-                'input' => 'dateinterval',
-                'widget' => 'choice',
-                'with_years'  => false,
+                'required' => true,
+                'label' => false,
+                'labels' => [
+                    'minutes' => false,
+                ],                 
+                'with_years' => false,
                 'with_months' => false,
-                'with_days'   => false,
-                'with_hours'  => false,
+                'with_days' => false,
                 'with_minutes' => true,
-                'with_seconds' => false,
+                'placeholder' => 'Sélectionner le délai en minutes',
             ])
 
-            ->add('AutoDeleteOperatorDelay', DateIntervalType::class, [
-                'required'    => false,
-                'placeholder' => 'Select number of months',
-                'row_attr' => [
-                    'class' => ''
-                ],
-                'label_attr' => [
-                    'class' => 'mb-4',
-                ],
-                'label' => 'Delai de suppression automatique des opérateurs aprés inactivité',
-                'input' => 'dateinterval',
-                'widget' => 'choice',
-                'with_years'  => false,
-                'with_months' => true,
-                'with_days'   => false,
-                'with_hours'  => false,
-                'with_minutes' => false,
-                'with_seconds' => false,
+            ->add('Training', CheckboxType::class, [
+                'required' => false,
+                'label' => false,
+                'attr' => ['class' => 'pretty-toggle'],
             ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Enregistrer',
+            ->add('OperatorRetrainingDelay', DateIntervalType::class, [
+                'required' => true,
+                'label' => false,
+                'labels' => [
+                    'months' => false,
+                ], 
+                'with_years' => false,
+                'with_months' => true,
+                'with_days' => false,
+                'with_minutes' => false,
+                'placeholder' => 'Sélectionner le délai en mois',
+            ])
+            ->add('AutoDeleteOperatorDelay', DateIntervalType::class, [
+                'required' => true,
+                'label' => false,
+                'labels' => [
+                    'months' => false,
+                ], 
+               'with_years' => false,
+                'with_months' => true,
+                'with_days' => false,
+                'with_minutes' => false,
+                'placeholder' => 'Sélectionner le délai en mois',
             ])
         ;
+
+        // Submit Button
+        $builder->add('submit', SubmitType::class, [
+            'label' => 'Enregistrer',
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
