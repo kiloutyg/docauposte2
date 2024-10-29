@@ -100,89 +100,79 @@ let buttonIdFromServer = null;
 					</h1>
 				</a>
 				{% if app.user is not null %}
-					<div
-						class=" d-flex flex-column dropdown justify-content-center">
-						{% set inValidations = [] %}
-						{% set DisapprovedFile = [] %}
-						{% set DisplayedFiles = [] %}
+					{% if settings.UploadValidation is same as(true) %}
+						<div
+							class=" d-flex flex-column dropdown justify-content-center">
+							{% set inValidations = [] %}
+							{% set DisapprovedFile = [] %}
+							{% set DisplayedFiles = [] %}
 
-						{% for upload in app.user.uploads %}
-							{% if upload.isValidated is same as(null) %}
-								{% set inValidations = inValidations|merge([upload]) %}
-							{% endif %}
-							{% if upload.isValidated is same as(false) %}
-								{% set DisapprovedFile = DisapprovedFile|merge([upload]) %}
-							{% endif %}
-						{% endfor %}
-						{% if inValidations|length > 0 %}
-							<button
-								class="btn dropdown-toggle"
-								style="background-color:#007AFF; color:white"
-								type="button"
-								data-bs-toggle="dropdown"
-								aria-expanded="false">
+							{% for upload in app.user.uploads %}
+								{% if upload.isValidated is same as(null) %}
+									{% set inValidations = inValidations|merge([upload]) %}
+								{% endif %}
+								{% if upload.isValidated is same as(false) %}
+									{% set DisapprovedFile = DisapprovedFile|merge([upload]) %}
+								{% endif %}
+							{% endfor %}
+							{% if inValidations|length > 0 %}
+								<button
+									class="btn dropdown-toggle"
+									style="background-color:#007AFF; color:white"
+									type="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false">
 								<span
 									class="badge bg-danger rounded-pill">
 									{{ inValidations|length }}
 								</span>
-								Documents en cours de validation
-							</button>
-							<ul
-								class="dropdown-menu dropdown-menu-start shadow shadow-inset"
-								aria-labelledby="dropdownMenuButton1">
-								{% for upload in inValidations %}
-									{% if upload.isValidated is same as(null) %}
+									Documents en cours de validation
+								</button>
+								<ul
+									class="dropdown-menu dropdown-menu-start shadow shadow-inset"
+									aria-labelledby="dropdownMenuButton1">
+									{% for upload in inValidations %}
+										{% if upload.isValidated is same as(null) %}
+											<li>
+												<a
+													href="{{ path('app_modify_file', {'uploadId': upload.id})}}" class="dropdown-item shadow ">
+													{{ upload.filename|upper }}
+												</a>
+											</li>
+										{% endif %}
+									{% endfor %}
+								</ul>
+							{% endif %}
+							{% if DisapprovedFile|length > 0 %}
+								<button
+									class="btn dropdown-toggle"
+									style="background-color:#007AFF; color:white"
+									type="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false">
+									<span
+										class="badge bg-danger rounded-pill">
+										{{ DisapprovedFile|length }}
+									</span>
+									Documents refusés
+								</button>
+								<ul
+									class="dropdown-menu dropdown-menu-start shadow shadow-inset"
+									aria-labelledby="dropdownMenuButton1">
+									{% for upload in DisapprovedFile %}
+
 										<li>
 											<a
-												href="{{ path('app_modify_file', {'uploadId': upload.id})}}" class="dropdown-item shadow ">
+												href="{{ path('app_validation_disapproved_modify_by_upload', {'uploadId': upload.id})}}" class="dropdown-item shadow ">
 												{{ upload.filename|upper }}
 											</a>
 										</li>
-									{% endif %}
-								{% endfor %}
-							</ul>
-						{% endif %}
-						{% if DisapprovedFile|length > 0 %}
-							<button
-								class="btn dropdown-toggle"
-								style="background-color:#007AFF; color:white"
-								type="button"
-								data-bs-toggle="dropdown"
-								aria-expanded="false">
-								<span
-									class="badge bg-danger rounded-pill">
-									{{ DisapprovedFile|length }}
-								</span>
-								Documents refusés
-							</button>
-							<ul
-								class="dropdown-menu dropdown-menu-start shadow shadow-inset"
-								aria-labelledby="dropdownMenuButton1">
-								{# {% for upload in DisapprovedFile %}
-																	{% for approbation in upload.validation.approbations %}
-																		{% if approbation.isApproval is same as(false) %}
-																			<li>
-																				<a
-																					href="{{ path('app_validation_disapproved_modify', {'approbationId': approbation.id})}}" class="dropdown-item shadow ">
-																					{{ upload.filename|upper }}
-																				</a>
-																			</li>
-																		{% endif %}
-																	{% endfor %}
-																{% endfor %} #}
-								{% for upload in DisapprovedFile %}
 
-									<li>
-										<a
-											href="{{ path('app_validation_disapproved_modify_by_upload', {'uploadId': upload.id})}}" class="dropdown-item shadow ">
-											{{ upload.filename|upper }}
-										</a>
-									</li>
-
-								{% endfor %}
-							</ul>
-						{% endif %}
-					</div>
+									{% endfor %}
+								</ul>
+							{% endif %}
+						</div>
+					{% endif %}
 				{% endif %}
 				<div
 					class="ms-auto d-flex align-items-center">
@@ -258,6 +248,9 @@ let buttonIdFromServer = null;
 		<div
 			class="container flex-grow-1 d-flex flex-column">
 			{% include "services/navbarservices/navbarservices.html.twig" %}
+
+			{{dump(settings)}}
+
 			{% block body %}
 				<div
 					class="inner-container flex-grow-1 d-flex flex-column">
@@ -290,6 +283,7 @@ let buttonIdFromServer = null;
 							</strong>
 						</h1>
 					</p>
+									
 					<h3
 						class="text-justify flex-shrink-0">
 						<strong>

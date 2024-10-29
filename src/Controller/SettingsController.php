@@ -40,12 +40,15 @@ class SettingsController extends SuperAdminController
 
         if ($request->isMethod('POST')) {
             try {
-                $this->settingsService->updateSettings($request);
-
+                $response = $this->settingsService->updateSettings($request);
+                if ($response) {
+                    $this->addFlash('success', 'Paramètres mis à jour avec succès');
+                }
             } catch (\Exception $e) {
                 $this->logger->error('Error updating settings', [
                     'error' => $e->getMessage()
                 ]);
+                    $this->addFlash('error', 'Erreur lors de la mise à jour des paramètres' . $e->getMessage());
             }
         }
 

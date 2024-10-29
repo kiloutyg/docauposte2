@@ -247,6 +247,17 @@ class BaseController extends AbstractController
 
         $this->cachingAppVariableAsArray();
         $this->cacheService->cachingAppVariable();
+        $this->cachingSettings();
+    }
+
+    public function cachingSettings()
+    {
+        $this->settings = $this->cache->get("settings_cache_array", function (ItemInterface $item) {
+            $item->tag("settings_tag_array");
+            // $item->expiresAfter(43200);
+            $item->expiresAfter(60);
+            return $this->settingsRepository->getSettings();
+        });
     }
 
     public function cachingAppVariableAsArray()
@@ -268,7 +279,6 @@ class BaseController extends AbstractController
             'approbations' => fn () => $this->approbationRepository->findAll(),
             'trainingRecords' => fn () => $this->trainingRecordRepository->findAll(),
             'trainers' => fn () => $this->trainerRepository->findAll(),
-            'settings' => fn () => $this->settingsRepository->findAll(),
         ];
 
         foreach ($variables as $key => $value) {
@@ -276,7 +286,6 @@ class BaseController extends AbstractController
                 $this->$key = $this->cache->get("{$key}_cache_array", function (ItemInterface $item) use ($value, $key) {
                     $item->tag(["{$key}_tag_array"]);
                     $item->expiresAfter(43200); // Cache for 12 hours
-                    // $item->expiresAfter(60); // Cache for 12 hours
                     return $value();
                 });
             } catch (\Exception $e) {
@@ -293,6 +302,9 @@ class BaseController extends AbstractController
             $this->cache->delete("{$key}_cache_array");
         }
         $this->cachingAppVariableAsArray();
+        
+        $this->cache->delete("settings_cache_array");
+        $this->cachingSettings();
     }
 
 

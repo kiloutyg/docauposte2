@@ -20,9 +20,11 @@ class FrontController extends BaseController
     #[Route('/', name: 'base')]
     public function base(): Response
     {
-        if ($this->validationRepository->findAll() != null) {
-        $this->validationService->remindCheck($this->users);
+
+        if ($this->settings->isUploadValidation() && $this->validationRepository->findAll() != null) {
+            $this->validationService->remindCheck($this->users);
         }
+        
         if ($this->departmentRepository->findAll() == null) {
             $Department = new Department();
             $Department->setName('I.T.');
@@ -48,7 +50,7 @@ class FrontController extends BaseController
         );
     }
     #[Route('/cache', name: 'cache')]
-    public function resetCache(): Response
+    public function resetCache(Request $request): Response
     {
         $this->clearAndRebuildCachesArrays();
         $this->cacheService->clearAndRebuildCaches();

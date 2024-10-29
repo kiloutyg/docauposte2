@@ -6,38 +6,66 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+
 use Symfony\Component\Routing\RouterInterface;
 
+use Symfony\Contracts\Cache\CacheInterface;
+
 use Symfony\Bundle\SecurityBundle\Security;
+
+use App\Controller\BaseController;
 
 use App\Repository\ApprobationRepository;
 use App\Repository\UserRepository;
 use App\Repository\UploadRepository;
 
+use App\Service\CacheService;
+
 
 class RedirectSubscriber implements EventSubscriberInterface
 {
     private $router;
+
+    private $cache;
+
     private $security;
+
     private $approbationRepository;
     private $userRepository;
     private $uploadRepository;
+    private $cacheService;
 
     public function __construct(
         RouterInterface $router,
+
+        CacheInterface $cache,
+        
         Security $security,
+
         ApprobationRepository $approbationRepository,
         UserRepository $userRepository,
-        UploadRepository $uploadRepository
+        UploadRepository $uploadRepository,
+        CacheService $cacheService
     ) {
         $this->router = $router;
+
+        $this->cache = $cache;
+        
         $this->security = $security;
+
         $this->approbationRepository = $approbationRepository;
         $this->userRepository = $userRepository;
         $this->uploadRepository = $uploadRepository;
+        $this->cacheService = $cacheService;
     }
+    
     public function approbationOnKernelRequest(RequestEvent $event): void
     {
+
+        if (!$this->cacheService->settings->isUploadValidation()) { 
+            return;
+        }
+
         // Get the current user
         $currentUser = $this->security->getUser();
 
@@ -81,6 +109,10 @@ class RedirectSubscriber implements EventSubscriberInterface
 
     public function reviseApprobationOnKernelRequest(RequestEvent $event): void
     {
+        if (!$this->cacheService->settings->isUploadValidation()) { 
+            return;
+        }
+
         // Get the current user
         $currentUser = $this->security->getUser();
 

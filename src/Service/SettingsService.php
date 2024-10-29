@@ -62,7 +62,7 @@ class SettingsService extends AbstractController
 
 
     // This function is responsible for updating the settings in the database
-    public function updateSettings(Request $request): void
+    public function updateSettings(Request $request): Response
     {        
         // $this->logger->info('Update settings service', [
         //     'request' => $request->request->all()
@@ -82,7 +82,19 @@ class SettingsService extends AbstractController
         //     'settingsEntity' => $settingsEntity
         // ]);
 
-        $this->em->persist($settingsEntity);
-        $this->em->flush();
+        $response = '';
+
+
+        try {
+            $this->em->persist($settingsEntity);
+            $this->em->flush();
+            $response = true;
+        } catch (\Exception $e) {
+            $this->logger->error('Error updating settings', [
+                'error' => $e->getMessage()
+            ]);
+            $response = $e->getMessage();
+        }
+        return new Response($response);
     }
 }
