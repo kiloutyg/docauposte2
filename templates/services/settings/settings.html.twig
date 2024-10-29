@@ -14,7 +14,7 @@
 				aria-expanded="true"
 				aria-controls="collapseSettings">
 				<strong>
-					Formulaire de paramétrage :
+					Formulaire de paramétrage de l'application :
 				</strong>
 			</button>
 		</h2>
@@ -34,35 +34,52 @@
 							class="card border-0 shadow rounded-3 my-5  mx-auto  bg-secondary">
 							<div
 								class="card-body">
+								{% form_theme settingsForm.settingsDateInterval 'bootstrap_5_layout.html.twig' %}
+                                {{ form_start(settingsForm, {
+                                    'attr': {
+                                        'class': 'd-flex flex-column justify-content-center',
+                                        'id': 'settingsForm',
+                                        'method' : 'POST',
+                                        'enctype': 'multipart/form-data'
+                                    },
+                                    'action': path('app_settings_update')
+                                }) }}
+                                    <hr class="my-4">
 
-								{{ form_start(settingsForm, {'attr': {'class': 'd-flex flex-column justify-content-center', 'id': 'settingsForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_settings_update')}) }}
-									<hr
-										class="my-4">
+                                    <h2 style="color: white;">Paramètres de la validation</h2>
 
-									<h2 style="color: white;">Paramètres de la validation</h2>
-
-									<div class=" d-flex justify-content-around mb-3">
-										<div class="col-4">
-											{{ form_label(settingsForm.UploadValidation, 'Validation des fichiers chargés: ', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}) }}
-											{{form_widget(settingsForm.UploadValidation) }}
-										</div>
-										
-										<div class="col-4">
-											<label style="color: white;">Nombre de validateurs: </label> {{ form_widget(settingsForm.ValidatorNumber, {'attr' : {'class' : 'align-self-end'}}) }}
-										</div>
-									</div>
+                                    <div class="d-flex flex-wrap justify-content-around<">
+                                        <div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
+                                            {{ form_label(settingsForm.UploadValidation, 'Validation des fichiers chargés:', {
+                                                'label_attr': {'class': 'text-white m-0'}
+                                            }) }}
+                                            {{ form_widget(settingsForm.UploadValidation) }}
+                                        </div>
+                                        <div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
+                                            {{ form_label(settingsForm.ValidatorNumber, 'Nombre de validateurs:', {
+                                                'label_attr': {'class': 'text-white m-0'}
+                                            }) }}
+                                            {{ form_widget(settingsForm.ValidatorNumber) }}
+                                        </div>
+                                    </div>
 
 									<hr
 										class="my-4">
 
 									<h2 style="color: white;">Paramètres des Incidents</h2>
 
-									<div class=" d-flex justify-content-around mb-3 flex-wrap">
-										<div class="col-4">
-											<label style="color: white;">Affichage automatique des incidents: </label> {{ form_widget(settingsForm.AutoDisplayIncident) }}
+									<div class=" d-flex justify-content-around flex-wrap">
+										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
+                                            {{ form_label(settingsForm.AutoDisplayIncident, 'Affichage automatique des incidents:', {
+                                                'label_attr': {'class': 'text-white m-0'}
+                                            }) }}
+                                            {{ form_widget(settingsForm.AutoDisplayIncident) }}										
 										</div>
-										<div class="col-4">
-											<label style="color: white;">Délai d'affichage automatique des incidents: </label> {{ form_widget(settingsForm.AutoDisplayIncidentTimer, {'attr' : {'class' : 'align-self-end'}}) }}
+										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
+                                   			{{ form_label(settingsForm.settingsDateInterval.AutoDisplayIncidentTimer, 'Délai d\'affichage automatique des incidents:', {
+                                                'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary text-white m-0'}
+                                            }) }}
+                                            {{ form_widget(settingsForm.settingsDateInterval.AutoDisplayIncidentTimer) }}										
 										</div>
 									</div>
 
@@ -72,21 +89,30 @@
 									<h2 style="color: white;">Paramètres des Opérateurs</h2>
 
 									<div
-										class=" d-flex justify-content-around mb-3 flex-wrap">
-										<div class="col-4">
-											<label style="color: white;">Activation des signatures Opérateur: </label> {{ form_widget(settingsForm.Training) }}
+										class=" d-flex justify-content-around flex-wrap">
+										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
+                                       		{{ form_label(settingsForm.Training, 'Activation des signatures Opérateur:', {
+                                                'label_attr': {'class': 'text-white m-0'}
+                                            }) }}
+                                            {{ form_widget(settingsForm.Training) }}										
 										</div>
-										<div class="col-4">
-											<label style="color: white;">Délai de suppression automatique des opérateurs après inactivité: </label> {{ form_widget(settingsForm.AutoDeleteOperatorDelay, {'attr' : {'class' : 'align-self-end'}}) }}
+										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
+                                            {{ form_label(settingsForm.settingsDateInterval.AutoDeleteOperatorDelay, 'Délai de suppression automatique des opérateurs après inactivité:', {
+                                                'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary text-white m-0'}
+                                            }) }}
+                                            {{ form_widget(settingsForm.settingsDateInterval.AutoDeleteOperatorDelay) }}										
 										</div>
-										<div class="col-4">
-											<label style="color: white;">Délai de déqualification des opérateurs : </label> {{ form_widget(settingsForm.OperatorRetrainingDelay, {'attr' : {'class' : 'align-self-end'}}) }}
+										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
+                                            {{ form_label(settingsForm.settingsDateInterval.OperatorRetrainingDelay, 'Délai de déqualification des opérateurs:', {
+                                                'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary  text-white m-0'}
+                                            }) }}
+                                            {{ form_widget(settingsForm.settingsDateInterval.OperatorRetrainingDelay) }}										
 										</div>
 									</div>			
 
 									<hr
 										class="my-4">
-									{{ form_widget(settingsForm.submit, {'attr': {'class': 'btn btn-primary mb-5 mx-auto submit-settings-modification'}}) }}
+									{{ form_widget(settingsForm.submit, {'attr': {'class': 'btn btn-primary mx-auto submit-settings-modification'}}) }}
 
 								{{ form_end(settingsForm) }}
 

@@ -517,7 +517,10 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
     aspect-ratio: 2.25;
     border-radius: var(--s);
     margin: calc(var(--s)/2);
-    display: grid;
+    display: inline-grid;
+    /* Change from 'grid' to 'inline-grid' */
+    vertical-align: middle;
+    /* Aligns toggle vertically with text */
     cursor: pointer;
     background-color: #ff7a7a;
     box-sizing: content-box;
