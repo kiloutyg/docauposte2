@@ -80,7 +80,7 @@ let buttonIdFromServer = null;
 			class="navbar navbar-expand-lg navbar-dark flex-shrink-0"
 			style="background-color: #1f3e52">
 			<div
-				class="container d-flex flex-column flex-lg-row align-items-end">
+				class="container d-flex  align-items-end">
 				<a
 					class="navbar-brand mb-lg-0"
 					href="{{ path('app_base') }}">
@@ -122,10 +122,10 @@ let buttonIdFromServer = null;
 									type="button"
 									data-bs-toggle="dropdown"
 									aria-expanded="false">
-								<span
-									class="badge bg-danger rounded-pill">
-									{{ inValidations|length }}
-								</span>
+									<span
+										class="badge bg-danger rounded-pill">
+										{{ inValidations|length }}
+									</span>
 									Documents en cours de validation
 								</button>
 								<ul
@@ -176,42 +176,42 @@ let buttonIdFromServer = null;
 				{% endif %}
 				<div
 					class="ms-auto d-flex align-items-center">
-				{% if users is defined %}
-					{% if users is empty %}
-					
-					{% else %}
-							{% if app.user is null %}
-								<p>
-									<a
-										class="btn btn-primary"
-										href="{{ path('app_login') }}">
-										Connexion
-									</a>
-								</p>
+					{% if users is defined %}
+						{% if users is empty %}
+
 							{% else %}
-								<p
-									class="d-flex align-items-center">
-									<strong
-										class="me-2">
-										{{ app.user.username|capitalize|split('.')|first }}
-										{{ app.user.username|upper|split('.')|last }}
-									</strong>
-									<a
-										class="btn btn-primary"
-										href="{{ path('app_logout') }}">
-										Déconnexion
-									</a>
-								</p>
-								<div
-									style="width: 10px"></div>
-								<p>
-									<a
-										class="btn btn-outline-info"
-										href="{{path('app_tutorial')}}">
-										TUTO
-									</a>
-								</p>
-							{% endif %}
+								{% if app.user is null %}
+									<p>
+										<a
+											class="btn btn-primary"
+											href="{{ path('app_login') }}">
+											Connexion
+										</a>
+									</p>
+								{% else %}
+									<p
+										class="d-flex align-items-center">
+										<strong
+											class="ms-2 me-2">
+											{{ app.user.username|capitalize|split('.')|first }}
+											{{ app.user.username|upper|split('.')|last }}
+										</strong>
+										<a
+											class="btn btn-primary"
+											href="{{ path('app_logout') }}">
+											Déconnexion
+										</a>
+									</p>
+									<div
+										style="width: 10px"></div>
+									<p>
+										<a
+											class="btn btn-outline-info"
+											href="{{path('app_tutorial')}}">
+											TUTO
+										</a>
+									</p>
+								{% endif %}
 						{% endif %}
 					{% endif %}
 
@@ -219,10 +219,11 @@ let buttonIdFromServer = null;
 			</div>
 		</nav>
 		<!-- End Main Navigation -->
-		<div
-			class="container ">
-			{% if users is defined %}
-				{% if users is empty %}
+		{% if users is defined %}
+			{% if users is empty %}
+				<div
+					class="container ">
+
 					<h5
 						class="my-5">
 						<strong>
@@ -242,9 +243,10 @@ let buttonIdFromServer = null;
 							</div>
 						</div>
 					</div>
-				{% endif %}
+
+				</div>
 			{% endif %}
-		</div>
+		{% endif %}
 		<div
 			class="container flex-grow-1 d-flex flex-column">
 			{% include "services/navbarservices/navbarservices.html.twig" %}
@@ -283,7 +285,7 @@ let buttonIdFromServer = null;
 							</strong>
 						</h1>
 					</p>
-									
+
 					<h3
 						class="text-justify flex-shrink-0">
 						<strong>
@@ -330,7 +332,8 @@ let buttonIdFromServer = null;
 						href="http://topnet.corp.ponet/"
 						style="color: #25a1dd"
 						class="mb-3  mb-md-0 text-decoration-none lh-1">
-						OPmobility {{ facilityName|capitalize }}
+						OPmobility
+						{{ facilityName|capitalize }}
 					</a>
 				</div>
 				<div>

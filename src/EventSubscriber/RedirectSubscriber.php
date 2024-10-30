@@ -129,24 +129,6 @@ class RedirectSubscriber implements EventSubscriberInterface
 
             // Iterate over each disapproved upload
             foreach ($disapprovedUploadsbyUser as $upload) {
-                // // Get the validation id of the upload
-                // $validationId = $upload->getValidation()->getId();
-
-                // // Find the disapproval object based on the validation id and Approval value being false
-                // $disapproval = $this->approbationRepository->findOneBy(['Validation' => $validationId, 'Approval' => false]);
-
-                // // If no disapproval is found, break the iteration
-                // if ($disapproval === null) {
-                //     break;
-                // }
-
-                // // Get the disapproval id
-                // $disapprovalId = $disapproval->getId();
-
-                // // Redirect to the 'app_validation_disapproved_modify' route with the disapproval id as parameter
-                // $event->setResponse(new RedirectResponse($this->router->generate('app_validation_disapproved_modify', [
-                //     'approbationId' => $disapprovalId,
-                // ])));
 
                 $event->setResponse(new RedirectResponse($this->router->generate(
                     'app_validation_disapproved_modify_by_upload',

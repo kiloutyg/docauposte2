@@ -156,9 +156,6 @@ class ValidationController extends FrontController
     #[Route('/validation/disapproved/modifyByUpload/{uploadId}', name: 'app_validation_disapproved_modify_by_upload')]
     public function disapprovedValidationModificationByUpload(int $uploadId = null, Request $request): Response
     {
-        // $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
-        // $validation  = $approbation->getValidation();
-        // $upload      = $validation->getUpload();
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $validation = $upload->getValidation();
 
@@ -175,7 +172,6 @@ class ValidationController extends FrontController
         $form = $this->createForm(UploadType::class, $upload, [
             'current_user_id'        => $user->getId(),
             'current_upload_id'      => $upload->getId(),
-            // 'current_approbation_id' => $approbationId,
         ]);
 
         $form->remove('approbator');
@@ -193,7 +189,6 @@ class ValidationController extends FrontController
         }
         if ($validation->isStatus() === false) {
             return $this->render('services/validation/disapprovedModificationByUpload.html.twig', [
-                // 'approbation'  => $approbation,
                 'upload'       => $upload,
                 'user'         => $this->getUser(),
                 'form'         => $form->createView(),

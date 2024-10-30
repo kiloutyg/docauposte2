@@ -38,6 +38,7 @@ class CacheService
     // Repositories
     private array $repositories;
     private array $repositoriesArray;
+    private $settingsRepository;
 
     private LoggerInterface $logger;
 
@@ -143,8 +144,7 @@ class CacheService
     {
         $this->settings = $this->cache->get("settings_cache", function (ItemInterface $item) {
             $item->tag("settings_tag");
-            // $item->expiresAfter(43200);
-            $item->expiresAfter(60);
+            $item->expiresAfter(43200);
             return $this->settingsRepository->getSettings();
         });
     }
@@ -156,7 +156,7 @@ class CacheService
                 if ($key === 'settings') {
                     $this->cacheServiceCachingSettings();
                     continue;
-                } 
+                }
                 $this->{$key} = new ArrayCollection($this->cache->get("{$key}_cache", function (ItemInterface $item) use ($repository, $key) {
                     $item->tag(["{$key}_tag"]);
                     $item->expiresAfter(43200); // Cache for 12 hours

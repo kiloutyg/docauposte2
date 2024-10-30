@@ -24,7 +24,7 @@ class FrontController extends BaseController
         if ($this->settings->isUploadValidation() && $this->validationRepository->findAll() != null) {
             $this->validationService->remindCheck($this->users);
         }
-        
+
         if ($this->departmentRepository->findAll() == null) {
             $Department = new Department();
             $Department->setName('I.T.');
@@ -32,7 +32,7 @@ class FrontController extends BaseController
             $this->em->flush();
         }
 
-        if ($this->authChecker->isGranted('ROLE_MANAGER')) {
+        if ($this->settings->isTraining() && $this->authChecker->isGranted('ROLE_MANAGER')) {
             $countArray = $this->operatorService->operatorCheckForAutoDelete();
             if ($countArray != null) {
                 $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
