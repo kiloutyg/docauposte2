@@ -462,14 +462,14 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
     position: relative;
     /* les .tooltips deviennent référents */
     cursor: help;
+    /* Rounded corners */
     border-radius: 50%;
 }
 
-/* on génère un élément :after lors du survol et du focus :*/
-
+/* Generate ::after pseudo-element on hover and focus */
 .tooltips:hover::after,
 .tooltips:focus::after {
-
+    /* Display the content of the aria-label attribute */
     content: attr(aria-label);
     /* on affiche aria-label */
     position: absolute;
@@ -480,7 +480,7 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
     z-index: 1;
     /* pour s'afficher au dessus des éléments en position relative */
     white-space: nowrap;
-    /* on interdit le retour à la ligne*/
+    /* Allow text to wrap */
     padding: 5px 14px;
     background: #413219;
     color: #fff;

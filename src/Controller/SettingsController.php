@@ -21,7 +21,7 @@ class SettingsController extends SuperAdminController
     public function settingsIndex(): Response
     {
         $settingsForm = $this->settingsService->getSettingsForm();
-        
+
         return $this->render('services/settings/settings.html.twig', [
             'settingsForm' => $settingsForm->createView()
         ]);
@@ -48,17 +48,16 @@ class SettingsController extends SuperAdminController
                 $this->logger->error('Error updating settings', [
                     'error' => $e->getMessage()
                 ]);
-                    $this->addFlash('error', 'Erreur lors de la mise à jour des paramètres' . $e->getMessage());
+                $this->addFlash('error', 'Erreur lors de la mise à jour des paramètres' . $e->getMessage());
             }
         }
 
         return $this->redirect($referer);
-
     }
 
     // This function is responsible to communicate the settings to the Hotwired/Stimulus controllers
-    #[Route('/settings/get', name: 'app_settings_get')]
-    public function settingsGet(): JsonResponse
-    {
-    }
+    // #[Route('/settings/get', name: 'app_settings_get')]
+    // public function settingsGet(): JsonResponse
+    // {
+    // }
 }

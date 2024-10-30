@@ -143,7 +143,7 @@ class BaseController extends AbstractController
     protected $trainers;
     protected $settings;
 
-
+    
     public function __construct(
 
         TagAwareCacheInterface          $cache,
@@ -252,10 +252,10 @@ class BaseController extends AbstractController
 
     public function cachingSettings()
     {
-        $this->settings = $this->cache->get("settings_cache_array", function (ItemInterface $item) {
-            $item->tag("settings_tag_array");
-            // $item->expiresAfter(43200);
-            $item->expiresAfter(60);
+        $this->settings = $this->cache->get("settings_cache_base", function (ItemInterface $item) {
+            $item->tag("settings_tag_base");
+            $item->expiresAfter(43200);
+            // $item->expiresAfter(60);
             return $this->settingsRepository->getSettings();
         });
     }
@@ -263,22 +263,22 @@ class BaseController extends AbstractController
     public function cachingAppVariableAsArray()
     {
         $variables = [
-            'zones' => fn () => $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']),
-            'productLines' => fn () => $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']),
-            'categories' => fn () => $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']),
-            'buttons' => fn () => $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']),
-            'users' => fn () => $this->userRepository->findAll(),
-            'uploads' => fn () => $this->uploadRepository->findAll(),
-            'incidents' => fn () => $this->incidentRepository->findAll(),
-            'incidentCategories' => fn () => $this->incidentCategoryRepository->findAll(),
-            'departments' => fn () => $this->departmentRepository->findAll(),
-            'validations' => fn () => $this->validationRepository->findAll(),
-            'teams' => fn () => $this->teamRepository->findAll(),
-            'uaps' => fn () => $this->uapRepository->findAll(),
-            'operators' => fn () => $this->operatorRepository->findAllOrdered(),
-            'approbations' => fn () => $this->approbationRepository->findAll(),
-            'trainingRecords' => fn () => $this->trainingRecordRepository->findAll(),
-            'trainers' => fn () => $this->trainerRepository->findAll(),
+            'zones' => fn() => $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']),
+            'productLines' => fn() => $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']),
+            'categories' => fn() => $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']),
+            'buttons' => fn() => $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']),
+            'users' => fn() => $this->userRepository->findAll(),
+            'uploads' => fn() => $this->uploadRepository->findAll(),
+            'incidents' => fn() => $this->incidentRepository->findAll(),
+            'incidentCategories' => fn() => $this->incidentCategoryRepository->findAll(),
+            'departments' => fn() => $this->departmentRepository->findAll(),
+            'validations' => fn() => $this->validationRepository->findAll(),
+            'teams' => fn() => $this->teamRepository->findAll(),
+            'uaps' => fn() => $this->uapRepository->findAll(),
+            'operators' => fn() => $this->operatorRepository->findAllOrdered(),
+            'approbations' => fn() => $this->approbationRepository->findAll(),
+            'trainingRecords' => fn() => $this->trainingRecordRepository->findAll(),
+            'trainers' => fn() => $this->trainerRepository->findAll(),
         ];
 
         foreach ($variables as $key => $value) {
@@ -302,8 +302,8 @@ class BaseController extends AbstractController
             $this->cache->delete("{$key}_cache_array");
         }
         $this->cachingAppVariableAsArray();
-        
-        $this->cache->delete("settings_cache_array");
+
+        $this->cache->delete("settings_cache_base");
         $this->cachingSettings();
     }
 
