@@ -197,11 +197,11 @@
 
 
 	<div
-		class="accordion"
+		class="accordion mb-5"
 		id="AccordionAdmin">
 
 		{% if pageLevel is same as('super')  %}
-
+			{{ render(controller('App\\Controller\\SettingsController::settingsIndex'), options = []) }}
 			{% include "admin_template/admin_template_component/zone_creation_form.html.twig" %}
 		{% elseif pageLevel is same as('zone') %}
 			{% include "admin_template/admin_template_component/line_creation_form.html.twig" %}
@@ -216,8 +216,9 @@
 
 		{% include "services/accountservices/create_account.html.twig" %}
 
-
-		{{ render(controller('App\\Controller\\OperatorController::operatorManagement'), options = []) }}
+		{% if settings.IsTraining %}
+			{{ render(controller('App\\Controller\\OperatorController::operatorManagement'), options = []) }}
+		{% endif %}
 
 
 		{% include "services/uploads/upload.html.twig" %}
@@ -228,8 +229,9 @@
 
 		{% include "services/uploads/uploaded_list.html.twig" %}
 
-
-		{% include "services/validation/validation_list.html.twig" %}
+		{% if settings.IsUploadValidation %}
+			{% include "services/validation/validation_list.html.twig" %}
+		{% endif %}
 
 	</div>
 {% endblock %}

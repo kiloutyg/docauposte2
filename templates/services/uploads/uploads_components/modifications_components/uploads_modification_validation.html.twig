@@ -5,7 +5,7 @@
 		class="accordion-item">
 		<div
 			class="accordion-header tooltips"
-			aria-label="Ouvrez ce menu pour activer la validation de document, fermez le pour la désactiver. ATTENTION : Si le document a déjà nécessité une validation il n'est pas nécessaire de sélectionner à nouveau les validateurs."
+			aria-label="ATTENTION : N'utilisez qu'en cas de changement de validateur."
 			id="validatorNeeded-header">
 			{% if upload.validation is null %}
 				<input
@@ -34,7 +34,6 @@
 				<strong>
 					Validation du Document
 				</strong>
-
 			</label>
 		</div>
 		<div

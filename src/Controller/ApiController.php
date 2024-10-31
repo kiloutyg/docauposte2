@@ -189,4 +189,30 @@ class ApiController extends FrontController
 
         return new JsonResponse($responseData);
     }
+
+
+
+    #[Route('/api/settings', name: 'api_settings_data')]
+    public function getSettings(): JsonResponse
+    {
+        // Fetch entity categories data to let the cascading dropdown access it
+
+
+
+        $uploadValidation = $this->settings->isUploadValidation();
+        $validatorNumber = $this->settings->getValidatorNumber();
+        $training = $this->settings->isTraining();
+        $operatorRetrainingDelay = $this->settings->getOperatorRetrainingDelay();
+        $autoDeleteOperatorDelay = $this->settings->getAutoDeleteOperatorDelay();
+
+        $responseData = [
+            'uploadValidation' => $uploadValidation,
+            'validatorNumber' => $validatorNumber,
+            'training' => $training,
+            'operatorRetrainingDelay' => $operatorRetrainingDelay,
+            'autoDeleteOperatorDelay' => $autoDeleteOperatorDelay
+        ];
+
+        return new JsonResponse($responseData);
+    }
 }

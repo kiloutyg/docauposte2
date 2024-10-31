@@ -38,6 +38,7 @@ use App\Repository\TeamRepository;
 use App\Repository\OperatorRepository;
 use App\Repository\TrainingRecordRepository;
 use App\Repository\TrainerRepository;
+use App\Repository\SettingsRepository;
 
 // use App\Entity\Zone;
 // use App\Entity\ProductLine;
@@ -64,6 +65,7 @@ use App\Service\TrainingRecordService;
 use App\Service\OperatorService;
 use App\Service\CacheService;
 use App\Service\PdfGeneratorService;
+use App\Service\SettingsService;
 
 #[Route('/', name: 'app_')]
 
@@ -104,7 +106,7 @@ class BaseController extends AbstractController
     protected $operatorRepository;
     protected $trainingRecordRepository;
     protected $trainerRepository;
-
+    protected $settingsRepository;
     // Services methods
     protected $validationService;
     protected $incidentService;
@@ -120,7 +122,7 @@ class BaseController extends AbstractController
     protected $operatorService;
     protected $cacheService;
     protected $pdfGeneratorService;
-
+    protected $settingsService;
     // Variables used in the twig templates to display all the entities
     protected $departments;
     protected $zones;
@@ -139,8 +141,9 @@ class BaseController extends AbstractController
     protected $oldUploads;
     protected $trainingRecords;
     protected $trainers;
+    protected $settings;
 
-
+    
     public function __construct(
 
         TagAwareCacheInterface          $cache,
@@ -170,6 +173,7 @@ class BaseController extends AbstractController
         OperatorRepository              $operatorRepository,
         TrainingRecordRepository        $trainingRecordRepository,
         TrainerRepository               $trainerRepository,
+        SettingsRepository              $settingsRepository,
         IncidentRepository              $incidentRepository,
 
 
@@ -187,7 +191,8 @@ class BaseController extends AbstractController
         TrainingRecordService           $trainingRecordService,
         OperatorService                 $operatorService,
         CacheService                    $cacheService,
-        PdfGeneratorService             $pdfGeneratorService
+        PdfGeneratorService             $pdfGeneratorService,
+        SettingsService                 $settingsService
 
     ) {
         $this->cache                        = $cache;
@@ -221,6 +226,7 @@ class BaseController extends AbstractController
         $this->operatorRepository           = $operatorRepository;
         $this->trainingRecordRepository     = $trainingRecordRepository;
         $this->trainerRepository            = $trainerRepository;
+        $this->settingsRepository           = $settingsRepository;
 
         // Variables related to the services
         $this->mailerService                = $mailerService;
@@ -237,30 +243,42 @@ class BaseController extends AbstractController
         $this->operatorService              = $operatorService;
         $this->cacheService                 = $cacheService;
         $this->pdfGeneratorService          = $pdfGeneratorService;
+        $this->settingsService              = $settingsService;
 
         $this->cachingAppVariableAsArray();
         $this->cacheService->cachingAppVariable();
+        $this->cachingSettings();
+    }
+
+    public function cachingSettings()
+    {
+        $this->settings = $this->cache->get("settings_cache_base", function (ItemInterface $item) {
+            $item->tag("settings_tag_base");
+            $item->expiresAfter(43200);
+            // $item->expiresAfter(60);
+            return $this->settingsRepository->getSettings();
+        });
     }
 
     public function cachingAppVariableAsArray()
     {
         $variables = [
-            'zones' => fn () => $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']),
-            'productLines' => fn () => $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']),
-            'categories' => fn () => $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']),
-            'buttons' => fn () => $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']),
-            'users' => fn () => $this->userRepository->findAll(),
-            'uploads' => fn () => $this->uploadRepository->findAll(),
-            'incidents' => fn () => $this->incidentRepository->findAll(),
-            'incidentCategories' => fn () => $this->incidentCategoryRepository->findAll(),
-            'departments' => fn () => $this->departmentRepository->findAll(),
-            'validations' => fn () => $this->validationRepository->findAll(),
-            'teams' => fn () => $this->teamRepository->findAll(),
-            'uaps' => fn () => $this->uapRepository->findAll(),
-            'operators' => fn () => $this->operatorRepository->findAllOrdered(),
-            'approbations' => fn () => $this->approbationRepository->findAll(),
-            'trainingRecords' => fn () => $this->trainingRecordRepository->findAll(),
-            'trainers' => fn () => $this->trainerRepository->findAll(),
+            'zones' => fn() => $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']),
+            'productLines' => fn() => $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']),
+            'categories' => fn() => $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']),
+            'buttons' => fn() => $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']),
+            'users' => fn() => $this->userRepository->findAll(),
+            'uploads' => fn() => $this->uploadRepository->findAll(),
+            'incidents' => fn() => $this->incidentRepository->findAll(),
+            'incidentCategories' => fn() => $this->incidentCategoryRepository->findAll(),
+            'departments' => fn() => $this->departmentRepository->findAll(),
+            'validations' => fn() => $this->validationRepository->findAll(),
+            'teams' => fn() => $this->teamRepository->findAll(),
+            'uaps' => fn() => $this->uapRepository->findAll(),
+            'operators' => fn() => $this->operatorRepository->findAllOrdered(),
+            'approbations' => fn() => $this->approbationRepository->findAll(),
+            'trainingRecords' => fn() => $this->trainingRecordRepository->findAll(),
+            'trainers' => fn() => $this->trainerRepository->findAll(),
         ];
 
         foreach ($variables as $key => $value) {
@@ -268,7 +286,6 @@ class BaseController extends AbstractController
                 $this->$key = $this->cache->get("{$key}_cache_array", function (ItemInterface $item) use ($value, $key) {
                     $item->tag(["{$key}_tag_array"]);
                     $item->expiresAfter(43200); // Cache for 12 hours
-                    // $item->expiresAfter(60); // Cache for 12 hours
                     return $value();
                 });
             } catch (\Exception $e) {
@@ -285,6 +302,9 @@ class BaseController extends AbstractController
             $this->cache->delete("{$key}_cache_array");
         }
         $this->cachingAppVariableAsArray();
+
+        $this->cache->delete("settings_cache_base");
+        $this->cachingSettings();
     }
 
 
@@ -307,7 +327,7 @@ class BaseController extends AbstractController
             'approbations'          => $this->approbations,
             'trainingRecords'       => $this->trainingRecords,
             'trainers'              => $this->trainers,
-
+            'settings'              => $this->settings,
         ];
 
 

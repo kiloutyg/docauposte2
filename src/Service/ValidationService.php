@@ -140,7 +140,7 @@ class ValidationService extends AbstractController
 
     public function updateValidation(Upload $upload, Request $request)
     {
-        $this->logger->info('updateValidation in validationService: upload: ' . $upload->getId() . ' request: ' . $request->request->all());
+        // $this->logger->info('updateValidation in validationService: upload: ' . $upload->getId() . ' request: ' . $request->request->all());
 
 
         // Get the Validation instance associated with the Upload instance
@@ -317,7 +317,7 @@ class ValidationService extends AbstractController
     // This method will also activate the notification email to the uploader
     public function updateValidationAndUploadStatus(Validation $validation, ?bool $status)
     {
-        $this->logger->info('updateValidationAndUploadStatus: ' . $validation->getId() . ' status: ' . $status);
+        // $this->logger->info('updateValidationAndUploadStatus: ' . $validation->getId() . ' status: ' . $status);
 
         if ($validation->isStatus() === false) {
             return;
@@ -425,7 +425,7 @@ class ValidationService extends AbstractController
         // Flush changes to the database
         $this->em->flush();
 
-        $this->logger->info('display-needed: ' . $request->request->get('display-needed') . ' training-needed: ' . $request->request->get('training-needed'));
+        // $this->logger->info('display-needed: ' . $request->request->get('display-needed') . ' training-needed: ' . $request->request->get('training-needed'));
 
         if ($request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
             $this->TrainingRecordService->updateTrainingRecord($upload);

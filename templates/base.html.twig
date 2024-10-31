@@ -80,7 +80,7 @@ let buttonIdFromServer = null;
 			class="navbar navbar-expand-lg navbar-dark flex-shrink-0"
 			style="background-color: #1f3e52">
 			<div
-				class="container d-flex flex-column flex-lg-row align-items-end">
+				class="container d-flex  align-items-end">
 				<a
 					class="navbar-brand mb-lg-0"
 					href="{{ path('app_base') }}">
@@ -100,128 +100,118 @@ let buttonIdFromServer = null;
 					</h1>
 				</a>
 				{% if app.user is not null %}
-					<div
-						class=" d-flex flex-column dropdown justify-content-center">
-						{% set inValidations = [] %}
-						{% set DisapprovedFile = [] %}
-						{% set DisplayedFiles = [] %}
+					{% if settings.UploadValidation is same as(true) %}
+						<div
+							class=" d-flex flex-column dropdown justify-content-center">
+							{% set inValidations = [] %}
+							{% set DisapprovedFile = [] %}
+							{% set DisplayedFiles = [] %}
 
-						{% for upload in app.user.uploads %}
-							{% if upload.isValidated is same as(null) %}
-								{% set inValidations = inValidations|merge([upload]) %}
+							{% for upload in app.user.uploads %}
+								{% if upload.isValidated is same as(null) %}
+									{% set inValidations = inValidations|merge([upload]) %}
+								{% endif %}
+								{% if upload.isValidated is same as(false) %}
+									{% set DisapprovedFile = DisapprovedFile|merge([upload]) %}
+								{% endif %}
+							{% endfor %}
+							{% if inValidations|length > 0 %}
+								<button
+									class="btn dropdown-toggle"
+									style="background-color:#007AFF; color:white"
+									type="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false">
+									<span
+										class="badge bg-danger rounded-pill">
+										{{ inValidations|length }}
+									</span>
+									Documents en cours de validation
+								</button>
+								<ul
+									class="dropdown-menu dropdown-menu-start shadow shadow-inset"
+									aria-labelledby="dropdownMenuButton1">
+									{% for upload in inValidations %}
+										{% if upload.isValidated is same as(null) %}
+											<li>
+												<a
+													href="{{ path('app_modify_file', {'uploadId': upload.id})}}" class="dropdown-item shadow ">
+													{{ upload.filename|upper }}
+												</a>
+											</li>
+										{% endif %}
+									{% endfor %}
+								</ul>
 							{% endif %}
-							{% if upload.isValidated is same as(false) %}
-								{% set DisapprovedFile = DisapprovedFile|merge([upload]) %}
-							{% endif %}
-						{% endfor %}
-						{% if inValidations|length > 0 %}
-							<button
-								class="btn dropdown-toggle"
-								style="background-color:#007AFF; color:white"
-								type="button"
-								data-bs-toggle="dropdown"
-								aria-expanded="false">
-								<span
-									class="badge bg-danger rounded-pill">
-									{{ inValidations|length }}
-								</span>
-								Documents en cours de validation
-							</button>
-							<ul
-								class="dropdown-menu dropdown-menu-start shadow shadow-inset"
-								aria-labelledby="dropdownMenuButton1">
-								{% for upload in inValidations %}
-									{% if upload.isValidated is same as(null) %}
+							{% if DisapprovedFile|length > 0 %}
+								<button
+									class="btn dropdown-toggle"
+									style="background-color:#007AFF; color:white"
+									type="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false">
+									<span
+										class="badge bg-danger rounded-pill">
+										{{ DisapprovedFile|length }}
+									</span>
+									Documents refusés
+								</button>
+								<ul
+									class="dropdown-menu dropdown-menu-start shadow shadow-inset"
+									aria-labelledby="dropdownMenuButton1">
+									{% for upload in DisapprovedFile %}
+
 										<li>
 											<a
-												href="{{ path('app_modify_file', {'uploadId': upload.id})}}" class="dropdown-item shadow ">
+												href="{{ path('app_validation_disapproved_modify_by_upload', {'uploadId': upload.id})}}" class="dropdown-item shadow ">
 												{{ upload.filename|upper }}
 											</a>
 										</li>
-									{% endif %}
-								{% endfor %}
-							</ul>
-						{% endif %}
-						{% if DisapprovedFile|length > 0 %}
-							<button
-								class="btn dropdown-toggle"
-								style="background-color:#007AFF; color:white"
-								type="button"
-								data-bs-toggle="dropdown"
-								aria-expanded="false">
-								<span
-									class="badge bg-danger rounded-pill">
-									{{ DisapprovedFile|length }}
-								</span>
-								Documents refusés
-							</button>
-							<ul
-								class="dropdown-menu dropdown-menu-start shadow shadow-inset"
-								aria-labelledby="dropdownMenuButton1">
-								{# {% for upload in DisapprovedFile %}
-																	{% for approbation in upload.validation.approbations %}
-																		{% if approbation.isApproval is same as(false) %}
-																			<li>
-																				<a
-																					href="{{ path('app_validation_disapproved_modify', {'approbationId': approbation.id})}}" class="dropdown-item shadow ">
-																					{{ upload.filename|upper }}
-																				</a>
-																			</li>
-																		{% endif %}
-																	{% endfor %}
-																{% endfor %} #}
-								{% for upload in DisapprovedFile %}
 
-									<li>
-										<a
-											href="{{ path('app_validation_disapproved_modify_by_upload', {'uploadId': upload.id})}}" class="dropdown-item shadow ">
-											{{ upload.filename|upper }}
-										</a>
-									</li>
-
-								{% endfor %}
-							</ul>
-						{% endif %}
-					</div>
+									{% endfor %}
+								</ul>
+							{% endif %}
+						</div>
+					{% endif %}
 				{% endif %}
 				<div
 					class="ms-auto d-flex align-items-center">
-				{% if users is defined %}
-					{% if users is empty %}
-					
-					{% else %}
-							{% if app.user is null %}
-								<p>
-									<a
-										class="btn btn-primary"
-										href="{{ path('app_login') }}">
-										Connexion
-									</a>
-								</p>
+					{% if users is defined %}
+						{% if users is empty %}
+
 							{% else %}
-								<p
-									class="d-flex align-items-center">
-									<strong
-										class="me-2">
-										{{ app.user.username|capitalize|split('.')|first }}
-										{{ app.user.username|upper|split('.')|last }}
-									</strong>
-									<a
-										class="btn btn-primary"
-										href="{{ path('app_logout') }}">
-										Déconnexion
-									</a>
-								</p>
-								<div
-									style="width: 10px"></div>
-								<p>
-									<a
-										class="btn btn-outline-info"
-										href="{{path('app_tutorial')}}">
-										TUTO
-									</a>
-								</p>
-							{% endif %}
+								{% if app.user is null %}
+									<p>
+										<a
+											class="btn btn-primary"
+											href="{{ path('app_login') }}">
+											Connexion
+										</a>
+									</p>
+								{% else %}
+									<p
+										class="d-flex align-items-center">
+										<strong
+											class="ms-2 me-2">
+											{{ app.user.username|capitalize|split('.')|first }}
+											{{ app.user.username|upper|split('.')|last }}
+										</strong>
+										<a
+											class="btn btn-primary"
+											href="{{ path('app_logout') }}">
+											Déconnexion
+										</a>
+									</p>
+									<div
+										style="width: 10px"></div>
+									<p>
+										<a
+											class="btn btn-outline-info"
+											href="{{path('app_tutorial')}}">
+											TUTO
+										</a>
+									</p>
+								{% endif %}
 						{% endif %}
 					{% endif %}
 
@@ -229,10 +219,11 @@ let buttonIdFromServer = null;
 			</div>
 		</nav>
 		<!-- End Main Navigation -->
-		<div
-			class="container ">
-			{% if users is defined %}
-				{% if users is empty %}
+		{% if users is defined %}
+			{% if users is empty %}
+				<div
+					class="container ">
+
 					<h5
 						class="my-5">
 						<strong>
@@ -252,12 +243,14 @@ let buttonIdFromServer = null;
 							</div>
 						</div>
 					</div>
-				{% endif %}
+
+				</div>
 			{% endif %}
-		</div>
+		{% endif %}
 		<div
 			class="container flex-grow-1 d-flex flex-column">
 			{% include "services/navbarservices/navbarservices.html.twig" %}
+
 			{% block body %}
 				<div
 					class="inner-container flex-grow-1 d-flex flex-column">
@@ -290,6 +283,7 @@ let buttonIdFromServer = null;
 							</strong>
 						</h1>
 					</p>
+
 					<h3
 						class="text-justify flex-shrink-0">
 						<strong>
@@ -336,7 +330,8 @@ let buttonIdFromServer = null;
 						href="http://topnet.corp.ponet/"
 						style="color: #25a1dd"
 						class="mb-3  mb-md-0 text-decoration-none lh-1">
-						OPmobility {{ facilityName|capitalize }}
+						OPmobility
+						{{ facilityName|capitalize }}
 					</a>
 				</div>
 				<div>

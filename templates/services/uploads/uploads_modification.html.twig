@@ -36,43 +36,41 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 					Revision n°
 					{{upload.revision}}
 				</h5>
-				{# <div
-					class=" "> #}
-
-					{% include "services/uploads/uploads_components/modifications_components/uploads_downloads_display.html.twig" %}
-
-					<div
-						class="col-8 mx-auto">
-						{{ form_label(form.file, 'Choisissez un nouveau ficher:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}
-						) }}
-						{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}
-						) }}
+				{% include "services/uploads/uploads_components/modifications_components/uploads_downloads_display.html.twig" %}
+				<hr
+					class="my-4">
+				<div
+					class="col-8 mx-auto">
+					{{ form_label(form.file, 'Choisissez un nouveau ficher:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}
+					) }}
+					{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}
+					) }}
+					{% if settings.isTraining %}
 						<div
 							class="d-flex align-items-left mt-2  ">
-
 							{{include('services/operators/training_toggles/training_toggle_component.html.twig', {checkStatus: false})}}
-
 						</div>
+					{% endif %}
+					{% if settings.isUploadValidation %}
 						<div
 							class="d-flex align-items-left mt-2   ">
 							{{ include('services/uploads/uploads_components/forced_display/forced_display_toggle_component.html.twig', {checkStatus: false}) }}
-
 						</div>
 						<div
 							class="d-flex align-items-left mt-2   ">
 							{{ include('services/uploads/uploads_components/modifications_components/modification_outlined/modification_outlined_toggle_component.html.twig') }}
-
 						</div>
-					</div>
-
-				{# </div> #}
-
+					{% endif %}
+				</div>
 			</div>
-
-
+			<hr
+				class="my-4">
 			{% include "services/uploads/uploads_components/modifications_components/uploads_other_modifications.html.twig" %}
-
-			{% include "services/uploads/uploads_components/modifications_components/uploads_modification_validation.html.twig" %}
+			<hr
+				class="my-4">
+			{% if settings.isUploadValidation %}
+				{% include "services/uploads/uploads_components/modifications_components/uploads_modification_validation.html.twig" %}
+			{% endif %}
 			<div
 				class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
 				<button

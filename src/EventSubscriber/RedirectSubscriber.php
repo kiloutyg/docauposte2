@@ -6,38 +6,66 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+
 use Symfony\Component\Routing\RouterInterface;
 
+use Symfony\Contracts\Cache\CacheInterface;
+
 use Symfony\Bundle\SecurityBundle\Security;
+
+use App\Controller\BaseController;
 
 use App\Repository\ApprobationRepository;
 use App\Repository\UserRepository;
 use App\Repository\UploadRepository;
 
+use App\Service\CacheService;
+
 
 class RedirectSubscriber implements EventSubscriberInterface
 {
     private $router;
+
+    private $cache;
+
     private $security;
+
     private $approbationRepository;
     private $userRepository;
     private $uploadRepository;
+    private $cacheService;
 
     public function __construct(
         RouterInterface $router,
+
+        CacheInterface $cache,
+        
         Security $security,
+
         ApprobationRepository $approbationRepository,
         UserRepository $userRepository,
-        UploadRepository $uploadRepository
+        UploadRepository $uploadRepository,
+        CacheService $cacheService
     ) {
         $this->router = $router;
+
+        $this->cache = $cache;
+        
         $this->security = $security;
+
         $this->approbationRepository = $approbationRepository;
         $this->userRepository = $userRepository;
         $this->uploadRepository = $uploadRepository;
+        $this->cacheService = $cacheService;
     }
+    
     public function approbationOnKernelRequest(RequestEvent $event): void
     {
+
+        if (!$this->cacheService->settings->isUploadValidation()) { 
+            return;
+        }
+
         // Get the current user
         $currentUser = $this->security->getUser();
 
@@ -81,6 +109,10 @@ class RedirectSubscriber implements EventSubscriberInterface
 
     public function reviseApprobationOnKernelRequest(RequestEvent $event): void
     {
+        if (!$this->cacheService->settings->isUploadValidation()) { 
+            return;
+        }
+
         // Get the current user
         $currentUser = $this->security->getUser();
 
@@ -97,24 +129,6 @@ class RedirectSubscriber implements EventSubscriberInterface
 
             // Iterate over each disapproved upload
             foreach ($disapprovedUploadsbyUser as $upload) {
-                // // Get the validation id of the upload
-                // $validationId = $upload->getValidation()->getId();
-
-                // // Find the disapproval object based on the validation id and Approval value being false
-                // $disapproval = $this->approbationRepository->findOneBy(['Validation' => $validationId, 'Approval' => false]);
-
-                // // If no disapproval is found, break the iteration
-                // if ($disapproval === null) {
-                //     break;
-                // }
-
-                // // Get the disapproval id
-                // $disapprovalId = $disapproval->getId();
-
-                // // Redirect to the 'app_validation_disapproved_modify' route with the disapproval id as parameter
-                // $event->setResponse(new RedirectResponse($this->router->generate('app_validation_disapproved_modify', [
-                //     'approbationId' => $disapprovalId,
-                // ])));
 
                 $event->setResponse(new RedirectResponse($this->router->generate(
                     'app_validation_disapproved_modify_by_upload',

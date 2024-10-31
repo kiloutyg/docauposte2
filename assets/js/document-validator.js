@@ -2,6 +2,24 @@
 let usersData;
 // This line declares a variable named usersData without assigning it a value.
 
+
+let uploadValidation;
+let validatorNumber;
+let training;
+let operatorRetrainingDelay;
+let autoDeleteOperatorDelay;
+
+fetch("/docauposte/api/settings")
+  .then((response) => response.json())
+  .then((data) => {
+    settingsData = data.settings;
+    uploadValidation = data.uploadValidation;
+    validatorNumber = data.validatorNumber - 1;
+    training = data.training;
+    operatorRetrainingDelay = data.operatorRetrainingDelay;
+    autoDeleteOperatorDelay = data.autoDeleteOperatorDelay;
+  });
+
 // This code is a JavaScript program that includes various functions to populate, 
 // reset, and create cascading dropdowns based on user data.
 
@@ -182,7 +200,9 @@ function createSelectElement() {
   // Set the id and name attributes of the new select element
   newSelect.id = newSelectId;
   newSelect.name = newSelectId;
-  if (document.querySelectorAll('.userSelect').length > 3) {
+
+
+  if (document.querySelectorAll('.userSelect').length > validatorNumber) {
     newSelect.required = false;
   }
   // Create a default option for the new select element

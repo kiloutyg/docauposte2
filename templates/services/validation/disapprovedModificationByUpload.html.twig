@@ -70,8 +70,6 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 
 				<div
 					class="fallback">
-
-
 					{% set toBeCorrected = [] %}
 					{% for upload in app.user.uploads %}
 						{% if upload.isValidated is same as (false) %}
@@ -79,8 +77,6 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						{% endif %}
 					{% endfor %}
 					{% if toBeCorrected|length - 1 > 0  %}
-
-
 						<div
 							class=" alert alert-info">
 							<strong>
@@ -158,11 +154,11 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 							{% endif %}
 						{% endfor %}
 					</div>
-
-					<iframe
-						src="{{ path('app_download_file_from_path', { 'uploadId': upload.id }) }}" width="100%"
-						height="750"
-						target="_blank"></iframe>
+					<div
+						class="ratio ratio-4x3">
+						<iframe
+							src="{{ path('app_download_file_from_path', { 'uploadId': upload.id }) }}" target="_blank"></iframe>
+					</div>
 					<hr
 						class="my-4">
 					<div
@@ -347,4 +343,6 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 				</div>
 			</div>
 		</div>
-	{% endblock %}
+	</div>
+
+{% endblock %}

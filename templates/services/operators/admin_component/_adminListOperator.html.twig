@@ -31,10 +31,10 @@
 			</div>
 		</div>
 	</ul>
-	<ul		
-	>
+	<ul>
 		{% if operatorForms|length > 0 %}
 			{% for operatorId, operatorForm in operatorForms %}
+			{% form_theme operatorForm 'bootstrap_5_layout.html.twig' %}
 
 				{% if operatorForm.vars.data.tobedeleted is not empty %}
 					{{ form_start(operatorForm, {'attr': {'class': 'row bg-dark', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
@@ -90,8 +90,9 @@
 		{% endfor %}
 	{% else %}
 		<div
-			class="card alert alert-danger">
-			Aucun opérateur n'a été trouvé.
+			class="card alert alert-warning "
+			id="live-toast">
+			Aucun opérateur n'a été recherché.
 		</div>
 	{% endif %}
 </ul></turbo-frame>

@@ -65,7 +65,7 @@ class CategoryAdminController extends FrontController
     // This function is responsible for creating a new user, it's access is restricted on the frontend
     public function createUser(int $categoryId = null, Request $request): Response
     {
-        $category    = $this->categoryRepository->find($categoryId);
+        $category = $this->categoryRepository->find($categoryId);
 
         $error = null;
         // This function is responsible for creating a new user, it depends on the AccountService class.

@@ -6,15 +6,17 @@
 				<div
 					class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 					{% for upload in button.uploads %}
-						{% set validated = '' %}
-						{% if upload.oldUpload != null and  upload.validation != null and upload.validation.status is same as(null)%}
-							{% set validated = 'download-non-validated-but-old' %}
-						{% elseif upload.oldUpload != null and  upload.validation != null and upload.validation.status is same as(false) %}
-							{% set validated = 'download-refused-but-old' %}
-						{% elseif  upload.validation != null and upload.validation.status is same as(null)  %}
-							{% set validated = 'download-non-validated-upload' %}
-						{% elseif  upload.validation != null and upload.validation.status is same as(false) %}
-							{% set validated = 'download-refused-upload' %}
+						{% if settings.isUploadValidation %}
+							{% set validated = '' %}
+							{% if upload.oldUpload != null and  upload.validation != null and upload.validation.status is same as(null)%}
+								{% set validated = 'download-non-validated-but-old' %}
+							{% elseif upload.oldUpload != null and  upload.validation != null and upload.validation.status is same as(false) %}
+								{% set validated = 'download-refused-but-old' %}
+							{% elseif  upload.validation != null and upload.validation.status is same as(null)  %}
+								{% set validated = 'download-non-validated-upload' %}
+							{% elseif  upload.validation != null and upload.validation.status is same as(false) %}
+								{% set validated = 'download-refused-upload' %}
+							{% endif %}
 						{% endif %}
 						<a
 							class="btn btn-primary btn-lg m-5 {{validated}}"
@@ -37,7 +39,6 @@
 							class="card-body">
 							<div
 								class="row">
-
 								{% include "services/uploads/upload.html.twig" %}
 							</div>
 						</div>

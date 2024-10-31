@@ -27,6 +27,9 @@ use App\Repository\TeamRepository;
 use App\Repository\OperatorRepository;
 use App\Repository\TrainingRecordRepository;
 use App\Repository\TrainerRepository;
+use App\Repository\SettingsRepository;
+
+use App\Entity\Settings;
 
 class CacheService
 {
@@ -35,6 +38,7 @@ class CacheService
     // Repositories
     private array $repositories;
     private array $repositoriesArray;
+    private $settingsRepository;
 
     private LoggerInterface $logger;
 
@@ -55,6 +59,7 @@ class CacheService
     public Collection $oldUploads;
     public Collection $trainingRecords;
     public Collection $trainers;
+    public ?Settings $settings = null;
 
     // public array $array_zones;
     // public array $array_productLines;
@@ -94,7 +99,8 @@ class CacheService
         TeamRepository                  $teamRepository,
         OperatorRepository              $operatorRepository,
         TrainingRecordRepository        $trainingRecordRepository,
-        TrainerRepository               $trainerRepository
+        TrainerRepository               $trainerRepository,
+        SettingsRepository              $settingsRepository
     ) {
         $this->cache = $cache;
         $this->logger = $logger;
@@ -115,23 +121,42 @@ class CacheService
             'approbations'              => $approbationRepository,
             'trainingRecords'           => $trainingRecordRepository,
             'trainers'                  => $trainerRepository,
+            'settings'                  => $settingsRepository
             // 'oldUploads'                => $oldUploadRepository
         ];
+        $this->settingsRepository = $settingsRepository;
         $this->initializeCollections();
+        $this->cacheServiceCachingSettings();
     }
 
     private function initializeCollections(): void
     {
         foreach ($this->repositories as $key => $repository) {
-            $this->{$key} = new ArrayCollection();
+            if ($key === 'settings') {
+                continue;
+            } else {
+                $this->{$key} = new ArrayCollection();
+            }
         }
     }
 
+    public function cacheServiceCachingSettings()
+    {
+        $this->settings = $this->cache->get("settings_cache", function (ItemInterface $item) {
+            $item->tag("settings_tag");
+            $item->expiresAfter(43200);
+            return $this->settingsRepository->getSettings();
+        });
+    }
 
     public function cachingAppVariable(): void
     {
         foreach ($this->repositories as $key => $repository) {
             try {
+                if ($key === 'settings') {
+                    $this->cacheServiceCachingSettings();
+                    continue;
+                }
                 $this->{$key} = new ArrayCollection($this->cache->get("{$key}_cache", function (ItemInterface $item) use ($repository, $key) {
                     $item->tag(["{$key}_tag"]);
                     $item->expiresAfter(43200); // Cache for 12 hours
