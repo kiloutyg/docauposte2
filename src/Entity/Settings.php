@@ -9,13 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: SettingsRepository::class)]
 class Settings
 {
-    // #[ORM\Id]
-    // #[ORM\GeneratedValue]
-    // #[ORM\Column]
-    // private ?int $id = null;
+
     #[ORM\Id]
-    // Remove the GeneratedValue attribute to set the ID manually
-    // #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = 1;
     
@@ -26,13 +21,13 @@ class Settings
     private ?int $ValidatorNumber = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $Training = null;
-
-    #[ORM\Column(nullable: true)]
     private ?bool $AutoDisplayIncident = null;
 
     #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
     private ?\DateInterval $AutoDisplayIncidentTimer = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $Training = null;
 
     #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
     private ?\DateInterval $OperatorRetrainingDelay = null;
@@ -74,17 +69,6 @@ class Settings
         return $this;
     }
 
-    public function isTraining(): ?bool
-    {
-        return $this->Training;
-    }
-
-    public function setTraining(?bool $Training): static
-    {
-        $this->Training = $Training;
-
-        return $this;
-    }
 
     public function isAutoDisplayIncident(): ?bool
     {
@@ -106,6 +90,18 @@ class Settings
     public function setAutoDisplayIncidentTimer(?\DateInterval $AutoDisplayIncidentTimer): static
     {
         $this->AutoDisplayIncidentTimer = $AutoDisplayIncidentTimer;
+
+        return $this;
+    }
+
+    public function isTraining(): ?bool
+    {
+        return $this->Training;
+    }
+
+    public function setTraining(?bool $Training): static
+    {
+        $this->Training = $Training;
 
         return $this;
     }

@@ -50,23 +50,23 @@
 
 			{% else %}
 				<strong>
-					- Document en cours de validation
+					&nbsp;Document en cours de validation
 				</strong>
+				<br>
 				{% for approbation in upload.validation.approbations  %}
 					-
 					<strong>
-
 						{{approbation.userapprobator.username|capitalize|split('.')|first }}
 						{{approbation.userapprobator.username|upper|split('.')|last }}
 					</strong>
 					{{approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé le ' ~ approbation.ApprovedAt|date('d/m/Y') : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}.
-						<br>
-						{% if approbation.comment is not empty %}
-							<ul>
-								<li >{{ approbation.comment }}</li>
-							</ul>
-						{% endif %}
-					{% endfor %}
+					<br>
+					{% if approbation.comment is not empty %}
+						<ul>
+							<li >{{ approbation.comment }}</li>
+						</ul>
+					{% endif %}
+				{% endfor %}
 			{% endif %}																					
 
 		</div>

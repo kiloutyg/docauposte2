@@ -131,6 +131,8 @@ class OperatorType extends AbstractType
                 'attr' => [
                     'class' => 'btn-check',
                     'value' => true,
+                    'autocomplete' => 'off',
+                    'checked' => false,
                 ],
                 'row_attr' => [
                     'class' => 'col'

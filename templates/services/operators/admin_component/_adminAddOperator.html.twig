@@ -15,6 +15,8 @@
 		</div>
 	</div>
 </ul>
+{% form_theme newOperatorForm 'bootstrap_5_layout.html.twig' %}
+
 <ul
 	data-controller="operator-admin-creation">
 	{{ form_start(newOperatorForm, {'attr': {'class': 'row', 'name': 'newOperator', 'id': 'newOperator'}}

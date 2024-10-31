@@ -28,26 +28,44 @@ use App\Entity\Uap;
 
 class OperatorController extends FrontController
 {
-    // private $validator;
 
-    // public function __construct(ValidatorInterface $validator)
-    // {
-    //     $this->validator = $validator;
-    // }
+    private function operatorEntitySearch(Request $request): array
+    {
+        $operators = [];
+
+
+        $this->logger->info(' the used method is a post');
+        if ($request->getContentTypeFormat() == 'json') {
+            $this->logger->info('is the content type a json');
+            $data = json_decode($request->getContent(), true);
+            $this->logger->info('data', $data);
+            $name       = $data['search_name'];
+            $code       = $data['search_code'];
+            $team       = $data['search_team'];
+            $uap        = $data['search_uap'];
+            $trainer    = $data['search_trainer'];
+        } else {
+            $this->logger->info('is the content type a form');
+            $name       = $request->request->get('search_name');
+            $code       = $request->request->get('search_code');
+            $team       = $request->request->get('search_team');
+            $uap        = $request->request->get('search_uap');
+            $trainer    = $request->request->get('search_trainer');
+        }
+        $operators = $this->operatorRepository->findBySearchQuery($name, $code, $team, $uap, $trainer);
+
+
+        return $operators;
+    }
 
 
     #[Route('/operator/admin', name: 'app_operator')]
     public function operatorBasePage(Request $request): Response
     {
         // $this->logger->info('search query with full request', $request->request->all());
-        // if ($app . user) Was doing somthing here and i don't remember what
-        $countArray = $this->operatorService->operatorCheckForAutoDelete();
-        // if ($countArray != null) {
-        //     if ($countArray != null) {
-        //         $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
-        //             ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
-        //     }
-        // }
+
+        // $countArray = $this->operatorService->operatorCheckForAutoDelete();
+
         $newOperator = new Operator();
         $newOperatorForm = $this->createForm(OperatorType::class, $newOperator);
         $newOperatorForm->handleRequest($request);
@@ -63,30 +81,11 @@ class OperatorController extends FrontController
             }
         }
 
-
-        $operators = [];
         if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
-            $this->logger->info(' the used method is a post');
-            if ($request->getContentTypeFormat() == 'json') {
-                $this->logger->info('is the content type a json');
-                $data = json_decode($request->getContent(), true);
-                $this->logger->info('data', $data);
-                $name       = $data['search_name'];
-                $code       = $data['search_code'];
-                $team       = $data['search_team'];
-                $uap        = $data['search_uap'];
-                $trainer    = $data['search_trainer'];
-            } else {
-                $this->logger->info('is the content type a form');
-                $name       = $request->request->get('search_name');
-                $code       = $request->request->get('search_code');
-                $team       = $request->request->get('search_team');
-                $uap        = $request->request->get('search_uap');
-                $trainer    = $request->request->get('search_trainer');
-            }
-            $operators = $this->operatorRepository->findBySearchQuery($name, $code, $team, $uap, $trainer);
+            $operators = $this->operatorEntitySearch($request);
+        } else {
+            $operators = [];
         }
-
 
         $operatorForms = [];
         // Create and handle forms
@@ -101,13 +100,14 @@ class OperatorController extends FrontController
         if (count($operatorForms) === 0) {
             $inActiveOperators = $this->operatorRepository->findInActiveOperators();
             $this->logger->info('in operatorBasePage is inActiveOperators : ' . count($inActiveOperators));
-
             foreach ($inActiveOperators as $operator) {
                 $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
                     'operator_id' => $operator->getId(),
                 ])->createView();
             }
         }
+        $flashes = $request->getSession()->getFlashBag()->all();
+        $this->logger->info('message in flashbag', $flashes);
 
         return $this->render('services/operators/operators_admin.html.twig', [
             'newOperatorForm' => $newOperatorForm->createView(),
@@ -175,13 +175,34 @@ class OperatorController extends FrontController
             try {
                 $this->em->persist($operator);
                 $this->em->flush();
-                $this->logger->info('operator, operateur bien modifié', [$operator]);
+                $this->logger->info('editOperatorAction, operateur bien modifié', [$operator]);
                 $this->addFlash('success', 'L\'opérateur a bien été modifié');
-                return $this->redirectToRoute('app_operator');
+
+                if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
+                    $operators = $this->operatorEntitySearch($request);
+                } else {
+                    $operators = [];
+                }
+                $operatorForms = [];
+                // Create and handle forms
+                foreach ($operators as $operator) {
+                    $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
+                        'operator_id' => $operator->getId(),
+                    ])->createView();
+                }
+                
+                // Return the updated frame content
+                return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
+                    'operatorForms' => $operatorForms,
+                ]);
             } catch (\Exception $e) {
                 $this->addFlash('danger', 'L\'opérateur n\'a pas pu être modifié. Erreur: ' . $e->getMessage());
                 $this->logger->error('Error while editing operator in try catch', [$e->getMessage()]);
-                return $this->redirectToRoute('app_operator');
+
+                // Render the form again with error message
+                return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
+                    'operatorForms' => [$operator->getId() => $form->createView()],
+                ]);
             }
         }
 
@@ -189,8 +210,14 @@ class OperatorController extends FrontController
             $this->logger->error('Error in submitting form while editing operator');
             $this->addFlash('danger', 'Erreur lors de la soumission du formulaire');
             return $this->redirectToRoute('app_operator');
+
+            // Render the form again with error message
+            return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
+                'operatorForms' => [$operator->getId() => $form->createView()],
+            ]);
         }
-        $this->logger->info('editoperatoraction reach return to template"');
+
+        $this->logger->info('editOperatorAction reach return to template"');
         return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
             'form' => $form->createView(),
             'operator' => $operator

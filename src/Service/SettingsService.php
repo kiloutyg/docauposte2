@@ -30,7 +30,7 @@ class SettingsService extends AbstractController
         LoggerInterface             $logger,
         EntityManagerInterface      $em,
         SettingsRepository          $settingsRepository
-    ){
+    ) {
 
         $this->logger = $logger;
         $this->em = $em;
@@ -55,18 +55,23 @@ class SettingsService extends AbstractController
 
         if (!$settingsEntity) {
             $settingsEntity = new Settings();
+            $settingsEntity->setUploadValidation(true);
+            $settingsEntity->setValidatorNumber(4);
+            $settingsEntity->setAutoDisplayIncident(true);
+            $settingsEntity->setAutoDisplayIncidentTimer(new \DateInterval("P0Y0M0DT0H10M0S"));
+            $settingsEntity->setTraining(true);
+            $settingsEntity->setOperatorRetrainingDelay(new \DateInterval("P0Y6M0DT0H0M0S"));
+            $settingsEntity->setAutoDeleteOperatorDelay(new \DateInterval("P0Y3M0DT0H0M0S"));
+            $this->em->persist($settingsEntity);
+            $this->em->flush();
         }
-
-        return $settingsEntity;    
+        return $settingsEntity;
     }
 
 
     // This function is responsible for updating the settings in the database
     public function updateSettings(Request $request): Response
-    {        
-        // $this->logger->info('Update settings service', [
-        //     'request' => $request->request->all()
-        // ]);
+    {
 
         $settingsEntity = $this->getSettings();
 
@@ -78,12 +83,8 @@ class SettingsService extends AbstractController
             $settingsEntity = $settingsForm->getData();
         }
 
-        // $this->logger->info('Settings updated', [
-        //     'settingsEntity' => $settingsEntity
-        // ]);
 
         $response = '';
-
 
         try {
             $this->em->persist($settingsEntity);
