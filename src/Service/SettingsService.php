@@ -49,7 +49,7 @@ class SettingsService extends AbstractController
     }
 
     // This function is responsible for getting all the settings from the database
-    protected function getSettings(): Settings
+    public function getSettings(): Settings
     {
         $settingsEntity = $this->settingsRepository->getSettings();
 

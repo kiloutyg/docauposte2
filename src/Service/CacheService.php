@@ -29,6 +29,8 @@ use App\Repository\TrainingRecordRepository;
 use App\Repository\TrainerRepository;
 use App\Repository\SettingsRepository;
 
+use App\Service\SettingsService;
+
 use App\Entity\Settings;
 
 class CacheService
@@ -39,6 +41,7 @@ class CacheService
     private array $repositories;
     private array $repositoriesArray;
     private $settingsRepository;
+    private $settingsService;
 
     private LoggerInterface $logger;
 
@@ -100,7 +103,8 @@ class CacheService
         OperatorRepository              $operatorRepository,
         TrainingRecordRepository        $trainingRecordRepository,
         TrainerRepository               $trainerRepository,
-        SettingsRepository              $settingsRepository
+        SettingsRepository              $settingsRepository,
+        SettingsService                 $settingsService
     ) {
         $this->cache = $cache;
         $this->logger = $logger;
@@ -125,6 +129,7 @@ class CacheService
             // 'oldUploads'                => $oldUploadRepository
         ];
         $this->settingsRepository = $settingsRepository;
+        $this->settingsService = $settingsService;
         $this->initializeCollections();
         $this->cacheServiceCachingSettings();
     }
@@ -145,7 +150,7 @@ class CacheService
         $this->settings = $this->cache->get("settings_cache", function (ItemInterface $item) {
             $item->tag("settings_tag");
             $item->expiresAfter(43200);
-            return $this->settingsRepository->getSettings();
+            return $this->settingsService->getSettings();
         });
     }
 
