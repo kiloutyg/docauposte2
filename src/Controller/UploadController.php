@@ -47,7 +47,7 @@ class UploadController extends FrontController
     #[Route('/uploading', name: 'generic_upload_files')]
     public function generic_upload_files(Request $request): Response
     {
-        $this->logger->info('fullrequest', ['request' => $request]);
+        // $this->logger->info('fullrequest', ['request' => $request]);
 
         // Get the URL of the page from which the request originated
         $originUrl = $request->headers->get('referer');
@@ -87,7 +87,7 @@ class UploadController extends FrontController
             // Use the UploadService to handle file uploads
             $name = $this->uploadService->uploadFiles($request, $buttonEntity, $user, $newFileName);
             $this->addFlash('success', 'Le document ' . $name . ' a été correctement chargé');
-            $this->logger->info('originURL', ['originURL' => $originUrl]);
+            // $this->logger->info('originURL', ['originURL' => $originUrl]);
             return $this->redirect($originUrl);
         }
     }
@@ -105,13 +105,13 @@ class UploadController extends FrontController
         if (!($this->settings->isUploadValidation() || $this->settings->IsTraining())) {
             return $this->downloadFileFromMethods($path);
         }
-    
+
         $isValidated = $file->isValidated();
         $isForcedDisplay = $file->isForcedDisplay();
         $isTraining = $file->isTraining();
         $hasOldUpload = $file->getOldUpload() !== null;
         $originUrl = $request->headers->get('Referer');
-    
+
         if ($isValidated === false && $isForcedDisplay === false) {
             if ($this->settings->IsTraining() && $isTraining) {
                 return $this->redirectToRoute('app_training_front_by_validation', [
@@ -127,7 +127,7 @@ class UploadController extends FrontController
                 return $this->redirect($originUrl, 307);
             }
         }
-    
+
         if ($isValidated === null && $isForcedDisplay === false) {
             if ($hasOldUpload) {
                 return $this->downloadFileFromPath($uploadId);
@@ -139,7 +139,7 @@ class UploadController extends FrontController
                 return $this->redirect($originUrl, 307);
             }
         }
-    
+
         if ($isValidated === true) {
             if ($this->settings->IsTraining() && $isTraining) {
                 return $this->redirectToRoute('app_training_front_by_upload', [
@@ -149,8 +149,8 @@ class UploadController extends FrontController
                 return $this->downloadFileFromMethods($path);
             }
         }
-    
-        if ($isValidated === null) {  
+
+        if ($isValidated === null) {
             if ($this->settings->IsTraining() && $isTraining) {
                 return $this->redirectToRoute('app_training_front_by_validation', [
                     'validationId' => $file->getValidation()->getId()
@@ -159,7 +159,7 @@ class UploadController extends FrontController
                 return $this->downloadFileFromPath($uploadId);
             }
         }
-    
+
         // Default action if none of the above conditions are met
         return $this->downloadFileFromMethods($path);
     }
@@ -170,9 +170,9 @@ class UploadController extends FrontController
     // create a route to download a file in more simple terms to display the file
     public function downloadFileFromMethods(string $path): Response
     {
-        $this->logger->info('path', ['path' => $path]);
+        // $this->logger->info('path', ['path' => $path]);
         $file = new File($path);
-        $this->logger->info('file', ['file' => $file]);
+        // $this->logger->info('file', ['file' => $file]);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
     // 
@@ -186,7 +186,7 @@ class UploadController extends FrontController
         $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
 
         $path = $this->determineFilePath($file);
-        $this->logger->info('path', ['path' => $path]);
+        // $this->logger->info('path', ['path' => $path]);
         return $this->downloadFileFromMethods($path);
     }
     // 
@@ -198,12 +198,12 @@ class UploadController extends FrontController
     {
 
         if (!$file->isValidated()) {
-            $this->logger->info('is validated', ['validated' => $file->isValidated()]);
+            // $this->logger->info('is validated', ['validated' => $file->isValidated()]);
             if ($file->isForcedDisplay() === true || $file->isForcedDisplay() === null) {
-                $this->logger->info('is forced display on or null', ['forcedDisplay' => $file->isForcedDisplay()]);
+                // $this->logger->info('is forced display on or null', ['forcedDisplay' => $file->isForcedDisplay()]);
                 return $file->getPath();
             } elseif ($file->getOldUpload() != null) {
-                $this->logger->info('is old upload', ['oldUpload' => $file->getOldUpload()]);
+                // $this->logger->info('is old upload', ['oldUpload' => $file->getOldUpload()]);
                 $oldUpload = $file->getOldUpload();
                 return $oldUpload->getPath();
             }
@@ -295,71 +295,58 @@ class UploadController extends FrontController
     public function modifyingFile(Request $request, int $uploadId): Response
     {
         // Log the request
-        $this->logger->info('fullrequest', ['request' => $request->request->all()]);
+        // $this->logger->info('fullrequest', ['request' => $request->request->all()]);
+        $originUrl = $request->headers->get('referer');
 
         // Retrieve the current upload entity based on the uploadId
-        $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
-        $categoryId  = $upload->getButton()->getCategory()->getId();
-        $oldFileName = $upload->getFilename();
-
-        // Create a form to modify the Upload entity
-        $form = $this->createForm(UploadType::class, $upload);
-
-        // Retrieve the User object
-        $user = $this->getUser();
-
+        $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         // Check if there is a file to modify
         if (!$upload) {
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
-            return $this->redirectToRoute('app_category_admin', [
-                'categoryId' => $categoryId
-            ]);
+            return $this->redirect($originUrl);
         }
 
-        $trainingNeeded =  $request->request->get('training-needed');
-        $forcedDisplay = $request->request->get('display-needed');
+        $categoryId  = $upload->getButton()->getCategory()->getId();
+        // Create a form to modify the Upload entity
+        $form = $this->createForm(UploadType::class, $upload);
 
-        $this->logger->info('training needed', ['training' => $trainingNeeded]);
-        $this->logger->info('forced display', ['display-needed' => $forcedDisplay]);
+        $trainingNeeded = filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN);
+        $forcedDisplay = filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN);
+        $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
 
-        $comment = $request->request->get('modificationComment');
-        $newValidation = $request->request->get('validatorRequired');
-        $enoughValidator = false;
-
-        $enoughValidator = $request->request->has('validator_user4');
+        $neededValidator = $this->settings->getValidatorNumber();
+        $enoughValidator = $this->validationService->checkNumberOfValidator($request, $neededValidator);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
             try {
                 if ($trainingNeeded == null || $forcedDisplay == null) {
-                    if ($upload->getFile() && $upload->getValidation() != null && $comment == null && $comment == "" && $request->request->get('modification-outlined' == '')) {
+                    $comment = $request->request->get('modificationComment');
+                    if ($upload->getFile() && $upload->getValidation() != null && empty($comment) && $request->request->get('modification-outlined' == '')) {
                         $this->addFlash('error', 'Le commentaire est vide. Commenter votre modification est obligatoire.');
                         return $this->redirectToRoute('app_category_admin', [
                             'categoryId' => $categoryId
                         ]);
-                    } elseif ($newValidation == "true" && $enoughValidator == false) {
-                        $this->addFlash('error', 'Selectionner au moins 4 validateurs pour valider le fichier.');
+                    } elseif ($newValidation && !$enoughValidator) {
+                        $this->addFlash('error', 'Selectionner au moins ' . $neededValidator . ' validateurs pour valider le fichier.');
                         return $this->redirectToRoute('app_category_admin', [
                             'categoryId' => $categoryId
                         ]);
                     }
                 }
-                $this->uploadService->modifyFile($upload, $user, $request, $oldFileName);
+                $this->uploadService->modifyFile($upload, $request);
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirectToRoute('app_category_admin', [
                     'categoryId' => $categoryId
                 ]);
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
-
                 return $this->redirectToRoute('app_category_admin', [
                     'categoryId' => $categoryId
                 ]);
             }
-        }
-        // Convert the errors to an array
-        if ($form->isSubmitted() && !$form->isValid()) {
+        } else {
             // Return the errors in the JSON response
             $this->addFlash('error', 'Invalid form. Check the entered data.');
             return $this->redirectToRoute('app_category_admin', [

@@ -158,10 +158,6 @@ class FrontController extends BaseController
         $productLine = $this->cacheService->getEntityById('productLine', $category->getProductLine()->getId());
         $zone = $this->cacheService->getEntityById('zone', $productLine->getZone()->getId());
 
-        $this->logger->info('buttons', [$buttons]);
-
-        // if (count($buttons) != 1) {
-
         return $this->render(
             'category.html.twig',
             [
@@ -194,7 +190,7 @@ class FrontController extends BaseController
         $zone        = $productLine->getZone();
 
         $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonId]);
-        $this->logger->info('buttonUploads', [$buttonUploads]);
+        // $this->logger->info('buttonUploads', [$buttonUploads]);
 
         // foreach ($buttonUploads as $buttonUpload) {
 
@@ -219,13 +215,5 @@ class FrontController extends BaseController
             $uploadId = $buttonUploads[0]->getId();
             return $uploadController->filterDownloadFile($uploadId, $request);
         }
-    }
-
-
-
-    #[Route('/flash-messages', name: 'flash_messages')]
-    public function flashMessages(Request $request): Response
-    {
-        return $this->render('services/_toasts.html.twig');
     }
 }

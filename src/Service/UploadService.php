@@ -178,18 +178,22 @@ class UploadService extends AbstractController
 
 
     // This function is responsible for the logic of modifying the uploads files
-    public function modifyFile(Upload $upload, User $user, Request $request, string $oldFileName)
+    public function modifyFile(Upload $upload, Request $request)
     {
 
-        $this->logger->info('fullrequest inside upload service', ['request' => $request->request->all()]);
+        // $this->logger->info('fullrequest inside upload service', ['request' => $request->request->all()]);
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
+        // $this->logger->info('is newfile empty ' . empty($newfile));
+
+        $user = $this->getUser();
 
         // Public directory
         $public_dir = $this->projectDir . '/public';
 
         // Old file path
         $oldFilePath = $upload->getPath();
+        $oldFileName = $upload->getFilename();
 
         // New file path
         // Dynamic folder creation and file upload
@@ -204,29 +208,43 @@ class UploadService extends AbstractController
 
         $comment = $request->request->get('modificationComment');
 
-        $preExistingValidation = !empty($upload->getValidation());
-        $this->logger->info('preExistingValidation', ['preExistingValidation' => $preExistingValidation]);
+        $modificationOutlined = $request->request->get('modification-outlined');
+        // $this->logger->info('modification-outlined', ['modification-outlined' => $modificationOutlined]);
 
-        ////////////// Part mainly important for the introduction of the validation process in the production environment
-        // Check if the file need to be validated or not, by checking if there is a validator_user string in the request
-        if ($request->request->get('validatorRequired') == 'true') {
+        $preExistingValidation = !empty($upload->getValidation());
+        // $this->logger->info('preExistingValidation', ['preExistingValidation' => $preExistingValidation]);
+
+        $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
+
+        if ($newValidation) {
+
             foreach ($request->request->keys() as $key) {
                 if (strpos($key, 'validator_user') !== false) {
                     $validated = null;
                 }
             }
-            // Retire the old file
-            $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
+
+            // Retire the old file if a new one has been uploaded.
+            if (!empty($newfile)) {
+                try {
+                    // $this->logger->info('try to retire oldfile when validator is required');
+                    $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
+                } catch (\Exception $e) {
+                    // $this->logger->info('Issues while retiring oldUpload' . $e);
+                    throw $e;
+                }
+            }
+
             // Set the validated boolean property
             $upload->setValidated($validated);
             // Update the uploader in the upload object
             $upload->setUploader($user);
             // Set the revision 
             $upload->setRevision(1);
-            $this->logger->info('modification-outlined' . ['modification-outlined' => $request->request->get('modification-outlined')]);
-            if ($preExistingValidation && ($request->request->get('modification-outlined') == null || $request->request->get('modification-outlined') == '' || $request->request->get('modification-outlined') == 'heavy-modification')) {
+
+            if ($preExistingValidation && ($modificationOutlined == null || $modificationOutlined == '' || $modificationOutlined == 'heavy-modification')) {
                 if ($validated === null) {
-                    $this->logger->info('Has an existing validation and is non minor modification');
+                    // $this->logger->info('Has an existing validation and is non minor modification');
                     $this->validationService->updateValidation($upload, $request);
                 }
             } else {
@@ -237,7 +255,7 @@ class UploadService extends AbstractController
         } else {
             $validated = true;
             if ($preExistingValidation && $comment != null) {
-                if ($request->request->get('modification-outlined') == 'minor-modification') {
+                if ($modificationOutlined == 'minor-modification') {
                     $comment = $comment . ' (modification mineure)';
                 }
                 $preExistingValidationEntity = $upload->getValidation();
@@ -263,10 +281,87 @@ class UploadService extends AbstractController
         if ($newFile) {
 
             try { // Retire the old file
+                // $this->logger->info('try to retire oldfile when there is a newfile');
+
                 $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
             } catch (\exception $e) {
+                // $this->logger->info('Issues during retiring oldUpload' . $e);
                 throw $e;
             }
+            // Check if the file is of the right type
+            if ($newFile->getMimeType() != 'application/pdf') {
+                throw new \Exception('Le fichier doit être un pdf');
+            }
+            // Remove old file if it exists
+            if (file_exists($oldFilePath)) {
+                unlink($oldFilePath);
+            }
+            // Move the new file to the directory
+            try {
+                $newFile->move($folderPath . '/', $upload->getFilename());
+            } catch (\Exception $e) {
+                // $this->logger->info('issues while moving the file to path' . $e);
+                throw $e;
+            }
+            // Update the file path in the upload object
+            $upload->setPath($Path);
+            // Update the uploader in the upload object
+            $upload->setUploader($user);
+
+            // If the modification is heavy, increment the revision number
+            $upload->setRevision($upload->getRevision() + 1);
+            if ($modificationOutlined == '') {
+                // If the modification is heavy, reset the approbation and set the $globalModification flag to true
+                $globalModification = true;
+                // Reset the validation and approbation property
+                $request->request->set('modification-outlined', 'heavy-modification');
+            }
+
+            if ($preExistingValidation  && ($modificationOutlined == null || $modificationOutlined == '' || $modificationOutlined == 'heavy-modification')) {
+                $this->validationService->resetApprobation($upload, $request, $globalModification);
+            }
+        } else {
+            // If no new file is uploaded, just rename the old one if necessary
+            if ($oldFilePath != $Path) {
+                rename($oldFilePath, $Path);
+                $upload->setPath($Path);
+                // Update the uploader in the upload object
+                $upload->setUploader($user);
+            }
+        }
+        // Persist changes and flush to the database
+        $upload->setUploadedAt(new \DateTime());
+        $this->manager->persist($upload);
+        $this->manager->flush();
+        return;
+    }
+
+
+
+
+    // This function is responsible for the logic of modifying the uploads files
+    public function modifyDisapprovedFile(Upload $upload, User $user, Request $request)
+    {
+
+        // Get the new file directly from the Upload object
+        $newFile = $upload->getFile();
+        // Public directory
+        $public_dir = $this->projectDir . '/public';
+        // Old file path
+        $oldFilePath = $upload->getPath();
+        // New file path
+        // Dynamic folder creation and file upload
+        $buttonname = $upload->getButton()->getName();
+        $parts      = explode('.', $buttonname);
+        $parts      = array_reverse($parts);
+        $folderPath = $public_dir . '/doc';
+        foreach ($parts as $part) {
+            $folderPath .= '/' . $part;
+        }
+        $Path = $folderPath . '/' . $upload->getFilename();
+
+        // If new file exists, process it and delete the old one
+        if ($newFile) {
             // Check if the file is of the right type
             if ($newFile->getMimeType() != 'application/pdf') {
                 throw new \Exception('Le fichier doit être un pdf');
@@ -285,19 +380,6 @@ class UploadService extends AbstractController
             $upload->setPath($Path);
             // Update the uploader in the upload object
             $upload->setUploader($user);
-
-            // If the modification is heavy, increment the revision number
-            $upload->setRevision($upload->getRevision() + 1);
-            if ($request->request->get('modification-outlined') == '') {
-                // If the modification is heavy, reset the approbation and set the $globalModification flag to true
-                $globalModification = true;
-                // Reset the validation and approbation property
-                $request->request->set('modification-outlined', 'heavy-modification');
-            }
-
-            if ($preExistingValidation  && ($request->request->get('modification-outlined') == null || $request->request->get('modification-outlined') == '' || $request->request->get('modification-outlined') == 'heavy-modification')) {
-                $this->validationService->resetApprobation($upload, $request, $globalModification);
-            }
         } else {
             // If no new file is uploaded, just rename the old one if necessary
             if ($oldFilePath != $Path) {
@@ -307,11 +389,15 @@ class UploadService extends AbstractController
                 $upload->setUploader($user);
             }
         }
-        // Persist changes and flush to the database
+        $upload->setValidated(null);
         $upload->setUploadedAt(new \DateTime());
+
+        // Persist changes and flush to the database
+
         $this->manager->persist($upload);
         $this->manager->flush();
-        return;
+
+        $this->validationService->resetApprobation($upload, $request);
     }
 
 
@@ -403,67 +489,5 @@ class UploadService extends AbstractController
         }
 
         return $groupedValidatedUploads;
-    }
-
-
-    // This function is responsible for the logic of modifying the uploads files
-    public function modifyDisapprovedFile(Upload $upload, User $user, Request $request)
-    {
-
-        // Get the new file directly from the Upload object
-        $newFile = $upload->getFile();
-        // Public directory
-        $public_dir = $this->projectDir . '/public';
-        // Old file path
-        $oldFilePath = $upload->getPath();
-        // New file path
-        // Dynamic folder creation and file upload
-        $buttonname = $upload->getButton()->getName();
-        $parts      = explode('.', $buttonname);
-        $parts      = array_reverse($parts);
-        $folderPath = $public_dir . '/doc';
-        foreach ($parts as $part) {
-            $folderPath .= '/' . $part;
-        }
-        $Path = $folderPath . '/' . $upload->getFilename();
-
-        // If new file exists, process it and delete the old one
-        if ($newFile) {
-            // Check if the file is of the right type
-            if ($newFile->getMimeType() != 'application/pdf') {
-                throw new \Exception('Le fichier doit être un pdf');
-            }
-            // Remove old file if it exists
-            if (file_exists($oldFilePath)) {
-                unlink($oldFilePath);
-            }
-            // Move the new file to the directory
-            try {
-                $newFile->move($folderPath . '/', $upload->getFilename());
-            } catch (\Exception $e) {
-                throw $e;
-            }
-            // Update the file path in the upload object
-            $upload->setPath($Path);
-            // Update the uploader in the upload object
-            $upload->setUploader($user);
-        } else {
-            // If no new file is uploaded, just rename the old one if necessary
-            if ($oldFilePath != $Path) {
-                rename($oldFilePath, $Path);
-                $upload->setPath($Path);
-                // Update the uploader in the upload object
-                $upload->setUploader($user);
-            }
-        }
-        $upload->setValidated(null);
-        $upload->setUploadedAt(new \DateTime());
-
-        // Persist changes and flush to the database
-
-        $this->manager->persist($upload);
-        $this->manager->flush();
-
-        $this->validationService->resetApprobation($upload, $request);
     }
 }

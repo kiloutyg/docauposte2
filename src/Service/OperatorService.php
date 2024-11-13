@@ -52,7 +52,7 @@ class OperatorService extends AbstractController
 
     public function operatorCheckForAutoDelete()
     {
-        $this->logger->info('Checking from operatorCheckForAutoDelete()');
+        // $this->logger->info('Checking from operatorCheckForAutoDelete()');
 
         $today = new \DateTime();
         $fileName = 'checked_for_unactive_operator.txt';
@@ -66,7 +66,7 @@ class OperatorService extends AbstractController
 
             $inActiveOperators = $this->operatorRepository->findOperatorWithNoRecentTraining();
 
-            $this->logger->info('Inactive operators: ' . json_encode($inActiveOperators));
+            // $this->logger->info('Inactive operators: ' . json_encode($inActiveOperators));
             if (count($inActiveOperators) > 0) {
                 foreach ($inActiveOperators as $operator) {
                     $operator->setTobedeleted($today);
@@ -78,7 +78,7 @@ class OperatorService extends AbstractController
 
 
             $toBeDeletedOperatorsIds = $this->operatorRepository->findOperatorToBeDeleted();
-            $this->logger->info('To be deleted operators: ' . json_encode($toBeDeletedOperatorsIds));
+            // $this->logger->info('To be deleted operators: ' . json_encode($toBeDeletedOperatorsIds));
 
             if (count($toBeDeletedOperatorsIds) > 0) {
                 foreach ($toBeDeletedOperatorsIds as $operatorId) {

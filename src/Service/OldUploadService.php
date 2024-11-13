@@ -48,21 +48,19 @@ class OldUploadService extends AbstractController
     {
         $upload = $this->uploadRepository->findOneBy(['path' => $OldFilePath]);
 
-        $this->logger->info('OldUploadService: retireOldUpload: upload: ' . $upload->getId());
-        $this->logger->info('OldUploadService: retireOldUpload: OldFilePath: ' . $OldFilePath);
-        $this->logger->info('OldUploadService: retireOldUpload: OldFileName: ' . $OldFileName);
+        // $this->logger->info('OldUploadService: retireOldUpload: upload: ' . $upload->getId());
+        // $this->logger->info('OldUploadService: retireOldUpload: upload to be retired name: ' . $upload->getFilename());
+
         $currentOldUpload = $upload->getOldUpload();
         if ($currentOldUpload !== null) {
-            $this->logger->info('OldUploadService: retireOldUpload: currentOldUpload: ' . $currentOldUpload->getId());
+            // $this->logger->info('OldUploadService: retireOldUpload: currentOldUpload: ' . $currentOldUpload->getId());
             $currendOldUploadEntity = $this->oldUploadRepository->find($currentOldUpload);
         }
 
         if ($currentOldUpload !== null && (file_get_contents($currendOldUploadEntity->getPath()) === file_get_contents($OldFilePath)) === true) {
-
-            $this->logger->info('OldUploadService: retireOldUpload: File exist and is the same as the current old file');
-            return;
+            // $this->logger->info('OldUploadService: retireOldUpload: File exist and is the same as the current old file');
         } else {
-            $this->logger->info('OldUploadService: retireOldUpload: File is different from the current old file');
+            // $this->logger->info('OldUploadService: retireOldUpload: File is different from the current old file');
 
             $button             = $upload->getButton();
             $uploader           = $upload->getUploader();
@@ -80,7 +78,6 @@ class OldUploadService extends AbstractController
             foreach ($parts as $part) {
                 $folderPath .= '/' . $part;
             }
-            // $path = $folderPath . '/' . $filename;
             $oldPath = $folderPath . '/' . $oldFilename;
 
             // Copy the file with the new name
@@ -109,8 +106,4 @@ class OldUploadService extends AbstractController
             $this->manager->flush();
         }
     }
-
-
-
-   
 }

@@ -42,7 +42,7 @@ class OperatorRepository extends ServiceEntityRepository
 
     public function findAllOrdered()
     {
-        $this->logger->info('Finding all operators ordered.');
+        // $this->logger->info('Finding all operators ordered.');
 
         $operators = $this->findOperatorsSortedByLastNameFirstName();
 
@@ -64,7 +64,7 @@ class OperatorRepository extends ServiceEntityRepository
 
     public function findOperatorsSortedByLastNameFirstName()
     {
-        $this->logger->info('Finding operators sorted last name, and first name.');
+        // $this->logger->info('Finding operators sorted last name, and first name.');
 
 
         // Fetch all operators with their team and UAP
@@ -111,7 +111,7 @@ class OperatorRepository extends ServiceEntityRepository
     public function findBySearchQuery($name, $code, $team, $uap, $trainer)
     {
 
-        $this->logger->info('Finding operators by search query.');
+        // $this->logger->info('Finding operators by search query.');
 
         $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.team', 't')
@@ -134,7 +134,7 @@ class OperatorRepository extends ServiceEntityRepository
                 ->setParameter('uap', '%' . strtolower($uap) . '%');
         }
 
-        // $this->logger->info('Trainer value in repository methods: ' . $trainer);
+        // // $this->logger->info('Trainer value in repository methods: ' . $trainer);
         // Handling trainer value based on true, false, or null
         switch ($trainer) {
             case "true":
@@ -148,19 +148,19 @@ class OperatorRepository extends ServiceEntityRepository
                 break;
         }
 
-        // $this->logger->info('Trainer value after handling: ' . $trainer);
+        // // $this->logger->info('Trainer value after handling: ' . $trainer);
 
         if ($trainer === true) {
-            // $this->logger->info('Trainer value true, select those who are trainer.');
+            // // $this->logger->info('Trainer value true, select those who are trainer.');
             $qb->setParameter('trainerStatus', true)
                 ->andWhere('o.IsTrainer = :trainerStatus');
         } elseif ($trainer === false) {
-            // $this->logger->info('Trainer value false, select those who are not trainers or undefined.');
+            // // $this->logger->info('Trainer value false, select those who are not trainers or undefined.');
             $qb->setParameter('trainerStatus', false)
                 ->andWhere('o.IsTrainer = :trainerStatus OR o.IsTrainer IS NULL');
         } elseif ($trainer === null) {
             // If $trainer is null, and you want to select all without any filter on IsTrainer, do not add any where clause related to IsTrainer.
-            // $this->logger->info('Trainer value is null, no filter applied on trainer status.');
+            // // $this->logger->info('Trainer value is null, no filter applied on trainer status.');
             // No further action needed if you want all records regardless of trainer status.
         }
 
@@ -172,7 +172,7 @@ class OperatorRepository extends ServiceEntityRepository
     public function orderOperator($operators)
     {
 
-        $this->logger->info('Ordering operators by team, UAP, last name, and first name.');
+        // $this->logger->info('Ordering operators by team, UAP, last name, and first name.');
 
         usort($operators, function ($a, $b) {
             // Split names to separate first name and last name
@@ -208,7 +208,7 @@ class OperatorRepository extends ServiceEntityRepository
 
     public function findByNameLikeForSuggestions(string $name): array
     {
-        $this->logger->info('Finding operators by name for suggestions.');
+        // $this->logger->info('Finding operators by name for suggestions.');
 
         if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) {
             throw new \InvalidArgumentException("Invalid name format.");
@@ -241,7 +241,7 @@ class OperatorRepository extends ServiceEntityRepository
     // Used in the methods that add the tobedeleted datetime value in the appropriate field to the operator entity
     public function findOperatorWithNoRecentTraining()
     {
-        $this->logger->info('Finding operators with no recent training.');
+        // $this->logger->info('Finding operators with no recent training.');
         # Related to Settings -> OperatorRetrainingDelay
         $retrainingDelay = new \DateTime();
         $retrainingDelay->modify('-6 months');
@@ -253,14 +253,14 @@ class OperatorRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        $this->logger->info('operators to be retrained: ', [$operators]);
+        // $this->logger->info('operators to be retrained: ', [$operators]);
         return $operators;
     }
 
     // Used in the methods that check for operators to be deleted, count them, display them in appropriate views etc
     public function findInActiveOperators()
     {
-        $this->logger->info('Finding operators with no recent training.');
+        // $this->logger->info('Finding operators with no recent training.');
         # Related to Settings -> Lack thereof an appropriate setting
         $inactiveDelay = new \DateTime();
         $inactiveDelay->modify('-3 months');
@@ -272,14 +272,14 @@ class OperatorRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        $this->logger->info('inactive operators: ', [$operators]);
+        // $this->logger->info('inactive operators: ', [$operators]);
         return $operators;
     }
 
     // Used in the methods that delete the operator entity
     public function findOperatorToBeDeleted()
     {
-        $this->logger->info('Finding operators to be deleted.');
+        // $this->logger->info('Finding operators to be deleted.');
         # Related to Settings -> OperatorAutoDeleteDelay
         $AutoDeleteDelay = new \DateTime();
         $AutoDeleteDelay->modify('-3 months');
@@ -291,7 +291,7 @@ class OperatorRepository extends ServiceEntityRepository
             ->getQuery()
             ->getScalarResult();
 
-        $this->logger->info('To be deleted operators: ' . json_encode($operatorIds));
+        // $this->logger->info('To be deleted operators: ' . json_encode($operatorIds));
         // Extract IDs from the result
         return array_column($operatorIds, 'id');
     }

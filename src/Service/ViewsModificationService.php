@@ -123,7 +123,7 @@ class ViewsModificationService extends AbstractController
     //     
     public function defineEntityType($entityType)
     {
-        $this->logger->info('defineEntityType: entityType: ' . $entityType);
+        // $this->logger->info('defineEntityType: entityType: ' . $entityType);
         $repository = null;
         switch ($entityType) {
             case 'zone':
@@ -198,16 +198,16 @@ class ViewsModificationService extends AbstractController
     //     
     public function updateSortOrders($otherEntities, $entity, $newValue)
     {
-        $this->logger->info('entity name' . $entity->getName());
-        $this->logger->info('entity id' . $entity->getId());
-        $this->logger->info('newValue: ' . $newValue);
+        // $this->logger->info('entity name' . $entity->getName());
+        // $this->logger->info('entity id' . $entity->getId());
+        // $this->logger->info('newValue: ' . $newValue);
 
         $originalValue = $entity->getSortorder();
-        $this->logger->info('originalValue: ' . $originalValue);
+        // $this->logger->info('originalValue: ' . $originalValue);
 
         $entity->setSortorder($newValue);
         $entityCount = count($otherEntities);
-        $this->logger->info('entityCount: ' . $entityCount);
+        // $this->logger->info('entityCount: ' . $entityCount);
 
         // Moved to a higher position (i.e., lower value)
         if ($newValue < $originalValue) {
@@ -215,7 +215,7 @@ class ViewsModificationService extends AbstractController
                 $otherSortOrder = $otherEntity->getSortOrder();
                 if ($otherSortOrder >= $newValue && $otherSortOrder < $originalValue) {
                     $otherEntity->setSortOrder($otherSortOrder + 1);
-                    $this->logger->info('Incrementing sortOrder for entity with ID: ' . $otherEntity->getId());
+                    // $this->logger->info('Incrementing sortOrder for entity with ID: ' . $otherEntity->getId());
                 }
             }
         }
@@ -225,7 +225,7 @@ class ViewsModificationService extends AbstractController
                 $otherSortOrder = $otherEntity->getSortOrder();
                 if ($otherSortOrder <= $newValue && $otherSortOrder > $originalValue) {
                     $otherEntity->setSortOrder($otherSortOrder - 1);
-                    $this->logger->info('Decrementing sortOrder for entity with ID: ' . $otherEntity->getId());
+                    // $this->logger->info('Decrementing sortOrder for entity with ID: ' . $otherEntity->getId());
                 }
             }
         }
@@ -243,9 +243,9 @@ class ViewsModificationService extends AbstractController
         // $entityNameParts = array_reverse($entityNameParts);
 
         $entityName = $entityNameParts[0];
-        $this->logger->info('updateEntityNameInheritance: entityName: ' . $entityName);
+        // $this->logger->info('updateEntityNameInheritance: entityName: ' . $entityName);
         $newName = $entityName . '.' . $newParentName;
-        $this->logger->info('updateEntityNameInheritance: newName: ' . $newName);
+        // $this->logger->info('updateEntityNameInheritance: newName: ' . $newName);
 
         $entityId = $entity->getId();
         $entity->setName($newName);
@@ -341,7 +341,7 @@ class ViewsModificationService extends AbstractController
         }
         // Get the entity from the database and return an empty array if it doesn't exist
         $entity = $repository->find($id);
-        $this->logger->info('updateByParentEntity: entityName: ' . $entity->getName());
+        // $this->logger->info('updateByParentEntity: entityName: ' . $entity->getName());
         if (!$entity) {
             return [];
         }

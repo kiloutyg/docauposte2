@@ -223,9 +223,9 @@ class MailerService extends AbstractController
         $emailRecipientsAddress = $uploader->getEmailAddress();
 
         $inValidationUploads = $uploader->getUploadsInValidation();
-        // $this->logger->info('inValidationUploads', json_decode($inValidationUploads));
+        // // $this->logger->info('inValidationUploads', json_decode($inValidationUploads));
         $refusedValidationUploads = $uploader->getUploadsInRefusedValidation();
-        // $this->logger->info('refusedValidationUploads', $refusedValidationUploads);
+        // // $this->logger->info('refusedValidationUploads', $refusedValidationUploads);
 
         // $totalUploads = array_merge($inValidationUploads, $refusedValidationUploads);
 
@@ -252,7 +252,7 @@ class MailerService extends AbstractController
     // Function to send a reminder email to all users listing uploads in validation entire status
     public function sendReminderEmailToAllUsers(array $uploads)
     {
-        $this->logger->info('uploads: ', [$uploads]);
+        // $this->logger->info('uploads: ', [$uploads]);
 
         $usersRaw = $this->userRepository->findAll();
         foreach ($usersRaw as $user) {
@@ -266,7 +266,7 @@ class MailerService extends AbstractController
             }
         }
 
-        $this->logger->info('users: ', [$users]);
+        // $this->logger->info('users: ', [$users]);
 
 
         $senderEmail = $this->senderEmail;

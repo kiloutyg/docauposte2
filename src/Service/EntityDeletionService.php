@@ -225,14 +225,14 @@ class EntityDeletionService
             $trainer->removeTrainingRecord($entity);
         } elseif ($entityType === 'team') {
             $unDefinedTeam = $this->teamRepository->findOneBy(['name' => 'INDEFINI']);
-            $this->logger->info('UnDefined Team: ', [$unDefinedTeam]);
+            // $this->logger->info('UnDefined Team: ', [$unDefinedTeam]);
             foreach ($entity->getOperator() as $operator) {
                 $operator->setTeam($unDefinedTeam);
                 $this->em->persist($operator);
             }
         } elseif ($entityType === 'uap') {
             $unDefinedUap = $this->uapRepository->findOneBy(['name' => 'INDEFINI']);
-            $this->logger->info('UnDefined UAP: ', [$unDefinedUap]);
+            // $this->logger->info('UnDefined UAP: ', [$unDefinedUap]);
             foreach ($entity->getOperator() as $operator) {
                 $operator->setUap($unDefinedUap);
                 $this->em->persist($operator);
@@ -280,7 +280,7 @@ class EntityDeletionService
     }
 
 
-         // This function is responsible for the logic of deleting the OldUploads files
+    // This function is responsible for the logic of deleting the OldUploads files
     public function deleteOldFile(int $oldUploadId)
     {
 
