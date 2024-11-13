@@ -6,8 +6,11 @@
 /.env.local.php
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
+
 /public/bundles/
 /public/doc/
+/public/build/
+
 /var/
 /vendor/
 /database_data/
@@ -43,5 +46,5 @@ temp
 docker-compose.override.yml
 database.test.tar.gz
 doc.test.tar.gz
-```
 docker/dockerfileGHAProd/docauposte2.code-workspace
+*.code-workspace
