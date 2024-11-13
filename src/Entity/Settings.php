@@ -13,7 +13,7 @@ class Settings
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
     private ?int $id = 1;
-    
+
     #[ORM\Column(nullable: true)]
     private ?bool $UploadValidation = null;
 
@@ -21,10 +21,10 @@ class Settings
     private ?int $ValidatorNumber = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $AutoDisplayIncident = null;
+    private ?bool $IncidentAutoDisplay = null;
 
     #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
-    private ?\DateInterval $AutoDisplayIncidentTimer = null;
+    private ?\DateInterval $IncidentAutoDisplayTimer = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $Training = null;
@@ -33,7 +33,7 @@ class Settings
     private ?\DateInterval $OperatorRetrainingDelay = null;
 
     #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
-    private ?\DateInterval $AutoDeleteOperatorDelay = null;
+    private ?\DateInterval $OperatorAutoDeleteDelay = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateInterval $OperatorInactivityDelay = null;
@@ -73,26 +73,26 @@ class Settings
     }
 
 
-    public function isAutoDisplayIncident(): ?bool
+    public function isIncidentAutoDisplay(): ?bool
     {
-        return $this->AutoDisplayIncident;
+        return $this->IncidentAutoDisplay;
     }
 
-    public function setAutoDisplayIncident(?bool $AutoDisplayIncident): static
+    public function setIncidentAutoDisplay(?bool $IncidentAutoDisplay): static
     {
-        $this->AutoDisplayIncident = $AutoDisplayIncident;
+        $this->IncidentAutoDisplay = $IncidentAutoDisplay;
 
         return $this;
     }
 
-    public function getAutoDisplayIncidentTimer(): ?\DateInterval
+    public function getIncidentAutoDisplayTimer(): ?\DateInterval
     {
-        return $this->AutoDisplayIncidentTimer;
+        return $this->IncidentAutoDisplayTimer;
     }
 
-    public function setAutoDisplayIncidentTimer(?\DateInterval $AutoDisplayIncidentTimer): static
+    public function setIncidentAutoDisplayTimer(?\DateInterval $IncidentAutoDisplayTimer): static
     {
-        $this->AutoDisplayIncidentTimer = $AutoDisplayIncidentTimer;
+        $this->IncidentAutoDisplayTimer = $IncidentAutoDisplayTimer;
 
         return $this;
     }
@@ -121,14 +121,14 @@ class Settings
         return $this;
     }
 
-    public function getAutoDeleteOperatorDelay(): ?\DateInterval
+    public function getOperatorAutoDeleteDelay(): ?\DateInterval
     {
-        return $this->AutoDeleteOperatorDelay;
+        return $this->OperatorAutoDeleteDelay;
     }
 
-    public function setAutoDeleteOperatorDelay(?\DateInterval $AutoDeleteOperatorDelay): static
+    public function setOperatorAutoDeleteDelay(?\DateInterval $OperatorAutoDeleteDelay): static
     {
-        $this->AutoDeleteOperatorDelay = $AutoDeleteOperatorDelay;
+        $this->OperatorAutoDeleteDelay = $OperatorAutoDeleteDelay;
 
         return $this;
     }
@@ -144,5 +144,4 @@ class Settings
 
         return $this;
     }
-
 }

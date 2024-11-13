@@ -199,14 +199,14 @@ class ApiController extends FrontController
         $validatorNumber = $this->settings->getValidatorNumber();
         $training = $this->settings->isTraining();
         $operatorRetrainingDelay = $this->settings->getOperatorRetrainingDelay();
-        $autoDeleteOperatorDelay = $this->settings->getAutoDeleteOperatorDelay();
+        $OperatorAutoDeleteDelay = $this->settings->getOperatorAutoDeleteDelay();
 
         $responseData = [
             'uploadValidation' => $uploadValidation,
             'validatorNumber' => $validatorNumber,
             'training' => $training,
             'operatorRetrainingDelay' => $operatorRetrainingDelay,
-            'autoDeleteOperatorDelay' => $autoDeleteOperatorDelay
+            'OperatorAutoDeleteDelay' => $OperatorAutoDeleteDelay
         ];
 
         return new JsonResponse($responseData);

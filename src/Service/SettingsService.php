@@ -57,11 +57,11 @@ class SettingsService extends AbstractController
             $settingsEntity = new Settings();
             $settingsEntity->setUploadValidation(true);
             $settingsEntity->setValidatorNumber(4);
-            $settingsEntity->setAutoDisplayIncident(true);
-            $settingsEntity->setAutoDisplayIncidentTimer(new \DateInterval("P0Y0M0DT0H10M0S"));
+            $settingsEntity->setIncidentAutoDisplay(true);
+            $settingsEntity->setIncidentAutoDisplayTimer(new \DateInterval("P0Y0M0DT0H10M0S"));
             $settingsEntity->setTraining(true);
             $settingsEntity->setOperatorRetrainingDelay(new \DateInterval("P0Y6M0DT0H0M0S"));
-            $settingsEntity->setAutoDeleteOperatorDelay(new \DateInterval("P0Y3M0DT0H0M0S"));
+            $settingsEntity->setOperatorAutoDeleteDelay(new \DateInterval("P0Y3M0DT0H0M0S"));
             $this->em->persist($settingsEntity);
             $this->em->flush();
         }

@@ -37,7 +37,7 @@ class OperatorRepository extends ServiceEntityRepository
         $this->logger = $logger;
         $this->em = $em;
         $this->settingsRepository = $settingsRepository;
-            }
+    }
 
 
     public function findAllOrdered()
@@ -280,7 +280,7 @@ class OperatorRepository extends ServiceEntityRepository
     public function findOperatorToBeDeleted()
     {
         $this->logger->info('Finding operators to be deleted.');
-        # Related to Settings -> AutoDeleteOperatorDelay
+        # Related to Settings -> OperatorAutoDeleteDelay
         $AutoDeleteDelay = new \DateTime();
         $AutoDeleteDelay->modify('-3 months');
 

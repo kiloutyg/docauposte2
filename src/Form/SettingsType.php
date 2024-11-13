@@ -34,11 +34,11 @@ class SettingsType extends AbstractType
                 'attr' => ['class' => '  align-items-center justify-content-center form-select w-25'],
             ])
 
-            ->add('AutoDisplayIncident', CheckboxType::class, [
+            ->add('IncidentAutoDisplay', CheckboxType::class, [
                 'required' => false,
                 'label' => false,
                 'attr' => ['class' => 'pretty-toggle'],
-                ])
+            ])
 
 
             ->add('Training', CheckboxType::class, [
@@ -46,15 +46,15 @@ class SettingsType extends AbstractType
                 'label' => false,
                 'attr' => ['class' => 'pretty-toggle'],
             ])
-            
+
         ;
-            
-            $builder->add('settingsDateInterval', FormType::class, [
-                'label' => false,
-                'inherit_data' => true,
-                'attr' => ['class' => 'incident-settings-group']           
-             ]);
-            $builder->get('settingsDateInterval')
+
+        $builder->add('settingsDateInterval', FormType::class, [
+            'label' => false,
+            'inherit_data' => true,
+            'attr' => ['class' => 'incident-settings-group']
+        ]);
+        $builder->get('settingsDateInterval')
             ->add('OperatorRetrainingDelay', DateIntervalType::class, [
                 'required' => true,
                 'label' => false,
@@ -69,7 +69,7 @@ class SettingsType extends AbstractType
                 'placeholder' => 'Sélectionner le délai en mois',
                 'attr' => ['class' => 'm-0 w-25'],
             ])
-            ->add('AutoDeleteOperatorDelay', DateIntervalType::class, [
+            ->add('OperatorAutoDeleteDelay', DateIntervalType::class, [
                 'required' => true,
                 'label' => false,
                 'labels' => [
@@ -83,7 +83,7 @@ class SettingsType extends AbstractType
                 'placeholder' => 'Sélectionner le délai en mois',
                 'attr' => ['class' => 'm-0 w-25'],
             ])
-            ->add('AutoDisplayIncidentTimer', DateIntervalType::class, [
+            ->add('IncidentAutoDisplayTimer', DateIntervalType::class, [
                 'required' => true,
                 'label' => false,
                 'labels' => [
