@@ -14,33 +14,41 @@ class Settings
     #[ORM\Column(type: 'integer')]
     private ?int $id = 1;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(nullable: true, options: ["default" => true])]
     private ?bool $UploadValidation = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(nullable: true, options: ["default" => 4])]
     private ?int $ValidatorNumber = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(nullable: true, options: ["default" => true])]
     private ?bool $IncidentAutoDisplay = null;
 
-    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
+    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true, options: ["default" => 'P0Y0M0DT0H10M0S'])]
     private ?\DateInterval $IncidentAutoDisplayTimer = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(nullable: true, options: ["default" => true])]
     private ?bool $Training = null;
 
-    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
+    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true, options: ["default" => 'P0Y6M0DT0H0M0S'])]
     private ?\DateInterval $OperatorRetrainingDelay = null;
 
-    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
-    private ?\DateInterval $OperatorAutoDeleteDelay = null;
-
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true, options: ["default" => 'P0Y3M0DT0H0M0S'])]
     private ?\DateInterval $OperatorInactivityDelay = null;
+
+    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true, options: ["default" => 'P0Y3M0DT0H0M0S'])]
+    private ?\DateInterval $OperatorAutoDeleteDelay = null;
 
     public function __construct()
     {
         $this->id = 1;
+        $this->UploadValidation = true;
+        $this->ValidatorNumber = 4;
+        $this->IncidentAutoDisplay = true;
+        $this->IncidentAutoDisplayTimer = new \DateInterval('P0Y0M0DT0H10M0S');
+        $this->Training = true;
+        $this->OperatorRetrainingDelay = new \DateInterval('P0Y6M0DT0H0M0S');
+        $this->OperatorInactivityDelay = new \DateInterval('P0Y3M0DT0H0M0S');
+        $this->OperatorAutoDeleteDelay = new \DateInterval('P0Y3M0DT0H0M0S');
     }
 
     public function getId(): ?int
@@ -121,18 +129,6 @@ class Settings
         return $this;
     }
 
-    public function getOperatorAutoDeleteDelay(): ?\DateInterval
-    {
-        return $this->OperatorAutoDeleteDelay;
-    }
-
-    public function setOperatorAutoDeleteDelay(?\DateInterval $OperatorAutoDeleteDelay): static
-    {
-        $this->OperatorAutoDeleteDelay = $OperatorAutoDeleteDelay;
-
-        return $this;
-    }
-
     public function getOperatorInactivityDelay(): ?\DateInterval
     {
         return $this->OperatorInactivityDelay;
@@ -141,6 +137,18 @@ class Settings
     public function setOperatorInactivityDelay(?\DateInterval $OperatorInactivityDelay): static
     {
         $this->OperatorInactivityDelay = $OperatorInactivityDelay;
+
+        return $this;
+    }
+
+    public function getOperatorAutoDeleteDelay(): ?\DateInterval
+    {
+        return $this->OperatorAutoDeleteDelay;
+    }
+
+    public function setOperatorAutoDeleteDelay(?\DateInterval $OperatorAutoDeleteDelay): static
+    {
+        $this->OperatorAutoDeleteDelay = $OperatorAutoDeleteDelay;
 
         return $this;
     }

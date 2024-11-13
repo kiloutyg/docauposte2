@@ -110,25 +110,28 @@
                                             {{ form_widget(settingsForm.Training) }}										
 										</div>
 										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
-                                            {{ form_label(settingsForm.settingsDateInterval.OperatorAutoDeleteDelay, 'Délai de suppression automatique des opérateurs après inactivité (en mois):', {
-                                                'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary text-white m-0'}
-                                            }) }}
-                                            {{ form_widget(settingsForm.settingsDateInterval.OperatorAutoDeleteDelay) }}										
-										</div>
-										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
                                             {{ form_label(settingsForm.settingsDateInterval.OperatorRetrainingDelay, 'Délai de déqualification des opérateurs (en mois):', {
                                                 'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary  text-white m-0'}
                                             }) }}
                                             {{ form_widget(settingsForm.settingsDateInterval.OperatorRetrainingDelay) }}										
 										</div>
-									</div>			
-
+										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
+                                            {{ form_label(settingsForm.settingsDateInterval.OperatorInactivityDelay, 'Délai de mise en inactivité des opérateurs (en mois):', {
+                                                'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary  text-white m-0'}
+                                            }) }}
+                                            {{ form_widget(settingsForm.settingsDateInterval.OperatorInactivityDelay) }}										
+										</div>
+										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
+                                            {{ form_label(settingsForm.settingsDateInterval.OperatorAutoDeleteDelay, 'Délai de suppression automatique des opérateurs après inactivité (en mois):', {
+                                                'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary text-white m-0'}
+                                            }) }}
+                                            {{ form_widget(settingsForm.settingsDateInterval.OperatorAutoDeleteDelay) }}										
+										</div>
+									</div>
 									<hr
 										class="my-4">
 									{{ form_widget(settingsForm.submit, {'attr': {'class': 'btn btn-primary mx-auto submit-settings-modification'}}) }}
-
 								{{ form_end(settingsForm) }}
-
 							</div>
 						</div>
 					</div>

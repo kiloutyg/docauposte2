@@ -69,6 +69,20 @@ class SettingsType extends AbstractType
                 'placeholder' => 'Sélectionner le délai en mois',
                 'attr' => ['class' => 'm-0 w-25'],
             ])
+            ->add('OperatorInactivityDelay', DateIntervalType::class, [
+                'required' => true,
+                'label' => false,
+                'labels' => [
+                    'months' => false,
+                ],
+                'widget' => 'choice',
+                'with_years' => false,
+                'with_months' => true,
+                'with_days' => false,
+                'with_minutes' => false,
+                'placeholder' => 'Sélectionner le délai en mois',
+                'attr' => ['class' => 'm-0 w-25'],
+            ])
             ->add('OperatorAutoDeleteDelay', DateIntervalType::class, [
                 'required' => true,
                 'label' => false,
@@ -97,6 +111,7 @@ class SettingsType extends AbstractType
                 'placeholder' => 'Sélectionner le délai en minutes',
                 'attr' => ['class' => 'm-0 w-25'],
             ])
+
         ;
 
         // Submit Button

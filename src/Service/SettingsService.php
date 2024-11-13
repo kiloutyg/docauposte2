@@ -7,6 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\Form\FormInterface;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
@@ -52,19 +55,11 @@ class SettingsService extends AbstractController
     public function getSettings(): Settings
     {
         $settingsEntity = $this->settingsRepository->getSettings();
-
+        
         if (!$settingsEntity) {
-            $settingsEntity = new Settings();
-            $settingsEntity->setUploadValidation(true);
-            $settingsEntity->setValidatorNumber(4);
-            $settingsEntity->setIncidentAutoDisplay(true);
-            $settingsEntity->setIncidentAutoDisplayTimer(new \DateInterval("P0Y0M0DT0H10M0S"));
-            $settingsEntity->setTraining(true);
-            $settingsEntity->setOperatorRetrainingDelay(new \DateInterval("P0Y6M0DT0H0M0S"));
-            $settingsEntity->setOperatorAutoDeleteDelay(new \DateInterval("P0Y3M0DT0H0M0S"));
-            $this->em->persist($settingsEntity);
-            $this->em->flush();
+            $settingsEntity = $this->initializeSettings();
         }
+
         return $settingsEntity;
     }
 
@@ -98,4 +93,22 @@ class SettingsService extends AbstractController
         }
         return new Response($response);
     }
+
+    private function initializeSettings()
+    {
+        $settingsEntity = new Settings();
+        $settingsEntity->setUploadValidation(true);
+        $settingsEntity->setValidatorNumber(4);
+        $settingsEntity->setIncidentAutoDisplay(true);
+        $settingsEntity->setIncidentAutoDisplayTimer(new \DateInterval("P0Y0M0DT0H10M0S"));
+        $settingsEntity->setTraining(true);
+        $settingsEntity->setOperatorRetrainingDelay(new \DateInterval("P0Y6M0DT0H0M0S"));
+        $settingsEntity->setOperatorAutoDeleteDelay(new \DateInterval("P0Y3M0DT0H0M0S"));
+        $settingsEntity->setOperatorInactivityDelay(new \DateInterval("P0Y3M0DT0H0M0S"));
+        $this->em->persist($settingsEntity);
+        $this->em->flush();
+
+        return $settingsEntity;
+    }
+
 }
