@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Operator;
 
+use App\Repository\SettingsRepository;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -23,13 +25,19 @@ class OperatorRepository extends ServiceEntityRepository
 {
     private $logger;
     private $em;
+    private $settingsRepository;
 
-    public function __construct(ManagerRegistry $registry, LoggerInterface $logger, EntityManagerInterface $em)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        LoggerInterface $logger,
+        EntityManagerInterface $em,
+        SettingsRepository $settingsRepository,
+    ) {
         parent::__construct($registry, Operator::class);
         $this->logger = $logger;
         $this->em = $em;
-    }
+        $this->settingsRepository = $settingsRepository;
+            }
 
 
     public function findAllOrdered()
@@ -234,17 +242,18 @@ class OperatorRepository extends ServiceEntityRepository
     public function findOperatorWithNoRecentTraining()
     {
         $this->logger->info('Finding operators with no recent training.');
-        $sixMonthsAgo = new \DateTime();
-        $sixMonthsAgo->modify('-6 months');
+        # Related to Settings -> OperatorRetrainingDelay
+        $retrainingDelay = new \DateTime();
+        $retrainingDelay->modify('-6 months');
 
         $operators = $this->createQueryBuilder('o')
-            ->where('o.lasttraining < :sixMonthsAgo')
-            ->setParameter('sixMonthsAgo', $sixMonthsAgo)
+            ->where('o.lasttraining < :retrainingDelay')
+            ->setParameter('retrainingDelay', $retrainingDelay)
             ->andWhere('o.tobedeleted IS NULL')
             ->getQuery()
             ->getResult();
 
-        $this->logger->info('Unactive operators: ', [$operators]);
+        $this->logger->info('operators to be retrained: ', [$operators]);
         return $operators;
     }
 
@@ -252,12 +261,13 @@ class OperatorRepository extends ServiceEntityRepository
     public function findInActiveOperators()
     {
         $this->logger->info('Finding operators with no recent training.');
-        $sixMonthsAgo = new \DateTime();
-        $sixMonthsAgo->modify('-3 months');
+        # Related to Settings -> Lack thereof an appropriate setting
+        $inactiveDelay = new \DateTime();
+        $inactiveDelay->modify('-3 months');
 
         $operators = $this->createQueryBuilder('o')
-            ->where('o.lasttraining < :sixMonthsAgo')
-            ->setParameter('sixMonthsAgo', $sixMonthsAgo)
+            ->where('o.lasttraining < :inactiveDelay')
+            ->setParameter('inactiveDelay', $inactiveDelay)
             ->andWhere('o.tobedeleted IS NOT NULL')
             ->getQuery()
             ->getResult();
@@ -270,13 +280,14 @@ class OperatorRepository extends ServiceEntityRepository
     public function findOperatorToBeDeleted()
     {
         $this->logger->info('Finding operators to be deleted.');
-        $threeMonthsAgo = new \DateTime();
-        $threeMonthsAgo->modify('-3 months');
+        # Related to Settings -> AutoDeleteOperatorDelay
+        $AutoDeleteDelay = new \DateTime();
+        $AutoDeleteDelay->modify('-3 months');
 
         $operatorIds = $this->createQueryBuilder('o')
             ->select('o.id')
-            ->where('o.tobedeleted < :threeMonthsAgo')
-            ->setParameter('threeMonthsAgo', $threeMonthsAgo)
+            ->where('o.tobedeleted < :AutoDeleteDelay')
+            ->setParameter('AutoDeleteDelay', $AutoDeleteDelay)
             ->getQuery()
             ->getScalarResult();
 

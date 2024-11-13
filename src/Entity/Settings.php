@@ -35,6 +35,9 @@ class Settings
     #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
     private ?\DateInterval $AutoDeleteOperatorDelay = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateInterval $OperatorInactivityDelay = null;
+
     public function __construct()
     {
         $this->id = 1;
@@ -126,6 +129,18 @@ class Settings
     public function setAutoDeleteOperatorDelay(?\DateInterval $AutoDeleteOperatorDelay): static
     {
         $this->AutoDeleteOperatorDelay = $AutoDeleteOperatorDelay;
+
+        return $this;
+    }
+
+    public function getOperatorInactivityDelay(): ?\DateInterval
+    {
+        return $this->OperatorInactivityDelay;
+    }
+
+    public function setOperatorInactivityDelay(?\DateInterval $OperatorInactivityDelay): static
+    {
+        $this->OperatorInactivityDelay = $OperatorInactivityDelay;
 
         return $this;
     }
