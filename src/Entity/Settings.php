@@ -14,28 +14,28 @@ class Settings
     #[ORM\Column(type: 'integer')]
     private ?int $id = 1;
 
-    #[ORM\Column(nullable: true, options: ["default" => true])]
-    private ?bool $UploadValidation = null;
+    #[ORM\Column(nullable: true)]
+    private ?bool $UploadValidation = true;
 
-    #[ORM\Column(nullable: true, options: ["default" => 4])]
-    private ?int $ValidatorNumber = null;
+    #[ORM\Column(nullable: true)]
+    private ?int $ValidatorNumber = 4;
 
-    #[ORM\Column(nullable: true, options: ["default" => true])]
-    private ?bool $IncidentAutoDisplay = null;
+    #[ORM\Column(nullable: true)]
+    private ?bool $IncidentAutoDisplay = true;
 
-    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true, options: ["default" => 'P0Y0M0DT0H10M0S'])]
+    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
     private ?\DateInterval $IncidentAutoDisplayTimer = null;
 
-    #[ORM\Column(nullable: true, options: ["default" => true])]
-    private ?bool $Training = null;
+    #[ORM\Column(nullable: true)]
+    private ?bool $Training = true;
 
-    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true, options: ["default" => 'P0Y6M0DT0H0M0S'])]
+    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
     private ?\DateInterval $OperatorRetrainingDelay = null;
 
-    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true, options: ["default" => 'P0Y3M0DT0H0M0S'])]
+    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
     private ?\DateInterval $OperatorInactivityDelay = null;
 
-    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true, options: ["default" => 'P0Y3M0DT0H0M0S'])]
+    #[ORM\Column(type: Types::DATEINTERVAL, nullable: true)]
     private ?\DateInterval $OperatorAutoDeleteDelay = null;
 
     public function __construct()
