@@ -44,11 +44,11 @@ class Settings
         $this->UploadValidation = true;
         $this->ValidatorNumber = 4;
         $this->IncidentAutoDisplay = true;
-        $this->IncidentAutoDisplayTimer = new \DateInterval('P0Y0M0DT0H10M0S');
+        $this->IncidentAutoDisplayTimer = new \DateInterval('P00Y00M00DT00H10M00S');
         $this->Training = true;
-        $this->OperatorRetrainingDelay = new \DateInterval('P0Y6M0DT0H0M0S');
-        $this->OperatorInactivityDelay = new \DateInterval('P0Y3M0DT0H0M0S');
-        $this->OperatorAutoDeleteDelay = new \DateInterval('P0Y3M0DT0H0M0S');
+        $this->OperatorRetrainingDelay = new \DateInterval('P00Y06M00DT00H00M00S');
+        $this->OperatorInactivityDelay = new \DateInterval('P00Y03M00DT00H00M00S');
+        $this->OperatorAutoDeleteDelay = new \DateInterval('P00Y03M00DT00H00M00S');
     }
 
     public function getId(): ?int
