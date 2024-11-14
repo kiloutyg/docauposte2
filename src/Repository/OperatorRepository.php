@@ -260,7 +260,6 @@ class OperatorRepository extends ServiceEntityRepository
         # Related to Settings -> OperatorRetrainingDelay
         $operatorRetrainingDateInterval = $this->settings->getOperatorRetrainingDelay();
         $retrainingDelay = new \DateTime('now');
-        // $retrainingDelay->modify('-6 months');
         $retrainingDelay->sub($operatorRetrainingDateInterval);
 
         $operators = $this->createQueryBuilder('o')
@@ -268,6 +267,7 @@ class OperatorRepository extends ServiceEntityRepository
             ->orWhere('o.lasttraining IS NULL')
             ->setParameter('retrainingDelay', $retrainingDelay)
             ->andWhere('o.tobedeleted IS NULL')
+            ->andWhere('o.inactiveSince IS NULL')
             ->getQuery()
             ->getResult();
 
@@ -286,11 +286,31 @@ class OperatorRepository extends ServiceEntityRepository
         # Related to Settings -> OperatorInactivityDelay
         $operatorInactivityDateInterval = $this->settings->getOperatorInactivityDelay();
         $inactiveDelay = new \DateTime('now');
-        // $inactiveDelay->modify('-3 months');
         $inactiveDelay->sub($operatorInactivityDateInterval);
 
         $operators = $this->createQueryBuilder('o')
-            ->where('o.lasttraining < :inactiveDelay')
+            ->where('o.inactiveSince < :inactiveDelay')
+            ->setParameter('inactiveDelay', $inactiveDelay)
+            ->andWhere('o.tobedeleted IS NULL')
+            ->getQuery()
+            ->getResult();
+
+        // $this->logger->info('inactive operators: ', [$operators]);
+        return $operators;
+    }
+
+
+    // Used in the methods that check for operators to be deleted, count them, display them in appropriate views etc
+    public function findDeactivatedOperators()
+    {
+        // $this->logger->info('Finding operators with no recent training.');
+        # Related to Settings -> OperatorInactivityDelay
+        $operatorInactivityDateInterval = $this->settings->getOperatorInactivityDelay();
+        $inactiveDelay = new \DateTime('now');
+        $inactiveDelay->sub($operatorInactivityDateInterval);
+
+        $operators = $this->createQueryBuilder('o')
+            ->where('o.inactiveSince < :inactiveDelay')
             ->setParameter('inactiveDelay', $inactiveDelay)
             ->andWhere('o.tobedeleted IS NOT NULL')
             ->getQuery()
@@ -301,9 +321,6 @@ class OperatorRepository extends ServiceEntityRepository
     }
 
 
-
-
-
     // Used in the methods that delete the operator entity
     public function findOperatorToBeDeleted()
     {
@@ -311,7 +328,6 @@ class OperatorRepository extends ServiceEntityRepository
         # Related to Settings -> OperatorAutoDeleteDelay
         $operatorAutoDeleteDateInterval = $this->settings->getOperatorAutoDeleteDelay();
         $autoDeleteDelay = new \DateTime();
-        // $autoDeleteDelay->modify('-3 months');
         $autoDeleteDelay->sub($operatorAutoDeleteDateInterval);
 
         $operatorIds = $this->createQueryBuilder('o')

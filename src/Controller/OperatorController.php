@@ -98,8 +98,7 @@ class OperatorController extends FrontController
         // $this->logger->info('in operatorBasePage is operatorForms empty: ' . count($operatorForms));
 
         if (count($operatorForms) === 0) {
-            $inActiveOperators = $this->operatorRepository->findInActiveOperators();
-            // $this->logger->info('in operatorBasePage is inActiveOperators : ' . count($inActiveOperators));
+            $inActiveOperators = $this->operatorRepository->findDeactivatedOperators();
             foreach ($inActiveOperators as $operator) {
                 $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
                     'operator_id' => $operator->getId(),

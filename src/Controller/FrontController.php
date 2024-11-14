@@ -35,7 +35,7 @@ class FrontController extends BaseController
         if ($this->settings->isTraining() && $this->authChecker->isGranted('ROLE_MANAGER')) {
             $countArray = $this->operatorService->operatorCheckForAutoDelete();
             if ($countArray != null) {
-                $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
+                $this->addFlash('info', ($countArray['findDeactivatedOperators'] === 1 ? $countArray['findDeactivatedOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['findDeactivatedOperators'] . ' opérateurs inactifs sont à supprimer. ') .
                     ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
             }
         }

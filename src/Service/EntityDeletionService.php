@@ -177,6 +177,7 @@ class EntityDeletionService
         if (!$entity) {
             return false;
         }
+        $this->logger->info('to be deleted entity details: ' , [$entity]);
 
         // Deletion logic for related entities, folder and files
         if ($entityType === 'zone') {
@@ -229,7 +230,10 @@ class EntityDeletionService
             }
             if ($entity->isIsTrainer()){
                 $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $entity]);
-                if (!empty($trainerEntity->getTrainingRecords())){
+                $this->logger->info('trainerEntity details: ' , [$trainerEntity]);
+                $this->logger->info('trainerEntity trainingRecords: ' , [$trainerEntity->getTrainingRecords()]);
+                
+                if (!$trainerEntity->getTrainingRecords()->isEmpty()){
                     $entity->setToBeDeleted(new \DateTime('now'));
                     $this->em->persist($entity);
                     $this->em->flush();
@@ -242,7 +246,7 @@ class EntityDeletionService
             $trainer = $entity->getTrainer();
             $trainer->removeTrainingRecord($entity);
         } elseif ($entityType === 'trainer'){
-            if (!empty($entity->getTrainingRecords())){
+            if (!$entity->getTrainingRecords()->isEmpty()){
                 return false;
             } else {
                 $entity->getOperator()->setIsTrainer(false);
@@ -262,7 +266,7 @@ class EntityDeletionService
                 $this->em->persist($operator);
             }
         } 
-
+        $this->logger->info('deleted entity details: ' , [$entity]);
         $this->em->remove($entity);
         $this->em->flush();
 

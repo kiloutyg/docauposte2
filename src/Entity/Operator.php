@@ -63,6 +63,9 @@ class Operator
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $tobedeleted = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $inactiveSince = null;
+
 
     public function __construct()
     {
@@ -234,6 +237,18 @@ class Operator
     public function setTobedeleted(?\DateTimeInterface $tobedeleted): static
     {
         $this->tobedeleted = $tobedeleted;
+
+        return $this;
+    }
+
+    public function getInactiveSince(): ?\DateTimeInterface
+    {
+        return $this->inactiveSince;
+    }
+
+    public function setInactiveSince(?\DateTimeInterface $inactiveSince): static
+    {
+        $this->inactiveSince = $inactiveSince;
 
         return $this;
     }
