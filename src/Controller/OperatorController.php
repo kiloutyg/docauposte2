@@ -173,6 +173,8 @@ class OperatorController extends FrontController
             if ($operator->getTobedeleted() != null) {
                 $operator->setTobedeleted(null);
                 $operator->setLasttraining(new \DateTime());
+                $operator->setInactiveSince(null);
+                $operator->setTobedeleted(null);
             }
             try {
                 $this->em->persist($operator);
@@ -540,6 +542,7 @@ class OperatorController extends FrontController
                         $this->em->persist($existingTrainingRecord);
                         $operatorEntity->setLasttraining(new \DateTime());
                         $operatorEntity->setTobedeleted(null);
+                        $operatorEntity->setInactiveSince(null);
                         $this->em->persist($operatorEntity);
                     }
                 } else {
@@ -553,6 +556,7 @@ class OperatorController extends FrontController
                     $this->em->persist($trainingRecord);
                     $operatorEntity->setLasttraining(new \DateTime());
                     $operatorEntity->setTobedeleted(null);
+                    $operatorEntity->setInactiveSince(null);
                     $this->em->persist($operatorEntity);
                 }
 
@@ -562,6 +566,8 @@ class OperatorController extends FrontController
         }
 
         $trainerOperator->setLasttraining(new \DateTime());
+        $trainerOperator->setTobedeleted(null);
+        $trainerOperator->setInactiveSince(null);
         $this->em->persist($trainerOperator);
         $this->em->flush();
 
