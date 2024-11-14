@@ -23,12 +23,18 @@ class UploadController extends FrontController
 {
 
 
+
+
+
     // This function is responsible for rendering the upload interface
     #[Route('/upload', name: 'upload')]
     public function index(): Response
     {
         return $this->render('/services/uploads/upload.html.twig', []);
     }
+
+
+
 
     // This function is responsible for rendering the uploaded files interface
     #[Route('/uploaded', name: 'uploaded_files')]
@@ -38,11 +44,12 @@ class UploadController extends FrontController
             'services/uploads/uploaded.html.twig'
         );
     }
-    // 
-    // 
-    // 
-    //     
-    // 
+
+
+
+
+
+
     // Create a route to upload a file, and pass the request to the UploadService to handle the file upload
     #[Route('/uploading', name: 'generic_upload_files')]
     public function generic_upload_files(Request $request): Response
@@ -91,10 +98,11 @@ class UploadController extends FrontController
             return $this->redirect($originUrl);
         }
     }
-    // 
-    // 
-    // 
-    // 
+
+
+
+
+
     // create a route to redirect to the correct views of a file
     #[Route('/download/{uploadId}', name: 'download_file')]
     public function filterDownloadFile(int $uploadId, Request $request): Response
@@ -163,10 +171,12 @@ class UploadController extends FrontController
         // Default action if none of the above conditions are met
         return $this->downloadFileFromMethods($path);
     }
-    // 
-    // 
-    // 
-    // 
+
+
+
+
+
+
     // create a route to download a file in more simple terms to display the file
     public function downloadFileFromMethods(string $path): Response
     {
@@ -175,10 +185,12 @@ class UploadController extends FrontController
         // $this->logger->info('file', ['file' => $file]);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
-    // 
-    // 
-    // 
-    // 
+
+
+
+
+
+
     // create a route to redirect to the correct views of a file
     #[Route('/downloadByPath/{uploadId}', name: 'download_file_from_path')]
     public function downloadFileFromPath(int $uploadId): Response
@@ -189,10 +201,11 @@ class UploadController extends FrontController
         // $this->logger->info('path', ['path' => $path]);
         return $this->downloadFileFromMethods($path);
     }
-    // 
-    // 
-    // 
-    // 
+
+
+
+
+
     // Private method to determine the file path
     private function determineFilePath($file): string
     {
@@ -211,10 +224,10 @@ class UploadController extends FrontController
         return $file->getPath();
     }
 
-    // 
-    // 
-    // 
-    // 
+
+
+
+
     // create a route to download a file in more simple terms to display the file
     #[Route('/download/invalidation/{uploadId}', name: 'download_invalidation_file')]
     public function downloadInvalidationFile(int $uploadId = null, Request $request): Response
@@ -226,10 +239,12 @@ class UploadController extends FrontController
         $file = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
-    // 
-    // 
-    // 
-    // 
+
+
+
+
+
+
     // create a route to delete a file
     #[Route('/delete/upload/{uploadId}', name: 'delete_file')]
 
@@ -250,10 +265,12 @@ class UploadController extends FrontController
         $this->addFlash('success', 'Le fichier  ' . $name . ' a été supprimé.');
         return $this->redirect($originUrl);
     }
-    // 
-    // 
-    // 
-    // 
+
+
+
+
+
+
     // create a route to modify a file and or display the modification page
     #[Route('/modification/view/{uploadId}', name: 'modify_file')]
     public function fileModificationView(Request $request, int $uploadId): Response
@@ -297,6 +314,11 @@ class UploadController extends FrontController
         // Log the request
         // $this->logger->info('fullrequest', ['request' => $request->request->all()]);
         $originUrl = $request->headers->get('referer');
+
+        if (!$request->isMethod('POST')) {
+            $this->addFlash('warning', 'Invalid request.');
+            return $this->redirectToRoute('app_base');
+        };
 
         // Retrieve the current upload entity based on the uploadId
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);

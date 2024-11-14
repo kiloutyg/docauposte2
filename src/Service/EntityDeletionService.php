@@ -25,6 +25,7 @@ use App\Repository\OperatorRepository;
 use App\Repository\TrainingRecordRepository;
 use App\Repository\TeamRepository;
 use App\Repository\UapRepository;
+use App\Repository\TrainerRepository;
 
 use App\Service\IncidentService;
 use App\Service\FolderCreationService;
@@ -57,6 +58,7 @@ class EntityDeletionService
     private $trainingRecordRepository;
     private $teamRepository;
     private $uapRepository;
+    private $trainerRepository;
 
 
 
@@ -83,7 +85,8 @@ class EntityDeletionService
         OperatorRepository              $operatorRepository,
         TrainingRecordRepository        $trainingRecordRepository,
         TeamRepository                  $teamRepository,
-        UapRepository                   $uapRepository
+        UapRepository                   $uapRepository,
+        TrainerRepository               $trainerRepository
     ) {
         $this->em                           = $em;
         $this->logger                       = $logger;
@@ -105,8 +108,9 @@ class EntityDeletionService
         $this->OldUploadRepository          = $OldUploadRepository;
         $this->operatorRepository           = $operatorRepository;
         $this->trainingRecordRepository     = $trainingRecordRepository;
-        $this->teamRepository                = $teamRepository;
+        $this->teamRepository               = $teamRepository;
         $this->uapRepository                = $uapRepository;
+        $this->trainerRepository            = $trainerRepository;
     }
 
     // This function is responsible for deleting an entity and its related entities from the database and the server filesystem
@@ -159,6 +163,9 @@ class EntityDeletionService
                 break;
             case 'uap':
                 $repository = $this->uapRepository;
+                break;
+            case 'trainer':
+                $repository = $this->trainerRepository;
                 break;
         }
         // If the repository is not found or the entity is not found in the database, return false
@@ -220,9 +227,26 @@ class EntityDeletionService
             foreach ($entity->getTrainingRecords() as $trainingRecord) {
                 $this->deleteEntity('trainingRecord', $trainingRecord->getId());
             }
+            if ($entity->isIsTrainer()){
+                $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $entity]);
+                if (!empty($trainerEntity->getTrainingRecords())){
+                    $entity->setToBeDeleted(new \DateTime('now'));
+                    $this->em->persist($entity);
+                    $this->em->flush();
+                    return false;
+                } else {
+                    $this->deleteEntity('trainer', $trainerEntity->getId());
+                }
+            }
         } elseif ($entityType === 'trainingRecord') {
             $trainer = $entity->getTrainer();
             $trainer->removeTrainingRecord($entity);
+        } elseif ($entityType === 'trainer'){
+            if (!empty($entity->getTrainingRecords())){
+                return false;
+            } else {
+                $entity->getOperator()->setIsTrainer(false);
+            }
         } elseif ($entityType === 'team') {
             $unDefinedTeam = $this->teamRepository->findOneBy(['name' => 'INDEFINI']);
             // $this->logger->info('UnDefined Team: ', [$unDefinedTeam]);
@@ -237,7 +261,7 @@ class EntityDeletionService
                 $operator->setUap($unDefinedUap);
                 $this->em->persist($operator);
             }
-        }
+        } 
 
         $this->em->remove($entity);
         $this->em->flush();

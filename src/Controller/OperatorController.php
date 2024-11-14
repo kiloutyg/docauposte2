@@ -115,6 +115,9 @@ class OperatorController extends FrontController
         ]);
     }
 
+
+
+    
     private function processNewOperator(Operator $newOperator, $form, Request $request)
     {
 
@@ -434,9 +437,6 @@ class OperatorController extends FrontController
             return $surnameA === $surnameB ? strcmp($firstNameA, $firstNameB) : strcmp($surnameA, $surnameB);
         });
 
-        // $this->logger->info('selectedOperators', [$selectedOperators]);
-
-
         $trainingRecords = []; // Array of training records
         $unorderedTrainingRecords = []; // Array of unordered training records
         $untrainedOperators = []; // Array of untrained operators
@@ -481,6 +481,9 @@ class OperatorController extends FrontController
             'inTrainingOperatorsByTrainer' => $inTrainingOperatorsByTrainer,
         ]);
     }
+
+
+
 
     #[Route('/operator/trainingRecord/form/{uploadId}/{teamId}/{uapId}', name: 'app_training_record_form')]
     public function trainingRecordForm(int $uploadId, Request $request, ?int $teamId = null, ?int $uapId = null): Response
@@ -572,6 +575,8 @@ class OperatorController extends FrontController
 
 
 
+
+
     #[Route('/operator/check-duplicate-by-name', name: 'app_operator_check_duplicate_by_name', methods: ['POST'])]
     public function checkDuplicateOperatorByName(Request $request): JsonResponse
     {
@@ -613,6 +618,8 @@ class OperatorController extends FrontController
 
 
 
+
+
     #[Route('/operator/check-duplicate-by-code', name: 'app_operator_check_duplicate_by_code', methods: ['POST'])]
     public function checkDuplicateOperatorByCode(Request $request): JsonResponse
     {
@@ -649,6 +656,8 @@ class OperatorController extends FrontController
             'message' => "Aucun opérateur avec ce codeOpé n'existe"
         ]);
     }
+
+
 
 
     // Route to check the operator to validate the training form and make the trained button appear
@@ -698,6 +707,9 @@ class OperatorController extends FrontController
     }
 
 
+
+
+
     // Route to check if a code exist in the database and then return a boolean
 
     #[Route('operator/check-if-code-exist', name: 'app_check_if_code_exist')]
@@ -722,6 +734,10 @@ class OperatorController extends FrontController
             ]);
         }
     }
+
+
+
+
 
     // Route to check if a trainer exist by name and code
     #[Route('operator/check-if-trainer-exist', name: 'app_check_if_trainer_exist')]
@@ -796,6 +812,10 @@ class OperatorController extends FrontController
         }
     }
 
+
+
+
+
     #[Route('operator/suggest-names', name: 'app_suggest_names')]
     public function suggestNames(Request $request, SerializerInterface $serializer): JsonResponse
     {
@@ -851,6 +871,8 @@ class OperatorController extends FrontController
         return new JsonResponse($serializedSuggestions, 200, [], true);
     }
 
+
+
     // Route to print the operator detail in a pdf
     #[Route('/operator/detail/{operatorId}', name: 'app_operator_detail')]
     public function printOpeDetail(int $operatorId)
@@ -858,7 +880,8 @@ class OperatorController extends FrontController
         $operator = $this->cacheService->getEntityById('operator', $operatorId);
         // $this->logger->info('operator', [$operator]);
 
-        $pdfContent = $this->pdfGeneratorService->generateOperatorPdf($operator);
+        // $pdfContent = $this->pdfGeneratorService->generateOperatorPdf($operator);
+        $this->pdfGeneratorService->generateOperatorPdf($operator);
 
         return true;
     }
@@ -991,6 +1014,7 @@ class OperatorController extends FrontController
 
 
 
+
     /**
      * Helper function to find an entity by name or return a default.
      *
@@ -1017,6 +1041,9 @@ class OperatorController extends FrontController
 
         throw new \Exception('Default entity not found');
     }
+
+
+
 
     // Route to delete UAP or Team without breaking operators and training records database
     #[Route('/operator/delete-uap-or-team/{entityType}/{entityId}', name: 'app_delete_uap_or_team')]
@@ -1052,7 +1079,6 @@ class OperatorController extends FrontController
             $this->em->persist($uap);
             $this->em->flush();
         }
-
 
         $team = new Team();
         $uap = new Uap();

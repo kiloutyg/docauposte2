@@ -108,15 +108,19 @@ class SuperAdminController extends FrontController
 
     // Zone deletion logic destined to the super admin, it also deletes the folder structure for the zone
     #[Route('/super_admin/delete_zone/{zoneId}', name: 'app_super_admin_delete_zone')]
-    public function deleteEntity(int $zoneId): Response
+    public function deleteEntityZone(int $zoneId): Response
     {
         $entityType = 'zone';
+
         $entity = $this->zoneRepository->findOneBy(['id' => $zoneId]);
+        
+        if (empty($entity)){
+            return $this->redirectToRoute('app_super_admin');
+        };
 
         $response = $this->entitydeletionService->deleteEntity($entityType, $entity->getId());
 
         if ($response == true) {
-
             $this->addFlash('success', $entityType . ' has been deleted');
             return $this->redirectToRoute('app_super_admin');
         } else {

@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 
 /**
- * @extends ServiceEntityRepository<Operator>
+ * @extends RepositoryEntityRepository<Operator>
  *
  * @method Operator|null find($id, $lockMode = null, $lockVersion = null)
  * @method Operator|null findOneBy(array $criteria, array $orderBy = null)
@@ -26,6 +26,7 @@ class OperatorRepository extends ServiceEntityRepository
     private $logger;
     private $em;
     private $settingsRepository;
+    private $settings;
 
     public function __construct(
         ManagerRegistry $registry,
@@ -34,10 +35,13 @@ class OperatorRepository extends ServiceEntityRepository
         SettingsRepository $settingsRepository,
     ) {
         parent::__construct($registry, Operator::class);
-        $this->logger = $logger;
-        $this->em = $em;
-        $this->settingsRepository = $settingsRepository;
+        $this->logger               = $logger;
+        $this->em                   = $em;
+        $this->settingsRepository   = $settingsRepository;
+        $this->settings             = $this->settingsRepository->getSettings();
     }
+
+
 
 
     public function findAllOrdered()
@@ -62,11 +66,11 @@ class OperatorRepository extends ServiceEntityRepository
 
 
 
+
+
     public function findOperatorsSortedByLastNameFirstName()
     {
         // $this->logger->info('Finding operators sorted last name, and first name.');
-
-
         // Fetch all operators with their team and UAP
         $operators = $this->createQueryBuilder('o')
             ->join('o.team', 't')
@@ -105,6 +109,8 @@ class OperatorRepository extends ServiceEntityRepository
 
         return $operators;
     }
+
+
 
 
 
@@ -169,6 +175,9 @@ class OperatorRepository extends ServiceEntityRepository
     }
 
 
+
+
+
     public function orderOperator($operators)
     {
 
@@ -206,6 +215,8 @@ class OperatorRepository extends ServiceEntityRepository
 
 
 
+
+
     public function findByNameLikeForSuggestions(string $name): array
     {
         // $this->logger->info('Finding operators by name for suggestions.');
@@ -238,16 +249,23 @@ class OperatorRepository extends ServiceEntityRepository
         }
     }
 
+
+
+
+
     // Used in the methods that add the tobedeleted datetime value in the appropriate field to the operator entity
     public function findOperatorWithNoRecentTraining()
     {
         // $this->logger->info('Finding operators with no recent training.');
         # Related to Settings -> OperatorRetrainingDelay
-        $retrainingDelay = new \DateTime();
-        $retrainingDelay->modify('-6 months');
+        $operatorRetrainingDateInterval = $this->settings->getOperatorRetrainingDelay();
+        $retrainingDelay = new \DateTime('now');
+        // $retrainingDelay->modify('-6 months');
+        $retrainingDelay->sub($operatorRetrainingDateInterval);
 
         $operators = $this->createQueryBuilder('o')
             ->where('o.lasttraining < :retrainingDelay')
+            ->orWhere('o.lasttraining IS NULL')
             ->setParameter('retrainingDelay', $retrainingDelay)
             ->andWhere('o.tobedeleted IS NULL')
             ->getQuery()
@@ -257,13 +275,19 @@ class OperatorRepository extends ServiceEntityRepository
         return $operators;
     }
 
+
+
+
+
     // Used in the methods that check for operators to be deleted, count them, display them in appropriate views etc
     public function findInActiveOperators()
     {
         // $this->logger->info('Finding operators with no recent training.');
-        # Related to Settings -> Lack thereof an appropriate setting
-        $inactiveDelay = new \DateTime();
-        $inactiveDelay->modify('-3 months');
+        # Related to Settings -> OperatorInactivityDelay
+        $operatorInactivityDateInterval = $this->settings->getOperatorInactivityDelay();
+        $inactiveDelay = new \DateTime('now');
+        // $inactiveDelay->modify('-3 months');
+        $inactiveDelay->sub($operatorInactivityDateInterval);
 
         $operators = $this->createQueryBuilder('o')
             ->where('o.lasttraining < :inactiveDelay')
@@ -276,18 +300,24 @@ class OperatorRepository extends ServiceEntityRepository
         return $operators;
     }
 
+
+
+
+
     // Used in the methods that delete the operator entity
     public function findOperatorToBeDeleted()
     {
         // $this->logger->info('Finding operators to be deleted.');
         # Related to Settings -> OperatorAutoDeleteDelay
-        $AutoDeleteDelay = new \DateTime();
-        $AutoDeleteDelay->modify('-3 months');
+        $operatorAutoDeleteDateInterval = $this->settings->getOperatorAutoDeleteDelay();
+        $autoDeleteDelay = new \DateTime();
+        // $autoDeleteDelay->modify('-3 months');
+        $autoDeleteDelay->sub($operatorAutoDeleteDateInterval);
 
         $operatorIds = $this->createQueryBuilder('o')
             ->select('o.id')
-            ->where('o.tobedeleted < :AutoDeleteDelay')
-            ->setParameter('AutoDeleteDelay', $AutoDeleteDelay)
+            ->where('o.tobedeleted < :autoDeleteDelay')
+            ->setParameter('autoDeleteDelay', $autoDeleteDelay)
             ->getQuery()
             ->getScalarResult();
 
@@ -295,6 +325,11 @@ class OperatorRepository extends ServiceEntityRepository
         // Extract IDs from the result
         return array_column($operatorIds, 'id');
     }
+
+
+
+
+
     // public function findBySearchQuery($search)
     // {
     //     return $this->createQueryBuilder('o')

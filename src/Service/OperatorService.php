@@ -60,7 +60,7 @@ class OperatorService extends AbstractController
 
 
         // if ($today->format('d') % 4 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
-        if (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false) {
+        // if (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false) {
 
             $return = false;
 
@@ -98,6 +98,6 @@ class OperatorService extends AbstractController
                 'toBeDeletedOperators' => count($toBeDeletedOperatorsIds)
             ];
             return $countArray;
-        }
+        // }
     }
 }

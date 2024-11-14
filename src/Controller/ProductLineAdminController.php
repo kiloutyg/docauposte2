@@ -122,10 +122,13 @@ class ProductLineAdminController extends FrontController
 
     #[Route('/productline_admin/delete_category/{categoryId}', name: 'app_productline_admin_delete_category')]
     // This function will delete a category and all of its children entities, it depends on the entitydeletionService
-    public function deleteEntity(int $categoryId): Response
+    public function deleteEntityCategory(int $categoryId): Response
     {
         $entityType = 'category';
         $entity = $this->categoryRepository->find($categoryId);
+        if (empty($entity)){
+            return $this->redirectToRoute('app_base');
+        };
         $productLineId = $entity->getProductLine()->getId();
 
         // Check if the user is the creator of the entity or if he is a super admin
