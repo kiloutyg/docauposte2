@@ -16,36 +16,6 @@ use App\Entity\Department;
 #[Route('/', name: 'app_')]
 class FrontController extends BaseController
 {
-    // Render the base page
-    #[Route('/', name: 'base')]
-    public function base(): Response
-    {
-
-        if ($this->cacheService->settings->isUploadValidation() && $this->validationRepository->findAll() != null) {
-            $this->validationService->remindCheck($this->cacheService->users);
-        }
-
-        if ($this->departmentRepository->findAll() == null) {
-            $Department = new Department();
-            $Department->setName('I.T.');
-            $this->em->persist($Department);
-            $this->em->flush();
-        }
-
-        if ($this->cacheService->settings->isTraining() && $this->authChecker->isGranted('ROLE_MANAGER')) {
-            $countArray = $this->operatorService->operatorCheckForAutoDelete();
-            if ($countArray != null) {
-                $this->addFlash('info', ($countArray['findDeactivatedOperators'] === 1 ? $countArray['findDeactivatedOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['findDeactivatedOperators'] . ' opérateurs inactifs sont à supprimer. ') .
-                    ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
-            }
-        }
-
-        return $this->render(
-            'base.html.twig',
-            []
-        );
-    }
-
 
     #[Route('/cache', name: 'cache')]
     public function resetCache(Request $request): Response
@@ -54,6 +24,9 @@ class FrontController extends BaseController
         $this->cacheService->clearAndRebuildCaches();
         return $this->redirectToRoute('app_base');
     }
+
+
+
 
     // This function is responsible for creating the super-admin account at the first connection of the application.
     #[Route('/createSuperAdmin', name: 'create_super_admin')]
@@ -83,11 +56,44 @@ class FrontController extends BaseController
     }
 
 
+
+    // Render the base page
+    #[Route('/', name: 'base')]
+    public function base(): Response
+    {
+
+        if ($this->cacheService->settings->isUploadValidation() && $this->validationRepository->findAll() != null) {
+            $this->validationService->remindCheck($this->cacheService->users);
+        }
+
+        if ($this->departmentRepository->findAll() == null) {
+            $Department = new Department();
+            $Department->setName('I.T.');
+            $this->em->persist($Department);
+            $this->em->flush();
+        }
+
+        if ($this->cacheService->settings->isTraining() && $this->authChecker->isGranted('ROLE_MANAGER')) {
+            $countArray = $this->operatorService->operatorCheckForAutoDelete();
+            if ($countArray != null) {
+                $this->addFlash('info', ($countArray['findDeactivatedOperators'] === 1 ? $countArray['findDeactivatedOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['findDeactivatedOperators'] . ' opérateurs inactifs sont à supprimer. ') .
+                    ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
+            }
+        }
+
+        return $this->render(
+            'base.html.twig'
+        );
+    }
+
+
+
+
     // Render the zone page
     #[Route('/zone/{zoneId}', name: 'zone')]
     public function zone(int $zoneId = null): Response
     {
-        $zone = $this->zoneRepository->findOneBy(['id' => $zoneId]);
+        $zone = $this->zoneRepository->find($zoneId);
         $linesInZone = [];
         $linesInZone = $zone->getProductLines();
 
@@ -102,8 +108,7 @@ class FrontController extends BaseController
             return $this->redirectToRoute(
                 'app_productline',
                 [
-                    // 'zoneId' => $zoneId,
-                    'productlineId' => $linesInZone[0]->getId()
+                    'productline' => $linesInZone[0]->getId()
                 ]
             );
         }
@@ -111,10 +116,8 @@ class FrontController extends BaseController
 
 
     // Render the productline page and redirect to the mandatory incident page if there is one
-    // #[Route('/zone/{zoneId}/productline/{productlineId}', name: 'productline')]
     #[Route('/productline/{productlineId}', name: 'productline')]
-    // public function productline(int $zoneId = null, int $productlineId = null): Response
-    public function productline(int $productlineId = null): Response
+    public function productline(int $productlineId = null, ProductLine $productLine): Response
     {
 
         $productLine = $this->productLineRepository->find($productlineId);
@@ -135,7 +138,7 @@ class FrontController extends BaseController
                     'productLine' => $productLine
                 ]
             );
-        } elseif (count($incidents) !== 0 && count($categoriesInLine) == 1) {
+        } elseif (count($incidents) == 0 && count($categoriesInLine) == 1) {
             return $this->redirectToRoute(
                 'app_category',
                 [
@@ -149,6 +152,7 @@ class FrontController extends BaseController
             ]);
         }
     }
+
 
 
 
@@ -178,12 +182,13 @@ class FrontController extends BaseController
     }
 
 
+
+
     // Render the button page and redirect to the upload page if there is only one upload in the button
     #[Route('/button/{buttonId}', name: 'button')]
     public function buttonDisplay(UploadController $uploadController, int $buttonId = null, Request $request): Response
     {
         $buttonEntity = $this->buttonRepository->find($buttonId);
-
 
         $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonId]);
         // $this->logger->info('buttonUploads', [$buttonUploads]);

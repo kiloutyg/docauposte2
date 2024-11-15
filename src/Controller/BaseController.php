@@ -40,17 +40,6 @@ use App\Repository\TrainingRecordRepository;
 use App\Repository\TrainerRepository;
 use App\Repository\SettingsRepository;
 
-// use App\Entity\Zone;
-// use App\Entity\ProductLine;
-// use App\Entity\User;
-// use App\Entity\Upload;
-// use App\Entity\Category;
-// use App\Entity\Button;
-// use App\Entity\Signature;
-// use App\Entity\Incident;
-// use App\Entity\IncidentCategory;
-// use App\Entity\Service;
-
 use App\Service\EntityDeletionService;
 use App\Service\AccountService;
 use App\Service\UploadService;
@@ -143,7 +132,7 @@ class BaseController extends AbstractController
     protected $trainers;
     protected $settings;
 
-    
+
     public function __construct(
 
         TagAwareCacheInterface          $cache,
@@ -245,67 +234,9 @@ class BaseController extends AbstractController
         $this->pdfGeneratorService          = $pdfGeneratorService;
         $this->settingsService              = $settingsService;
 
-        // $this->cachingAppVariableAsArray();
         $this->cacheService->cachingAppVariable();
-        // $this->cachingSettings();
     }
 
-    // public function cachingSettings()
-    // {
-    //     $this->cacheService->settings = $this->cache->get("settings_cache_base", function (ItemInterface $item) {
-    //         $item->tag("settings_tag_base");
-    //         $item->expiresAfter(43200);
-    //         // $item->expiresAfter(60);
-    //         return $this->settingsRepository->getSettings();
-    //     });
-    // }
-
-    // public function cachingAppVariableAsArray()
-    // {
-    //     $variables = [
-    //         'zones' => fn() => $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']),
-    //         'productLines' => fn() => $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']),
-    //         'categories' => fn() => $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']),
-    //         'buttons' => fn() => $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']),
-    //         'users' => fn() => $this->userRepository->findAll(),
-    //         'uploads' => fn() => $this->uploadRepository->findAll(),
-    //         'incidents' => fn() => $this->incidentRepository->findAll(),
-    //         'incidentCategories' => fn() => $this->incidentCategoryRepository->findAll(),
-    //         'departments' => fn() => $this->departmentRepository->findAll(),
-    //         'validations' => fn() => $this->validationRepository->findAll(),
-    //         'teams' => fn() => $this->teamRepository->findAll(),
-    //         'uaps' => fn() => $this->uapRepository->findAll(),
-    //         'operators' => fn() => $this->operatorRepository->findAllOrdered(),
-    //         'approbations' => fn() => $this->approbationRepository->findAll(),
-    //         'trainingRecords' => fn() => $this->trainingRecordRepository->findAll(),
-    //         'trainers' => fn() => $this->trainerRepository->findAll(),
-    //     ];
-
-    //     foreach ($variables as $key => $value) {
-    //         try {
-    //             $this->$key = $this->cache->get("{$key}_cache_array", function (ItemInterface $item) use ($value, $key) {
-    //                 $item->tag(["{$key}_tag_array"]);
-    //                 $item->expiresAfter(43200); // Cache for 12 hours
-    //                 return $value();
-    //             });
-    //         } catch (\Exception $e) {
-    //             $this->logger->error("Error caching {$key}: " . $e->getMessage());
-    //         }
-    //     }
-    // }
-
-
-    // public function clearAndRebuildCachesArrays()
-    // {
-    //     // Clear the cache
-    //     foreach (['zones', 'productLines', 'categories', 'buttons', 'uploads', 'incidents', 'incidentCategories', 'departments', 'validations', 'teams', 'operators', 'uaps', 'approbations'] as $key) {
-    //         $this->cache->delete("{$key}_cache_array");
-    //     }
-    //     $this->cachingAppVariableAsArray();
-
-    //     $this->cache->delete("settings_cache_base");
-    //     $this->cachingSettings();
-    // }
 
 
     protected function render(string $view, array $parameters = [], Response $response = null): Response

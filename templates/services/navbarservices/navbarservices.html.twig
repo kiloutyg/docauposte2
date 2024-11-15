@@ -1,6 +1,4 @@
 <div>
-
-
 	{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
 
 {% if (button is defined) and (button is not empty) %}
@@ -52,6 +50,7 @@
 			{% set params = params|merge({(item.varName ~ 'Id'): item.id|default(null)}) %}
 		{% endif %}
 	{% endfor %}
+	
 <nav class="breadcrumb-nav mt-2" aria-label="breadcrumb">
   <ol class="breadcrumb">
   			<li class="breadcrumb-item">
