@@ -6,23 +6,23 @@
 {% if (button is defined) and (button is not empty) %}
 
 	{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
-	{% set zone = {'name': zone.name, 'varName': 'zone', 'id': zone.id|default(null)} %}
-	{% set productline = {'name': productLine.name, 'varName': 'productline', 'id': productLine.id|default(null)} %}
-	{% set category = {'name': category.name, 'varName': 'category', 'id': category.id|default(null)} %}
+	{% set zone = {'name': button.category.productLine.zone.name, 'varName': 'zone', 'id': button.category.productLine.zone.id|default(null)} %}
+	{% set productline = {'name': button.category.productLine.name, 'varName': 'productline', 'id': button.category.productLine.id|default(null)} %}
+	{% set category = {'name': button.category.name, 'varName': 'category', 'id': button.category.id|default(null)} %}
 	{% set button = null %}
 
 {% elseif (category is defined) and (category is not empty) %}
 
 	{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
-	{% set zone = {'name': zone.name, 'varName': 'zone', 'id': zone.id|default(null)} %}
-	{% set productline = {'name': productLine.name, 'varName': 'productline', 'id': productLine.id|default(null)} %}
+	{% set zone = {'name': category.productLine.zone.name, 'varName': 'zone', 'id': category.productLine.zone.id|default(null)} %}
+	{% set productline = {'name': category.productLine.name, 'varName': 'productline', 'id': category.productLine.id|default(null)} %}
 	{% set category = null %}
 	{% set button = null %}
 
 	{% elseif (productLine is defined) and (productLine is not empty) %}
 
 		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
-	{% set zone = {'name': zone.name, 'varName': 'zone', 'id': zone.id|default(null)} %}
+	{% set zone = {'name': productLine.zone.name, 'varName': 'zone', 'id': productLine.zone.id|default(null)} %}
 	{% set productline = null %}
 	{% set category = null %}
 	{% set button = null %}

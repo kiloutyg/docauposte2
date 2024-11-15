@@ -245,89 +245,89 @@ class BaseController extends AbstractController
         $this->pdfGeneratorService          = $pdfGeneratorService;
         $this->settingsService              = $settingsService;
 
-        $this->cachingAppVariableAsArray();
+        // $this->cachingAppVariableAsArray();
         $this->cacheService->cachingAppVariable();
-        $this->cachingSettings();
+        // $this->cachingSettings();
     }
 
-    public function cachingSettings()
-    {
-        $this->settings = $this->cache->get("settings_cache_base", function (ItemInterface $item) {
-            $item->tag("settings_tag_base");
-            $item->expiresAfter(43200);
-            // $item->expiresAfter(60);
-            return $this->settingsRepository->getSettings();
-        });
-    }
+    // public function cachingSettings()
+    // {
+    //     $this->cacheService->settings = $this->cache->get("settings_cache_base", function (ItemInterface $item) {
+    //         $item->tag("settings_tag_base");
+    //         $item->expiresAfter(43200);
+    //         // $item->expiresAfter(60);
+    //         return $this->settingsRepository->getSettings();
+    //     });
+    // }
 
-    public function cachingAppVariableAsArray()
-    {
-        $variables = [
-            'zones' => fn() => $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']),
-            'productLines' => fn() => $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']),
-            'categories' => fn() => $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']),
-            'buttons' => fn() => $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']),
-            'users' => fn() => $this->userRepository->findAll(),
-            'uploads' => fn() => $this->uploadRepository->findAll(),
-            'incidents' => fn() => $this->incidentRepository->findAll(),
-            'incidentCategories' => fn() => $this->incidentCategoryRepository->findAll(),
-            'departments' => fn() => $this->departmentRepository->findAll(),
-            'validations' => fn() => $this->validationRepository->findAll(),
-            'teams' => fn() => $this->teamRepository->findAll(),
-            'uaps' => fn() => $this->uapRepository->findAll(),
-            'operators' => fn() => $this->operatorRepository->findAllOrdered(),
-            'approbations' => fn() => $this->approbationRepository->findAll(),
-            'trainingRecords' => fn() => $this->trainingRecordRepository->findAll(),
-            'trainers' => fn() => $this->trainerRepository->findAll(),
-        ];
+    // public function cachingAppVariableAsArray()
+    // {
+    //     $variables = [
+    //         'zones' => fn() => $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']),
+    //         'productLines' => fn() => $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']),
+    //         'categories' => fn() => $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']),
+    //         'buttons' => fn() => $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']),
+    //         'users' => fn() => $this->userRepository->findAll(),
+    //         'uploads' => fn() => $this->uploadRepository->findAll(),
+    //         'incidents' => fn() => $this->incidentRepository->findAll(),
+    //         'incidentCategories' => fn() => $this->incidentCategoryRepository->findAll(),
+    //         'departments' => fn() => $this->departmentRepository->findAll(),
+    //         'validations' => fn() => $this->validationRepository->findAll(),
+    //         'teams' => fn() => $this->teamRepository->findAll(),
+    //         'uaps' => fn() => $this->uapRepository->findAll(),
+    //         'operators' => fn() => $this->operatorRepository->findAllOrdered(),
+    //         'approbations' => fn() => $this->approbationRepository->findAll(),
+    //         'trainingRecords' => fn() => $this->trainingRecordRepository->findAll(),
+    //         'trainers' => fn() => $this->trainerRepository->findAll(),
+    //     ];
 
-        foreach ($variables as $key => $value) {
-            try {
-                $this->$key = $this->cache->get("{$key}_cache_array", function (ItemInterface $item) use ($value, $key) {
-                    $item->tag(["{$key}_tag_array"]);
-                    $item->expiresAfter(43200); // Cache for 12 hours
-                    return $value();
-                });
-            } catch (\Exception $e) {
-                $this->logger->error("Error caching {$key}: " . $e->getMessage());
-            }
-        }
-    }
+    //     foreach ($variables as $key => $value) {
+    //         try {
+    //             $this->$key = $this->cache->get("{$key}_cache_array", function (ItemInterface $item) use ($value, $key) {
+    //                 $item->tag(["{$key}_tag_array"]);
+    //                 $item->expiresAfter(43200); // Cache for 12 hours
+    //                 return $value();
+    //             });
+    //         } catch (\Exception $e) {
+    //             $this->logger->error("Error caching {$key}: " . $e->getMessage());
+    //         }
+    //     }
+    // }
 
 
-    public function clearAndRebuildCachesArrays()
-    {
-        // Clear the cache
-        foreach (['zones', 'productLines', 'categories', 'buttons', 'uploads', 'incidents', 'incidentCategories', 'departments', 'validations', 'teams', 'operators', 'uaps', 'approbations'] as $key) {
-            $this->cache->delete("{$key}_cache_array");
-        }
-        $this->cachingAppVariableAsArray();
+    // public function clearAndRebuildCachesArrays()
+    // {
+    //     // Clear the cache
+    //     foreach (['zones', 'productLines', 'categories', 'buttons', 'uploads', 'incidents', 'incidentCategories', 'departments', 'validations', 'teams', 'operators', 'uaps', 'approbations'] as $key) {
+    //         $this->cache->delete("{$key}_cache_array");
+    //     }
+    //     $this->cachingAppVariableAsArray();
 
-        $this->cache->delete("settings_cache_base");
-        $this->cachingSettings();
-    }
+    //     $this->cache->delete("settings_cache_base");
+    //     $this->cachingSettings();
+    // }
 
 
     protected function render(string $view, array $parameters = [], Response $response = null): Response
     {
         $commonParameters = [
-            'zones'                 => $this->zones,
-            'productLines'          => $this->productLines,
-            'categories'            => $this->categories,
-            'buttons'               => $this->buttons,
-            'uploads'               => $this->uploads,
-            'users'                 => $this->users,
-            'incidents'             => $this->incidents,
-            'incidentCategories'    => $this->incidentCategories,
-            'departments'           => $this->departments,
-            'validations'           => $this->validations,
-            'teams'                 => $this->teams,
-            'operators'             => $this->operators,
-            'uaps'                  => $this->uaps,
-            'approbations'          => $this->approbations,
-            'trainingRecords'       => $this->trainingRecords,
-            'trainers'              => $this->trainers,
-            'settings'              => $this->settings,
+            'zones'                 => $this->cacheService->zones,
+            'productLines'          => $this->cacheService->productLines,
+            'categories'            => $this->cacheService->categories,
+            'buttons'               => $this->cacheService->buttons,
+            'uploads'               => $this->cacheService->uploads,
+            'users'                 => $this->cacheService->users,
+            'incidents'             => $this->cacheService->incidents,
+            'incidentCategories'    => $this->cacheService->incidentCategories,
+            'departments'           => $this->cacheService->departments,
+            'validations'           => $this->cacheService->validations,
+            'teams'                 => $this->cacheService->teams,
+            'operators'             => $this->cacheService->operators,
+            'uaps'                  => $this->cacheService->uaps,
+            'approbations'          => $this->cacheService->approbations,
+            'trainingRecords'       => $this->cacheService->trainingRecords,
+            'trainers'              => $this->cacheService->trainers,
+            'settings'              => $this->cacheService->settings,
         ];
 
 

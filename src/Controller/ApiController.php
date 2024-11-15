@@ -21,7 +21,7 @@ class ApiController extends FrontController
                 'name'  => $zone->getName(),
                 'sortOrder' => $zone->getSortOrder()
             ];
-        }, $this->zones);
+        }, $this->cacheService->zones->toArray());
 
         $productLines = array_map(function ($productLine) {
             return [
@@ -30,7 +30,7 @@ class ApiController extends FrontController
                 'zone_id'   => $productLine->getZone()->getId(),
                 'sortOrder' => $productLine->getSortOrder()
             ];
-        }, $this->productLines);
+        }, $this->cacheService->productLines->toArray());
 
         $categories = array_map(function ($category) {
             return [
@@ -39,7 +39,7 @@ class ApiController extends FrontController
                 'product_line_id'   => $category->getProductLine()->getId(),
                 'sortOrder'         => $category->getSortOrder()
             ];
-        }, $this->categories);
+        }, $this->cacheService->categories->toArray());
 
         $buttons = array_map(function ($button) {
             return [
@@ -48,7 +48,7 @@ class ApiController extends FrontController
                 'category_id'   => $button->getCategory()->getId(),
                 'sortOrder'     => $button->getSortOrder()
             ];
-        }, $this->buttons);
+        }, $this->cacheService->buttons->toArray());
 
         $responseData = [
             'zones'         => $zones,
@@ -70,7 +70,7 @@ class ApiController extends FrontController
                 'id'        => $zone->getId(),
                 'name'      => $zone->getName()
             ];
-        }, $this->zones);
+        }, $this->cacheService->zones->toArray());
 
         $productLines = array_map(function ($productLine) {
             return [
@@ -78,14 +78,14 @@ class ApiController extends FrontController
                 'name'      => $productLine->getName(),
                 'zone_id'   => $productLine->getZone()->getId()
             ];
-        }, $this->productLines);
+        }, $this->cacheService->productLines->toArray());
 
         $incidentsCategories = array_map(function ($incidentsCategory) {
             return [
                 'id'    => $incidentsCategory->getId(),
                 'name'  => $incidentsCategory->getName(),
             ];
-        }, $this->incidentCategories);
+        }, $this->cacheService->incidentCategories->toArray());
 
 
         $responseData = [
@@ -105,7 +105,7 @@ class ApiController extends FrontController
                 'id'    => $department->getId(),
                 'name'  => $department->getName(),
             ];
-        }, $this->departments);
+        }, $this->cacheService->departments->toArray());
 
         $responseData = [
 
@@ -119,7 +119,7 @@ class ApiController extends FrontController
     public function getUserData(): JsonResponse
     {
         $filteredUsers = [];
-        $allUsers = $this->users;
+        $allUsers = $this->cacheService->users;
         $currentUser = $this->getUser();
 
         foreach ($allUsers as $user) {
@@ -151,7 +151,7 @@ class ApiController extends FrontController
                 'name'  => $zone->getName(),
                 'sortOrder' => $zone->getSortOrder()
             ];
-        }, $this->zones);
+        }, $this->cacheService->zones->toArray());
 
         $productLines = array_map(function ($productLine) {
             return [
@@ -160,7 +160,7 @@ class ApiController extends FrontController
                 'zone_id'   => $productLine->getZone()->getId(),
                 'sortOrder' => $productLine->getSortOrder()
             ];
-        }, $this->productLines);
+        }, $this->cacheService->productLines->toArray());
 
         $categories = array_map(function ($category) {
             return [
@@ -169,7 +169,7 @@ class ApiController extends FrontController
                 'product_line_id'   => $category->getProductLine()->getId(),
                 'sortOrder'         => $category->getSortOrder()
             ];
-        }, $this->categories);
+        }, $this->cacheService->categories->toArray());
 
         $buttons = array_map(function ($button) {
             return [
@@ -178,7 +178,7 @@ class ApiController extends FrontController
                 'category_id'   => $button->getCategory()->getId(),
                 'sortOrder'     => $button->getSortOrder()
             ];
-        }, $this->buttons);
+        }, $this->cacheService->buttons->toArray());
 
         $responseData = [
             'zones'         => $zones,
@@ -195,11 +195,11 @@ class ApiController extends FrontController
     #[Route('/api/settings', name: 'api_settings_data')]
     public function getSettings(): JsonResponse
     {
-        $uploadValidation = $this->settings->isUploadValidation();
-        $validatorNumber = $this->settings->getValidatorNumber();
-        $training = $this->settings->isTraining();
-        $operatorRetrainingDelay = $this->settings->getOperatorRetrainingDelay();
-        $OperatorAutoDeleteDelay = $this->settings->getOperatorAutoDeleteDelay();
+        $uploadValidation = $this->cacheService->settings->isUploadValidation();
+        $validatorNumber = $this->cacheService->settings->getValidatorNumber();
+        $training = $this->cacheService->settings->isTraining();
+        $operatorRetrainingDelay = $this->cacheService->settings->getOperatorRetrainingDelay();
+        $OperatorAutoDeleteDelay = $this->cacheService->settings->getOperatorAutoDeleteDelay();
 
         $responseData = [
             'uploadValidation' => $uploadValidation,

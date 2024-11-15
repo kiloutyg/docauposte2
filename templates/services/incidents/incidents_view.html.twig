@@ -25,8 +25,14 @@
 			</h1>
 			<div
 				style="height: 40vh;"></div>
+			{# <a
+							href="{{ path('app_mandatory_incident', {'incidentId': nextIncidentId, 'zoneId' : zoneId , 'productlineId' : productlineId})}}" class="btn btn-warning btn-lg">
+							<strong>
+								Ok, J'ai compris
+							</strong>
+						</a> #}
 			<a
-				href="{{ path('app_mandatory_incident', {'incidentId': nextIncidentId, 'zoneId' : zoneId , 'productlineId' : productlineId})}}" class="btn btn-warning btn-lg">
+				href="{{ path('app_mandatory_incident', {'incidentId': nextIncidentId, 'productlineId' : productlineId})}}" class="btn btn-warning btn-lg">
 				<strong>
 					Ok, J'ai compris
 				</strong>

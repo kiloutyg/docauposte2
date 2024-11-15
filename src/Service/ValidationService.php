@@ -24,7 +24,7 @@ use App\Service\MailerService;
 use App\Service\OldUploadService;
 use App\Service\TrainingRecordService;
 use App\Service\SettingsService;
-
+use Doctrine\Common\Collections\ArrayCollection;
 
 class ValidationService extends AbstractController
 {
@@ -448,7 +448,7 @@ class ValidationService extends AbstractController
         }
     }
 
-    public function remindCheck(array $users)
+    public function remindCheck(ArrayCollection $users)
     {
         $today = new \DateTime();
         $fileName = 'email_sent.txt';

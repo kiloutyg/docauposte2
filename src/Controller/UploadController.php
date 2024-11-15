@@ -110,7 +110,7 @@ class UploadController extends FrontController
         $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $path = $file->getPath();
 
-        if (!($this->settings->isUploadValidation() || $this->settings->IsTraining())) {
+        if (!($this->cacheService->settings->isUploadValidation() || $this->cacheService->settings->IsTraining())) {
             return $this->downloadFileFromMethods($path);
         }
 
@@ -121,7 +121,7 @@ class UploadController extends FrontController
         $originUrl = $request->headers->get('Referer');
 
         if ($isValidated === false && $isForcedDisplay === false) {
-            if ($this->settings->IsTraining() && $isTraining) {
+            if ($this->cacheService->settings->IsTraining() && $isTraining) {
                 return $this->redirectToRoute('app_training_front_by_validation', [
                     'validationId' => $file->getValidation()->getId()
                 ]);
@@ -149,7 +149,7 @@ class UploadController extends FrontController
         }
 
         if ($isValidated === true) {
-            if ($this->settings->IsTraining() && $isTraining) {
+            if ($this->cacheService->settings->IsTraining() && $isTraining) {
                 return $this->redirectToRoute('app_training_front_by_upload', [
                     'uploadId' => $uploadId
                 ]);
@@ -159,7 +159,7 @@ class UploadController extends FrontController
         }
 
         if ($isValidated === null) {
-            if ($this->settings->IsTraining() && $isTraining) {
+            if ($this->cacheService->settings->IsTraining() && $isTraining) {
                 return $this->redirectToRoute('app_training_front_by_validation', [
                     'validationId' => $file->getValidation()->getId()
                 ]);
@@ -336,7 +336,7 @@ class UploadController extends FrontController
         $forcedDisplay = filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN);
         $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
 
-        $neededValidator = $this->settings->getValidatorNumber();
+        $neededValidator = $this->cacheService->settings->getValidatorNumber();
         $enoughValidator = $this->validationService->checkNumberOfValidator($request, $neededValidator);
 
         $form->handleRequest($request);

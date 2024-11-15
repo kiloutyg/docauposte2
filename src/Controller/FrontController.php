@@ -21,8 +21,8 @@ class FrontController extends BaseController
     public function base(): Response
     {
 
-        if ($this->settings->isUploadValidation() && $this->validationRepository->findAll() != null) {
-            $this->validationService->remindCheck($this->users);
+        if ($this->cacheService->settings->isUploadValidation() && $this->validationRepository->findAll() != null) {
+            $this->validationService->remindCheck($this->cacheService->users);
         }
 
         if ($this->departmentRepository->findAll() == null) {
@@ -32,7 +32,7 @@ class FrontController extends BaseController
             $this->em->flush();
         }
 
-        if ($this->settings->isTraining() && $this->authChecker->isGranted('ROLE_MANAGER')) {
+        if ($this->cacheService->settings->isTraining() && $this->authChecker->isGranted('ROLE_MANAGER')) {
             $countArray = $this->operatorService->operatorCheckForAutoDelete();
             if ($countArray != null) {
                 $this->addFlash('info', ($countArray['findDeactivatedOperators'] === 1 ? $countArray['findDeactivatedOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['findDeactivatedOperators'] . ' opérateurs inactifs sont à supprimer. ') .
@@ -42,17 +42,15 @@ class FrontController extends BaseController
 
         return $this->render(
             'base.html.twig',
-            [
-                "zonesBase" => $this->zones,
-                "zonesServices" => $this->cacheService->zones,
-                "zoneRepo" => $this->zoneRepository->findAll(),
-            ]
+            []
         );
     }
+
+
     #[Route('/cache', name: 'cache')]
     public function resetCache(Request $request): Response
     {
-        $this->clearAndRebuildCachesArrays();
+        // $this->clearAndRebuildCachesArrays();
         $this->cacheService->clearAndRebuildCaches();
         return $this->redirectToRoute('app_base');
     }
@@ -62,7 +60,7 @@ class FrontController extends BaseController
     public function createSuperAdmin(Request $request): Response
     {
         $users = [];
-        $users  = $this->users;
+        $users  = $this->cacheService->users;
 
         if ($users == null) {
 
@@ -89,34 +87,38 @@ class FrontController extends BaseController
     #[Route('/zone/{zoneId}', name: 'zone')]
     public function zone(int $zoneId = null): Response
     {
+        $zone = $this->zoneRepository->findOneBy(['id' => $zoneId]);
+        $linesInZone = [];
+        $linesInZone = $zone->getProductLines();
 
-        // $zone = $this->cacheService->zones->filter(function ($zone) use ($zoneId) {
-        //     return $zone->getId() === $zoneId;
-        // })->first();
-
-        $zone = $this->cacheService->getEntityById('zone', $zoneId);
-
-        return $this->render(
-            'zone.html.twig',
-            [
-                'zone'         => $zone
-            ]
-        );
+        if (count($linesInZone) > 1) {
+            return $this->render(
+                'zone.html.twig',
+                [
+                    'zone' => $zone,
+                ]
+            );
+        } else {
+            return $this->redirectToRoute(
+                'app_productline',
+                [
+                    // 'zoneId' => $zoneId,
+                    'productlineId' => $linesInZone[0]->getId()
+                ]
+            );
+        }
     }
 
 
     // Render the productline page and redirect to the mandatory incident page if there is one
-    #[Route('/zone/{zoneId}/productline/{productlineId}', name: 'productline')]
-    public function productline(int $zoneId = null, int $productlineId = null): Response
+    // #[Route('/zone/{zoneId}/productline/{productlineId}', name: 'productline')]
+    #[Route('/productline/{productlineId}', name: 'productline')]
+    // public function productline(int $zoneId = null, int $productlineId = null): Response
+    public function productline(int $productlineId = null): Response
     {
 
-        // $productLine = $this->productLineRepository->find($productlineId);
-        // $zone        = $productLine->getZone();
-
-        $productLine = $this->cacheService->getEntityById('productLine', $productlineId);
-
-        $zone = $this->cacheService->getEntityById('zone', $zoneId);
-
+        $productLine = $this->productLineRepository->find($productlineId);
+        $categoriesInLine = $productLine->getCategories();
         $incidents = [];
         $incidents = $this->incidentRepository->findBy(
             ['ProductLine' => $productlineId],
@@ -125,18 +127,23 @@ class FrontController extends BaseController
 
         $incidentId = count($incidents) > 0 ? $incidents[0]->getId() : null;
 
-        if (count($incidents) == 0) {
+        if (count($incidents) == 0 && count($categoriesInLine) > 1) {
 
             return $this->render(
                 'productline.html.twig',
                 [
-                    'zone'        => $zone,
                     'productLine' => $productLine
+                ]
+            );
+        } elseif (count($incidents) !== 0 && count($categoriesInLine) == 1) {
+            return $this->redirectToRoute(
+                'app_category',
+                [
+                    'categoryId' => $categoriesInLine[0]->getId()
                 ]
             );
         } else {
             return $this->redirectToRoute('app_mandatory_incident', [
-                'zoneId' => $zoneId,
                 'productlineId' => $productlineId,
                 'incidentId' => $incidentId
             ]);
@@ -146,8 +153,7 @@ class FrontController extends BaseController
 
 
     // Render the category page and redirect to the button page if there is only one button in the category
-    #[Route('/zone/{zoneId}/productline/{productlineId}/category/{categoryId}', name: 'category')]
-
+    #[Route('/category/{categoryId}', name: 'category')]
     public function category(int $categoryId = null): Response
     {
 
@@ -155,58 +161,37 @@ class FrontController extends BaseController
         $buttons = $this->buttonRepository->findBy(['Category' => $categoryId]);
 
         $category = $this->cacheService->getEntityById('category', $categoryId);
-        $productLine = $this->cacheService->getEntityById('productLine', $category->getProductLine()->getId());
-        $zone = $this->cacheService->getEntityById('zone', $productLine->getZone()->getId());
 
-        return $this->render(
-            'category.html.twig',
-            [
-                'zone'        => $zone,
-                'productLine' => $productLine,
-                'category'    => $category,
-                'matchingButtons' => $buttons,
-            ]
-        );
-        // } else {
-        //     $key = array_key_first($buttons);
-        //     $buttonId = $buttons[$key]->getId();
-        //     return $this->redirectToRoute('app_button', [
-        //         'zoneId'        => $zone->getId(),
-        //         'productlineId' => $productLine->getId(),
-        //         'categoryId'    => $category->getId(),
-        //         'buttonId'      => $buttonId
-        //     ]);
-        // }
+        if (count($buttons) > 1) {
+            return $this->render(
+                'category.html.twig',
+                [
+                    'category'    => $category,
+                    'matchingButtons' => $buttons,
+                ]
+            );
+        } else {
+            return $this->redirectToRoute('app_button', [
+                'buttonId' => $buttons[0]->getId()
+            ]);
+        }
     }
 
 
     // Render the button page and redirect to the upload page if there is only one upload in the button
-    #[Route('/zone/{zoneId}/productline/{productlineId}/category/{categoryId}/button/{buttonId}', name: 'button')]
+    #[Route('/button/{buttonId}', name: 'button')]
     public function buttonDisplay(UploadController $uploadController, int $buttonId = null, Request $request): Response
     {
         $buttonEntity = $this->buttonRepository->find($buttonId);
-        $category    = $buttonEntity->getCategory();
-        $productLine = $category->getProductLine();
-        $zone        = $productLine->getZone();
+
 
         $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonId]);
         // $this->logger->info('buttonUploads', [$buttonUploads]);
-
-        // foreach ($buttonUploads as $buttonUpload) {
-
-        //     if ($buttonUpload->isValidated() || $buttonUpload->getValidation() != null || $buttonUpload->getOldUpload() != null) {
-        //         $uploads[] = $buttonUpload;
-        //     }
-        // }
-
 
         if (count($buttonUploads) != 1) {
             return $this->render(
                 'button.html.twig',
                 [
-                    'zone'        => $zone,
-                    'productLine' => $productLine,
-                    'category'    => $category,
                     'button'      => $buttonEntity,
                     'uploads'     => $buttonUploads,
                 ]
