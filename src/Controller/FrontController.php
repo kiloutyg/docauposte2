@@ -35,7 +35,7 @@ class FrontController extends BaseController
         if ($this->settings->isTraining() && $this->authChecker->isGranted('ROLE_MANAGER')) {
             $countArray = $this->operatorService->operatorCheckForAutoDelete();
             if ($countArray != null) {
-                $this->addFlash('info', ($countArray['inActiveOperators'] === 1 ? $countArray['inActiveOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['inActiveOperators'] . ' opérateurs inactifs sont à supprimer. ') .
+                $this->addFlash('info', ($countArray['findDeactivatedOperators'] === 1 ? $countArray['findDeactivatedOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['findDeactivatedOperators'] . ' opérateurs inactifs sont à supprimer. ') .
                     ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
             }
         }
@@ -158,10 +158,6 @@ class FrontController extends BaseController
         $productLine = $this->cacheService->getEntityById('productLine', $category->getProductLine()->getId());
         $zone = $this->cacheService->getEntityById('zone', $productLine->getZone()->getId());
 
-        $this->logger->info('buttons', [$buttons]);
-
-        // if (count($buttons) != 1) {
-
         return $this->render(
             'category.html.twig',
             [
@@ -194,7 +190,7 @@ class FrontController extends BaseController
         $zone        = $productLine->getZone();
 
         $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonId]);
-        $this->logger->info('buttonUploads', [$buttonUploads]);
+        // $this->logger->info('buttonUploads', [$buttonUploads]);
 
         // foreach ($buttonUploads as $buttonUpload) {
 
@@ -219,13 +215,5 @@ class FrontController extends BaseController
             $uploadId = $buttonUploads[0]->getId();
             return $uploadController->filterDownloadFile($uploadId, $request);
         }
-    }
-
-
-
-    #[Route('/flash-messages', name: 'flash_messages')]
-    public function flashMessages(Request $request): Response
-    {
-        return $this->render('services/_toasts.html.twig');
     }
 }

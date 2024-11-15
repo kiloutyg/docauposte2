@@ -137,10 +137,13 @@ class CategoryAdminController extends FrontController
     #[Route('/category_admin/delete_button/{buttonId}', name: 'app_category_admin_delete_button')]
 
     // This function is used to delete a button and all the uploads attached to it.
-    public function deleteEntity(int $buttonId): Response
+    public function deleteEntityButton(int $buttonId): Response
     {
         $entityType = 'button';
         $entity = $this->buttonRepository->find($buttonId);
+        if (empty($entity)){
+            return $this->redirectToRoute('app_base');
+        };
         $categoryId = $entity->getCategory()->getId();
 
         // Check if the user is the creator of the button or if he is a super admin

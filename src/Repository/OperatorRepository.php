@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Operator;
 
+use App\Repository\SettingsRepository;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -12,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 
 /**
- * @extends ServiceEntityRepository<Operator>
+ * @extends RepositoryEntityRepository<Operator>
  *
  * @method Operator|null find($id, $lockMode = null, $lockVersion = null)
  * @method Operator|null findOneBy(array $criteria, array $orderBy = null)
@@ -23,18 +25,28 @@ class OperatorRepository extends ServiceEntityRepository
 {
     private $logger;
     private $em;
+    private $settingsRepository;
+    private $settings;
 
-    public function __construct(ManagerRegistry $registry, LoggerInterface $logger, EntityManagerInterface $em)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        LoggerInterface $logger,
+        EntityManagerInterface $em,
+        SettingsRepository $settingsRepository,
+    ) {
         parent::__construct($registry, Operator::class);
-        $this->logger = $logger;
-        $this->em = $em;
+        $this->logger               = $logger;
+        $this->em                   = $em;
+        $this->settingsRepository   = $settingsRepository;
+        $this->settings             = $this->settingsRepository->getSettings();
     }
+
+
 
 
     public function findAllOrdered()
     {
-        $this->logger->info('Finding all operators ordered.');
+        // $this->logger->info('Finding all operators ordered.');
 
         $operators = $this->findOperatorsSortedByLastNameFirstName();
 
@@ -54,11 +66,11 @@ class OperatorRepository extends ServiceEntityRepository
 
 
 
+
+
     public function findOperatorsSortedByLastNameFirstName()
     {
-        $this->logger->info('Finding operators sorted last name, and first name.');
-
-
+        // $this->logger->info('Finding operators sorted last name, and first name.');
         // Fetch all operators with their team and UAP
         $operators = $this->createQueryBuilder('o')
             ->join('o.team', 't')
@@ -100,10 +112,12 @@ class OperatorRepository extends ServiceEntityRepository
 
 
 
+
+
     public function findBySearchQuery($name, $code, $team, $uap, $trainer)
     {
 
-        $this->logger->info('Finding operators by search query.');
+        // $this->logger->info('Finding operators by search query.');
 
         $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.team', 't')
@@ -126,7 +140,7 @@ class OperatorRepository extends ServiceEntityRepository
                 ->setParameter('uap', '%' . strtolower($uap) . '%');
         }
 
-        // $this->logger->info('Trainer value in repository methods: ' . $trainer);
+        // // $this->logger->info('Trainer value in repository methods: ' . $trainer);
         // Handling trainer value based on true, false, or null
         switch ($trainer) {
             case "true":
@@ -140,19 +154,19 @@ class OperatorRepository extends ServiceEntityRepository
                 break;
         }
 
-        // $this->logger->info('Trainer value after handling: ' . $trainer);
+        // // $this->logger->info('Trainer value after handling: ' . $trainer);
 
         if ($trainer === true) {
-            // $this->logger->info('Trainer value true, select those who are trainer.');
+            // // $this->logger->info('Trainer value true, select those who are trainer.');
             $qb->setParameter('trainerStatus', true)
                 ->andWhere('o.IsTrainer = :trainerStatus');
         } elseif ($trainer === false) {
-            // $this->logger->info('Trainer value false, select those who are not trainers or undefined.');
+            // // $this->logger->info('Trainer value false, select those who are not trainers or undefined.');
             $qb->setParameter('trainerStatus', false)
                 ->andWhere('o.IsTrainer = :trainerStatus OR o.IsTrainer IS NULL');
         } elseif ($trainer === null) {
             // If $trainer is null, and you want to select all without any filter on IsTrainer, do not add any where clause related to IsTrainer.
-            // $this->logger->info('Trainer value is null, no filter applied on trainer status.');
+            // // $this->logger->info('Trainer value is null, no filter applied on trainer status.');
             // No further action needed if you want all records regardless of trainer status.
         }
 
@@ -161,10 +175,13 @@ class OperatorRepository extends ServiceEntityRepository
     }
 
 
+
+
+
     public function orderOperator($operators)
     {
 
-        $this->logger->info('Ordering operators by team, UAP, last name, and first name.');
+        // $this->logger->info('Ordering operators by team, UAP, last name, and first name.');
 
         usort($operators, function ($a, $b) {
             // Split names to separate first name and last name
@@ -198,9 +215,11 @@ class OperatorRepository extends ServiceEntityRepository
 
 
 
+
+
     public function findByNameLikeForSuggestions(string $name): array
     {
-        $this->logger->info('Finding operators by name for suggestions.');
+        // $this->logger->info('Finding operators by name for suggestions.');
 
         if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) {
             throw new \InvalidArgumentException("Invalid name format.");
@@ -230,60 +249,103 @@ class OperatorRepository extends ServiceEntityRepository
         }
     }
 
+
+
+
+
     // Used in the methods that add the tobedeleted datetime value in the appropriate field to the operator entity
     public function findOperatorWithNoRecentTraining()
     {
-        $this->logger->info('Finding operators with no recent training.');
-        $sixMonthsAgo = new \DateTime();
-        $sixMonthsAgo->modify('-6 months');
+        // $this->logger->info('Finding operators with no recent training.');
+        # Related to Settings -> OperatorRetrainingDelay
+        $operatorRetrainingDateInterval = $this->settings->getOperatorRetrainingDelay();
+        $retrainingDelay = new \DateTime('now');
+        $retrainingDelay->sub($operatorRetrainingDateInterval);
 
         $operators = $this->createQueryBuilder('o')
-            ->where('o.lasttraining < :sixMonthsAgo')
-            ->setParameter('sixMonthsAgo', $sixMonthsAgo)
+            ->where('o.lasttraining < :retrainingDelay')
+            ->orWhere('o.lasttraining IS NULL')
+            ->setParameter('retrainingDelay', $retrainingDelay)
             ->andWhere('o.tobedeleted IS NULL')
+            ->andWhere('o.inactiveSince IS NULL')
             ->getQuery()
             ->getResult();
 
-        $this->logger->info('Unactive operators: ', [$operators]);
+        // $this->logger->info('operators to be retrained: ', [$operators]);
         return $operators;
     }
+
+
+
+
 
     // Used in the methods that check for operators to be deleted, count them, display them in appropriate views etc
     public function findInActiveOperators()
     {
-        $this->logger->info('Finding operators with no recent training.');
-        $sixMonthsAgo = new \DateTime();
-        $sixMonthsAgo->modify('-3 months');
+        // $this->logger->info('Finding operators with no recent training.');
+        # Related to Settings -> OperatorInactivityDelay
+        $operatorInactivityDateInterval = $this->settings->getOperatorInactivityDelay();
+        $inactiveDelay = new \DateTime('now');
+        $inactiveDelay->sub($operatorInactivityDateInterval);
 
         $operators = $this->createQueryBuilder('o')
-            ->where('o.lasttraining < :sixMonthsAgo')
-            ->setParameter('sixMonthsAgo', $sixMonthsAgo)
+            ->where('o.inactiveSince < :inactiveDelay')
+            ->setParameter('inactiveDelay', $inactiveDelay)
+            ->andWhere('o.tobedeleted IS NULL')
+            ->getQuery()
+            ->getResult();
+
+        // $this->logger->info('inactive operators: ', [$operators]);
+        return $operators;
+    }
+
+
+    // Used in the methods that check for operators to be deleted, count them, display them in appropriate views etc
+    public function findDeactivatedOperators()
+    {
+        // $this->logger->info('Finding operators with no recent training.');
+        # Related to Settings -> OperatorInactivityDelay
+        $operatorInactivityDateInterval = $this->settings->getOperatorInactivityDelay();
+        $inactiveDelay = new \DateTime('now');
+        $inactiveDelay->sub($operatorInactivityDateInterval);
+
+        $operators = $this->createQueryBuilder('o')
+            ->where('o.inactiveSince < :inactiveDelay')
+            ->setParameter('inactiveDelay', $inactiveDelay)
             ->andWhere('o.tobedeleted IS NOT NULL')
             ->getQuery()
             ->getResult();
 
-        $this->logger->info('inactive operators: ', [$operators]);
+        // $this->logger->info('inactive operators: ', [$operators]);
         return $operators;
     }
+
 
     // Used in the methods that delete the operator entity
     public function findOperatorToBeDeleted()
     {
-        $this->logger->info('Finding operators to be deleted.');
-        $threeMonthsAgo = new \DateTime();
-        $threeMonthsAgo->modify('-3 months');
+        // $this->logger->info('Finding operators to be deleted.');
+        # Related to Settings -> OperatorAutoDeleteDelay
+        $operatorAutoDeleteDateInterval = $this->settings->getOperatorAutoDeleteDelay();
+        $autoDeleteDelay = new \DateTime();
+        $autoDeleteDelay->sub($operatorAutoDeleteDateInterval);
 
         $operatorIds = $this->createQueryBuilder('o')
             ->select('o.id')
-            ->where('o.tobedeleted < :threeMonthsAgo')
-            ->setParameter('threeMonthsAgo', $threeMonthsAgo)
+            ->where('o.tobedeleted < :autoDeleteDelay')
+            ->setParameter('autoDeleteDelay', $autoDeleteDelay)
             ->getQuery()
             ->getScalarResult();
 
-        $this->logger->info('To be deleted operators: ' . json_encode($operatorIds));
+        // $this->logger->info('To be deleted operators: ' . json_encode($operatorIds));
         // Extract IDs from the result
         return array_column($operatorIds, 'id');
     }
+
+
+
+
+
     // public function findBySearchQuery($search)
     // {
     //     return $this->createQueryBuilder('o')

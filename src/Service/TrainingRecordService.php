@@ -44,15 +44,15 @@ class TrainingRecordService extends AbstractController
 
     public function updateTrainingRecord(Upload $upload)
     {
-        $this->logger->info('TrainingRecordService: updateTrainingRecord: upload: ' . $upload->getId());
+        // $this->logger->info('TrainingRecordService: updateTrainingRecord: upload: ' . $upload->getId());
         $trainingRecords = $upload->getTrainingRecords();
         $trained = false;
         if ($trainingRecords->isEmpty()) {
-            $this->logger->info('TrainingRecordService: updateTrainingRecord: trainingRecords is empty');
+            // $this->logger->info('TrainingRecordService: updateTrainingRecord: trainingRecords is empty');
             return;
         } else {
             foreach ($trainingRecords as $trainingRecord) {
-                $this->logger->info('TrainingRecordService: updateTrainingRecord: trainingRecord: ' . $trainingRecord->getId());
+                // $this->logger->info('TrainingRecordService: updateTrainingRecord: trainingRecord: ' . $trainingRecord->getId());
                 $trainingRecord->setTrained($trained);
                 $this->em->persist($trainingRecord);
                 $this->em->flush($trainingRecord);
@@ -111,11 +111,11 @@ class TrainingRecordService extends AbstractController
 
     public function cheatTrain(string $date)
     {
-        $this->logger->info('TrainingRecordService: cheatTrain: date: ' . $date);
+        // $this->logger->info('TrainingRecordService: cheatTrain: date: ' . $date);
 
         $date = (new \DateTime($date));
         $trainingRecords = $this->trainingRecordRepository->findBy(['date' => $date]);
-        $this->logger->info('TrainingRecordService: cheatTrain: trainingRecords: ' . count($trainingRecords));
+        // $this->logger->info('TrainingRecordService: cheatTrain: trainingRecords: ' . count($trainingRecords));
         foreach ($trainingRecords as $trainingRecord) {
             if ($trainingRecord->isTrained() === false) {
                 $trainingRecord->setTrained(trained: true);
@@ -130,18 +130,18 @@ class TrainingRecordService extends AbstractController
     {
         $trainingRecord = $this->trainingRecordRepository->find($trainingRecordId);
 
-        $this->logger->info('TrainingRecordService: deleteWeeksOldTrainingRecords', ['trainingRecordId' => $trainingRecord->getId()]);
+        // $this->logger->info('TrainingRecordService: deleteWeeksOldTrainingRecords', ['trainingRecordId' => $trainingRecord->getId()]);
         $today = new \DateTime();
 
         if ($trainingRecord->getDate() < $today->modify('-1 week')) {
-            $this->logger->info('TrainingRecordService: deleteWeeksOldTrainingRecords: trainingRecord is too old');
+            // $this->logger->info('TrainingRecordService: deleteWeeksOldTrainingRecords: trainingRecord is too old');
             return false;
         } else {
             $response = $this->entityDeletionService->deleteEntity('trainingRecord', $trainingRecord->getId());
         }
 
         if ($response != '' || $response != null) {
-            $this->logger->info('TrainingRecordService: deleteWeeksOldTrainingRecords: response: ' . $response);
+            // $this->logger->info('TrainingRecordService: deleteWeeksOldTrainingRecords: response: ' . $response);
             return true;
         } else {
             return false;

@@ -115,10 +115,14 @@ class ZoneAdminController extends FrontController
 
     // Delete a productline and all its children entities, it depends on the entitydeletionService
     #[Route('/zone_admin/delete_productline/{productlineId}', name: 'app_zone_admin_delete_productline')]
-    public function deleteEntity(int $productlineId): Response
+    public function deleteEntityProductLine(int $productlineId): Response
     {
         $entityType = 'productline';
         $entity = $this->productLineRepository->find($productlineId);
+        if (empty($entity)){
+            return $this->redirectToRoute('app_base');
+        };
+        
         $zoneId = $entity->getZone()->getId();
 
         // Check if the user is the creator of the entity or if he is a super admin

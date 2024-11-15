@@ -17,7 +17,7 @@ class TrainingRecordController extends OperatorController
     public function deleteWeeksOldTrainingRecords(int $trainingRecordId, int $uploadId, int $teamId, int $uapId): Response
     {
 
-        $this->logger->info('TrainingRecordController: deleteWeeksOldTrainingRecords', ['trainingRecordId' => $trainingRecordId]);
+        // $this->logger->info('TrainingRecordController: deleteWeeksOldTrainingRecords', ['trainingRecordId' => $trainingRecordId]);
         if ($this->authChecker->isGranted('ROLE_MANAGER')) {
             $response = $this->trainingRecordService->deleteWeeksOldTrainingRecords($trainingRecordId);
         } else {
@@ -35,14 +35,14 @@ class TrainingRecordController extends OperatorController
                 'uploadId' => $uploadId,
                 'teamId' => $teamId,
                 'uapId' => $uapId,
-            ]);       
+            ]);
         } else {
             $this->addFlash(type: 'error', message: 'Error deleting training record');
             return $this->redirectToRoute(route: 'app_render_training_records', parameters: [
                 'uploadId' => $uploadId,
                 'teamId' => $teamId,
                 'uapId' => $uapId,
-            ]);        
+            ]);
         }
     }
 }

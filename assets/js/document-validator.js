@@ -7,7 +7,7 @@ let uploadValidation;
 let validatorNumber;
 let training;
 let operatorRetrainingDelay;
-let autoDeleteOperatorDelay;
+let OperatorAutoDeleteDelay;
 
 fetch("/docauposte/api/settings")
   .then((response) => response.json())
@@ -17,7 +17,7 @@ fetch("/docauposte/api/settings")
     validatorNumber = data.validatorNumber - 1;
     training = data.training;
     operatorRetrainingDelay = data.operatorRetrainingDelay;
-    autoDeleteOperatorDelay = data.autoDeleteOperatorDelay;
+    OperatorAutoDeleteDelay = data.OperatorAutoDeleteDelay;
   });
 
 // This code is a JavaScript program that includes various functions to populate, 

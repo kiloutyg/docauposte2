@@ -52,7 +52,7 @@ class OperatorService extends AbstractController
 
     public function operatorCheckForAutoDelete()
     {
-        $this->logger->info('Checking from operatorCheckForAutoDelete()');
+        // $this->logger->info('Checking from operatorCheckForAutoDelete()');
 
         $today = new \DateTime();
         $fileName = 'checked_for_unactive_operator.txt';
@@ -60,15 +60,26 @@ class OperatorService extends AbstractController
 
 
         // if ($today->format('d') % 4 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
-        if (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false) {
+        // if (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false) {
 
             $return = false;
 
             $inActiveOperators = $this->operatorRepository->findOperatorWithNoRecentTraining();
-
-            $this->logger->info('Inactive operators: ' . json_encode($inActiveOperators));
+            // $this->logger->info('Inactive operators: ' . json_encode($inActiveOperators));
             if (count($inActiveOperators) > 0) {
                 foreach ($inActiveOperators as $operator) {
+                    $operator->setInactiveSince($today);
+                    $this->em->persist($operator);
+                };
+                $this->em->flush();
+                $return = true;
+            }
+
+
+            $operatorSetToBeDeleted = $this->operatorRepository->findInActiveOperators();
+            // $this->logger->info('Inactive operatorSetToBeDeleted: ' . json_encode($operatorSetToBeDeleted));
+            if (count($operatorSetToBeDeleted) > 0) {
+                foreach ($operatorSetToBeDeleted as $operator) {
                     $operator->setTobedeleted($today);
                     $this->em->persist($operator);
                 };
@@ -78,8 +89,7 @@ class OperatorService extends AbstractController
 
 
             $toBeDeletedOperatorsIds = $this->operatorRepository->findOperatorToBeDeleted();
-            $this->logger->info('To be deleted operators: ' . json_encode($toBeDeletedOperatorsIds));
-
+            // $this->logger->info('Inactive toBeDeletedOperatorsIds: ' . json_encode($toBeDeletedOperatorsIds));
             if (count($toBeDeletedOperatorsIds) > 0) {
                 foreach ($toBeDeletedOperatorsIds as $operatorId) {
                     $this->entityDeletionService->deleteEntity('operator', $operatorId);
@@ -92,12 +102,11 @@ class OperatorService extends AbstractController
                 file_put_contents($filePath, $today->format('Y-m-d'));
             }
 
-
             $countArray = [
-                'inActiveOperators' => count($this->operatorRepository->findInActiveOperators()),
+                'findDeactivatedOperators' => count($this->operatorRepository->findDeactivatedOperators()),
                 'toBeDeletedOperators' => count($toBeDeletedOperatorsIds)
             ];
             return $countArray;
         }
     }
-}
+// }

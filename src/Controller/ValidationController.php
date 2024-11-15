@@ -208,15 +208,15 @@ class ValidationController extends FrontController
 
     // public function validatedListUploadsRender(array $uploads = null): Response
     // {
-    //     $this->logger->info('Uploads: ', [$uploads]);
+    //     // $this->logger->info('Uploads: ', [$uploads]);
     //     if (count($uploads) === 1) {
 
     //         $upload = $this->cacheService->getEntityById('upload', $uploads[0]->getId());
-    //         $this->logger->info('Upload: ', [$upload]);
+    //         // $this->logger->info('Upload: ', [$upload]);
     //         $validation = $this->cacheService->getEntitiesByParentId('validation', $uploads[0]->getId());
-    //         $this->logger->info('Validation: ', [$validation]);
-    //         // $this->logger->info('Validation[0: ', [$validation[0]]);
-    //         // $this->logger->info('Validationtoarray: ', [$validation->toArray()]);
+    //         // $this->logger->info('Validation: ', [$validation]);
+    //         // // $this->logger->info('Validation[0: ', [$validation[0]]);
+    //         // // $this->logger->info('Validationtoarray: ', [$validation->toArray()]);
 
     //         $approbations = $this->cacheService->getEntitiesByParentId('approbation', $validation->getId());
     //         // $approbations = $validation[0]->getApprobations();

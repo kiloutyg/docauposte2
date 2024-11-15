@@ -23,24 +23,26 @@ use App\Entity\Approbation;
 use App\Service\MailerService;
 use App\Service\OldUploadService;
 use App\Service\TrainingRecordService;
+use App\Service\SettingsService;
 
-use function PHPUnit\Framework\isEmpty;
 
 class ValidationService extends AbstractController
 {
-    protected $logger;
-    protected $em;
-    protected $projectDir;
+    protected   $logger;
+    protected   $em;
+    protected   $projectDir;
 
-    protected $uploadRepository;
-    protected $departmentRepository;
-    protected $userRepository;
-    protected $validationRepository;
-    protected $approbationRepository;
+    protected   $uploadRepository;
+    protected   $departmentRepository;
+    protected   $userRepository;
+    protected   $validationRepository;
+    protected   $approbationRepository;
+    protected   $settings;
 
-    protected $mailerService;
-    protected $oldUploadService;
-    private $TrainingRecordService;
+    protected   $mailerService;
+    protected   $oldUploadService;
+
+    private     $TrainingRecordService;
 
 
     public function __construct(
@@ -53,6 +55,7 @@ class ValidationService extends AbstractController
         UserRepository                  $userRepository,
         ValidationRepository            $validationRepository,
         ApprobationRepository           $approbationRepository,
+        SettingsService                 $settingsService,
 
         MailerService                   $mailerService,
         OldUploadService                $oldUploadService,
@@ -67,6 +70,7 @@ class ValidationService extends AbstractController
         $this->userRepository        = $userRepository;
         $this->validationRepository  = $validationRepository;
         $this->approbationRepository = $approbationRepository;
+        $this->settings              = $settingsService->getSettings();
 
         $this->mailerService         = $mailerService;
         $this->oldUploadService      = $oldUploadService;
@@ -140,7 +144,7 @@ class ValidationService extends AbstractController
 
     public function updateValidation(Upload $upload, Request $request)
     {
-        // $this->logger->info('updateValidation in validationService: upload: ' . $upload->getId() . ' request: ' . $request->request->all());
+        // // $this->logger->info('updateValidation in validationService: upload: ' . $upload->getId() . ' request: ' . $request->request->all());
 
 
         // Get the Validation instance associated with the Upload instance
@@ -195,7 +199,7 @@ class ValidationService extends AbstractController
 
         // Send a notification email to the validator
         $this->mailerService->approbationEmail($validation);
-        $this->logger->info('forcedDisplay: ' . $upload->isForcedDisplay() . ' training-needed: ' . $request->request->get('training-needed') . ' display-needed: ' . $request->request->get('display-needed'));
+        // $this->logger->info('forcedDisplay: ' . $upload->isForcedDisplay() . ' training-needed: ' . $request->request->get('training-needed') . ' display-needed: ' . $request->request->get('display-needed'));
         if ($request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
             $this->TrainingRecordService->updateTrainingRecord($upload);
         }
@@ -317,7 +321,7 @@ class ValidationService extends AbstractController
     // This method will also activate the notification email to the uploader
     public function updateValidationAndUploadStatus(Validation $validation, ?bool $status)
     {
-        // $this->logger->info('updateValidationAndUploadStatus: ' . $validation->getId() . ' status: ' . $status);
+        // // $this->logger->info('updateValidationAndUploadStatus: ' . $validation->getId() . ' status: ' . $status);
 
         if ($validation->isStatus() === false) {
             return;
@@ -350,7 +354,7 @@ class ValidationService extends AbstractController
             $this->em->remove($oldUpload);
             $this->em->flush($oldUpload);
         }
-        $this->logger->info('validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay());
+        // $this->logger->info('validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay());
         if ($validation->isStatus() === true && $upload->isForcedDisplay() === false) {
             $this->mailerService->sendApprovalEmail($validation);
             $this->TrainingRecordService->updateTrainingRecord($upload);
@@ -390,7 +394,7 @@ class ValidationService extends AbstractController
             $approbations = [];
             // Get the ID of the Validation instance
             $approbations = $validation->getApprobations();
-            $this->logger->info('Resetting approbations' . json_encode($approbations));
+            // $this->logger->info('Resetting approbations' . json_encode($approbations));
             // Loop through each Approbation instance
             foreach ($approbations as $approbation) {
                 //If it's a major modification reset all approbations
@@ -425,7 +429,7 @@ class ValidationService extends AbstractController
         // Flush changes to the database
         $this->em->flush();
 
-        // $this->logger->info('display-needed: ' . $request->request->get('display-needed') . ' training-needed: ' . $request->request->get('training-needed'));
+        // // $this->logger->info('display-needed: ' . $request->request->get('display-needed') . ' training-needed: ' . $request->request->get('training-needed'));
 
         if ($request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
             $this->TrainingRecordService->updateTrainingRecord($upload);
@@ -450,9 +454,9 @@ class ValidationService extends AbstractController
         $fileName = 'email_sent.txt';
         $filePath = $this->projectDir . '/public/doc/' . $fileName;
         $uploadsWaitingValidationRaw = [];
-        // $badValidators = [];
+
         $uploaders = [];
-        
+
         if ($today->format('d') % 2 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
 
             $nonValidatedValidations = $this->validationRepository->findNonValidatedValidations();
@@ -513,7 +517,7 @@ class ValidationService extends AbstractController
 
             if ($return) {
                 $fileWriting = file_put_contents($filePath, $today->format('Y-m-d'));
-                $this->logger->info('fileWriting: ' . $fileWriting);
+                // $this->logger->info('fileWriting: ' . $fileWriting);
             }
             foreach ($uploaders as $uploader) {
                 $this->mailerService->sendReminderEmailToUploader($uploader);
@@ -523,5 +527,27 @@ class ValidationService extends AbstractController
                 $this->mailerService->sendReminderEmailToAllUsers($uploadsWaitingValidationRaw);
             }
         }
+    }
+
+    public function checkNumberOfValidator(Request $request, Int $neededValidator): bool
+    {
+
+        $selectedValidatorsCount = 0;
+        $enoughValidator = false;
+
+        foreach ($request->request->keys() as $key) {
+            // If the key contains 'validator_user', add its value to the validator_user_values array
+            if (strpos($key, 'validator_user') !== false && $request->request->get($key) !== null && !empty($request->request->get($key))) {
+                $selectedValidatorsCount++;
+            }
+        }
+        // $this->logger->info('number of selected validator: ' . $selectedValidatorsCount);
+        // $this->logger->info('neededValidator: ' . $neededValidator);
+        // $this->logger->info('is enough validator correctly determined: ' . $selectedValidatorsCount >= $neededValidator);
+
+        if ($selectedValidatorsCount >= $neededValidator) {
+            $enoughValidator = true;
+        }
+        return $enoughValidator;
     }
 }

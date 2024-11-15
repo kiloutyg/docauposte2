@@ -34,11 +34,11 @@ class MailerController extends FrontController
 
         foreach ($this->userRepository->findAll() as $user) {
             $username = $user->getUsername();
-            $this->logger->info('username: ' . $username);
+            // $this->logger->info('username: ' . $username);
             $newEmail = "{$username}@opmobility.com";
             $oldEmail = $user->getEmailAddress();
-            $this->logger->info('oldEmail: ' . $oldEmail);
-            $this->logger->info('newEmail: ' . $newEmail);
+            // $this->logger->info('oldEmail: ' . $oldEmail);
+            // $this->logger->info('newEmail: ' . $newEmail);
 
             // Check if the new email already exists in the database
             $existingUser = $this->userRepository->findOneBy(['emailAddress' => $newEmail]);
@@ -49,7 +49,7 @@ class MailerController extends FrontController
 
             if ($oldEmail !== $newEmail) {
                 $user->setEmailAddress($newEmail);
-                $this->logger->info('user email now: ' . $user->getEmailAddress());
+                // $this->logger->info('user email now: ' . $user->getEmailAddress());
 
                 // Persist and flush inside the loop is not efficient, should be done outside
                 // $this->em->persist($user);
@@ -92,11 +92,11 @@ class MailerController extends FrontController
 
         foreach ($this->userRepository->findAll() as $user) {
             $username = $user->getUsername();
-            $this->logger->info('username: ' . $username);
+            // $this->logger->info('username: ' . $username);
             $newEmail = "florian.dkhissi+{$username}@opmobility.com";
             $oldEmail = $user->getEmailAddress();
-            $this->logger->info('oldEmail: ' . $oldEmail);
-            $this->logger->info('newEmail: ' . $newEmail);
+            // $this->logger->info('oldEmail: ' . $oldEmail);
+            // $this->logger->info('newEmail: ' . $newEmail);
 
             // Check if the new email already exists in the database
             $existingUser = $this->userRepository->findOneBy(['emailAddress' => $newEmail]);
@@ -107,7 +107,7 @@ class MailerController extends FrontController
 
             if ($oldEmail !== $newEmail) {
                 $user->setEmailAddress($newEmail);
-                $this->logger->info('user email now: ' . $user->getEmailAddress());
+                // $this->logger->info('user email now: ' . $user->getEmailAddress());
 
                 // Persist and flush inside the loop is not efficient, should be done outside
                 // $this->em->persist($user);
@@ -123,7 +123,7 @@ class MailerController extends FrontController
         // Persist and flush after all updates
         if (!empty($usersUpdated)) {
             foreach ($usersUpdated as $updatedUser) {
-                $this->logger->info('updatedUser: ', [$updatedUser]);
+                // $this->logger->info('updatedUser: ', [$updatedUser]);
                 $this->em->persist($updatedUser);
             }
             $this->em->flush();
@@ -152,7 +152,7 @@ class MailerController extends FrontController
         // $uploader = $this->userRepository->findOneBy(['username' => 'aamr.fadili']);
         $uploader = $this->userRepository->findOneBy(['username' => 'camille.gindrey']);
 
-        $this->logger->info('uploader' . $uploader->getUsername());
+        // $this->logger->info('uploader' . $uploader->getUsername());
         $message = $this->mailerService->sendReminderEmailToUploader($uploader);
 
         $this->addFlash('alert', $message);
@@ -166,12 +166,12 @@ class MailerController extends FrontController
     {
         // $nonValidatedValidations[] = $this->validationRepository->findBy(['status' => !true]);
         $nonValidatedValidations = $this->validationRepository->findNonValidatedValidations();
-        $this->logger->info('nonValidatedValidations: ', [$nonValidatedValidations]);
-        
+        // $this->logger->info('nonValidatedValidations: ', [$nonValidatedValidations]);
+
         foreach ($nonValidatedValidations as $validation) {
             $uploads[] = $validation->getUpload();
         }
-        $this->logger->info('uploads: ', [$uploads]);
+        // $this->logger->info('uploads: ', [$uploads]);
 
         $this->mailerService->sendReminderEmailToAllUsers($uploads);
         return $this->redirectToRoute('app_base');

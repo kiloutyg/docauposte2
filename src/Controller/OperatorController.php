@@ -34,18 +34,18 @@ class OperatorController extends FrontController
         $operators = [];
 
 
-        $this->logger->info(' the used method is a post');
+        // $this->logger->info(' the used method is a post');
         if ($request->getContentTypeFormat() == 'json') {
-            $this->logger->info('is the content type a json');
+            // $this->logger->info('is the content type a json');
             $data = json_decode($request->getContent(), true);
-            $this->logger->info('data', $data);
+            // $this->logger->info('data', $data);
             $name       = $data['search_name'];
             $code       = $data['search_code'];
             $team       = $data['search_team'];
             $uap        = $data['search_uap'];
             $trainer    = $data['search_trainer'];
         } else {
-            $this->logger->info('is the content type a form');
+            // $this->logger->info('is the content type a form');
             $name       = $request->request->get('search_name');
             $code       = $request->request->get('search_code');
             $team       = $request->request->get('search_team');
@@ -62,7 +62,7 @@ class OperatorController extends FrontController
     #[Route('/operator/admin', name: 'app_operator')]
     public function operatorBasePage(Request $request): Response
     {
-        // $this->logger->info('search query with full request', $request->request->all());
+        // // $this->logger->info('search query with full request', $request->request->all());
 
         // $countArray = $this->operatorService->operatorCheckForAutoDelete();
 
@@ -95,11 +95,10 @@ class OperatorController extends FrontController
             ])->createView();
         }
 
-        $this->logger->info('in operatorBasePage is operatorForms empty: ' . count($operatorForms));
+        // $this->logger->info('in operatorBasePage is operatorForms empty: ' . count($operatorForms));
 
         if (count($operatorForms) === 0) {
-            $inActiveOperators = $this->operatorRepository->findInActiveOperators();
-            $this->logger->info('in operatorBasePage is inActiveOperators : ' . count($inActiveOperators));
+            $inActiveOperators = $this->operatorRepository->findDeactivatedOperators();
             foreach ($inActiveOperators as $operator) {
                 $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
                     'operator_id' => $operator->getId(),
@@ -107,7 +106,7 @@ class OperatorController extends FrontController
             }
         }
         $flashes = $request->getSession()->getFlashBag()->all();
-        $this->logger->info('message in flashbag', $flashes);
+        // $this->logger->info('message in flashbag', $flashes);
 
         return $this->render('services/operators/operators_admin.html.twig', [
             'newOperatorForm' => $newOperatorForm->createView(),
@@ -115,6 +114,9 @@ class OperatorController extends FrontController
         ]);
     }
 
+
+
+    
     private function processNewOperator(Operator $newOperator, $form, Request $request)
     {
 
@@ -144,7 +146,7 @@ class OperatorController extends FrontController
     #[Route('/operator/edit/{id}', name: 'app_operator_edit')]
     public function editOperatorAction(Request $request, Operator $operator): Response
     {
-        $this->logger->info('Full request editOperatorAction', $request->request->all());
+        // $this->logger->info('Full request editOperatorAction', $request->request->all());
 
         $form = $this->createForm(OperatorType::class, $operator, [
             'operator_id' => $operator->getId(),
@@ -171,11 +173,13 @@ class OperatorController extends FrontController
             if ($operator->getTobedeleted() != null) {
                 $operator->setTobedeleted(null);
                 $operator->setLasttraining(new \DateTime());
+                $operator->setInactiveSince(null);
+                $operator->setTobedeleted(null);
             }
             try {
                 $this->em->persist($operator);
                 $this->em->flush();
-                $this->logger->info('editOperatorAction, operateur bien modifié', [$operator]);
+                // $this->logger->info('editOperatorAction, operateur bien modifié', [$operator]);
                 $this->addFlash('success', 'L\'opérateur a bien été modifié');
 
                 if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
@@ -217,7 +221,7 @@ class OperatorController extends FrontController
             ]);
         }
 
-        $this->logger->info('editOperatorAction reach return to template"');
+        // $this->logger->info('editOperatorAction reach return to template"');
         return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
             'form' => $form->createView(),
             'operator' => $operator
@@ -304,11 +308,11 @@ class OperatorController extends FrontController
     public function trainingListNewOperator(ValidatorInterface $validator, Request $request, int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
     {
 
-        $this->logger->info('Full request', $request->request->all());
+        // $this->logger->info('Full request', $request->request->all());
         $team = $this->teamRepository->find($teamId);
-        $this->logger->info('team', [$team->getName()]);
+        // $this->logger->info('team', [$team->getName()]);
         $uap = $this->uapRepository->find($uapId);
-        $this->logger->info('uap', [$uap->getName()]);
+        // $this->logger->info('uap', [$uap->getName()]);
         $operatorCode = $request->request->get('newOperatorCode');
 
         $surname = $request->request->get('newOperatorSurname');
@@ -333,7 +337,7 @@ class OperatorController extends FrontController
         }
 
         if ($existingOperator != null) {
-            $this->logger->info('existingOperator', [$existingOperator->getName()]);
+            // $this->logger->info('existingOperator', [$existingOperator->getName()]);
             if ($existingOperator->getTeam() == $team && $existingOperator->getUap() == $uap) {
                 $this->addFlash('danger', 'Cet opérateur existe déjà dans cette equipe et uap');
                 return $this->redirectToRoute('app_training_list', [
@@ -377,7 +381,7 @@ class OperatorController extends FrontController
             // If you need to return JSON response:
             // return new JsonResponse(['errors' => $errorMessages], Response::HTTP_BAD_REQUEST);
 
-            $this->logger->info('danger', [$errorsString]);
+            // $this->logger->info('danger', [$errorsString]);
             return $this->redirectToRoute('app_render_training_records', [
                 'uploadId' => $uploadId,
                 'teamId' => $teamId,
@@ -400,7 +404,7 @@ class OperatorController extends FrontController
     public function trainingListFormHandling(Request $request, int $uploadId): Response
     {
         // Log the full request for debugging
-        $this->logger->info('Full request', $request->request->all());
+        // $this->logger->info('Full request', $request->request->all());
 
         // Process the POST request
 
@@ -434,9 +438,6 @@ class OperatorController extends FrontController
             return $surnameA === $surnameB ? strcmp($firstNameA, $firstNameB) : strcmp($surnameA, $surnameB);
         });
 
-        $this->logger->info('selectedOperators', [$selectedOperators]);
-
-
         $trainingRecords = []; // Array of training records
         $unorderedTrainingRecords = []; // Array of unordered training records
         $untrainedOperators = []; // Array of untrained operators
@@ -449,7 +450,7 @@ class OperatorController extends FrontController
 
             $record = $records[0] ?? null;
             if ($record) {
-                $this->logger->info('unorderedTrainingRecords', [$unorderedTrainingRecords]);
+                // $this->logger->info('unorderedTrainingRecords', [$unorderedTrainingRecords]);
                 $trainerName = $record->getTrainer() ? $record->getTrainer()->getOperator()->getName() : 'inconnu.nom';
                 if ($record->isTrained()) {
                     $operatorsByTrainer[$trainerName][] = $operator;
@@ -467,7 +468,7 @@ class OperatorController extends FrontController
         }
 
 
-        $this->logger->info('trainingRecords', [$trainingRecords]);
+        // $this->logger->info('trainingRecords', [$trainingRecords]);
 
         // Render the partial view
         return $this->render('services/operators/training_component/_listOperatorContainer.html.twig', [
@@ -482,10 +483,13 @@ class OperatorController extends FrontController
         ]);
     }
 
+
+
+
     #[Route('/operator/trainingRecord/form/{uploadId}/{teamId}/{uapId}', name: 'app_training_record_form')]
     public function trainingRecordForm(int $uploadId, Request $request, ?int $teamId = null, ?int $uapId = null): Response
     {
-        $this->logger->info('Full request', $request->request->all());
+        // $this->logger->info('Full request', $request->request->all());
         $operators = [];
         $operators = $request->request->all('operators');
         $upload = $this->uploadRepository->find($uploadId);
@@ -493,28 +497,28 @@ class OperatorController extends FrontController
 
         $trainerEntityWithUpload = $this->trainerRepository->findOneBy(['operator' => $trainerId, 'upload' => $upload]);
         if ($trainerEntityWithUpload == null) {
-            $this->logger->info('operator ID', [$trainerId]);
+            // $this->logger->info('operator ID', [$trainerId]);
             $trainerOperator = $this->operatorRepository->find($trainerId);
             $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $trainerOperator]);
-            $this->logger->info('trainerEntity', [$trainerEntity]);
+            // $this->logger->info('trainerEntity', [$trainerEntity]);
         } else {
-            $this->logger->info('trainerEntityWithUpload', [$trainerEntityWithUpload]);
+            // $this->logger->info('trainerEntityWithUpload', [$trainerEntityWithUpload]);
             $trainerOperator = $this->operatorRepository->find($trainerId);
         };
 
         foreach ($operators as $operator) {
-            $this->logger->info('does the key exist', [array_key_exists("trained", $operator)]);
+            // $this->logger->info('does the key exist', [array_key_exists("trained", $operator)]);
 
             if (array_key_exists("trained", $operator)) {
 
-                $this->logger->info('operator', [$operator]);
+                // $this->logger->info('operator', [$operator]);
                 $operatorEntity = $this->operatorRepository->find($operator['id']);
                 $trained = ($operator['trained'] === '') ? null : (($operator['trained'] === 'true') ? true : false);
 
-                $this->logger->info('operator name and is he trained',     [
-                    'name'    => $operatorEntity->getName(),
-                    'trained' => $trained
-                ]);
+                // $this->logger->info('operator name and is he trained',     [
+                //     'name'    => $operatorEntity->getName(),
+                //     'trained' => $trained
+                // ]);
                 if ($trained === null) {
                     break;
                 }
@@ -538,6 +542,7 @@ class OperatorController extends FrontController
                         $this->em->persist($existingTrainingRecord);
                         $operatorEntity->setLasttraining(new \DateTime());
                         $operatorEntity->setTobedeleted(null);
+                        $operatorEntity->setInactiveSince(null);
                         $this->em->persist($operatorEntity);
                     }
                 } else {
@@ -551,6 +556,7 @@ class OperatorController extends FrontController
                     $this->em->persist($trainingRecord);
                     $operatorEntity->setLasttraining(new \DateTime());
                     $operatorEntity->setTobedeleted(null);
+                    $operatorEntity->setInactiveSince(null);
                     $this->em->persist($operatorEntity);
                 }
 
@@ -560,6 +566,8 @@ class OperatorController extends FrontController
         }
 
         $trainerOperator->setLasttraining(new \DateTime());
+        $trainerOperator->setTobedeleted(null);
+        $trainerOperator->setInactiveSince(null);
         $this->em->persist($trainerOperator);
         $this->em->flush();
 
@@ -572,19 +580,21 @@ class OperatorController extends FrontController
 
 
 
+
+
     #[Route('/operator/check-duplicate-by-name', name: 'app_operator_check_duplicate_by_name', methods: ['POST'])]
     public function checkDuplicateOperatorByName(Request $request): JsonResponse
     {
-        $this->logger->info('Full requestbyname', [$request->request->all()]);
+        // $this->logger->info('Full requestbyname', [$request->request->all()]);
 
         $parsedRequest = json_decode($request->getContent(), true);
-        $this->logger->info('parsedRequest', [$parsedRequest]);
+        // $this->logger->info('parsedRequest', [$parsedRequest]);
 
         $operatorName = $parsedRequest['value'];
-        $this->logger->info('operatorName', [$operatorName]);
+        // $this->logger->info('operatorName', [$operatorName]);
 
         $existingOperator = $this->operatorRepository->findOneBy(['name' => $operatorName]);
-        $this->logger->info('existingOperator', [$existingOperator]);
+        // $this->logger->info('existingOperator', [$existingOperator]);
 
         if ($existingOperator !== null) {
 
@@ -613,19 +623,21 @@ class OperatorController extends FrontController
 
 
 
+
+
     #[Route('/operator/check-duplicate-by-code', name: 'app_operator_check_duplicate_by_code', methods: ['POST'])]
     public function checkDuplicateOperatorByCode(Request $request): JsonResponse
     {
-        $this->logger->info('Full request bycode', $request->request->all());
+        // $this->logger->info('Full request bycode', $request->request->all());
 
         $parsedRequest = json_decode($request->getContent(), true);
-        $this->logger->info('parsedRequest', [$parsedRequest]);
+        // $this->logger->info('parsedRequest', [$parsedRequest]);
 
         $operatorCode = $parsedRequest['value'];
-        $this->logger->info('operatorCode', [$operatorCode]);
+        // $this->logger->info('operatorCode', [$operatorCode]);
 
         $existingOperator = $this->operatorRepository->findOneBy(['code' => $operatorCode]);
-        $this->logger->info('existingOperator', [$existingOperator]);
+        // $this->logger->info('existingOperator', [$existingOperator]);
 
         if ($existingOperator !== null) {
             // Found duplicate
@@ -651,6 +663,8 @@ class OperatorController extends FrontController
     }
 
 
+
+
     // Route to check the operator to validate the training form and make the trained button appear
 
     #[Route('operator/check-entered-code-against-operator-code/{teamId}/{uapId}', name: 'app_check_entered_code_against_operator_code')]
@@ -658,23 +672,23 @@ class OperatorController extends FrontController
     {
         $parsedRequest = json_decode($request->getContent(), true);
 
-        $this->logger->info('Full request', $parsedRequest);
+        // $this->logger->info('Full request', $parsedRequest);
 
         $enteredCode = $parsedRequest['code'];
-        $this->logger->info('enteredCode', [$enteredCode]);
+        // $this->logger->info('enteredCode', [$enteredCode]);
 
         $operatorId = (int)$parsedRequest['operatorId'];
-        $this->logger->info('operatorId', [$operatorId]);
+        // $this->logger->info('operatorId', [$operatorId]);
 
         $controllerOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'team' => $teamId, 'uap' => $uapId]);
-        $this->logger->info('controllerOperator', [$controllerOperator]);
+        // $this->logger->info('controllerOperator', [$controllerOperator]);
 
         if ($controllerOperator != null) {
             $controllerOperatorId = $controllerOperator->getId();
-            $this->logger->info('controllerOperatorId', [$controllerOperatorId]);
+            // $this->logger->info('controllerOperatorId', [$controllerOperatorId]);
 
             $controllerOperatorId === $operatorId ? $operator = $controllerOperator : $operator = null;
-            $this->logger->info('operator', [$operator]);
+            // $this->logger->info('operator', [$operator]);
 
             if ($operator !== null) {
                 // Found operator
@@ -698,6 +712,9 @@ class OperatorController extends FrontController
     }
 
 
+
+
+
     // Route to check if a code exist in the database and then return a boolean
 
     #[Route('operator/check-if-code-exist', name: 'app_check_if_code_exist')]
@@ -705,10 +722,10 @@ class OperatorController extends FrontController
     {
         $parsedRequest = json_decode($request->getContent(), true);
 
-        $this->logger->info('Full request', $parsedRequest);
+        // $this->logger->info('Full request', $parsedRequest);
 
         $enteredCode = $parsedRequest['code'];
-        $this->logger->info('enteredCode', [$enteredCode]);
+        // $this->logger->info('enteredCode', [$enteredCode]);
 
         $existingOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode]);
         if ($existingOperator !== null) {
@@ -723,31 +740,35 @@ class OperatorController extends FrontController
         }
     }
 
+
+
+
+
     // Route to check if a trainer exist by name and code
     #[Route('operator/check-if-trainer-exist', name: 'app_check_if_trainer_exist')]
     public function checkIfTrainerExist(Request $request): JsonResponse
     {
         $parsedRequest = json_decode($request->getContent(), true);
 
-        $this->logger->info('Full request', $parsedRequest);
+        // $this->logger->info('Full request', $parsedRequest);
 
         if (key_exists('code', $parsedRequest)) {
             $enteredCode = $parsedRequest['code'];
-            $this->logger->info('enteredCode', [$enteredCode]);
+            // $this->logger->info('enteredCode', [$enteredCode]);
         } else {
             $enteredCode = null;
         };
 
         if (key_exists('name', $parsedRequest)) {
             $enteredName = $parsedRequest['name'];
-            $this->logger->info('enteredName', [$enteredName]);
+            // $this->logger->info('enteredName', [$enteredName]);
         } else {
             $enteredName = null;
         };
 
         if (key_exists('uploadId', $parsedRequest)) {
             $uploadId = $parsedRequest['uploadId'];
-            $this->logger->info('uploadId', [$uploadId]);
+            // $this->logger->info('uploadId', [$uploadId]);
             $upload = $this->uploadRepository->find($uploadId);
         } else {
             $upload = null;
@@ -796,17 +817,21 @@ class OperatorController extends FrontController
         }
     }
 
+
+
+
+
     #[Route('operator/suggest-names', name: 'app_suggest_names')]
     public function suggestNames(Request $request, SerializerInterface $serializer): JsonResponse
     {
         $parsedRequest = json_decode($request->getContent(), true);
-        $this->logger->info('app_suggest_names parsedRequest', $parsedRequest);
+        // $this->logger->info('app_suggest_names parsedRequest', $parsedRequest);
 
         $name = $parsedRequest['name'];
 
         /////////////// serialized data ////////////////////////
         $rawSuggestions = $this->operatorRepository->findByNameLikeForSuggestions($name);
-        $this->logger->info('app_suggest_names Raw suggestions', $rawSuggestions);
+        // $this->logger->info('app_suggest_names Raw suggestions', $rawSuggestions);
 
         $teams = $this->teamRepository->findAll();
         $teamIndex = [];
@@ -837,28 +862,31 @@ class OperatorController extends FrontController
             }
         }
 
-        $this->logger->info('app_suggest_names rawSuggestions', $rawSuggestions);
+        // $this->logger->info('app_suggest_names rawSuggestions', $rawSuggestions);
         // Serialize the entire array of entities at once using groups
         $serializedSuggestions = json_encode($rawSuggestions);
         // $serializedSuggestions = $serializer->serialize($rawSuggestions, 'json', [
         //     'groups' => 'operator_details'
         // ]);
 
-        // $this->logger->info('app_suggest_names serialized suggestions', json_decode($serializedSuggestions));
-        // $this->logger->info('app_suggest_names serialized suggestions', json_decode($serializedSuggestions));
+        // // $this->logger->info('app_suggest_names serialized suggestions', json_decode($serializedSuggestions));
+        // // $this->logger->info('app_suggest_names serialized suggestions', json_decode($serializedSuggestions));
 
         // Since $serializedSuggestions is a JSON string, return it directly with JsonResponse
         return new JsonResponse($serializedSuggestions, 200, [], true);
     }
+
+
 
     // Route to print the operator detail in a pdf
     #[Route('/operator/detail/{operatorId}', name: 'app_operator_detail')]
     public function printOpeDetail(int $operatorId)
     {
         $operator = $this->cacheService->getEntityById('operator', $operatorId);
-        $this->logger->info('operator', [$operator]);
+        // $this->logger->info('operator', [$operator]);
 
-        $pdfContent = $this->pdfGeneratorService->generateOperatorPdf($operator);
+        // $pdfContent = $this->pdfGeneratorService->generateOperatorPdf($operator);
+        $this->pdfGeneratorService->generateOperatorPdf($operator);
 
         return true;
     }
@@ -959,15 +987,15 @@ class OperatorController extends FrontController
                     }
                 }
 
-                $this->logger->info(sprintf(
-                    'code: %s, firstname: %s, surname: %s, name: %s, team: %s, uap: %s',
-                    $code,
-                    $firstname,
-                    $surname,
-                    $name,
-                    $team->getName(),
-                    $uap->getName()
-                ));
+                // $this->logger->info(sprintf(
+                //     'code: %s, firstname: %s, surname: %s, name: %s, team: %s, uap: %s',
+                //     $code,
+                //     $firstname,
+                //     $surname,
+                //     $name,
+                //     $team->getName(),
+                //     $uap->getName()
+                // ));
             }
 
             // Commit the transaction
@@ -988,6 +1016,7 @@ class OperatorController extends FrontController
         $this->addFlash('success', 'Les opérateurs ont bien été importés');
         return $this->redirectToRoute('app_operator');
     }
+
 
 
 
@@ -1017,6 +1046,9 @@ class OperatorController extends FrontController
 
         throw new \Exception('Default entity not found');
     }
+
+
+
 
     // Route to delete UAP or Team without breaking operators and training records database
     #[Route('/operator/delete-uap-or-team/{entityType}/{entityId}', name: 'app_delete_uap_or_team')]
@@ -1052,7 +1084,6 @@ class OperatorController extends FrontController
             $this->em->persist($uap);
             $this->em->flush();
         }
-
 
         $team = new Team();
         $uap = new Uap();
