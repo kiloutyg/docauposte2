@@ -21,7 +21,7 @@ class SecurityController extends FrontController
 
     // This function is responsible for rendering the login interface 
     #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils, Request $request)
+    public function login(AuthenticationUtils $authenticationUtils)
     {
         if ($this->getUser()) {
             $this->addFlash('success', 'Vous êtes connecté');
