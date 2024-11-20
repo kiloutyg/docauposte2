@@ -28,7 +28,7 @@ use App\Service\SettingsService;
 use App\Service\EntityFetchingService;
 use App\Service\ErrorService;
 
-#[Route('/productline_admin', name: 'app_productline_')]
+#[Route('/productline_admin', name: 'app_productLine_')]
 // This controller manage the logic of the productline admin interface
 class ProductLineAdminController extends AbstractController
 {
@@ -144,7 +144,7 @@ class ProductLineAdminController extends AbstractController
         if (!preg_match("/^[^.]+$/", $request->request->get('categoryname'))) {
             // Handle the case when category name contains disallowed characters
             $this->addFlash('danger', 'Nom de catégorie invalide');
-            return $this->productLineAdmin(null, $productLine);
+            return $this->redirectToRoute('app_productLine_admin', ['productLineId' => $productLineId]);
         } else {
 
             // Check if the category already exists by looking for a category with the same name
@@ -154,10 +154,10 @@ class ProductLineAdminController extends AbstractController
             // If the category already exists, redirect to the productline admin interface  with a flash message
             if ($category) {
                 $this->addFlash('danger', 'La catégorie existe deja');
-                return $this->productLineAdmin(null, $productLine);
+                return $this->redirectToRoute('app_productLine_admin', ['productLineId' => $productLineId]);
                 // If the category doesn't exist, create it and redirect to the productline admin interface with a flash message
             } else {
-                $count = $this->categoryRepository->count(['ProductLine' => $productLine->getId()]);
+                $count = $this->categoryRepository->count(['ProductLine' => $productLineId]);
                 $sortOrder = $count + 1;
                 $category = new Category();
                 $category->setName($categoryname);
@@ -168,36 +168,36 @@ class ProductLineAdminController extends AbstractController
                 $this->em->flush();
                 $this->folderCreationService->folderStructure($categoryname);
                 $this->addFlash('success', 'La catégorie a été créée');
-                return $this->productLineAdmin(null, $productLine);
+                return $this->redirectToRoute('app_productLine_admin', ['productLineId' => $productLineId]);
             }
         }
     }
 
     #[Route('/delete_category/{categoryId}', name: 'admin_delete_category')]
     // This function will delete a category and all of its children entities, it depends on the entitydeletionService
-    public function deleteEntityCategory(int $categoryId, Category $category = null): Response
+    public function deleteEntityCategory(int $categoryId): Response
     {
         $entityType = 'category';
 
-        $category ? $this->categoryRepository->find($categoryId) : $this->errorService->errorRedirectByOrgaEntityType($entityType);
-
-        $productLine = $category->getProductLine();
-
+        $category = $this->categoryRepository->find($categoryId);
         // Check if the user is the creator of the entity or if he is a super admin
-        if ($this->authChecker->isGranted("ROLE_LINE_ADMIN") || $this->getUser() === $category->getCreator()) {
+        if ($this->authChecker->isGranted("ROLE_LINE_ADMIN")) {
             // This function is used to delete a category and all the infants entity attached to it, it depends on the EntityDeletionService class. 
             // The folder is deleted by the FolderCreationService class through the EntityDeletionService class.
-            $response = $this->entitydeletionService->deleteEntity($entityType, $category->getId());
+            $response = $this->entitydeletionService->deleteEntity($entityType, $categoryId);
         } else {
+            $productLineId = $category->getProductLine()->getId();
             $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer cette ' . $entityType . '.');
-            return $this->productLineAdmin(null, $productLine);
+            return $this->redirectToRoute('app_productLine_admin', ['productLineId' => $productLineId]);
         }
+
+        $productLineId = $category->getProductLine()->getId();
         if ($response == true) {
             $this->addFlash('success', 'La catégorie ' . $category->getName() . ' a été supprimée.');
-            return $this->productLineAdmin(null, $productLine);
+            return $this->redirectToRoute('app_productLine_admin', ['productLineId' => $productLineId]);
         } else {
             $this->addFlash('danger', 'La catégorie ' . $category->getName() . ' n\'existe pas.');
-            return $this->productLineAdmin(null, $productLine);
+            return $this->redirectToRoute('app_productLine_admin', ['productLineId' => $productLineId]);
         }
     }
 }

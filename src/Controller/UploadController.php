@@ -245,10 +245,10 @@ class UploadController extends AbstractController
 
     // create a route to modify a file and or display the modification page
     #[Route('/modification/view/{uploadId}', name: 'modify_file')]
-    public function fileModificationView(Request $request, int $uploadId): Response
+    public function fileModificationView(int $uploadId = null, Request $request,): Response
     {
         // Retrieve the current upload entity based on the uploadId
-        $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $upload      = $this->uploadRepository->find($uploadId);
         $button      = $upload->getButton();
         $category    = $button->getCategory();
         $productLine = $category->getProductLine();
@@ -260,7 +260,7 @@ class UploadController extends AbstractController
         $currentUser = $this->security->getUser();
         $uploader = $upload->getUploader();
         // If it's a GET request, render the form
-        if ($request->isMethod('GET') && ($currentUser === $uploader || $uploader === null || $this->authChecker->isGranted("ROLE_ADMIN"))) {
+        if ($request->isMethod('GET') && ($currentUser === $uploader || $uploader === null || $this->authChecker->isGranted("ROLE_LINE_ADMIN"))) {
             return $this->render('services/uploads/uploads_modification.html.twig', [
                 'form'        => $form->createView(),
                 'zone'        => $zone,

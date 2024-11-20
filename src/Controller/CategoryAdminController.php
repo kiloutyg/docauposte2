@@ -137,14 +137,15 @@ class CategoryAdminController extends AbstractController
     #[Route('/create_button/{categoryId}', name: 'admin_create_button')]
     public function createButton(Request $request, int $categoryId = null)
     {
-        $category = $this->categoryRepository->find($categoryId);
         // Check if button name does not contain the disallowed characters
         if (!preg_match("/^[^.]+$/", $request->request->get('buttonname'))) {
 
             // Handle the case when button name contains disallowed characters
             $this->addFlash('danger', 'Nom de bouton invalide');
-            return $this->categoryAdmin(null, $category);
+            return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
         } else {
+
+            $category = $this->categoryRepository->find($categoryId);
             // Look if the the button already exists
             $buttonname = $request->request->get('buttonname') . '.' . $category->getName();
             $button = $this->buttonRepository->findoneBy(['name' => $buttonname]);
@@ -152,7 +153,7 @@ class CategoryAdminController extends AbstractController
             // If the button already exists, redirect to the category manager page and display a flash message.
             if ($button) {
                 $this->addFlash('danger', 'Le bouton existe déjà');
-                return $this->categoryAdmin(null, $category);
+                return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
                 // If the button does not exist, create it and redirect to the category manager page and display a flash message. It depends on the FolderCreationService class.
             } else {
                 $count = $this->buttonRepository->count(['Category' => $categoryId]);
@@ -167,7 +168,7 @@ class CategoryAdminController extends AbstractController
                 $this->folderCreationService->folderStructure($buttonname);
 
                 $this->addFlash('success', 'Le bouton a été créé');
-                return $this->categoryAdmin(null, $category);
+                return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
             }
         }
     }
@@ -178,11 +179,9 @@ class CategoryAdminController extends AbstractController
     public function deleteEntityButton(int $buttonId): Response
     {
         $entityType = 'button';
+
         $button = $this->buttonRepository->find($buttonId);
-        if (empty($button)) {
-            return $this->errorService->errorRedirectByOrgaEntityType($entityType);
-        };
-        $category = $button->getCategory();
+        $categoryId = $button->getCategory()->getid();
 
         // Check if the user is the creator of the button or if he is a super admin
         if ($this->authChecker->isGranted("ROLE_LINE_ADMIN")) {
@@ -191,15 +190,15 @@ class CategoryAdminController extends AbstractController
             $response = $this->entitydeletionService->deleteEntity($entityType, $buttonId);
         } else {
             $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer cette ' . $entityType . '.');
-            return $this->categoryAdmin(null, $category);
+            return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
         }
 
         if ($response == true) {
             $this->addFlash('success', 'Le bouton ' . $entityType . ' a été supprimé');
-            return $this->categoryAdmin(null, $category);
+            return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
         } else {
             $this->addFlash('danger', 'Le bouton ' . $entityType . ' n\'existe pas.');
-            return $this->categoryAdmin(null, $category);
+            return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
         }
     }
 }

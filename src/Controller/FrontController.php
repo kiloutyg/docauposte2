@@ -182,7 +182,7 @@ class FrontController extends AbstractController
         $productLinesInZone = [];
         $productLinesInZone = $zone->getProductLines();
 
-        if (count($productLinesInZone) === 1) {
+        if (count($productLinesInZone) === 1 && !$this->authChecker->isGranted('ROLE_LINE_ADMIN')) {
             return $this->productline(null, $productLinesInZone[0]);
         } else {
             return $this->render(
@@ -197,7 +197,7 @@ class FrontController extends AbstractController
 
 
     // Render the productline page and redirect to the mandatory incident page if there is one
-    #[Route('/productline/{productLineId}', name: 'productline')]
+    #[Route('/productline/{productLineId}', name: 'productLine')]
     public function productline(int $productLineId = null, ProductLine $productLine = null): Response
     {
         // $this->logger->info('productLine and productLineID', ['productLineId' => $productLineId, 'productLine' => $productLine]);
@@ -216,7 +216,7 @@ class FrontController extends AbstractController
         $incidentId = count($incidents) > 0 ? $incidents[0]->getId() : null;
 
         if (count($incidents) === 0) {
-            if (count($categoriesInLine) === 1) {
+            if (count($categoriesInLine) === 1 && !$this->authChecker->isGranted('ROLE_LINE_ADMIN')) {
                 return $this->category(null, $categoriesInLine[0]);
             }
             return $this->render(

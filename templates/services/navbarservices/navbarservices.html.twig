@@ -5,7 +5,7 @@
 
 		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
 		{% set zone = {'name': button.category.productLine.zone.name, 'varName': 'zone', 'id': button.category.productLine.zone.id|default(null)} %}
-		{% set productline = {'name': button.category.productLine.name, 'varName': 'productline', 'id': button.category.productLine.id|default(null)} %}
+		{% set productLine = {'name': button.category.productLine.name, 'varName': 'productLine', 'id': button.category.productLine.id|default(null)} %}
 		{% set category = {'name': button.category.name, 'varName': 'category', 'id': button.category.id|default(null)} %}
 		{% set button = null %}
 
@@ -13,7 +13,7 @@
 
 		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
 		{% set zone = {'name': category.productLine.zone.name, 'varName': 'zone', 'id': category.productLine.zone.id|default(null)} %}
-		{% set productline = {'name': category.productLine.name, 'varName': 'productline', 'id': category.productLine.id|default(null)} %}
+		{% set productLine = {'name': category.productLine.name, 'varName': 'productLine', 'id': category.productLine.id|default(null)} %}
 		{% set category = null %}
 		{% set button = null %}
 
@@ -21,7 +21,7 @@
 
 		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
 		{% set zone = {'name': productLine.zone.name, 'varName': 'zone', 'id': productLine.zone.id|default(null)} %}
-		{% set productline = null %}
+		{% set productLine = null %}
 		{% set category = null %}
 		{% set button = null %}
 
@@ -29,7 +29,7 @@
 
 		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
 		{% set zone = null %}
-		{% set productline = null %}
+		{% set productLine = null %}
 		{% set category = null %}
 		{% set button = null %}
 
@@ -37,13 +37,13 @@
 
 		{% set base = null %}
 		{% set zone = null %}
-		{% set productline = null %}
+		{% set productLine = null %}
 		{% set category = null %}
 		{% set button = null %}
 
 	{% endif %}
 
-	{% set navbar = [base, zone, productline, category, button] %}
+	{% set navbar = [base, zone, productLine, category, button] %}
 	{% set params = {} %}
 
 	{% for item in navbar %}

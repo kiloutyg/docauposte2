@@ -144,7 +144,7 @@
 							{% if productLineExt != productLine %}
 								<li>
 									<a
-										href="{{ path('app_productline_admin', {productLineId: productLineExt.id}) }}" class="dropdown-item shadow ">
+										href="{{ path('app_productLine_admin', {productLineId: productLineExt.id}) }}" class="dropdown-item shadow ">
 										{{productLineExt.name|split('.')|first|upper}}
 									</a>
 								</li>
@@ -164,7 +164,7 @@
 					<aside
 						class="end-0">
 						<a
-							href="{{ path('app_productline_admin', {productLineId: productLine.id}) }}" class="btn shadow  bg-dark "
+							href="{{ path('app_productLine_admin', {productLineId: productLine.id}) }}" class="btn shadow  bg-dark "
 							style="color:white">
 							<span
 								class="fa fa-gear"></span>
