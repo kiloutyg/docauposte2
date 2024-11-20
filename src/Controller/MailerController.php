@@ -3,16 +3,24 @@
 namespace App\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
+
 use Symfony\Component\Routing\Annotation\Route;
 
-
+use App\Service\EntityFetchingService;
 
 
 class MailerController extends FrontController
-
 {
+    private $entityFetchingService;
+    
+    public function __construct(
+        EntityFetchingService $entityFetchingService,
+    ) {
+        parent::__construct();
+        $this->entityFetchingService = $entityFetchingService;
+    }
+
+
     #[Route('/mail/testmail', name: 'testmail')]
     public function testMail(): Response
     {
@@ -32,7 +40,7 @@ class MailerController extends FrontController
         $usersUpdated = [];
         $htmlContent = "<h1>Email Address Updates</h1>"; // Start your HTML content
 
-        foreach ($this->userRepository->findAll() as $user) {
+        foreach ($this->entityFetchingService->getUsers() as $user) {
             $username = $user->getUsername();
             // $this->logger->info('username: ' . $username);
             $newEmail = "{$username}@opmobility.com";
@@ -90,7 +98,7 @@ class MailerController extends FrontController
         $usersUpdated = [];
         $htmlContent = "<h1>Email Address Updates</h1>"; // Start your HTML content
 
-        foreach ($this->userRepository->findAll() as $user) {
+        foreach ($this->entityFetchingService->getUsers() as $user) {
             $username = $user->getUsername();
             // $this->logger->info('username: ' . $username);
             $newEmail = "florian.dkhissi+{$username}@opmobility.com";

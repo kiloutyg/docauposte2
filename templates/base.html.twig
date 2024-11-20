@@ -26,8 +26,9 @@
 			{{ encore_entry_script_tags('toast') }}
 			{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
 			{{ encore_entry_script_tags('cascading-dropdowns') }}
-			{{ encore_entry_script_tags('department-creation') }}
 			{{ encore_entry_script_tags('document-validator') }}
+			{{ encore_entry_script_tags('department-creation') }}
+
 			<script>
 				let zoneIdFromServer = null;
 let productLineIdFromServer = null;
@@ -176,8 +177,8 @@ let buttonIdFromServer = null;
 				{% endif %}
 				<div
 					class="ms-auto d-flex align-items-center">
-					{% if users is defined %}
-						{% if users is empty %}
+					{% if usersExist is defined %}
+						{% if usersExist is empty %}
 
 							{% else %}
 								{% if app.user is null %}
@@ -219,8 +220,8 @@ let buttonIdFromServer = null;
 			</div>
 		</nav>
 		<!-- End Main Navigation -->
-		{% if users is defined %}
-			{% if users is empty %}
+		{% if usersExist is defined %}
+			{% if usersExist is empty %}
 				<div
 					class="container ">
 

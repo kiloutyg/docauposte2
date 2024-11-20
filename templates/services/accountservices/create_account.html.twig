@@ -1,13 +1,13 @@
 {% if is_granted('ROLE_SUPER_ADMIN') or users is empty %}
-{% if users is empty %}
-{% set superAdminCreationButton = "" %}
-{% set superAdminCreationAria = "true" %}
-{% set superAdminCreationDiv = "show" %}
-{% else %}
-{% set superAdminCreationButton = "collapsed" %}
-{% set superAdminCreationAria = "false" %}
-{% set superAdminCreationDiv = "collapse" %}
-{% endif %}
+	{% if usersExist is null %}
+		{% set superAdminCreationButton = "" %}
+		{% set superAdminCreationAria = "true" %}
+		{% set superAdminCreationDiv = "show" %}
+	{% else %}
+		{% set superAdminCreationButton = "collapsed" %}
+		{% set superAdminCreationAria = "false" %}
+		{% set superAdminCreationDiv = "collapse" %}
+	{% endif %}
 	<div
 		class="accordion-item">
 		<h2
@@ -18,8 +18,7 @@
 				type="button"
 				data-bs-toggle="collapse"
 				data-bs-target="#collapseAccount"
-				aria-expanded="{{superAdminCreationAria}}"
-				aria-controls="collapseAccount">
+				aria-expanded="{{superAdminCreationAria}}" aria-controls="collapseAccount">
 				<strong>
 					Formulaire de creation de compte utilisateur :
 				</strong>
@@ -49,62 +48,59 @@
 										class="col-8 mx-auto">
 										<br>
 										{% include "services/accountservices/account_tool_components/account_crea_mod.html.twig" %}
-										{% if is_granted('ROLE_SUPER_ADMIN') %}
 
 										<hr
 											class="my-4">
 
+										<div
+											class="row mb-3">
+											<label
+												for="department_Name"
+												class="form-label"
+												style="color:white">
+												Nouveau Service :
+											</label>
 											<div
-												class="row mb-3">
-												<label
-													for="department_Name"
-													class="form-label"
-													style="color:white">
-													Nouveau Service :
-												</label>
-												<div
-													class="col-sm">
-													<input
-														type="text"
-														class="form-control"
-														id="department_name"
-														name="department_name"
-														placeholder="Nom du nouveau Service">
-												</div>
-
-												<div
-													class="col-sm-auto">
-													<input
-														type="button"
-														id="create_department"
-														class="btn btn-secondary shadow border border-dark-subtle"
-														value="Ajouter un nouveau service">
-												</div>
+												class="col-sm">
+												<input
+													type="text"
+													class="form-control"
+													id="department_name"
+													name="department_name"
+													placeholder="Nom du nouveau Service">
 											</div>
 
-											{% for department in departments %}
+											<div
+												class="col-sm-auto">
+												<input
+													type="button"
+													id="create_department"
+													class="btn btn-secondary shadow border border-dark-subtle"
+													value="Ajouter un nouveau service">
+											</div>
+										</div>
 
-												<div
-													class="col-10 mx-auto mb-3">
-													<li
-														class="form-control shadow d-flex justify-content-between align-items-center">
-														{{department.name|upper}}
-														<a
-															href="{{ path('app_department_deletion', {departmentId : department.id}) }}" type="button"
-															class="btn btn-danger shadow border border-dark-subtle delete-department">
-															supprimer
-														</a>
-													</li>
-												</div>
+										{% for department in departments %}
 
-											{% endfor %}
+											<div
+												class="col-10 mx-auto mb-3">
+												<li
+													class="form-control shadow d-flex justify-content-between align-items-center">
+													{{department.name|upper}}
+													<a
+														href="{{ path('app_account_department_deletion', {departmentId : department.id}) }}" type="button"
+														class="btn btn-danger shadow border border-dark-subtle delete-department">
+														supprimer
+													</a>
+												</li>
+											</div>
+
+										{% endfor %}
 										<hr
 											class="my-4">
-									{% endif %}
 									</div>
 
 								</div>
-							{% if is_granted('ROLE_SUPER_ADMIN') %}
 
 								<div
 									class=" d-flex align-items-center gy-lg-0 gy-5">
@@ -181,7 +177,7 @@
 
 																	<td>
 																		<a
-																			href="{{path('app_modify_account', {userId: user.id})}}" class="btn btn-danger">
+																			href="{{path('app_account_modify_account', {userId: user.id})}}" class="btn btn-danger">
 																			Modifier
 																		</a>
 																	</td>
@@ -189,19 +185,19 @@
 																		{% if user.blocked ? true %}
 																			{% if user.uploads is not empty or user.incidents is not empty %}
 																				<a
-																					href="{{path('app_modify_account', {userId: user.id})}}" class="btn btn-danger">
+																					href="{{path('app_account_modify_account', {userId: user.id})}}" class="btn btn-danger">
 																					Transfer of works
 																				</a>
 																			{% else %}
 																				<a
-																					href="{{path('app_delete_account', {userId: user.id})}}" class="btn btn-danger definitively-delete-user">
+																					href="{{path('app_account_delete_account', {userId: user.id})}}" class="btn btn-danger definitively-delete-user">
 																					Supprimer definitivement
 																				</a>
 																			{% endif %}
 
 																		{% else %}
 																			<a
-																				href="{{path('app_delete_account_basic', {userId: user.id})}}" class="btn btn-danger delete-user">
+																				href="{{path('app_account_delete_account_basic', {userId: user.id})}}" class="btn btn-danger delete-user">
 																				Bloquer
 																			</a>
 																		{% endif %}
@@ -215,7 +211,6 @@
 										</div>
 									</div>
 								</div>
-							{% endif %}
 							</div>
 						</div>
 					</div>

@@ -27,6 +27,8 @@ class SettingsService extends AbstractController
 
     protected $settingsRepository;
 
+    private $settings;
+
 
 
     public function __construct(
@@ -54,15 +56,17 @@ class SettingsService extends AbstractController
     // This function is responsible for getting all the settings from the database
     public function getSettings(): Settings
     {
-        $settingsEntity = $this->settingsRepository->getSettings();
-
-        if (!$settingsEntity) {
+        if (null === $this->settings) {
+            // Assuming getSettings returns an associative array or an object with your settings
+            $this->settings = $this->settingsRepository->getSettings();
+        }
+        if (!$this->settings) {
             $settingsEntity = new Settings();
             $this->em->persist($settingsEntity);
             $this->em->flush();
         }
 
-        return $settingsEntity;
+        return $this->settings;
     }
 
 

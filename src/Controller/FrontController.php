@@ -2,29 +2,106 @@
 
 namespace App\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
+use Doctrine\ORM\EntityManagerInterface;
+
+use  \Psr\Log\LoggerInterface;
 
 use App\Controller\UploadController;
 
+use App\Entity\ProductLine;
+use App\Entity\Category;
+use App\Entity\Button;
 use App\Entity\Department;
+
+use App\Repository\ZoneRepository;
+use App\Repository\ProductLineRepository;
+use App\Repository\IncidentRepository;
+use App\Repository\CategoryRepository;
+use App\Repository\ButtonRepository;
+use App\Repository\UploadRepository;
+
+use App\Service\EntityFetchingService;
+use App\Service\AccountService;
+use App\Service\SettingsService;
+use App\Service\ValidationService;
+use App\Service\OperatorService;
 
 // This controller manage the logic of the front interface, it is the main controller of the application and is responsible for rendering the front interface.
 // It is also responsible for creating the super-admin account.
 
 #[Route('/', name: 'app_')]
-class FrontController extends BaseController
+class FrontController extends AbstractController
 {
 
-    #[Route('/cache', name: 'cache')]
-    public function resetCache(Request $request): Response
-    {
-        // $this->clearAndRebuildCachesArrays();
-        $this->cacheService->clearAndRebuildCaches();
-        return $this->redirectToRoute('app_base');
-    }
+    private $em;
+    private $authChecker;
+    private $logger;
 
+    private $categoryRepository;
+    private $buttonRepository;
+    private $incidentRepository;
+    private $uploadRepository;
+    private $zoneRepository;
+    private $productLineRepository;
+
+    private $uploadController;
+
+    private $settingsService;
+    private $validationService;
+    private $operatorService;
+    private $entityFetchingService;
+    private $accountService;
+
+
+
+    public function __construct(
+
+        AuthorizationCheckerInterface   $authChecker,
+        EntityManagerInterface          $em,
+        LoggerInterface                 $logger,
+
+        CategoryRepository              $categoryRepository,
+        ButtonRepository                $buttonRepository,
+        UploadRepository                $uploadRepository,
+        ZoneRepository                  $zoneRepository,
+        ProductLineRepository           $productLineRepository,
+        IncidentRepository              $incidentRepository,
+
+        UploadController                $uploadController,
+
+        SettingsService                 $settingsService,
+        OperatorService                 $operatorService,
+        ValidationService               $validationService,
+        EntityFetchingService           $entityFetchingService,
+        AccountService                  $accountService,
+
+    ) {
+        $this->authChecker                  = $authChecker;
+        $this->em                           = $em;
+        $this->logger                       = $logger;
+
+        $this->categoryRepository           = $categoryRepository;
+        $this->buttonRepository             = $buttonRepository;
+        $this->incidentRepository           = $incidentRepository;
+        $this->uploadRepository             = $uploadRepository;
+        $this->zoneRepository               = $zoneRepository;
+        $this->productLineRepository        = $productLineRepository;
+
+        $this->uploadController             = $uploadController;
+
+        $this->operatorService              = $operatorService;
+        $this->settingsService              = $settingsService;
+        $this->validationService            = $validationService;
+        $this->entityFetchingService        = $entityFetchingService;
+        $this->accountService               = $accountService;
+    }
 
 
 
@@ -33,7 +110,7 @@ class FrontController extends BaseController
     public function createSuperAdmin(Request $request): Response
     {
         $users = [];
-        $users  = $this->cacheService->users;
+        $users  = $this->entityFetchingService->getUsers();
 
         if ($users == null) {
 
@@ -61,19 +138,23 @@ class FrontController extends BaseController
     #[Route('/', name: 'base')]
     public function base(): Response
     {
-
-        if ($this->cacheService->settings->isUploadValidation() && $this->validationRepository->findAll() != null) {
-            $this->validationService->remindCheck($this->cacheService->users);
+        $users = $this->entityFetchingService->getUsers();
+        $settings = $this->settingsService->getSettings();
+        if ($settings->isUploadValidation() && $this->entityFetchingService->getValidations() != null) {
+            $this->validationService->remindCheck($users);
         }
 
-        if ($this->departmentRepository->findAll() == null) {
-            $Department = new Department();
-            $Department->setName('I.T.');
-            $this->em->persist($Department);
+        if ($this->entityFetchingService->getDepartments() == null) {
+            $department = new Department();
+            $department->setName('I.T.');
+            $this->em->persist($department);
+            $department = new Department();
+            $department->setName('QUALITY');
+            $this->em->persist($department);
             $this->em->flush();
         }
 
-        if ($this->cacheService->settings->isTraining() && $this->authChecker->isGranted('ROLE_MANAGER')) {
+        if ($settings->isTraining() && $this->authChecker->isGranted('ROLE_MANAGER')) {
             $countArray = $this->operatorService->operatorCheckForAutoDelete();
             if ($countArray != null) {
                 $this->addFlash('info', ($countArray['findDeactivatedOperators'] === 1 ? $countArray['findDeactivatedOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['findDeactivatedOperators'] . ' opérateurs inactifs sont à supprimer. ') .
@@ -82,7 +163,11 @@ class FrontController extends BaseController
         }
 
         return $this->render(
-            'base.html.twig'
+            'base.html.twig',
+            [
+                'zones'                 => $this->entityFetchingService->getZones(),
+
+            ]
         );
     }
 
@@ -94,21 +179,17 @@ class FrontController extends BaseController
     public function zone(int $zoneId = null): Response
     {
         $zone = $this->zoneRepository->find($zoneId);
-        $linesInZone = [];
-        $linesInZone = $zone->getProductLines();
+        $productLinesInZone = [];
+        $productLinesInZone = $zone->getProductLines();
 
-        if (count($linesInZone) > 1) {
+        if (count($productLinesInZone) === 1) {
+            return $this->productline(null, $productLinesInZone[0]);
+        } else {
             return $this->render(
                 'zone.html.twig',
                 [
                     'zone' => $zone,
-                ]
-            );
-        } else {
-            return $this->redirectToRoute(
-                'app_productline',
-                [
-                    'productline' => $linesInZone[0]->getId()
+                    'productLines' => $productLinesInZone
                 ]
             );
         }
@@ -116,38 +197,38 @@ class FrontController extends BaseController
 
 
     // Render the productline page and redirect to the mandatory incident page if there is one
-    #[Route('/productline/{productlineId}', name: 'productline')]
-    public function productline(int $productlineId = null, ProductLine $productLine): Response
+    #[Route('/productline/{productLineId}', name: 'productline')]
+    public function productline(int $productLineId = null, ProductLine $productLine = null): Response
     {
+        // $this->logger->info('productLine and productLineID', ['productLineId' => $productLineId, 'productLine' => $productLine]);
 
-        $productLine = $this->productLineRepository->find($productlineId);
+        if (!$productLine) {
+            $productLine = $this->productLineRepository->find($productLineId);
+        }
+
         $categoriesInLine = $productLine->getCategories();
         $incidents = [];
         $incidents = $this->incidentRepository->findBy(
-            ['ProductLine' => $productlineId],
+            ['ProductLine' => $productLineId],
             ['id' => 'ASC'] // order by id ascending
         );
 
         $incidentId = count($incidents) > 0 ? $incidents[0]->getId() : null;
 
-        if (count($incidents) == 0 && count($categoriesInLine) > 1) {
-
+        if (count($incidents) === 0) {
+            if (count($categoriesInLine) === 1) {
+                return $this->category(null, $categoriesInLine[0]);
+            }
             return $this->render(
                 'productline.html.twig',
                 [
-                    'productLine' => $productLine
-                ]
-            );
-        } elseif (count($incidents) == 0 && count($categoriesInLine) == 1) {
-            return $this->redirectToRoute(
-                'app_category',
-                [
-                    'categoryId' => $categoriesInLine[0]->getId()
+                    'productLine' => $productLine,
+                    'categories' => $categoriesInLine
                 ]
             );
         } else {
             return $this->redirectToRoute('app_mandatory_incident', [
-                'productlineId' => $productlineId,
+                'productLineId' => $productLine->getid(),
                 'incidentId' => $incidentId
             ]);
         }
@@ -158,26 +239,27 @@ class FrontController extends BaseController
 
     // Render the category page and redirect to the button page if there is only one button in the category
     #[Route('/category/{categoryId}', name: 'category')]
-    public function category(int $categoryId = null): Response
+    public function category(int $categoryId = null, Category $category = null): Response
     {
+        $this->logger->info('category and categoryId', ['categoryId' => $categoryId, 'category' => $category]);
 
         $buttons = [];
-        $buttons = $this->buttonRepository->findBy(['Category' => $categoryId]);
+        if (!$category) {
+            $category = $this->categoryRepository->find($categoryId);
+        }
 
-        $category = $this->cacheService->getEntityById('category', $categoryId);
+        $buttons = $category->getButtons();
 
-        if (count($buttons) > 1) {
+        if (count($buttons) === 1) {
+            return $this->buttonDisplay(null, $buttons[0]);
+        } else {
             return $this->render(
                 'category.html.twig',
                 [
                     'category'    => $category,
-                    'matchingButtons' => $buttons,
+                    'buttons' => $buttons,
                 ]
             );
-        } else {
-            return $this->redirectToRoute('app_button', [
-                'buttonId' => $buttons[0]->getId()
-            ]);
         }
     }
 
@@ -186,24 +268,27 @@ class FrontController extends BaseController
 
     // Render the button page and redirect to the upload page if there is only one upload in the button
     #[Route('/button/{buttonId}', name: 'button')]
-    public function buttonDisplay(UploadController $uploadController, int $buttonId = null, Request $request): Response
+    public function buttonDisplay(int $buttonId = null, Button $button = null): Response
     {
-        $buttonEntity = $this->buttonRepository->find($buttonId);
+        if (!$button) {
+            $button = $this->buttonRepository->find($buttonId);
+        }
 
-        $buttonUploads = $this->uploadRepository->findBy(['button' => $buttonId]);
-        // $this->logger->info('buttonUploads', [$buttonUploads]);
+        $buttonUploads = $button->getUploads();
 
         if (count($buttonUploads) != 1) {
             return $this->render(
                 'button.html.twig',
                 [
-                    'button'      => $buttonEntity,
+                    'button'      => $button,
                     'uploads'     => $buttonUploads,
                 ]
             );
         } else {
             $uploadId = $buttonUploads[0]->getId();
-            return $uploadController->filterDownloadFile($uploadId, $request);
+            return $this->redirectToRoute('app_download_file', [
+                'uploadId' => $uploadId
+            ]);
         }
     }
 }

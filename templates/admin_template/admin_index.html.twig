@@ -39,199 +39,222 @@
 		{% endif %}
 	{% endif %}
 
-
-	{% if pageLevel is same as('super') %}
-		<h1
-			class="my-4">
-			<strong>
-				Page de Super-Administration
-			</strong>
-		</h1>
-
-	{% elseif pageLevel is same as('zone') %}
-		<h1
-			class="my-4">
-			<strong>
-				Page d'administration des Lignes de la Zone
-
-				<button
-					class="dropdown-toggle"
-					data-bs-toggle="dropdown"
-					aria-expanded="false"
-					type="button"
-					id="zoneDropdown">
-					{{zone.name|split('.')|first|upper}}
-				</button>
-
-				<ul
-					class="dropdown-menu shadow shadow-inset"
-					aria-labelledby="zoneDropdown">
-					{% for zoneExt in zones %}
-						{% if zoneExt != zone %}
-							<li>
-								<a
-									href="{{ path('app_zone_admin', {zoneId: zoneExt.id}) }}" class="dropdown-item shadow ">
-									{{zoneExt.name|split('.')|first|upper}}
-								</a>
-							</li>
-						{% endif %}
-					{% endfor %}
-				</ul>
-			</strong>
-		</h1>
-
-	{% elseif pageLevel is same as('productLine') %}
-
-		{% if  is_granted('ROLE_ADMIN') %}
-			<aside
-				class="position-absolute end-0 mt-2">
-				<a
-					href="{{ path('app_zone_admin', {zoneId: zone.id}) }}" class="btn shadow bg-dark "
-					style="color:white">
-					<span
-						class="fa fa-gear"></span>
-					<strong>
-						<span
-							class="button-text">
-							Centre d'Administration de la Zone
-						</span>
-					</strong>
-				</a>
-			</aside>
-		{% endif %}
-		<h1
-			class="my-4">
-			<strong>
-				Page d'administration de la ligne
-
-				<button
-					class="dropdown-toggle"
-					data-bs-toggle="dropdown"
-					aria-expanded="false"
-					type="button"
-					id="productLineDropdown">
-					{{productLine.name|split('.')|first|upper}}
-				</button>
-				<ul
-					class="dropdown-menu shadow shadow-inset"
-					aria-labelledby="productLineDropdown">
-					{% set matchingProductLines = [] %}
-					{% for productLine in productLines %}
-						{% if productLine.zone.id is same as(zone.id)  %}
-							{% set matchingProductLines = matchingProductLines|merge([productLine]) %}
-						{% endif %}
-					{% endfor %}
-					{% for productLineExt in matchingProductLines %}
-						{% if productLineExt != productLine %}
-							<li>
-								<a
-									href="{{ path('app_productline_admin', {productlineId: productLineExt.id}) }}" class="dropdown-item shadow ">
-									{{productLineExt.name|split('.')|first|upper}}
-								</a>
-							</li>
-						{% endif %}
-					{% endfor %}
-				</ul>
-				de la Zone
-				{{productLine.zone.name|split('.')|first|upper}}
-			</strong>
-		</h1>
-
-	{% elseif pageLevel is same as('category') %}
-
-		{% if  is_granted('ROLE_LINE_ADMIN') %}
-			<aside
-				class="position-absolute end-0 mt-2">
-				<a
-					href="{{ path('app_productline_admin', {productlineId: productLine.id}) }}" class="btn shadow  bg-dark "
-					style="color:white">
-					<span
-						class="fa fa-gear"></span>
-					<strong>
-						<span
-							class="button-text">
-							Centre d'Administration de la Ligne
-						</span>
-					</strong>
-				</a>
-			</aside>
-		{% endif %}
-		<h1
-			class="my-4">
-			<strong>
-				Page d'administration de la catégorie
-				<button
-					class="dropdown-toggle"
-					data-bs-toggle="dropdown"
-					aria-expanded="false"
-					type="button"
-					id="categoryDropdown">
-					{{category.name|split('.')|first|upper}}
-				</button>
-				<ul
-					class="dropdown-menu shadow shadow-inset"
-					aria-labelledby="categoryDropdown">
-					{% set matchingCategories = [] %}
-					{% for category in categories %}
-						{% if category.productLine.id is same as(productLine.id) %}
-							{% set matchingCategories = matchingCategories|merge([category]) %}
-						{% endif %}
-					{% endfor %}
-					{% for categoryExt in matchingCategories %}
-						{% if categoryExt != category %}
-							<li>
-								<a
-									href="{{ path('app_category_admin', {categoryId: categoryExt.id}) }}" class="dropdown-item shadow ">
-									{{categoryExt.name|split('.')|first|upper}}
-								</a>
-							</li>
-						{% endif %}
-					{% endfor %}
-				</ul>
-				de la Ligne
-				{{category.productLine.name|split('.')|first|upper}}
-			</strong>
-		</h1>
-
-	{% endif %}
-
-
 	<div
-		class="accordion mb-5"
-		id="AccordionAdmin">
+		class="row align-items-center">
+		{% if pageLevel is same as('super') %}
+			<h1
+				class="my-4">
+				<strong>
+					Page de Super-Administration
+				</strong>
+			</h1>
 
-		{% if pageLevel is same as('super')  %}
-			{{ render(controller('App\\Controller\\SettingsController::settingsIndex'), options = []) }}
-			{% include "admin_template/admin_template_component/zone_creation_form.html.twig" %}
 		{% elseif pageLevel is same as('zone') %}
-			{% include "admin_template/admin_template_component/line_creation_form.html.twig" %}
+
+			{% if  is_granted('ROLE_SUPER_ADMIN') %}
+				<div
+					class='my-3'>
+					<aside
+						class="end-0">
+						<a
+							href="{{ path('app_super_admin') }}" class="btn shadow bg-dark "
+							style="color:white">
+							<span
+								class="fa fa-gear"></span>
+							<strong>
+								<span
+									class="button-text">
+									Centre de SuperAdministration
+								</span>
+							</strong>
+						</a>
+					</aside>
+				</div>
+			{% endif %}
+			<h1
+				class="my-3">
+				<strong>
+					Page d'administration des Lignes de la Zone
+
+					<button
+						class="dropdown-toggle"
+						data-bs-toggle="dropdown"
+						aria-expanded="false"
+						type="button"
+						id="zoneDropdown">
+						{{zone.name|split('.')|first|upper}}
+					</button>
+
+					<ul
+						class="dropdown-menu shadow shadow-inset"
+						aria-labelledby="zoneDropdown">
+						{% for zoneExt in zones %}
+							{% if zoneExt != zone %}
+								<li>
+									<a
+										href="{{ path('app_zone_admin', {zoneId: zoneExt.id}) }}" class="dropdown-item shadow ">
+										{{zoneExt.name|split('.')|first|upper}}
+									</a>
+								</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+				</strong>
+			</h1>
 
 		{% elseif pageLevel is same as('productLine') %}
-			{% include "admin_template/admin_template_component/category_creation_form.html.twig" %}
+
+			{% if  is_granted('ROLE_ADMIN') %}
+				<div
+					class='my-3'>
+					<aside
+						class="end-0">
+						<a
+							href="{{ path('app_zone_admin', {zoneId: zone.id}) }}" class="btn shadow bg-dark "
+							style="color:white">
+							<span
+								class="fa fa-gear"></span>
+							<strong>
+								<span
+									class="button-text">
+									Centre d'Administration de la Zone
+								</span>
+							</strong>
+						</a>
+					</aside>
+				</div>
+			{% endif %}
+			<h1
+				class="my-3">
+				<strong>
+					Page d'administration de la ligne
+
+					<button
+						class="dropdown-toggle"
+						data-bs-toggle="dropdown"
+						aria-expanded="false"
+						type="button"
+						id="productLineDropdown">
+						{{productLine.name|split('.')|first|upper}}
+					</button>
+					<ul
+						class="dropdown-menu shadow shadow-inset"
+						aria-labelledby="productLineDropdown">
+						{% for productLineExt in zoneProductLines %}
+							{% if productLineExt != productLine %}
+								<li>
+									<a
+										href="{{ path('app_productline_admin', {productLineId: productLineExt.id}) }}" class="dropdown-item shadow ">
+										{{productLineExt.name|split('.')|first|upper}}
+									</a>
+								</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+					de la Zone
+					{{productLine.zone.name|split('.')|first|upper}}
+				</strong>
+			</h1>
 
 		{% elseif pageLevel is same as('category') %}
-			{% include "admin_template/admin_template_component/button_creation_form.html.twig" %}
+
+			{% if  is_granted('ROLE_LINE_ADMIN') %}
+				<div
+					class='my-3'>
+					<aside
+						class="end-0">
+						<a
+							href="{{ path('app_productline_admin', {productLineId: productLine.id}) }}" class="btn shadow  bg-dark "
+							style="color:white">
+							<span
+								class="fa fa-gear"></span>
+							<strong>
+								<span
+									class="button-text">
+									Centre d'Administration de la Ligne
+								</span>
+							</strong>
+						</a>
+					</aside>
+				</div>
+			{% endif %}
+			<h1
+				class='my-3'>
+				<strong>
+					Page d'administration de la catégorie
+					<button
+						class="dropdown-toggle"
+						data-bs-toggle="dropdown"
+						aria-expanded="false"
+						type="button"
+						id="categoryDropdown">
+						{{category.name|split('.')|first|upper}}
+					</button>
+					<ul
+						class="dropdown-menu shadow shadow-inset"
+						aria-labelledby="categoryDropdown">
+						{% for categoryExt in productLineCategories %}
+							{% if categoryExt != category %}
+								<li>
+									<a
+										href="{{ path('app_category_admin', {categoryId: categoryExt.id}) }}" class="dropdown-item shadow ">
+										{{categoryExt.name|split('.')|first|upper}}
+									</a>
+								</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+					de la Ligne
+					{{productLine.name|split('.')|first|upper}}
+				</strong>
+			</h1>
 
 		{% endif %}
 
-		{% include "services/accountservices/create_account.html.twig" %}
 
-		{% if settings.IsTraining %}
-			{{ render(controller('App\\Controller\\OperatorController::operatorManagement'), options = []) }}
-		{% endif %}
+		<div
+			class="accordion my-3"
+			id="AccordionAdmin">
+
+			{% if pageLevel is same as('super')  %}
+				{{ render(controller('App\\Controller\\SettingsController::settingsIndex'), options = []) }}
+				{% include "admin_template/admin_template_component/zone_creation_form.html.twig" %}
+				{{ render(controller('App\\Controller\\AccountController::createAccount'), options = []) }}
+			{% elseif pageLevel is same as('zone') %}
+				{% include "admin_template/admin_template_component/line_creation_form.html.twig" %}
+
+			{% elseif pageLevel is same as('productLine') %}
+				{% include "admin_template/admin_template_component/category_creation_form.html.twig" %}
+
+			{% elseif pageLevel is same as('category') %}
+				{% include "admin_template/admin_template_component/button_creation_form.html.twig" %}
+
+			{% endif %}
 
 
-		{% include "services/uploads/upload.html.twig" %}
+			{% if settings.IsTraining %}
+				{{ render(controller('App\\Controller\\OperatorController::operatorManagement'), options = []) }}
+			{% endif %}
 
 
-		{% include "services/incidents/incidents.html.twig" %}
+			{% include "services/uploads/upload.html.twig" %}
+
+			{% if is_granted('ROLE_LINE_ADMIN') %}
+				{% if is_granted('ROLE_SUPER_ADMIN') %}
+					{{ render(controller('App\\Controller\\IncidentController::incidentManagementView'), options = []) }}
+				{% else %}
+					{% include "services/incidents/incidents.html.twig" %}
+				{% endif %}
+			{% endif %}
 
 
-		{% include "services/uploads/uploaded_list.html.twig" %}
+			{% include "services/uploads/uploaded_list.html.twig" %}
 
-		{% if settings.IsUploadValidation %}
-			{% include "services/validation/validation_list.html.twig" %}
-		{% endif %}
+			{% if settings.IsUploadValidation %}
+				{% include "services/validation/validation_list.html.twig" %}
+			{% endif %}
 
+		</div>
 	</div>
+
 {% endblock %}

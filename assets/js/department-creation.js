@@ -106,7 +106,7 @@ document.addEventListener("turbo:load", function () {
 
       // Create a new XMLHttpRequest object
       let xhr = new XMLHttpRequest();
-      xhr.open("POST", "/docauposte/department/department_creation");
+      xhr.open("POST", "/docauposte/account/department/department_creation");
       xhr.setRequestHeader("Content-Type", "application/json");
 
       // Set the onload event handler for the XMLHttpRequest
@@ -152,7 +152,7 @@ document.addEventListener("turbo:load", function () {
 
 // // Event listener to fetch department data and initialize cascading dropdowns
 document.addEventListener("turbo:load", function () {
-  fetch("/docauposte/api/department_data")
+  fetch("/docauposte/api/entity_data")
     .then((response) => response.json())
     .then((data) => {
       departmentsData = data.departments;
@@ -169,7 +169,7 @@ document.addEventListener("turbo:load", function () {
 });
 
 // This code adds an event listener to the document object for the "turbo:load" event. 
-// When the event is triggered, it fetches department data from the API endpoint /api/department_data. 
+// When the event is triggered, it fetches department data from the API endpoint /api/entity_data. 
 // Once the data is successfully received, it assigns the departments property of the data to the departmentsData variable. 
 // Then, it calls two functions: initCascadingDropdowns() and resetDropdowns(). 
 // If there is an error during the fetch request, an error message will be logged to the console.

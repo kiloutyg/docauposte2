@@ -97,7 +97,7 @@
 														<li
 															class="form-control d-flex justify-content-between align-items-center mb-2">
 															<a
-																href="{{path('app_productline_admin', {productlineId: productLine.Id})}}" class="btn btn-dark">
+																href="{{path('app_productline_admin', {productLineId: productLine.Id})}}" class="btn btn-dark">
 																{{ productLine.name|split('.')|first|upper}}
 															</a>
 															{% if is_granted ('ROLE_LINE_ADMIN') or app.user is same as( productLine.creator) %}
@@ -106,7 +106,7 @@
 																	Modifier
 																</a>
 																<a
-																	href="{{path('app_zone_admin_delete_productline', {productlineId: productLine.id})}}" class="btn btn-danger delete-productline">
+																	href="{{path('app_zone_admin_delete_productline', {productLineId: productLine.id})}}" class="btn btn-danger delete-productline">
 																	Supprimer
 																</a>
 															{% endif %}

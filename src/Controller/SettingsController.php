@@ -2,19 +2,30 @@
 
 namespace App\Controller;
 
+use  \Psr\Log\LoggerInterface;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-use App\Entity\Settings;
+use App\Service\SettingsService;
 
 
 #[Route('/super_admin')]
 // This controller is responsible for rendering the settings interface an managing the logic of the settings interface
 class SettingsController extends SuperAdminController
 {
+    private $logger;
+    private $settingsService;
+
+    public function __construct(
+        LoggerInterface                 $logger,
+        SettingsService                 $settingsService
+    ) {
+        $this->logger                       = $logger;
+        $this->settingsService              = $settingsService;
+    }
+
 
     // This function is responsible for rendering the super admin interface
     #[Route('/settings', name: 'app_settings')]
@@ -52,8 +63,7 @@ class SettingsController extends SuperAdminController
                 $this->addFlash('error', 'Erreur lors de la mise à jour des paramètres' . $e->getMessage());
             }
         }
-        $this->clearAndRebuildCachesArrays();
-        $this->cacheService->clearAndRebuildCaches();
+
         return $this->redirect($referer);
     }
 }

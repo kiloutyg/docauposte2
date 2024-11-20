@@ -15,7 +15,7 @@
 					<a
 						href="{{ path('app_category_admin', {categoryId: category.id}) }}" class="btn shadow  bg-dark "
 						style="color:white">
-						<span
+					/home/admin.sdkhissi@AD.PONET/docauposte2/templates/services/accountservices	<span
 							class="fa fa-gear"></span>
 						<strong>
 							<span
@@ -47,10 +47,10 @@
 		</div>
 		<div
 			class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
-			{% if matchingButtons|length > 0 %}
+			{% if buttons|length > 0 %}
 				<div
 					class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
-					{% for button in matchingButtons %}
+					{% for button in buttons %}
 						{% set validated = '' %}
 						{% if button.uploads|length == 1 %}
 							{% if settings.isUploadValidation %}

@@ -7,16 +7,16 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class LastNameTransformer implements DataTransformerInterface
 {
-    public function transform($value)
+    public function transform(mixed $value): mixed
     {
         if (!$value) {
-            return '';
+            return null;
         }
         // Transform to uppercase
         return strtoupper($value);
     }
 
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): mixed
     {
         // Store as upper in the database
         return strtoupper($value);

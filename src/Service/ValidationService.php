@@ -448,7 +448,7 @@ class ValidationService extends AbstractController
         }
     }
 
-    public function remindCheck(ArrayCollection $users)
+    public function remindCheck(array $users)
     {
         $today = new \DateTime();
         $fileName = 'email_sent.txt';

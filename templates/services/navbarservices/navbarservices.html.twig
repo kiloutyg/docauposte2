@@ -1,33 +1,33 @@
 <div>
 	{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
 
-{% if (button is defined) and (button is not empty) %}
+	{% if (button is defined) and (button is not empty) %}
 
-	{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
-	{% set zone = {'name': button.category.productLine.zone.name, 'varName': 'zone', 'id': button.category.productLine.zone.id|default(null)} %}
-	{% set productline = {'name': button.category.productLine.name, 'varName': 'productline', 'id': button.category.productLine.id|default(null)} %}
-	{% set category = {'name': button.category.name, 'varName': 'category', 'id': button.category.id|default(null)} %}
-	{% set button = null %}
+		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
+		{% set zone = {'name': button.category.productLine.zone.name, 'varName': 'zone', 'id': button.category.productLine.zone.id|default(null)} %}
+		{% set productline = {'name': button.category.productLine.name, 'varName': 'productline', 'id': button.category.productLine.id|default(null)} %}
+		{% set category = {'name': button.category.name, 'varName': 'category', 'id': button.category.id|default(null)} %}
+		{% set button = null %}
 
-{% elseif (category is defined) and (category is not empty) %}
+	{% elseif (category is defined) and (category is not empty) %}
 
-	{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
-	{% set zone = {'name': category.productLine.zone.name, 'varName': 'zone', 'id': category.productLine.zone.id|default(null)} %}
-	{% set productline = {'name': category.productLine.name, 'varName': 'productline', 'id': category.productLine.id|default(null)} %}
-	{% set category = null %}
-	{% set button = null %}
+		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
+		{% set zone = {'name': category.productLine.zone.name, 'varName': 'zone', 'id': category.productLine.zone.id|default(null)} %}
+		{% set productline = {'name': category.productLine.name, 'varName': 'productline', 'id': category.productLine.id|default(null)} %}
+		{% set category = null %}
+		{% set button = null %}
 
 	{% elseif (productLine is defined) and (productLine is not empty) %}
 
 		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
-	{% set zone = {'name': productLine.zone.name, 'varName': 'zone', 'id': productLine.zone.id|default(null)} %}
-	{% set productline = null %}
-	{% set category = null %}
-	{% set button = null %}
+		{% set zone = {'name': productLine.zone.name, 'varName': 'zone', 'id': productLine.zone.id|default(null)} %}
+		{% set productline = null %}
+		{% set category = null %}
+		{% set button = null %}
 
-{% elseif (zone is defined) and (zone is not empty) %}
+	{% elseif (zone is defined) and (zone is not empty) %}
 
-	{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
+		{% set base = {'name' : 'Page d\'accueil', 'varName' :'base'} %}
 		{% set zone = null %}
 		{% set productline = null %}
 		{% set category = null %}
@@ -35,11 +35,12 @@
 
 	{% else %}
 
-{% set base = null %}
+		{% set base = null %}
 		{% set zone = null %}
 		{% set productline = null %}
 		{% set category = null %}
 		{% set button = null %}
+
 	{% endif %}
 
 	{% set navbar = [base, zone, productline, category, button] %}
@@ -51,24 +52,22 @@
 		{% endif %}
 	{% endfor %}
 	
-<nav class="breadcrumb-nav mt-2" aria-label="breadcrumb">
-  <ol class="breadcrumb">
-  			<li class="breadcrumb-item">
-			<a class=" btn fa fa-arrow-circle-o-left" style="color:red" href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
-			Retour</a>
-			</li>	
-			
-	{% for item in navbar %}
-		{% if (item is defined) and (item is not null) %}
-         <li class="breadcrumb-item">
-			<a class="btn fa" style="color:white" href="{{ path('app_' ~ item.varName, params) }}">{{ item.name|split('.')|first|upper }}
+	<nav class="breadcrumb-nav mt-2" aria-label="breadcrumb">
+		<ol class="breadcrumb">
+				<li class="breadcrumb-item">
+				<a class=" btn fa fa-arrow-circle-o-left" style="color:red" href="javascript:void(0)" onclick="event.preventDefault(); window.history.back();">
+				Retour
 				</a>
-                </li>	
-
-        {% endif %}
-	{% endfor %}
-    </ol>
-</nav>
-
-
+				</li>	
+				
+			{% for item in navbar %}
+				{% if (item is defined) and (item is not null) %}
+				<li class="breadcrumb-item">
+					<a class="btn fa" style="color:white" href="{{ path('app_' ~ item.varName, params) }}">{{ item.name|split('.')|first|upper }}
+					</a>
+				</li>	
+				{% endif %}
+			{% endfor %}
+		</ol>
+	</nav>
 </div>

@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use \Psr\Log\LoggerInterface;
+
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -9,9 +11,11 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -25,9 +29,94 @@ use App\Entity\Trainer;
 use App\Entity\Team;
 use App\Entity\Uap;
 
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class OperatorController extends FrontController
+
+use App\Repository\UploadRepository;
+use App\Repository\ValidationRepository;
+use App\Repository\UapRepository;
+use App\Repository\TeamRepository;
+use App\Repository\OperatorRepository;
+use App\Repository\TrainingRecordRepository;
+use App\Repository\TrainerRepository;
+
+use App\Service\EntityDeletionService;
+use App\Service\EntityFetchingService;
+use App\Service\TrainingRecordService;
+use App\Service\PdfGeneratorService;
+
+
+class OperatorController extends AbstractController
 {
+
+    private $em;
+    private $request;
+    private $logger;
+    private $authChecker;
+
+    // Repository methods
+    private $validationRepository;
+    private $uploadRepository;
+    private $uapRepository;
+    private $teamRepository;
+    private $operatorRepository;
+    private $trainingRecordRepository;
+    private $trainerRepository;
+
+
+    // Services methods
+    private $entitydeletionService;
+    private $trainingRecordService;
+    private $pdfGeneratorService;
+    private $entityFetchingService;
+
+
+
+    public function __construct(
+
+        EntityManagerInterface          $em,
+        LoggerInterface                 $logger,
+        AuthorizationCheckerInterface   $authChecker,
+        RequestStack                    $requestStack,
+
+        // Repository classes
+        ValidationRepository            $validationRepository,
+        UploadRepository                $uploadRepository,
+        UapRepository                   $uapRepository,
+        TeamRepository                  $teamRepository,
+        OperatorRepository              $operatorRepository,
+        TrainingRecordRepository        $trainingRecordRepository,
+        TrainerRepository               $trainerRepository,
+
+        // Services classes
+        EntityDeletionService           $entitydeletionService,
+        TrainingRecordService           $trainingRecordService,
+        PdfGeneratorService             $pdfGeneratorService,
+        EntityFetchingService           $entityFetchingService,
+
+    ) {
+        // $this->cache                        = $cache;
+
+        $this->em                           = $em;
+        $this->logger                       = $logger;
+        $this->authChecker                  = $authChecker;
+        $this->request                      = $requestStack->getCurrentRequest();
+
+        // Variables related to the repositories
+        $this->validationRepository         = $validationRepository;
+        $this->uploadRepository             = $uploadRepository;
+        $this->uapRepository                = $uapRepository;
+        $this->teamRepository               = $teamRepository;
+        $this->operatorRepository           = $operatorRepository;
+        $this->trainingRecordRepository     = $trainingRecordRepository;
+        $this->trainerRepository            = $trainerRepository;
+
+        // Variables related to the services
+        $this->entitydeletionService        = $entitydeletionService;
+        $this->trainingRecordService        = $trainingRecordService;
+        $this->pdfGeneratorService          = $pdfGeneratorService;
+        $this->entityFetchingService        = $entityFetchingService;
+    }
 
     private function operatorEntitySearch(Request $request): array
     {
@@ -116,7 +205,7 @@ class OperatorController extends FrontController
 
 
 
-    
+
     private function processNewOperator(Operator $newOperator, $form, Request $request)
     {
 
@@ -194,7 +283,7 @@ class OperatorController extends FrontController
                         'operator_id' => $operator->getId(),
                     ])->createView();
                 }
-                
+
                 // Return the updated frame content
                 return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
                     'operatorForms' => $operatorForms,
@@ -299,6 +388,9 @@ class OperatorController extends FrontController
         return $this->render('services/operators/operatorTraining.html.twig', [
             'trainingRecords'   => $trainingRecords,
             'upload'            => $upload,
+            'teams'             => $this->entityFetchingService->getTeams(),
+            'uaps'              => $this->entityFetchingService->getUaps(),
+            'operators'         => $this->entityFetchingService->getOperators(),
         ]);
     }
 
@@ -882,7 +974,7 @@ class OperatorController extends FrontController
     #[Route('/operator/detail/{operatorId}', name: 'app_operator_detail')]
     public function printOpeDetail(int $operatorId)
     {
-        $operator = $this->cacheService->getEntityById('operator', $operatorId);
+        $operator = $this->operatorRepository->findOneBy(['id', $operatorId]);
         // $this->logger->info('operator', [$operator]);
 
         // $pdfContent = $this->pdfGeneratorService->generateOperatorPdf($operator);
@@ -1074,8 +1166,10 @@ class OperatorController extends FrontController
     #[Route('/operator/operator_management_base_page', name: 'app_operator_team_or_uap_management')]
     public function operatorManagement(Request $request): Response
     {
+        $teams = $this->teamRepository->findAll();
+        $uaps = $this->uapRepository->findAll();
 
-        if (count($this->teamRepository->findAll()) == 0 || count($this->uapRepository->findAll()) == 0) {
+        if (count($teams) == 0 || count($uaps) == 0) {
             $team = new Team();
             $uap = new Uap();
             $team->setName('INDEFINI');
@@ -1129,6 +1223,8 @@ class OperatorController extends FrontController
             }
         } else if ($request->getMethod() == 'GET') {
             return $this->render('services/operators/team_uap_operator_management.html.twig', [
+                'teams' => $teams,
+                'uaps' => $uaps,
                 'teamForm' => $teamForm->createView(),
                 'uapForm' => $uapForm->createView()
             ]);

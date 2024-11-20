@@ -2,59 +2,64 @@
 
 namespace App\Service;
 
+use Psr\Log\LoggerInterface;
 
 use Doctrine\ORM\EntityManagerInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\Response;
+
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Psr\Log\LoggerInterface;
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-use App\Repository\ButtonRepository;
 use App\Repository\UploadRepository;
 
 use App\Entity\Upload;
 use App\Entity\User;
 
-use App\Service\FolderCreationService;
 use App\Service\ValidationService;
 use App\Service\OldUploadService;
-use App\Service\CacheService;
+use App\Service\SettingsService;
 
 // This class is used to manage the uploads files and logic
 class UploadService extends AbstractController
 {
-    protected $uploadRepository;
-    protected $manager;
-    protected $projectDir;
-    protected $logger;
-    protected $buttonRepository;
-    protected $folderCreationService;
+    private $manager;
+    private $projectDir;
+    private $logger;
+
+    private $uploadRepository;
+
     private $validationService;
-    protected $oldUploadService;
-    private $cacheService;
+    private $oldUploadService;
+    private $settingsService;
+
 
 
     public function __construct(
-        FolderCreationService $folderCreationService,
-        ButtonRepository $buttonRepository,
-        EntityManagerInterface $manager,
-        ParameterBagInterface $params,
-        UploadRepository $uploadRepository,
-        LoggerInterface $logger,
-        ValidationService $validationService,
-        OldUploadService $oldUploadService,
-        CacheService $cacheService
+        EntityManagerInterface  $manager,
+        ParameterBagInterface   $params,
+        LoggerInterface         $logger,
+
+        UploadRepository        $uploadRepository,
+
+        ValidationService       $validationService,
+        OldUploadService        $oldUploadService,
+        SettingsService         $settingsService
     ) {
-        $this->uploadRepository      = $uploadRepository;
+
         $this->manager               = $manager;
         $this->projectDir            = $params->get(name: 'kernel.project_dir');
         $this->logger                = $logger;
-        $this->buttonRepository      = $buttonRepository;
-        $this->folderCreationService = $folderCreationService;
+
+        $this->uploadRepository      = $uploadRepository;
+
         $this->validationService     = $validationService;
         $this->oldUploadService      = $oldUploadService;
-        $this->cacheService          = $cacheService;
+        $this->settingsService       = $settingsService;
     }
 
     // This function is responsible for the logic of uploading the uploads files
@@ -401,29 +406,22 @@ class UploadService extends AbstractController
     }
 
 
-
     // This function is responsible for the logic of grouping the uploads files by parent entities
-    public function groupUploads($uploads)
+    public function groupAllUploads($uploads)
     {
         $groupedUploads = [];
+
+        $groupedValidatedUploads = [];
         // Group uploads by zone, productLine, category, and button
         foreach ($uploads as $upload) {
-            $button = $upload->getButton();
-            $button = $this->cacheService->getEntityById('button', $button->getId());
 
-            $category = $button->getCategory();
-            $category = $this->cacheService->getEntityById('category', $category->getId());
+            // $this->logger->info('upload in groupAllUpload service', $upload);
 
-            $productLine = $category->getProductLine();
-            $productLine = $this->cacheService->getEntityById('productLine', $productLine->getId());
+            $zoneName        = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
+            $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
+            $categoryName    = $upload->getButton()->getCategory()->getName();
+            $buttonName      = $upload->getButton()->getname();
 
-            $zone = $productLine->getZone();
-            $zone = $this->cacheService->getEntityById('zone', $zone->getId());
-
-            $zoneName        = $zone->getName();
-            $productLineName = $productLine->getName();
-            $categoryName    = $category->getName();
-            $buttonName      = $button->getname();
 
             if (!isset($groupedUploads[$zoneName])) {
                 $groupedUploads[$zoneName] = [];
@@ -437,37 +435,10 @@ class UploadService extends AbstractController
             if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
                 $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
             }
-            // $upload = $this->uploadRepository->findOneBy(['id' => $upload->getId()]);
 
             $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
-        }
-        return $groupedUploads;
-    }
 
-
-    // This function is responsible for the logic of grouping the uploads files by parent entities
-    public function groupValidatedUploads($uploads)
-    {
-        $groupedValidatedUploads = [];
-        // Group uploads by zone, productLine, category, and button
-        foreach ($uploads as $upload) {
             if ($upload->getValidation()) {
-                $button = $upload->getButton();
-                $button = $this->cacheService->getEntityById('button', $button->getId());
-
-                $category = $button->getCategory();
-                $category = $this->cacheService->getEntityById('category', $category->getId());
-
-                $productLine = $category->getProductLine();
-                $productLine = $this->cacheService->getEntityById('productLine', $productLine->getId());
-
-                $zone = $productLine->getZone();
-                $zone = $this->cacheService->getEntityById('zone', $zone->getId());
-
-                $zoneName        = $zone->getName();
-                $productLineName = $productLine->getName();
-                $categoryName    = $category->getName();
-                $buttonName      = $button->getname();
 
                 if (!isset($groupedValidatedUploads[$zoneName])) {
                     $groupedValidatedUploads[$zoneName] = [];
@@ -482,12 +453,184 @@ class UploadService extends AbstractController
                     $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
                 }
 
-                $upload = $this->uploadRepository->findOneBy(['id' => $upload->getId()]);
-
                 $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
             }
         }
 
-        return $groupedValidatedUploads;
+        return [$groupedUploads, $groupedValidatedUploads];
+    }
+
+
+    public function prepareUploadData(array $uploads): array
+    {
+        $processedUploads = [];
+
+        foreach ($uploads as $upload) {
+            $processedUpload = [
+                'id' => $upload->getId(),
+                'filename' => strtoupper($upload->getFilename()),
+                'revision' => $upload->getRevision(),
+                'uploader' => $upload->getUploader() ? [
+                    'firstName' => explode('.', $upload->getUploader()->getUsername()[0]),
+                    'lastName' => explode('.', $upload->getUploader()->getUsername()[1]),
+                ] : 'inconnu',
+                'uploadedAt' => $upload->getUploadedAt()->format('d/m/Y'),
+                'validated' => $upload->isValidated(),
+                'validations' => [],
+            ];
+
+            // Process validations
+            if ($upload->getValidation()) {
+                foreach ($upload->getValidation()->getApprobations() as $approbation) {
+                    $processedApprobation = [
+                        'approver' => [
+                            'firstName' => ucfirst(explode('.', $approbation->getUserapprobator()->getUsername())[0]),
+                            'lastName' => strtoupper(explode('.', $approbation->getUserapprobator()->getUsername())[1]),
+                        ],
+                        'approval' => $approbation->isApproval(),
+                        'comment' => $approbation->getComment(),
+                        'approvedAt' => $approbation->getApprovedAt() ? $approbation->getApprovedAt()->format('d/m/Y H\hi') : null,
+                    ];
+
+                    $processedUpload['validations'][] = $processedApprobation;
+                }
+            }
+
+            $processedUploads[] = $processedUpload;
+        }
+
+        return $processedUploads;
+    }
+
+
+    // create a route to redirect to the correct views of a file
+    public function filterDownloadFile(int $uploadId, Request $request): Response
+    {
+        $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $path = $file->getPath();
+        $settings = $this->settingsService->getSettings();
+        if (!($settings->isUploadValidation() || $settings->IsTraining())) {
+            return $this->downloadFileFromMethods($path);
+        }
+
+        $isValidated = $file->isValidated();
+        $isForcedDisplay = $file->isForcedDisplay();
+        $isTraining = $file->isTraining();
+        $hasOldUpload = $file->getOldUpload() !== null;
+        $originUrl = $request->headers->get('Referer');
+
+        if ($isValidated === false && $isForcedDisplay === false) {
+            if ($settings->IsTraining() && $isTraining) {
+                return $this->redirectToRoute('app_training_front_by_validation', [
+                    'validationId' => $file->getValidation()->getId()
+                ]);
+            } elseif ($hasOldUpload) {
+                return $this->downloadFileFromPath($uploadId);
+            } else {
+                $this->addFlash(
+                    'Danger',
+                    'Le fichier a été refusé par les validateurs et son affichage n\'est pas forcé. Contacter votre responsable pour plus d\'informations.'
+                );
+                return $this->redirect($originUrl, 307);
+            }
+        }
+
+        if ($isValidated === null && $isForcedDisplay === false) {
+            if ($hasOldUpload) {
+                return $this->downloadFileFromPath($uploadId);
+            } else {
+                $this->addFlash(
+                    'Danger',
+                    'Le fichier est en cours de validation et son affichage n\'est pas forcé. Contacter votre responsable pour plus d\'informations.'
+                );
+                return $this->redirect($originUrl, 307);
+            }
+        }
+
+        if ($isValidated === true) {
+            if ($settings->IsTraining() && $isTraining) {
+                return $this->redirectToRoute('app_training_front_by_upload', [
+                    'uploadId' => $uploadId
+                ]);
+            } else {
+                return $this->downloadFileFromMethods($path);
+            }
+        }
+
+        if ($isValidated === null) {
+            if ($settings->IsTraining() && $isTraining) {
+                return $this->redirectToRoute('app_training_front_by_validation', [
+                    'validationId' => $file->getValidation()->getId()
+                ]);
+            } else {
+                return $this->downloadFileFromPath($uploadId);
+            }
+        }
+
+        // Default action if none of the above conditions are met
+        return $this->downloadFileFromMethods($path);
+    }
+
+
+
+
+
+
+    public function downloadFileFromMethods(string $path): Response
+    {
+        // $this->logger->info('path', ['path' => $path]);
+        $file = new File($path);
+        // $this->logger->info('file', ['file' => $file]);
+        return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
+    }
+
+
+
+
+
+
+    public function downloadFileFromPath(int $uploadId)
+    {
+        $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+
+        $path = $this->determineFilePath($file);
+        // $this->logger->info('path', ['path' => $path]);
+        return $this->downloadFileFromMethods($path);
+    }
+
+
+
+
+
+    // Private method to determine the file path
+    private function determineFilePath($file): string
+    {
+
+        if (!$file->isValidated()) {
+            // $this->logger->info('is validated', ['validated' => $file->isValidated()]);
+            if ($file->isForcedDisplay() === true || $file->isForcedDisplay() === null) {
+                // $this->logger->info('is forced display on or null', ['forcedDisplay' => $file->isForcedDisplay()]);
+                return $file->getPath();
+            } elseif ($file->getOldUpload() != null) {
+                // $this->logger->info('is old upload', ['oldUpload' => $file->getOldUpload()]);
+                $oldUpload = $file->getOldUpload();
+                return $oldUpload->getPath();
+            }
+        }
+        return $file->getPath();
+    }
+
+
+
+
+
+    // create a route to download a file in more simple terms to display the file
+    public function downloadInvalidationFile(int $uploadId = null)
+    {
+        // Retrieve the origin URL
+        $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $path = $file->getPath();
+        $file = new File($path);
+        return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 }
