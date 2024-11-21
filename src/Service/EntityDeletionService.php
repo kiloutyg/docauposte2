@@ -182,11 +182,10 @@ class EntityDeletionService
         // Deletion logic for related entities, folder and files
         if ($entityType === 'zone') {
             foreach ($entity->getProductLines() as $productLine) {
-                $this->deleteEntity('productline', $productLine->getId());
+                $this->deleteEntity('productLine', $productLine->getId());
             }
             $this->folderCreationService->deleteFolderStructure($entity->getName());
-        } elseif ($entityType === 'productline') {
-
+        } elseif ($entityType === 'productLine') {
             foreach ($entity->getCategories() as $category) {
                 $this->deleteEntity('category', $category->getId());
             }

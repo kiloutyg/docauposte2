@@ -35,6 +35,18 @@ class OperatorType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+
+        /** @var Operator|null $operator */
+        $operator = $builder->getData();
+
+        // Default CSS class
+        $labelClass = 'btn btn-outline-primary mb-4';
+
+        // Check if the operator exists and has a trainer who is demoted
+        if ($operator instanceof Operator && $operator->getTrainer() && $operator->getTrainer()->isDemoted(true)) {
+            $labelClass = 'btn btn-outline-danger mb-4';
+        }
+
         $operatorId = $options['operator_id'] ?? null;
         $builder
 
@@ -138,8 +150,7 @@ class OperatorType extends AbstractType
                     'class' => 'col'
                 ],
                 'label_attr' => [
-
-                    'class' => 'btn btn-outline-primary mb-4',
+                    'class' => $labelClass,
                     'style' => 'font-weight: bold; color: #ffffff;',
                 ],
                 'label' => 'Formateur',

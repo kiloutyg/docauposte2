@@ -2,16 +2,72 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\File\File;
+
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
+use Symfony\Component\HttpFoundation\File\File;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+use App\Repository\UserRepository;
+use App\Repository\UploadRepository;
+use App\Repository\ApprobationRepository;
+
 use App\Form\UploadType;
 
-class ValidationController extends FrontController
+use App\Service\UploadService;
+use App\Service\ValidationService;
+
+
+
+class ValidationController extends AbstractController
 {
+
+    // private $logger;
+
+    // Repository methods
+    private $approbationRepository;
+    private $uploadRepository;
+    private $userRepository;
+
+
+    // Services methods
+    private $validationService;
+    private $uploadService;
+
+
+
+
+    private function __construct(
+
+        // LoggerInterface                 $logger,
+
+        // Repository methods
+        ApprobationRepository           $approbationRepository,
+        UploadRepository                $uploadRepository,
+        UserRepository                  $userRepository,
+
+
+        // Services methods
+        ValidationService               $validationService,
+        UploadService                   $uploadService,
+
+    ) {
+        // $this->logger                       = $logger;
+
+        // Variables related to the repositories
+        $this->approbationRepository        = $approbationRepository;
+        $this->uploadRepository             = $uploadRepository;
+        $this->userRepository               = $userRepository;
+
+        // Variables related to the services
+        $this->validationService            = $validationService;
+        $this->uploadService                = $uploadService;
+    }
+
 
 
     // Is not currently in use, but might get useful for the operator side validation. 

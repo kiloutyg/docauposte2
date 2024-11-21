@@ -7,17 +7,59 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 use App\Service\EntityFetchingService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use \Psr\Log\LoggerInterface;
 
+use Doctrine\ORM\EntityManagerInterface;
 
-class MailerController extends FrontController
+use App\Repository\UserRepository;
+use App\Repository\ValidationRepository;
+
+use App\Service\MailerService;
+
+class MailerController extends AbstractController
 {
+
+    private $em;
+    private $logger;
+
+    // Repository methods
+    private $validationRepository;
+    private $userRepository;
+
+
+    // Services methods
+    private $mailerService;
     private $entityFetchingService;
-    
+
+
+
+
     public function __construct(
-        EntityFetchingService $entityFetchingService,
+
+        EntityManagerInterface          $em,
+        LoggerInterface                 $logger,
+
+        // Repository methods
+        ValidationRepository            $validationRepository,
+        UserRepository                  $userRepository,
+
+
+        // Services methods
+        MailerService                   $mailerService,
+        EntityFetchingService           $entityFetchingService,
+
     ) {
-        parent::__construct();
-        $this->entityFetchingService = $entityFetchingService;
+        $this->em                           = $em;
+        $this->logger                       = $logger;
+
+        // Variables related to the repositories
+        $this->validationRepository         = $validationRepository;
+        $this->userRepository               = $userRepository;
+
+        // Variables related to the services
+        $this->mailerService                = $mailerService;
+        $this->entityFetchingService        = $entityFetchingService;
     }
 
 

@@ -6,6 +6,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Psr\Log\LoggerInterface;
 
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+
 use App\Repository\ZoneRepository;
 use App\Repository\ProductLineRepository;
 use App\Repository\UserRepository;
@@ -29,6 +32,8 @@ class EntityFetchingService extends AbstractController
 {
     private $logger;
 
+    private $cache;
+
     private $departmentRepository;
     private $approbationRepository;
     private $validationRepository;
@@ -50,6 +55,8 @@ class EntityFetchingService extends AbstractController
     public function __construct(
         LoggerInterface                 $logger,
 
+        CacheInterface $cache,
+
         ApprobationRepository           $approbationRepository,
         ValidationRepository            $validationRepository,
         DepartmentRepository            $departmentRepository,
@@ -69,6 +76,8 @@ class EntityFetchingService extends AbstractController
         IncidentRepository              $incidentRepository,
     ) {
         $this->logger                       = $logger;
+
+        $this->cache = $cache;
 
         $this->departmentRepository         = $departmentRepository;
         $this->approbationRepository        = $approbationRepository;
@@ -92,8 +101,7 @@ class EntityFetchingService extends AbstractController
 
     public function getUsers()
     {
-        $users = $this->userRepository->findAll();
-        return $users;
+        return $this->userRepository->findAll();;
     }
 
 
@@ -198,6 +206,14 @@ class EntityFetchingService extends AbstractController
 
     public function getOperators()
     {
+
+        // $operators = $this->cache->get('operators_list', function (ItemInterface $item) {
+        //     $item->expiresAfter(3600);
+
+        //     return $this->operatorRepository->findAllOrdered();
+        // });
+
+        // return $operators;
         return $this->operatorRepository->findAllOrdered();
     }
 

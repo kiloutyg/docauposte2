@@ -9,11 +9,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 use App\Service\SettingsService;
-
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/super_admin')]
 // This controller is responsible for rendering the settings interface an managing the logic of the settings interface
-class SettingsController extends SuperAdminController
+class SettingsController extends AbstractController
 {
     private $logger;
     private $settingsService;

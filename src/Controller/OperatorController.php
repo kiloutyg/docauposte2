@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+use Symfony\Contracts\Cache\CacheInterface;
+
 use App\Form\OperatorType;
 use App\Form\TeamType;
 use App\Form\UapType;
@@ -53,6 +55,7 @@ class OperatorController extends AbstractController
     private $request;
     private $logger;
     private $authChecker;
+    private $cache;
 
     // Repository methods
     private $validationRepository;
@@ -78,6 +81,7 @@ class OperatorController extends AbstractController
         LoggerInterface                 $logger,
         AuthorizationCheckerInterface   $authChecker,
         RequestStack                    $requestStack,
+        CacheInterface                  $cache,
 
         // Repository classes
         ValidationRepository            $validationRepository,
@@ -101,6 +105,7 @@ class OperatorController extends AbstractController
         $this->logger                       = $logger;
         $this->authChecker                  = $authChecker;
         $this->request                      = $requestStack->getCurrentRequest();
+        $this->cache                        = $cache;
 
         // Variables related to the repositories
         $this->validationRepository         = $validationRepository;
@@ -194,7 +199,6 @@ class OperatorController extends AbstractController
                 ])->createView();
             }
         }
-        $flashes = $request->getSession()->getFlashBag()->all();
         // $this->logger->info('message in flashbag', $flashes);
 
         return $this->render('services/operators/operators_admin.html.twig', [
@@ -225,6 +229,7 @@ class OperatorController extends AbstractController
         $operator = $form->getData();
         $this->em->persist($operator);
         $this->em->flush();
+        $this->cache->delete('operators_list');
     }
 
 
@@ -235,7 +240,7 @@ class OperatorController extends AbstractController
     #[Route('/operator/edit/{id}', name: 'app_operator_edit')]
     public function editOperatorAction(Request $request, Operator $operator): Response
     {
-        // $this->logger->info('Full request editOperatorAction', $request->request->all());
+        $this->logger->info('Full request editOperatorAction', $request->request->all());
 
         $form = $this->createForm(OperatorType::class, $operator, [
             'operator_id' => $operator->getId(),
@@ -245,19 +250,27 @@ class OperatorController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $trainerBool = $form->get('isTrainer')->getData();
+            $this->logger->info('isTrainer form key value', [$trainerBool]);
+
             if ($trainerBool == true) {
                 if ($operator->getTrainer() == null) {
                     $trainer = new Trainer();
                     $trainer->setOperator($operator);
-                    $this->em->persist($trainer);
                     $operator->setTrainer($trainer);
+                } else {
+                    $trainer = $operator->getTrainer();
+                    $trainer->setDemoted(false);
                 }
+                $this->em->persist($trainer);
             } else {
                 $trainer = $operator->getTrainer();
-                $operator->setTrainer(null);
-                if ($trainer != null) {
+                if ($trainer != null && $trainer->getTrainingRecords() != null) {
+                    $trainer->setDemoted(true);
+                } else {
+                    $operator->setIsTrainer(false);
                     $this->em->remove($trainer);
                 }
+                $this->em->persist($trainer);
             }
             if ($operator->getTobedeleted() != null) {
                 $operator->setTobedeleted(null);
@@ -268,6 +281,8 @@ class OperatorController extends AbstractController
             try {
                 $this->em->persist($operator);
                 $this->em->flush();
+                $this->cache->delete('operators_list');
+
                 // $this->logger->info('editOperatorAction, operateur bien modifié', [$operator]);
                 $this->addFlash('success', 'L\'opérateur a bien été modifié');
 
@@ -483,6 +498,7 @@ class OperatorController extends AbstractController
 
         $this->em->persist($operator);
         $this->em->flush();
+        $this->cache->delete('operators_list');
         $this->addFlash('success', 'L\'opérateur a bien été ajouté');
         return $this->redirectToRoute('app_render_training_records', [
             'uploadId' => $uploadId,
@@ -654,6 +670,8 @@ class OperatorController extends AbstractController
 
                 // Flush changes for each operator
                 $this->em->flush();
+                $this->cache->delete('operators_list');
+
             }
         }
 
@@ -1071,6 +1089,7 @@ class OperatorController extends AbstractController
                     try {
                         $em->persist($operator);
                         $em->flush();
+                        
                         break; // Exit loop if successful
                     } catch (UniqueConstraintViolationException $e) {
                         // Modify the violating field and retry
@@ -1100,6 +1119,7 @@ class OperatorController extends AbstractController
             if (!$em->isOpen()) {
                 $em = $doctrine->resetManager();
             }
+            $this->cache->delete('operators_list');
 
             // Re-throw the exception for further handling
             throw $e;

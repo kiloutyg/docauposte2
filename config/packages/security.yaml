@@ -28,7 +28,15 @@ security:
         ROLE_ADMIN: [ROLE_LINE_ADMIN]
         ROLE_ADMIN_VALIDATOR: [ROLE_ADMIN]
         ROLE_SUPER_ADMIN:
-            [ROLE_ADMIN_VALIDATOR, ROLE_ALLOWED_TO_SWITCH, ROLE_ADMIN, ROLE_LINE_ADMIN, ROLE_LINE_ADMIN_VALIDATOR, ROLE_MANAGER, ROLE_USER]
+            [
+                ROLE_ADMIN_VALIDATOR,
+                ROLE_ALLOWED_TO_SWITCH,
+                ROLE_ADMIN,
+                ROLE_LINE_ADMIN,
+                ROLE_LINE_ADMIN_VALIDATOR,
+                ROLE_MANAGER,
+                ROLE_USER,
+            ]
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
@@ -44,6 +52,7 @@ security:
         - { path: ^/modify_account_view, roles: ROLE_SUPER_ADMIN }
         - { path: ^/department, roles: ROLE_SUPER_ADMIN }
         - { path: ^/operator/delete-uap-or-team, roles: ROLE_SUPER_ADMIN }
+        - { path: ^/account, roles: ROLE_SUPER_ADMIN }
 
         - { path: ^/mail, roles: ROLE_SUPER_ADMIN }
 
@@ -55,7 +64,7 @@ security:
         - { path: ^/uploaded, roles: ROLE_LINE_ADMIN }
         - { path: ^/validation, roles: ROLE_LINE_ADMIN }
         - { path: ^/view, roles: ROLE_LINE_ADMIN }
-  
+
         - { path: ^/zone_admin, roles: ROLE_MANAGER }
         - { path: ^/productline_admin, roles: ROLE_MANAGER }
         - { path: ^/category_admin, roles: ROLE_MANAGER }
@@ -64,9 +73,7 @@ security:
         - { path: ^/training-record/delete-weeks-old, roles: ROLE_MANAGER }
         - { path: ^/admin, roles: ROLE_MANAGER }
 
-
         # - { path: ^/operator, roles: ROLE_MANAGER }
-
 
 when@test:
     security:
@@ -75,8 +82,8 @@ when@test:
             # important to generate secure password hashes. In tests however, secure hashes
             # are not important, waste resources and increase test times. The following
             # reduces the work factor to the lowest possible values.
-          Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-            algorithm: auto
-            cost: 4 # Lowest possible value for bcrypt
-            time_cost: 3 # Lowest possible value for argon
-            memory_cost: 10 # Lowest possible value for argon
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+              algorithm: auto
+              cost: 4 # Lowest possible value for bcrypt
+              time_cost: 3 # Lowest possible value for argon
+              memory_cost: 10 # Lowest possible value for argon
