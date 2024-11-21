@@ -47,10 +47,10 @@
 		</div>
 		<div
 			class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
-			{% if matchingButtons|length > 0 %}
+			{% if buttons|length > 0 %}
 				<div
 					class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
-					{% for button in matchingButtons %}
+					{% for button in buttons %}
 						{% set validated = '' %}
 						{% if button.uploads|length == 1 %}
 							{% if settings.isUploadValidation %}
@@ -73,7 +73,7 @@
 							role="button"
 							aria-pressed="true"
 							style="color:white"
-							href="{{path('app_button', {buttonId: button.id, categoryId: category.id, productlineId: productLine.id, zoneId: zone.id})}}">
+							href="{{path('app_button', {buttonId: button.id})}}">
 							<span
 								class="line-details text-justify">
 								{{ button.name|split('.')|first|upper}}

@@ -5,6 +5,8 @@ twig:
         facilityName: "%env(FACILITY_NAME)%"
         hostname: "%env(HOSTNAME)%"
         # base_path: '/docauposte'
+    cache: "%kernel.cache_dir%/twig"
+    optimizations: -1
 when@test:
     twig:
         strict_variables: true

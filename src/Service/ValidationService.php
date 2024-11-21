@@ -24,7 +24,7 @@ use App\Service\MailerService;
 use App\Service\OldUploadService;
 use App\Service\TrainingRecordService;
 use App\Service\SettingsService;
-
+use Doctrine\Common\Collections\ArrayCollection;
 
 class ValidationService extends AbstractController
 {

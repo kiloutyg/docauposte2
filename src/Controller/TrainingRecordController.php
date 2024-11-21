@@ -6,11 +6,24 @@ use Symfony\Component\Routing\Annotation\Route;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use App\Controller\OperatorController;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class TrainingRecordController extends OperatorController
+use App\Service\TrainingRecordService;
+
+class TrainingRecordController extends AbstractController
 {
+    private $authChecker;
+    private $trainingRecordService;
+
+    public function __construct(
+        AuthorizationCheckerInterface $authChecker,
+        TrainingRecordService $trainingRecordService,
+    ) {
+        $this->authChecker = $authChecker;
+        $this->trainingRecordService = $trainingRecordService;
+    }
 
     // Methods to delete a weeks old training record maximum
     #[Route('/training-record/delete-weeks-old/{uploadId}/{teamId}/{uapId}/{trainingRecordId}', name: 'app_training_record_delete_weeks_old')]

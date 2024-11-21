@@ -1,47 +1,124 @@
 <?php
 
-
 namespace App\Controller;
 
+// use \Psr\Log\LoggerInterface;
+
+use Doctrine\ORM\EntityManagerInterface;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-
+use App\Entity\Category;
 use App\Entity\Button;
 
-// This controller manage the logic of the category's admin interface
+use App\Repository\ZoneRepository;
+use App\Repository\CategoryRepository;
+use App\Repository\ButtonRepository;
 
-class CategoryAdminController extends FrontController
+use App\Service\EntityDeletionService;
+use App\Service\UploadService;
+use App\Service\FolderCreationService;
+use App\Service\IncidentService;
+use App\Service\EntityHeritanceService;
+use App\Service\ErrorService;
+
+#[Route('/category_admin', name: 'app_category_')]
+class CategoryAdminController extends AbstractController
 {
 
-    #[Route('/category_admin/{categoryId}', name: 'app_category_admin')]
+    private $em;
+    // private $logger;
+    private $authChecker;
 
+    // Repository methods
+    private $categoryRepository;
+    private $buttonRepository;
+    private $zoneRepository;
+
+    // Services methods
+    private $incidentService;
+    private $folderCreationService;
+    private $entityHeritanceService;
+    private $entitydeletionService;
+    private $uploadService;
+    private $errorService;
+
+    public function __construct(
+
+        EntityManagerInterface          $em,
+        // LoggerInterface                 $logger,
+        AuthorizationCheckerInterface   $authChecker,
+
+        // Repository methods
+        CategoryRepository              $categoryRepository,
+        ButtonRepository                $buttonRepository,
+        ZoneRepository                  $zoneRepository,
+
+
+        // Services methods
+        IncidentService                 $incidentService,
+        EntityHeritanceService          $entityHeritanceService,
+        FolderCreationService           $folderCreationService,
+        EntityDeletionService           $entitydeletionService,
+        UploadService                   $uploadService,
+        ErrorService                    $errorService,
+
+    ) {
+        $this->em                           = $em;
+        // $this->logger                       = $logger;
+        $this->authChecker                  = $authChecker;
+
+        // Variables related to the repositories
+        $this->zoneRepository               = $zoneRepository;
+        $this->categoryRepository           = $categoryRepository;
+        $this->buttonRepository             = $buttonRepository;
+
+        // Variables related to the services
+        $this->incidentService              = $incidentService;
+        $this->entityHeritanceService       = $entityHeritanceService;
+        $this->folderCreationService        = $folderCreationService;
+        $this->uploadService                = $uploadService;
+        $this->entitydeletionService        = $entitydeletionService;
+        $this->errorService                 = $errorService;
+    }
+
+    #[Route('/{categoryId}', name: 'admin')]
     // This function is responsible for rendering the category's admin interface. 
-    public function index(int $categoryId = null): Response
+    public function categoryAdmin(int $categoryId = null, Category $category = null): Response
     {
         $pageLevel = 'category';
+        if ($category === null) {
+            $category = $this->categoryRepository->find($categoryId);
+        }
+        if (!$category) {
+            $this->errorService->errorRedirectByOrgaEntityType($pageLevel);
+        }
 
-        $category    = $this->cacheService->getEntityById('category', $categoryId);
-        $buttons     = $this->cacheService->getEntitiesByParentId('button', $categoryId);
-        $productLine = $this->cacheService->getEntityById('productLine', $category->getProductLine()->getId());
-        $zone        = $this->cacheService->getEntityById('zone', $productLine->getZone()->getId());
+        $categoryButtons        = $category->getButtons();
+        $productLine            = $category->getProductLine();
+        $zone                   = $productLine->getZone();
+        $productLineCategories  = $productLine->getCategories();
 
         // These functions are responsible for retrieving the uploads and incidents children of the current category, it depends on the EntityHeritanceService class.
         $uploads = $this->entityHeritanceService->uploadsByParentEntity(
             'category',
-            $category->getId()
+            $category
         );
         $incidents = $this->entityHeritanceService->incidentsByParentEntity(
             'category',
-            $category->getId()
+            $category
         );
 
         // These functions are responsible for grouping the uploads and incidents by button and parent entity, it depends on the UploadService and IncidentService classes.
-        $groupedUploads = $this->uploadService->groupUploads($uploads);
+        $uploadsArray = $this->uploadService->groupAllUploads($uploads);
+        $groupedUploads = $uploadsArray[0];
+        $groupedValidatedUploads = $uploadsArray[1];
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
-        $groupedValidatedUploads = $this->uploadService->groupValidatedUploads($uploads);
 
         return $this->render('admin_template/admin_index.html.twig', [
             'pageLevel'                 => $pageLevel,
@@ -51,75 +128,39 @@ class CategoryAdminController extends FrontController
             'zone'                      => $zone,
             'productLine'               => $productLine,
             'category'                  => $category,
-            'uploads'                   => $uploads,
-            'incidents'                 => $incidents,
-            'categoryButtons'           => $buttons
-
+            'categoryButtons'           => $categoryButtons,
+            'productLineCategories'     => $productLineCategories,
         ]);
     }
-
-
-
-    #[Route('/category_admin/create_user/{categoryId}', name: 'app_category_admin_create_user')]
-
-    // This function is responsible for creating a new user, it's access is restricted on the frontend
-    public function createUser(int $categoryId = null, Request $request): Response
-    {
-        $category = $this->categoryRepository->find($categoryId);
-
-        $error = null;
-        // This function is responsible for creating a new user, it depends on the AccountService class.
-        $result = $this->accountService->createAccount(
-            $request,
-            $error
-        );
-
-        if ($result) {
-            $this->addFlash('success', 'Le compte a été créé');
-        }
-
-        if ($error) {
-            $this->addFlash('error', $error);
-        }
-
-        return $this->redirectToRoute('app_category_admin', [
-            'categoryId'    => $categoryId,
-        ]);
-    }
-
-
-    #[Route('/category_admin/create_button/{categoryId}', name: 'app_category_admin_create_button')]
 
     // This function is used to create a new button to which is attached the uploads.
+    #[Route('/create_button/{categoryId}', name: 'admin_create_button')]
     public function createButton(Request $request, int $categoryId = null)
     {
-        $categoryentity = $this->categoryRepository->find($categoryId);
         // Check if button name does not contain the disallowed characters
         if (!preg_match("/^[^.]+$/", $request->request->get('buttonname'))) {
 
             // Handle the case when button name contains disallowed characters
             $this->addFlash('danger', 'Nom de bouton invalide');
-            return $this->redirectToRoute('app_category_admin', [
-                'categoryId'    => $categoryId,
-            ]);
+            return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
         } else {
+
+            $category = $this->categoryRepository->find($categoryId);
             // Look if the the button already exists
-            $buttonname = $request->request->get('buttonname') . '.' . $categoryentity->getName();
+            $buttonname = $request->request->get('buttonname') . '.' . $category->getName();
             $button = $this->buttonRepository->findoneBy(['name' => $buttonname]);
 
             // If the button already exists, redirect to the category manager page and display a flash message.
             if ($button) {
                 $this->addFlash('danger', 'Le bouton existe déjà');
-                return $this->redirectToRoute('app_category_admin', [
-                    'categoryId'    => $categoryId,
-                ]);
+                return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
                 // If the button does not exist, create it and redirect to the category manager page and display a flash message. It depends on the FolderCreationService class.
             } else {
-                $count = $this->buttonRepository->count(['Category' => $categoryentity->getId()]);
+                $count = $this->buttonRepository->count(['Category' => $categoryId]);
                 $sortOrder = $count + 1;
                 $button = new Button();
                 $button->setName($buttonname);
-                $button->setCategory($categoryentity);
+                $button->setCategory($category);
                 $button->setSortOrder($sortOrder);
                 $button->setCreator($this->getUser());
                 $this->em->persist($button);
@@ -127,47 +168,37 @@ class CategoryAdminController extends FrontController
                 $this->folderCreationService->folderStructure($buttonname);
 
                 $this->addFlash('success', 'Le bouton a été créé');
-                return $this->redirectToRoute('app_category_admin', [
-                    'categoryId'    => $categoryId,
-                ]);
+                return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
             }
         }
     }
 
-    #[Route('/category_admin/delete_button/{buttonId}', name: 'app_category_admin_delete_button')]
+    #[Route('/delete_button/{buttonId}', name: 'admin_delete_button')]
 
     // This function is used to delete a button and all the uploads attached to it.
     public function deleteEntityButton(int $buttonId): Response
     {
         $entityType = 'button';
-        $entity = $this->buttonRepository->find($buttonId);
-        if (empty($entity)){
-            return $this->redirectToRoute('app_base');
-        };
-        $categoryId = $entity->getCategory()->getId();
+
+        $button = $this->buttonRepository->find($buttonId);
+        $categoryId = $button->getCategory()->getid();
 
         // Check if the user is the creator of the button or if he is a super admin
-        if ($this->getUser() === $entity->getCreator() || $this->authChecker->isGranted("ROLE_LINE_ADMIN")) {
+        if ($this->authChecker->isGranted("ROLE_LINE_ADMIN")) {
             // This function is used to delete a button and all the uploads attached to it, it depends on the EntityDeletionService class. 
             // The folder is deleted by the FolderCreationService class through the EntityDeletionService class.
             $response = $this->entitydeletionService->deleteEntity($entityType, $buttonId);
         } else {
             $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer cette ' . $entityType . '.');
-            return $this->redirectToRoute('app_category_admin', [
-                'categoryId'    => $categoryId,
-            ]);
+            return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
         }
 
         if ($response == true) {
             $this->addFlash('success', 'Le bouton ' . $entityType . ' a été supprimé');
-            return $this->redirectToRoute('app_category_admin', [
-                'categoryId'    => $categoryId,
-            ]);
+            return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
         } else {
             $this->addFlash('danger', 'Le bouton ' . $entityType . ' n\'existe pas.');
-            return $this->redirectToRoute('app_category_admin', [
-                'categoryId'    => $categoryId,
-            ]);
+            return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
         }
     }
 }

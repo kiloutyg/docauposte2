@@ -24,6 +24,9 @@ class Trainer
     #[ORM\ManyToOne(inversedBy: 'trainers')]
     private ?Upload $upload = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private ?bool $demoted;
+
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
@@ -84,6 +87,18 @@ class Trainer
     public function setUpload(?Upload $upload): static
     {
         $this->upload = $upload;
+
+        return $this;
+    }
+
+    public function isDemoted(): ?bool
+    {
+        return $this->demoted;
+    }
+
+    public function setDemoted(?bool $demoted): static
+    {
+        $this->demoted = $demoted;
 
         return $this;
     }

@@ -2,48 +2,132 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\Request;
+// use \Psr\Log\LoggerInterface;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\File\File;
 
+use Symfony\Component\Routing\Annotation\Route;
+
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use App\Entity\IncidentCategory;
 
 use App\Form\IncidentType;
 
+use App\Repository\ProductLineRepository;
+use App\Repository\IncidentRepository;
+use App\Repository\IncidentCategoryRepository;
+
+use App\Service\EntityDeletionService;
+use App\Service\IncidentService;
+use App\Service\EntityFetchingService;
 
 // This controller manage the logics of the incidents interface, it is responsible for rendering the incidents interface.
 // It is also responsible for creating, modifying, deleting incidents and incident categories.
 #[Route('/', name: 'app_')]
-class IncidentController extends FrontController
+class IncidentController extends AbstractController
 {
+
+    private $em;
+    private $authChecker;
+    private $request;
+
+
+    // Repository methods
+    private $incidentRepository;
+    private $incidentCategoryRepository;
+    private $productLineRepository;
+
+    // Services methods
+    private $incidentService;
+    private $entitydeletionService;
+    private $entityFetchingService;
+
+    public function __construct(
+        EntityManagerInterface          $em,
+        // LoggerInterface                 $logger,
+        AuthorizationCheckerInterface   $authChecker,
+        RequestStack                    $requestStack,
+
+        // Repository methods
+        IncidentCategoryRepository      $incidentCategoryRepository,
+        ProductLineRepository           $productLineRepository,
+        IncidentRepository              $incidentRepository,
+
+        // Services methods
+        IncidentService                 $incidentService,
+        EntityDeletionService           $entitydeletionService,
+        EntityFetchingService           $entityFetchingService,
+
+    ) {
+        // $this->cache                        = $cache;
+
+        $this->em                           = $em;
+        $this->authChecker                  = $authChecker;
+        // $this->logger                       = $logger;
+        $this->request                      = $requestStack->getCurrentRequest();
+
+        // Variables related to the repositories
+
+        $this->incidentCategoryRepository   = $incidentCategoryRepository;
+        $this->incidentRepository           = $incidentRepository;
+        $this->productLineRepository        = $productLineRepository;
+
+        // Variables related to the services
+        $this->incidentService              = $incidentService;
+        $this->entitydeletionService        = $entitydeletionService;
+        $this->entityFetchingService        = $entityFetchingService;
+    }
+
+    // Render the Incident management view in any role level admin page
+    #[Route('/admin/incidentmanagementview', name: 'incident_management_view')]
+    public function incidentManagementView()
+    {
+        $originurl = $this->request->headers->get('referer');
+
+        $incidents = $this->entityFetchingService->getIncidents();
+
+        $groupIncidents = $this->incidentService->groupIncidents($incidents);
+        $incidentCategories = $this->entityFetchingService->getIncidentCategories();
+
+        return $this->render(
+            'services/incidents/incidents.html.twig',
+            [
+                'groupincidents'            => $groupIncidents,
+                'incidentCategories'        => $incidentCategories,
+            ]
+        );
+    }
+
     // Render the incidents page and filter the incidents by productline and sort them by id ascending to display them in the right order
-    #[Route('/zone/{zoneId}/productline/{productlineId}/incident/{incidentId}', name: 'mandatory_incident')]
-    public function mandatoryIncident(int $zoneId, int $productlineId = null, int $incidentId = null): Response
+    #[Route('/productline/{productLineId}/incident/{incidentId}', name: 'mandatory_incident')]
+    public function mandatoryIncident(int $productLineId = null, int $incidentId = null): Response
     {
         $incidentEntity = null;
         if ($incidentId != null) {
-            // $incidentEntity = $this->incidentRepository->find($incidentId);
-            $incidentEntity = $this->cacheService->getEntityById('incident', $incidentId);
+            $incidentEntity = $this->incidentRepository->findOneBy(['id' => $incidentId]);
         }
 
         // If the incident does not exist, we get the productline entity from the productline id
         if (!$incidentEntity) {
-            $productLine = $this->cacheService->getEntityById('productLine', $productlineId);
+            $productLine = $this->productLineRepository->findOneBy(['id' => $productLineId]);
         } else {
             $productLine = $incidentEntity->getProductLine();
         }
 
-        $zone        = $this->cacheService->getEntityById('zone', $zoneId);
         $incidents   = [];
 
         // Get all the incidents of the productline and sort them by id ascending
         $incidents = $this->incidentRepository->findBy(
-            ['ProductLine' => $productlineId],
+            ['ProductLine' => $productLineId],
             ['id' => 'ASC'] // order by id ascending
         );
 
@@ -78,8 +162,7 @@ class IncidentController extends FrontController
                     'incident'          => $incident,
                     'incidentCategory'  => $incident ? $incident->getIncidentCategory() : null,
                     'incidents'         => $incidents,
-                    'productlineId'     => $productLine->getId(),
-                    'zoneId'            => $zoneId,
+                    'productLineId'     => $productLine->getId(),
                     'nextIncidentId'    => $nextIncident ? $nextIncident->getId() : null
                 ]
             );
@@ -88,8 +171,8 @@ class IncidentController extends FrontController
             return $this->render(
                 'productline.html.twig',
                 [
-                    'zone'        => $zone,
-                    'productLine' => $productLine
+                    'productLine' => $productLine,
+                    'categories' => $productLine->getCategories(),
                 ]
             );
         }
@@ -197,10 +280,10 @@ class IncidentController extends FrontController
     }
 
     // Create a route to delete a file
-    #[Route('/incident/delete/{productlineId}/{incidentId}', name: 'incident_delete_file')]
-    public function delete_file(int $incidentId, int $productlineId, Request $request): Response
+    #[Route('/incident/delete/{productLineId}/{incidentId}', name: 'incident_delete_file')]
+    public function delete_file(int $incidentId, int $productLineId, Request $request): Response
     {
-        $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productlineId]);
+        $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productLineId]);
         $originUrl = $request->headers->get('referer');
         $incidentEntity = $this->incidentRepository->find($incidentId);
 

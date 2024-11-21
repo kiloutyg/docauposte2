@@ -13,7 +13,7 @@
 				<aside
 					class="position-absolute end-0">
 					<a
-						href="{{ path('app_productline_admin', {productlineId: productLine.id}) }}" class="btn shadow  bg-dark "
+						href="{{ path('app_productLine_admin', {productLineId: productLine.id}) }}" class="btn shadow  bg-dark "
 						style="color:white">
 						<span
 							class="fa fa-gear"></span>
@@ -48,23 +48,18 @@
 		</div>
 		<div
 			class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
-			{% set matchingCategories = [] %}
-			{% for category in categories %}
-				{% if category.productLine.id is same as(productLine.id)  %}
-					{% set matchingCategories = matchingCategories|merge([category]) %}
-				{% endif %}
-			{% endfor %}
-			{% if matchingCategories|length > 0 %}
+
+			{% if categories|length > 0 %}
 				<div
 					class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 
-					{% for category in matchingCategories %}
+					{% for category in categories %}
 						<a
 							class="btn btn-primary btn-lg m-5"
 							role="button"
 							aria-pressed="true"
 							style="color:white"
-							href="{{path('app_category', {categoryId: category.id, productlineId: productLine.id, zoneId: zone.id} )}}">
+							href="{{path('app_category', {categoryId: category.id} )}}">
 							<span
 								class="line-details text-justify">
 								{{ category.name|split('.')|first|upper }}

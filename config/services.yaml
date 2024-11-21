@@ -15,9 +15,13 @@ services:
     _defaults:
         autowire: true # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
     App\Twig\RoleComparisonExtension:
         tags: ["twig.extension"]
 
+    App\Twig\VariableExtension:
+        tags:
+            - { name: "twig.extension" }
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -37,19 +41,12 @@ services:
     App\Service\MailerService:
         arguments:
             $senderEmail: "%env(MAILER_SENDER_EMAIL)%"
-    
+
     app.cache.tag_aware:
         class: Symfony\Component\Cache\Adapter\TagAwareAdapter
         arguments:
-            - '@cache.app'
+            - "@cache.app"
 
-    App\EventListener\CacheInvalidationListener:
-        arguments:
-            $cache: '@app.cache.tag_aware'
-        tags:
-            - { name: doctrine.event_listener, event: postPersist }
-            - { name: doctrine.event_listener, event: postUpdate }
-            - { name: doctrine.event_listener, event: postRemove }
     App\EventSubscriber\SettingsSubscriber:
         tags:
             - { name: kernel.event_subscriber }

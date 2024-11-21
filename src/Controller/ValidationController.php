@@ -2,16 +2,72 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\File\File;
+
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
+use Symfony\Component\HttpFoundation\File\File;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+use App\Repository\UserRepository;
+use App\Repository\UploadRepository;
+use App\Repository\ApprobationRepository;
+
 use App\Form\UploadType;
 
-class ValidationController extends FrontController
+use App\Service\UploadService;
+use App\Service\ValidationService;
+
+
+
+class ValidationController extends AbstractController
 {
+
+    // private $logger;
+
+    // Repository methods
+    private $approbationRepository;
+    private $uploadRepository;
+    private $userRepository;
+
+
+    // Services methods
+    private $validationService;
+    private $uploadService;
+
+
+
+
+    private function __construct(
+
+        // LoggerInterface                 $logger,
+
+        // Repository methods
+        ApprobationRepository           $approbationRepository,
+        UploadRepository                $uploadRepository,
+        UserRepository                  $userRepository,
+
+
+        // Services methods
+        ValidationService               $validationService,
+        UploadService                   $uploadService,
+
+    ) {
+        // $this->logger                       = $logger;
+
+        // Variables related to the repositories
+        $this->approbationRepository        = $approbationRepository;
+        $this->uploadRepository             = $uploadRepository;
+        $this->userRepository               = $userRepository;
+
+        // Variables related to the services
+        $this->validationService            = $validationService;
+        $this->uploadService                = $uploadService;
+    }
+
 
 
     // Is not currently in use, but might get useful for the operator side validation. 
@@ -211,14 +267,14 @@ class ValidationController extends FrontController
     //     // $this->logger->info('Uploads: ', [$uploads]);
     //     if (count($uploads) === 1) {
 
-    //         $upload = $this->cacheService->getEntityById('upload', $uploads[0]->getId());
+    //         $upload = $this->->getEntityById('upload', $uploads[0]->getId());
     //         // $this->logger->info('Upload: ', [$upload]);
-    //         $validation = $this->cacheService->getEntitiesByParentId('validation', $uploads[0]->getId());
+    //         $validation = $this->->getEntitiesByParentId('validation', $uploads[0]->getId());
     //         // $this->logger->info('Validation: ', [$validation]);
     //         // // $this->logger->info('Validation[0: ', [$validation[0]]);
     //         // // $this->logger->info('Validationtoarray: ', [$validation->toArray()]);
 
-    //         $approbations = $this->cacheService->getEntitiesByParentId('approbation', $validation->getId());
+    //         $approbations = $this->->getEntitiesByParentId('approbation', $validation->getId());
     //         // $approbations = $validation[0]->getApprobations();
     //     } else {
     //         $uploads = [];

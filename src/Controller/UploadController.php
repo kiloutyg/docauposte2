@@ -2,26 +2,84 @@
 
 namespace App\Controller;
 
+// use \Psr\Log\LoggerInterface;
+
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\File\File;
-
 use Symfony\Component\HttpFoundation\Request;
 
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Routing\Annotation\Route;
 
 use App\Form\UploadType;
 
-use App\Entity\Upload;
 
+use App\Repository\UploadRepository;
+use App\Repository\ButtonRepository;
 
+use App\Service\EntityDeletionService;
+use App\Service\UploadService;
+use App\Service\ValidationService;
+use App\Service\SettingsService;
 
 // This controlle is responsible for managing the logic of the upload interface
 #[Route('/', name: 'app_')]
-class UploadController extends FrontController
+class UploadController extends AbstractController
 {
 
+    private $security;
+    // private $logger;
+    private $authChecker;
+
+    // Repository methods
+    private $buttonRepository;
+    private $uploadRepository;
+
+
+    // Services methods
+    private $validationService;
+    private $entitydeletionService;
+    private $uploadService;
+    private $settingsService;
+
+
+
+
+    public function __construct(
+
+        Security                        $security,
+        AuthorizationCheckerInterface   $authChecker,
+
+        // Repository methods
+        ButtonRepository                $buttonRepository,
+        UploadRepository                $uploadRepository,
+
+
+        // Services methods
+        ValidationService               $validationService,
+        EntityDeletionService           $entitydeletionService,
+        UploadService                   $uploadService,
+        SettingsService                 $settingsService
+
+    ) {
+        $this->security                     = $security;
+        // $this->logger                       = $logger;
+
+        $this->authChecker                  = $authChecker;
+
+        // Variables related to the repositories
+        $this->uploadRepository             = $uploadRepository;
+        $this->buttonRepository             = $buttonRepository;
+
+        // Variables related to the services
+        $this->validationService            = $validationService;
+        $this->uploadService                = $uploadService;
+        $this->entitydeletionService        = $entitydeletionService;
+        $this->settingsService              = $settingsService;
+    }
 
 
 
@@ -105,85 +163,15 @@ class UploadController extends FrontController
 
     // create a route to redirect to the correct views of a file
     #[Route('/download/{uploadId}', name: 'download_file')]
-    public function filterDownloadFile(int $uploadId, Request $request): Response
+    public function filterDownloadFile(int $uploadId = null, Request $request): Response
     {
-        $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
-        $path = $file->getPath();
-
-        if (!($this->settings->isUploadValidation() || $this->settings->IsTraining())) {
-            return $this->downloadFileFromMethods($path);
+        if ($uploadId) {
+            return $this->uploadService->filterDownloadFile($uploadId, $request);
+        } else {
+            $this->addFlash('warning', 'No File with ID exist');
+            $originUrl = $request->headers->get('referer');
+            return $this->redirect($originUrl);
         }
-
-        $isValidated = $file->isValidated();
-        $isForcedDisplay = $file->isForcedDisplay();
-        $isTraining = $file->isTraining();
-        $hasOldUpload = $file->getOldUpload() !== null;
-        $originUrl = $request->headers->get('Referer');
-
-        if ($isValidated === false && $isForcedDisplay === false) {
-            if ($this->settings->IsTraining() && $isTraining) {
-                return $this->redirectToRoute('app_training_front_by_validation', [
-                    'validationId' => $file->getValidation()->getId()
-                ]);
-            } elseif ($hasOldUpload) {
-                return $this->downloadFileFromPath($uploadId);
-            } else {
-                $this->addFlash(
-                    'Danger',
-                    'Le fichier a été refusé par les validateurs et son affichage n\'est pas forcé. Contacter votre responsable pour plus d\'informations.'
-                );
-                return $this->redirect($originUrl, 307);
-            }
-        }
-
-        if ($isValidated === null && $isForcedDisplay === false) {
-            if ($hasOldUpload) {
-                return $this->downloadFileFromPath($uploadId);
-            } else {
-                $this->addFlash(
-                    'Danger',
-                    'Le fichier est en cours de validation et son affichage n\'est pas forcé. Contacter votre responsable pour plus d\'informations.'
-                );
-                return $this->redirect($originUrl, 307);
-            }
-        }
-
-        if ($isValidated === true) {
-            if ($this->settings->IsTraining() && $isTraining) {
-                return $this->redirectToRoute('app_training_front_by_upload', [
-                    'uploadId' => $uploadId
-                ]);
-            } else {
-                return $this->downloadFileFromMethods($path);
-            }
-        }
-
-        if ($isValidated === null) {
-            if ($this->settings->IsTraining() && $isTraining) {
-                return $this->redirectToRoute('app_training_front_by_validation', [
-                    'validationId' => $file->getValidation()->getId()
-                ]);
-            } else {
-                return $this->downloadFileFromPath($uploadId);
-            }
-        }
-
-        // Default action if none of the above conditions are met
-        return $this->downloadFileFromMethods($path);
-    }
-
-
-
-
-
-
-    // create a route to download a file in more simple terms to display the file
-    public function downloadFileFromMethods(string $path): Response
-    {
-        // $this->logger->info('path', ['path' => $path]);
-        $file = new File($path);
-        // $this->logger->info('file', ['file' => $file]);
-        return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
 
@@ -193,36 +181,19 @@ class UploadController extends FrontController
 
     // create a route to redirect to the correct views of a file
     #[Route('/downloadByPath/{uploadId}', name: 'download_file_from_path')]
-    public function downloadFileFromPath(int $uploadId): Response
+    public function downloadFileFromPath(int $uploadId, Request $request): Response
     {
-        $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
-
-        $path = $this->determineFilePath($file);
-        // $this->logger->info('path', ['path' => $path]);
-        return $this->downloadFileFromMethods($path);
-    }
-
-
-
-
-
-    // Private method to determine the file path
-    private function determineFilePath($file): string
-    {
-
-        if (!$file->isValidated()) {
-            // $this->logger->info('is validated', ['validated' => $file->isValidated()]);
-            if ($file->isForcedDisplay() === true || $file->isForcedDisplay() === null) {
-                // $this->logger->info('is forced display on or null', ['forcedDisplay' => $file->isForcedDisplay()]);
-                return $file->getPath();
-            } elseif ($file->getOldUpload() != null) {
-                // $this->logger->info('is old upload', ['oldUpload' => $file->getOldUpload()]);
-                $oldUpload = $file->getOldUpload();
-                return $oldUpload->getPath();
-            }
+        if ($uploadId) {
+            return $this->uploadService->downloadFileFromPath($uploadId);
+        } else {
+            $this->addFlash('warning', 'No File with ID exist');
+            $originUrl = $request->headers->get('referer');
+            return $this->redirect($originUrl);
         }
-        return $file->getPath();
     }
+
+
+
 
 
 
@@ -232,12 +203,13 @@ class UploadController extends FrontController
     #[Route('/download/invalidation/{uploadId}', name: 'download_invalidation_file')]
     public function downloadInvalidationFile(int $uploadId = null, Request $request): Response
     {
-        // Retrieve the origin URL
-        $originUrl = $request->headers->get('Referer');
-        $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
-        $path = $file->getPath();
-        $file = new File($path);
-        return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
+        if ($uploadId) {
+            return $this->uploadService->downloadInvalidationFile($uploadId);
+        } else {
+            $this->addFlash('warning', 'No File with ID exist');
+            $originUrl = $request->headers->get('referer');
+            return $this->redirect($originUrl);
+        }
     }
 
 
@@ -273,10 +245,10 @@ class UploadController extends FrontController
 
     // create a route to modify a file and or display the modification page
     #[Route('/modification/view/{uploadId}', name: 'modify_file')]
-    public function fileModificationView(Request $request, int $uploadId): Response
+    public function fileModificationView(int $uploadId = null, Request $request,): Response
     {
         // Retrieve the current upload entity based on the uploadId
-        $upload      = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $upload      = $this->uploadRepository->find($uploadId);
         $button      = $upload->getButton();
         $category    = $button->getCategory();
         $productLine = $category->getProductLine();
@@ -288,7 +260,7 @@ class UploadController extends FrontController
         $currentUser = $this->security->getUser();
         $uploader = $upload->getUploader();
         // If it's a GET request, render the form
-        if ($request->isMethod('GET') && ($currentUser === $uploader || $uploader === null || $this->authChecker->isGranted("ROLE_ADMIN"))) {
+        if ($request->isMethod('GET') && ($currentUser === $uploader || $uploader === null || $this->authChecker->isGranted("ROLE_LINE_ADMIN"))) {
             return $this->render('services/uploads/uploads_modification.html.twig', [
                 'form'        => $form->createView(),
                 'zone'        => $zone,
@@ -336,7 +308,7 @@ class UploadController extends FrontController
         $forcedDisplay = filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN);
         $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
 
-        $neededValidator = $this->settings->getValidatorNumber();
+        $neededValidator = $this->settingsService->getSettings()->getValidatorNumber();
         $enoughValidator = $this->validationService->checkNumberOfValidator($request, $neededValidator);
 
         $form->handleRequest($request);

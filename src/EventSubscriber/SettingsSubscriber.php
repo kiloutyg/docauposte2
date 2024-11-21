@@ -11,18 +11,18 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse; // we need to return a response
 use Symfony\Component\Routing\RouterInterface;
 
-use App\Service\CacheService; // Or use SettingsRepository
+use App\Service\SettingsService;
 
 class SettingsSubscriber implements EventSubscriberInterface
 {
-    private $cacheService;
+    private $settingsService;
     private $router;
 
     public function __construct(
-        CacheService $cacheService,
         RouterInterface $router,
+        SettingsService $settingsService,
     ) {
-        $this->cacheService = $cacheService;
+        $this->settingsService = $settingsService;
         $this->router = $router;
     }
 
@@ -38,9 +38,8 @@ class SettingsSubscriber implements EventSubscriberInterface
 
         // Check if the controller is an instance of ValidationController
         if ($controller instanceof \App\Controller\ValidationController) {
-            $settings = $this->cacheService->settings;
 
-            if (!$settings || !$settings->isUploadValidation()) {
+            if (!$this->settingsService->getSettings() || !$this->settingsService->getSettings()->isUploadValidation()) {
                 // Get the request
                 $request = $controllerEvent->getRequest();
 
@@ -58,9 +57,8 @@ class SettingsSubscriber implements EventSubscriberInterface
 
         // Check if the controller is an instance of TrainingRecordController
         if ($controller instanceof \App\Controller\TrainingRecordController) {
-            $settings = $this->cacheService->settings;
 
-            if (!$settings || !$settings->IsTraining()) {
+            if (!$this->settingsService->getSettings() || !$this->settingsService->getSettings()->IsTraining()) {
                 // Get the request
                 $request = $controllerEvent->getRequest();
 
@@ -78,9 +76,8 @@ class SettingsSubscriber implements EventSubscriberInterface
 
         // Check if the controller is an instance of OperatorController
         if ($controller instanceof \App\Controller\OperatorController) {
-            $settings = $this->cacheService->settings;
 
-            if (!$settings || !$settings->IsTraining()) {
+            if (!$this->settingsService->getSettings() || !$this->settingsService->getSettings()->IsTraining()) {
                 // Get the request
                 $request = $controllerEvent->getRequest();
 

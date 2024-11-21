@@ -43,27 +43,21 @@
 				{{zone.name|split('.')|first|upper}}
 				:
 			</h3>
-			{% set matchingProductLines = [] %}
-			{% for productLine in productLines %}
-				{% if productLine.zone.id is same as(zone.id)  %}
-					{% set matchingProductLines = matchingProductLines|merge([productLine]) %}
-				{% endif %}
-			{% endfor %}
 		</div>
 
 		<div
 			class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
-			{% if matchingProductLines|length > 0 %}
+			{% if productLines|length > 0 %}
 				<div
 					class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 
-					{% for productLine in matchingProductLines %}
+					{% for productLine in productLines %}
 						<a
 							class="btn btn-primary btn-lg m-5"
 							role="button"
 							aria-pressed="true"
 							style="color:white"
-							href="{{path('app_productline', {productlineId: productLine.id, zoneId: productLine.zone.id,} )}}">
+							href="{{path('app_productLine', {productLineId: productLine.id} )}}">
 							<span
 								class="line-details text-justify">
 								{{ productLine.name|split('.')|first|upper }}

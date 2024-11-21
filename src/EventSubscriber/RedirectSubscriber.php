@@ -9,60 +9,50 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 use Symfony\Component\Routing\RouterInterface;
 
-use Symfony\Contracts\Cache\CacheInterface;
-
 use Symfony\Bundle\SecurityBundle\Security;
 
-use App\Controller\BaseController;
-
-use App\Repository\ApprobationRepository;
 use App\Repository\UserRepository;
 use App\Repository\UploadRepository;
 
-use App\Service\CacheService;
+use App\Service\SettingsService;
 
 
 class RedirectSubscriber implements EventSubscriberInterface
 {
     private $router;
 
-    private $cache;
 
     private $security;
 
-    private $approbationRepository;
     private $userRepository;
     private $uploadRepository;
-    private $cacheService;
+    private $settingsService;
+    private $settings;
 
     public function __construct(
         RouterInterface $router,
 
-        CacheInterface $cache,
-        
         Security $security,
 
-        ApprobationRepository $approbationRepository,
         UserRepository $userRepository,
         UploadRepository $uploadRepository,
-        CacheService $cacheService
+        SettingsService $settingsService
     ) {
         $this->router = $router;
 
-        $this->cache = $cache;
-        
+
         $this->security = $security;
 
-        $this->approbationRepository = $approbationRepository;
         $this->userRepository = $userRepository;
         $this->uploadRepository = $uploadRepository;
-        $this->cacheService = $cacheService;
+        $this->settingsService = $settingsService;
     }
-    
+
     public function approbationOnKernelRequest(RequestEvent $event): void
     {
 
-        if (!$this->cacheService->settings->isUploadValidation()) { 
+
+        if (!$this->settingsService->getSettings()->isUploadValidation()) {
             return;
         }
 
@@ -109,7 +99,7 @@ class RedirectSubscriber implements EventSubscriberInterface
 
     public function reviseApprobationOnKernelRequest(RequestEvent $event): void
     {
-        if (!$this->cacheService->settings->isUploadValidation()) { 
+        if (!$this->settingsService->getSettings()->isUploadValidation()) {
             return;
         }
 

@@ -3,16 +3,66 @@
 namespace App\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
+
 use Symfony\Component\Routing\Annotation\Route;
 
+use App\Service\EntityFetchingService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use \Psr\Log\LoggerInterface;
 
+use Doctrine\ORM\EntityManagerInterface;
 
+use App\Repository\UserRepository;
+use App\Repository\ValidationRepository;
 
-class MailerController extends FrontController
+use App\Service\MailerService;
 
+class MailerController extends AbstractController
 {
+
+    private $em;
+    private $logger;
+
+    // Repository methods
+    private $validationRepository;
+    private $userRepository;
+
+
+    // Services methods
+    private $mailerService;
+    private $entityFetchingService;
+
+
+
+
+    public function __construct(
+
+        EntityManagerInterface          $em,
+        LoggerInterface                 $logger,
+
+        // Repository methods
+        ValidationRepository            $validationRepository,
+        UserRepository                  $userRepository,
+
+
+        // Services methods
+        MailerService                   $mailerService,
+        EntityFetchingService           $entityFetchingService,
+
+    ) {
+        $this->em                           = $em;
+        $this->logger                       = $logger;
+
+        // Variables related to the repositories
+        $this->validationRepository         = $validationRepository;
+        $this->userRepository               = $userRepository;
+
+        // Variables related to the services
+        $this->mailerService                = $mailerService;
+        $this->entityFetchingService        = $entityFetchingService;
+    }
+
+
     #[Route('/mail/testmail', name: 'testmail')]
     public function testMail(): Response
     {
@@ -32,7 +82,7 @@ class MailerController extends FrontController
         $usersUpdated = [];
         $htmlContent = "<h1>Email Address Updates</h1>"; // Start your HTML content
 
-        foreach ($this->userRepository->findAll() as $user) {
+        foreach ($this->entityFetchingService->getUsers() as $user) {
             $username = $user->getUsername();
             // $this->logger->info('username: ' . $username);
             $newEmail = "{$username}@opmobility.com";
@@ -90,7 +140,7 @@ class MailerController extends FrontController
         $usersUpdated = [];
         $htmlContent = "<h1>Email Address Updates</h1>"; // Start your HTML content
 
-        foreach ($this->userRepository->findAll() as $user) {
+        foreach ($this->entityFetchingService->getUsers() as $user) {
             $username = $user->getUsername();
             // $this->logger->info('username: ' . $username);
             $newEmail = "florian.dkhissi+{$username}@opmobility.com";

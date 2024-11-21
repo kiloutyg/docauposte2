@@ -14,7 +14,7 @@
 	<form
 		class="form col-sm-10 col-md-9 col-lg-8 mx-auto"
 		method="post"
-		action="{{path('app_modify_account', {userId: user.id})}}">
+		action="{{path('app_account_modify_account', {userId: user.id})}}">
 
 	{% else %}
 		<h3
@@ -27,7 +27,7 @@
 		<form
 			class="form col-sm-10 col-md-9 col-lg-8 mx-auto"
 			method="POST"
-			action="{{ path('app_super_admin_create_admin') }}">
+			action="{{ path('app_account_create') }}">
 		{% endif %}
 
 		{% if error is defined %}
@@ -143,7 +143,7 @@
 					<form
 						class="form col-sm-10 col-md-9 col-lg-8 mx-auto d-flex"
 						method="post"
-						action="{{path('app_transfer_work', {userId: user.id})}}">
+						action="{{path('app_account_transfer_work', {userId: user.id})}}">
 
 						<select
 							name="work-transfer-recipient"
@@ -174,17 +174,17 @@
 					</form>
 				{% else %}
 					<a
-						href="{{path('app_delete_account', {userId: user.id})}}" class="col-4 mx-auto btn btn-danger definitively-delete-user">
+						href="{{path('app_account_delete_account', {userId: user.id})}}" class="col-4 mx-auto btn btn-danger definitively-delete-user">
 						Supprimer definitivement
 					</a>
 					<a
-						href="{{path('app_unblock_account', {userId: user.id})}}" class="col-4 mx-auto btn btn-success unblock-user">
+						href="{{path('app_account_unblock_account', {userId: user.id})}}" class="col-4 mx-auto btn btn-success unblock-user">
 						Debloquer le compte
 					</a>
 				{% endif %}
 			{% else %}
 				<a
-					href="{{path('app_delete_account_basic', {userId: user.id})}}" class="col-4 mx-auto btn btn-danger delete-user">
+					href="{{path('app_account_delete_account_basic', {userId: user.id})}}" class="col-4 mx-auto btn btn-danger delete-user">
 					Supprimer (Bloquer le compte)
 				</a>
 			{% endif %}

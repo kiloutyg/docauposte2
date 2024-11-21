@@ -8,13 +8,8 @@
 {% block body %}
 	<div
 		class="container">
-		{% set matchinUploads = [] %}
-		{% for upload in uploads %}
-			{% if upload.button.id is same as(button.id)  %}
-				{% set matchinUploads = matchinUploads|merge([upload]) %}
-			{% endif %}
-		{% endfor %}
-		{% if matchinUploads|length > 1 %}
+		{% if uploads|length > 1 %}
+
 			<div>
 				<div
 					class="justify-content-between align-items-center ">
@@ -27,7 +22,9 @@
 					{% include 'services/uploads/uploaded.html.twig' %}
 				</div>
 			</div>
-		{% elseif matchinUploads|length < 1 %}
+			{# {% elseif matchinUploads|length < 1 %} #}
+		{% elseif uploads|length < 1 %}
+
 			<div
 				class="justify-content-between align-items-center ">
 				<h2>

@@ -122,7 +122,7 @@ class EntityDeletionService
             case 'zone':
                 $repository = $this->zoneRepository;
                 break;
-            case 'productline':
+            case 'productLine':
                 $repository = $this->productLineRepository;
                 break;
             case 'category':
@@ -177,16 +177,15 @@ class EntityDeletionService
         if (!$entity) {
             return false;
         }
-        $this->logger->info('to be deleted entity details: ' , [$entity]);
+        $this->logger->info('to be deleted entity details: ', [$entity]);
 
         // Deletion logic for related entities, folder and files
         if ($entityType === 'zone') {
             foreach ($entity->getProductLines() as $productLine) {
-                $this->deleteEntity('productline', $productLine->getId());
+                $this->deleteEntity('productLine', $productLine->getId());
             }
             $this->folderCreationService->deleteFolderStructure($entity->getName());
-        } elseif ($entityType === 'productline') {
-
+        } elseif ($entityType === 'productLine') {
             foreach ($entity->getCategories() as $category) {
                 $this->deleteEntity('category', $category->getId());
             }
@@ -228,12 +227,12 @@ class EntityDeletionService
             foreach ($entity->getTrainingRecords() as $trainingRecord) {
                 $this->deleteEntity('trainingRecord', $trainingRecord->getId());
             }
-            if ($entity->isIsTrainer()){
+            if ($entity->isIsTrainer()) {
                 $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $entity]);
-                $this->logger->info('trainerEntity details: ' , [$trainerEntity]);
-                $this->logger->info('trainerEntity trainingRecords: ' , [$trainerEntity->getTrainingRecords()]);
-                
-                if (!$trainerEntity->getTrainingRecords()->isEmpty()){
+                $this->logger->info('trainerEntity details: ', [$trainerEntity]);
+                $this->logger->info('trainerEntity trainingRecords: ', [$trainerEntity->getTrainingRecords()]);
+
+                if (!$trainerEntity->getTrainingRecords()->isEmpty()) {
                     $entity->setToBeDeleted(new \DateTime('now'));
                     $this->em->persist($entity);
                     $this->em->flush();
@@ -245,8 +244,8 @@ class EntityDeletionService
         } elseif ($entityType === 'trainingRecord') {
             $trainer = $entity->getTrainer();
             $trainer->removeTrainingRecord($entity);
-        } elseif ($entityType === 'trainer'){
-            if (!$entity->getTrainingRecords()->isEmpty()){
+        } elseif ($entityType === 'trainer') {
+            if (!$entity->getTrainingRecords()->isEmpty()) {
                 return false;
             } else {
                 $entity->getOperator()->setIsTrainer(false);
@@ -265,8 +264,8 @@ class EntityDeletionService
                 $operator->setUap($unDefinedUap);
                 $this->em->persist($operator);
             }
-        } 
-        $this->logger->info('deleted entity details: ' , [$entity]);
+        }
+        $this->logger->info('deleted entity details: ', [$entity]);
         $this->em->remove($entity);
         $this->em->flush();
 

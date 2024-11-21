@@ -2,20 +2,39 @@
 
 namespace App\Controller;
 
-use Doctrine\ORM\Mapping\Entity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Controller\FrontController;
 
-class ViewsModificationController extends FrontController
+use App\Service\ViewsModificationService;
+use App\Service\EntityFetchingService;
+
+class ViewsModificationController extends AbstractController
 {
+    private $viewsModificationService;
+    private $entityFetchingService;
+
+    public function __construct(
+        ViewsModificationService $viewsModificationService,
+        EntityFetchingService $entityFetchingService,
+    ) {
+        $this->viewsModificationService = $viewsModificationService;
+        $this->entityFetchingService = $entityFetchingService;
+    }
+
+
     #[Route('/view/viewmod/base', name: 'app_base_views_modification')]
     public function baseViewModificationPageView(): Response
     {
-
-        return $this->render('services/views_modification/base_views_modification.html.twig');
+        return $this->render(
+            'services/views_modification/base_views_modification.html.twig',
+            [
+                'zones' => $this->entityFetchingService->getZones(),
+                'users' => $this->entityFetchingService->getUsers()
+            ]
+        );
     }
 
     #[Route('/view/viewmod/modifying', name: 'app_views_modification')]

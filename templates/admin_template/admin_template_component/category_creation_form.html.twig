@@ -32,7 +32,7 @@
 							class="row">
 							<form
 								method="POST"
-								action="{{ path('app_productline_admin_create_category', {productlineId: productLine.id}) }}">
+								action="{{ path('app_productLine_admin_create_category', {productLineId: productLine.id}) }}">
 
 								<div
 									class="card border-0 shadow rounded-3 my-5  bg-secondary">
@@ -103,7 +103,7 @@
 															</a>
 															{% if is_granted ('ROLE_LINE_ADMIN') or app.user is same as( category.creator) %}
 																<a
-																	href="{{path('app_productline_admin_delete_category', {categoryId: category.id})}}" class="btn btn-danger delete-category">
+																	href="{{path('app_productLine_admin_delete_category', {categoryId: category.id})}}" class="btn btn-danger delete-category">
 																	Supprimer
 																</a>
 															{% endif %}

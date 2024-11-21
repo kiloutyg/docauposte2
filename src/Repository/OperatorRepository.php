@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Operator;
 
-use App\Repository\SettingsRepository;
+use App\Service\SettingsService;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -25,20 +25,19 @@ class OperatorRepository extends ServiceEntityRepository
 {
     private $logger;
     private $em;
-    private $settingsRepository;
+    private $settingsService;
     private $settings;
 
     public function __construct(
         ManagerRegistry $registry,
         LoggerInterface $logger,
         EntityManagerInterface $em,
-        SettingsRepository $settingsRepository,
+        SettingsService $settingsService,
     ) {
         parent::__construct($registry, Operator::class);
         $this->logger               = $logger;
         $this->em                   = $em;
-        $this->settingsRepository   = $settingsRepository;
-        $this->settings             = $this->settingsRepository->getSettings();
+        $this->settingsService      = $settingsService;
     }
 
 
@@ -258,7 +257,7 @@ class OperatorRepository extends ServiceEntityRepository
     {
         // $this->logger->info('Finding operators with no recent training.');
         # Related to Settings -> OperatorRetrainingDelay
-        $operatorRetrainingDateInterval = $this->settings->getOperatorRetrainingDelay();
+        $operatorRetrainingDateInterval = $this->settingsService->getSettings()->getOperatorRetrainingDelay();
         $retrainingDelay = new \DateTime('now');
         $retrainingDelay->sub($operatorRetrainingDateInterval);
 
@@ -284,7 +283,7 @@ class OperatorRepository extends ServiceEntityRepository
     {
         // $this->logger->info('Finding operators with no recent training.');
         # Related to Settings -> OperatorInactivityDelay
-        $operatorInactivityDateInterval = $this->settings->getOperatorInactivityDelay();
+        $operatorInactivityDateInterval = $this->settingsService->getSettings()->getOperatorInactivityDelay();
         $inactiveDelay = new \DateTime('now');
         $inactiveDelay->sub($operatorInactivityDateInterval);
 
@@ -305,7 +304,7 @@ class OperatorRepository extends ServiceEntityRepository
     {
         // $this->logger->info('Finding operators with no recent training.');
         # Related to Settings -> OperatorInactivityDelay
-        $operatorInactivityDateInterval = $this->settings->getOperatorInactivityDelay();
+        $operatorInactivityDateInterval = $this->settingsService->getSettings()->getOperatorInactivityDelay();
         $inactiveDelay = new \DateTime('now');
         $inactiveDelay->sub($operatorInactivityDateInterval);
 
@@ -326,7 +325,7 @@ class OperatorRepository extends ServiceEntityRepository
     {
         // $this->logger->info('Finding operators to be deleted.');
         # Related to Settings -> OperatorAutoDeleteDelay
-        $operatorAutoDeleteDateInterval = $this->settings->getOperatorAutoDeleteDelay();
+        $operatorAutoDeleteDateInterval = $this->settingsService->getSettings()->getOperatorAutoDeleteDelay();
         $autoDeleteDelay = new \DateTime();
         $autoDeleteDelay->sub($operatorAutoDeleteDateInterval);
 

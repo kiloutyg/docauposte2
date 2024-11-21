@@ -2,44 +2,92 @@
 
 namespace App\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 use App\Entity\Zone;
 
+use App\Repository\ZoneRepository;
+
+use App\Service\EntityFetchingService;
+use App\Service\TrainingRecordService;
+use App\Service\IncidentService;
+use App\Service\EntityDeletionService;
+use App\Service\UploadService;
+use App\Service\FolderCreationService;
 
 // This controller is responsible for rendering the super admin interface an managing the logic of the super admin interface
-class SuperAdminController extends FrontController
+class SuperAdminController extends AbstractController
 {
+    private $projectDir;
+    private $public_dir;
+    private $em;
+
+    private $zoneRepository;
+
+    private $entityFetchingService;
+    private $trainingRecordService;
+    private $folderCreationService;
+    private $entitydeletionService;
+    private $incidentService;
+    private $uploadService;
+
+    public function __construct(
+
+        EntityManagerInterface          $em,
+        ParameterBagInterface           $params,
+
+        ZoneRepository                  $zoneRepository,
+
+        EntityFetchingService           $entityFetchingService,
+        TrainingRecordService           $trainingRecordService,
+        UploadService                   $uploadService,
+        EntityDeletionService           $entitydeletionService,
+        FolderCreationService           $folderCreationService,
+        IncidentService                 $incidentService,
+
+    ) {
+        $this->em                           = $em;
+        $this->projectDir                   = $params->get('kernel.project_dir');
+        $this->public_dir                   = $this->projectDir . '/public';
+
+        $this->zoneRepository               = $zoneRepository;
+
+        $this->uploadService                = $uploadService;
+        $this->folderCreationService        = $folderCreationService;
+        $this->incidentService              = $incidentService;
+        $this->entitydeletionService        = $entitydeletionService;
+        $this->trainingRecordService        = $trainingRecordService;
+        $this->entityFetchingService        = $entityFetchingService;
+    }
 
     // This function is responsible for rendering the super admin interface
     #[Route('/super_admin', name: 'app_super_admin')]
-    public function index(): Response
+    public function superAdmin(): Response
     {
-
         $pageLevel = 'super';
 
-        $incidents = $this->cacheService->incidents;
+        $incidents = $this->entityFetchingService->getIncidents();
 
-        $uploads = $this->cacheService->uploads;
+        $uploads = $this->entityFetchingService->getAllWithAssociations();
 
-        // Group the uploads and incidents by parent entity
-        $groupedUploads = $this->uploadService->groupUploads($uploads);
-        $groupedValidatedUploads = $this->uploadService->groupValidatedUploads($uploads);
+        $uploadsArray = $this->uploadService->groupAllUploads($uploads);
+        $groupedUploads = $uploadsArray[0];
+        $groupedValidatedUploads = $uploadsArray[1];
+
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
-
-        // Get the error and last username using AuthenticationUtils
-
 
         return $this->render('admin_template/admin_index.html.twig', [
             'pageLevel'                 => $pageLevel,
             'groupedUploads'            => $groupedUploads,
             'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'            => $groupIncidents,
-
+            'zones'                     => $this->entityFetchingService->getZones(),
         ]);
     }
 
@@ -47,28 +95,6 @@ class SuperAdminController extends FrontController
 
 
 
-
-    // Creation of new user account destined to the super admin
-    #[Route('/super_admin/create_admin', name: 'app_super_admin_create_admin')]
-    public function createAdmin(Request $request): Response
-    {
-        $error = null;
-        try {
-            $result = $this->accountService->createAccount($request);
-            if ($result) {
-                $this->addFlash('success', 'Le compte a bien été créé.');
-            }
-        } catch (\Exception $e) {
-            // Catch and handle the exception.
-            // Log it, add a flash message, etc.
-            $error = $e->getMessage();
-            $this->addFlash('danger', $error);
-        }
-
-        return $this->redirectToRoute('app_super_admin', [
-            'error'         => $error
-        ]);
-    }
 
     // Zone creation logic destined to the super admin, it also creates the folder structure for the zone
     #[Route('/super_admin/create_zone', name: 'app_super_admin_create_zone')]
@@ -113,8 +139,8 @@ class SuperAdminController extends FrontController
         $entityType = 'zone';
 
         $entity = $this->zoneRepository->findOneBy(['id' => $zoneId]);
-        
-        if (empty($entity)){
+
+        if (empty($entity)) {
             return $this->redirectToRoute('app_super_admin');
         };
 

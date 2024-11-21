@@ -267,19 +267,19 @@ _______________________________________________
                 - app_delete_file
                 - app_modify_file
                     - api_cascading_dropdown_data
-        - app_productline : 
+        - app_productLine : 
             - [/templates/productline.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/productline.html.twig)
         - app_mandatory_incident : 
             - [/templates/services/incidents/incidents_view.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incidents/incidents_view.html.twig)
-            - app_productline_admin : 
+            - app_productLine_admin : 
                 - [/templates/productline_admin/productline_admin.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/productline_admin/productline_admin.html.twig)
-                - app_productline_admin_create_manager
+                - app_productLine_admin_create_manager
                     - app_modify_account_view
                         - app_modify_account
                     - app_delete_account
-                - app_productline_admin_create_category : 
+                - app_productLine_admin_create_category : 
                     - [/templates/productline_admin/productline_admin.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/productline_admin/productline_admin.html.twig)
-                - app_productline_admin_delete_category :
+                - app_productLine_admin_delete_category :
                     - [/templates/productline_admin/productline_admin.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/productline_admin/productline_admin.html.twig)
                 - app_generic_upload_files
                         - api_cascading_dropdown_data
@@ -353,7 +353,7 @@ The method resides in each of the Controller managing the mother page :
         - [/src/Controller/SuperAdminController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/SuperAdminController.php)
         - app_zone_admin_create_line_admin :
             - [/src/Controller/ZoneAdminController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/ZoneAdminController.php)
-            - app_productline_admin_create_manager :
+            - app_productLine_admin_create_manager :
                 - [/src/Controller/ProductLineAdminController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/ProductLineAdminController.php)
                 - app_category_admin_create_user :
                     - [/src/Controller/CategoryAdminController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/CategoryAdminController.php)
@@ -388,7 +388,7 @@ The method resides in each of the Controller managing the mother page :
     - [/src/Controller/SuperAdminController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/SuperAdminController.php)
     - app_zone_admin_create_productline - app_zone_admin_delete_productline : 
         - [/src/Controller/ZoneAdminController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/ZoneAdminController.php)
-        - app_productline_admin_create_category - app_productline_admin_delete_category :
+        - app_productLine_admin_create_category - app_productLine_admin_delete_category :
             - [/src/Controller/ProductLineAdminController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/ProductLineAdminController.php)
             - app_category_admin_create_button - app_category_admin_delete_button : 
                 - [/src/Controller/CategoryAdminController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/CategoryAdminController.php)

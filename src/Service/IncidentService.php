@@ -17,8 +17,7 @@ use App\Entity\Incident;
 use App\Entity\User;
 
 use App\Service\FolderCreationService;
-use App\Service\CacheService;
-
+use Doctrine\Common\Collections\ArrayCollection;
 
 // This class is responsible for the logic of managing the incidents files
 class IncidentService extends AbstractController
@@ -31,7 +30,6 @@ class IncidentService extends AbstractController
     protected $productlineRepository;
     protected $folderCreationService;
     protected $incidentCategoryRepository;
-    protected $cacheService;
 
 
     public function __construct(
@@ -42,7 +40,6 @@ class IncidentService extends AbstractController
         IncidentRepository $incidentRepository,
         LoggerInterface $logger,
         IncidentCategoryRepository $incidentCategoryRepository,
-        CacheService $cacheService
     ) {
         $this->incidentRepository = $incidentRepository;
         $this->manager = $manager;
@@ -51,9 +48,9 @@ class IncidentService extends AbstractController
         $this->productlineRepository = $productlineRepository;
         $this->folderCreationService = $folderCreationService;
         $this->incidentCategoryRepository = $incidentCategoryRepository;
-        $this->cacheService = $cacheService;
     }
 
+    
     // This function is responsible for the logic of uploading the incidents files
     public function uploadIncidentFiles(Request $request, $productline,  $IncidentCategoryId, User $user, $newName = null)
     {
@@ -220,10 +217,8 @@ class IncidentService extends AbstractController
         // Group incidents by zone, productLine, category, and productline
         foreach ($incidents as $incident) {
             $productLine = $incident->getProductLine();
-            $productLine = $this->cacheService->getEntityById('productLine', $productLine->getId());
             $productLineName = $productLine->getName();
             $zone = $productLine->getZone();
-            $zone = $this->cacheService->getEntityById('zone', $zone->getId());
             $zoneName = $zone->getName();
 
             if (!isset($groupedincidents[$zoneName])) {

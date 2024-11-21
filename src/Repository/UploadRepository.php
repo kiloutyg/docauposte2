@@ -40,7 +40,83 @@ class UploadRepository extends BaseRepository
         }
     }
 
+    public function getNonValidatedUploads()
+    {
+        $nonValidatedUploads = $this->createQueryBuilder('u')
+            ->leftJoin('u.validation', 'v')
+            ->where('v.id IS NULL')
+            ->getQuery()
+            ->getResult();
 
+        return $nonValidatedUploads;
+    }
+
+    public function getValidatedUploads()
+    {
+        $validatedUploads = $this->createQueryBuilder('u')
+            ->leftJoin('u.validation', 'v')
+            ->where('v.id IS NOT NULL')
+            ->getQuery()
+            ->getResult();
+
+        return $validatedUploads;
+    }
+
+    public function findAllWithAssociations()
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.button', 'b')
+            ->addSelect('b')
+            ->leftJoin('b.Category', 'c')
+            ->addSelect('c')
+            ->leftJoin('c.ProductLine', 'p')
+            ->addSelect('p')
+            ->leftJoin('p.zone', 'z')
+            ->addSelect('z')
+            ->leftJoin('u.validation', 'v')
+            ->addSelect('v')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllWithAssociationsProductLine()
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.button', 'b')
+            ->addSelect('b')
+            ->leftJoin('b.Category', 'c')
+            ->addSelect('c')
+            ->leftJoin('c.ProductLine', 'p')
+            ->addSelect('p')
+            ->leftJoin('u.validation', 'v')
+            ->addSelect('v')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllWithAssociationsCategory()
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.button', 'b')
+            ->addSelect('b')
+            ->leftJoin('b.Category', 'c')
+            ->addSelect('c')
+            ->leftJoin('u.validation', 'v')
+            ->addSelect('v')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllWithAssociationsButton()
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.button', 'b')
+            ->addSelect('b')
+            ->leftJoin('u.validation', 'v')
+            ->addSelect('v')
+            ->getQuery()
+            ->getResult();
+    }
     //    /**
     //     * @return Upload[] Returns an array of Upload objects
     //     */
