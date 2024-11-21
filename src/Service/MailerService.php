@@ -18,6 +18,8 @@ use App\Entity\Approbation;
 
 use App\Repository\ApprobationRepository;
 use App\Repository\UserRepository;
+use App\Repository\DepartmentRepository;
+use App\Repository\ValidationRepository;
 
 class MailerService extends AbstractController
 {
@@ -28,6 +30,8 @@ class MailerService extends AbstractController
 
     private $userRepository;
     private $approbationRepository;
+    private $departmentRepository;
+    private $validationRepository;
 
 
     public function __construct(
@@ -35,7 +39,9 @@ class MailerService extends AbstractController
         string $senderEmail,
         LoggerInterface $logger,
         UserRepository $userRepository,
-        ApprobationRepository $approbationRepository
+        ApprobationRepository $approbationRepository,
+        ValidationRepository $validationRepository,
+        DepartmentRepository $departmentRepository,
     ) {
         $this->mailer                   = $mailer;
         $this->senderEmail              = $senderEmail;
@@ -43,6 +49,8 @@ class MailerService extends AbstractController
 
         $this->userRepository           = $userRepository;
         $this->approbationRepository   = $approbationRepository;
+        $this->departmentRepository     = $departmentRepository;
+        $this->validationRepository     = $validationRepository;
     }
 
     public function approbationEmail(Validation $validation)
@@ -283,6 +291,37 @@ class MailerService extends AbstractController
             ->context([
                 'uploads'                    => $uploads,
                 'uploaders'                  => $uploaders
+            ]);
+
+        try {
+            $this->mailer->send($email);
+            return true;
+        } catch (TransportExceptionInterface $e) {
+            return false;
+        }
+    }
+
+
+    public function monthlyQualityResume()
+    {
+        $validations = $this->validationRepository->findAll(['Status' => true]);
+        $uploads = [];
+        foreach ($validations as $validation) {
+            $uploads[] = $validation->getUpload();
+        }
+
+        $users = $this->departmentRepository->findOneBy(['name' => 'QUALITY'])->getUsers();
+
+        foreach ($users as $user) {
+            $emailRecipientsAddresses[] = $user->getEmailAddress();
+        }
+        $email = (new TemplatedEmail())
+            ->from($this->senderEmail)
+            ->to(...$emailRecipientsAddresses)
+            ->subject('Docauposte - Rappel de toutes les actions en cours.')
+            ->htmlTemplate('services/email_templates/reminderEmailToAll.html.twig')
+            ->context([
+                'uploads'                    => $uploads
             ]);
 
         try {

@@ -166,7 +166,6 @@ class FrontController extends AbstractController
             'base.html.twig',
             [
                 'zones'                 => $this->entityFetchingService->getZones(),
-
             ]
         );
     }

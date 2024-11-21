@@ -448,6 +448,9 @@ class ValidationService extends AbstractController
         }
     }
 
+
+
+
     public function remindCheck(array $users)
     {
         $today = new \DateTime();
@@ -505,7 +508,6 @@ class ValidationService extends AbstractController
                         $uploadsRefused[] = $upload;
                     }
                 }
-
                 if (count($uploadsRefused) > 0) {
                     foreach ($uploadsRefused as $upload) {
                         $uploaderId = $upload->getUploader()->getId();
@@ -513,7 +515,6 @@ class ValidationService extends AbstractController
                     }
                 }
             }
-
 
             if ($return) {
                 $fileWriting = file_put_contents($filePath, $today->format('Y-m-d'));
@@ -527,7 +528,31 @@ class ValidationService extends AbstractController
                 $this->mailerService->sendReminderEmailToAllUsers($uploadsWaitingValidationRaw);
             }
         }
+
+        if (file_exists($filePath)) {
+            $dateString = trim(file_get_contents($filePath));
+            // $this->logger->info('date string' . $dateString);
+
+            $dateFromFile = \DateTime::createFromFormat('Y-m-d', $dateString);
+            // $this->logger->info('dateFromFile', [$dateFromFile]);
+
+            $fileMonth = $dateFromFile->format('m');
+            // $this->logger->info('fileMonth', [$fileMonth]);
+
+            $todayMonth = $today->format('m');
+            // $this->logger->info('todayMonth', [$todayMonth]);
+
+            if ($fileMonth != $todayMonth) {
+                $user = $this->userRepository->findOneBy(['username' => 'florian.dkhissi']);
+                $subject = 'TEST EMAIL FOR QUALITY STAFF';
+                $html = " <h1> <strong> TEST EMAIL</strong></h1>";
+                $this->mailerService->sendEmail($user, $subject, $html);
+            }
+        }
     }
+
+
+
 
     public function checkNumberOfValidator(Request $request, Int $neededValidator): bool
     {
