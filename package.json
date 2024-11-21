@@ -22,7 +22,6 @@
         "axios": "^1.7.7",
         "bootstrap": "^5.3.3",
         "core-js": "^3.39.0",
-        "encore": "^0.0.30-beta",
         "favicon": "^0.0.2",
         "jquery": "^3.7.1",
         "node-sass": "^9.0.0",
