@@ -1,8 +1,8 @@
 # config/packages/cache.yaml
-# framework:
-#     cache:
-#         app: cache.adapter.filesystem
-#         system: cache.adapter.system
+framework:
+    cache:
+        app: cache.adapter.filesystem
+        system: cache.adapter.system
         # Unique name of your app: used to compute stable namespaces for cache keys.
         # prefix_seed: your_vendor_name/app_name
         # prefix_seed: 'docauposte'
@@ -20,4 +20,4 @@
 
         # Namespaced pools use the above "app" backend by default
         #pools:
-            #my.dedicated.cache: null
+        #my.dedicated.cache: null
