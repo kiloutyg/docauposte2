@@ -15,6 +15,26 @@ export default class OperatorTrainerController extends Controller {
 
     ];
 
+    connect() {
+
+        this.trainerOperatorLoginCheck();
+    }
+
+    async trainerOperatorLoginCheck() {
+        console.log('trainerOperatorLoginCheck method called on page load');
+        try {
+            const response = await axios.post('/docauposte/operator/user_login_check');
+            console.log('entire axios response for trainerOperatorLoginCheck:', response.data);
+            if (response.data.found) {
+                this.trainerAuthenticated(response);
+            } else {
+                console.error('No user connected or User not found as a trainer');
+            }
+        } catch (error) {
+            console.error('error in axios request', error); // Log out the actual error
+
+        }
+    }
 
 
     validateTrainerOperatorName() {
