@@ -41,6 +41,7 @@ use App\Repository\TeamRepository;
 use App\Repository\OperatorRepository;
 use App\Repository\TrainingRecordRepository;
 use App\Repository\TrainerRepository;
+use App\Repository\UserRepository;
 
 use App\Service\EntityDeletionService;
 use App\Service\EntityFetchingService;
@@ -65,7 +66,7 @@ class OperatorController extends AbstractController
     private $operatorRepository;
     private $trainingRecordRepository;
     private $trainerRepository;
-
+    private $userRepository;
 
     // Services methods
     private $entitydeletionService;
@@ -91,6 +92,7 @@ class OperatorController extends AbstractController
         OperatorRepository              $operatorRepository,
         TrainingRecordRepository        $trainingRecordRepository,
         TrainerRepository               $trainerRepository,
+        UserRepository                  $userRepository,
 
         // Services classes
         EntityDeletionService           $entitydeletionService,
@@ -115,6 +117,7 @@ class OperatorController extends AbstractController
         $this->operatorRepository           = $operatorRepository;
         $this->trainingRecordRepository     = $trainingRecordRepository;
         $this->trainerRepository            = $trainerRepository;
+        $this->userRepository               = $userRepository;
 
         // Variables related to the services
         $this->entitydeletionService        = $entitydeletionService;
@@ -217,6 +220,7 @@ class OperatorController extends AbstractController
         if ($trainerBool == true) {
             $trainer = new Trainer();
             $trainer->setOperator($newOperator);
+            $trainer->setDemoted(false);
             $this->em->persist($trainer);
             $newOperator->setTrainer($trainer);
         } else if ($trainerBool != true) {
@@ -256,6 +260,7 @@ class OperatorController extends AbstractController
                 if ($operator->getTrainer() == null) {
                     $trainer = new Trainer();
                     $trainer->setOperator($operator);
+                    $trainer->setDemoted(false);
                     $operator->setTrainer($trainer);
                 } else {
                     $trainer = $operator->getTrainer();
@@ -671,7 +676,6 @@ class OperatorController extends AbstractController
                 // Flush changes for each operator
                 $this->em->flush();
                 $this->cache->delete('operators_list');
-
             }
         }
 
@@ -1089,7 +1093,7 @@ class OperatorController extends AbstractController
                     try {
                         $em->persist($operator);
                         $em->flush();
-                        
+
                         break; // Exit loop if successful
                     } catch (UniqueConstraintViolationException $e) {
                         // Modify the violating field and retry
@@ -1243,11 +1247,42 @@ class OperatorController extends AbstractController
             }
         } else if ($request->getMethod() == 'GET') {
             return $this->render('services/operators/team_uap_operator_management.html.twig', [
-                'teams' => $teams,
-                'uaps' => $uaps,
-                'teamForm' => $teamForm->createView(),
-                'uapForm' => $uapForm->createView()
+                'teams'     => $teams,
+                'uaps'      => $uaps,
+                'teamForm'  => $teamForm->createView(),
+                'uapForm'   => $uapForm->createView()
             ]);
         }
+    }
+
+
+
+    #[Route('/operator/user_login_check', name: 'app_operator_user_login_check')]
+    public function userLoginCheck(): JsonResponse
+    {
+        $currentUser = $this->getUser();
+        $this->logger->info('current user', [$currentUser]);
+        $this->logger->info('role granted', [$this->authChecker->isGranted('ROLE_MANAGER')]);
+        
+        if (!empty($currentUser) && $this->authChecker->isGranted('ROLE_MANAGER')) {
+            $user               = $this->userRepository->find($currentUser);
+            $this->logger->info(' user', [$user]);
+
+            $operator           = $this->operatorRepository->findOneBy(['name' => $user->getUsername()]);
+            $this->logger->info('operator', [$operator]);
+
+            if ($operator->isIsTrainer()) {
+                return new JsonResponse([
+                    'found'         => true,
+                    'name'          => $operator->getName(),
+                    'code'          => $operator->getCode(),
+                    'trainerId'     => $operator->getId(),
+                    'uploadTrainer' => true,
+                ]);
+            }
+        }
+        return new JsonResponse([
+            'found'         => false
+        ]);
     }
 }
