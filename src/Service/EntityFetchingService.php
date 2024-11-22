@@ -161,30 +161,16 @@ class EntityFetchingService extends AbstractController
     }
 
 
-    public function getNonValidatedUploads()
-    {
-        return $this->uploadRepository->getNonValidatedUploads();
-    }
-
-
     public function getValidations()
     {
         return $this->validationRepository->findAll();
     }
 
 
-    public function getValidatedUploads()
-    {
-
-        return $this->uploadRepository->getValidatedUploads();
-    }
-
 
     public function getAllValidatedUploadsWithAssociations()
     {
-        $uploads = $this->uploadRepository->findAllValidatedUploadsWithAssociationsAtDate();
-        $groupedValidatedUploads = $this->groupUploads($uploads);
-        return $groupedValidatedUploads;
+        return $this->groupUploads($this->uploadRepository->findAllValidatedUploadsWithAssociationsAtDate());;
     }
 
 
@@ -273,30 +259,7 @@ class EntityFetchingService extends AbstractController
             $ref[] = $upload;
             unset($ref);
         }
-        // $groupedValidatedUploads = [];
-        // foreach ($uploads as $upload) {
 
-
-        //     $zoneName        = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
-        //     $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
-        //     $categoryName    = $upload->getButton()->getCategory()->getName();
-        //     $buttonName      = $upload->getButton()->getname();
-
-        //     if (!isset($groupedValidatedUploads[$zoneName])) {
-        //         $groupedValidatedUploads[$zoneName] = [];
-        //     }
-        //     if (!isset($groupedValidatedUploads[$zoneName][$productLineName])) {
-        //         $groupedValidatedUploads[$zoneName][$productLineName] = [];
-        //     }
-        //     if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName])) {
-        //         $groupedValidatedUploads[$zoneName][$productLineName][$categoryName] = [];
-        //     }
-        //     if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
-        //         $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
-        //     }
-
-        //     $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
-        // }
         return $groupedValidatedUploads;
     }
 }

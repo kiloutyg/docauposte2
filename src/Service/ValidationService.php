@@ -33,7 +33,7 @@ class ValidationService extends AbstractController
 
     private   $mailerService;
 
-    private     $TrainingRecordService;
+    private     $trainingRecordService;
 
 
     public function __construct(
@@ -46,7 +46,7 @@ class ValidationService extends AbstractController
         ApprobationRepository           $approbationRepository,
 
         MailerService                   $mailerService,
-        TrainingRecordService           $TrainingRecordService,
+        TrainingRecordService           $trainingRecordService,
 
     ) {
         $this->logger                   = $logger;
@@ -58,7 +58,7 @@ class ValidationService extends AbstractController
         $this->approbationRepository    = $approbationRepository;
 
         $this->mailerService            = $mailerService;
-        $this->TrainingRecordService    = $TrainingRecordService;
+        $this->trainingRecordService    = $trainingRecordService;
     }
 
     public function createValidation(Upload $upload, Request $request)
@@ -185,7 +185,7 @@ class ValidationService extends AbstractController
         $this->mailerService->approbationEmail($validation);
         // $this->logger->info('forcedDisplay: ' . $upload->isForcedDisplay() . ' training-needed: ' . $request->request->get('training-needed') . ' display-needed: ' . $request->request->get('display-needed'));
         if ($request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
-            $this->TrainingRecordService->updateTrainingRecord($upload);
+            $this->trainingRecordService->updateTrainingRecord($upload);
         }
 
         // Return early
@@ -341,7 +341,7 @@ class ValidationService extends AbstractController
         // $this->logger->info('validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay());
         if ($validation->isStatus() === true && $upload->isForcedDisplay() === false) {
             $this->mailerService->sendApprovalEmail($validation);
-            $this->TrainingRecordService->updateTrainingRecord($upload);
+            $this->trainingRecordService->updateTrainingRecord($upload);
         } else if ($validation->isStatus() === true) {
             $this->mailerService->sendApprovalEmail($validation);
         }
@@ -416,7 +416,7 @@ class ValidationService extends AbstractController
         // // $this->logger->info('display-needed: ' . $request->request->get('display-needed') . ' training-needed: ' . $request->request->get('training-needed'));
 
         if ($request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
-            $this->TrainingRecordService->updateTrainingRecord($upload);
+            $this->trainingRecordService->updateTrainingRecord($upload);
         }
         // Return early
         return;
