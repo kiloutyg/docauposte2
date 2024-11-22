@@ -62,6 +62,47 @@ class UploadRepository extends BaseRepository
         return $validatedUploads;
     }
 
+
+    public function findAllValidatedUploadsWithAssociationsAtDate()
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.button', 'b')
+            ->addSelect('b')
+            ->leftJoin('b.Category', 'c')
+            ->addSelect('c')
+            ->leftJoin('c.ProductLine', 'p')
+            ->addSelect('p')
+            ->leftJoin('p.zone', 'z')
+            ->addSelect('z')
+            ->leftJoin('u.validation', 'v')
+            ->where('v.id IS NOT NULL')
+            ->andWhere('v.Status = 1')
+            ->addSelect('v')
+            ->getQuery()
+            ->getResult();
+    }
+
+
+    public function findAllValidatedUploadsWithAssociations()
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.button', 'b')
+            ->addSelect('b')
+            ->leftJoin('b.Category', 'c')
+            ->addSelect('c')
+            ->leftJoin('c.ProductLine', 'p')
+            ->addSelect('p')
+            ->leftJoin('p.zone', 'z')
+            ->addSelect('z')
+            ->leftJoin('u.validation', 'v')
+            ->where('v.id IS NOT NULL')
+            ->andWhere('v.Status IS TRUE')
+            ->addSelect('v')
+            ->getQuery()
+            ->getResult();
+    }
+
+
     public function findAllWithAssociations()
     {
         return $this->createQueryBuilder('u')

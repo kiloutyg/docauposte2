@@ -41,7 +41,7 @@ class ValidationController extends AbstractController
 
 
 
-    private function __construct(
+    public function __construct(
 
         // LoggerInterface                 $logger,
 

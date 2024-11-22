@@ -180,6 +180,46 @@ class EntityFetchingService extends AbstractController
     }
 
 
+    public function getAllValidatedUploadsWithAssociations()
+    {
+        // This function is responsible for the logic of grouping the uploads files by parent entities
+        $uploads = $this->uploadRepository->findAllValidatedUploadsWithAssociationsAtDate();
+
+        $groupedValidatedUploads = [];
+        // Group uploads by zone, productLine, category, and button
+        foreach ($uploads as $upload) {
+
+            // $this->logger->info('upload in groupAllUpload service', $upload);
+
+            $zoneName        = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
+            $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
+            $categoryName    = $upload->getButton()->getCategory()->getName();
+            $buttonName      = $upload->getButton()->getname();
+
+
+
+            if (!isset($groupedValidatedUploads[$zoneName])) {
+                $groupedValidatedUploads[$zoneName] = [];
+            }
+            if (!isset($groupedValidatedUploads[$zoneName][$productLineName])) {
+                $groupedValidatedUploads[$zoneName][$productLineName] = [];
+            }
+            if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName])) {
+                $groupedValidatedUploads[$zoneName][$productLineName][$categoryName] = [];
+            }
+            if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
+                $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
+            }
+
+            $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
+        }
+
+
+        return $groupedValidatedUploads;
+    }
+
+
+
     public function getApprobations()
     {
         return $this->approbationRepository->findAll();

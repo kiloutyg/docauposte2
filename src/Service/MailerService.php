@@ -19,7 +19,8 @@ use App\Entity\Approbation;
 use App\Repository\ApprobationRepository;
 use App\Repository\UserRepository;
 use App\Repository\DepartmentRepository;
-use App\Repository\ValidationRepository;
+
+use App\Service\EntityFetchingService;
 
 class MailerService extends AbstractController
 {
@@ -30,27 +31,31 @@ class MailerService extends AbstractController
 
     private $userRepository;
     private $approbationRepository;
-    private $departmentRepository;
-    private $validationRepository;
+    private   $departmentRepository;
 
+    private $entityFetchingService;
 
     public function __construct(
-        MailerInterface $mailer,
         string $senderEmail,
-        LoggerInterface $logger,
-        UserRepository $userRepository,
-        ApprobationRepository $approbationRepository,
-        ValidationRepository $validationRepository,
-        DepartmentRepository $departmentRepository,
+
+        MailerInterface         $mailer,
+        LoggerInterface         $logger,
+
+        UserRepository          $userRepository,
+        ApprobationRepository   $approbationRepository,
+        DepartmentRepository            $departmentRepository,
+
+        EntityFetchingService           $entityFetchingService,
     ) {
         $this->mailer                   = $mailer;
         $this->senderEmail              = $senderEmail;
         $this->logger                   = $logger;
 
         $this->userRepository           = $userRepository;
-        $this->approbationRepository   = $approbationRepository;
+        $this->approbationRepository    = $approbationRepository;
         $this->departmentRepository     = $departmentRepository;
-        $this->validationRepository     = $validationRepository;
+
+        $this->entityFetchingService    = $entityFetchingService;
     }
 
     public function approbationEmail(Validation $validation)
@@ -302,13 +307,11 @@ class MailerService extends AbstractController
     }
 
 
+    // public function monthlyQualityResume(array $emailRecipientsAddresses, array $groupedValidatedUploads)
     public function monthlyQualityResume()
     {
-        $validations = $this->validationRepository->findAll(['Status' => true]);
-        $uploads = [];
-        foreach ($validations as $validation) {
-            $uploads[] = $validation->getUpload();
-        }
+
+        $uploads = $this->entityFetchingService->getAllValidatedUploadsWithAssociations();
 
         $users = $this->departmentRepository->findOneBy(['name' => 'QUALITY'])->getUsers();
 
@@ -318,8 +321,8 @@ class MailerService extends AbstractController
         $email = (new TemplatedEmail())
             ->from($this->senderEmail)
             ->to(...$emailRecipientsAddresses)
-            ->subject('Docauposte - Rappel de toutes les actions en cours.')
-            ->htmlTemplate('services/email_templates/reminderEmailToAll.html.twig')
+            ->subject('Docauposte - Rappel de tous les documents validés durant la précedente période.')
+            ->htmlTemplate('services/email_templates/validatedUploadResumeToQualityStaff.html.twig')
             ->context([
                 'uploads'                    => $uploads
             ]);
