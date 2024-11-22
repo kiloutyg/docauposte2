@@ -1,161 +1,168 @@
-{# <p>
-	Bonjour,
-</p>
-
-{% if (uploads is defined) and (uploads is not empty ) %}
-	{% for zoneName, zoneKey in uploads %}
-		{{ zoneName|split('.')|first|upper }}
-		{% for productLineName, productLineKey in zoneKey %}
-			{{ productLineName|split('.')|first|upper }}
-			{% for categoryName, categoryKey in productLineKey %}
-				{{ categoryName|split('.')|first|upper }}
-				{% for buttonName, buttonKey in categoryKey %}
-					{{ buttonName|split('.')|first|upper }}
-					{% for upload in buttonKey %}
-						{{ upload.filename }}
-					{% endfor %}
-				{% endfor %}
-			{% endfor %}
-		{% endfor %}
-	{% endfor %}
-{% endif %}
-<p>
-	Vous pouvez accéder aux documents en vous connectant à l'application en cliquant sur le lien suivant :
-	<a
-		class='btn-info'
-		href='http://{{ hostname|lower }}/docauposte/login'>
-		Page de connexion
-	</a>
-</p>
-<p>
-	Cordialement
-</p> #}
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Validated Upload Summary</title>
-    <!-- Inline styles for better email client compatibility -->
-    <style type="text/css">
-        /* General styling */
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #ffffff;
-            color: #333333;
-        }
-        .container {
-            padding: 20px;
-        }
-        p {
-            font-size: 16px;
-            line-height: 24px;
-        }
-        a.btn {
-            color: #ffffff;
-            background-color: #008CBA;
-            padding: 12px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            display: inline-block;
-            font-size: 16px;
-            margin-top: 10px;
-        }
-        /* List styling */
-        ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        li {
-            margin-bottom: 5px;
-            padding-left: 20px;
-            position: relative;
-        }
-        li:before {
-            content: '\2022';
-            position: absolute;
-            left: 0;
-            color: #008CBA;
-        }
-        .level-1 { padding-left: 0; }
-        .level-2 { padding-left: 20px; }
-        .level-3 { padding-left: 40px; }
-        .level-4 { padding-left: 60px; }
-        .level-5 { padding-left: 80px; }
-        /* Style overrides for email clients */
-        @media only screen and (max-width: 600px) {
-            .container {
-                padding: 10px;
-            }
-            a.btn {
-                font-size: 14px;
-                padding: 10px 15px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <p>Bonjour,</p>
+<html
+	lang="fr-FR">
+	<head>
+		<meta
+			charset="UTF-8">
+		<title>
+			Validated Upload Summary
+		</title>
+		<!-- Inline styles for better email client compatibility -->
+		<style>
+			type="text/css"
+			/* General styling */
+			body {
+				margin: 0;
+				padding: 0;
+				font-family: Arial, sans-serif;
+				background-color: #ffffff;
+				color: #333333;
+			}
+			.container {
+				padding: 20px;
+			}
+			p {
+				font-size: 16px;
+				line-height: 24px;
+			}
+			a.btn {
+				color: #ffffff;
+				background-color: #008CBA;
+				padding: 12px 20px;
+				text-decoration: none;
+				border-radius: 5px;
+				display: inline-block;
+				font-size: 16px;
+				margin-top: 10px;
+			}
+			/* List styling */
+			ul {
+				list-style-type: none;
+				padding-left: 0;
+			}
+			li {
+				margin-bottom: 5px;
+				padding-left: 20px;
+				position: relative;
+			}
+			li:before {
+				content: '\2022';
+				position: absolute;
+				left: 0;
+				color: #008CBA;
+			}
+			.level-1 {
+				padding-left: 0;
+			}
+			.level-2 {
+				padding-left: 20px;
+			}
+			.level-3 {
+				padding-left: 40px;
+			}
+			.level-4 {
+				padding-left: 60px;
+			}
+			.level-5 {
+				padding-left: 80px;
+			}
+			/* Style overrides for email clients */
+			@media only screen and(max-width: 600px) {
+				.container {
+					padding: 10px;
+				}
+				a.btn {
+					font-size: 14px;
+					padding: 10px 15px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div
+			class="container">
+			<p>
+				Bonjour,
+			</p>
 
-        {% if uploads is defined and uploads is not empty %}
-            <p>Veuillez trouver ci-dessous la liste des documents validés :</p>
-            <ul class="level-1">
-                {% for zoneName, zoneKey in uploads %}
-                    <li>
-                        <strong>{{ zoneName|split('.')|first|upper }}</strong>
-                        {% if zoneKey is iterable %}
-                            <ul class="level-2">
-                                {% for productLineName, productLineKey in zoneKey %}
-                                    <li>
-                                        <strong>{{ productLineName|split('.')|first|upper }}</strong>
-                                        {% if productLineKey is iterable %}
-                                            <ul class="level-3">
-                                                {% for categoryName, categoryKey in productLineKey %}
-                                                    <li>
-                                                        <strong>{{ categoryName|split('.')|first|upper }}</strong>
-                                                        {% if categoryKey is iterable %}
-                                                            <ul class="level-4">
-                                                                {% for buttonName, buttonKey in categoryKey %}
-                                                                    <li>
-                                                                        <strong>{{ buttonName|split('.')|first|upper }}</strong>
-                                                                        {% if buttonKey is iterable %}
-                                                                            <ul class="level-5">
-                                                                                {% for upload in buttonKey %}
-                                                                                    <li>{{ upload.filename }}</li>
-                                                                                {% endfor %}
-                                                                            </ul>
-                                                                        {% endif %}
-                                                                    </li>
-                                                                {% endfor %}
-                                                            </ul>
-                                                        {% endif %}
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>Aucun document validé n'a été trouvé.</p>
-        {% endif %}
+			{% if uploads is defined and uploads is not empty %}
+				<p>
+					Veuillez trouver ci-dessous la liste des documents validés :
+				</p>
+				<ul
+					class="level-1">
+					{% for zoneName, zoneKey in uploads %}
+						<li>
+							<strong>
+								{{ zoneName|split('.')|first|upper }}
+							</strong>
+							{% if zoneKey is iterable %}
+								<ul
+									class="level-2">
+									{% for productLineName, productLineKey in zoneKey %}
+										<li>
+											<strong>
+												{{ productLineName|split('.')|first|upper }}
+											</strong>
+											{% if productLineKey is iterable %}
+												<ul
+													class="level-3">
+													{% for categoryName, categoryKey in productLineKey %}
+														<li>
+															<strong>
+																{{ categoryName|split('.')|first|upper }}
+															</strong>
+															{% if categoryKey is iterable %}
+																<ul
+																	class="level-4">
+																	{% for buttonName, buttonKey in categoryKey %}
+																		<li>
+																			<strong>
+																				{{ buttonName|split('.')|first|upper }}
+																			</strong>
+																			{% if buttonKey is iterable %}
+																				<ul
+																					class="level-5">
+																					{% for upload in buttonKey %}
+																						<li>
+																							{{ upload.filename }}
+																						</li>
+																					{% endfor %}
+																				</ul>
+																			{% endif %}
+																		</li>
+																	{% endfor %}
+																</ul>
+															{% endif %}
+														</li>
+													{% endfor %}
+												</ul>
+											{% endif %}
+										</li>
+									{% endfor %}
+								</ul>
+							{% endif %}
+						</li>
+					{% endfor %}
+				</ul>
+			{% else %}
+				<p>
+					Aucun document validé n'a été trouvé.
+				</p>
+			{% endif %}
 
-        <p>
-            Vous pouvez accéder aux documents en vous connectant à l'application en cliquant sur le lien suivant :
-            <br>
-            <a
-                href="http://{{ hostname|lower }}/docauposte/login"
-                class="btn">
-                Page de connexion
-            </a>
-        </p>
-        <p>Cordialement,</p>
-    </div>
-</body>
+			<p>
+				Vous pouvez accéder aux documents en vous connectant à l'application en cliquant sur le lien suivant :
+				<br>
+				<a
+					href="http://{{ hostname|lower }}/docauposte/login"
+					class="btn">
+					Page de connexion
+				</a>
+			</p>
+			<p>
+				Cordialement,
+			</p>
+		</div>
+	</body>
 </html>

@@ -233,7 +233,6 @@ class EntityFetchingService extends AbstractController
 
     private function groupUploads($uploads)
     {
-        $uploads = $this->uploadRepository->findAllValidatedUploadsWithAssociationsAtDate();
 
         $groupedValidatedUploads = [];
         foreach ($uploads as $upload) {
