@@ -161,23 +161,18 @@ class EntityFetchingService extends AbstractController
     }
 
 
-    public function getNonValidatedUploads()
-    {
-        return $this->uploadRepository->getNonValidatedUploads();
-    }
-
-
     public function getValidations()
     {
         return $this->validationRepository->findAll();
     }
 
 
-    public function getValidatedUploads()
-    {
 
-        return $this->uploadRepository->getValidatedUploads();
+    public function getAllValidatedUploadsWithAssociations()
+    {
+        return $this->groupUploads($this->uploadRepository->findAllValidatedUploadsWithAssociations());
     }
+
 
 
     public function getApprobations()
@@ -207,13 +202,6 @@ class EntityFetchingService extends AbstractController
     public function getOperators()
     {
 
-        // $operators = $this->cache->get('operators_list', function (ItemInterface $item) {
-        //     $item->expiresAfter(3600);
-
-        //     return $this->operatorRepository->findAllOrdered();
-        // });
-
-        // return $operators;
         return $this->operatorRepository->findAllOrdered();
     }
 
@@ -227,5 +215,51 @@ class EntityFetchingService extends AbstractController
     public function getTrainers()
     {
         return $this->trainerRepository->findAll();
+    }
+
+    private function groupUploads($uploads)
+    {
+
+        $groupedValidatedUploads = [];
+        foreach ($uploads as $upload) {
+
+            $button = $upload->getButton();
+            if (!$button) {
+                continue;
+            }
+
+            $category = $button->getCategory();
+            if (!$category) {
+                continue;
+            }
+
+            $productLine = $category->getProductLine();
+            if (!$productLine) {
+                continue;
+            }
+
+            $zone = $productLine->getZone();
+            if (!$zone) {
+                continue;
+            }
+
+            $zoneName        = $zone->getName();
+            $productLineName = $productLine->getName();
+            $categoryName    = $category->getName();
+            $buttonName      = $button->getName();
+
+            // Using reference to build the nested array
+            $ref = &$groupedValidatedUploads;
+            foreach ([$zoneName, $productLineName, $categoryName, $buttonName] as $key) {
+                if (!isset($ref[$key])) {
+                    $ref[$key] = [];
+                }
+                $ref = &$ref[$key];
+            }
+            $ref[] = $upload;
+            unset($ref);
+        }
+
+        return $groupedValidatedUploads;
     }
 }

@@ -129,6 +129,7 @@ class ProductLineAdminController extends AbstractController
             'groupincidents'            => $groupIncidents,
             'zone'                      => $zone,
             'productLine'               => $productLine,
+            'incidentCategories'        => $this->entityFetchingService->getIncidentCategories(),
             'zoneProductLines'          => $zoneProductLines
         ]);
     }

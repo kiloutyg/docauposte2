@@ -8,8 +8,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-use App\Repository\UploadRepository;
-use App\Repository\DepartmentRepository;
 use App\Repository\UserRepository;
 use App\Repository\ValidationRepository;
 use App\Repository\ApprobationRepository;
@@ -21,28 +19,21 @@ use App\Entity\Validation;
 use App\Entity\Approbation;
 
 use App\Service\MailerService;
-use App\Service\OldUploadService;
 use App\Service\TrainingRecordService;
-use App\Service\SettingsService;
-use Doctrine\Common\Collections\ArrayCollection;
 
 class ValidationService extends AbstractController
 {
-    protected   $logger;
-    protected   $em;
-    protected   $projectDir;
+    private   $logger;
+    private   $em;
+    private   $projectDir;
 
-    protected   $uploadRepository;
-    protected   $departmentRepository;
-    protected   $userRepository;
-    protected   $validationRepository;
-    protected   $approbationRepository;
-    protected   $settings;
+    private   $userRepository;
+    private   $validationRepository;
+    private   $approbationRepository;
 
-    protected   $mailerService;
-    protected   $oldUploadService;
+    private   $mailerService;
 
-    private     $TrainingRecordService;
+    private     $trainingRecordService;
 
 
     public function __construct(
@@ -50,31 +41,24 @@ class ValidationService extends AbstractController
         EntityManagerInterface          $em,
         ParameterBagInterface           $params,
 
-        UploadRepository                $uploadRepository,
-        DepartmentRepository            $departmentRepository,
         UserRepository                  $userRepository,
         ValidationRepository            $validationRepository,
         ApprobationRepository           $approbationRepository,
-        SettingsService                 $settingsService,
 
         MailerService                   $mailerService,
-        OldUploadService                $oldUploadService,
-        TrainingRecordService           $TrainingRecordService
+        TrainingRecordService           $trainingRecordService,
+
     ) {
-        $this->logger                = $logger;
-        $this->em                    = $em;
-        $this->projectDir            = $params->get('kernel.project_dir');
+        $this->logger                   = $logger;
+        $this->em                       = $em;
+        $this->projectDir               = $params->get('kernel.project_dir');
 
-        $this->uploadRepository      = $uploadRepository;
-        $this->departmentRepository  = $departmentRepository;
-        $this->userRepository        = $userRepository;
-        $this->validationRepository  = $validationRepository;
-        $this->approbationRepository = $approbationRepository;
-        $this->settings              = $settingsService->getSettings();
+        $this->userRepository           = $userRepository;
+        $this->validationRepository     = $validationRepository;
+        $this->approbationRepository    = $approbationRepository;
 
-        $this->mailerService         = $mailerService;
-        $this->oldUploadService      = $oldUploadService;
-        $this->TrainingRecordService = $TrainingRecordService;
+        $this->mailerService            = $mailerService;
+        $this->trainingRecordService    = $trainingRecordService;
     }
 
     public function createValidation(Upload $upload, Request $request)
@@ -201,7 +185,7 @@ class ValidationService extends AbstractController
         $this->mailerService->approbationEmail($validation);
         // $this->logger->info('forcedDisplay: ' . $upload->isForcedDisplay() . ' training-needed: ' . $request->request->get('training-needed') . ' display-needed: ' . $request->request->get('display-needed'));
         if ($request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
-            $this->TrainingRecordService->updateTrainingRecord($upload);
+            $this->trainingRecordService->updateTrainingRecord($upload);
         }
 
         // Return early
@@ -357,7 +341,7 @@ class ValidationService extends AbstractController
         // $this->logger->info('validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay());
         if ($validation->isStatus() === true && $upload->isForcedDisplay() === false) {
             $this->mailerService->sendApprovalEmail($validation);
-            $this->TrainingRecordService->updateTrainingRecord($upload);
+            $this->trainingRecordService->updateTrainingRecord($upload);
         } else if ($validation->isStatus() === true) {
             $this->mailerService->sendApprovalEmail($validation);
         }
@@ -432,7 +416,7 @@ class ValidationService extends AbstractController
         // // $this->logger->info('display-needed: ' . $request->request->get('display-needed') . ' training-needed: ' . $request->request->get('training-needed'));
 
         if ($request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
-            $this->TrainingRecordService->updateTrainingRecord($upload);
+            $this->trainingRecordService->updateTrainingRecord($upload);
         }
         // Return early
         return;
@@ -459,6 +443,8 @@ class ValidationService extends AbstractController
         $uploadsWaitingValidationRaw = [];
 
         $uploaders = [];
+
+
 
         if ($today->format('d') % 2 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
 
@@ -517,7 +503,7 @@ class ValidationService extends AbstractController
             }
 
             if ($return) {
-                $fileWriting = file_put_contents($filePath, $today->format('Y-m-d'));
+                file_put_contents($filePath, $today->format('Y-m-d'));
                 // $this->logger->info('fileWriting: ' . $fileWriting);
             }
             foreach ($uploaders as $uploader) {
@@ -528,30 +514,43 @@ class ValidationService extends AbstractController
                 $this->mailerService->sendReminderEmailToAllUsers($uploadsWaitingValidationRaw);
             }
         }
+    }
 
-        if (file_exists($filePath)) {
-            $dateString = trim(file_get_contents($filePath));
-            // $this->logger->info('date string' . $dateString);
+    public function qualityCheckUp()
+    {
+        $today = new \DateTime();
+        $fileName = 'quality_email_sent.txt';
+        $filePath = $this->projectDir . '/public/doc/' . $fileName;
 
-            $dateFromFile = \DateTime::createFromFormat('Y-m-d', $dateString);
-            // $this->logger->info('dateFromFile', [$dateFromFile]);
 
-            $fileMonth = $dateFromFile->format('m');
-            // $this->logger->info('fileMonth', [$fileMonth]);
+        if (
+            // $today->format('d') == $today->format('t') &&
+            $today->format('d') % 2 == 0 &&
+            (
+                !file_exists($filePath) ||
+                strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false
+            )
+        ) {
+
+            $dateString = '';
+            $fileMonth = null;
+
+            if (file_exists($filePath)) {
+                $dateString = trim(file_get_contents($filePath));
+                $dateFromFile = \DateTime::createFromFormat('Y-m-d', $dateString);
+                $fileMonth = $dateFromFile ? $dateFromFile->format('m') : null;
+            }
 
             $todayMonth = $today->format('m');
-            // $this->logger->info('todayMonth', [$todayMonth]);
 
             if ($fileMonth != $todayMonth) {
-                $user = $this->userRepository->findOneBy(['username' => 'florian.dkhissi']);
-                $subject = 'TEST EMAIL FOR QUALITY STAFF';
-                $html = " <h1> <strong> TEST EMAIL</strong></h1>";
-                $this->mailerService->sendEmail($user, $subject, $html);
+                $return = $this->mailerService->monthlyQualityResume();
+                if ($return) {
+                    file_put_contents($filePath, $today->format('Y-m-d'));
+                }
             }
         }
     }
-
-
 
 
     public function checkNumberOfValidator(Request $request, Int $neededValidator): bool

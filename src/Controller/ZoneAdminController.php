@@ -127,6 +127,7 @@ class ZoneAdminController extends AbstractController
             'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'            => $groupIncidents,
             'zones'                     => $this->entityFetchingService->getZones(),
+            'incidentCategories'        => $this->entityFetchingService->getIncidentCategories(),
             'zone'                      => $zone,
             'zoneProductLines'          => $productLines,
         ]);

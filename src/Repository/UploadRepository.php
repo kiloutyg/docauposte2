@@ -40,83 +40,126 @@ class UploadRepository extends BaseRepository
         }
     }
 
-    public function getNonValidatedUploads()
+    /**
+     * Get uploads with optional associations and filters.
+     *
+     * @param array $associations
+     * @param bool  $validatedOnly
+     * @return Upload[]
+     */
+    private function getUploads(array $associations = [], bool $validatedOnly = false)
     {
-        $nonValidatedUploads = $this->createQueryBuilder('u')
-            ->leftJoin('u.validation', 'v')
-            ->where('v.id IS NULL')
-            ->getQuery()
-            ->getResult();
+        $qb = $this->createQueryBuilder('u');
 
-        return $nonValidatedUploads;
+        // Resolve and include dependencies
+        $resolvedAssociations = $this->resolveAssociations($associations);
+
+        // Always join 'button' association
+        $qb->leftJoin('u.button', 'b')
+            ->addSelect('b');
+
+        // Always join 'validation' association
+        $qb->leftJoin('u.validation', 'v')
+            ->addSelect('v');
+
+        // Conditionally join associations based on resolved associations
+        if (in_array('category', $resolvedAssociations)) {
+            $qb->leftJoin('b.category', 'c')
+                ->addSelect('c');
+        }
+
+        if (in_array('productLine', $resolvedAssociations)) {
+            $qb->leftJoin('c.productLine', 'p')
+                ->addSelect('p');
+        }
+
+        if (in_array('zone', $resolvedAssociations)) {
+            $qb->leftJoin('p.zone', 'z')
+                ->addSelect('z');
+        }
+
+        // Apply validation filter if needed
+        if ($validatedOnly) {
+            $qb->where('v.id IS NOT NULL')
+                ->andWhere('v.status = 1');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+    /**
+     * Resolve associations to include dependencies.
+     *
+     * @param array $associations
+     * @return array
+     */
+    private function resolveAssociations(array $associations): array
+    {
+        // Define the dependencies for each association
+        $dependencies = [
+            'zone' => ['productLine', 'category', 'button'],
+            'productLine' => ['category', 'button'],
+            'category' => ['button'],
+            'button' => [],
+        ];
+
+        $resolved = [];
+
+        foreach ($associations as $association) {
+            // Add the association itself
+            $resolved[] = $association;
+
+            // Recursively add dependencies
+            if (isset($dependencies[$association])) {
+                $resolved = array_merge($resolved, $dependencies[$association]);
+            }
+        }
+
+        // Always include 'button' as it's a direct association
+        if (!in_array('button', $resolved)) {
+            $resolved[] = 'button';
+        }
+
+        // Remove duplicates
+        $resolved = array_unique($resolved);
+
+        return $resolved;
     }
 
-    public function getValidatedUploads()
+    public function findAllValidatedUploadsWithAssociations()
     {
-        $validatedUploads = $this->createQueryBuilder('u')
-            ->leftJoin('u.validation', 'v')
-            ->where('v.id IS NOT NULL')
-            ->getQuery()
-            ->getResult();
-
-        return $validatedUploads;
+        return $this->getUploads(
+            ['zone'],
+            true
+        );
     }
 
     public function findAllWithAssociations()
     {
-        return $this->createQueryBuilder('u')
-            ->leftJoin('u.button', 'b')
-            ->addSelect('b')
-            ->leftJoin('b.Category', 'c')
-            ->addSelect('c')
-            ->leftJoin('c.ProductLine', 'p')
-            ->addSelect('p')
-            ->leftJoin('p.zone', 'z')
-            ->addSelect('z')
-            ->leftJoin('u.validation', 'v')
-            ->addSelect('v')
-            ->getQuery()
-            ->getResult();
+        return $this->getUploads(
+            ['zone']
+        );
     }
 
     public function findAllWithAssociationsProductLine()
     {
-        return $this->createQueryBuilder('u')
-            ->leftJoin('u.button', 'b')
-            ->addSelect('b')
-            ->leftJoin('b.Category', 'c')
-            ->addSelect('c')
-            ->leftJoin('c.ProductLine', 'p')
-            ->addSelect('p')
-            ->leftJoin('u.validation', 'v')
-            ->addSelect('v')
-            ->getQuery()
-            ->getResult();
+        return $this->getUploads(
+            ['productLine']
+        );
     }
 
     public function findAllWithAssociationsCategory()
     {
-        return $this->createQueryBuilder('u')
-            ->leftJoin('u.button', 'b')
-            ->addSelect('b')
-            ->leftJoin('b.Category', 'c')
-            ->addSelect('c')
-            ->leftJoin('u.validation', 'v')
-            ->addSelect('v')
-            ->getQuery()
-            ->getResult();
+        return $this->getUploads(
+            ['category']
+        );
     }
 
     public function findAllWithAssociationsButton()
     {
-        return $this->createQueryBuilder('u')
-            ->leftJoin('u.button', 'b')
-            ->addSelect('b')
-            ->leftJoin('u.validation', 'v')
-            ->addSelect('v')
-            ->getQuery()
-            ->getResult();
+        return $this->getUploads();
     }
+
+
     //    /**
     //     * @return Upload[] Returns an array of Upload objects
     //     */
