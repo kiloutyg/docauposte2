@@ -170,7 +170,7 @@ class EntityFetchingService extends AbstractController
 
     public function getAllValidatedUploadsWithAssociations()
     {
-        return $this->groupUploads($this->uploadRepository->findAllValidatedUploadsWithAssociationsAtDate());;
+        return $this->groupUploads($this->uploadRepository->findAllValidatedUploadsWithAssociations());
     }
 
 

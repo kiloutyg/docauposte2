@@ -537,10 +537,6 @@ class ValidationService extends AbstractController
 
             if (file_exists($filePath)) {
                 $dateString = trim(file_get_contents($filePath));
-            }
-
-            if (file_exists($filePath)) {
-                $dateString = trim(file_get_contents($filePath));
                 $dateFromFile = \DateTime::createFromFormat('Y-m-d', $dateString);
                 $fileMonth = $dateFromFile ? $dateFromFile->format('m') : null;
             }

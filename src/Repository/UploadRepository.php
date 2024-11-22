@@ -86,27 +86,6 @@ class UploadRepository extends BaseRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findAllValidatedUploadsWithAssociationsAtDate(\DateTimeInterface $date)
-    {
-        $qb = $this->createQueryBuilder('u')
-            ->leftJoin('u.button', 'b')
-            ->addSelect('b')
-            ->leftJoin('b.Category', 'c')
-            ->addSelect('c')
-            ->leftJoin('c.ProductLine', 'p')
-            ->addSelect('p')
-            ->leftJoin('p.zone', 'z')
-            ->addSelect('z')
-            ->leftJoin('u.validation', 'v')
-            ->addSelect('v')
-            ->where('v.id IS NOT NULL')
-            ->andWhere('v.Status = 1')
-            ->andWhere('u.dateField = :date')
-            ->setParameter('date', $date);
-
-        return $qb->getQuery()->getResult();
-    }
-
     public function findAllValidatedUploadsWithAssociations()
     {
         return $this->getUploads(
