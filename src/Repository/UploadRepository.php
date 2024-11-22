@@ -51,45 +51,84 @@ class UploadRepository extends BaseRepository
     {
         $qb = $this->createQueryBuilder('u');
 
-        // Join associations based on input array
-        if (in_array('button', $associations)) {
-            $qb->leftJoin('u.button', 'b')
-                ->addSelect('b');
-        }
+        // Resolve and include dependencies
+        $resolvedAssociations = $this->resolveAssociations($associations);
 
-        if (in_array('category', $associations)) {
-            $qb->leftJoin('b.Category', 'c')
+        // Always join 'button' association
+        $qb->leftJoin('u.button', 'b')
+            ->addSelect('b');
+
+        // Always join 'validation' association
+        $qb->leftJoin('u.validation', 'v')
+            ->addSelect('v');
+
+        // Conditionally join associations based on resolved associations
+        if (in_array('category', $resolvedAssociations)) {
+            $qb->leftJoin('b.category', 'c')
                 ->addSelect('c');
         }
 
-        if (in_array('productLine', $associations)) {
-            $qb->leftJoin('c.ProductLine', 'p')
+        if (in_array('productLine', $resolvedAssociations)) {
+            $qb->leftJoin('c.productLine', 'p')
                 ->addSelect('p');
         }
 
-        if (in_array('zone', $associations)) {
+        if (in_array('zone', $resolvedAssociations)) {
             $qb->leftJoin('p.zone', 'z')
                 ->addSelect('z');
-        }
-
-        if (in_array('validation', $associations)) {
-            $qb->leftJoin('u.validation', 'v')
-                ->addSelect('v');
         }
 
         // Apply validation filter if needed
         if ($validatedOnly) {
             $qb->where('v.id IS NOT NULL')
-                ->andWhere('v.Status = 1');
+                ->andWhere('v.status = 1');
         }
 
         return $qb->getQuery()->getResult();
+    }
+    /**
+     * Resolve associations to include dependencies.
+     *
+     * @param array $associations
+     * @return array
+     */
+    private function resolveAssociations(array $associations): array
+    {
+        // Define the dependencies for each association
+        $dependencies = [
+            'zone' => ['productLine', 'category', 'button'],
+            'productLine' => ['category', 'button'],
+            'category' => ['button'],
+            'button' => [],
+        ];
+
+        $resolved = [];
+
+        foreach ($associations as $association) {
+            // Add the association itself
+            $resolved[] = $association;
+
+            // Recursively add dependencies
+            if (isset($dependencies[$association])) {
+                $resolved = array_merge($resolved, $dependencies[$association]);
+            }
+        }
+
+        // Always include 'button' as it's a direct association
+        if (!in_array('button', $resolved)) {
+            $resolved[] = 'button';
+        }
+
+        // Remove duplicates
+        $resolved = array_unique($resolved);
+
+        return $resolved;
     }
 
     public function findAllValidatedUploadsWithAssociations()
     {
         return $this->getUploads(
-            ['button', 'category', 'productLine', 'zone', 'validation'],
+            ['zone'],
             true
         );
     }
@@ -97,29 +136,27 @@ class UploadRepository extends BaseRepository
     public function findAllWithAssociations()
     {
         return $this->getUploads(
-            ['button', 'category', 'productLine', 'zone', 'validation']
+            ['zone']
         );
     }
 
     public function findAllWithAssociationsProductLine()
     {
         return $this->getUploads(
-            ['button', 'category', 'productLine', 'validation']
+            ['productLine']
         );
     }
 
     public function findAllWithAssociationsCategory()
     {
         return $this->getUploads(
-            ['button', 'category', 'validation']
+            ['category']
         );
     }
 
     public function findAllWithAssociationsButton()
     {
-        return $this->getUploads(
-            ['button', 'validation']
-        );
+        return $this->getUploads();
     }
 
 
