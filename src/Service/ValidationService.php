@@ -524,7 +524,8 @@ class ValidationService extends AbstractController
 
 
         if (
-            $today->format('d') == $today->format('t') &&
+            // $today->format('d') == $today->format('t') &&
+            $today->format('d') % 2 == 0 &&
             (
                 !file_exists($filePath) ||
                 strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false
