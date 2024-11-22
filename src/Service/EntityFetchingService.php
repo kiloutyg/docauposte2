@@ -182,39 +182,8 @@ class EntityFetchingService extends AbstractController
 
     public function getAllValidatedUploadsWithAssociations()
     {
-        // This function is responsible for the logic of grouping the uploads files by parent entities
         $uploads = $this->uploadRepository->findAllValidatedUploadsWithAssociationsAtDate();
-
-        $groupedValidatedUploads = [];
-        // Group uploads by zone, productLine, category, and button
-        foreach ($uploads as $upload) {
-
-            // $this->logger->info('upload in groupAllUpload service', $upload);
-
-            $zoneName        = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
-            $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
-            $categoryName    = $upload->getButton()->getCategory()->getName();
-            $buttonName      = $upload->getButton()->getname();
-
-
-
-            if (!isset($groupedValidatedUploads[$zoneName])) {
-                $groupedValidatedUploads[$zoneName] = [];
-            }
-            if (!isset($groupedValidatedUploads[$zoneName][$productLineName])) {
-                $groupedValidatedUploads[$zoneName][$productLineName] = [];
-            }
-            if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName])) {
-                $groupedValidatedUploads[$zoneName][$productLineName][$categoryName] = [];
-            }
-            if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
-                $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
-            }
-
-            $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
-        }
-
-
+        $groupedValidatedUploads = $this->groupUploads($uploads);
         return $groupedValidatedUploads;
     }
 
@@ -247,13 +216,6 @@ class EntityFetchingService extends AbstractController
     public function getOperators()
     {
 
-        // $operators = $this->cache->get('operators_list', function (ItemInterface $item) {
-        //     $item->expiresAfter(3600);
-
-        //     return $this->operatorRepository->findAllOrdered();
-        // });
-
-        // return $operators;
         return $this->operatorRepository->findAllOrdered();
     }
 
@@ -267,5 +229,75 @@ class EntityFetchingService extends AbstractController
     public function getTrainers()
     {
         return $this->trainerRepository->findAll();
+    }
+
+    private function groupUploads($uploads)
+    {
+        $uploads = $this->uploadRepository->findAllValidatedUploadsWithAssociationsAtDate();
+
+        $groupedValidatedUploads = [];
+        foreach ($uploads as $upload) {
+
+            $button = $upload->getButton();
+            if (!$button) {
+                continue;
+            }
+
+            $category = $button->getCategory();
+            if (!$category) {
+                continue;
+            }
+
+            $productLine = $category->getProductLine();
+            if (!$productLine) {
+                continue;
+            }
+
+            $zone = $productLine->getZone();
+            if (!$zone) {
+                continue;
+            }
+
+            $zoneName        = $zone->getName();
+            $productLineName = $productLine->getName();
+            $categoryName    = $category->getName();
+            $buttonName      = $button->getName();
+
+            // Using reference to build the nested array
+            $ref = &$groupedValidatedUploads;
+            foreach ([$zoneName, $productLineName, $categoryName, $buttonName] as $key) {
+                if (!isset($ref[$key])) {
+                    $ref[$key] = [];
+                }
+                $ref = &$ref[$key];
+            }
+            $ref[] = $upload;
+            unset($ref);
+        }
+        // $groupedValidatedUploads = [];
+        // foreach ($uploads as $upload) {
+
+
+        //     $zoneName        = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
+        //     $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
+        //     $categoryName    = $upload->getButton()->getCategory()->getName();
+        //     $buttonName      = $upload->getButton()->getname();
+
+        //     if (!isset($groupedValidatedUploads[$zoneName])) {
+        //         $groupedValidatedUploads[$zoneName] = [];
+        //     }
+        //     if (!isset($groupedValidatedUploads[$zoneName][$productLineName])) {
+        //         $groupedValidatedUploads[$zoneName][$productLineName] = [];
+        //     }
+        //     if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName])) {
+        //         $groupedValidatedUploads[$zoneName][$productLineName][$categoryName] = [];
+        //     }
+        //     if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
+        //         $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
+        //     }
+
+        //     $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
+        // }
+        return $groupedValidatedUploads;
     }
 }
