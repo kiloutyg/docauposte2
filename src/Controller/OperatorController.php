@@ -1247,13 +1247,15 @@ class OperatorController extends AbstractController
             }
         } else if ($request->getMethod() == 'GET') {
             return $this->render('services/operators/team_uap_operator_management.html.twig', [
-                'teams' => $teams,
-                'uaps' => $uaps,
-                'teamForm' => $teamForm->createView(),
-                'uapForm' => $uapForm->createView()
+                'teams'     => $teams,
+                'uaps'      => $uaps,
+                'teamForm'  => $teamForm->createView(),
+                'uapForm'   => $uapForm->createView()
             ]);
         }
     }
+
+
 
     #[Route('/operator/user_login_check', name: 'app_operator_user_login_check')]
     public function userLoginCheck(): JsonResponse
@@ -1261,6 +1263,7 @@ class OperatorController extends AbstractController
         $currentUser = $this->getUser();
         $this->logger->info('current user', [$currentUser]);
         $this->logger->info('role granted', [$this->authChecker->isGranted('ROLE_MANAGER')]);
+        
         if (!empty($currentUser) && $this->authChecker->isGranted('ROLE_MANAGER')) {
             $user               = $this->userRepository->find($currentUser);
             $this->logger->info(' user', [$user]);

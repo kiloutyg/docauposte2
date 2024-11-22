@@ -12,13 +12,13 @@ export default class OperatorTrainerController extends Controller {
         "trainerOperatorCode",
         "trainerOperatorNameMessage",
         "trainerOperatorCodeMessage",
-
+        "trainerOperatorLogon",
     ];
 
-    connect() {
-
+    trainerOperatorLogonTargetConnected() {
         this.trainerOperatorLoginCheck();
     }
+
 
     async trainerOperatorLoginCheck() {
         console.log('trainerOperatorLoginCheck method called on page load');
