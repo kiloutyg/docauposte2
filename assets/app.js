@@ -2,6 +2,8 @@ import './bootstrap.js';
 
 import '@hotwired/turbo';
 
+import "bootstrap";
+
 document.addEventListener('turbo:load', () => {
     console.log('Turbo frame loaded');
 });
@@ -27,8 +29,6 @@ document.addEventListener('turbo:submit-start', (event) => {
 // any CSS you import will output into a single css file (app.css in this case)
 import "./styles/app.scss";
 
-import "./bootstrap";
 
-import "bootstrap";
 
 
