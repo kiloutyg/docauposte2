@@ -17,6 +17,7 @@
         "@popperjs/core": "^2.11.8",
         "@symfony/stimulus-bridge": "^3.2.0",
         "@symfony/webpack-encore": "^4.3.0",
+        "@symfony/ux-turbo": "file:vendor/symfony/ux-turbo/assets",
         "axios": "^1.6.7",
         "bootstrap": "^5.3.0",
         "core-js": "^3.31.0",
@@ -32,7 +33,5 @@
         "webpack-cli": "^5.1.4",
         "webpack-notifier": "^1.15.0"
     },
-    "devDependencies": {
-        "@symfony/ux-turbo": "file:vendor/symfony/ux-turbo/assets"
-    }
+    "devDependencies": {}
 }
