@@ -18,6 +18,7 @@ return static function (Configuration $config): Configuration {
         ->addNamedFilter(NamedFilter::fromString('symfony/webpack-encore-bundle'))
         ->addNamedFilter(NamedFilter::fromString('symfony/monolog-bundle'))
         ->addNamedFilter(NamedFilter::fromString('symfony/yaml'))
+        ->addNamedFilter(NamedFilter::fromString('symfony/flex'))
 
 
         // Ignore all Symfony UX packages
