@@ -14,6 +14,9 @@ return static function (Configuration $config): Configuration {
         // Ignore specific packages that are used indirectly or via configuration
         ->addNamedFilter(NamedFilter::fromString('symfony/dotenv'))
         ->addNamedFilter(NamedFilter::fromString('symfony/apache-pack'))
+        ->addNamedFilter(NamedFilter::fromString('symfony/runtime'))
+        ->addNamedFilter(NamedFilter::fromString('symfony/webpack-encore-bundle'))
+        ->addNamedFilter(NamedFilter::fromString('symfony/monolog-bundle'))
 
 
         // Ignore all Symfony UX packages

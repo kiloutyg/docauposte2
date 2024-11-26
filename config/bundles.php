@@ -12,6 +12,6 @@ return [
     Symfony\UX\Turbo\TurboBundle::class => ['all' => true],
     Symfony\UX\StimulusBundle\StimulusBundle::class => ['all' => true],
     TomasVotruba\BarcodeBundle\BarcodeBundle::class => ['all' => true],
-    Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
     Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle::class => ['all' => true],
+    Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
 ];
