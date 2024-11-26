@@ -8,6 +8,8 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "doctrine/doctrine-bundle": ">=2.13",
+        "doctrine/doctrine-migrations-bundle": ">=3.3",
+        "symfony/monolog-bundle": ">=3.10",
         "doctrine/orm": ">=2.14",
         "picqer/php-barcode-generator": ">=2.4",
         "symfony/apache-pack": ">=1.0",
@@ -87,9 +89,7 @@
         }
     },
     "require-dev": {
-        "doctrine/doctrine-migrations-bundle": ">=3.3",
         "symfony/maker-bundle": ">=1.50",
-        "symfony/monolog-bundle": ">=3.10",
         "symfony/process": ">=6.3",
         "symfony/stopwatch": ">=6.3"
     }
