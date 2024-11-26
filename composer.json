@@ -7,15 +7,15 @@
     "require": {
         "php": ">=8.2",
         "ext-ctype": "*",
-        "doctrine/doctrine-bundle": "^2.13",
+        "doctrine/doctrine-bundle": ">=2.13",
         "doctrine/orm": ">=2.14",
         "picqer/php-barcode-generator": ">=2.4",
-        "symfony/apache-pack": "^1.0",
+        "symfony/apache-pack": ">=1.0",
         "symfony/cache": ">=6.3",
         "symfony/console": ">=6.3",
         "symfony/dotenv": ">=6.3",
         "symfony/error-handler": ">=6.3",
-        "symfony/flex": "^2.4",
+        "symfony/flex": ">=2.4",
         "symfony/form": ">=6.3",
         "symfony/framework-bundle": ">=6.3",
         "symfony/http-foundation": ">=6.3",
@@ -87,9 +87,9 @@
         }
     },
     "require-dev": {
-        "doctrine/doctrine-migrations-bundle": "^3.3",
+        "doctrine/doctrine-migrations-bundle": ">=3.3",
         "symfony/maker-bundle": ">=1.50",
-        "symfony/monolog-bundle": "^3.10",
+        "symfony/monolog-bundle": ">=3.10",
         "symfony/process": ">=6.3",
         "symfony/stopwatch": ">=6.3"
     }
