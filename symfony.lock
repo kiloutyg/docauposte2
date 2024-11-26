@@ -219,8 +219,5 @@
     },
     "tomasvotruba/barcode-bundle": {
         "version": "1.5.0"
-    },
-    "twig/extra-bundle": {
-        "version": "v3.15.0"
     }
 }

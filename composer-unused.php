@@ -17,6 +17,7 @@ return static function (Configuration $config): Configuration {
         ->addNamedFilter(NamedFilter::fromString('symfony/runtime'))
         ->addNamedFilter(NamedFilter::fromString('symfony/webpack-encore-bundle'))
         ->addNamedFilter(NamedFilter::fromString('symfony/monolog-bundle'))
+        ->addNamedFilter(NamedFilter::fromString('symfony/yaml'))
 
 
         // Ignore all Symfony UX packages

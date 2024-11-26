@@ -29,17 +29,14 @@
         "symfony/stimulus-bundle": ">=2.14",
         "symfony/string": ">=6.3",
         "symfony/templating": ">=6.3",
-        "symfony/twig-bundle": ">=6.3",
         "symfony/ux-turbo": ">=2.14",
         "symfony/validator": ">=6.3",
         "symfony/var-dumper": ">=6.3",
-        "symfony/web-link": ">=6.3",
         "symfony/web-profiler-bundle": ">=6.3",
         "symfony/webpack-encore-bundle": ">=2.0",
         "symfony/yaml": ">=6.3",
         "tecnickcom/tcpdf": ">=6.7",
         "tomasvotruba/barcode-bundle": ">=1.5",
-        "twig/extra-bundle": ">=2.12|>=3.0",
         "twig/twig": ">=2.12|>=3.0"
     },
     "config": {
