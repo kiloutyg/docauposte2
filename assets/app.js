@@ -4,21 +4,22 @@ import './bootstrap.js';
 
 import "bootstrap";
 
-document.addEventListener('turbo:load', () => {
-    console.log('Turbo frame loaded');
-});
+// document.addEventListener('turbo:load', () => {
+//     console.log('Turbo frame loaded');
+// });
 
-document.addEventListener('turbo:before-render', (event) => {
-    console.log('Before Turbo renders', event);
-});
+// document.addEventListener('turbo:before-render', (event) => {
+//     console.log('Before Turbo renders', event);
+// });
 
-document.addEventListener('turbo:render', (event) => {
-    console.log('After Turbo renders', event);
-});
+// document.addEventListener('turbo:render', (event) => {
+//     console.log('After Turbo renders', event);
+// });
 
-document.addEventListener('turbo:submit-start', (event) => {
-    console.log('Form submit started', event);
-});
+// document.addEventListener('turbo:submit-start', (event) => {
+//     console.log('Form submit started', event);
+// });
+
 /*
  * Welcome to your app's main JavaScript file!
  *

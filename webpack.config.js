@@ -25,14 +25,8 @@ Encore
   .addEntry("toast", "./assets/js/toast.js")
   .addEntry("server-variable", "./assets/js/server-variable.js")
   .addEntry("cascading-dropdowns", "./assets/js/cascading-dropdowns.js")
-  .addEntry(
-    "incident-cascading-dropdowns",
-    "./assets/js/incident-cascading-dropdowns.js"
-  )
-  .addEntry(
-    "incident-checkbox-signature",
-    "./assets/js/incident-checkbox-signature.js"
-  )
+  .addEntry("incident-cascading-dropdowns", "./assets/js/incident-cascading-dropdowns.js")
+  .addEntry("incident-checkbox-signature", "./assets/js/incident-checkbox-signature.js")
   .addEntry("department-creation", "./assets/js/department-creation.js")
   .addEntry("document-validator", "./assets/js/document-validator.js")
 
@@ -45,8 +39,8 @@ Encore
   // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
   .enableStimulusBridge('./assets/controllers.json')
 
-  // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
-  .enableStimulusBridge('./assets/controllers.json')
+  // // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
+  // .enableStimulusBridge('./assets/controllers.json')
 
   // will require an extra script tag for runtime.js
   // but, you probably want this, unless you're building a single-page app
@@ -90,6 +84,6 @@ Encore.enableSassLoader();
 //.enableIntegrityHashes(Encore.isProduction())
 
 // uncomment if you're having problems with a jQuery plugin
-Encore.autoProvidejQuery();
+// Encore.autoProvidejQuery();
 
 module.exports = Encore.getWebpackConfig();
