@@ -1,4 +1,3 @@
-
 ###> symfony/framework-bundle ###
 .env
 .env.local
@@ -16,12 +15,6 @@
 /database_data/
 dap*
 ###< symfony/framework-bundle ###
-
-###> phpunit/phpunit ###
-/phpunit.xml
-.phpunit.result.cache
-###< phpunit/phpunit ###
-
 ###> symfony/phpunit-bridge ###
 .phpunit.result.cache
 /phpunit.xml
@@ -48,3 +41,5 @@ database.test.tar.gz
 doc.test.tar.gz
 docker/dockerfileGHAProd/docauposte2.code-workspace
 *.code-workspace
+composer-unused.phar
+.yarnclean

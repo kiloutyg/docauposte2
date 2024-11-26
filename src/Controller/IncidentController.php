@@ -127,7 +127,7 @@ class IncidentController extends AbstractController
 
         // Get all the incidents of the productline and sort them by id ascending
         $incidents = $this->incidentRepository->findBy(
-            ['ProductLine' => $productLineId],
+            ['productLine' => $productLineId],
             ['id' => 'ASC'] // order by id ascending
         );
 

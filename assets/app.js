@@ -1,6 +1,6 @@
 import './bootstrap.js';
 
-import '@hotwired/turbo';
+// import '@hotwired/turbo';
 
 import "bootstrap";
 

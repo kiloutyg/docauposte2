@@ -158,7 +158,7 @@ class ProductLineAdminController extends AbstractController
                 return $this->redirectToRoute('app_productLine_admin', ['productLineId' => $productLineId]);
                 // If the category doesn't exist, create it and redirect to the productline admin interface with a flash message
             } else {
-                $count = $this->categoryRepository->count(['ProductLine' => $productLineId]);
+                $count = $this->categoryRepository->count(['productLine' => $productLineId]);
                 $sortOrder = $count + 1;
                 $category = new Category();
                 $category->setName($categoryname);

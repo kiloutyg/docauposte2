@@ -201,10 +201,10 @@ class UploadController extends AbstractController
 
     // create a route to download a file in more simple terms to display the file
     #[Route('/download/invalidation/{uploadId}', name: 'download_invalidation_file')]
-    public function downloadInvalidationFile(int $uploadId = null, Request $request): Response
+    public function downloadInValidationFile(int $uploadId = null, Request $request): Response
     {
         if ($uploadId) {
-            return $this->uploadService->downloadInvalidationFile($uploadId);
+            return $this->uploadService->downloadInValidationFile($uploadId);
         } else {
             $this->addFlash('warning', 'No File with ID exist');
             $originUrl = $request->headers->get('referer');

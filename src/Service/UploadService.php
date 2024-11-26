@@ -628,7 +628,7 @@ class UploadService extends AbstractController
 
 
     // create a route to download a file in more simple terms to display the file
-    public function downloadInvalidationFile(int $uploadId = null)
+    public function downloadInValidationFile(int $uploadId = null)
     {
         // Retrieve the origin URL
         $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
