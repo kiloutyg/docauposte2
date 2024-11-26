@@ -43,3 +43,7 @@ docker/dockerfileGHAProd/docauposte2.code-workspace
 *.code-workspace
 composer-unused.phar
 .yarnclean
+
+composer copy.json
+composer copy.lock
+symfony copy.lock
