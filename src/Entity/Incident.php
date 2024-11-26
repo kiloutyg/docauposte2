@@ -37,7 +37,7 @@ class Incident
 
     #[ORM\ManyToOne(inversedBy: 'incidents')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?ProductLine $ProductLine = null;
+    private ?ProductLine $productLine = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $active = null;
@@ -113,12 +113,12 @@ class Incident
 
     public function getProductLine(): ?ProductLine
     {
-        return $this->ProductLine;
+        return $this->productLine;
     }
 
-    public function setProductLine(?ProductLine $ProductLine): self
+    public function setProductLine(?ProductLine $productLine): self
     {
-        $this->ProductLine = $ProductLine;
+        $this->productLine = $productLine;
 
         return $this;
     }

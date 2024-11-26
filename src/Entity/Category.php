@@ -20,9 +20,9 @@ class Category
 
     #[ORM\ManyToOne(inversedBy: 'categories')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?ProductLine $ProductLine = null;
+    private ?ProductLine $productLine = null;
 
-    #[ORM\OneToMany(mappedBy: 'Category', targetEntity: Button::class)]
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Button::class)]
     private Collection $buttons;
 
     #[ORM\Column(nullable: true)]
@@ -57,12 +57,12 @@ class Category
 
     public function getProductLine(): ?ProductLine
     {
-        return $this->ProductLine;
+        return $this->productLine;
     }
 
-    public function setProductLine(?ProductLine $ProductLine): self
+    public function setProductLine(?ProductLine $productLine): self
     {
-        $this->ProductLine = $ProductLine;
+        $this->productLine = $productLine;
 
         return $this;
     }

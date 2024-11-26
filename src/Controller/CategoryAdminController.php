@@ -156,7 +156,7 @@ class CategoryAdminController extends AbstractController
                 return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
                 // If the button does not exist, create it and redirect to the category manager page and display a flash message. It depends on the FolderCreationService class.
             } else {
-                $count = $this->buttonRepository->count(['Category' => $categoryId]);
+                $count = $this->buttonRepository->count(['category' => $categoryId]);
                 $sortOrder = $count + 1;
                 $button = new Button();
                 $button->setName($buttonname);

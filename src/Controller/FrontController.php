@@ -13,8 +13,6 @@ use Doctrine\ORM\EntityManagerInterface;
 
 use  \Psr\Log\LoggerInterface;
 
-use App\Controller\UploadController;
-
 use App\Entity\ProductLine;
 use App\Entity\Category;
 use App\Entity\Button;
@@ -25,7 +23,6 @@ use App\Repository\ProductLineRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ButtonRepository;
-use App\Repository\UploadRepository;
 
 use App\Service\EntityFetchingService;
 use App\Service\AccountService;
@@ -47,11 +44,8 @@ class FrontController extends AbstractController
     private $categoryRepository;
     private $buttonRepository;
     private $incidentRepository;
-    private $uploadRepository;
     private $zoneRepository;
     private $productLineRepository;
-
-    private $uploadController;
 
     private $settingsService;
     private $validationService;
@@ -69,12 +63,10 @@ class FrontController extends AbstractController
 
         CategoryRepository              $categoryRepository,
         ButtonRepository                $buttonRepository,
-        UploadRepository                $uploadRepository,
         ZoneRepository                  $zoneRepository,
         ProductLineRepository           $productLineRepository,
         IncidentRepository              $incidentRepository,
 
-        UploadController                $uploadController,
 
         SettingsService                 $settingsService,
         OperatorService                 $operatorService,
@@ -90,11 +82,9 @@ class FrontController extends AbstractController
         $this->categoryRepository           = $categoryRepository;
         $this->buttonRepository             = $buttonRepository;
         $this->incidentRepository           = $incidentRepository;
-        $this->uploadRepository             = $uploadRepository;
         $this->zoneRepository               = $zoneRepository;
         $this->productLineRepository        = $productLineRepository;
 
-        $this->uploadController             = $uploadController;
 
         $this->operatorService              = $operatorService;
         $this->settingsService              = $settingsService;
@@ -177,12 +167,14 @@ class FrontController extends AbstractController
     #[Route('/zone/{zoneId}', name: 'zone')]
     public function zone(int $zoneId = null): Response
     {
+        $this->logger->info('zoneId', [$zoneId]);
+
         $zone = $this->zoneRepository->find($zoneId);
+
         $productLinesInZone = [];
         $productLinesInZone = $zone->getProductLines();
-
         if (count($productLinesInZone) === 1 && !$this->authChecker->isGranted('ROLE_LINE_ADMIN')) {
-            return $this->productline(null, $productLinesInZone[0]);
+            return $this->productLine(null, $productLinesInZone[0]);
         } else {
             return $this->render(
                 'zone.html.twig',
@@ -197,20 +189,22 @@ class FrontController extends AbstractController
 
     // Render the productline page and redirect to the mandatory incident page if there is one
     #[Route('/productline/{productLineId}', name: 'productLine')]
-    public function productline(int $productLineId = null, ProductLine $productLine = null): Response
+    public function productLine(int $productLineId = null, ProductLine $productLine = null): Response
     {
-        // $this->logger->info('productLine and productLineID', ['productLineId' => $productLineId, 'productLine' => $productLine]);
+        $this->logger->info('productLine and productLineID', ['productLineId' => $productLineId, 'productLine' => $productLine]);
 
         if (!$productLine) {
             $productLine = $this->productLineRepository->find($productLineId);
         }
 
         $categoriesInLine = $productLine->getCategories();
+        $this->logger->info('categoriesInLine', [$categoriesInLine]);
         $incidents = [];
         $incidents = $this->incidentRepository->findBy(
-            ['ProductLine' => $productLineId],
+            ['productLine' => $productLineId],
             ['id' => 'ASC'] // order by id ascending
         );
+        $this->logger->info('incidents', [$incidents]);
 
         $incidentId = count($incidents) > 0 ? $incidents[0]->getId() : null;
 

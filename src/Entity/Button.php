@@ -20,7 +20,7 @@ class Button
 
     #[ORM\ManyToOne(inversedBy: 'buttons')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Category $Category = null;
+    private ?Category $category = null;
 
     #[ORM\OneToMany(mappedBy: 'button', targetEntity: Upload::class, orphanRemoval: true)]
     private Collection $uploads;
@@ -59,12 +59,12 @@ class Button
 
     public function getCategory(): ?Category
     {
-        return $this->Category;
+        return $this->category;
     }
 
-    public function setCategory(?Category $Category): self
+    public function setCategory(?Category $category): self
     {
-        $this->Category = $Category;
+        $this->category = $category;
 
         return $this;
     }
