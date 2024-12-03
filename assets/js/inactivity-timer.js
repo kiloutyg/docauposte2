@@ -19,13 +19,21 @@ function inactivityTime(delay) {
     const resetTimer = () => {
         console.log('Inactivity timer reset at', new Date().toTimeString());
         clearTimeout(time);
-        time = setTimeout(reload, delay || 300000); // Default to 5 minutes
+        time = setTimeout(inactivity, delay || 300000); // Default to 5 minutes
     };
 
-    const reload = () => {
-        console.log('window reload due to inactivity at', new Date().toTimeString());
-        // Redirect or take appropriate action
-        window.location.reload();
+    const inactivity = () => {
+        console.log('window inactivity due to inactivity at', new Date().toTimeString());
+    // Send AJAX request to inform the server of inactivity
+    axios.post('/inactivity')
+      .then(response => {
+        console.log('Server acknowledged inactivity');
+      })
+      .catch(error => {
+        console.log('Error notifying server of inactivity:', error);
+      });
+        // window.location.inactivity();
+
     };
 
     // Attach event listeners using a helper function
@@ -44,6 +52,6 @@ function inactivityTime(delay) {
 
     console.log('Inactivity timer started at', new Date().toTimeString());
     attachEventListeners();
-    time = setTimeout(reload, delay || 300000); // Start the initial timer
+    time = setTimeout(inactivity, delay || 300000); // Start the initial timer
 
 };

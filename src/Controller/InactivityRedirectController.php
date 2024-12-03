@@ -14,6 +14,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 
 use App\Service\SettingsService;
 use App\Service\IncidentRedirectService;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class IncidentRedirectController extends AbstractController
 {
@@ -84,28 +85,34 @@ class IncidentRedirectController extends AbstractController
         $this->logger->info('idleTime>incidentAutoDisplayTimer', [$idleTime > $incidentAutoDisplayTimer]);
 
         if ($idleTime > $incidentAutoDisplayTimer) {
-            $session->invalidate();
-
-            $routeName = $request->attributes->get('_route');
-            $this->logger->info('routeName in eventSubscriber', [$routeName]);
-
-            $routeParams =  $request->attributes->get('_route_params');
-            $this->logger->info('routeParam in eventSubscriber', [$routeParams]);
-
-
-            if (($routeName == 'app_zone' || $routeName == 'app_productLine' || $routeName == 'app_category' || $routeName == 'app_button') && $routeParams != null) {
-                $response = $this->incidentRedirectService->incidentRouteDetermination($request);
-                if ($response) {
-                    return $this->redirectToRoute(
-                        'app_mandatory_incident',
-                        [
-                            'productLineId' => $response[0],
-                            'incidentId' => $response[1]
-                        ]
-                    );
-                }
-            }
+            $this->redirectionManagement($session, $request);
         }
         return;
+    }
+
+
+    public function redirectionManagement(SessionInterface $session, Request $request)
+    {
+        $session->invalidate();
+
+        $routeName = $request->attributes->get('_route');
+        $this->logger->info('routeName in eventSubscriber', [$routeName]);
+
+        $routeParams =  $request->attributes->get('_route_params');
+        $this->logger->info('routeParam in eventSubscriber', [$routeParams]);
+
+
+        if (($routeName == 'app_zone' || $routeName == 'app_productLine' || $routeName == 'app_category' || $routeName == 'app_button') && $routeParams != null) {
+            $response = $this->incidentRedirectService->incidentRouteDetermination($request);
+            if ($response) {
+                return $this->redirectToRoute(
+                    'app_mandatory_incident',
+                    [
+                        'productLineId' => $response[0],
+                        'incidentId' => $response[1]
+                    ]
+                );
+            }
+        }
     }
 }
