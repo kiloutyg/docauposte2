@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Doctrine\ORM\EntityManagerInterface;
 
-use  \Psr\Log\LoggerInterface;
+// use  \Psr\Log\LoggerInterface;
 
 use App\Entity\ProductLine;
 use App\Entity\Category;
@@ -39,7 +39,7 @@ class FrontController extends AbstractController
 
     private $em;
     private $authChecker;
-    private $logger;
+    // private $logger;
 
     private $categoryRepository;
     private $buttonRepository;
@@ -59,7 +59,7 @@ class FrontController extends AbstractController
 
         AuthorizationCheckerInterface   $authChecker,
         EntityManagerInterface          $em,
-        LoggerInterface                 $logger,
+        // LoggerInterface                 $logger,
 
         CategoryRepository              $categoryRepository,
         ButtonRepository                $buttonRepository,
@@ -77,7 +77,7 @@ class FrontController extends AbstractController
     ) {
         $this->authChecker                  = $authChecker;
         $this->em                           = $em;
-        $this->logger                       = $logger;
+        // $this->logger                       = $logger;
 
         $this->categoryRepository           = $categoryRepository;
         $this->buttonRepository             = $buttonRepository;
@@ -165,9 +165,19 @@ class FrontController extends AbstractController
 
     // Render the zone page
     #[Route('/zone/{zoneId}', name: 'zone')]
-    public function zone(int $zoneId = null): Response
-    {
-        $this->logger->info('zoneId', [$zoneId]);
+    public function zone(
+        int $zoneId = null,
+        // Request $request = null
+    ): Response {
+        // // $this->logger->info('zoneId', [$zoneId]);
+        // $this->logger->info('request in frontController', [$request]);
+        // $this->logger->info('frontController request request all', [$request->request->all()]);
+        // $this->logger->info('frontController request attributes all', [$request->attributes->all()]);
+        // $routeName = $request->attributes->get('_route');
+        // $this->logger->info('routeName in frontController', [$routeName]);
+
+        // $routeParams =  $request->attributes->get('_route_params');
+        // $this->logger->info('routeParam in frontController', [$routeParams]);
 
         $zone = $this->zoneRepository->find($zoneId);
 
@@ -191,20 +201,20 @@ class FrontController extends AbstractController
     #[Route('/productline/{productLineId}', name: 'productLine')]
     public function productLine(int $productLineId = null, ProductLine $productLine = null): Response
     {
-        $this->logger->info('productLine and productLineID', ['productLineId' => $productLineId, 'productLine' => $productLine]);
+        // $this->logger->info('productLine and productLineID', ['productLineId' => $productLineId, 'productLine' => $productLine]);
 
         if (!$productLine) {
             $productLine = $this->productLineRepository->find($productLineId);
         }
 
         $categoriesInLine = $productLine->getCategories();
-        $this->logger->info('categoriesInLine', [$categoriesInLine]);
+        // $this->logger->info('categoriesInLine', [$categoriesInLine]);
         $incidents = [];
         $incidents = $this->incidentRepository->findBy(
             ['productLine' => $productLineId],
             ['id' => 'ASC'] // order by id ascending
         );
-        $this->logger->info('incidents', [$incidents]);
+        // $this->logger->info('incidents', [$incidents]);
 
         $incidentId = count($incidents) > 0 ? $incidents[0]->getId() : null;
 
@@ -234,7 +244,7 @@ class FrontController extends AbstractController
     #[Route('/category/{categoryId}', name: 'category')]
     public function category(int $categoryId = null, Category $category = null): Response
     {
-        $this->logger->info('category and categoryId', ['categoryId' => $categoryId, 'category' => $category]);
+        // $this->logger->info('category and categoryId', ['categoryId' => $categoryId, 'category' => $category]);
 
         $buttons = [];
         if (!$category) {

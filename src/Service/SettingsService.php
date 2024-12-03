@@ -69,7 +69,6 @@ class SettingsService extends AbstractController
         return $this->settings;
     }
 
-
     // This function is responsible for updating the settings in the database
     public function updateSettings(Request $request): Response
     {

@@ -1,24 +1,30 @@
-// Remove the hardcoded data from your JavaScript file
-let zonesData = []; // array to store zone data fetched from API
-let productLinesData = []; // array to store product line data fetched from API
-let categoriesData = []; // array to store category data fetched from API
-let buttonsData = []; // array to store button data fetched from API
 
-// Fetch data from the API endpoint and populate the respective arrays
-fetch("/docauposte/api/entity_data")
-  .then((response) => response.json()) // parse the JSON response
-  .then((data) => {
-    zonesData = data.zones;
-    productLinesData = data.productLines;
-    categoriesData = data.categories;
-    buttonsData = data.buttons;
+import { getEntityData } from './serverVariable.js';
 
-    // Call the function that initializes the cascading dropdowns
-    // after the data has been fetched
-    initCascadingDropdowns();
-    resetDropdowns();
-    preselectValues();
-  });
+let zonesData = null;
+let productLinesData = null;
+let categoriesData = null;
+let buttonsData = null;
+
+// Event listener for Turbo-Links page load event
+document.addEventListener("turbo:load", () => {
+  // Fetch data from the API endpoint on page load
+  getEntityData() // parse the JSON response
+    .then((data) => {
+      zonesData = data.zones;
+      productLinesData = data.productLines;
+      categoriesData = data.categories;
+      buttonsData = data.buttons;
+
+      // Initialize the cascading dropdowns and reset them on page load
+      initCascadingDropdowns();
+      resetDropdowns();
+      preselectValues();
+    })
+    .catch((error) => {
+      console.log('Error fetching entity data:', error);
+    });
+});
 
 // Function to filter data based on key-value pair
 function filterData(data, key, value) {
@@ -119,23 +125,6 @@ function resetDropdowns() {
   if (button) button.selectedIndex = 0;
 }
 
-// Event listener for Turbo-Links page load event
-document.addEventListener("turbo:load", () => {
-  // Fetch data from the API endpoint on page load
-  fetch("/docauposte/api/entity_data")
-    .then((response) => response.json()) // parse the JSON response
-    .then((data) => {
-      zonesData = data.zones;
-      productLinesData = data.productLines;
-      categoriesData = data.categories;
-      buttonsData = data.buttons;
-
-      // Initialize the cascading dropdowns and reset them on page load
-      initCascadingDropdowns();
-      resetDropdowns();
-      preselectValues();
-    });
-});
 
 // Function to preselect values in the dropdowns based on server-side data
 function preselectValues() {

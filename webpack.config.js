@@ -23,18 +23,19 @@ Encore
   .addEntry("app", "./assets/app.js")
   .addEntry("confirmation", "./assets/js/confirmation.js")
   .addEntry("toast", "./assets/js/toast.js")
-  .addEntry("server-variable", "./assets/js/server-variable.js")
+  .addEntry("server-variable", "./assets/js/serverVariable.js")
   .addEntry("cascading-dropdowns", "./assets/js/cascading-dropdowns.js")
   .addEntry("incident-cascading-dropdowns", "./assets/js/incident-cascading-dropdowns.js")
   .addEntry("incident-checkbox-signature", "./assets/js/incident-checkbox-signature.js")
   .addEntry("department-creation", "./assets/js/department-creation.js")
   .addEntry("document-validator", "./assets/js/document-validator.js")
+  .addEntry("inactivity-timer", "./assets/js/inactivity-timer.js")
 
   // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
   .splitEntryChunks()
 
-    // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
-    .enableStimulusBridge('./assets/controllers.json')
+  // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
+  .enableStimulusBridge('./assets/controllers.json')
 
   // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
   .enableStimulusBridge('./assets/controllers.json')

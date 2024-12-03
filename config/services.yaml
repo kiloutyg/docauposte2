@@ -50,3 +50,6 @@ services:
     App\EventSubscriber\SettingsSubscriber:
         tags:
             - { name: kernel.event_subscriber }
+    App\EventSubscriber\IncidentRedirectSubscriber:
+        tags:
+            - { name: kernel.event_subscriber }

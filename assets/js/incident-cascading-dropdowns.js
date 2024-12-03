@@ -1,23 +1,25 @@
 // Remove the hardcoded data from your JavaScript file
-let incidentZoneData = [];
-let incidentProductLinesData = [];
-let incidentsCategoriesData = [];
+import { getEntityData } from './serverVariable.js';
 
-// Fetch data from the API endpoint
-fetch("/docauposte/api/entity_data")
-  .then((response) => response.json())
-  .then((data) => {
-    incidentZoneData = data.zones;
-    incidentProductLinesData = data.productLines;
-    incidentsCategoriesData = data.incidentsCategories;
+let incidentZoneData = null;
+let incidentProductLinesData = null;
+let incidentsCategoriesData = null;
 
-    // Call the function that initializes the cascading dropdowns
-    // after the data has been fetched
-    initCascadingDropdowns();
-    resetDropdowns();
-    preselectValues();
-  });
+document.addEventListener("turbo:load", function () {
+  // Fetch data from the API endpoint
+  getEntityData()
+    .then((data) => {
+      incidentZoneData = data.zones;
+      incidentProductLinesData = data.productLines;
+      incidentsCategoriesData = data.incidentsCategories;
 
+      // Call the function that initializes the cascading dropdowns
+      // after the data has been fetched
+      initCascadingDropdowns();
+      resetDropdowns();
+      preselectValues();
+    });
+});
 // Existing filterData and populateDropdown functions here...
 function filterData(data, key, value) {
   return data.filter((item) => item[key] === value);
@@ -95,20 +97,7 @@ function resetDropdowns() {
 
 // Existing turbo:load event listener and preselectValues function here...
 
-document.addEventListener("turbo:load", () => {
-  // Fetch data from the API endpoint on page load
-  fetch("/docauposte/api/entity_data")
-    .then((response) => response.json())
-    .then((data) => {
-      incidentZoneData = data.zones;
-      incidentProductLinesData = data.productLines;
 
-      // Initialize the cascading dropdowns and reset them on page load
-      initCascadingDropdowns();
-      resetDropdowns();
-      preselectValues();
-    });
-});
 
 function preselectValues() {
   const incidentZoneDropdown = document.getElementById("incident_zone");

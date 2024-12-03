@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-// use \Psr\Log\LoggerInterface;
+use \Psr\Log\LoggerInterface;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -39,7 +39,7 @@ class IncidentController extends AbstractController
     private $em;
     private $authChecker;
     private $request;
-
+    private $logger;
 
     // Repository methods
     private $incidentRepository;
@@ -53,7 +53,7 @@ class IncidentController extends AbstractController
 
     public function __construct(
         EntityManagerInterface          $em,
-        // LoggerInterface                 $logger,
+        LoggerInterface                 $logger,
         AuthorizationCheckerInterface   $authChecker,
         RequestStack                    $requestStack,
 
@@ -72,7 +72,7 @@ class IncidentController extends AbstractController
 
         $this->em                           = $em;
         $this->authChecker                  = $authChecker;
-        // $this->logger                       = $logger;
+        $this->logger                       = $logger;
         $this->request                      = $requestStack->getCurrentRequest();
 
         // Variables related to the repositories
@@ -111,6 +111,7 @@ class IncidentController extends AbstractController
     #[Route('/productline/{productLineId}/incident/{incidentId}', name: 'mandatory_incident')]
     public function mandatoryIncident(int $productLineId = null, int $incidentId = null): Response
     {
+        $this->logger->info('mandatory incident is being called', ['productLineId' => $productLineId, 'incidentId' => $incidentId]);
         $incidentEntity = null;
         if ($incidentId != null) {
             $incidentEntity = $this->incidentRepository->findOneBy(['id' => $incidentId]);

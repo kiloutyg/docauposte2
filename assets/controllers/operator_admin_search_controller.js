@@ -38,7 +38,6 @@ export default class OperatorAdminSearchController extends Controller {
     async validateSearchByCode(code) {
         console.log('searching by code', code);
         const regex = /^[0-9]$/;
-        code = code;
         const isValid = regex.test(code.trim());
         console.log(code, 'isValid:', isValid);
         return isValid;
@@ -48,7 +47,6 @@ export default class OperatorAdminSearchController extends Controller {
     async validateSearchByTeam(team) {
         console.log('searching by team', team);
         const regex = /^[a-z][A-Z]+$/;
-        team = team;
         const isValid = regex.test(team.trim());
         console.log(team, 'isValid:', isValid);
         return isValid;
@@ -57,7 +55,6 @@ export default class OperatorAdminSearchController extends Controller {
     async validateSearchByUap(uap) {
         console.log('searching by uap', uap);
         const regex = /^[a-z][A-Z]+$/;
-        uap = uap;
         const isValid = regex.test(uap.trim());
         console.log(uap, 'isValid:', isValid);
         return isValid;
@@ -117,6 +114,6 @@ export default class OperatorAdminSearchController extends Controller {
             this.operatorAdminSearchCodeInputTarget.value = '';
             this.operatorAdminSearchNameInputTarget.value = '';
             this.operatorAdminSearchIsTrainerInputTarget.value = '';
-        }, 5000);
+        }, 10000);
     }
 }
