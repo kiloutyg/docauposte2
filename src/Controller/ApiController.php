@@ -141,7 +141,8 @@ class ApiController extends AbstractController
         $uploadValidation = $settings->isUploadValidation();
         $validatorNumber = $settings->getValidatorNumber();
 
-        $incidentAutoDisplayTimer = ($this->settingsRepository->getIncidentAutoDisplayTimerInSeconds() * 1000) / 2;
+        // $incidentAutoDisplayTimer = ($this->settingsRepository->getIncidentAutoDisplayTimerInSeconds() * 1000) / 2;
+        $incidentAutoDisplayTimer = $this->settingsRepository->getIncidentAutoDisplayTimerInSeconds() / 2;
 
 
         $this->logger->info('incidentAutoDisplayTimer', [

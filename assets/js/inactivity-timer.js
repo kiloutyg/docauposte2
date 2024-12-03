@@ -1,36 +1,49 @@
 import { getSettingsData } from './serverVariable.js';
-
-getSettingsData()
-    .then((data) => {
-        const delay = data.incidentAutoDisplayTimer;
-        console.log('timer', delay)
-        inactivityTime(delay);
-    })
-    .catch((error) => {
-        console.log('Error fetching settings data:', error);
-    });
-
+document.addEventListener("turbo:load", function () {
+    getSettingsData()
+        .then((data) => {
+            const delay = data.incidentAutoDisplayTimer;
+            console.log('timer', delay)
+            inactivityTime(delay);
+        })
+        .catch((error) => {
+            console.log('Error fetching settings data:', error);
+            // Fall back to a default delay if needed
+            inactivityTime(300000); // 5 minutes
+        });
+});
 
 function inactivityTime(delay) {
     let time;
 
-    window.onload = resetTimer;
-    // document.onmousemove = resetTimer;
-    document.onkeydown = resetTimer;
-    document.onclick = resetTimer;
-    document.onscroll = resetTimer;
-
-    function logout() {
-        // Replace 'app_inactivity_redirect' with your route name
-        window.location.reload();
-    }
-
-    function resetTimer() {
+    const resetTimer = () => {
+        console.log('Inactivity timer reset at', new Date().toTimeString());
         clearTimeout(time);
-        // Set the timer (e.g., 5 minutes = 300,000 ms)
-        time = setTimeout(logout, 300000);
-        // time = setTimeout(logout, delay);
+        time = setTimeout(reload, delay || 300000); // Default to 5 minutes
+    };
 
-    }
+    const reload = () => {
+        console.log('window reload due to inactivity at', new Date().toTimeString());
+        // Redirect or take appropriate action
+        window.location.reload();
+    };
+
+    // Attach event listeners using a helper function
+    const attachEventListeners = () => {
+        const events = [
+            'load',
+            // 'mousemove',
+            // 'keydown',
+            // 'click',
+            // 'scroll'
+        ];
+        events.forEach(event => {
+            window.addEventListener(event, resetTimer);
+        });
+    };
+
+    console.log('Inactivity timer started at', new Date().toTimeString());
+    attachEventListeners();
+    time = setTimeout(reload, delay || 300000); // Start the initial timer
+
 };
-
