@@ -24,14 +24,19 @@ function inactivityTime(delay) {
 
     const inactivity = () => {
         console.log('window inactivity due to inactivity at', new Date().toTimeString());
-    // Send AJAX request to inform the server of inactivity
-    axios.post('/inactivity')
-      .then(response => {
-        console.log('Server acknowledged inactivity');
-      })
-      .catch(error => {
-        console.log('Error notifying server of inactivity:', error);
-      });
+        // Send AJAX request to inform the server of inactivity
+        axios.post('/docauposte/inactivityCheck')
+            .then(response => {
+                console.log('response', response);
+                if (response) {
+                    console.log('Server acknowledged inactivity');
+                } else {
+                    resetTimer;
+                }
+            })
+            .catch(error => {
+                console.log('Error notifying server of inactivity:', error);
+            });
         // window.location.inactivity();
 
     };
@@ -40,10 +45,10 @@ function inactivityTime(delay) {
     const attachEventListeners = () => {
         const events = [
             'load',
-            // 'mousemove',
-            // 'keydown',
-            // 'click',
-            // 'scroll'
+            'mousemove',
+            'keydown',
+            'click',
+            'scroll'
         ];
         events.forEach(event => {
             window.addEventListener(event, resetTimer);

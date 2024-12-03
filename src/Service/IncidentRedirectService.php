@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use Symfony\Component\HttpFoundation\Request;
-
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
@@ -12,12 +12,13 @@ use App\Entity\Zone;
 use App\Entity\ProductLine;
 use App\Entity\Category;
 use App\Entity\Button;
+
 use App\Repository\ZoneRepository;
 use App\Repository\ProductLineRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ButtonRepository;
 
-
+use App\Service\SettingsService;
 
 
 class IncidentRedirectService extends AbstractController
@@ -29,6 +30,7 @@ class IncidentRedirectService extends AbstractController
     private $categoryRepository;
     private $buttonRepository;
 
+    private $settingsService;
 
     public function __construct(
         LoggerInterface                 $logger,
@@ -36,15 +38,75 @@ class IncidentRedirectService extends AbstractController
         ProductLineRepository           $productLineRepository,
         CategoryRepository              $categoryRepository,
         ButtonRepository                $buttonRepository,
+        SettingsService                 $settingsService,
 
     ) {
         $this->logger                   = $logger;
 
+        $this->settingsService          = $settingsService;
 
         $this->zoneRepository           = $zoneRepository;
         $this->productLineRepository    = $productLineRepository;
         $this->categoryRepository       = $categoryRepository;
         $this->buttonRepository         = $buttonRepository;
+    }
+
+
+
+
+    public function inactivityCheck(Request $request)
+    {
+
+        $session = $request->getSession();
+
+        if (!$session->isStarted()) {
+            $session->start();
+        }
+
+        $currentTime = time();
+        $this->logger->info('currentTime', [$currentTime]);
+
+        $lastUsed = $session->getMetadataBag()->getLastUsed();
+        $this->logger->info('lastUsed', [$lastUsed]);
+
+        $idleTime = $currentTime - $lastUsed;
+        $this->logger->info('idleTime', [$idleTime]);
+
+        $incidentAutoDisplayTimer = $this->settingsService->getIncidentAutoDisplayTimerInSeconds();
+        $this->logger->info('idleTime>incidentAutoDisplayTimer', [$idleTime > $incidentAutoDisplayTimer]);
+
+        if ($idleTime > $incidentAutoDisplayTimer && $session->get('inactive')) {
+            $this->redirectionManagement($session, $request);
+        }
+
+        $session->set('inactive', true);
+        return false;
+    }
+
+
+    public function redirectionManagement(SessionInterface $session, Request $request)
+    {
+        $session->invalidate();
+
+        $routeName = $request->attributes->get('_route');
+        $this->logger->info('routeName in eventSubscriber', [$routeName]);
+
+        $routeParams =  $request->attributes->get('_route_params');
+        $this->logger->info('routeParam in eventSubscriber', [$routeParams]);
+
+
+        if (($routeName == 'app_zone' || $routeName == 'app_productLine' || $routeName == 'app_category' || $routeName == 'app_button') && $routeParams != null) {
+            $response = $this->incidentRouteDetermination($request);
+            if ($response) {
+                return $this->redirectToRoute(
+                    'app_mandatory_incident',
+                    [
+                        'productLineId' => $response[0],
+                        'incidentId' => $response[1]
+                    ]
+                );
+            }
+        }
     }
 
     public function incidentRouteDetermination(Request $request)
