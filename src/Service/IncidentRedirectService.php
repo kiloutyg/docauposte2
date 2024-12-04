@@ -65,7 +65,7 @@ class IncidentRedirectService extends AbstractController
 
 
 
-    public function inactivityCheck(Request $request)
+    public function inactivityCheck(Request $request): JsonResponse
     {
         $session = $request->getSession();
 
@@ -77,7 +77,7 @@ class IncidentRedirectService extends AbstractController
         if ($session->get('inactive') === null || $session->get('inactive') === false) {
             $session->set('lastActivity', time());
             $session->set('inactive', true);
-            return new JsonResponse(['redirect' => false]);
+            return new JsonResponse(['redirect' => false, 'cause' => 'issue in inactivity check service inactivity timer start']);
         }
 
         $currentTime = time();
@@ -97,13 +97,13 @@ class IncidentRedirectService extends AbstractController
             return $this->redirectionManagement($session);
         }
 
-        return new JsonResponse(['redirect' => false]);
+        return new JsonResponse(['redirect' => false, 'cause' => 'issue in inactivityCheck service not enough idle time(in sec) ' . $idleTime]);
     }
 
 
 
 
-    public function redirectionManagement(SessionInterface $session)
+    public function redirectionManagement(SessionInterface $session): JsonResponse
     {
 
         $routeName = $session->get('stuff_route');
@@ -127,12 +127,12 @@ class IncidentRedirectService extends AbstractController
             }
             $session->set('lastActivity', time());
 
-            return new JsonResponse(['redirect' => false]);
+            return new JsonResponse(['redirect' => false, 'cause' => 'issue in incidentRouteDetermination service response not correct']);
         }
 
         $session->set('lastActivity', time());
 
-        return new JsonResponse(['redirect' => false]);
+        return new JsonResponse(['redirect' => false, 'cause' => 'issue in redirectionManagement service, no correct route stored']);
     }
 
 
@@ -150,48 +150,36 @@ class IncidentRedirectService extends AbstractController
 
         switch ($routeName) {
             case 'app_zone':
-
                 $zoneId = $routeParams['zoneId'];
-                // $this->logger->info('zoneId', [$zoneId]);
 
                 $zone = $this->zoneRepository->find($zoneId);
-                // $this->logger->info('zone', [$zone]);
 
                 $response = $this->incidentByZone($zone);
 
                 break;
 
             case 'app_productLine':
-
                 $productLineId = $routeParams['productLineId'];
-                // $this->logger->info('productLineId', [$productLineId]);
 
                 $productLine = $this->productLineRepository->find($productLineId);
-                // $this->logger->info('productLine', [$productLine]);
 
                 $response = $this->incidentByProductLine($productLine);
 
                 break;
 
             case 'app_category':
-
                 $categoryId = $routeParams['categoryId'];
-                // $this->logger->info('categoryId', [$categoryId]);
 
                 $category = $this->categoryRepository->find($categoryId);
-                // $this->logger->info('category', [$category]);
 
                 $response = $this->incidentByCategory($category);
 
                 break;
 
             case 'app_button':
-
                 $buttonId = $routeParams['buttonId'];
-                // $this->logger->info('buttonId', [$buttonId]);
 
                 $button = $this->buttonRepository->find($buttonId);
-                // $this->logger->info('button', [$button]);
 
                 $response = $this->incidentByButton($button);
                 break;
@@ -218,18 +206,12 @@ class IncidentRedirectService extends AbstractController
     public function incidentByZone(Zone $zone)
     {
         $productLines = $zone->getProductLines();
-        // $this->logger->info('productLines', [$productLines]);
-        // $this->logger->info('productLines count', [$productLines->count()]);
 
         $incidentsArray = [];
 
         foreach ($productLines as $productLine) {
 
-            // $this->logger->info('ProductLineName', [$productLine->getName()]);
-
             $incidents = $productLine->getIncidents();
-            // $this->logger->info('incidents', [$incidents]);
-            // $this->logger->info('incidents count', [$incidents->count()]);
 
             if ($incidents->count() != 0) {
                 foreach ($incidents as $incident) {
@@ -238,27 +220,14 @@ class IncidentRedirectService extends AbstractController
             }
         }
 
-        // $this->logger->info('incidentsPersistentCollection', [$incidentsArray]);
-        // $this->logger->info('incidentsPersistentCollection count', [count($incidentsArray)]);
+        $this->logger->info('incidentsArray before sorting', [$incidentsArray]);
+        $incidentsArraySorted = $this->incidentArraySortByPriority($incidentsArray);
 
-        if (count($incidentsArray) != 0) {
-            // $this->logger->info('$incidentsArray', [$incidentsArray]);
+        if (count($incidentsArraySorted) != 0) {
 
-            $productLine = $incidentsArray[0]->getProductLine();
-            // $this->logger->info('productLine ', [$productLine]);
+            $productLine = $incidentsArraySorted[0]->getProductLine();
 
-            $productLineId = $productLine->getID();
-            // $this->logger->info('productLineId', [$productLineId]);
-
-            $incidentsId = $incidentsArray[0]->getId();
-            // $this->logger->info('incidentsId', [$incidentsId]);
-
-            return [$productLineId, $incidentsId];
-            // return
-            //     [
-            //         'productLineId' => $productLineId,
-            //         'incidentId' => $incidentsId
-            //     ];
+            return [$productLine->getID(), $incidentsArraySorted[0]->getId()];
         }
         return false;
     }
@@ -270,7 +239,7 @@ class IncidentRedirectService extends AbstractController
     {
         $incidents = $productLine->getIncidents();
         if ($incidents->count() != 0) {
-            return [$productLine->getId(), $incidents[0]];
+            return [$productLine->getId(), $incidents[0]->getId()];
         }
         return false;
     }
@@ -291,5 +260,14 @@ class IncidentRedirectService extends AbstractController
     {
         $category = $button->getCategory();
         return $this->incidentByCategory($category);
+    }
+
+    public function incidentArraySortByPriority(array $incidentsArray)
+    {
+        usort($incidentsArray, function ($a, $b) {
+            return $b->getAutoDisplayPriority() <=> $a->getAutoDisplayPriority();
+        });
+
+        return $incidentsArray;
     }
 }

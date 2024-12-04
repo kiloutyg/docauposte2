@@ -5,7 +5,7 @@ document.addEventListener("turbo:load", function () {
     getSettingsData()
         .then((data) => {
             const delay = data.incidentAutoDisplayTimer;
-            console.log('timer', delay)
+            console.log('timer in milliseconds', delay)
             inactivityTime(delay);
         })
         .catch((error) => {
@@ -35,6 +35,7 @@ function inactivityTime(delay) {
                     // Redirect the browser to the new URL
                     window.location.href = response.data.redirect;
                 } else {
+                    console.log('response data cause', response.data.cause);
                     resetTimer();
                 }
             })
@@ -51,8 +52,8 @@ function inactivityTime(delay) {
         const events = [
             'load',
             // 'mousemove',
-            'keydown',
-            'click',
+            // 'keydown',
+            // 'click',
             'scroll'
         ];
         events.forEach(event => {

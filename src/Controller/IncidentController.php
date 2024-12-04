@@ -26,6 +26,8 @@ use App\Repository\ProductLineRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
 
+use App\Controller\FrontController;
+
 use App\Service\EntityDeletionService;
 use App\Service\IncidentService;
 use App\Service\EntityFetchingService;
@@ -46,6 +48,8 @@ class IncidentController extends AbstractController
     private $incidentCategoryRepository;
     private $productLineRepository;
 
+    private $frontController;
+
     // Services methods
     private $incidentService;
     private $entitydeletionService;
@@ -62,6 +66,8 @@ class IncidentController extends AbstractController
         ProductLineRepository           $productLineRepository,
         IncidentRepository              $incidentRepository,
 
+        FrontController                 $frontController,
+
         // Services methods
         IncidentService                 $incidentService,
         EntityDeletionService           $entitydeletionService,
@@ -76,10 +82,11 @@ class IncidentController extends AbstractController
         $this->request                      = $requestStack->getCurrentRequest();
 
         // Variables related to the repositories
-
         $this->incidentCategoryRepository   = $incidentCategoryRepository;
         $this->incidentRepository           = $incidentRepository;
         $this->productLineRepository        = $productLineRepository;
+
+        $this->frontController              = $frontController;
 
         // Variables related to the services
         $this->incidentService              = $incidentService;
@@ -124,24 +131,30 @@ class IncidentController extends AbstractController
             $productLine = $incidentEntity->getProductLine();
         }
 
-        $incidents   = [];
+        $incidentsInProductLine   = [];
 
         // Get all the incidents of the productline and sort them by id ascending
-        $incidents = $this->incidentRepository->findBy(
+        $incidentsInProductLine = $this->incidentRepository->findBy(
             ['productLine' => $productLineId],
             ['id' => 'ASC'] // order by id ascending
         );
 
+        $this->logger->info('incidentsInProductLine', [$incidentsInProductLine]);
+
         // Get the id of each incident and put them in an array
         $incidentIds = array_map(function ($incident) {
             return $incident->getId();
-        }, $incidents);
+        }, $incidentsInProductLine);
+        $this->logger->info('incidentIds', [$incidentIds]);
+
 
         // Get the key of the current incident in the array
         $currentIncidentKey = array_search($incidentId, $incidentIds);
+        $this->logger->info('currentIncidentKey', [$currentIncidentKey]);
 
         // Get the current incident
-        $incident = $incidents[$currentIncidentKey];
+        $incident = $incidentsInProductLine[$currentIncidentKey];
+        $this->logger->info('current incident', [$incident]);
 
         // If the current incident does not exist, we set it to null
         if ($currentIncidentKey === false) {
@@ -152,7 +165,7 @@ class IncidentController extends AbstractController
         $nextIncidentKey = $currentIncidentKey + 1;
 
         // Get the next incident in the array based on the next incident key
-        $nextIncident  = isset($incidents[$nextIncidentKey]) ? $incidents[$nextIncidentKey] : null;
+        $nextIncident  = isset($incidentsInProductLine[$nextIncidentKey]) ? $incidentsInProductLine[$nextIncidentKey] : null;
 
         // If there is an incident we render the incidents page with the incident data and the next incident id to redirect to the next incident page
         if ($incident) {
@@ -162,7 +175,7 @@ class IncidentController extends AbstractController
                     'incidentId'        => $incident ? $incident->getId() : null,
                     'incident'          => $incident,
                     'incidentCategory'  => $incident ? $incident->getIncidentCategory() : null,
-                    'incidents'         => $incidents,
+                    'incidents'         => $incidentsInProductLine,
                     'productLineId'     => $productLine->getId(),
                     'nextIncidentId'    => $nextIncident ? $nextIncident->getId() : null
                 ]

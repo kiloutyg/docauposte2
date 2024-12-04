@@ -52,17 +52,17 @@ class InactivityController extends AbstractController
     {
         if (!$this->settingsService->getSettings()->isIncidentAutoDisplay()) {
             $this->logger->info('isIncidentAutoDisplay false');
-            return new JsonResponse(false);
+            return new JsonResponse(['redirect' => false, 'cause' => 'issue in inactivity check controller isIncidentAutoDisplay false']);
         }
 
         if ($this->security->getUser()) {
             $this->logger->info('getUser true');
-            return new JsonResponse(false);
+            return new JsonResponse(['redirect' => false, 'cause' => 'issue in inactivity check controller getUser true']);
         }
 
         if ($request->isXmlHttpRequest()) {
             $this->logger->info('isXmlHttpRequest true');
-            return new JsonResponse(false);
+            return new JsonResponse(['redirect' => false, 'cause' => 'issue in inactivity check controller isXmlHttpRequest true']);
         }
 
         $this->logger->info('inactivityCheck in controller', [$request]);

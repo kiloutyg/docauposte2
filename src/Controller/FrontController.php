@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Doctrine\ORM\EntityManagerInterface;
 
-// use  \Psr\Log\LoggerInterface;
+use  \Psr\Log\LoggerInterface;
 
 use App\Entity\ProductLine;
 use App\Entity\Category;
@@ -39,7 +39,7 @@ class FrontController extends AbstractController
 
     private $em;
     private $authChecker;
-    // private $logger;
+    private $logger;
 
     private $categoryRepository;
     private $buttonRepository;
@@ -59,7 +59,7 @@ class FrontController extends AbstractController
 
         AuthorizationCheckerInterface   $authChecker,
         EntityManagerInterface          $em,
-        // LoggerInterface                 $logger,
+        LoggerInterface                 $logger,
 
         CategoryRepository              $categoryRepository,
         ButtonRepository                $buttonRepository,
@@ -77,7 +77,7 @@ class FrontController extends AbstractController
     ) {
         $this->authChecker                  = $authChecker;
         $this->em                           = $em;
-        // $this->logger                       = $logger;
+        $this->logger                       = $logger;
 
         $this->categoryRepository           = $categoryRepository;
         $this->buttonRepository             = $buttonRepository;
@@ -208,17 +208,17 @@ class FrontController extends AbstractController
         }
 
         $categoriesInLine = $productLine->getCategories();
-        // $this->logger->info('categoriesInLine', [$categoriesInLine]);
-        $incidents = [];
-        $incidents = $this->incidentRepository->findBy(
-            ['productLine' => $productLineId],
-            ['id' => 'ASC'] // order by id ascending
-        );
-        // $this->logger->info('incidents', [$incidents]);
+        $this->logger->info('categoriesInLine', [$categoriesInLine]);
 
-        $incidentId = count($incidents) > 0 ? $incidents[0]->getId() : null;
-
-        if (count($incidents) === 0) {
+        $incidentsInProductLine = [];
+            $incidentsInProductLine = $this->incidentRepository->findBy(
+                ['productLine' => $productLineId],
+                ['id' => 'ASC'] // order by id ascending
+            );
+            $this->logger->info('incidents', [$incidentsInProductLine]);
+            $this->logger->info('incidents count', [count($incidentsInProductLine)]);
+    
+        if (count($incidentsInProductLine) === 0) {
             if (count($categoriesInLine) === 1 && !$this->authChecker->isGranted('ROLE_LINE_ADMIN')) {
                 return $this->category(null, $categoriesInLine[0]);
             }
@@ -230,6 +230,7 @@ class FrontController extends AbstractController
                 ]
             );
         } else {
+            $incidentId = $incidentsInProductLine[0]->getId();
             return $this->redirectToRoute('app_mandatory_incident', [
                 'productLineId' => $productLine->getid(),
                 'incidentId' => $incidentId
