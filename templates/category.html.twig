@@ -1,15 +1,24 @@
 {% extends 'base.html.twig' %}
+
 {% block title %}
 	{{category.name|split('.')|first|upper}}
 	|
 	{{ parent() }}
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+	{{ encore_entry_script_tags('inactivity-timer') }}
+{% endblock %}
+
 {% block body %}
+
 	<div
 		class="inner-container flex-grow-1 d-flex flex-column">
 
 		{% if app.user %}
-			{% if  is_granted('ROLE_MANAGER') %}
+			{% if is_granted('ROLE_MANAGER') %}
 				<aside
 					class="position-absolute end-0">
 					<a
@@ -28,6 +37,7 @@
 				</aside>
 			{% endif %}
 		{% endif %}
+
 		<p>
 			<h2
 				class="text-justify mb-2 mt-4">
@@ -36,6 +46,7 @@
 				</strong>
 			</h2>
 		</p>
+
 		<div>
 			<h3
 				class="text-justify">
@@ -43,13 +54,14 @@
 				{{ category.name|split('.')|first|upper}}
 				:
 			</h3>
-
 		</div>
+
 		<div
 			class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
 			{% if buttons|length > 0 %}
 				<div
 					class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
+
 					{% for button in buttons %}
 						{% set validated = '' %}
 						{% if button.uploads|length == 1 %}
@@ -67,7 +79,6 @@
 								{% endfor %}
 							{% endif %}
 						{% endif %}
-
 						<a
 							class="btn btn-primary btn-lg m-5 {{validated}}"
 							role="button"
@@ -80,7 +91,6 @@
 
 							</span>
 						</a>
-
 					{% endfor %}
 				</div>
 			{% else %}

@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Controller;
+
 use Psr\Log\LoggerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -7,6 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
 
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -43,26 +47,28 @@ class InactivityController extends AbstractController
 
 
     // Route to check inactivity and respond to the client side 
-    #[Route(path: '/inactivityCheck', name: 'inactivity_check')]
+    #[Route(path: '/inactivity_check', name: 'inactivity_check')]
     public function inactivityCheck(Request $request)
     {
-
         if (!$this->settingsService->getSettings()->isIncidentAutoDisplay()) {
             $this->logger->info('isIncidentAutoDisplay false');
-            return false;
+            return new JsonResponse(false);
         }
 
         if ($this->security->getUser()) {
             $this->logger->info('getUser true');
-            return false;
+            return new JsonResponse(false);
         }
-
 
         if ($request->isXmlHttpRequest()) {
-            return false;
+            $this->logger->info('isXmlHttpRequest true');
+            return new JsonResponse(false);
         }
 
+        $this->logger->info('inactivityCheck in controller', [$request]);
+
         $response = $this->incidentRedirectService->inactivityCheck($request);
+        
         return $response;
     }
 }

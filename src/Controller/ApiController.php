@@ -2,17 +2,18 @@
 
 namespace App\Controller;
 
+use Psr\Log\LoggerInterface;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-use App\Service\EntityFetchingService;
 use App\Repository\SettingsRepository;
+
+use App\Service\EntityFetchingService;
 use App\Service\SettingsService;
 
-use DateTime;
-use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 # This controller is responsible for fetching data from the database and returning it as JSON
 
@@ -141,8 +142,7 @@ class ApiController extends AbstractController
         $uploadValidation = $settings->isUploadValidation();
         $validatorNumber = $settings->getValidatorNumber();
 
-        // $incidentAutoDisplayTimer = ($this->settingsRepository->getIncidentAutoDisplayTimerInSeconds() * 1000) / 2;
-        $incidentAutoDisplayTimer = ($this->settingsRepository->getIncidentAutoDisplayTimerInSeconds() * 100) / 2;
+        $incidentAutoDisplayTimer = ($this->settingsRepository->getIncidentAutoDisplayTimerInSeconds() * 1000) / 2;
 
 
         $this->logger->info('incidentAutoDisplayTimer', [

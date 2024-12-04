@@ -1,4 +1,6 @@
 import { getSettingsData } from './serverVariable.js';
+import axios from 'axios'; // Import axios
+
 document.addEventListener("turbo:load", function () {
     getSettingsData()
         .then((data) => {
@@ -25,17 +27,20 @@ function inactivityTime(delay) {
     const inactivity = () => {
         console.log('window inactivity due to inactivity at', new Date().toTimeString());
         // Send AJAX request to inform the server of inactivity
-        axios.post('/docauposte/inactivityCheck')
+        axios.post('/docauposte/inactivity_check')
             .then(response => {
                 console.log('response', response);
-                if (response) {
-                    console.log('Server acknowledged inactivity');
+                console.log('response data redirect', response.data.redirect);
+                if (response.data.redirect) {
+                    // Redirect the browser to the new URL
+                    window.location.href = response.data.redirect;
                 } else {
-                    resetTimer;
+                    resetTimer();
                 }
             })
             .catch(error => {
                 console.log('Error notifying server of inactivity:', error);
+                resetTimer();
             });
         // window.location.inactivity();
 
@@ -45,7 +50,7 @@ function inactivityTime(delay) {
     const attachEventListeners = () => {
         const events = [
             'load',
-            'mousemove',
+            // 'mousemove',
             'keydown',
             'click',
             'scroll'

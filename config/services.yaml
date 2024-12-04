@@ -51,3 +51,6 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
+    App\EventSubscriber\ActivitySubscriber:
+        tags:
+            - { name: kernel.event_subscriber }

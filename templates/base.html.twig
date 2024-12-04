@@ -18,15 +18,11 @@
 		{% block stylesheets %}
 			{{ encore_entry_link_tags('app') }}
 		{% endblock %}
+
 		{% block javascripts %}
 			{{ encore_entry_script_tags('app') }}
-			{{ encore_entry_script_tags('confirmation') }}
 			{{ encore_entry_script_tags('toast') }}
-			{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
-			{{ encore_entry_script_tags('cascading-dropdowns') }}
-			{{ encore_entry_script_tags('document-validator') }}
-			{{ encore_entry_script_tags('department-creation') }}
-			{{ encore_entry_script_tags('inactivity-timer') }}
+			{{ encore_entry_script_tags('confirmation') }}
 			<script>
 				let zoneIdFromServer = null;
 let productLineIdFromServer = null;
@@ -65,8 +61,7 @@ let buttonIdFromServer = null;
 					</script>
 				{% endif %}
 			{% endif %}
-
-
+			
 		{% endblock %}
 
 		{% include "services/_toasts.html.twig" %}

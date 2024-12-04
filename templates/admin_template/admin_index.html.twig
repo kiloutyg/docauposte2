@@ -4,8 +4,16 @@
 	AdminPage
 {% endblock %}
 
-{% block body %}
+{% block javascripts %}
+	{{ parent() }}
 
+	{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
+	{{ encore_entry_script_tags('cascading-dropdowns') }}
+	{{ encore_entry_script_tags('document-validator') }}
+	{{ encore_entry_script_tags('department-creation') }}
+{% endblock %}
+
+{% block body %}
 
 	{% if zoneIdFromServer is not defined %}
 		{% if zone is defined and zone is not null %}

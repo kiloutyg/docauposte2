@@ -2,11 +2,16 @@
 
 namespace App\Service;
 
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\Routing\RouterInterface;
+
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Psr\Log\LoggerInterface;
 
 use App\Entity\Zone;
 use App\Entity\ProductLine;
@@ -20,10 +25,11 @@ use App\Repository\ButtonRepository;
 
 use App\Service\SettingsService;
 
-
 class IncidentRedirectService extends AbstractController
 {
     private $logger;
+
+    private $router;
 
     private $zoneRepository;
     private $productLineRepository;
@@ -34,6 +40,9 @@ class IncidentRedirectService extends AbstractController
 
     public function __construct(
         LoggerInterface                 $logger,
+
+        RouterInterface                 $router,
+
         ZoneRepository                  $zoneRepository,
         ProductLineRepository           $productLineRepository,
         CategoryRepository              $categoryRepository,
@@ -42,6 +51,8 @@ class IncidentRedirectService extends AbstractController
 
     ) {
         $this->logger                   = $logger;
+
+        $this->router                   = $router;
 
         $this->settingsService          = $settingsService;
 
@@ -56,75 +67,91 @@ class IncidentRedirectService extends AbstractController
 
     public function inactivityCheck(Request $request)
     {
-
         $session = $request->getSession();
 
         if (!$session->isStarted()) {
             $session->start();
         }
 
+        $this->logger->info('inactive', [$session->get('inactive')]);
+        if ($session->get('inactive') === null || $session->get('inactive') === false) {
+            $session->set('lastActivity', time());
+            $session->set('inactive', true);
+            return new JsonResponse(['redirect' => false]);
+        }
+
         $currentTime = time();
         $this->logger->info('currentTime', [$currentTime]);
 
-        $lastUsed = $session->getMetadataBag()->getLastUsed();
-        $this->logger->info('lastUsed', [$lastUsed]);
+        $lastActivity = $session->get('lastActivity');
+        $this->logger->info('lastActivity', [$lastActivity]);
 
-        $idleTime = $currentTime - $lastUsed;
+        $idleTime = $currentTime - $lastActivity;
         $this->logger->info('idleTime', [$idleTime]);
 
-        $incidentAutoDisplayTimer = $this->settingsService->getIncidentAutoDisplayTimerInSeconds();
+        $incidentAutoDisplayTimer = ($this->settingsService->getIncidentAutoDisplayTimerInSeconds());
+        $this->logger->info('incidentAutoDisplayTimer', [$incidentAutoDisplayTimer]);
         $this->logger->info('idleTime>incidentAutoDisplayTimer', [$idleTime > $incidentAutoDisplayTimer]);
 
         if ($idleTime > $incidentAutoDisplayTimer && $session->get('inactive')) {
-            $this->redirectionManagement($session, $request);
+            return $this->redirectionManagement($session);
         }
 
-        $session->set('inactive', true);
-        return false;
+        return new JsonResponse(['redirect' => false]);
     }
 
 
-    public function redirectionManagement(SessionInterface $session, Request $request)
+
+
+    public function redirectionManagement(SessionInterface $session)
     {
-        $session->invalidate();
 
-        $routeName = $request->attributes->get('_route');
-        $this->logger->info('routeName in eventSubscriber', [$routeName]);
+        $routeName = $session->get('stuff_route');
+        $this->logger->info('routeName in request', [$routeName]);
 
-        $routeParams =  $request->attributes->get('_route_params');
-        $this->logger->info('routeParam in eventSubscriber', [$routeParams]);
+        $routeParams =  $session->get('stuff_param');
+        $this->logger->info('routeParam in request', [$routeParams]);
 
 
         if (($routeName == 'app_zone' || $routeName == 'app_productLine' || $routeName == 'app_category' || $routeName == 'app_button') && $routeParams != null) {
-            $response = $this->incidentRouteDetermination($request);
+            $response = $this->incidentRouteDetermination($routeName, $routeParams);
+            $this->logger->info('respose of incidentRouteDetermination', [$response]);
             if ($response) {
-                return $this->redirectToRoute(
-                    'app_mandatory_incident',
-                    [
+                $session->invalidate();
+                return new JsonResponse([
+                    'redirect' => $this->generateUrl('app_mandatory_incident', [
                         'productLineId' => $response[0],
                         'incidentId' => $response[1]
-                    ]
-                );
+                    ])
+                ]);
             }
+            $session->set('lastActivity', time());
+
+            return new JsonResponse(['redirect' => false]);
         }
+
+        $session->set('lastActivity', time());
+
+        return new JsonResponse(['redirect' => false]);
     }
 
-    public function incidentRouteDetermination(Request $request)
+
+
+
+    public function incidentRouteDetermination(string $routeName, array $routeParams)
     {
 
         // Get the current position
-        $routeName = $request->attributes->get('_route');
-        // $this->logger->info('routeName in service', [$routeName]);
+        $this->logger->info('routeName in service', [$routeName]);
 
-        // $routeParameter = $request->attributes->get('_route_params');
-        // $this->logger->info('routeParameter in service', [$routeParameter]);
+        $this->logger->info('routeParameter in service', [$routeParams]);
 
         $response = [];
 
         switch ($routeName) {
             case 'app_zone':
 
-                $zoneId = $request->attributes->get('zoneId');
+                $zoneId = $routeParams['zoneId'];
                 // $this->logger->info('zoneId', [$zoneId]);
 
                 $zone = $this->zoneRepository->find($zoneId);
@@ -136,7 +163,7 @@ class IncidentRedirectService extends AbstractController
 
             case 'app_productLine':
 
-                $productLineId = $request->attributes->get('productLineId');
+                $productLineId = $routeParams['productLineId'];
                 // $this->logger->info('productLineId', [$productLineId]);
 
                 $productLine = $this->productLineRepository->find($productLineId);
@@ -148,7 +175,7 @@ class IncidentRedirectService extends AbstractController
 
             case 'app_category':
 
-                $categoryId = $request->attributes->get('categoryId');
+                $categoryId = $routeParams['categoryId'];
                 // $this->logger->info('categoryId', [$categoryId]);
 
                 $category = $this->categoryRepository->find($categoryId);
@@ -160,7 +187,7 @@ class IncidentRedirectService extends AbstractController
 
             case 'app_button':
 
-                $buttonId = $request->attributes->get('buttonId');
+                $buttonId = $routeParams['buttonId'];
                 // $this->logger->info('buttonId', [$buttonId]);
 
                 $button = $this->buttonRepository->find($buttonId);
@@ -184,6 +211,8 @@ class IncidentRedirectService extends AbstractController
         );
         return false;
     }
+
+
 
 
     public function incidentByZone(Zone $zone)
@@ -235,6 +264,8 @@ class IncidentRedirectService extends AbstractController
     }
 
 
+
+
     public function incidentByProductLine(ProductLine $productLine)
     {
         $incidents = $productLine->getIncidents();
@@ -245,11 +276,15 @@ class IncidentRedirectService extends AbstractController
     }
 
 
+
+
     public function incidentByCategory(Category $category)
     {
         $productLine = $category->getProductLine();
         return $this->incidentByProductLine($productLine);
     }
+
+
 
 
     public function incidentByButton(Button $button)
