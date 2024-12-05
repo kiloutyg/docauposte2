@@ -1,5 +1,22 @@
+
+import { getEntityData } from './serverVariable.js';
 // Declaring variable 
-let departmentsData;
+let departmentsData = null;
+// // Event listener to fetch department data and initialize cascading dropdowns
+document.addEventListener("turbo:load", function () {
+  getEntityData()
+    .then((data) => {
+      departmentsData = data.departments;
+
+      // after the data has been fetched
+      initCascadingDropdowns();
+      resetDropdowns();
+
+    })
+    .catch((error) => {
+      console.log('Error fetching data:', error);
+    });
+});
 
 // This line declares a variable named departmentsData without assigning it a value.
 
@@ -150,23 +167,7 @@ document.addEventListener("turbo:load", function () {
 });
 
 
-// // Event listener to fetch department data and initialize cascading dropdowns
-document.addEventListener("turbo:load", function () {
-  fetch("/docauposte/api/entity_data")
-    .then((response) => response.json())
-    .then((data) => {
-      departmentsData = data.departments;
 
-      // Call the function that initializes the cascading dropdowns
-      // after the data has been fetched
-      initCascadingDropdowns();
-      resetDropdowns();
-
-    })
-    .catch((error) => {
-      console.log('Error fetching data:', error);
-    });
-});
 
 // This code adds an event listener to the document object for the "turbo:load" event. 
 // When the event is triggered, it fetches department data from the API endpoint /api/entity_data. 

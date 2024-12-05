@@ -17,7 +17,7 @@ use App\Repository\UploadRepository;
 use App\Service\SettingsService;
 
 
-class RedirectSubscriber implements EventSubscriberInterface
+class ValidationRedirectSubscriber implements EventSubscriberInterface
 {
     private $router;
 
@@ -27,7 +27,6 @@ class RedirectSubscriber implements EventSubscriberInterface
     private $userRepository;
     private $uploadRepository;
     private $settingsService;
-    private $settings;
 
     public function __construct(
         RouterInterface $router,

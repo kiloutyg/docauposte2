@@ -165,9 +165,19 @@ class FrontController extends AbstractController
 
     // Render the zone page
     #[Route('/zone/{zoneId}', name: 'zone')]
-    public function zone(int $zoneId = null): Response
-    {
-        $this->logger->info('zoneId', [$zoneId]);
+    public function zone(
+        int $zoneId = null,
+        // Request $request = null
+    ): Response {
+        // // $this->logger->info('zoneId', [$zoneId]);
+        // $this->logger->info('request in frontController', [$request]);
+        // $this->logger->info('frontController request request all', [$request->request->all()]);
+        // $this->logger->info('frontController request attributes all', [$request->attributes->all()]);
+        // $routeName = $request->attributes->get('_route');
+        // $this->logger->info('routeName in frontController', [$routeName]);
+
+        // $routeParams =  $request->attributes->get('_route_params');
+        // $this->logger->info('routeParam in frontController', [$routeParams]);
 
         $zone = $this->zoneRepository->find($zoneId);
 
@@ -191,7 +201,7 @@ class FrontController extends AbstractController
     #[Route('/productline/{productLineId}', name: 'productLine')]
     public function productLine(int $productLineId = null, ProductLine $productLine = null): Response
     {
-        $this->logger->info('productLine and productLineID', ['productLineId' => $productLineId, 'productLine' => $productLine]);
+        // $this->logger->info('productLine and productLineID', ['productLineId' => $productLineId, 'productLine' => $productLine]);
 
         if (!$productLine) {
             $productLine = $this->productLineRepository->find($productLineId);
@@ -199,27 +209,28 @@ class FrontController extends AbstractController
 
         $categoriesInLine = $productLine->getCategories();
         $this->logger->info('categoriesInLine', [$categoriesInLine]);
-        $incidents = [];
-        $incidents = $this->incidentRepository->findBy(
-            ['productLine' => $productLineId],
-            ['id' => 'ASC'] // order by id ascending
-        );
-        $this->logger->info('incidents', [$incidents]);
 
-        $incidentId = count($incidents) > 0 ? $incidents[0]->getId() : null;
-
-        if (count($incidents) === 0) {
+        $incidentsInProductLine = [];
+            $incidentsInProductLine = $this->incidentRepository->findBy(
+                ['productLine' => $productLineId],
+                ['id' => 'ASC'] // order by id ascending
+            );
+            $this->logger->info('incidents', [$incidentsInProductLine]);
+            $this->logger->info('incidents count', [count($incidentsInProductLine)]);
+    
+        if (count($incidentsInProductLine) === 0) {
             if (count($categoriesInLine) === 1 && !$this->authChecker->isGranted('ROLE_LINE_ADMIN')) {
                 return $this->category(null, $categoriesInLine[0]);
             }
             return $this->render(
-                'productline.html.twig',
+                'productLine.html.twig',
                 [
                     'productLine' => $productLine,
                     'categories' => $categoriesInLine
                 ]
             );
         } else {
+            $incidentId = $incidentsInProductLine[0]->getId();
             return $this->redirectToRoute('app_mandatory_incident', [
                 'productLineId' => $productLine->getid(),
                 'incidentId' => $incidentId
@@ -234,7 +245,7 @@ class FrontController extends AbstractController
     #[Route('/category/{categoryId}', name: 'category')]
     public function category(int $categoryId = null, Category $category = null): Response
     {
-        $this->logger->info('category and categoryId', ['categoryId' => $categoryId, 'category' => $category]);
+        // $this->logger->info('category and categoryId', ['categoryId' => $categoryId, 'category' => $category]);
 
         $buttons = [];
         if (!$category) {

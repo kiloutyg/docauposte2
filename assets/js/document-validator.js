@@ -1,25 +1,34 @@
+import { getUserData, getSettingsData } from './serverVariable.js';
+
 // Declaring variable 
 let usersData;
-// This line declares a variable named usersData without assigning it a value.
-
+let userName;
 
 let uploadValidation;
 let validatorNumber;
-let training;
-let operatorRetrainingDelay;
-let OperatorAutoDeleteDelay;
 
-fetch("/docauposte/api/settings")
-  .then((response) => response.json())
-  .then((data) => {
-    settingsData = data.settings;
-    uploadValidation = data.uploadValidation;
-    validatorNumber = data.validatorNumber - 1;
-    training = data.training;
-    operatorRetrainingDelay = data.operatorRetrainingDelay;
-    OperatorAutoDeleteDelay = data.OperatorAutoDeleteDelay;
-  });
 
+document.addEventListener("turbo:load", function () {
+  getUserData()
+    .then((data) => {
+      usersData = data.users;
+
+      initCascadingDropdowns();
+      resetDropdowns();
+    })
+    .catch((error) => {
+      console.log('Error fetching data:', error);
+    });
+
+  getSettingsData()
+    .then((data) => {
+      uploadValidation = data.uploadValidation;
+      validatorNumber = data.validatorNumber - 1;
+    })
+    .catch((error) => {
+      console.log('Error fetching settings data:', error);
+    });
+});
 // This code is a JavaScript program that includes various functions to populate, 
 // reset, and create cascading dropdowns based on user data.
 
@@ -42,8 +51,6 @@ function populateDropdown(dropdown, data, selectedId) {
   defaultOption.textContent = 'Selectionner un Valideur';
   dropdown.appendChild(defaultOption);
 
-
-
   // Add each item in the data array as an option in the dropdown
   data.forEach((item) => {
     const option = document.createElement("option");
@@ -55,8 +62,6 @@ function populateDropdown(dropdown, data, selectedId) {
     userName = nameParts.join(" ");
     option.textContent = userName;
 
-
-
     // If this option should be selected, set the 'selected' attribute
     if (item.id === selectedId) {
       option.selected = true;
@@ -66,31 +71,7 @@ function populateDropdown(dropdown, data, selectedId) {
   });
 }
 
-// The populateDropdown function takes three parameters: 
-// dropdown (an HTMLElement representing the dropdown element), 
-// data (an array of data used to populate the dropdown options), 
-// and selectedId (a string representing the id of the option to be selected by default). 
-// It clears the dropdown element, creates a default "Select" option, adds it to the dropdown, 
-// and then iterates over each item in the data array to create options and add them to the dropdown. 
-// If an item's id matches the selectedId, the option is set as selected.
 
-// // Event listener to fetch user data and initialize cascading dropdowns
-document.addEventListener("turbo:load", function () {
-  fetch("/docauposte/api/user_data")
-    .then((response) => response.json())
-    .then((data) => {
-      usersData = data.users;
-
-      // Call the function that initializes the cascading dropdowns
-      // after the data has been fetched
-      initCascadingDropdowns();
-      resetDropdowns();
-
-    })
-    .catch((error) => {
-      console.log('Error fetching data:', error);
-    });
-});
 
 // The code also includes an event listener attached to the document's 
 // "turbo:load" event. When the event is triggered, the code fetches user data from 

@@ -1,42 +1,29 @@
-{% block stylesheets %}
-	{{
-		encore_entry_link_tags("app")
-        }}
-	{{encore_entry_script_tags("toast")}}
+{% extends 'blank.html.twig' %}
+{% block title %}
+	TrainingRecord
+
+{% endblock %}
+{% block javascripts %}
+	{{ parent()}}
+	{{encore_entry_script_tags('inactivity-timer')}}
 
 {% endblock %}
 {% block body %}
-	<html>
 
-		<head>
-			<title>
-				TrainingRecord
-			</title>
-			<meta
-				name="viewport"
-				content="width=device-width, initial-scale=1">
-			<link
-				rel="icon"
-				type="image/ico"
-				href="{{ asset('OPmobility_icon.svg') }}"/>
-			{% include "services/_toasts.html.twig" %}
 
-		</head>
-		<body>
-			<div
-				class="d-flex ">
+	<div
+		class="d-flex ">
 
-				<iframe
-					src="{{ path('app_download_file_from_path', { 'uploadId': upload.id }) }}" class=" vh-100"
-					width="70%"
-					target="_blank"></iframe>
-				<iframe
-					class="rounded-3 card vh-100  border-2 bg-light "
-					name="trainingRecord"
-					width="30%"
-					src="{{ path('app_training_list', { uploadId: upload.id})}}" frameborder="0"></iframe>
+		<iframe
+			src="{{ path('app_download_file_from_path', { 'uploadId': upload.id }) }}" class=" vh-100"
+			width="70%"
+			target="_blank"></iframe>
+		<iframe
+			class="rounded-3 card vh-100  border-2 bg-light "
+			name="trainingRecord"
+			width="30%"
+			src="{{ path('app_training_list', { uploadId: upload.id})}}" frameborder="0"></iframe>
 
-			</div>
-		</body>
-	</html>
+	</div>
+
 {% endblock %}

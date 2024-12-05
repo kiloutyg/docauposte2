@@ -9,11 +9,18 @@
 	{% set lastProductLine = null %}
 	{% set lastCategory = null %}
 	{% set lastButton = null %}
+{% block javascripts %}
+	{{ parent() }}
 
+	{{ encore_entry_script_tags('cascading-dropdowns') }}
+	{{ encore_entry_script_tags('document-validator') }}
+{% endblock %}
 	<script>
 		{% if zone is defined and zone is not null %}
 zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
 	</script>
+
+
 	<div
 		class="card border-0 shadow rounded-3 my-5 bg-secondary"
 		data-controller="document-training document-display">

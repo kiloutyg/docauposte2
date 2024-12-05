@@ -1,9 +1,17 @@
 {% extends 'base.html.twig' %}
+
 {% block title %}
 	{{productLine.name|split('.')|first|upper}}
 	|
 	{{ parent() }}
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+	{{ encore_entry_script_tags('inactivity-timer') }}
+{% endblock %}
+
 {% block body %}
 	<div
 		class="inner-container flex-grow-1 d-flex flex-column">
