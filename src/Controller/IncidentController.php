@@ -206,23 +206,15 @@ class IncidentController extends AbstractController
 
     // Create a route to upload an incident file. It depends on the IncidentService.
     #[Route('/incident/incident_uploading', name: 'generic_upload_incident_files')]
-    public function generic_upload_incident_files(Request $request): Response
+    public function genericUploadOfIncidentFiles(Request $request): Response
     {
 
         $originUrl = $request->headers->get('referer');
 
         // Check if the form is submitted 
         if ($request->isMethod('POST')) {
-
-            $productLineId = $request->request->get('incident_productLine');
-            $newname = $request->request->get('incidents_newFileName');
-            $IncidentCategoryId = $request->request->get('incidents_incidentsCategory');
-            $IncidentCategory = $this->incidentCategoryRepository->find($IncidentCategoryId);
-            $productLineEntity = $this->productLineRepository->find($productLineId);
-            $user = $this->getUser();
-
             // Use the IncidentService to handle the upload of the Incidents files
-            $name = $this->incidentService->uploadIncidentFiles($request, $productLineEntity, $IncidentCategory, $user, $newname);
+            $name = $this->incidentService->uploadIncidentFiles($request);
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
             return $this->redirect($originUrl);
         } else {

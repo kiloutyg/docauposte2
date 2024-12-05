@@ -80,24 +80,13 @@ class IncidentRedirectService extends AbstractController
             return new JsonResponse(['redirect' => false, 'cause' => 'issue in inactivity check service inactivity timer start']);
         }
 
-        $currentTime = time();
-        $this->logger->info('currentTime', [$currentTime]);
+        $timeResponse = $this->timeComparison($session->get('lastActivity'));
 
-        $lastActivity = $session->get('lastActivity');
-        $this->logger->info('lastActivity', [$lastActivity]);
-
-        $idleTime = $currentTime - $lastActivity;
-        $this->logger->info('idleTime', [$idleTime]);
-
-        $incidentAutoDisplayTimer = ($this->settingsService->getIncidentAutoDisplayTimerInSeconds());
-        $this->logger->info('incidentAutoDisplayTimer', [$incidentAutoDisplayTimer]);
-        $this->logger->info('idleTime>incidentAutoDisplayTimer', [$idleTime > $incidentAutoDisplayTimer]);
-
-        if ($idleTime > $incidentAutoDisplayTimer && $session->get('inactive')) {
+        if ($timeResponse && $session->get('inactive')) {
             return $this->redirectionManagement($session);
         }
 
-        return new JsonResponse(['redirect' => false, 'cause' => 'issue in inactivityCheck service not enough idle time(in sec) ' . $idleTime]);
+        return new JsonResponse(['redirect' => false, 'cause' => 'issue in inactivityCheck service not enough idle time']);
     }
 
 
@@ -107,15 +96,11 @@ class IncidentRedirectService extends AbstractController
     {
 
         $routeName = $session->get('stuff_route');
-        $this->logger->info('routeName in request', [$routeName]);
-
         $routeParams =  $session->get('stuff_param');
-        $this->logger->info('routeParam in request', [$routeParams]);
 
 
         if (($routeName == 'app_zone' || $routeName == 'app_productLine' || $routeName == 'app_category' || $routeName == 'app_button') && $routeParams != null) {
             $response = $this->incidentRouteDetermination($routeName, $routeParams);
-            $this->logger->info('respose of incidentRouteDetermination', $response);
             if ($response) {
                 $session->remove('lastActivity', time());
                 $session->set('inactive', false);
@@ -130,6 +115,7 @@ class IncidentRedirectService extends AbstractController
                 if ($numberOfIncidents > 1) {
                     $session->set('numberOfIncidents', $numberOfIncidents);
                     $session->set('incidentsKeyCycling', 0);
+                    $session->set('cyclingTimer', time());
                 }
 
                 return new JsonResponse([
@@ -162,6 +148,13 @@ class IncidentRedirectService extends AbstractController
         $numberOfIncidents = $session->get('numberOfIncidents');
 
         if ($numberOfIncidents) {
+            $timeResponse = $this->timeComparison($session->get('cyclingTimer'));
+
+            if (!$timeResponse) {
+                return new JsonResponse(['redirect' => false, 'cause' => 'issue in cyclingIncident service, not enough idle time']);
+            }
+            $session->set('cyclingTimer', time());
+
             $currentIncidentCyclingKey = $session->get('incidentsKeyCycling');
 
             // Increment the key to move to the next incident
@@ -191,7 +184,6 @@ class IncidentRedirectService extends AbstractController
                 return new JsonResponse(['redirect' => false, 'cause' => 'Invalid incident data']);
             }
         }
-
         return new JsonResponse(['redirect' => false, 'cause' => 'No incidents to display']);
     }
 
@@ -199,13 +191,20 @@ class IncidentRedirectService extends AbstractController
 
 
 
-    public function incidentRouteDetermination(string $routeName, array $routeParams)
+    public function timeComparison(int $time): bool
     {
 
-        // Get the current position
-        $this->logger->info('routeName in service', [$routeName]);
+        if ((time() - $time) > $this->settingsService->getIncidentAutoDisplayTimerInSeconds()) {
+            return true;
+        }
+        return false;
+    }
 
-        $this->logger->info('routeParameter in service', [$routeParams]);
+
+
+
+    public function incidentRouteDetermination(string $routeName, array $routeParams)
+    {
 
         $response = [];
 
@@ -216,7 +215,6 @@ class IncidentRedirectService extends AbstractController
                 $zone = $this->zoneRepository->find($zoneId);
 
                 $response = $this->incidentByZone($zone);
-
                 break;
 
             case 'app_productLine':
@@ -234,7 +232,6 @@ class IncidentRedirectService extends AbstractController
                 $category = $this->categoryRepository->find($categoryId);
 
                 $response = $this->incidentByCategory($category);
-
                 break;
 
             case 'app_button':
@@ -246,18 +243,10 @@ class IncidentRedirectService extends AbstractController
                 break;
         }
 
-
         if ($response) {
-            $this->logger->info('Response: ', $response);
             return $response;
         }
 
-        $this->logger->info(
-            'Response because if($reponse) failed: ',
-            [
-                $response
-            ]
-        );
         return false;
     }
 
@@ -280,8 +269,6 @@ class IncidentRedirectService extends AbstractController
                 }
             }
         }
-
-        $this->logger->info('incidentsArray before sorting', [$incidentsArray]);
 
         if (count($incidentsArray) != 0) {
 

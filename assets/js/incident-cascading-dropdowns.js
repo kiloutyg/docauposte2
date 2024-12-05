@@ -57,7 +57,7 @@ function populateDropdown(dropdown, data, selectedId) {
 
 function initCascadingDropdowns() {
   const zone = document.getElementById("incident_zone");
-  const productline = document.getElementById("incident_productline");
+  const productline = document.getElementById("incident_productLine");
   const incidentsCategory = document.getElementById(
     "incidents_incidentsCategory"
   );
@@ -78,14 +78,14 @@ function handleIncidentsZoneChange(event) {
     selectedValue
   );
   populateDropdown(
-    document.getElementById("incident_productline"),
+    document.getElementById("incident_productLine"),
     filteredProductLines
   );
 }
 
 function resetDropdowns() {
   const zone = document.getElementById("incident_zone");
-  const productline = document.getElementById("incident_productline");
+  const productline = document.getElementById("incident_productLine");
   const incidentsCategory = document.getElementById(
     "incidents_incidentsCategory"
   );
@@ -102,7 +102,7 @@ function resetDropdowns() {
 function preselectValues() {
   const incidentZoneDropdown = document.getElementById("incident_zone");
   const incidentProductLineDropdown = document.getElementById(
-    "incident_productline"
+    "incident_productLine"
   );
 
   // Preselect zone
@@ -216,7 +216,7 @@ if (modifyIncidentForm) {
     // Get the dropdown elements
 
     let incidentProductLineDropdown = document.getElementById(
-      "incident_productline"
+      "incident_productLine"
     );
     // Get the name input
     let nameInput = document.getElementById("incident_name");

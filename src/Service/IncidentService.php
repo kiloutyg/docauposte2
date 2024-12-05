@@ -58,18 +58,30 @@ class IncidentService extends AbstractController
 
 
     // This function is responsible for the logic of uploading the incidents files
-    public function uploadIncidentFiles(Request $request, $productline,  $IncidentCategoryId, User $user, $newName = null)
+    public function uploadIncidentFiles(Request $request)
     {
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();
         $public_dir = $this->projectDir . '/public';
-        $IncidentCategory = $this->incidentCategoryRepository->findoneBy(['id' => $IncidentCategoryId]);
+
+        $newName = $request->request->get('incidents_newFileName');
+
+        $IncidentCategoryId = $request->request->get('incidents_incidentsCategory');
+        $IncidentCategory = $this->incidentCategoryRepository->find($IncidentCategoryId);
+
+        $productLineId = $request->request->get('incident_productLine');
+        $productLine = $this->productLineRepository->find($productLineId);
+
+        $autoDisplayPriority = $request->request->get('incidents_autoDisplayPriority');
+
+        $user = $this->getUser();
+
 
         foreach ($files as $file) {
 
             // Dynamic folder creation in the case it does not aleady exist
-            $productlinename = $productline->getName();
-            $parts = explode('.', $productlinename);
+            $productLineName = $productLine->getName();
+            $parts = explode('.', $productLineName);
             $parts = array_reverse($parts);
             $folderPath = $public_dir . '/doc';
 
@@ -96,7 +108,7 @@ class IncidentService extends AbstractController
             $fileExtension = pathinfo($name, PATHINFO_EXTENSION); // Gets the file extension
 
             if (file_exists($folderPath . '/' . $name)) {
-                $iteration = count($this->incidentRepository->findBy(['name' => $name, 'ProductLine' => $productline]));
+                $iteration = count($this->incidentRepository->findBy(['name' => $name, 'ProductLine' => $productLine]));
                 $storageName = $originalName . '-' . ($iteration + 1) . '.' . $fileExtension;
                 $path       = $folderPath . '/' . $storageName;
                 $file->move($folderPath . '/', $storageName);
@@ -111,13 +123,18 @@ class IncidentService extends AbstractController
             $incident->setPath($path);
             $incident->setUploader($user);
             $incident->setIncidentCategory($IncidentCategory);
-            $incident->setProductLine($productline);
+            $incident->setProductLine($productLine);
             $incident->setuploadedAt(new \DateTime());
+            $incident->setAutoDisplayPriority($autoDisplayPriority);
             $this->manager->persist($incident);
         }
         $this->manager->flush();
         return $name;
     }
+
+
+
+
 
     // This function is responsible for the logic of deleting the incidents files 
     public function deleteIncidentFile($incidentEntity, $productlineEntity)
@@ -127,8 +144,8 @@ class IncidentService extends AbstractController
         $public_dir = $this->projectDir . '/public';
 
         // Dynamic folder creation and file incident
-        $productlinename = $productlineEntity->getName();
-        $parts = explode('.', $productlinename);
+        $productLineName = $productlineEntity->getName();
+        $parts = explode('.', $productLineName);
         $parts = array_reverse($parts);
         $folderPath = $public_dir . '/doc';
 
@@ -151,7 +168,6 @@ class IncidentService extends AbstractController
     // This function is responsible for the logic of modifying the incidents files
     public function modifyIncidentFile(incident $incident, User $user)
     {
-
         // Get the new file directly from the incident object
         $newFile = $incident->getFile();
 
@@ -161,10 +177,10 @@ class IncidentService extends AbstractController
         // Old file path
         $oldFilePath = $incident->getPath();
 
-        // New file path
-        // Dynamic folder creation and file incident
-        $productlinename = $incident->getProductLine()->getName();
-        $parts = explode('.', $productlinename);
+        $productLine = $incident->getProductLine();
+        $this->logger->info('productLine entity', [$productLine]);
+        $productLineName = $productLine->getName();
+        $parts = explode('.', $productLineName);
         $parts = array_reverse($parts);
         $folderPath = $public_dir . '/doc';
 
@@ -246,7 +262,7 @@ class IncidentService extends AbstractController
 
     public function displayIncident(int $productLineId = null, int $incidentId = null)
     {
-        
+
         $incidentEntity = null;
         if ($incidentId != null) {
             $incidentEntity = $this->incidentRepository->find(['id' => $incidentId]);
@@ -291,6 +307,4 @@ class IncidentService extends AbstractController
 
         return [$incident, $productLine, $nextIncident];
     }
-
-
 }
