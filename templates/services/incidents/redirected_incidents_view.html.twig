@@ -1,23 +1,23 @@
 {% extends 'blank.html.twig' %}
 {% block title %}
 	Incident-Alert
-
 {% endblock %}
-
+{% block javascripts %}
+	{{ parent()}}
+	{{ encore_entry_script_tags('incident-cycler') }}
+{% endblock %}
 {% block body %}
 	<div
 		class="d-flex align-items-center  flex-row">
-
 		<iframe
-			src="{{ path('app_incident_download_file', { 'incidentId': incident.id }) }}" width="80%"
+			src="{{ path('app_incident_download_file', { 'incidentId': incidentId }) }}" width="90%"
 			class="vh-100"
 			target="_blank"></iframe>
 		<div
-			style="width: 2%"></div>
+			style="width: 1%"></div>
 		<div
-			style="width: 16%"
+			style="width: 8%"
 			class="text-center">
-
 			<h1
 				style="text-align: center;">
 				<strong>
@@ -26,26 +26,17 @@
 			</h1>
 			<div
 				style="height: 40vh;"></div>
-
+			<div
+				style="height: 10vh;"></div>
 			<a
-				href="{{ path('app_mandatory_incident', {'incidentId': nextIncidentId, 'productLineId' : productLineId})}}" class="btn btn-warning btn-lg">
+				href="{{path('app_zone',{'zoneId': zoneId})}}" class="btn btn-warning btn-lg"
+				style="color:black">
 				<strong>
 					Ok, J'ai compris
 				</strong>
 			</a>
 			<div
-				style="height: 10vh;"></div>
-			<a
-				href="javascript:void(0)"
-				class="btn btn-secondary"
-				onclick="event.preventDefault(); window.history.back();"
-				style="color:black">
-				Retour
-			</a>
-			<div
-				style="width: 2%"></div>
-
+				style="width: 1%"></div>
 		</div>
 	</div>
-
 {% endblock %}

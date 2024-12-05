@@ -23,34 +23,40 @@ use Doctrine\Common\Collections\ArrayCollection;
 class IncidentService extends AbstractController
 {
 
-    protected $incidentRepository;
-    protected $manager;
-    protected $projectDir;
-    protected $logger;
-    protected $productlineRepository;
-    protected $folderCreationService;
-    protected $incidentCategoryRepository;
+    private $manager;
+    private $projectDir;
+    private $logger;
+
+    private $productLineRepository;
+    private $incidentRepository;
+    private $incidentCategoryRepository;
+
+    private $folderCreationService;
 
 
     public function __construct(
-        FolderCreationService $folderCreationService,
-        ProductLineRepository $productlineRepository,
         EntityManagerInterface $manager,
         ParameterBagInterface $params,
-        IncidentRepository $incidentRepository,
         LoggerInterface $logger,
+
+        IncidentRepository $incidentRepository,
+        ProductLineRepository $productLineRepository,
+        FolderCreationService $folderCreationService,
+
         IncidentCategoryRepository $incidentCategoryRepository,
     ) {
-        $this->incidentRepository = $incidentRepository;
         $this->manager = $manager;
         $this->projectDir = $params->get('kernel.project_dir');
         $this->logger = $logger;
-        $this->productlineRepository = $productlineRepository;
-        $this->folderCreationService = $folderCreationService;
+
+        $this->productLineRepository = $productLineRepository;
+        $this->incidentRepository = $incidentRepository;
         $this->incidentCategoryRepository = $incidentCategoryRepository;
+
+        $this->folderCreationService = $folderCreationService;
     }
 
-    
+
     // This function is responsible for the logic of uploading the incidents files
     public function uploadIncidentFiles(Request $request, $productline,  $IncidentCategoryId, User $user, $newName = null)
     {
@@ -234,4 +240,57 @@ class IncidentService extends AbstractController
 
         return $groupedincidents;
     }
+
+
+
+
+    public function displayIncident(int $productLineId = null, int $incidentId = null)
+    {
+        
+        $incidentEntity = null;
+        if ($incidentId != null) {
+            $incidentEntity = $this->incidentRepository->find(['id' => $incidentId]);
+        }
+
+        // If the incident does not exist, we get the productline entity from the productline id
+        if (!$incidentEntity) {
+            $productLine = $this->productLineRepository->find($productLineId);
+        } else {
+            $productLine = $incidentEntity->getProductLine();
+        }
+
+        $incidentsInProductLine   = [];
+
+        // Get all the incidents of the productline and sort them by id ascending
+        $incidentsInProductLine = $this->incidentRepository->findBy(
+            ['productLine' => $productLineId],
+            ['id' => 'ASC'] // order by id ascending
+        );
+
+        // Get the id of each incident and put them in an array
+        $incidentIds = array_map(function ($incident) {
+            return $incident->getId();
+        }, $incidentsInProductLine);
+
+        // Get the key of the current incident in the array
+        $currentIncidentKey = array_search($incidentId, $incidentIds);
+
+        // Get the current incident
+        $incident = $incidentsInProductLine[$currentIncidentKey];
+
+        // If the current incident does not exist, we set it to null
+        if ($currentIncidentKey === false) {
+            $incident = null;
+        }
+
+        // Get the next incident key in the array 
+        $nextIncidentKey = $currentIncidentKey + 1;
+
+        // Get the next incident in the array based on the next incident key
+        $nextIncident  = isset($incidentsInProductLine[$nextIncidentKey]) ? $incidentsInProductLine[$nextIncidentKey] : null;
+
+        return [$incident, $productLine, $nextIncident];
+    }
+
+
 }

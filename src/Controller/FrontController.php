@@ -223,7 +223,7 @@ class FrontController extends AbstractController
                 return $this->category(null, $categoriesInLine[0]);
             }
             return $this->render(
-                'productline.html.twig',
+                'productLine.html.twig',
                 [
                     'productLine' => $productLine,
                     'categories' => $categoriesInLine

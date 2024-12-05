@@ -30,6 +30,7 @@ Encore
   .addEntry("department-creation", "./assets/js/department-creation.js")
   .addEntry("document-validator", "./assets/js/document-validator.js")
   .addEntry("inactivity-timer", "./assets/js/inactivity-timer.js")
+  .addEntry("incident-cycler", "./assets/js/incident-cycler.js")
 
   // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
   .splitEntryChunks()

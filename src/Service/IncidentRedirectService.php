@@ -115,25 +115,86 @@ class IncidentRedirectService extends AbstractController
 
         if (($routeName == 'app_zone' || $routeName == 'app_productLine' || $routeName == 'app_category' || $routeName == 'app_button') && $routeParams != null) {
             $response = $this->incidentRouteDetermination($routeName, $routeParams);
-            $this->logger->info('respose of incidentRouteDetermination', [$response]);
+            $this->logger->info('respose of incidentRouteDetermination', $response);
             if ($response) {
-                $session->invalidate();
+                $session->remove('lastActivity', time());
+                $session->set('inactive', false);
+
+                $arrayOfProductLines = $response[0];
+                $session->set('arrayOfProductLines', $arrayOfProductLines);
+
+                $arrayOfIncidents = $response[1];
+                $session->set('arrayOfIncidents', $arrayOfIncidents);
+
+                $numberOfIncidents = count($response[0]);
+                if ($numberOfIncidents > 1) {
+                    $session->set('numberOfIncidents', $numberOfIncidents);
+                    $session->set('incidentsKeyCycling', 0);
+                }
+
                 return new JsonResponse([
-                    'redirect' => $this->generateUrl('app_mandatory_incident', [
-                        'productLineId' => $response[0],
-                        'incidentId' => $response[1]
+                    'redirect' => $this->generateUrl('app_redirected_incident', [
+                        'productLineId' => $arrayOfProductLines[0],
+                        'incidentId' => $arrayOfIncidents[0]
                     ])
                 ]);
             }
-            $session->set('lastActivity', time());
 
-            return new JsonResponse(['redirect' => false, 'cause' => 'issue in incidentRouteDetermination service response not correct']);
+            $session->remove('lastActivity', time());
+            $session->set('inactive', false);
+            return new JsonResponse(['redirect' => null, 'cause' => 'issue in incidentRouteDetermination service response not correct, no incident found']);
         }
 
-        $session->set('lastActivity', time());
-
-        return new JsonResponse(['redirect' => false, 'cause' => 'issue in redirectionManagement service, no correct route stored']);
+        $session->remove('lastActivity', time());
+        $session->set('inactive', false);
+        return new JsonResponse(['redirect' => null, 'cause' => 'issue in redirectionManagement service, no correct route stored']);
     }
+
+
+
+
+
+    public function cyclingIncident(Request $request): JsonResponse
+    {
+        $session = $request->getSession();
+
+        // Get the total number of incidents
+        $numberOfIncidents = $session->get('numberOfIncidents');
+
+        if ($numberOfIncidents) {
+            $currentIncidentCyclingKey = $session->get('incidentsKeyCycling');
+
+            // Increment the key to move to the next incident
+            $currentIncidentCyclingKey++;
+
+            // Check if the key exceeds the number of incidents
+            if ($currentIncidentCyclingKey >= $numberOfIncidents) {
+                $currentIncidentCyclingKey = 0;
+            }
+
+            // Save the updated key back to the session
+            $session->set('incidentsKeyCycling', $currentIncidentCyclingKey);
+
+            // Retrieve arrays from the session
+            $arrayOfProductLines = $session->get('arrayOfProductLines', []);
+            $arrayOfIncidents = $session->get('arrayOfIncidents', []);
+
+            // Ensure the arrays contain the expected data
+            if (isset($arrayOfProductLines[$currentIncidentCyclingKey]) && isset($arrayOfIncidents[$currentIncidentCyclingKey])) {
+                return new JsonResponse([
+                    'redirect' => $this->generateUrl('app_redirected_incident', [
+                        'productLineId' => $arrayOfProductLines[$currentIncidentCyclingKey],
+                        'incidentId' => $arrayOfIncidents[$currentIncidentCyclingKey]
+                    ])
+                ]);
+            } else {
+                return new JsonResponse(['redirect' => false, 'cause' => 'Invalid incident data']);
+            }
+        }
+
+        return new JsonResponse(['redirect' => false, 'cause' => 'No incidents to display']);
+    }
+
 
 
 
@@ -221,13 +282,21 @@ class IncidentRedirectService extends AbstractController
         }
 
         $this->logger->info('incidentsArray before sorting', [$incidentsArray]);
-        $incidentsArraySorted = $this->incidentArraySortByPriority($incidentsArray);
 
-        if (count($incidentsArraySorted) != 0) {
+        if (count($incidentsArray) != 0) {
 
-            $productLine = $incidentsArraySorted[0]->getProductLine();
+            $incidentsArraySorted = $this->incidentArraySortByPriority($incidentsArray);
 
-            return [$productLine->getID(), $incidentsArraySorted[0]->getId()];
+            $incidentsIdsArray = array_map(function ($incident) {
+                return $incident->getId();
+            }, $incidentsArraySorted);
+
+            $productLinesIdsArray = array_map(function ($incident) {
+                return $incident->getProductLine()->getId();
+            }, $incidentsArraySorted);
+
+            // return [$productLine->getID(), $incidentsArraySorted[0]->getId()];
+            return [$productLinesIdsArray, $incidentsIdsArray];
         }
         return false;
     }

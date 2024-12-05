@@ -10,7 +10,6 @@ document.addEventListener("turbo:load", function () {
         })
         .catch((error) => {
             console.log('Error fetching settings data:', error);
-            // Fall back to a default delay if needed
             inactivityTime(300000); // 5 minutes
         });
 });
@@ -26,8 +25,7 @@ function inactivityTime(delay) {
 
     const inactivity = () => {
         console.log('window inactivity due to inactivity at', new Date().toTimeString());
-        // Send AJAX request to inform the server of inactivity
-        axios.post('/docauposte/inactivity_check')
+        axios.post('/docauposte/cycling_incident')
             .then(response => {
                 console.log('response', response);
                 console.log('response data redirect', response.data.redirect);
@@ -43,26 +41,9 @@ function inactivityTime(delay) {
                 console.log('Error notifying server of inactivity:', error);
                 resetTimer();
             });
-        // window.location.inactivity();
-
-    };
-
-    // Attach event listeners using a helper function
-    const attachEventListeners = () => {
-        const events = [
-            'load',
-            // 'mousemove',
-            'keydown',
-            'click',
-            'scroll'
-        ];
-        events.forEach(event => {
-            window.addEventListener(event, resetTimer);
-        });
     };
 
     console.log('Inactivity timer started at', new Date().toTimeString());
-    attachEventListeners();
     time = setTimeout(inactivity, delay || 300000); // Start the initial timer
 
 };

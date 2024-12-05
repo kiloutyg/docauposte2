@@ -11,13 +11,14 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-
 use Symfony\Bundle\SecurityBundle\Security;
 
 use App\Service\SettingsService;
 use App\Service\IncidentRedirectService;
+use App\Service\IncidentService;
 
 
+#[Route('/', name: 'app_')]
 class InactivityController extends AbstractController
 {
     private $logger;
@@ -25,7 +26,7 @@ class InactivityController extends AbstractController
 
     private $security;
 
-
+    private $incidentService;
     private $settingsService;
     private $incidentRedirectService;
 
@@ -34,6 +35,7 @@ class InactivityController extends AbstractController
 
         Security                        $security,
 
+        IncidentService                 $incidentService,
         SettingsService                 $settingsService,
         IncidentRedirectService         $incidentRedirectService,
     ) {
@@ -41,6 +43,7 @@ class InactivityController extends AbstractController
 
         $this->security                 = $security;
 
+        $this->incidentService          = $incidentService;
         $this->settingsService          = $settingsService;
         $this->incidentRedirectService  = $incidentRedirectService;
     }
@@ -68,7 +71,46 @@ class InactivityController extends AbstractController
         $this->logger->info('inactivityCheck in controller', [$request]);
 
         $response = $this->incidentRedirectService->inactivityCheck($request);
-        
+
+        return $response;
+    }
+
+
+
+
+
+    // Render the redirected incidents page
+    #[Route('/productline/{productLineId}/redirected_incident/{incidentId}', name: 'redirected_incident')]
+    public function redirectedIncident(int $productLineId = null, int $incidentId = null)
+    {
+        $this->logger->info('redirect incident is being called', ['productLineId' => $productLineId, 'incidentId' => $incidentId]);
+
+        $response = $this->incidentService->displayIncident($productLineId, $incidentId);
+        $incident       = $response[0];
+        $productLine    = $response[1];
+
+        return $this->render(
+            '/services/incidents/redirected_incidents_view.html.twig',
+            [
+                'incidentId'        => $incident->getId(),
+                'incidentCategory'  => $incident->getIncidentCategory(),
+                'zoneId'            => $productLine->getZone()->getId(),
+            ]
+        );
+    }
+
+
+
+
+
+    // Render the redirected incidents page
+    #[Route('/cycling_incident', name: 'cycling_incident')]
+    public function cyclingIncident(Request $request)
+    {
+        $this->logger->info('cyclingIncident is being called');
+
+        $response = $this->incidentRedirectService->cyclingIncident($request);
+
         return $response;
     }
 }
