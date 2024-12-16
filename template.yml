@@ -1,23 +1,23 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: database
+  name: docauposte-database-service
 spec:
   selector:
-    app: database
+    app: docauposte-database
   ports:
     - port: 3306
 ---
 apiVersion: v1
 kind: Pod
 metadata:
-  name: database
+  name: docauposte-database-pod
   labels:
-    app: database
+    app: docauposte-database
 spec:
   restartPolicy: Always
   containers:
-    - name: docauposte
+    - name: database
       image: docker.io/library/mariadb:latest
       env:
         - name: MARIADB_ROOT_PASSWORD_FILE
@@ -50,19 +50,19 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: phpmyadmin
+  name: docauposte-phpmyadmin-pod
   labels:
-    app: docauposte
+    app: docauposte-phpmyadmin
     traefik.enable: true
-    traefik.http.routers.phpmyadmin.rule: PathPrefix(`/dappma`)
-    traefik.http.routers.phpmyadmin.entrypoints: web
-    traefik.http.routers.phpmyadmin.middlewares: strip-phpmyadmin-prefix
-    traefik.http.services.phpmyadmin.loadbalancer.server.port: 80
-    traefik.http.middlewares.strip-phpmyadmin-prefix.stripPrefix.prefixes: /dappma
+    traefik.http.routers.docauposte-phpmyadmin.rule: PathPrefix(`/dappma`)
+    traefik.http.routers.docauposte-phpmyadmin.entrypoints: web
+    traefik.http.routers.docauposte-phpmyadmin.middlewares: strip-phpmyadmin-prefix
+    traefik.http.services.docauposte-phpmyadmin.loadbalancer.server.port: 80
+    traefik.http.middlewares.strip-docauposte-phpmyadmin-prefix.stripPrefix.prefixes: /dappma
 spec:
   restartPolicy: Always
   containers:
-    - name: docauposte
+    - name: phpmyadmin
       image: docker.io/phpmyadmin/phpmyadmin
       env:
         - name: PMA_HOST
@@ -82,19 +82,19 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: web
+  name: docauposte-web-pod
   labels:
-    app: docauposte
+    app: docauposte-web
     traefik.enable: true
-    traefik.http.routers.webdap.rule: PathPrefix(`/docauposte`)
-    traefik.http.routers.webdap.entrypoints: web
-    traefik.http.routers.webdap.middlewares: strip-webdap-prefix
-    traefik.http.services.webdap.loadbalancer.server.port: 80
-    traefik.http.middlewares.strip-webdap-prefix.stripPrefix.prefixes: /docauposte
+    traefik.http.routers.docauposte-web.rule: PathPrefix(`/docauposte`)
+    traefik.http.routers.docauposte-web.entrypoints: web
+    traefik.http.routers.docauposte-web.middlewares: strip-webdap-prefix
+    traefik.http.services.docauposte-web.loadbalancer.server.port: 80
+    traefik.http.middlewares.strip-docauposte-web-prefix.stripPrefix.prefixes: /docauposte
 spec:
   restartPolicy: Always
   containers:
-    - name: docauposte
+    - name: web
       image: ghcr.io/${GITHUB_USER}/docauposte2:main
       command: ["./${APP_CONTEXT}-entrypoint.sh"]
       env:

@@ -6,25 +6,25 @@ document.addEventListener("turbo:load", function () {
         .then((data) => {
             const delay = data.incidentAutoDisplayTimer;
             console.log('timer in milliseconds', delay)
-            inactivityTime(delay);
+            cyclingTime(delay);
         })
         .catch((error) => {
             console.log('Error fetching settings data:', error);
-            inactivityTime(300000); // 5 minutes
+            cyclingTime(300000); // 5 minutes
         });
 });
 
-function inactivityTime(delay) {
+function cyclingTime(delay) {
     let time;
 
     const resetTimer = () => {
-        console.log('Inactivity timer reset at', new Date().toTimeString());
+        console.log('cycling timer reset at', new Date().toTimeString());
         clearTimeout(time);
-        time = setTimeout(inactivity, delay || 300000); // Default to 5 minutes
+        time = setTimeout(cycling, delay || 300000); // Default to 5 minutes
     };
 
-    const inactivity = () => {
-        console.log('window inactivity due to inactivity at', new Date().toTimeString());
+    const cycling = () => {
+        console.log('window cycling due to cycling at', new Date().toTimeString());
         axios.post('/docauposte/cycling_incident')
             .then(response => {
                 console.log('response', response);
@@ -38,12 +38,12 @@ function inactivityTime(delay) {
                 }
             })
             .catch(error => {
-                console.log('Error notifying server of inactivity:', error);
+                console.log('Error notifying server of cycling:', error);
                 resetTimer();
             });
     };
 
-    console.log('Inactivity timer started at', new Date().toTimeString());
-    time = setTimeout(inactivity, delay || 300000); // Start the initial timer
+    console.log('cycling timer started at', new Date().toTimeString());
+    time = setTimeout(cycling, delay || 300000); // Start the initial timer
 
 };
