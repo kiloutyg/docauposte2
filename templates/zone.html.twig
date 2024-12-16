@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
+	{{ parent() }}
 
 	{{ encore_entry_script_tags('inactivity-timer') }}
 {% endblock %}
@@ -75,16 +75,16 @@
 					{% endfor %}
 				</div>
 			{% else %}
-				<div
-					class="alert alert-danger">
-					<a
-						href="#"
-						onclick="event.preventDefault(); window.history.back();">
-						Il n'y a pas de lignes dans cette zone.
-					</a>
-				</div>
+				<button
+					class="btn-warning btn btn-lg"
+					style="color:red"
+					onclick="event.preventDefault(); window.history.back();">
+					Il n'y a pas de lignes dans cette zone.
+				</button>
+				<a
+					href="javascript:void(0)"
+					onclick="event.preventDefault(); window.history.back();"></a>
 			{% endif %}
-
 		</div>
 	</div>
 {% endblock %}

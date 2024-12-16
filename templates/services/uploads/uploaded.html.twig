@@ -44,13 +44,16 @@
 						</div>
 					</div>
 				{% else %}
-					<a
-						class="btn-warning btn btn-lg fa fa-arrow-circle-o-left"
-						style="color:red"
-						href="javascript:void(0)"
+
+					<button
+					class="btn-warning btn btn-lg"
+					style="color:red"
 						onclick="event.preventDefault(); window.history.back();">
 						Retour
-					</a>
+					</button>
+					<a
+						href="javascript:void(0)"
+						onclick="event.preventDefault(); window.history.back();"></a>
 				{% endif %}
 			{% endif %}
 		</p>

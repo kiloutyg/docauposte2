@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
+	{{ parent() }}
 
 	{{ encore_entry_script_tags('inactivity-timer') }}
 {% endblock %}
@@ -60,8 +60,7 @@
 			class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
 			{% if buttons|length > 0 %}
 				<div
-					class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
-
+					class="d-flex mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
 					{% for button in buttons %}
 						{% set validated = '' %}
 						{% if button.uploads|length == 1 %}
@@ -94,14 +93,15 @@
 					{% endfor %}
 				</div>
 			{% else %}
-				<div
-					class="alert alert-danger">
-					<a
-						href="#"
-						onclick="event.preventDefault(); window.history.back();">
-						Il n'y a pas de boutons dans cette catégories.
-					</a>
-				</div>
+				<button
+					class="btn-warning btn btn-lg"
+					style="color:red"
+					onclick="event.preventDefault(); window.history.back();">
+					Il n'y a pas de boutons dans cette catégories.
+				</button>
+				<a
+					href="javascript:void(0)"
+					onclick="event.preventDefault(); window.history.back();"></a>
 			{% endif %}
 		</div>
 	</div>
