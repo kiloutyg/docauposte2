@@ -110,6 +110,18 @@
 																Supprimer
 															</a>
 														</li>
+													{% else %}
+														<li
+															class="alert alert-danger d-flex justify-content-center">
+															<button
+																class="btn btn-lg btn-outline-dark"
+																onclick="event.preventDefault(); window.history.back();">
+																Il n'y a pas de zone dans l'application.
+															</button>
+															<a
+																href="javascript:void(0)"
+																onclick="event.preventDefault(); window.history.back();"></a>
+														</li>
 													{% endfor %}
 												</ul>
 											</div>

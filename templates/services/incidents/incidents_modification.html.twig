@@ -32,6 +32,7 @@
 					{{ incident.incidentCategory.name|split('.')|first|upper }}
 				</p>
 				<iframe
+					title="incident-file-display-for-modification"
 					src="{{ path('app_modify_incident_download_file', { 'id': incident.id }) }}" width="69%"
 					height="950"
 					target="_blank"></iframe>
