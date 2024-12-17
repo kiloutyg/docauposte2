@@ -14,7 +14,7 @@ document.addEventListener("turbo:load", function () {
 
     })
     .catch((error) => {
-      console.log('Error fetching data:', error);
+      // console.log('Error fetching data:', error);
     });
 });
 

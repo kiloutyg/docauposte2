@@ -4,26 +4,26 @@ export function timer(delay, locationString) {
     let time;
 
     const resetTimer = () => {
-        console.log('Inactivity timer reset at', new Date().toTimeString());
+        // console.log('Inactivity timer reset at', new Date().toTimeString());
         clearTimeout(time);
         time = setTimeout(inactivity, delay || 300000); // Default to 5 minutes
     };
 
     const inactivity = () => {
-        console.log('window inactivity due to inactivity at', new Date().toTimeString());
+        // console.log('window inactivity due to inactivity at', new Date().toTimeString());
         axios.post('/docauposte/' + locationString)
             .then(response => {
-                console.log('response', response);
-                console.log('response data redirect', response.data.redirect);
+                // console.log('response', response);
+                // console.log('response data redirect', response.data.redirect);
                 if (response.data.redirect) {
                     window.location.href = response.data.redirect;
                 } else if (response.data.redirect === false) {
-                    console.log('response data cause', response.data.cause);
+                    // console.log('response data cause', response.data.cause);
                     resetTimer();
                 }
             })
             .catch(error => {
-                console.log('Error notifying server of inactivity:', error);
+                // console.log('Error notifying server of inactivity:', error);
                 resetTimer();
             });
 
@@ -44,7 +44,7 @@ export function timer(delay, locationString) {
         attachEventListeners();
     }
 
-    console.log('Inactivity timer started at', new Date().toTimeString());
+    // console.log('Inactivity timer started at', new Date().toTimeString());
     time = setTimeout(inactivity, delay || 300000); // Start the initial timer
 
 };

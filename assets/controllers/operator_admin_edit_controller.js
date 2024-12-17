@@ -38,33 +38,33 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
 
             if (isValidFormat) {
                 const isValidSum = this.editedCodeFormatChecker(code);
-                console.log('isValidSum', isValidSum)
+                // console.log('isValidSum', isValidSum)
                 const isExistingCode = await this.existingCodeChecker(code);
-                console.log('isExistingCode', isExistingCode)
+                // console.log('isExistingCode', isExistingCode)
 
                 if (isValidSum && !isExistingCode) {
                     // Code is valid and doesn't exist
-                    console.log('Code is valid and unique.');
+                    // console.log('Code is valid and unique.');
                     // Provide positive feedback to the user if necessary
                 } else if (!isValidSum) {
-                    console.log('Sum of first three digits does not equal last two digits.');
+                    // console.log('Sum of first three digits does not equal last two digits.');
                     this.showCodeFormatError('Bad Format.');
-
-                        const newCode = await this.proposeCompliantNewCode();
-                        this.operatorFormCodeTarget.value = newCode;
-                } else if (isExistingCode) {
-                    console.log('Code already exists.');
-                    this.showCodeExistenceError('Existe déjà.');
-
-                        const newCode = await this.proposeCompliantNewCode();
-                        this.operatorFormCodeTarget.value = newCode;
-                }
-            } else {
-                console.log('Code format is not compliant.');
-                this.showCodeFormatError('Format invalide.');
 
                     const newCode = await this.proposeCompliantNewCode();
                     this.operatorFormCodeTarget.value = newCode;
+                } else if (isExistingCode) {
+                    // console.log('Code already exists.');
+                    this.showCodeExistenceError('Existe déjà.');
+
+                    const newCode = await this.proposeCompliantNewCode();
+                    this.operatorFormCodeTarget.value = newCode;
+                }
+            } else {
+                // console.log('Code format is not compliant.');
+                this.showCodeFormatError('Format invalide.');
+
+                const newCode = await this.proposeCompliantNewCode();
+                this.operatorFormCodeTarget.value = newCode;
             }
         }, 800);
     }
@@ -81,30 +81,30 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
 
     // Method to display format errors
     showCodeFormatError(message) {
-            this.operatorFormCodeTarget.value = '';
-            this.operatorFormCodeTarget.placeholder = message;
+        this.operatorFormCodeTarget.value = '';
+        this.operatorFormCodeTarget.placeholder = message;
     }
 
 
 
     // Method to display existence errors
     showCodeExistenceError(message) {
-            // You can implement visual feedback to the user here
-            this.operatorFormCodeTarget.value = '';
-            this.operatorFormCodeTarget.placeholder = message;
+        // You can implement visual feedback to the user here
+        this.operatorFormCodeTarget.value = '';
+        this.operatorFormCodeTarget.placeholder = message;
     }
 
 
 
     async existingCodeChecker(code) {
         // Since axios.post is asynchronous, we need to handle it with async/await or promises
-        console.log('checking if code already exists, code:', code);
+        // console.log('checking if code already exists, code:', code);
         return axios.post('/docauposte/operator/check-if-code-exist', { code })
             .then(response => {
-                console.log('response', response)
-                console.log('response.data.found', response.data.found)
+                // console.log('response', response)
+                // console.log('response.data.found', response.data.found)
                 const found = response.data.found;
-                console.log('found', found)
+                // console.log('found', found)
                 return found;
             })
             .catch(error => {
@@ -117,7 +117,7 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
 
 
     editedCodeFormatChecker(code) {
-        console.log('editing code format checker, code:', code);
+        // console.log('editing code format checker, code:', code);
         const sumOfFirstThreeDigits = code
             .substring(0, 3)
             .split('')
@@ -131,13 +131,13 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
 
 
     async proposeCompliantNewCode() {
-        console.log('proposing a compliant new code');
+        // console.log('proposing a compliant new code');
 
         const newCode = this.codeGenerator();
-        console.log('newCode', newCode);
+        // console.log('newCode', newCode);
         const response = await this.existingCodeChecker(newCode);
         if (response) {
-            console.log('newCode already exists, proposing a new one');
+            // console.log('newCode already exists, proposing a new one');
             return this.proposeCompliantNewCode();
         } else {
             return newCode;

@@ -26,7 +26,7 @@ document.addEventListener("turbo:load", () => {
       preselectDropdownValues();
     })
     .catch((error) => {
-      console.log('Error fetching entity data:', error);
+      // console.log('Error fetching entity data:', error);
     });
 });
 
@@ -46,7 +46,7 @@ function initCascadingDropdowns() {
       const filteredProductLines = filterData(productLinesData, "zone_id", selectedValue);
 
       populateDropdown(productLineDropdown, filteredProductLines, {
-        defaultText: 'Sélectionner une ProductLine',
+        defaultText: 'Sélectionner une Ligne',
         textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
       });
 
@@ -59,7 +59,7 @@ function initCascadingDropdowns() {
       const filteredCategories = filterData(categoriesData, "product_line_id", selectedValue);
 
       populateDropdown(categoryDropdown, filteredCategories, {
-        defaultText: 'Sélectionner une Categorie',
+        defaultText: 'Sélectionner une Catégorie',
         textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
       });
 
