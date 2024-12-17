@@ -4,11 +4,8 @@ namespace App\Service;
 
 use Psr\Log\LoggerInterface;
 
-use Symfony\Component\Routing\RouterInterface;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,8 +26,6 @@ class IncidentRedirectService extends AbstractController
 {
     private $logger;
 
-    private $router;
-
     private $zoneRepository;
     private $productLineRepository;
     private $categoryRepository;
@@ -41,8 +36,6 @@ class IncidentRedirectService extends AbstractController
     public function __construct(
         LoggerInterface                 $logger,
 
-        RouterInterface                 $router,
-
         ZoneRepository                  $zoneRepository,
         ProductLineRepository           $productLineRepository,
         CategoryRepository              $categoryRepository,
@@ -51,8 +44,6 @@ class IncidentRedirectService extends AbstractController
 
     ) {
         $this->logger                   = $logger;
-
-        $this->router                   = $router;
 
         $this->settingsService          = $settingsService;
 
@@ -151,42 +142,55 @@ class IncidentRedirectService extends AbstractController
             $timeResponse = $this->timeComparison($session->get('cyclingTimer'));
 
             if (!$timeResponse) {
-                return new JsonResponse(['redirect' => false, 'cause' => 'issue in cyclingIncident service, not enough idle time']);
-            }
-            $session->set('cyclingTimer', time());
-
-            $currentIncidentCyclingKey = $session->get('incidentsKeyCycling');
-
-            // Increment the key to move to the next incident
-            $currentIncidentCyclingKey++;
-
-            // Check if the key exceeds the number of incidents
-            if ($currentIncidentCyclingKey >= $numberOfIncidents) {
-                $currentIncidentCyclingKey = 0;
+                $response = new JsonResponse(['redirect' => false, 'cause' => 'issue in cyclingIncident service, not enough idle time']);
             }
 
-            // Save the updated key back to the session
-            $session->set('incidentsKeyCycling', $currentIncidentCyclingKey);
-
-            // Retrieve arrays from the session
-            $arrayOfProductLines = $session->get('arrayOfProductLines', []);
-            $arrayOfIncidents = $session->get('arrayOfIncidents', []);
-
-            // Ensure the arrays contain the expected data
-            if (isset($arrayOfProductLines[$currentIncidentCyclingKey]) && isset($arrayOfIncidents[$currentIncidentCyclingKey])) {
-                return new JsonResponse([
-                    'redirect' => $this->generateUrl('app_redirected_incident', [
-                        'productLineId' => $arrayOfProductLines[$currentIncidentCyclingKey],
-                        'incidentId' => $arrayOfIncidents[$currentIncidentCyclingKey]
-                    ])
-                ]);
-            } else {
-                return new JsonResponse(['redirect' => false, 'cause' => 'Invalid incident data']);
-            }
+            $response = $this->getNextIncidentRedirectResponse($session, $numberOfIncidents);
         }
-        return new JsonResponse(['redirect' => false, 'cause' => 'No incidents to display']);
+
+        if (empty($response)) {
+            $response = new JsonResponse(['redirect' => false, 'cause' => 'No incidents to display']);
+        }
+
+        return $response;
     }
 
+
+    public function getNextIncidentRedirectResponse(SessionInterface $session, int $numberOfIncidents): JsonResponse
+    {
+        // Update cycling timer
+        $session->set('cyclingTimer', time());
+
+        // Retrieve and update incident index
+        $currentIncidentCyclingKey = $session->get('incidentsKeyCycling');
+        $currentIncidentCyclingKey++;
+
+        // Handle wrap-around
+        if ($currentIncidentCyclingKey >= $numberOfIncidents) {
+            $currentIncidentCyclingKey = 0;
+        }
+
+        // Update session with new index
+        $session->set('incidentsKeyCycling', $currentIncidentCyclingKey);
+
+        // Retrieve incident data from session
+        $arrayOfProductLines = $session->get('arrayOfProductLines', []);
+        $arrayOfIncidents = $session->get('arrayOfIncidents', []);
+
+        // Validate data and generate redirect
+        if (
+            isset($arrayOfProductLines[$currentIncidentCyclingKey]) &&
+            isset($arrayOfIncidents[$currentIncidentCyclingKey])
+        ) {
+            $redirectUrl = $this->generateUrl('app_redirected_incident', [
+                'productLineId' => $arrayOfProductLines[$currentIncidentCyclingKey],
+                'incidentId' => $arrayOfIncidents[$currentIncidentCyclingKey],
+            ]);
+            return new JsonResponse(['redirect' => $redirectUrl]);
+        } else {
+            return new JsonResponse(['redirect' => false, 'cause' => 'Invalid incident data']);
+        }
+    }
 
 
 
@@ -241,13 +245,15 @@ class IncidentRedirectService extends AbstractController
 
                 $response = $this->incidentByButton($button);
                 break;
+
+            default:
+
+                $response = false;
+
+                break;
         }
 
-        if ($response) {
-            return $response;
-        }
-
-        return false;
+        return $response;
     }
 
 
@@ -270,7 +276,7 @@ class IncidentRedirectService extends AbstractController
             }
         }
 
-        if (count($incidentsArray) != 0) {
+        if (!empty($incidentsArray)) {
 
             $incidentsArraySorted = $this->incidentArraySortByPriority($incidentsArray);
 
@@ -282,7 +288,6 @@ class IncidentRedirectService extends AbstractController
                 return $incident->getProductLine()->getId();
             }, $incidentsArraySorted);
 
-            // return [$productLine->getID(), $incidentsArraySorted[0]->getId()];
             return [$productLinesIdsArray, $incidentsIdsArray];
         }
         return false;

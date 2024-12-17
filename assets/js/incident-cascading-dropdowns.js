@@ -1,132 +1,92 @@
-// Remove the hardcoded data from your JavaScript file
+// docauposte2/assets/js/incident-cascading-dropdowns.js
+
 import { getEntityData } from './serverVariable.js';
+import { filterData, populateDropdown, resetDropdowns, preselectValues } from './dropdown-utils.js';
 
 let incidentZoneData = null;
 let incidentProductLinesData = null;
 let incidentsCategoriesData = null;
 
-document.addEventListener("turbo:load", function () {
-  // Fetch data from the API endpoint
+document.addEventListener("turbo:load", () => {
   getEntityData()
     .then((data) => {
       incidentZoneData = data.zones;
       incidentProductLinesData = data.productLines;
       incidentsCategoriesData = data.incidentsCategories;
 
-      // Call the function that initializes the cascading dropdowns
-      // after the data has been fetched
       initCascadingDropdowns();
-      resetDropdowns();
-      preselectValues();
+      resetDropdowns(
+        document.getElementById("incident_zone"),
+        document.getElementById("incident_productLine"),
+        document.getElementById("incidents_incidentsCategory")
+      );
+      preselectDropdownValues();
+    })
+    .catch((error) => {
+      console.log('Error fetching entity data:', error);
     });
 });
-// Existing filterData and populateDropdown functions here...
-function filterData(data, key, value) {
-  return data.filter((item) => item[key] === value);
-}
-
-function populateDropdown(dropdown, data, selectedId) {
-  dropdown.innerHTML = "";
-  const defaultOption = document.createElement("option");
-  defaultOption.value = "";
-  defaultOption.selected = true;
-  defaultOption.disabled = true;
-  defaultOption.hidden = true;
-  defaultOption.textContent = "Selectionner une option";
-  dropdown.appendChild(defaultOption);
-
-  data.forEach((item) => {
-    const option = document.createElement("option");
-    option.value = item.id;
-
-    // Split the item name by '.' and capitalize the first word
-    let nameParts = item.name.split(".");
-    if (nameParts.length > 0) {
-      nameParts[0] =
-        nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
-    }
-    option.textContent = nameParts[0]; // Use only the first part after the split.
-
-    // If this option should be selected, set the 'selected' attribute
-    if (item.id === selectedId) {
-      option.selected = true;
-    }
-    dropdown.appendChild(option);
-  });
-}
 
 function initCascadingDropdowns() {
-  const zone = document.getElementById("incident_zone");
-  const productline = document.getElementById("incident_productLine");
-  const incidentsCategory = document.getElementById(
-    "incidents_incidentsCategory"
-  );
+  const zoneDropdown = document.getElementById("incident_zone");
+  const productLineDropdown = document.getElementById("incident_productLine");
+  const incidentsCategoryDropdown = document.getElementById("incidents_incidentsCategory");
 
-  if (zone && productline && incidentsCategory) {
-    zone.addEventListener("change", handleIncidentsZoneChange);
-    populateDropdown(incidentsCategory, incidentsCategoriesData); // Populate 'category' dropdown here
-    populateDropdown(zone, incidentZoneData);
-    resetDropdowns();
+  if (zoneDropdown && productLineDropdown && incidentsCategoryDropdown) {
+    populateDropdown(zoneDropdown, incidentZoneData, {
+      defaultText: 'Sélectionner une Zone',
+    });
+
+    populateDropdown(incidentsCategoryDropdown, incidentsCategoriesData, {
+      defaultText: 'Sélectionner une Catégorie d\'Incident',
+      textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+    });
+
+    zoneDropdown.addEventListener("change", (event) => {
+      const selectedValue = parseInt(event.target.value);
+      const filteredProductLines = filterData(incidentProductLinesData, "zone_id", selectedValue);
+
+      populateDropdown(productLineDropdown, filteredProductLines, {
+        defaultText: 'Sélectionner une Ligne',
+        textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+      });
+
+      // Reset dependent dropdowns
+      resetDropdowns(productLineDropdown);
+    });
   }
 }
 
-function handleIncidentsZoneChange(event) {
-  const selectedValue = parseInt(event.target.value);
-  const filteredProductLines = filterData(
-    incidentProductLinesData,
-    "zone_id",
-    selectedValue
-  );
-  populateDropdown(
-    document.getElementById("incident_productLine"),
-    filteredProductLines
-  );
-}
+function preselectDropdownValues() {
+  const zoneDropdown = document.getElementById("incident_zone");
+  const productLineDropdown = document.getElementById("incident_productLine");
 
-function resetDropdowns() {
-  const zone = document.getElementById("incident_zone");
-  const productline = document.getElementById("incident_productLine");
-  const incidentsCategory = document.getElementById(
-    "incidents_incidentsCategory"
-  );
+  preselectValues([
+    {
+      dropdown: zoneDropdown,
+      data: incidentZoneData,
+      id: zoneIdFromServer,
+      options: { defaultText: 'Sélectionner une Zone' },
+    },
+  ]);
 
-  if (zone) zone.selectedIndex = 0;
-  if (productline) productline.selectedIndex = 0;
-  if (incidentsCategory) incidentsCategory.selectedIndex = 0;
-}
-
-// Existing turbo:load event listener and preselectValues function here...
-
-
-
-function preselectValues() {
-  const incidentZoneDropdown = document.getElementById("incident_zone");
-  const incidentProductLineDropdown = document.getElementById(
-    "incident_productLine"
-  );
-
-  // Preselect zone
-  if (zoneIdFromServer && incidentZoneDropdown) {
-    const filteredProductLines = filterData(
-      incidentProductLinesData,
-      "zone_id",
-      parseInt(zoneIdFromServer)
-    );
-    populateDropdown(incidentZoneDropdown, incidentZoneData, zoneIdFromServer);
-    if (incidentProductLineDropdown) {
-      populateDropdown(
-        incidentProductLineDropdown,
-        filteredProductLines,
-        productLineIdFromServer
-      );
-    }
+  if (zoneIdFromServer && productLineDropdown) {
+    const filteredProductLines = filterData(incidentProductLinesData, "zone_id", parseInt(zoneIdFromServer));
+    populateDropdown(productLineDropdown, filteredProductLines, {
+      selectedId: productLineIdFromServer,
+      defaultText: 'Sélectionner une Ligne',
+      textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+    });
   }
 
-  // Preselect product line
-  if (incidentProductLineDropdown && productLineIdFromServer) {
-    incidentProductLineDropdown.value = productLineIdFromServer;
+  if (productLineIdFromServer && productLineDropdown) {
+    productLineDropdown.value = productLineIdFromServer;
   }
 }
+
+
+
+
 
 document.addEventListener("turbo:load", function () {
   let createIncidentsCategoryButton = document.getElementById(
@@ -184,6 +144,9 @@ document.addEventListener("turbo:load", function () {
     });
   }
 });
+
+
+
 
 let modifyIncidentForm = document.querySelector("#modifyIncidentForm");
 if (modifyIncidentForm) {
@@ -243,7 +206,6 @@ if (modifyIncidentForm) {
     // Get the incident ID from the URL
     let form = document.getElementById("modifyIncidentForm");
     let actionUrl = form.getAttribute("action");
-    let incidentId = actionUrl.split("/").pop();
 
     // Send formData to server...
     fetch(actionUrl, {

@@ -16,8 +16,6 @@ use App\Repository\IncidentCategoryRepository;
 use App\Entity\Incident;
 use App\Entity\User;
 
-use App\Service\FolderCreationService;
-use Doctrine\Common\Collections\ArrayCollection;
 
 // This class is responsible for the logic of managing the incidents files
 class IncidentService extends AbstractController
@@ -31,9 +29,6 @@ class IncidentService extends AbstractController
     private $incidentRepository;
     private $incidentCategoryRepository;
 
-    private $folderCreationService;
-
-
     public function __construct(
         EntityManagerInterface $manager,
         ParameterBagInterface $params,
@@ -41,8 +36,6 @@ class IncidentService extends AbstractController
 
         IncidentRepository $incidentRepository,
         ProductLineRepository $productLineRepository,
-        FolderCreationService $folderCreationService,
-
         IncidentCategoryRepository $incidentCategoryRepository,
     ) {
         $this->manager = $manager;
@@ -52,8 +45,6 @@ class IncidentService extends AbstractController
         $this->productLineRepository = $productLineRepository;
         $this->incidentRepository = $incidentRepository;
         $this->incidentCategoryRepository = $incidentCategoryRepository;
-
-        $this->folderCreationService = $folderCreationService;
     }
 
 
@@ -66,8 +57,8 @@ class IncidentService extends AbstractController
 
         $newName = $request->request->get('incidents_newFileName');
 
-        $IncidentCategoryId = $request->request->get('incidents_incidentsCategory');
-        $IncidentCategory = $this->incidentCategoryRepository->find($IncidentCategoryId);
+        $incidentCategoryId = $request->request->get('incidents_incidentsCategory');
+        $incidentCategory = $this->incidentCategoryRepository->find($incidentCategoryId);
 
         $productLineId = $request->request->get('incident_productLine');
         $productLine = $this->productLineRepository->find($productLineId);
@@ -122,7 +113,7 @@ class IncidentService extends AbstractController
             $incident->setName($name);
             $incident->setPath($path);
             $incident->setUploader($user);
-            $incident->setIncidentCategory($IncidentCategory);
+            $incident->setIncidentCategory($incidentCategory);
             $incident->setProductLine($productLine);
             $incident->setuploadedAt(new \DateTime());
             $incident->setAutoDisplayPriority($autoDisplayPriority);
@@ -299,7 +290,7 @@ class IncidentService extends AbstractController
             $incident = null;
         }
 
-        // Get the next incident key in the array 
+        // Get the next incident key in the array
         $nextIncidentKey = $currentIncidentKey + 1;
 
         // Get the next incident in the array based on the next incident key

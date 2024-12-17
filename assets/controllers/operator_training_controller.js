@@ -30,7 +30,6 @@ export default class OperatorTrainingController extends Controller {
             const isValid = regex.test(surname.trim());
             this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir un nom valide(sans accent, ni caractères spéciaux).");
             if (isValid) {
-                // this.newOperatorLastnameTarget.disabled = true;
                 if (this.newOperatorFirstnameTarget.value.trim() === "") {
                     this.newOperatorFirstnameTarget.disabled = false;
                     this.newOperatorFirstnameTarget.focus();
@@ -63,7 +62,6 @@ export default class OperatorTrainingController extends Controller {
 
                 let invertedCombined = `${this.newOperatorSurnameTarget.value.trim()}.${this.newOperatorFirstnameTarget.value.trim()}`;
                 this.newOperatorInvertedNameTarget = invertedCombined.toLowerCase();
-                // this.newOperatorFirstnameTarget.disabled = true;
                 this.validateNewOperatorName();
             }
         }, 1400);
@@ -135,11 +133,6 @@ export default class OperatorTrainingController extends Controller {
             if (isValid) {
                 console.log('Code is valid, clearing duplicate check results and checking for existing entity by code')
                 this.duplicateCheckResults.code = null;
-                // if (this.duplicateCheckResults.name === null) {
-                //     this.checkForExistingEntityByCode();
-                // } else {
-                //     this.checkForCorrespondingEntity();
-                // };
                 this.checkForExistingEntityByCode();
 
             }
