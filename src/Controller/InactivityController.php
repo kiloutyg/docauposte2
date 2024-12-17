@@ -49,7 +49,7 @@ class InactivityController extends AbstractController
     }
 
 
-    // Route to check inactivity and respond to the client side 
+    // Route to check inactivity and respond to the client side
     #[Route(path: '/inactivity_check', name: 'inactivity_check')]
     public function inactivityCheck(Request $request)
     {

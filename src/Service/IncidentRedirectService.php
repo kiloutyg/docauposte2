@@ -143,9 +143,9 @@ class IncidentRedirectService extends AbstractController
 
             if (!$timeResponse) {
                 $response = new JsonResponse(['redirect' => false, 'cause' => 'issue in cyclingIncident service, not enough idle time']);
+            } else {
+                $response = $this->getNextIncidentRedirectResponse($session, $numberOfIncidents);
             }
-
-            $response = $this->getNextIncidentRedirectResponse($session, $numberOfIncidents);
         }
 
         if (empty($response)) {

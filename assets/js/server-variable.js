@@ -1,4 +1,4 @@
-// assets/js/serverVariable.js
+// assets/js/server-variable.js
 
 // Variables to store promises for each API call
 let entityDataPromise = null;

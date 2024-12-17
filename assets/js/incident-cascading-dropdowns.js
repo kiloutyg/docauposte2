@@ -1,6 +1,6 @@
 // docauposte2/assets/js/incident-cascading-dropdowns.js
 
-import { getEntityData } from './serverVariable.js';
+import { getEntityData } from './server-variable.js';
 import { filterData, populateDropdown, resetDropdowns, preselectValues } from './dropdown-utils.js';
 
 let incidentZoneData = null;

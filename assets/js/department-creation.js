@@ -1,5 +1,5 @@
 
-import { getEntityData } from './serverVariable.js';
+import { getEntityData } from './server-variable.js';
 // Declaring variable 
 let departmentsData = null;
 // // Event listener to fetch department data and initialize cascading dropdowns

@@ -1,4 +1,4 @@
-import { getSettingsData } from './serverVariable.js';
+import { getSettingsData } from './server-variable.js';
 import { timer } from './timer.js';
 
 document.addEventListener("turbo:load", function () {
