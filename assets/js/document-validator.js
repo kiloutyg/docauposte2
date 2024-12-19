@@ -235,14 +235,12 @@ function hasDuplicateSelections(selectedValidators) {
  */
 function handleFormSubmit(event) {
   const selectedValidators = getSelectedValidatorIds();
-  // console.log('minimumValidatorsRequired', minimumValidatorsRequired);
 
   if (selectedValidators.length < minimumValidatorsRequired) {
     event.preventDefault();
     alert(`Veuillez sélectionner au moins ${minimumValidatorsRequired} valideur(s).`);
   } else {
     // Proceed with form submission or additional validation
-    // console.log('Form submitted successfully.');
   }
 }
 

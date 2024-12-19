@@ -23,7 +23,7 @@ document.addEventListener("turbo:load", () => {
       preselectDropdownValues();
     })
     .catch((error) => {
-      // console.log('Error fetching entity data:', error);
+      console.error('Error fetching entity data:', error);
     });
 });
 
