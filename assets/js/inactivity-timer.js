@@ -8,7 +8,7 @@ document.addEventListener("turbo:load", function () {
             timer(delay, 'inactivity_check');
         })
         .catch((error) => {
-            console.error('Query server variable error', error);
+            console.error('Query server variable error', response.data.cause, error);
             timer(300000, 'inactivity_check');
         });
 });

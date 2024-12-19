@@ -93,7 +93,6 @@ class IncidentController extends AbstractController
     #[Route('/admin/incidentmanagementview', name: 'incident_management_view')]
     public function incidentManagementView()
     {
-        $originurl = $this->request->headers->get('referer');
 
         $incidents = $this->entityFetchingService->getIncidents();
 
@@ -144,6 +143,8 @@ class IncidentController extends AbstractController
                     'categories' => $productLine->getCategories(),
                 ]
             );
+
+            // return $this
         }
     }
 

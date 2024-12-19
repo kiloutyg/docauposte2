@@ -56,6 +56,8 @@ class IncidentRedirectService extends AbstractController
 
 
 
+
+
     public function inactivityCheck(Request $request): JsonResponse
     {
         $session = $request->getSession();
@@ -83,6 +85,8 @@ class IncidentRedirectService extends AbstractController
 
 
 
+
+
     public function redirectionManagement(SessionInterface $session): JsonResponse
     {
 
@@ -92,6 +96,7 @@ class IncidentRedirectService extends AbstractController
 
         if (($routeName == 'app_zone' || $routeName == 'app_productLine' || $routeName == 'app_category' || $routeName == 'app_button') && $routeParams != null) {
             $response = $this->incidentRouteDetermination($routeName, $routeParams);
+            $this->logger->info('response', [$response]);
             if ($response) {
                 $session->remove('lastActivity', time());
                 $session->set('inactive', false);
@@ -102,7 +107,7 @@ class IncidentRedirectService extends AbstractController
                 $arrayOfIncidents = $response[1];
                 $session->set('arrayOfIncidents', $arrayOfIncidents);
 
-                $numberOfIncidents = count($response[0]);
+                $numberOfIncidents = count($arrayOfIncidents);
                 if ($numberOfIncidents > 1) {
                     $session->set('numberOfIncidents', $numberOfIncidents);
                     $session->set('incidentsKeyCycling', 0);
@@ -156,6 +161,9 @@ class IncidentRedirectService extends AbstractController
     }
 
 
+
+
+
     public function getNextIncidentRedirectResponse(SessionInterface $session, int $numberOfIncidents): JsonResponse
     {
         // Update cycling timer
@@ -195,14 +203,16 @@ class IncidentRedirectService extends AbstractController
 
 
 
+
     public function timeComparison(int $time): bool
     {
-
+        
         if ((time() - $time) > $this->settingsService->getIncidentAutoDisplayTimerInSeconds()) {
             return true;
         }
         return false;
     }
+
 
 
 
@@ -259,6 +269,7 @@ class IncidentRedirectService extends AbstractController
 
 
 
+
     public function incidentByZone(Zone $zone)
     {
         $productLines = $zone->getProductLines();
@@ -296,13 +307,28 @@ class IncidentRedirectService extends AbstractController
 
 
 
+
     public function incidentByProductLine(ProductLine $productLine)
     {
+        $response = false;
+
         $incidents = $productLine->getIncidents();
-        if ($incidents->count() != 0) {
-            return [$productLine->getId(), $incidents[0]->getId()];
+        $productLinesIdsArray = array($productLine->getId());
+
+        if ($incidents->count() == 1) {
+            $incidentsIdsArray = array($incidents[0]->getId());
+            $response = [$productLinesIdsArray, $incidentsIdsArray];
+        } elseif ($incidents->count() > 1) {
+            foreach ($incidents as $incident) {
+                $incidentsArray[] = $incident;
+            }
+            $incidentsArraySorted = $this->incidentArraySortByPriority($incidentsArray);
+            $incidentsIdsArray = array_map(function ($incident) {
+                return $incident->getId();
+            }, $incidentsArraySorted);
+            $response = [$productLinesIdsArray, $incidentsIdsArray];
         }
-        return false;
+        return $response;
     }
 
 
@@ -322,6 +348,9 @@ class IncidentRedirectService extends AbstractController
         $category = $button->getCategory();
         return $this->incidentByCategory($category);
     }
+
+
+
 
     public function incidentArraySortByPriority(array $incidentsArray)
     {

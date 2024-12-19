@@ -8,7 +8,7 @@ document.addEventListener("turbo:load", function () {
             timer(delay, 'cycling_incident');
         })
         .catch((error) => {
-            console.error('Error fetching settings data:', error);
+            console.error('Error fetching settings data:', response.data.cause, error);
             timer(300000, 'cycling_incident');
         });
 });
