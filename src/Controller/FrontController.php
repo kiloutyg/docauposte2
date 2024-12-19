@@ -187,8 +187,8 @@ class FrontController extends AbstractController
     }
 
 
-    // Render the productline page and redirect to the mandatory incident page if there is one
-    #[Route('/productline/{productLineId}', name: 'productLine')]
+    // Render the productLine page and redirect to the mandatory incident page if there is one
+    #[Route('/productLine/{productLineId}', name: 'productLine')]
     public function productLine(int $productLineId = null, ProductLine $productLine = null): Response
     {
 

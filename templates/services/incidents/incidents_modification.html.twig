@@ -33,7 +33,7 @@
 				</p>
 				<iframe
 					title="incident-file-display-for-modification"
-					src="{{ path('app_modify_incident_download_file', { 'id': incident.id }) }}" width="69%"
+					src="{{ path('app_modify_incident_download_file', { 'incidentId': incident.id }) }}" width="69%"
 					height="950"
 					target="_blank"></iframe>
 
@@ -64,7 +64,7 @@
 
 						Zone:
 						{{ incident.productLine.zone.name|split('.')|first|upper }}
-						&nbsp;>&nbsp;Produit:
+						&nbsp;>&nbsp;Ligne:
 						{{ incident.productLine.name|split('.')|first|upper}}
 
 					</div>
@@ -134,7 +134,7 @@
 						</div>
 						<div
 							class="col-md-10 col-sm-10 mt-2 mb-2">
-							{{ form_widget(form.autoDisplayPriority,{'attr': {'class': 'form-select', 'name': 'incidents_autoDisplayPriority', 'id': 'incidents_autoDisplayPriority'}}
+							{{ form_widget(form.autoDisplayPriority,{'attr': {'class': 'form-select', 'name': 'incident_autoDisplayPriority', 'id': 'incident_autoDisplayPriority'}}
 							) }}
 						</div>
 					</div>

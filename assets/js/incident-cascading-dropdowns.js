@@ -2,6 +2,7 @@
 
 import { getEntityData } from './server-variable.js';
 import { filterData, populateDropdown, resetDropdowns, preselectValues } from './dropdown-utils.js';
+import axios from 'axios'; // Import axios
 
 let incidentZoneData = null;
 let incidentProductLinesData = null;
@@ -147,7 +148,7 @@ document.addEventListener("turbo:load", function () {
 
 
 
-
+// TODO : Delete this form handling to use symfony formtype exclusively
 let modifyIncidentForm = document.querySelector("#modifyIncidentForm");
 if (modifyIncidentForm) {
   modifyIncidentForm.addEventListener("submit", function (event) {
@@ -186,13 +187,13 @@ if (modifyIncidentForm) {
 
     // Get the selected values
     if (incidentProductLineDropdown) {
-      let productlineValue = parseInt(
+      let productLineValue = parseInt(
         incidentProductLineDropdown.options[
           incidentProductLineDropdown.selectedIndex
         ].value,
         10
       );
-      formData.append("incident[productline]", productlineValue);
+      formData.append("incident[productLine]", productLineValue);
     }
 
     // Get the name value
@@ -203,6 +204,30 @@ if (modifyIncidentForm) {
       formData.append("incident[name]", nameValue);
     }
 
+    let autoDisplayPriority = document.getElementById("incident_autoDisplayPriority")
+    if (autoDisplayPriority) {
+      let autoDisplayPriorityValue = parseInt(
+        autoDisplayPriority.options[
+          autoDisplayPriority.selectedIndex
+        ].value,
+        6
+      );
+      formData.append("incident[autoDisplayPriority]", autoDisplayPriorityValue);
+    }
+
+    let incidentCategory = document.getElementById("incident_incidentCategory")
+    if (incidentCategory) {
+      let incidentCategoryValue = parseInt(
+        incidentCategory.options[
+          incidentCategory.selectedIndex
+        ].value,
+        10
+      );
+      console.log('incidentCategoryValue', incidentCategoryValue)
+      formData.append("incident[incidentCategory]", incidentCategoryValue)
+    }
+
+
     // Get the incident ID from the URL
     let form = document.getElementById("modifyIncidentForm");
     let actionUrl = form.getAttribute("action");
@@ -211,12 +236,13 @@ if (modifyIncidentForm) {
     fetch(actionUrl, {
       method: "POST",
       body: formData,
+    }).then((response) => {
+      console.log('response', response)
+      window.location.reload(true)
     })
-      .then((response) => response)
       .catch((error) => {
-        then((response) => response.json());
         console.error("Error:", error);
-        // Handle fetch errors here...
       });
+
   });
 }

@@ -29,7 +29,7 @@ use App\Service\EntityFetchingService;
 use App\Service\ErrorService;
 
 #[Route('/productline_admin', name: 'app_productLine_')]
-// This controller manage the logic of the productline admin interface
+// This controller manage the logic of the productLine admin interface
 class ProductLineAdminController extends AbstractController
 {
 
@@ -91,7 +91,7 @@ class ProductLineAdminController extends AbstractController
 
 
     #[Route('/{productLineId}', name: 'admin')]
-    // This function is responsible for rendering the productline's admin interface
+    // This function is responsible for rendering the productLine's admin interface
     public function productLineAdmin(int $productLineId = null, ProductLine $productLine = null): Response
     {
         $pageLevel = 'productLine';
@@ -106,7 +106,7 @@ class ProductLineAdminController extends AbstractController
         $zone = $productLine->getZone();
         $zoneProductLines = $zone->getProductLines();
 
-        // Get all the uploads and incidents related to the productline
+        // Get all the uploads and incidents related to the productLine
         $uploads = $this->entityHeritanceService->uploadsByParentEntity(
             'productLine',
             $productLine
@@ -152,11 +152,11 @@ class ProductLineAdminController extends AbstractController
             $categoryname = $request->request->get('categoryname') . '.' . $productLine->getName();
             $category = $this->categoryRepository->findOneBy(['name' => $categoryname]);
 
-            // If the category already exists, redirect to the productline admin interface  with a flash message
+            // If the category already exists, redirect to the productLine admin interface  with a flash message
             if ($category) {
                 $this->addFlash('danger', 'La catégorie existe deja');
                 return $this->redirectToRoute('app_productLine_admin', ['productLineId' => $productLineId]);
-                // If the category doesn't exist, create it and redirect to the productline admin interface with a flash message
+                // If the category doesn't exist, create it and redirect to the productLine admin interface with a flash message
             } else {
                 $count = $this->categoryRepository->count(['productLine' => $productLineId]);
                 $sortOrder = $count + 1;
