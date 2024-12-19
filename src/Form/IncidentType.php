@@ -27,12 +27,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 // It also contains the logic for the form validation and the form submission.
 class IncidentType extends AbstractType
 {
-    private $productLineRepository;
     private $logger;
 
-    public function __construct(ProductLineRepository $productLineRepository, LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger)
     {
-        $this->productLineRepository = $productLineRepository;
         $this->logger = $logger;
     }
     public function buildForm(FormBuilderInterface $builder, array $options): void

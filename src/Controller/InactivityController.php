@@ -77,7 +77,7 @@ class InactivityController extends AbstractController
 
 
     // Render the redirected incidents page
-    #[Route('/productline/{productLineId}/redirected_incident/{incidentId}', name: 'redirected_incident')]
+    #[Route('/productLine/{productLineId}/redirected_incident/{incidentId}', name: 'redirected_incident')]
     public function redirectedIncident(int $productLineId = null, int $incidentId = null)
     {
 

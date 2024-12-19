@@ -135,7 +135,7 @@ class ZoneAdminController extends AbstractController
 
 
 
-    // Creation of new productline
+    // Creation of new productLine
     #[Route('/create_productline/{zoneId}', name: 'admin_create_productline')]
     public function createProductLine(Request $request, int $zoneId = null): Response
     {
@@ -147,7 +147,7 @@ class ZoneAdminController extends AbstractController
         } else {
 
             $zone = $this->zoneRepository->find($zoneId);
-            // Check if the productline already exists by comparing the productline name and the zone
+            // Check if the productLine already exists by comparing the productLine name and the zone
             $productLineName = $request->request->get('productLineName') . '.' . $zone->getName();
             $productLine = $this->productLineRepository->findOneBy(['name' => $productLineName]);
 
@@ -175,7 +175,7 @@ class ZoneAdminController extends AbstractController
     }
 
 
-    // Delete a productline and all its children entities, it depends on the entitydeletionService
+    // Delete a productLine and all its children entities, it depends on the entitydeletionService
     #[Route('/delete_productline/{productLineId}', name: 'admin_delete_productline')]
     public function deleteEntityProductLine(int $productLineId): Response
     {

@@ -19,7 +19,7 @@ document.addEventListener("turbo:load", () => {
       initCascadingDropdowns();
       resetDropdowns(
         document.getElementById("zone"),
-        document.getElementById("productline"),
+        document.getElementById("productLine"),
         document.getElementById("category"),
         document.getElementById("upload_button")
       );
@@ -31,7 +31,7 @@ document.addEventListener("turbo:load", () => {
 
 function initCascadingDropdowns() {
   const zoneDropdown = document.getElementById("zone");
-  const productLineDropdown = document.getElementById("productline");
+  const productLineDropdown = document.getElementById("productLine");
   const categoryDropdown = document.getElementById("category");
   const buttonDropdown = document.getElementById("upload_button");
 
@@ -80,7 +80,7 @@ function initCascadingDropdowns() {
 
 function preselectDropdownValues() {
   const zoneDropdown = document.getElementById("zone");
-  const productLineDropdown = document.getElementById("productline");
+  const productLineDropdown = document.getElementById("productLine");
   const categoryDropdown = document.getElementById("category");
   const buttonDropdown = document.getElementById("upload_button");
 

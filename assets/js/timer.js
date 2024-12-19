@@ -21,7 +21,6 @@ export function timer(delay, locationString) {
                 console.error('Error notifying server of inactivity:', error);
                 resetTimer();
             });
-
     };
     if (locationString === 'inactivity_check') {
         // Attach event listeners using a helper function

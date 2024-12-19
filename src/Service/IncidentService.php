@@ -4,6 +4,8 @@ namespace App\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -157,8 +159,12 @@ class IncidentService extends AbstractController
 
 
     // This function is responsible for the logic of modifying the incidents files
-    public function modifyIncidentFile(incident $incident, User $user)
+    public function modifyIncidentFile(incident $incident)
     {
+
+        $this->logger->info('incident', [$incident]);
+
+        $user = $this->getUser();
         // Get the new file directly from the incident object
         $newFile = $incident->getFile();
 
@@ -169,7 +175,6 @@ class IncidentService extends AbstractController
         $oldFilePath = $incident->getPath();
 
         $productLine = $incident->getProductLine();
-        $this->logger->info('productLine entity', [$productLine]);
         $productLineName = $productLine->getName();
         $parts = explode('.', $productLineName);
         $parts = array_reverse($parts);
@@ -214,11 +219,24 @@ class IncidentService extends AbstractController
             }
         }
 
+        if ($incident->getAutoDisplayPriority() != 0) {
+            $incident->setActivateAutoDisplay(true);
+        } else {
+            $incident->setActivateAutoDisplay(false);
+        }
+
         // Persist changes and flush to the database
         $incident->setuploadedAt(new \DateTime());
         $this->manager->persist($incident);
         $this->manager->flush();
+        $this->addFlash('success', 'Incident modifié');
+
+        return $this->redirectToRoute('app_productLine_admin', [
+            'productLineId' => $productLine->getId()
+        ]);
     }
+
+
 
 
     // This function is responsible for the logic of grouping the incidents files by parent entity
@@ -227,7 +245,7 @@ class IncidentService extends AbstractController
 
         $groupedincidents = [];
 
-        // Group incidents by zone, productLine, category, and productline
+        // Group incidents by zone, productLine, category, and productLine
         foreach ($incidents as $incident) {
             $productLine = $incident->getProductLine();
             $productLineName = $productLine->getName();
@@ -259,7 +277,7 @@ class IncidentService extends AbstractController
             $incidentEntity = $this->incidentRepository->find(['id' => $incidentId]);
         }
 
-        // If the incident does not exist, we get the productline entity from the productline id
+        // If the incident does not exist, we get the productLine entity from the productLine id
         if (!$incidentEntity) {
             $productLine = $this->productLineRepository->find($productLineId);
         } else {
@@ -268,7 +286,7 @@ class IncidentService extends AbstractController
 
         $incidentsInProductLine   = [];
 
-        // Get all the incidents of the productline and sort them by id ascending
+        // Get all the incidents of the productLine and sort them by id ascending
         $incidentsInProductLine = $this->incidentRepository->findBy(
             ['productLine' => $productLineId],
             ['id' => 'ASC'] // order by id ascending

@@ -1,6 +1,6 @@
 window.addEventListener("turbo:load", () => {
   const deleteZoneButtons = document.querySelectorAll(".delete-zone");
-  const deleteProductLineButtons = document.querySelectorAll(".delete-productline");
+  const deleteProductLineButtons = document.querySelectorAll(".delete-productLine");
   const deleteCategoryButtons = document.querySelectorAll(".delete-category");
   const deleteButtonButtons = document.querySelectorAll(".delete-button");
   const deleteUserButtons = document.querySelectorAll(".delete-user");

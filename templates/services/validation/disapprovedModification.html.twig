@@ -33,7 +33,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						<aside
 							class="position-absolute end-0">
 							<a
-								href="{{ path('app_productLine_admin', {productLineId: upload.button.category.productline.id}) }}" class="btn shadow  bg-dark "
+								href="{{ path('app_productLine_admin', {productLineId: upload.button.category.productLine.id}) }}" class="btn shadow  bg-dark "
 								style="color:white">
 								<span
 									class="fa fa-gear"></span>
@@ -41,9 +41,9 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 									<span
 										class="button-text">
 										Centre d'Admin de
-										{{upload.button.category.productline.name|split('.')|first|upper}}
+										{{upload.button.category.productLine.name|split('.')|first|upper}}
 										de la zone
-										{{upload.button.category.productline.zone.name|split('.')|first|upper}}
+										{{upload.button.category.productLine.zone.name|split('.')|first|upper}}
 									</span>
 
 
