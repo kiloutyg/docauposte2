@@ -318,7 +318,7 @@ class IncidentRedirectService extends AbstractController
         if ($incidents->count() == 1) {
             $incidentsIdsArray = array($incidents[0]->getId());
             $response = [$productLinesIdsArray, $incidentsIdsArray];
-        } else if ($incidents->count() > 1) {
+        } elseif ($incidents->count() > 1) {
             foreach ($incidents as $incident) {
                 $incidentsArray[] = $incident;
             }
