@@ -278,10 +278,6 @@ export default class OperatorAdminCreationController extends Controller {
         const nameOperatorId = this.duplicateCheckResults.name?.data?.operator?.id;
         const codeOperatorId = this.duplicateCheckResults.code?.data?.operator?.id;
         const entitiesMatch = matchesFound && nameOperatorId === codeOperatorId;
-
-        const message = entitiesMatch
-            ? "Nom et Code opérateurs correspondent à un même opérateur. Vous pouvez le transferer."
-            : "Nom et Code opérateurs ne correspondent pas à un même opérateur. Veuillez saisir un autre nom ou code opérateur";
         this.manageNewOperatorSubmitButton(!entitiesMatch);
     }
 
@@ -352,8 +348,6 @@ export default class OperatorAdminCreationController extends Controller {
             clearTimeout(this.suggestTimeout);
             this.suggestTimeout = setTimeout(async () => {
                 const regex = /^[A-Z]+$/;
-                // const upperCasedInput = input.toUpperCase();
-                // const isValid = regex.test(upperCasedInput);
                 const isValid = regex.test(input.toUpperCase().trim());
                 if (isValid) {
                     const response = await this.fetchNameSuggestions(input, 'lastname');

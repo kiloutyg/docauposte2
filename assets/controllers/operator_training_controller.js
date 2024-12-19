@@ -444,10 +444,6 @@ export default class OperatorTrainingController extends Controller {
 
 
 
-    newOperatorHandleSubmit() {
-
-    }
-
     suggestSurname(event) {
         const input = event.target.value;
         if (input.length > 0) { // Only start suggesting after at least 3 characters have been entered
@@ -543,12 +539,6 @@ export default class OperatorTrainingController extends Controller {
             const parts = response.name.split('.'); // Split the 'name' to get firstName and lastName
             const firstName = this.capitalizeFirstLetter(parts[0]); // Capitalize the first name
             const lastName = parts.length > 1 ? parts[1].toUpperCase() : ''; // Handle last name if present
-            const teamName = response.team_name; // Get the team name
-            const teamId = response.team_id; // Get the team id
-            const uapName = response.uap_name; // Get the uap name
-            const uapId = response.uap_id; // Get the uap id
-            const code = response.code; // Get the code
-            const isTrainerBool = response.is_trainer; // Get the isTrainer value
             return `<div class="traininglist-suggestion-item" data-firstname="${firstName}" data-lastname="${lastName}">
             ${lastName} ${firstName}
         </div>`;
@@ -558,11 +548,6 @@ export default class OperatorTrainingController extends Controller {
             item.addEventListener('click', (event) => {
                 const firstname = event.currentTarget.getAttribute('data-firstname');
                 const lastname = event.currentTarget.getAttribute('data-lastname');
-                const code = event.currentTarget.getAttribute('data-code');
-                const team = event.currentTarget.getAttribute('data-team');
-                const uap = event.currentTarget.getAttribute('data-uap');
-                const isTrainer = event.currentTarget.getAttribute('data-istrainer');
-
 
                 this.newOperatorFirstnameTarget.value = firstname;
                 this.newOperatorSurnameTarget.value = lastname;
