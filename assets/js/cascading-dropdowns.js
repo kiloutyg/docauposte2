@@ -1,197 +1,123 @@
-// Remove the hardcoded data from your JavaScript file
-let zonesData = []; // array to store zone data fetched from API
-let productLinesData = []; // array to store product line data fetched from API
-let categoriesData = []; // array to store category data fetched from API
-let buttonsData = []; // array to store button data fetched from API
+// docauposte2/assets/js/cascading-dropdowns.js
 
-// Fetch data from the API endpoint and populate the respective arrays
-fetch("/docauposte/api/entity_data")
-  .then((response) => response.json()) // parse the JSON response
-  .then((data) => {
-    zonesData = data.zones;
-    productLinesData = data.productLines;
-    categoriesData = data.categories;
-    buttonsData = data.buttons;
+import { getEntityData } from './server-variable.js';
+import { filterData, populateDropdown, resetDropdowns, preselectValues } from './dropdown-utils.js';
 
-    // Call the function that initializes the cascading dropdowns
-    // after the data has been fetched
-    initCascadingDropdowns();
-    resetDropdowns();
-    preselectValues();
-  });
+let zonesData = null;
+let productLinesData = null;
+let categoriesData = null;
+let buttonsData = null;
 
-// Function to filter data based on key-value pair
-function filterData(data, key, value) {
-  return data.filter((item) => item[key] === value);
-}
-
-// Function to populate a dropdown with data
-function populateDropdown(dropdown, data, selectedId) {
-  dropdown.innerHTML = ""; // clear the dropdown options first
-
-  // Create a default option and set its attributes
-  const defaultOption = document.createElement("option");
-  defaultOption.value = "";
-  defaultOption.selected = true;
-  defaultOption.disabled = true;
-  defaultOption.hidden = true;
-  defaultOption.textContent = "Selectionner une option";
-  dropdown.appendChild(defaultOption);
-
-  // Iterate over the data and create options for each item
-  data.forEach((item) => {
-    const option = document.createElement("option");
-    option.value = item.id;
-
-    // Split the item name by '.' and capitalize the first word
-    let nameParts = item.name.split(".");
-    if (nameParts.length > 0) {
-      nameParts[0] =
-        nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
-    }
-    option.textContent = nameParts[0]; // Use only the first part after the split.
-
-    // If this option should be selected, set the 'selected' attribute
-    if (item.id === selectedId) {
-      option.selected = true;
-    }
-    dropdown.appendChild(option);
-  });
-}
-
-// Function to initialize the cascading dropdowns
-function initCascadingDropdowns() {
-  const zone = document.getElementById("zone");
-  const productline = document.getElementById("productline");
-  const category = document.getElementById("category");
-
-  if (zone && productline && category) {
-    zone.addEventListener("change", handleZoneChange);
-    productline.addEventListener("change", handleProductLineChange);
-    category.addEventListener("change", handleCategoryChange);
-    populateDropdown(zone, zonesData);
-    resetDropdowns();
-  }
-}
-
-// Event handler for Zone dropdown change event
-function handleZoneChange(event) {
-  const selectedValue = parseInt(event.target.value);
-  const filteredProductLines = filterData(
-    productLinesData,
-    "zone_id",
-    selectedValue
-  );
-  populateDropdown(
-    document.getElementById("productline"),
-    filteredProductLines
-  );
-}
-
-// Event handler for Product Line dropdown change event
-function handleProductLineChange(event) {
-  const selectedValue = parseInt(event.target.value);
-  const filteredCategories = filterData(
-    categoriesData,
-    "product_line_id",
-    selectedValue
-  );
-  populateDropdown(document.getElementById("category"), filteredCategories);
-}
-
-// Event handler for Category dropdown change event
-function handleCategoryChange(event) {
-  const selectedValue = parseInt(event.target.value);
-  const filteredButtons = filterData(buttonsData, "category_id", selectedValue);
-  populateDropdown(document.getElementById("upload_button"), filteredButtons);
-}
-
-// Function to reset all dropdowns to their default state
-function resetDropdowns() {
-  const zone = document.getElementById("zone");
-  const productline = document.getElementById("productline");
-  const category = document.getElementById("category");
-  const button = document.getElementById("upload_button");
-
-  if (zone) zone.selectedIndex = 0;
-  if (productline) productline.selectedIndex = 0;
-  if (category) category.selectedIndex = 0;
-  if (button) button.selectedIndex = 0;
-}
-
-// Event listener for Turbo-Links page load event
 document.addEventListener("turbo:load", () => {
-  // Fetch data from the API endpoint on page load
-  fetch("/docauposte/api/entity_data")
-    .then((response) => response.json()) // parse the JSON response
+  getEntityData()
     .then((data) => {
       zonesData = data.zones;
       productLinesData = data.productLines;
       categoriesData = data.categories;
       buttonsData = data.buttons;
 
-      // Initialize the cascading dropdowns and reset them on page load
       initCascadingDropdowns();
-      resetDropdowns();
-      preselectValues();
+      resetDropdowns(
+        document.getElementById("zone"),
+        document.getElementById("productline"),
+        document.getElementById("category"),
+        document.getElementById("upload_button")
+      );
+      preselectDropdownValues();
+    })
+    .catch((error) => {
     });
 });
 
-// Function to preselect values in the dropdowns based on server-side data
-function preselectValues() {
+function initCascadingDropdowns() {
   const zoneDropdown = document.getElementById("zone");
   const productLineDropdown = document.getElementById("productline");
   const categoryDropdown = document.getElementById("category");
-  const buttonDropdown = document.getElementById("upload_button"); // get the button dropdown element
+  const buttonDropdown = document.getElementById("upload_button");
 
-  // Preselect zone based on server-side data
-  if (zoneIdFromServer && zoneDropdown) {
-    const filteredProductLines = filterData(
-      productLinesData,
-      "zone_id",
-      parseInt(zoneIdFromServer)
-    );
-    populateDropdown(zoneDropdown, zonesData, zoneIdFromServer);
-    if (productLineDropdown) {
-      populateDropdown(
-        productLineDropdown,
-        filteredProductLines,
-        productLineIdFromServer
-      );
-    }
+  if (zoneDropdown && productLineDropdown && categoryDropdown) {
+    populateDropdown(zoneDropdown, zonesData, {
+      defaultText: 'Sélectionner une Zone',
+    });
+
+    zoneDropdown.addEventListener("change", (event) => {
+      const selectedValue = parseInt(event.target.value);
+      const filteredProductLines = filterData(productLinesData, "zone_id", selectedValue);
+
+      populateDropdown(productLineDropdown, filteredProductLines, {
+        defaultText: 'Sélectionner une Ligne',
+        textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+      });
+
+      // Reset dependent dropdowns
+      resetDropdowns(categoryDropdown, buttonDropdown);
+    });
+
+    productLineDropdown.addEventListener("change", (event) => {
+      const selectedValue = parseInt(event.target.value);
+      const filteredCategories = filterData(categoriesData, "product_line_id", selectedValue);
+
+      populateDropdown(categoryDropdown, filteredCategories, {
+        defaultText: 'Sélectionner une Catégorie',
+        textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+      });
+
+      // Reset dependent dropdown
+      resetDropdowns(buttonDropdown);
+    });
+
+    categoryDropdown.addEventListener("change", (event) => {
+      const selectedValue = parseInt(event.target.value);
+      const filteredButtons = filterData(buttonsData, "category_id", selectedValue);
+
+      populateDropdown(buttonDropdown, filteredButtons, {
+        defaultText: 'Sélectionner un Bouton',
+        textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+      });
+    });
+  }
+}
+
+function preselectDropdownValues() {
+  const zoneDropdown = document.getElementById("zone");
+  const productLineDropdown = document.getElementById("productline");
+  const categoryDropdown = document.getElementById("category");
+  const buttonDropdown = document.getElementById("upload_button");
+
+  preselectValues([
+    {
+      dropdown: zoneDropdown,
+      data: zonesData,
+      id: zoneIdFromServer,
+      options: { defaultText: 'Sélectionner une Zone' },
+    },
+  ]);
+
+  if (zoneIdFromServer && productLineDropdown) {
+    const filteredProductLines = filterData(productLinesData, "zone_id", parseInt(zoneIdFromServer));
+    populateDropdown(productLineDropdown, filteredProductLines, {
+      selectedId: productLineIdFromServer,
+      defaultText: 'Sélectionner une Ligne',
+      textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+    });
   }
 
-  // Preselect product line based on server-side data
-  if (productLineIdFromServer && productLineDropdown) {
-    const filteredCategories = filterData(
-      categoriesData,
-      "product_line_id",
-      parseInt(productLineIdFromServer)
-    );
-    if (categoryDropdown) {
-      populateDropdown(
-        categoryDropdown,
-        filteredCategories,
-        categoryIdFromServer
-      );
-    }
+  if (productLineIdFromServer && categoryDropdown) {
+    const filteredCategories = filterData(categoriesData, "product_line_id", parseInt(productLineIdFromServer));
+    populateDropdown(categoryDropdown, filteredCategories, {
+      selectedId: categoryIdFromServer,
+      defaultText: 'Sélectionner une Catégorie',
+      textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+    });
   }
 
-  // Preselect category based on server-side data
-  if (categoryIdFromServer && categoryDropdown) {
-    const filteredButtons = filterData(
-      buttonsData,
-      "category_id",
-      parseInt(categoryIdFromServer)
-    );
-    if (buttonDropdown) {
-      populateDropdown(buttonDropdown, filteredButtons, buttonIdFromServer);
-    }
-  }
-
-  // Preselect button based on server-side data
-  if (buttonIdFromServer && buttonDropdown) {
-    buttonDropdown.value = buttonIdFromServer;
+  if (categoryIdFromServer && buttonDropdown) {
+    const filteredButtons = filterData(buttonsData, "category_id", parseInt(categoryIdFromServer));
+    populateDropdown(buttonDropdown, filteredButtons, {
+      selectedId: buttonIdFromServer,
+      defaultText: 'Sélectionner un Bouton',
+      textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+    });
   }
 }
 
@@ -249,7 +175,6 @@ if (modifyForm) {
     // Get the upload ID from the URL
     let form = document.getElementById("modifyForm");
     let actionUrl = form.getAttribute("action");
-    let uploadId = actionUrl.split("/").pop();
 
     // Send formData to server...
     fetch(actionUrl, {
@@ -260,7 +185,6 @@ if (modifyForm) {
       .catch((error) => {
         then((response) => response.json());
         console.error("Error:", error);
-        // Handle fetch errors here...
       });
   });
 }

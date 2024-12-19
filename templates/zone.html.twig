@@ -1,9 +1,17 @@
 {% extends 'base.html.twig' %}
+
 {% block title %}
 	{{zone.name|split('.')|first|upper}}
 	|
 	{{ parent() }}
 {% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+
+	{{ encore_entry_script_tags('inactivity-timer') }}
+{% endblock %}
+
 {% block body %}
 	<div
 		class="inner-container flex-grow-1 d-flex flex-column">
@@ -27,6 +35,7 @@
 				</aside>
 			{% endif %}
 		{% endif %}
+
 		<p>
 			<h2
 				class="text-justify mb-2 mt-4">
@@ -47,10 +56,10 @@
 
 		<div
 			class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+
 			{% if productLines|length > 0 %}
 				<div
 					class="d-flex  mb-5 mt-5 line-list align-items-center justify-content-center flex-wrap">
-
 					{% for productLine in productLines %}
 						<a
 							class="btn btn-primary btn-lg m-5"
@@ -65,16 +74,16 @@
 						</a>
 					{% endfor %}
 				</div>
-
 			{% else %}
-				<div
-					class="alert alert-danger">
-					<a
-						href="#"
-						onclick="event.preventDefault(); window.history.back();">
-						Il n'y a pas de lignes dans cette zone.
-					</a>
-				</div>
+				<button
+					class="btn-warning btn btn-lg"
+					style="color:red"
+					onclick="event.preventDefault(); window.history.back();">
+					Il n'y a pas de lignes dans cette zone.
+				</button>
+				<a
+					href="javascript:void(0)"
+					onclick="event.preventDefault(); window.history.back();"></a>
 			{% endif %}
 		</div>
 	</div>

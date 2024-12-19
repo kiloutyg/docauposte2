@@ -1,43 +1,42 @@
-{% if is_granted('ROLE_LINE_ADMIN') %}
+{% if is_granted('ROLE_ADMIN') %}
 
 	<div
 		class="accordion-item">
-
 		<h2
 			class="accordion-header"
-			id="headingCategory">
+			id="headingZone">
 			<button
 				class="accordion-button fs-3 collapsed"
 				type="button"
 				data-bs-toggle="collapse"
-				data-bs-target="#collapseCategory"
-				aria-expanded="true"
-				aria-controls="collapseCategory">
+				data-bs-target="#collapseZone"
+				aria-expanded="false"
+				aria-controls="collapseZone">
 				<strong>
-					Formulaire de création de boutons :
+					Formulaire de création de Zones :
 				</strong>
 			</button>
 		</h2>
 		<div
-			id="collapseCategory"
+			id="collapseZone"
 			class="accordion-collapse collapse"
-			aria-labelledby="headingCategory"
-			data-bs-parent="#accordionCategory">
+			aria-labelledby="headingZone"
+			data-bs-parent="#accordionAdmin">
 			<div
 				class="accordion-body accordion-bg shadow shadow-inset">
+
 				<div
 					class="card border-0 shadow rounded-3 my-5">
 					<div
 						class="card-body">
 						<div
-							class="row">
+							class="row ">
 							<form
-								class="form-control"
 								method="POST"
-								action="{{ path('app_category_admin_create_button', {categoryId: category.id}) }}">
+								action="{{ path('app_super_admin_create_zone') }}">
 
 								<div
-									class="card border-0 shadow rounded-3 my-5  bg-secondary">
+									class="card border-0 shadow rounded-3 my-5 bg-secondary">
 									<div
 										class="card-body">
 										<div
@@ -45,30 +44,32 @@
 											<div
 												class="col-md-6">
 
-												<h5
+												<h3
 													class="card-title text-center mb-5 fw-light fs-5">
 													<strong>
-														Création de Boutons
+														Création de Zones
 													</strong>
-												</h5>
+												</h3>
 
 												<form
 													class="form-floating"
-													method="POST">
+													method="post">
+
 													<div
 														class="form-control mb-3">
 														<label
-															for="buttonname">
-															Nom du Bouton
+															for="zonename">
+															Nom de la zone
 														</label>
 														<input
 															type="text"
-															name="buttonname"
-															placeholder="Nom du Bouton"
+															name="zonename"
+															placeholder="Nom de la zone"
 															required
 															class="form-control"
-															id="buttonname">
+															id="zonename">
 													</div>
+
 													<div
 														class="d-grid">
 														<button
@@ -77,50 +78,54 @@
 															Valider
 														</button>
 													</div>
+
 												</form>
+												<hr
+													class="my-4">
+
 											</div>
 											<div
 												class="col-md-6">
 												<h5
 													class="card-title text-center mb-5 fw-light fs-5">
 													<strong>
-														Liste des boutons de la Catégorie
-														{{ category.name|split('.')|first|upper }}
-														:
+														Liste des zones :
 													</strong>
 												</h5>
 												<ul
 													class="list-unstyled">
-													{% for button in categoryButtons %}
+													{% for zone in zones %}
 														<li
 															class="form-control d-flex justify-content-between align-items-center mb-2">
 															<a
-																href="{{path('app_button', {buttonId: button.id })}}" class="btn btn-dark">
-																{{ button.name|split('.')|first|upper }}
+																href="{{path('app_zone_admin', {zoneId: zone.id})}}" class="btn btn-dark">
+																{{ zone.name|split('.')|first|upper }}
 															</a>
-															{% if is_granted ('ROLE_LINE_ADMIN') %}
-																<a
-																	href="{{path('app_category_admin_delete_button', {buttonId: button.id})}}" class="btn btn-danger delete-button">
-																	Supprimer
-																</a>
-															{% endif %}
+															<a
+																href="{{path('app_base_views_modification')}}" class="btn btn-info">
+																Modifier
+															</a>
+															<a
+																href="{{path('app_super_admin_delete_zone', {zoneId: zone.id})}}" class="btn btn-danger delete-zone">
+																Supprimer
+															</a>
 														</li>
 													{% else %}
 														<li
-															class="alert alert-danger">
-															<a
-																href="#"
+															class="alert alert-danger d-flex justify-content-center">
+															<button
+																class="btn btn-lg btn-outline-dark"
 																onclick="event.preventDefault(); window.history.back();">
-																Il n'y a pas de boutons dans cette catégorie.
-															</a>
+																Il n'y a pas de zone dans l'application.
+															</button>
+															<a
+																href="javascript:void(0)"
+																onclick="event.preventDefault(); window.history.back();"></a>
 														</li>
 													{% endfor %}
 												</ul>
 											</div>
 										</div>
-
-										<hr
-											class="my-4">
 									</div>
 								</div>
 							</form>

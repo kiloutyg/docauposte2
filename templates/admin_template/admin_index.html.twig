@@ -4,8 +4,16 @@
 	AdminPage
 {% endblock %}
 
-{% block body %}
+{% block javascripts %}
+	{{ parent() }}
 
+	{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
+	{{ encore_entry_script_tags('cascading-dropdowns') }}
+	{{ encore_entry_script_tags('document-validator') }}
+	{{ encore_entry_script_tags('department-creation') }}
+{% endblock %}
+
+{% block body %}
 
 	{% if zoneIdFromServer is not defined %}
 		{% if zone is defined and zone is not null %}
@@ -214,21 +222,18 @@
 
 		<div
 			class="accordion my-3"
-			id="AccordionAdmin">
+			id="accordionAdmin">
 
 			{% if pageLevel is same as('super')  %}
 				{{ render(controller('App\\Controller\\SettingsController::settingsIndex'), options = []) }}
-				{% include "admin_template/admin_template_component/zone_creation_form.html.twig" %}
-				{{ render(controller('App\\Controller\\AccountController::createAccount'), options = []) }}
+				{% include "admin_template/admin_template_components/zone_creation_form.html.twig" %}
+				{{ render(controller('App\\Controller\\AccountController::createAccountController'), options = []) }}
 			{% elseif pageLevel is same as('zone') %}
-				{% include "admin_template/admin_template_component/line_creation_form.html.twig" %}
-
+				{% include "admin_template/admin_template_components/line_creation_form.html.twig" %}
 			{% elseif pageLevel is same as('productLine') %}
-				{% include "admin_template/admin_template_component/category_creation_form.html.twig" %}
-
+				{% include "admin_template/admin_template_components/category_creation_form.html.twig" %}
 			{% elseif pageLevel is same as('category') %}
-				{% include "admin_template/admin_template_component/button_creation_form.html.twig" %}
-
+				{% include "admin_template/admin_template_components/button_creation_form.html.twig" %}
 			{% endif %}
 
 

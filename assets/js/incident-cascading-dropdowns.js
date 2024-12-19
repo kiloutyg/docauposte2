@@ -1,143 +1,92 @@
-// Remove the hardcoded data from your JavaScript file
-let incidentZoneData = [];
-let incidentProductLinesData = [];
-let incidentsCategoriesData = [];
+// docauposte2/assets/js/incident-cascading-dropdowns.js
 
-// Fetch data from the API endpoint
-fetch("/docauposte/api/entity_data")
-  .then((response) => response.json())
-  .then((data) => {
-    incidentZoneData = data.zones;
-    incidentProductLinesData = data.productLines;
-    incidentsCategoriesData = data.incidentsCategories;
+import { getEntityData } from './server-variable.js';
+import { filterData, populateDropdown, resetDropdowns, preselectValues } from './dropdown-utils.js';
 
-    // Call the function that initializes the cascading dropdowns
-    // after the data has been fetched
-    initCascadingDropdowns();
-    resetDropdowns();
-    preselectValues();
-  });
-
-// Existing filterData and populateDropdown functions here...
-function filterData(data, key, value) {
-  return data.filter((item) => item[key] === value);
-}
-
-function populateDropdown(dropdown, data, selectedId) {
-  dropdown.innerHTML = "";
-  const defaultOption = document.createElement("option");
-  defaultOption.value = "";
-  defaultOption.selected = true;
-  defaultOption.disabled = true;
-  defaultOption.hidden = true;
-  defaultOption.textContent = "Selectionner une option";
-  dropdown.appendChild(defaultOption);
-
-  data.forEach((item) => {
-    const option = document.createElement("option");
-    option.value = item.id;
-
-    // Split the item name by '.' and capitalize the first word
-    let nameParts = item.name.split(".");
-    if (nameParts.length > 0) {
-      nameParts[0] =
-        nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
-    }
-    option.textContent = nameParts[0]; // Use only the first part after the split.
-
-    // If this option should be selected, set the 'selected' attribute
-    if (item.id === selectedId) {
-      option.selected = true;
-    }
-    dropdown.appendChild(option);
-  });
-}
-
-function initCascadingDropdowns() {
-  const zone = document.getElementById("incident_zone");
-  const productline = document.getElementById("incident_productline");
-  const incidentsCategory = document.getElementById(
-    "incidents_incidentsCategory"
-  );
-
-  if (zone && productline && incidentsCategory) {
-    zone.addEventListener("change", handleIncidentsZoneChange);
-    populateDropdown(incidentsCategory, incidentsCategoriesData); // Populate 'category' dropdown here
-    populateDropdown(zone, incidentZoneData);
-    resetDropdowns();
-  }
-}
-
-function handleIncidentsZoneChange(event) {
-  const selectedValue = parseInt(event.target.value);
-  const filteredProductLines = filterData(
-    incidentProductLinesData,
-    "zone_id",
-    selectedValue
-  );
-  populateDropdown(
-    document.getElementById("incident_productline"),
-    filteredProductLines
-  );
-}
-
-function resetDropdowns() {
-  const zone = document.getElementById("incident_zone");
-  const productline = document.getElementById("incident_productline");
-  const incidentsCategory = document.getElementById(
-    "incidents_incidentsCategory"
-  );
-
-  if (zone) zone.selectedIndex = 0;
-  if (productline) productline.selectedIndex = 0;
-  if (incidentsCategory) incidentsCategory.selectedIndex = 0;
-}
-
-// Existing turbo:load event listener and preselectValues function here...
+let incidentZoneData = null;
+let incidentProductLinesData = null;
+let incidentsCategoriesData = null;
 
 document.addEventListener("turbo:load", () => {
-  // Fetch data from the API endpoint on page load
-  fetch("/docauposte/api/entity_data")
-    .then((response) => response.json())
+  getEntityData()
     .then((data) => {
       incidentZoneData = data.zones;
       incidentProductLinesData = data.productLines;
+      incidentsCategoriesData = data.incidentsCategories;
 
-      // Initialize the cascading dropdowns and reset them on page load
       initCascadingDropdowns();
-      resetDropdowns();
-      preselectValues();
+      resetDropdowns(
+        document.getElementById("incident_zone"),
+        document.getElementById("incident_productLine"),
+        document.getElementById("incidents_incidentsCategory")
+      );
+      preselectDropdownValues();
+    })
+    .catch((error) => {
+      console.error('Error fetching entity data:', error);
     });
 });
 
-function preselectValues() {
-  const incidentZoneDropdown = document.getElementById("incident_zone");
-  const incidentProductLineDropdown = document.getElementById(
-    "incident_productline"
-  );
+function initCascadingDropdowns() {
+  const zoneDropdown = document.getElementById("incident_zone");
+  const productLineDropdown = document.getElementById("incident_productLine");
+  const incidentsCategoryDropdown = document.getElementById("incidents_incidentsCategory");
 
-  // Preselect zone
-  if (zoneIdFromServer && incidentZoneDropdown) {
-    const filteredProductLines = filterData(
-      incidentProductLinesData,
-      "zone_id",
-      parseInt(zoneIdFromServer)
-    );
-    populateDropdown(incidentZoneDropdown, incidentZoneData, zoneIdFromServer);
-    if (incidentProductLineDropdown) {
-      populateDropdown(
-        incidentProductLineDropdown,
-        filteredProductLines,
-        productLineIdFromServer
-      );
-    }
-  }
+  if (zoneDropdown && productLineDropdown && incidentsCategoryDropdown) {
+    populateDropdown(zoneDropdown, incidentZoneData, {
+      defaultText: 'Sélectionner une Zone',
+    });
 
-  // Preselect product line
-  if (incidentProductLineDropdown && productLineIdFromServer) {
-    incidentProductLineDropdown.value = productLineIdFromServer;
+    populateDropdown(incidentsCategoryDropdown, incidentsCategoriesData, {
+      defaultText: 'Sélectionner une Catégorie d\'Incident',
+      textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+    });
+
+    zoneDropdown.addEventListener("change", (event) => {
+      const selectedValue = parseInt(event.target.value);
+      const filteredProductLines = filterData(incidentProductLinesData, "zone_id", selectedValue);
+
+      populateDropdown(productLineDropdown, filteredProductLines, {
+        defaultText: 'Sélectionner une Ligne',
+        textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+      });
+
+      // Reset dependent dropdowns
+      resetDropdowns(productLineDropdown);
+    });
   }
 }
+
+function preselectDropdownValues() {
+  const zoneDropdown = document.getElementById("incident_zone");
+  const productLineDropdown = document.getElementById("incident_productLine");
+
+  preselectValues([
+    {
+      dropdown: zoneDropdown,
+      data: incidentZoneData,
+      id: zoneIdFromServer,
+      options: { defaultText: 'Sélectionner une Zone' },
+    },
+  ]);
+
+  if (zoneIdFromServer && productLineDropdown) {
+    const filteredProductLines = filterData(incidentProductLinesData, "zone_id", parseInt(zoneIdFromServer));
+    populateDropdown(productLineDropdown, filteredProductLines, {
+      selectedId: productLineIdFromServer,
+      defaultText: 'Sélectionner une Ligne',
+      textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+    });
+  }
+
+  if (productLineIdFromServer && productLineDropdown) {
+    productLineDropdown.value = productLineIdFromServer;
+  }
+}
+
+
+
+
 
 document.addEventListener("turbo:load", function () {
   let createIncidentsCategoryButton = document.getElementById(
@@ -196,6 +145,9 @@ document.addEventListener("turbo:load", function () {
   }
 });
 
+
+
+
 let modifyIncidentForm = document.querySelector("#modifyIncidentForm");
 if (modifyIncidentForm) {
   modifyIncidentForm.addEventListener("submit", function (event) {
@@ -227,7 +179,7 @@ if (modifyIncidentForm) {
     // Get the dropdown elements
 
     let incidentProductLineDropdown = document.getElementById(
-      "incident_productline"
+      "incident_productLine"
     );
     // Get the name input
     let nameInput = document.getElementById("incident_name");
@@ -254,7 +206,6 @@ if (modifyIncidentForm) {
     // Get the incident ID from the URL
     let form = document.getElementById("modifyIncidentForm");
     let actionUrl = form.getAttribute("action");
-    let incidentId = actionUrl.split("/").pop();
 
     // Send formData to server...
     fetch(actionUrl, {

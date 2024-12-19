@@ -20,7 +20,15 @@ class SettingsRepository extends ServiceEntityRepository
     {
         return $this->find(1);
     }
-    
+
+    public function getIncidentAutoDisplayTimerInSeconds()
+    {
+        $interval = $this->getSettings()->getIncidentAutoDisplayTimer();
+        $now = new \DateTime();
+        $ref = new \DateTime();
+        return $now->add($interval)->getTimestamp() - $ref->getTimestamp();
+    }
+
     //    /**
     //     * @return Settings[] Returns an array of Settings objects
     //     */

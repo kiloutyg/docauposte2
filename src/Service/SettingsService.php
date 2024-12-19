@@ -29,7 +29,7 @@ class SettingsService extends AbstractController
 
     private $settings;
 
-
+    private $incidentAutoDisplayTimerInSeconds;
 
     public function __construct(
         LoggerInterface             $logger,
@@ -69,7 +69,6 @@ class SettingsService extends AbstractController
         return $this->settings;
     }
 
-
     // This function is responsible for updating the settings in the database
     public function updateSettings(Request $request): Response
     {
@@ -98,5 +97,13 @@ class SettingsService extends AbstractController
             $response = $e->getMessage();
         }
         return new Response($response);
+    }
+
+    public function getIncidentAutoDisplayTimerInSeconds()
+    {
+        if ($this->incidentAutoDisplayTimerInSeconds === null) {
+            $this->incidentAutoDisplayTimerInSeconds = $this->settingsRepository->getIncidentAutoDisplayTimerInSeconds();
+        }
+        return $this->incidentAutoDisplayTimerInSeconds;
     }
 }

@@ -2,28 +2,38 @@
 
 namespace App\Controller;
 
+use Psr\Log\LoggerInterface;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
+use App\Repository\SettingsRepository;
+
 use App\Service\EntityFetchingService;
 use App\Service\SettingsService;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 # This controller is responsible for fetching data from the database and returning it as JSON
 
 class ApiController extends AbstractController
 {
     private $entityFetchingService;
+    private $settingsRepository;
     private $settingsService;
-
+    private $logger;
     public function __construct(
         EntityFetchingService $entityFetchingService,
+        SettingsRepository $settingsRepository,
         SettingsService $settingsService,
+
+        LoggerInterface $logger,
     ) {
         $this->entityFetchingService = $entityFetchingService;
+        $this->settingsRepository = $settingsRepository;
         $this->settingsService = $settingsService;
+        $this->logger = $logger;
     }
 
 
@@ -131,16 +141,18 @@ class ApiController extends AbstractController
 
         $uploadValidation = $settings->isUploadValidation();
         $validatorNumber = $settings->getValidatorNumber();
-        $training = $settings->isTraining();
-        $operatorRetrainingDelay = $settings->getOperatorRetrainingDelay();
-        $OperatorAutoDeleteDelay = $settings->getOperatorAutoDeleteDelay();
+
+        $incidentAutoDisplayTimer = ($this->settingsRepository->getIncidentAutoDisplayTimerInSeconds() * 100);
+
+
+        $this->logger->info('incidentAutoDisplayTimer', [
+            $incidentAutoDisplayTimer
+        ]);
 
         $responseData = [
             'uploadValidation' => $uploadValidation,
             'validatorNumber' => $validatorNumber,
-            'training' => $training,
-            'operatorRetrainingDelay' => $operatorRetrainingDelay,
-            'OperatorAutoDeleteDelay' => $OperatorAutoDeleteDelay
+            'incidentAutoDisplayTimer' => $incidentAutoDisplayTimer
         ];
 
         return new JsonResponse($responseData);

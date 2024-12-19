@@ -18,9 +18,9 @@
 
 		</h2>
 		<div
-			id="collapseProductline"
+			id="collapseProductLine"
 			class="accordion-collapse collapse "
-			aria-labelledby="headingProductline"
+			aria-labelledby="headingProductLine"
 			data-bs-parent="#accordionAdmin">
 			<div
 				class="accordion-body accordion-bg shadow shadow-inset">
@@ -109,11 +109,15 @@
 
 											{% else %}
 												<li
-													class="alert alert-danger">
-													<a
-														href="{{path('app_base')}}">
+													class="alert alert-danger d-flex justify-content-center">
+													<button
+														class="btn btn-lg btn-outline-dark"
+														onclick="event.preventDefault(); window.history.back();">
 														Il n'y a pas de lignes dans cette zone.
-													</a>
+													</button>
+													<a
+														href="javascript:void(0)"
+														onclick="event.preventDefault(); window.history.back();"></a>
 												</li>
 											{% endfor %}
 										</ul>

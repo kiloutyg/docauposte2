@@ -1,13 +1,15 @@
-{% block stylesheets %}
-	{{
-            encore_entry_link_tags("app")
-        }}
+{% extends 'blank.html.twig' %}
+{% block title %}
+	Incident-Alert
+
 {% endblock %}
+
 {% block body %}
 	<div
 		class="d-flex align-items-center  flex-row">
 
 		<iframe
+			title="incident-file-display-for-view"
 			src="{{ path('app_incident_download_file', { 'incidentId': incident.id }) }}" width="80%"
 			class="vh-100"
 			target="_blank"></iframe>

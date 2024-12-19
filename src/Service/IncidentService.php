@@ -16,54 +16,63 @@ use App\Repository\IncidentCategoryRepository;
 use App\Entity\Incident;
 use App\Entity\User;
 
-use App\Service\FolderCreationService;
-use Doctrine\Common\Collections\ArrayCollection;
 
 // This class is responsible for the logic of managing the incidents files
 class IncidentService extends AbstractController
 {
 
-    protected $incidentRepository;
-    protected $manager;
-    protected $projectDir;
-    protected $logger;
-    protected $productlineRepository;
-    protected $folderCreationService;
-    protected $incidentCategoryRepository;
+    private $manager;
+    private $projectDir;
+    private $logger;
 
+    private $productLineRepository;
+    private $incidentRepository;
+    private $incidentCategoryRepository;
 
     public function __construct(
-        FolderCreationService $folderCreationService,
-        ProductLineRepository $productlineRepository,
         EntityManagerInterface $manager,
         ParameterBagInterface $params,
-        IncidentRepository $incidentRepository,
         LoggerInterface $logger,
+
+        IncidentRepository $incidentRepository,
+        ProductLineRepository $productLineRepository,
         IncidentCategoryRepository $incidentCategoryRepository,
     ) {
-        $this->incidentRepository = $incidentRepository;
         $this->manager = $manager;
         $this->projectDir = $params->get('kernel.project_dir');
         $this->logger = $logger;
-        $this->productlineRepository = $productlineRepository;
-        $this->folderCreationService = $folderCreationService;
+
+        $this->productLineRepository = $productLineRepository;
+        $this->incidentRepository = $incidentRepository;
         $this->incidentCategoryRepository = $incidentCategoryRepository;
     }
 
-    
+
     // This function is responsible for the logic of uploading the incidents files
-    public function uploadIncidentFiles(Request $request, $productline,  $IncidentCategoryId, User $user, $newName = null)
+    public function uploadIncidentFiles(Request $request)
     {
         $allowedExtensions = ['pdf'];
         $files = $request->files->all();
         $public_dir = $this->projectDir . '/public';
-        $IncidentCategory = $this->incidentCategoryRepository->findoneBy(['id' => $IncidentCategoryId]);
+
+        $newName = $request->request->get('incidents_newFileName');
+
+        $incidentCategoryId = $request->request->get('incidents_incidentsCategory');
+        $incidentCategory = $this->incidentCategoryRepository->find($incidentCategoryId);
+
+        $productLineId = $request->request->get('incident_productLine');
+        $productLine = $this->productLineRepository->find($productLineId);
+
+        $autoDisplayPriority = $request->request->get('incidents_autoDisplayPriority');
+
+        $user = $this->getUser();
+
 
         foreach ($files as $file) {
 
             // Dynamic folder creation in the case it does not aleady exist
-            $productlinename = $productline->getName();
-            $parts = explode('.', $productlinename);
+            $productLineName = $productLine->getName();
+            $parts = explode('.', $productLineName);
             $parts = array_reverse($parts);
             $folderPath = $public_dir . '/doc';
 
@@ -90,7 +99,7 @@ class IncidentService extends AbstractController
             $fileExtension = pathinfo($name, PATHINFO_EXTENSION); // Gets the file extension
 
             if (file_exists($folderPath . '/' . $name)) {
-                $iteration = count($this->incidentRepository->findBy(['name' => $name, 'ProductLine' => $productline]));
+                $iteration = count($this->incidentRepository->findBy(['name' => $name, 'ProductLine' => $productLine]));
                 $storageName = $originalName . '-' . ($iteration + 1) . '.' . $fileExtension;
                 $path       = $folderPath . '/' . $storageName;
                 $file->move($folderPath . '/', $storageName);
@@ -104,14 +113,19 @@ class IncidentService extends AbstractController
             $incident->setName($name);
             $incident->setPath($path);
             $incident->setUploader($user);
-            $incident->setIncidentCategory($IncidentCategory);
-            $incident->setProductLine($productline);
+            $incident->setIncidentCategory($incidentCategory);
+            $incident->setProductLine($productLine);
             $incident->setuploadedAt(new \DateTime());
+            $incident->setAutoDisplayPriority($autoDisplayPriority);
             $this->manager->persist($incident);
         }
         $this->manager->flush();
         return $name;
     }
+
+
+
+
 
     // This function is responsible for the logic of deleting the incidents files 
     public function deleteIncidentFile($incidentEntity, $productlineEntity)
@@ -121,8 +135,8 @@ class IncidentService extends AbstractController
         $public_dir = $this->projectDir . '/public';
 
         // Dynamic folder creation and file incident
-        $productlinename = $productlineEntity->getName();
-        $parts = explode('.', $productlinename);
+        $productLineName = $productlineEntity->getName();
+        $parts = explode('.', $productLineName);
         $parts = array_reverse($parts);
         $folderPath = $public_dir . '/doc';
 
@@ -145,7 +159,6 @@ class IncidentService extends AbstractController
     // This function is responsible for the logic of modifying the incidents files
     public function modifyIncidentFile(incident $incident, User $user)
     {
-
         // Get the new file directly from the incident object
         $newFile = $incident->getFile();
 
@@ -155,10 +168,10 @@ class IncidentService extends AbstractController
         // Old file path
         $oldFilePath = $incident->getPath();
 
-        // New file path
-        // Dynamic folder creation and file incident
-        $productlinename = $incident->getProductLine()->getName();
-        $parts = explode('.', $productlinename);
+        $productLine = $incident->getProductLine();
+        $this->logger->info('productLine entity', [$productLine]);
+        $productLineName = $productLine->getName();
+        $parts = explode('.', $productLineName);
         $parts = array_reverse($parts);
         $folderPath = $public_dir . '/doc';
 
@@ -233,5 +246,56 @@ class IncidentService extends AbstractController
         }
 
         return $groupedincidents;
+    }
+
+
+
+
+    public function displayIncident(int $productLineId = null, int $incidentId = null)
+    {
+
+        $incidentEntity = null;
+        if ($incidentId != null) {
+            $incidentEntity = $this->incidentRepository->find(['id' => $incidentId]);
+        }
+
+        // If the incident does not exist, we get the productline entity from the productline id
+        if (!$incidentEntity) {
+            $productLine = $this->productLineRepository->find($productLineId);
+        } else {
+            $productLine = $incidentEntity->getProductLine();
+        }
+
+        $incidentsInProductLine   = [];
+
+        // Get all the incidents of the productline and sort them by id ascending
+        $incidentsInProductLine = $this->incidentRepository->findBy(
+            ['productLine' => $productLineId],
+            ['id' => 'ASC'] // order by id ascending
+        );
+
+        // Get the id of each incident and put them in an array
+        $incidentIds = array_map(function ($incident) {
+            return $incident->getId();
+        }, $incidentsInProductLine);
+
+        // Get the key of the current incident in the array
+        $currentIncidentKey = array_search($incidentId, $incidentIds);
+
+        // Get the current incident
+        $incident = $incidentsInProductLine[$currentIncidentKey];
+
+        // If the current incident does not exist, we set it to null
+        if ($currentIncidentKey === false) {
+            $incident = null;
+        }
+
+        // Get the next incident key in the array
+        $nextIncidentKey = $currentIncidentKey + 1;
+
+        // Get the next incident in the array based on the next incident key
+        $nextIncident  = isset($incidentsInProductLine[$nextIncidentKey]) ? $incidentsInProductLine[$nextIncidentKey] : null;
+
+        return [$incident, $productLine, $nextIncident];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Psr\Log\LoggerInterface;
+
 use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,11 +26,12 @@ use App\Repository\DepartmentRepository;
 use App\Service\AccountService;
 use App\Service\EntityFetchingService;
 use App\Service\EntityDeletionService;
-use App\Service\ErrorService;
 
 #[Route('/account', name: 'app_account_')]
 class AccountController extends AbstractController
 {
+    private $logger;
+
     private $em;
 
     private $userRepository;
@@ -37,9 +40,10 @@ class AccountController extends AbstractController
     private $accountService;
     private $entityFetchingService;
     private $entityDeletionService;
-    private $errorService;
 
     public function __construct(
+        LoggerInterface $logger,
+
         EntityManagerInterface $em,
 
         UserRepository $userRepository,
@@ -48,9 +52,10 @@ class AccountController extends AbstractController
         AccountService $accountService,
         EntityFetchingService $entityFetchingService,
         EntityDeletionService $entityDeletionService,
-        ErrorService                    $errorService,
 
     ) {
+        $this->logger = $logger;
+
         $this->em = $em;
 
         $this->userRepository = $userRepository;
@@ -59,16 +64,35 @@ class AccountController extends AbstractController
         $this->accountService = $accountService;
         $this->entityFetchingService = $entityFetchingService;
         $this->entityDeletionService = $entityDeletionService;
-        $this->errorService = $errorService;
     }
+
 
 
 
     // Creation of new user account destined to the super admin
     #[Route(path: '/create', name: 'create')]
-    public function createAccount(Request $request): Response
+    public function createAccountController(Request $request): Response
     {
-        if ($request->getMethod('GET')) {
+        $this->logger->info('full request', [$request]);
+
+        if ($request->isMethod('POST')) {
+
+            $this->logger->info('isPOST');
+
+            try {
+                $this->logger->info('isPost and will go to service');
+
+                $this->accountService->createAccount($request);
+
+                $this->addFlash('success', 'Le compte a bien été créé.');
+            } catch (\Exception $e) {
+                // Catch and handle the exception.
+                $this->addFlash('danger', $e->getMessage());
+            }
+            return $this->redirectToRoute('app_super_admin');
+        } else {
+            $this->logger->info('iSGET');
+
             return $this->render(
                 '/services/accountservices/create_account.html.twig',
                 [
@@ -76,19 +100,13 @@ class AccountController extends AbstractController
                     'users'       => $this->entityFetchingService->getUsers(),
                 ]
             );
-        } else if ($request->getMethod('POST')) {
-            try {
-                $result = $this->accountService->createAccount($request);
-                if ($result) {
-                    $this->addFlash('success', 'Le compte a bien été créé.');
-                }
-            } catch (\Exception $e) {
-                // Catch and handle the exception.
-                $this->addFlash('danger', $e->getMessage());
-            }
-            return $this->redirectToRoute('app_super_admin');
         }
     }
+
+
+
+
+
 
 
     // This function is responsible for rendering the account modifiying interface destined to the super admin
@@ -122,6 +140,10 @@ class AccountController extends AbstractController
     }
 
 
+
+
+
+
     // This function is responsible for managing the logic of the account deletion
     #[Route(path: '/delete_account/basic', name: 'delete_account_basic')]
     public function delete_account_basic(Request $request): Response
@@ -136,6 +158,10 @@ class AccountController extends AbstractController
         }
         return $this->redirect($originUrl);
     }
+
+
+
+
 
     // This function is responsible for managing the unblocking of an account
     #[Route(path: '/delete_account/unblock_account', name: 'unblock_account')]
@@ -152,6 +178,10 @@ class AccountController extends AbstractController
         return $this->redirect($originUrl);
     }
 
+
+
+
+
     // This function is responsible for managing the logic of the account deletion
     #[Route(path: '/delete_account', name: 'delete_account')]
     public function delete_account(Request $request): Response
@@ -167,6 +197,9 @@ class AccountController extends AbstractController
         }
         return $this->redirect($originUrl);
     }
+
+
+
 
 
     // Logic to create a new department and display a message

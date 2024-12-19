@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-// use \Psr\Log\LoggerInterface;
+use \Psr\Log\LoggerInterface;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -39,7 +39,7 @@ class IncidentController extends AbstractController
     private $em;
     private $authChecker;
     private $request;
-
+    private $logger;
 
     // Repository methods
     private $incidentRepository;
@@ -53,7 +53,7 @@ class IncidentController extends AbstractController
 
     public function __construct(
         EntityManagerInterface          $em,
-        // LoggerInterface                 $logger,
+        LoggerInterface                 $logger,
         AuthorizationCheckerInterface   $authChecker,
         RequestStack                    $requestStack,
 
@@ -72,11 +72,10 @@ class IncidentController extends AbstractController
 
         $this->em                           = $em;
         $this->authChecker                  = $authChecker;
-        // $this->logger                       = $logger;
+        $this->logger                       = $logger;
         $this->request                      = $requestStack->getCurrentRequest();
 
         // Variables related to the repositories
-
         $this->incidentCategoryRepository   = $incidentCategoryRepository;
         $this->incidentRepository           = $incidentRepository;
         $this->productLineRepository        = $productLineRepository;
@@ -86,6 +85,9 @@ class IncidentController extends AbstractController
         $this->entitydeletionService        = $entitydeletionService;
         $this->entityFetchingService        = $entityFetchingService;
     }
+
+
+
 
     // Render the Incident management view in any role level admin page
     #[Route('/admin/incidentmanagementview', name: 'incident_management_view')]
@@ -107,51 +109,19 @@ class IncidentController extends AbstractController
         );
     }
 
-    // Render the incidents page and filter the incidents by productline and sort them by id ascending to display them in the right order
-    #[Route('/productline/{productLineId}/incident/{incidentId}', name: 'mandatory_incident')]
+
+
+
+    // Render the incidents page and filter the incidents by productLine and sort them by id ascending to display them in the right order
+    #[Route('/productLine/{productLineId}/incident/{incidentId}', name: 'mandatory_incident')]
     public function mandatoryIncident(int $productLineId = null, int $incidentId = null): Response
     {
-        $incidentEntity = null;
-        if ($incidentId != null) {
-            $incidentEntity = $this->incidentRepository->findOneBy(['id' => $incidentId]);
-        }
+        $this->logger->info('mandatory incident is being called', ['productLineId' => $productLineId, 'incidentId' => $incidentId]);
 
-        // If the incident does not exist, we get the productline entity from the productline id
-        if (!$incidentEntity) {
-            $productLine = $this->productLineRepository->findOneBy(['id' => $productLineId]);
-        } else {
-            $productLine = $incidentEntity->getProductLine();
-        }
-
-        $incidents   = [];
-
-        // Get all the incidents of the productline and sort them by id ascending
-        $incidents = $this->incidentRepository->findBy(
-            ['productLine' => $productLineId],
-            ['id' => 'ASC'] // order by id ascending
-        );
-
-        // Get the id of each incident and put them in an array
-        $incidentIds = array_map(function ($incident) {
-            return $incident->getId();
-        }, $incidents);
-
-        // Get the key of the current incident in the array
-        $currentIncidentKey = array_search($incidentId, $incidentIds);
-
-        // Get the current incident
-        $incident = $incidents[$currentIncidentKey];
-
-        // If the current incident does not exist, we set it to null
-        if ($currentIncidentKey === false) {
-            $incident = null;
-        }
-
-        // Get the next incident key in the array 
-        $nextIncidentKey = $currentIncidentKey + 1;
-
-        // Get the next incident in the array based on the next incident key
-        $nextIncident  = isset($incidents[$nextIncidentKey]) ? $incidents[$nextIncidentKey] : null;
+        $response = $this->incidentService->displayIncident($productLineId, $incidentId);
+        $incident       = $response[0];
+        $productLine    = $response[1];
+        $nextIncident   = $response[2];
 
         // If there is an incident we render the incidents page with the incident data and the next incident id to redirect to the next incident page
         if ($incident) {
@@ -161,15 +131,14 @@ class IncidentController extends AbstractController
                     'incidentId'        => $incident ? $incident->getId() : null,
                     'incident'          => $incident,
                     'incidentCategory'  => $incident ? $incident->getIncidentCategory() : null,
-                    'incidents'         => $incidents,
                     'productLineId'     => $productLine->getId(),
                     'nextIncidentId'    => $nextIncident ? $nextIncident->getId() : null
                 ]
             );
-            // If there is no incident we render the productline page
+            // If there is no incident we render the productLine page
         } else {
             return $this->render(
-                'productline.html.twig',
+                'productLine.html.twig',
                 [
                     'productLine' => $productLine,
                     'categories' => $productLine->getCategories(),
@@ -177,6 +146,8 @@ class IncidentController extends AbstractController
             );
         }
     }
+
+
 
 
     // Logic to create a new IncidentCategory and display a message
@@ -209,6 +180,9 @@ class IncidentController extends AbstractController
         }
     }
 
+
+
+
     // Create a route for incidentCategory deletion. It depends on the entitydeletionService.
     #[Route('/incident/delete/incident_incidentsCategory_deletion/{incidentCategoryId}', name: 'incident_incidentsCategory_deletion')]
     public function incidentCategoryDeletion(int $incidentCategoryId, Request $request): Response
@@ -229,25 +203,18 @@ class IncidentController extends AbstractController
 
 
 
+
     // Create a route to upload an incident file. It depends on the IncidentService.
     #[Route('/incident/incident_uploading', name: 'generic_upload_incident_files')]
-    public function generic_upload_incident_files(Request $request): Response
+    public function genericUploadOfIncidentFiles(Request $request): Response
     {
 
         $originUrl = $request->headers->get('referer');
 
         // Check if the form is submitted 
         if ($request->isMethod('POST')) {
-
-            $productline = $request->request->get('incident_productline');
-            $newname = $request->request->get('incidents_newFileName');
-            $IncidentCategoryId = $request->request->get('incidents_incidentsCategory');
-            $IncidentCategory = $this->incidentCategoryRepository->findoneBy(['id' => $IncidentCategoryId]);
-            $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productline]);
-            $user = $this->getUser();
-
             // Use the IncidentService to handle the upload of the Incidents files
-            $name = $this->incidentService->uploadIncidentFiles($request, $productlineEntity, $IncidentCategory, $user, $newname);
+            $name = $this->incidentService->uploadIncidentFiles($request);
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
             return $this->redirect($originUrl);
         } else {
@@ -256,6 +223,8 @@ class IncidentController extends AbstractController
             return $this->redirect($originUrl);
         }
     }
+
+
 
 
     // Create a route to download a file, in more simple terms, to display a file.
@@ -269,6 +238,8 @@ class IncidentController extends AbstractController
     }
 
 
+
+
     // Create a route to visualize the file in the modifcation view.
     #[Route('/incident/modify_download_incident/{id}', name: 'modify_incident_download_file')]
     public function modify_download_file(int $id = null): Response
@@ -279,21 +250,24 @@ class IncidentController extends AbstractController
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
+
+
+
     // Create a route to delete a file
     #[Route('/incident/delete/{productLineId}/{incidentId}', name: 'incident_delete_file')]
     public function delete_file(int $incidentId, int $productLineId, Request $request): Response
     {
-        $productlineEntity = $this->productLineRepository->findoneBy(['id' => $productLineId]);
+        $productLineEntity = $this->productLineRepository->findoneBy(['id' => $productLineId]);
         $originUrl = $request->headers->get('referer');
         $incidentEntity = $this->incidentRepository->find($incidentId);
 
         // Check if the user is the creator of the upload or if he is a super admin
         if ($this->authChecker->isGranted('ROLE_ADMIN')) {
             // Use the incidentService to handle file deletion
-            $name = $this->incidentService->deleteIncidentFile($incidentEntity, $productlineEntity);
+            $name = $this->incidentService->deleteIncidentFile($incidentEntity, $productLineEntity);
         } else if ($this->getUser() === $incidentEntity->getUploader()) {
             // Use the incidentService to handle file deletion
-            $name = $this->incidentService->deleteIncidentFile($incidentEntity, $productlineEntity);
+            $name = $this->incidentService->deleteIncidentFile($incidentEntity, $productLineEntity);
         } else {
             $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer ce document.');
             return $this->redirectToRoute($originUrl);
@@ -303,6 +277,8 @@ class IncidentController extends AbstractController
         return $this->redirect($originUrl);
     }
 
+
+    
 
     // Create a route to modify a file and or display the modification page
     #[Route('/incident/modify_incident/{incidentId}', name: 'incident_modify_file')]

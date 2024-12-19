@@ -17,111 +17,134 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 
 class SettingsType extends AbstractType
 {
+
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-
-            ->add('UploadValidation', CheckboxType::class, [
-                'required' => false,
-                'label' => 'stuff',
-                'attr' => ['class' => 'pretty-toggle'],
-            ])
-            ->add('ValidatorNumber', ChoiceType::class, [
-                'required' => true,
-                'choices' => array_combine(range(1, 10), range(1, 10)),
-                'label' => false,
-                'placeholder' => 'Sélectionner le nombre de validateurs',
-                'attr' => ['class' => '  align-items-center justify-content-center form-select w-25'],
-            ])
-
-            ->add('IncidentAutoDisplay', CheckboxType::class, [
-                'required' => false,
-                'label' => false,
-                'attr' => ['class' => 'pretty-toggle'],
-            ])
-
-
-            ->add('Training', CheckboxType::class, [
-                'required' => false,
-                'label' => false,
-                'attr' => ['class' => 'pretty-toggle'],
-            ])
+            ->add(
+                'UploadValidation',
+                CheckboxType::class,
+                [
+                    'required' => false,
+                    'label' => 'stuff',
+                    'attr' => ['class' => 'pretty-toggle'],
+                ]
+            )
+            ->add(
+                'ValidatorNumber',
+                ChoiceType::class,
+                [
+                    'required' => true,
+                    'choices' => array_combine(range(1, 10), range(1, 10)),
+                    'label' => false,
+                    'placeholder' => 'Sélectionner le nombre de validateurs',
+                    'attr' => ['class' => '  align-items-center justify-content-center form-select m-0 w-25'],
+                ]
+            )
+            ->add(
+                'IncidentAutoDisplay',
+                CheckboxType::class,
+                [
+                    'required' => false,
+                    'label' => false,
+                    'attr' => ['class' => 'pretty-toggle'],
+                ]
+            )
+            ->add(
+                'Training',
+                CheckboxType::class,
+                [
+                    'required' => false,
+                    'label' => false,
+                    'attr' => ['class' => 'pretty-toggle'],
+                ]
+            )
 
         ;
 
-        $builder->add('settingsDateInterval', FormType::class, [
-            'label' => false,
-            'inherit_data' => true,
-            'attr' => ['class' => 'incident-settings-group']
-        ]);
-        $builder->get('settingsDateInterval')
-            ->add('OperatorRetrainingDelay', DateIntervalType::class, [
+        $builder
+            ->add(
+                'settingsDateInterval',
+                FormType::class,
+                [
+                    'label' => false,
+                    'inherit_data' => true,
+                    'attr' => ['class' => 'incident-settings-group']
+                ]
+            );
+
+        $intervalArray =
+            [
                 'required' => true,
                 'label' => false,
+                'widget' => 'choice',
+                'attr' => ['class' => 'm-0 w-25'],
+                'with_days' => false,
+                'with_years' => false
+            ];
+        $months =
+            [
                 'labels' => [
                     'months' => false,
                 ],
-                'widget' => 'choice',
-                'with_years' => false,
-                'with_months' => true,
                 'months' => array_combine(range(1, 12), range(1, 12)),
-                'with_days' => false,
-                'with_minutes' => false,
                 'placeholder' => 'Sélectionner le délai en mois',
-                'attr' => ['class' => 'm-0 w-25'],
-            ])
-            ->add('OperatorInactivityDelay', DateIntervalType::class, [
-                'required' => true,
-                'label' => false,
-                'labels' => [
-                    'months' => false,
-                ],
-                'widget' => 'choice',
-                'with_years' => false,
-                'with_months' => true,
-                'months' => array_combine(range(1, 12), range(1, 12)),
-                'with_days' => false,
-                'with_minutes' => false,
-                'placeholder' => 'Sélectionner le délai en mois',
-                'attr' => ['class' => 'm-0 w-25'],
-            ])
-            ->add('OperatorAutoDeleteDelay', DateIntervalType::class, [
-                'required' => true,
-                'label' => false,
-                'labels' => [
-                    'months' => false,
-                ],
-                'widget' => 'choice',
-                'with_years' => false,
-                'with_months' => true,
-                'months' => array_combine(range(1, 12), range(1, 12)),
-                'with_days' => false,
-                'with_minutes' => false,
-                'placeholder' => 'Sélectionner le délai en mois',
-                'attr' => ['class' => 'm-0 w-25'],
-            ])
-            ->add('IncidentAutoDisplayTimer', DateIntervalType::class, [
-                'required' => true,
-                'label' => false,
+            ];
+        $minutes =
+            [
                 'labels' => [
                     'minutes' => false,
                 ],
-                'widget' => 'choice',
-                'with_years' => false,
                 'with_months' => false,
-                'with_days' => false,
                 'with_minutes' => true,
                 'minutes' => array_combine(range(1, 60), range(1, 60)),
                 'placeholder' => 'Sélectionner le délai en minutes',
-                'attr' => ['class' => 'm-0 w-25'],
-            ])
-
+            ];
+        $builder
+            ->get('settingsDateInterval')
+            ->add(
+                'OperatorRetrainingDelay',
+                DateIntervalType::class,
+                array_merge(
+                    $intervalArray,
+                    $months
+                )
+            )
+            ->add(
+                'OperatorInactivityDelay',
+                DateIntervalType::class,
+                array_merge(
+                    $intervalArray,
+                    $months
+                )
+            )
+            ->add(
+                'OperatorAutoDeleteDelay',
+                DateIntervalType::class,
+                array_merge(
+                    $intervalArray,
+                    $months
+                )
+            )
+            ->add(
+                'IncidentAutoDisplayTimer',
+                DateIntervalType::class,
+                array_merge(
+                    $intervalArray,
+                    $minutes
+                )
+            )
         ;
 
         // Submit Button
-        $builder->add('submit', SubmitType::class, [
-            'label' => 'Enregistrer',
-        ]);
+        $builder->add(
+            'submit',
+            SubmitType::class,
+            [
+                'label' => 'Enregistrer',
+            ]
+        );
     }
 
     public function configureOptions(OptionsResolver $resolver): void

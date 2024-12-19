@@ -65,61 +65,66 @@ class AccountService
         $this->logger = $logger;
     }
 
+
+
+
+
     // This function is responsible for creating a new user account and persisting it to the database
     public function createAccount(Request $request)
     {
-        if ($request->getMethod() == 'POST') {
-            $name = $request->request->get('username');
-            $password = $request->request->get('password');
-            $role = $request->request->get('role');
-            $departmentId = $request->request->get('department');
-            $department = $this->departmentRepository->findOneBy(['id' => $departmentId]);
-            $emailAddress = $request->request->get('emailAddress');
+        $name = $request->request->get('username');
+        $password = $request->request->get('password');
+        $role = $request->request->get('role');
+        $departmentId = $request->request->get('department');
+        $department = $this->departmentRepository->findOneBy(['id' => $departmentId]);
+        $emailAddress = $request->request->get('emailAddress');
 
+        // check if the username is already in use
+        $user = $this->userRepository->findOneBy(['username' => $name]);
+        if ($user) {
+            throw new \Exception('Ce nom d\'utilisateur est déja utilisé.');
+        } else {
+            // create the user
+            $user = new User();
 
+            $password = $this->passwordHasher->hashPassword($user, $password);
+            $user->setUsername($name);
+            $user->setPassword($password);
+            $user->setRoles([$role]);
+            $user->setDepartment($department);
+            $user->setEmailAddress($emailAddress);
 
-            // check if the username is already in use
-            $user = $this->userRepository->findOneBy(['username' => $name]);
-            if ($user) {
-                throw new \Exception('Ce nom d\'utilisateur est déja utilisé.');
-            } else {
-                // create the user
-                $user = new User();
-
-                $password = $this->passwordHasher->hashPassword($user, $password);
-                $user->setUsername($name);
-                $user->setPassword($password);
-                $user->setRoles([$role]);
-                $user->setDepartment($department);
-                $user->setEmailAddress($emailAddress);
-
-                $errors = $this->validator->validate($user);
-                if (count($errors) > 0) {
-                    $errorMessages = [];
-                    foreach ($errors as $violation) {
-                        // You can use ->getPropertyPath() if you need to show the field name
-                        // $errorMessages[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
-                        $errorMessages[] = $violation->getMessage();
-                    }
-
-                    // Now you have an array of user-friendly messages you can display
-                    // For example, you can separate them with new lines when displaying in text format:
-                    $errorsString = implode("\n", $errorMessages);
-
-                    // If you need to return JSON response:
-                    // return new JsonResponse(['errors' => $errorMessages], Response::HTTP_BAD_REQUEST);
-
-                    throw new \Exception($errorsString);
+            $errors = $this->validator->validate($user);
+            if (count($errors) > 0) {
+                $errorMessages = [];
+                foreach ($errors as $violation) {
+                    // You can use ->getPropertyPath() if you need to show the field name
+                    // $errorMessages[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
+                    $errorMessages[] = $violation->getMessage();
                 }
 
-                $this->manager->persist($user);
-                $this->manager->flush();
+                // Now you have an array of user-friendly messages you can display
+                // For example, you can separate them with new lines when displaying in text format:
+                $errorsString = implode("\n", $errorMessages);
 
-                return  $user;
+                // If you need to return JSON response:
+                // return new JsonResponse(['errors' => $errorMessages], Response::HTTP_BAD_REQUEST);
+
+                throw new \Exception($errorsString);
             }
+
+            $this->manager->persist($user);
+            $this->manager->flush();
+
+            return  $user;
         }
-        return null;
+
     }
+
+
+
+
+
 
     // This function is responsible for modifying a user account and persisting the modification to the database
     public function modifyAccount(Request $request, UserInterface $currentUser, User $user)

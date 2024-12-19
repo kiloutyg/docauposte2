@@ -1,0 +1,43 @@
+{% extends 'blank.html.twig' %}
+{% block title %}
+	Incident-Alert
+{% endblock %}
+{% block javascripts %}
+	{{ parent()}}
+	{{ encore_entry_script_tags('incident-cycler') }}
+{% endblock %}
+{% block body %}
+	<div
+		class="d-flex align-items-center  flex-row">
+		<iframe
+			title="incident display on automatic redirection event"
+			src="{{ path('app_incident_download_file', { 'incidentId': incidentId }) }}" width="85%"
+			class="vh-100"
+			target="_blank"></iframe>
+		<div
+			style="width: 1%"></div>
+		<div
+			style="width: 13%"
+			class="text-center">
+			<h1
+				style="text-align: center;">
+				<strong>
+					{{incidentCategory.name|split('.')|first|upper}}
+				</strong>
+			</h1>
+			<div
+				style="height: 40vh;"></div>
+			<div
+				style="height: 10vh;"></div>
+			<a
+				href="{{path('app_zone',{'zoneId': zoneId})}}" class="btn btn-warning btn-lg"
+				style="color:black">
+				<strong>
+					Ok, J'ai compris
+				</strong>
+			</a>
+			<div
+				style="width: 1%"></div>
+		</div>
+	</div>
+{% endblock %}
