@@ -197,15 +197,13 @@ class FrontController extends AbstractController
         }
 
         $categoriesInLine = $productLine->getCategories();
-        $this->logger->info('categoriesInLine', [$categoriesInLine]);
 
         $incidentsInProductLine = [];
         $incidentsInProductLine = $this->incidentRepository->findBy(
             ['productLine' => $productLineId],
             ['id' => 'ASC'] // order by id ascending
         );
-        $this->logger->info('incidents', [$incidentsInProductLine]);
-        $this->logger->info('incidents count', [count($incidentsInProductLine)]);
+
 
         if (empty($incidentsInProductLine)) {
             if (count($categoriesInLine) === 1 && !$this->authChecker->isGranted('ROLE_LINE_ADMIN')) {
