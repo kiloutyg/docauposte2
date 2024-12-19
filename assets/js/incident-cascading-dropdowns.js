@@ -2,7 +2,7 @@
 
 import { getEntityData } from './server-variable.js';
 import { filterData, populateDropdown, resetDropdowns, preselectValues } from './dropdown-utils.js';
-import axios from 'axios'; // Import axios
+
 
 let incidentZoneData = null;
 let incidentProductLinesData = null;
@@ -148,7 +148,6 @@ document.addEventListener("turbo:load", function () {
 
 
 
-// TODO : Delete this form handling to use symfony formtype exclusively
 let modifyIncidentForm = document.querySelector("#modifyIncidentForm");
 if (modifyIncidentForm) {
   modifyIncidentForm.addEventListener("submit", function (event) {

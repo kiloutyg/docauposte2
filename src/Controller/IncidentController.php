@@ -239,18 +239,6 @@ class IncidentController extends AbstractController
 
 
 
-    // Create a route to visualize the file in the modifcation view.
-    #[Route('/incident/modify_download_incident/{incidentId}', name: 'modify_incident_download_file')]
-    public function modify_download_file(int $incidentId = null): Response
-    {
-        $file       = $this->incidentRepository->find($incidentId);
-        $path       = $file->getPath();
-        $file       = new File($path);
-        return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
-    }
-
-
-
 
     // Create a route to delete a file
     #[Route('/incident/delete/{productLineId}/{incidentId}', name: 'incident_delete_file')]
