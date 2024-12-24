@@ -62,6 +62,8 @@ function preselectDropdownValues() {
   const zoneDropdown = document.getElementById("incident_zone");
   const productLineDropdown = document.getElementById("incident_productLine");
 
+  console.log('productLineIdFromServer', productLineIdFromServer)
+
   preselectValues([
     {
       dropdown: zoneDropdown,

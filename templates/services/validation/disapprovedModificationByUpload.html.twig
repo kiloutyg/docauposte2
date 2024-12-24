@@ -5,22 +5,11 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-	{% set lastZone = null %}
-	{% set lastProductLine = null %}
-	{% set lastCategory = null %}
-	{% set lastButton = null %}
+	{% block javascripts %}
+		{{ parent() }}
 
-	<script>
-
-		{% if upload is defined and upload is not null %}
-{% set button = upload.button %}
-{% set category = button.category %}
-{% set productLine = category.productLine %}
-{% set zone = productLine.zone %}
-{% endif %}
-{% if zone is defined and zone is not null %}
-zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
-	</script>
+		{{ encore_entry_script_tags('cascading-dropdowns') }}
+	{% endblock %}
 
 
 	<div
