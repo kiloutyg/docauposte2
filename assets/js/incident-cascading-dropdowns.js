@@ -14,13 +14,27 @@ document.addEventListener("turbo:load", () => {
       incidentZoneData = data.zones;
       incidentProductLinesData = data.productLines;
       incidentCategoriesData = data.incidentCategories;
-      console.log('data', data);
+
+      // const incidentCategoryDropdown = document.getElementById("incident_incidentCategory");
+      // if (incidentCategoryDropdown) {
+      //   const incidentCategoryValue = incidentCategoryDropdown.options.selectedIndex;
+      //   console.log('incidentCategoryValue', incidentCategoryValue)
+      // }
+      // preselectValues([
+      //   {
+      //     dropdown: incidentCategoryDropdown,
+      //     data: incidentCategoriesData,
+      //     id: incidentCategoryValue,
+      //     options: { defaultText: 'Sélectionner une Catégorie d\'Incident' },
+      //   },
+      // ]);
+
+
       initCascadingDropdowns();
       resetDropdowns(
         document.getElementById("incident_zone"),
         document.getElementById("incident_productLine"),
-        document.getElementById("incident_incidentCategory")
-
+        // document.getElementById("incident_incidentCategory")
       );
       preselectDropdownValues();
     })
@@ -34,19 +48,27 @@ function initCascadingDropdowns() {
   const productLineDropdown = document.getElementById("incident_productLine");
   const incidentCategoryDropdown = document.getElementById("incident_incidentCategory");
 
-  console.log('zoneDropdown', zoneDropdown);
-  console.log('productLineDropdown', productLineDropdown);
-  console.log('incidentCategoryDropdown', incidentCategoryDropdown);
 
   if (zoneDropdown && productLineDropdown && incidentCategoryDropdown) {
     populateDropdown(zoneDropdown, incidentZoneData, {
       defaultText: 'Sélectionner une Zone',
     });
 
-    populateDropdown(incidentCategoryDropdown, incidentCategoriesData, {
-      defaultText: 'Sélectionner une Catégorie d\'Incident',
-      textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
-    });
+
+    let incidentCategoryValue = parseInt(incidentCategoryDropdown.options.selectedIndex, 10);
+
+    // let incidentCategoryValue = incidentCategoryDropdown.options.selectedIndex;
+
+    console.log('incidentCategoryValue', incidentCategoryValue)
+    console.log('incidentCategoryValue = true', incidentCategoryValue === 0)
+
+    if (incidentCategoryValue === 0) {
+      populateDropdown(incidentCategoryDropdown, incidentCategoriesData, {
+        defaultText: 'Sélectionner une Catégorie d\'Incident',
+        textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
+      });
+    }
+
 
     zoneDropdown.addEventListener("change", (event) => {
       const selectedValue = parseInt(event.target.value);
@@ -69,7 +91,6 @@ function preselectDropdownValues() {
   const zoneDropdown = document.getElementById("incident_zone");
   const productLineDropdown = document.getElementById("incident_productLine");
 
-  console.log('productLineIdFromServer', productLineIdFromServer)
 
   preselectValues([
     {
@@ -92,6 +113,11 @@ function preselectDropdownValues() {
   if (productLineIdFromServer && productLineDropdown) {
     productLineDropdown.value = productLineIdFromServer;
   }
+
+
+
+
+
 }
 
 

@@ -97,7 +97,7 @@ class ApiController extends AbstractController
             'productLines'          => $productLines,
             'categories'            => $categories,
             'buttons'               => $buttons,
-            'incidentCategories'   => $incidentCategories,
+            'incidentCategories'    => $incidentCategories,
             'departments'           => $departments,
 
         ];
