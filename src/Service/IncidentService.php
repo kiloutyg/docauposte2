@@ -57,15 +57,15 @@ class IncidentService extends AbstractController
         $files = $request->files->all();
         $public_dir = $this->projectDir . '/public';
 
-        $newName = $request->request->get('incidents_newFileName');
+        $newName = $request->request->get('incident_newFileName');
 
-        $incidentCategoryId = $request->request->get('incidents_incidentsCategory');
+        $incidentCategoryId = $request->request->get('incident_incidentCategory');
         $incidentCategory = $this->incidentCategoryRepository->find($incidentCategoryId);
 
         $productLineId = $request->request->get('incident_productLine');
         $productLine = $this->productLineRepository->find($productLineId);
 
-        $autoDisplayPriority = $request->request->get('incidents_autoDisplayPriority');
+        $autoDisplayPriority = $request->request->get('incident_autoDisplayPriority');
 
         $user = $this->getUser();
 

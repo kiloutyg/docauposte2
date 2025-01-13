@@ -100,7 +100,7 @@ class IncidentController extends AbstractController
         $incidentCategories = $this->entityFetchingService->getIncidentCategories();
 
         return $this->render(
-            'services/incidents/incidents.html.twig',
+            'services/incident/incident.html.twig',
             [
                 'groupincidents'            => $groupIncidents,
                 'incidentCategories'        => $incidentCategories,
@@ -125,7 +125,7 @@ class IncidentController extends AbstractController
         // If there is an incident we render the incidents page with the incident data and the next incident id to redirect to the next incident page
         if ($incident) {
             return $this->render(
-                '/services/incidents/incidents_view.html.twig',
+                '/services/incident/incident_view.html.twig',
                 [
                     'incidentId'        => $incident ? $incident->getId() : null,
                     'incident'          => $incident,
@@ -152,14 +152,14 @@ class IncidentController extends AbstractController
 
 
     // Logic to create a new IncidentCategory and display a message
-    #[Route('/incident/incident_incidentsCategory_creation', name: 'incident_incidentsCategory_creation')]
+    #[Route('/incident/incident_incidentCategory_creation', name: 'incident_incidentCategory_creation')]
     public function incidentCategoryCreation(Request $request): JsonResponse
     {
         // Get the data from the request
         $data = json_decode($request->getContent(), true);
 
         // Get the name of the incident category
-        $incidentCategoryName = $data['incident_incidentsCategory_name'] ?? null;
+        $incidentCategoryName = $data['incident_incidentCategory_name'] ?? null;
 
         // Get the existing incident category name
         $existingIncidentCategory = $this->incidentCategoryRepository->findOneBy(['name' => $incidentCategoryName]);
@@ -185,7 +185,7 @@ class IncidentController extends AbstractController
 
 
     // Create a route for incidentCategory deletion. It depends on the entitydeletionService.
-    #[Route('/incident/delete/incident_incidentsCategory_deletion/{incidentCategoryId}', name: 'incident_incidentsCategory_deletion')]
+    #[Route('/incident/delete/incident_incidentCategory_deletion/{incidentCategoryId}', name: 'incident_incidentCategory_deletion')]
     public function incidentCategoryDeletion(int $incidentCategoryId, Request $request)
     {
         $entityType = "incidentCategory";
@@ -194,10 +194,10 @@ class IncidentController extends AbstractController
         if ($entity == true) {
 
             $this->addFlash('success', $entityType . ' has been deleted');
-            $this->redirectToOriginUrl($request);
+            return $this->redirectToOriginUrl($request);
         } else {
             $this->addFlash('danger',  $entityType . '  does not exist');
-            $this->redirectToOriginUrl($request);
+            return $this->redirectToOriginUrl($request);
         }
     }
 
@@ -209,17 +209,16 @@ class IncidentController extends AbstractController
     public function genericUploadOfIncidentFiles(Request $request)
     {
 
-
         // Check if the form is submitted 
         if ($request->isMethod('POST')) {
             // Use the IncidentService to handle the upload of the Incidents files
             $name = $this->incidentService->uploadIncidentFiles($request);
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
-            $this->redirectToOriginUrl($request);
+            return $this->redirectToOriginUrl($request);
         } else {
             // Show an error message if the form is not submitted
             $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
-            $this->redirectToOriginUrl($request);
+            return $this->redirectToOriginUrl($request);
         }
     }
 
@@ -256,11 +255,11 @@ class IncidentController extends AbstractController
             $name = $this->incidentService->deleteIncidentFile($incidentEntity, $productLineEntity);
         } else {
             $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer ce document.');
-            $this->redirectToOriginUrl($request);
+            return $this->redirectToOriginUrl($request);
         }
         $this->addFlash('success', 'File ' . $name . ' deleted');
 
-        $this->redirectToOriginUrl($request);
+        return $this->redirectToOriginUrl($request);
     }
 
 
@@ -285,7 +284,7 @@ class IncidentController extends AbstractController
             if ($form->isSubmitted() && $form->isValid()) {
 
                 // Process the form data and modify the Upload entity
-                
+
                 return $this->incidentService->modifyIncidentFile($incident);
             }
 
@@ -301,23 +300,23 @@ class IncidentController extends AbstractController
 
                 // Return the errors in the JSON response
                 $this->addFlash('error', 'Invalid form. Check the entered data.');
-                $this->redirectToOriginUrl($request);
+                return $this->redirectToOriginUrl($request);
             }
 
             // If it's a POST request but the form is not valid or not submitted
             $this->addFlash('error', 'Invalid form. Errors: ' . implode(', ', $errorMessages));
-            $this->redirectToOriginUrl($request);
+            return $this->redirectToOriginUrl($request);
         }
 
         if (!$incident) {
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
-            $this->redirectToOriginUrl($request);
+            return $this->redirectToOriginUrl($request);
         }
 
         $productLine = $incident->getProductLine();
         $zone = $productLine->getZone();
         // If it's a GET request, render the form
-        return $this->render('services/incidents/incidents_modification.html.twig', [
+        return $this->render('services/incident/incident_modification.html.twig', [
             'form'          => $form->createView(),
             'zone'          => $zone,
             'productLine'   => $productLine,

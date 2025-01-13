@@ -66,7 +66,6 @@ class IncidentRedirectService extends AbstractController
             $session->start();
         }
 
-        $this->logger->info('inactive', [$session->get('inactive')]);
         if ($session->get('inactive') === null || $session->get('inactive') === false) {
             $session->set('lastActivity', time());
             $session->set('inactive', true);
@@ -95,8 +94,9 @@ class IncidentRedirectService extends AbstractController
 
 
         if (($routeName == 'app_zone' || $routeName == 'app_productLine' || $routeName == 'app_category' || $routeName == 'app_button') && $routeParams != null) {
+
             $response = $this->incidentRouteDetermination($routeName, $routeParams);
-            $this->logger->info('response', [$response]);
+
             if ($response) {
                 $session->remove('lastActivity', time());
                 $session->set('inactive', false);
@@ -144,14 +144,14 @@ class IncidentRedirectService extends AbstractController
         $numberOfIncidents = $session->get('numberOfIncidents');
 
         if ($numberOfIncidents) {
-            $timeResponse = $this->timeComparison($session->get('cyclingTimer'));
 
-            if (!$timeResponse) {
-                $response = new JsonResponse(['redirect' => false, 'cause' => 'issue in cyclingIncident service, not enough idle time']);
-            } else {
+            if ($this->timeComparison($session->get('cyclingTimer'))) {
                 $response = $this->getNextIncidentRedirectResponse($session, $numberOfIncidents);
+            } else {
+                $response = new JsonResponse(['redirect' => false, 'cause' => 'issue in cyclingIncident service, not enough idle time']);
             }
         }
+
 
         if (empty($response)) {
             $response = new JsonResponse(['redirect' => false, 'cause' => 'No incidents to display']);
@@ -178,6 +178,8 @@ class IncidentRedirectService extends AbstractController
             $currentIncidentCyclingKey = 0;
         }
 
+        $this->logger->info('currentIncidentCyclingKey', [$currentIncidentCyclingKey]);
+
         // Update session with new index
         $session->set('incidentsKeyCycling', $currentIncidentCyclingKey);
 
@@ -185,15 +187,23 @@ class IncidentRedirectService extends AbstractController
         $arrayOfProductLines = $session->get('arrayOfProductLines', []);
         $arrayOfIncidents = $session->get('arrayOfIncidents', []);
 
+
+        if (count($arrayOfProductLines) < $numberOfIncidents && $currentIncidentCyclingKey != 0) {
+            $currentProductLineKey = $currentIncidentCyclingKey - 1;
+        } else {
+            $currentProductLineKey = $currentIncidentCyclingKey;
+        }
+
         // Validate data and generate redirect
         if (
-            isset($arrayOfProductLines[$currentIncidentCyclingKey]) &&
+            isset($arrayOfProductLines[$currentProductLineKey]) &&
             isset($arrayOfIncidents[$currentIncidentCyclingKey])
         ) {
             $redirectUrl = $this->generateUrl('app_redirected_incident', [
-                'productLineId' => $arrayOfProductLines[$currentIncidentCyclingKey],
+                'productLineId' => $arrayOfProductLines[$currentProductLineKey],
                 'incidentId' => $arrayOfIncidents[$currentIncidentCyclingKey],
             ]);
+
             return new JsonResponse(['redirect' => $redirectUrl]);
         } else {
             return new JsonResponse(['redirect' => false, 'cause' => 'Invalid incident data']);
@@ -206,7 +216,7 @@ class IncidentRedirectService extends AbstractController
 
     public function timeComparison(int $time): bool
     {
-        
+
         if ((time() - $time) > $this->settingsService->getIncidentAutoDisplayTimerInSeconds()) {
             return true;
         }

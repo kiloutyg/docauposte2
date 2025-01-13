@@ -86,7 +86,7 @@ class InactivityController extends AbstractController
         $productLine    = $response[1];
 
         return $this->render(
-            '/services/incidents/redirected_incidents_view.html.twig',
+            '/services/incident/redirected_incident_view.html.twig',
             [
                 'incidentId'        => $incident->getId(),
                 'incidentCategory'  => $incident->getIncidentCategory(),

@@ -5,7 +5,9 @@ export function timer(delay, locationString) {
 
     const resetTimer = () => {
         clearTimeout(time);
+
         time = setTimeout(inactivity, delay || 300000); // Default to 5 minutes
+
     };
 
     const inactivity = () => {

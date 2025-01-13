@@ -6,20 +6,21 @@ import { filterData, populateDropdown, resetDropdowns, preselectValues } from '.
 
 let incidentZoneData = null;
 let incidentProductLinesData = null;
-let incidentsCategoriesData = null;
+let incidentCategoriesData = null;
 
 document.addEventListener("turbo:load", () => {
   getEntityData()
     .then((data) => {
       incidentZoneData = data.zones;
       incidentProductLinesData = data.productLines;
-      incidentsCategoriesData = data.incidentsCategories;
-
+      incidentCategoriesData = data.incidentCategories;
+      console.log('data', data);
       initCascadingDropdowns();
       resetDropdowns(
         document.getElementById("incident_zone"),
         document.getElementById("incident_productLine"),
-        document.getElementById("incidents_incidentsCategory")
+        document.getElementById("incident_incidentCategory")
+
       );
       preselectDropdownValues();
     })
@@ -31,14 +32,18 @@ document.addEventListener("turbo:load", () => {
 function initCascadingDropdowns() {
   const zoneDropdown = document.getElementById("incident_zone");
   const productLineDropdown = document.getElementById("incident_productLine");
-  const incidentsCategoryDropdown = document.getElementById("incidents_incidentsCategory");
+  const incidentCategoryDropdown = document.getElementById("incident_incidentCategory");
 
-  if (zoneDropdown && productLineDropdown && incidentsCategoryDropdown) {
+  console.log('zoneDropdown', zoneDropdown);
+  console.log('productLineDropdown', productLineDropdown);
+  console.log('incidentCategoryDropdown', incidentCategoryDropdown);
+
+  if (zoneDropdown && productLineDropdown && incidentCategoryDropdown) {
     populateDropdown(zoneDropdown, incidentZoneData, {
       defaultText: 'Sélectionner une Zone',
     });
 
-    populateDropdown(incidentsCategoryDropdown, incidentsCategoriesData, {
+    populateDropdown(incidentCategoryDropdown, incidentCategoriesData, {
       defaultText: 'Sélectionner une Catégorie d\'Incident',
       textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
     });
@@ -57,6 +62,8 @@ function initCascadingDropdowns() {
     });
   }
 }
+
+
 
 function preselectDropdownValues() {
   const zoneDropdown = document.getElementById("incident_zone");
@@ -92,20 +99,20 @@ function preselectDropdownValues() {
 
 
 document.addEventListener("turbo:load", function () {
-  let createIncidentsCategoryButton = document.getElementById(
-    "create_incident_incidentsCategory"
+  let createIncidentCategoryButton = document.getElementById(
+    "create_incident_incidentCategory"
   );
 
-  if (createIncidentsCategoryButton) {
-    createIncidentsCategoryButton.addEventListener("click", function (e) {
+  if (createIncidentCategoryButton) {
+    createIncidentCategoryButton.addEventListener("click", function (e) {
       e.preventDefault();
 
-      let incidentsCategoryName = document
-        .getElementById("incident_incidentsCategory_name")
+      let incidentCategoryName = document
+        .getElementById("incident_incidentCategory_name")
         .value.trim();
 
       let xhr = new XMLHttpRequest();
-      xhr.open("POST", "/docauposte/incident/incident_incidentsCategory_creation");
+      xhr.open("POST", "/docauposte/incident/incident_incidentCategory_creation");
       xhr.setRequestHeader("Content-Type", "application/json");
 
       xhr.onload = function () {
@@ -119,7 +126,7 @@ document.addEventListener("turbo:load", function () {
           // Check if the operation was successful
           if (response.success) {
             // Clear the input field after a successful submission
-            document.getElementById("incident_incidentsCategory_name").value =
+            document.getElementById("incident_incidentCategory_name").value =
               "";
 
             // Force a reload of the page
@@ -141,7 +148,7 @@ document.addEventListener("turbo:load", function () {
 
       xhr.send(
         JSON.stringify({
-          incident_incidentsCategory_name: incidentsCategoryName,
+          incident_incidentCategory_name: incidentCategoryName,
         })
       );
     });

@@ -54,15 +54,15 @@
 													<input
 														type="file"
 														class="form-control"
-														id="incidents_file"
-														name="incidents_file"
+														id="incident_file"
+														name="incident_file"
 														accept=".pdf"
 														required>
 
 													<div
 														class="mb-3">
 														<label
-															for="incidents_newFileName"
+															for="incident_newFileName"
 															style="color:white"
 															class="form-label">
 															Nom du fichier:
@@ -71,11 +71,11 @@
 														<input
 															type="text"
 															class="form-control"
-															id="incidents_newFileName"
-															name="incidents_newFileName"
+															id="incident_newFileName"
+															name="incident_newFileName"
 															placeholder="Entrer un nouveau nom de fichier (optionnel)">
 													</div>
-													{% include 'services/incidents/cascading_dropdowns_incidents.html.twig' %}
+													{% include 'services/incident/cascading_dropdowns_incident.html.twig' %}
 												</div>
 												<div
 													class="d-grid gap-2 d-md-flex justify-content-md-center mt-2 mb-5">
@@ -91,7 +91,7 @@
 												<div
 													class="row mt-5 mb-3">
 													<label
-														for="incidents_newFileName"
+														for="incident_newFileName"
 														style="color:white"
 														class="form-label">
 														Ajout d'un nouveau Type d'Incident:
@@ -101,15 +101,15 @@
 														<input
 															type="text"
 															class="form-control"
-															id="incident_incidentsCategory_name"
-															name="incident_incidentsCategory_name"
+															id="incident_incidentCategory_name"
+															name="incident_incidentCategory_name"
 															placeholder="Entrer un nouveau type d'incident">
 													</div>
 													<div
 														class="col-sm-auto">
 														<input
 															type="button"
-															id="create_incident_incidentsCategory"
+															id="create_incident_incidentCategory"
 															class="btn btn-secondary shadow border border-dark-subtle"
 															value="Ajouter un nouveau type d'incident">
 													</div>
@@ -121,7 +121,7 @@
 															class="form-control shadow d-flex justify-content-between align-items-center">
 															{{incidentCategory.name|split('.')|first|upper}}
 															<a
-																href="{{ path('app_incident_incidentsCategory_deletion', {incidentCategoryId : incidentCategory.id}) }}" type="button"
+																href="{{ path('app_incident_incidentCategory_deletion', {incidentCategoryId : incidentCategory.id}) }}" type="button"
 																class="btn btn-danger shadow border border-dark-subtle delete-incidentCategory">
 																supprimer
 															</a>
@@ -133,7 +133,7 @@
 										</div>
 										<div
 											class="col-lg-6 col-md-12 col-sm-12">
-											{% include 'services/incidents/incidents_list.html.twig' %}
+											{% include 'services/incident/incident_list.html.twig' %}
 										</div>
 									</div>
 								</div>

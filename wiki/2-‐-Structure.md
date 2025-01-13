@@ -140,7 +140,7 @@ _Api controller to generate the views of the forms and the Forms Type file used 
     - [/src/Controller/ApiController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/ApiController.php)
     - [/src/Form/UploadType.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Form/UploadType.php)
 ________________________________________________
-- api_incidents_cascading_dropdown_data : 
+- api_incident_Cascading_dropdown_data : 
     - [/src/Controller/ApiController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/ApiController.php)
     - [/src/Form/IncidentType.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Form/IncidentType.php)
 ________________________________________________
@@ -150,28 +150,28 @@ _General Incident upload and creation view structure:_
 ***
 
 - app_generic_upload_incident_files 
-    - api_incidents_cascading_dropdown_data :
-        - [/templates/services/incidents/cascading_dropdowns_incidents.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incidents/cascading_dropdowns_incidents.html.twig)
+    - api_incident_Cascading_dropdown_data :
+        - [/templates/services/incident/cascading_dropdowns_incident.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incident/cascading_dropdowns_incident.html.twig)
         - [/assets/js/incident-cascading-dropdowns.js](https://github.com/polangres/DocAuPoste2/blob/main/assets/js/incident-cascading-dropdowns.js)
         - [/src/Controller/ApiController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/ApiController.php)
-    - app_incident_incidentsCategory_creation :
-        - [/templates/services/incidents/cascading_dropdowns_incidents.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incidents/cascading_dropdowns_incidents.html.twig)
+    - app_incident_incidentCategory_creation :
+        - [/templates/services/incident/cascading_dropdowns_incident.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incident/cascading_dropdowns_incident.html.twig)
         - [/assets/js/incident-cascading-dropdowns.js](https://github.com/polangres/DocAuPoste2/blob/main/assets/js/incident-cascading-dropdowns.js)
-    - app_incident_incidentsCategory_deletion :
-        - [/templates/services/incidents/cascading_dropdowns_incidents.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incidents/cascading_dropdowns_incidents.html.twig)
+    - app_incident_incidentCategory_deletion :
+        - [/templates/services/incident/cascading_dropdowns_incident.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incident/cascading_dropdowns_incident.html.twig)
         - [/assets/js/incident-cascading-dropdowns.js](https://github.com/polangres/DocAuPoste2/blob/main/assets/js/incident-cascading-dropdowns.js)
     - app_incident_download_file :
-        - [/templates/services/incidents/incidents_view.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incidents/incidents_view.html.twig)
+        - [/templates/services/incident/incident_view.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incident/incident_view.html.twig)
     - app_incident_delete_file :
-        - [/templates/services/incidents/incidents.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incidents/incidents.html.twig)
+        - [/templates/services/incident/incident.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incident/incident.html.twig)
     - app_incident_modify_file :
-        - [/templates/services/incidents/incidents_modification.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incidents/incidents_modification.html.twig)
-        - api_incidents_cascading_dropdown_data :
-            - [/templates/services/incidents/cascading_dropdowns_incidents.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incidents/cascading_dropdowns_incidents.html.twig)
+        - [/templates/services/incident/incident_modification.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incident/incident_modification.html.twig)
+        - api_incident_Cascading_dropdown_data :
+            - [/templates/services/incident/cascading_dropdowns_incident.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incident/cascading_dropdowns_incident.html.twig)
             - [/assets/js/incident-cascading-dropdowns.js](https://github.com/polangres/DocAuPoste2/blob/main/assets/js/incident-cascading-dropdowns.js)
             - [/src/Controller/ApiController.php](https://github.com/polangres/DocAuPoste2/blob/main/src/Controller/ApiController.php)
 - app_mandatory_incident : 
-            - [/templates/services/incidents/incidents_view.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incidents/incidents_view.html.twig)
+            - [/templates/services/incident/incident_view.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incident/incident_view.html.twig)
 ________________________________________________
 
 _General account creation view structure:_
@@ -241,13 +241,13 @@ _______________________________________________
             - app_modify_file
                 - api_cascading_dropdown_data
         - app_generic_upload_incident_files
-            - api_incidents_cascading_dropdown_data
-            - app_incident_incidentsCategory_creation
-            - app_incident_incidentsCategory_deletion
+            - api_incident_Cascading_dropdown_data
+            - app_incident_incidentCategory_creation
+            - app_incident_incidentCategory_deletion
             - app_incident_download_file
             - app_incident_delete_file
             - app_incident_modify_file
-                - api_incidents_cascading_dropdown_data
+                - api_incident_Cascading_dropdown_data
     - app_zone : 
         - [/templates/zone.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/zone.html.twig)
         - app_zone_admin : 
@@ -270,7 +270,7 @@ _______________________________________________
         - app_productLine : 
             - [/templates/productLine.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/productLine.html.twig)
         - app_mandatory_incident : 
-            - [/templates/services/incidents/incidents_view.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incidents/incidents_view.html.twig)
+            - [/templates/services/incident/incident_view.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/services/incident/incident_view.html.twig)
             - app_productLine_admin : 
                 - [/templates/productline_admin/productline_admin.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/productline_admin/productline_admin.html.twig)
                 - app_productLine_admin_create_manager
@@ -291,13 +291,13 @@ _______________________________________________
                     - app_modify_file
                         - api_cascading_dropdown_data
                 - app_generic_upload_incident_files
-                    - api_incidents_cascading_dropdown_data
-                    - app_incident_incidentsCategory_creation
-                    - app_incident_incidentsCategory_deletion
+                    - api_incident_Cascading_dropdown_data
+                    - app_incident_incidentCategory_creation
+                    - app_incident_incidentCategory_deletion
                     - app_incident_download_file
                     - app_incident_delete_file
                     - app_incident_modify_file
-                        - api_incidents_cascading_dropdown_data
+                        - api_incident_Cascading_dropdown_data
             - app_category : 
                 - [/templates/category.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/category.html.twig)
                 - app_category_admin : 
@@ -320,13 +320,13 @@ _______________________________________________
                         - app_modify_file
                             - api_cascading_dropdown_data
                     - app_generic_upload_incident_files
-                        - api_incidents_cascading_dropdown_data
-                        - app_incident_incidentsCategory_creation
-                        - app_incident_incidentsCategory_deletion
+                        - api_incident_Cascading_dropdown_data
+                        - app_incident_incidentCategory_creation
+                        - app_incident_incidentCategory_deletion
                         - app_incident_download_file
                         - app_incident_delete_file
                         - app_incident_modify_file
-                            - api_incidents_cascading_dropdown_data
+                            - api_incident_Cascading_dropdown_data
                 - app_button : 
                     - [/templates/button.html.twig](https://github.com/polangres/DocAuPoste2/blob/main/templates/button.html.twig)
                     - app_download_file : 
@@ -453,8 +453,8 @@ From the view described earlier, used at different level of the application :
 The methods reside in one controller, whereas the views are present in all the Admin pages to make it easier for the user to manage the Incident file upload system. 
 
 - app_generic_upload_incident_files
-    - app_incident_incidentsCategory_creation
-    - app_incident_incidentsCategory_deletion
+    - app_incident_incidentCategory_creation
+    - app_incident_incidentCategory_deletion
     - app_incident_download_file
     - app_incident_delete_file
     - app_incident_modify_file

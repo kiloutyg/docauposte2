@@ -410,8 +410,8 @@ class CacheService
     public function getIncidents(): ArrayCollection
     {
         if ($this->incidents === null) {
-            $this->incidents = new ArrayCollection($this->cache->get('incidents_cache', function (ItemInterface $item) {
-                $item->tag('incidents_tag');
+            $this->incidents = new ArrayCollection($this->cache->get('incident_Cache', function (ItemInterface $item) {
+                $item->tag('incident_tag');
                 $item->expiresAfter(43200);
                 return $this->repositories['incidents']->findBy([], ['SortOrder' => 'ASC']);
             }));
