@@ -284,7 +284,6 @@ class IncidentController extends AbstractController
             if ($form->isSubmitted() && $form->isValid()) {
 
                 // Process the form data and modify the Upload entity
-
                 return $this->incidentService->modifyIncidentFile($incident);
             }
 
@@ -298,18 +297,10 @@ class IncidentController extends AbstractController
                     $errorMessages[] = $error->getMessage();
                 }
 
-                // Return the errors in the JSON response
-                $this->addFlash('error', 'Invalid form. Check the entered data.');
-                return $this->redirectToOriginUrl($request);
             }
 
             // If it's a POST request but the form is not valid or not submitted
             $this->addFlash('error', 'Invalid form. Errors: ' . implode(', ', $errorMessages));
-            return $this->redirectToOriginUrl($request);
-        }
-
-        if (!$incident) {
-            $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
             return $this->redirectToOriginUrl($request);
         }
 
