@@ -6,6 +6,8 @@ name: Docker
 # documentation.
 
 on:
+  push:
+    branches: ["main"]
   pull_request:
     branches: ["main"]
     types: [opened, synchronize, reopened]
@@ -24,7 +26,7 @@ jobs:
     #   - https://gh.io/supported-runners-and-hardware-resources
     #   - https://gh.io/using-larger-runners (GitHub.com only)
     # Consider using larger runners or machines with greater resources for possible analysis time improvements.
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       # required for all workflows
       security-events: write
@@ -158,7 +160,7 @@ jobs:
           # tags: ${{ steps.meta.outputs.tags }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test-${{ github.sha }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test-latest          
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test-latest
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
