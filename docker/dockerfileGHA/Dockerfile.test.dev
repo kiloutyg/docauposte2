@@ -34,8 +34,8 @@ RUN apt-get update -y \
   && apt-get install --no-install-recommends -y nodejs \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN npm install -g npm@11
-RUN npm install -g yarn
+RUN npm install --ignore-scripts -g npm@11
+RUN npm install --ignore-scripts -g yarn
 
 # install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
@@ -59,7 +59,7 @@ COPY . .
 
 # Install dependencies and perform build steps
 RUN composer install\
-  && yarn install \
+  && yarn install --ignore-scripts \
   && composer clear-cache \
   # Clear the cache
   && php bin/console cache:clear --no-warmup --env=dev \
