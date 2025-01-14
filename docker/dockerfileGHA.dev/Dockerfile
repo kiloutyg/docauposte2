@@ -1,5 +1,7 @@
 FROM php:8.4-apache-bookworm AS base
 
+USER root
+
 # Create a non-root user and group
 RUN addgroup --system nonroot \
   && adduser --system --ingroup nonroot nonroot
