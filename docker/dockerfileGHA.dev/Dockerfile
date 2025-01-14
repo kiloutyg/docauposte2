@@ -1,10 +1,5 @@
 FROM php:8.4-apache-bookworm AS base
 
-USER root
-
-# Create a non-root user and group
-RUN addgroup --system nonroot \
-  && adduser --system --ingroup nonroot nonroot
 
 # Copy custom php.ini
 COPY php.ini /usr/local/etc/php/php.ini
@@ -83,6 +78,10 @@ RUN curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
 
 # Set working directory
 WORKDIR /var/www
+
+# Create a non-root user and group
+RUN addgroup --system nonroot \
+  && adduser --system --ingroup nonroot nonroot
 
 # Switch to non-root user for subsequent operations
 USER nonroot
