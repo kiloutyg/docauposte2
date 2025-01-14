@@ -1,6 +1,5 @@
 FROM php:8.2-apache-bookworm AS base
 
-
 # Copy custom php.ini
 COPY php.ini /usr/local/etc/php/php.ini
 
