@@ -154,7 +154,7 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@v5 # v5.0.0
         with:
-          context: ./docker/dockerfileGHA.test.dev/r
+          context: ./docker/dockerfileGHA.test.dev
           file: .
           push: ${{ github.event_name != 'pull_request' }}
           # tags: ${{ steps.meta.outputs.tags }}
