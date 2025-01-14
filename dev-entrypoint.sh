@@ -28,9 +28,7 @@ mkdir -p migrations;
 php bin/console make:migration;
 php bin/console doctrine:migrations:migrate;
 
-# Build the assets
+# Build the assets and start the server
+exec apache2-foreground &
 yarn encore dev --watch
-
-# Start the Apache server in the foreground
-exec apache2-foreground
 
