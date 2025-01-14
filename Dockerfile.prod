@@ -1,0 +1,20 @@
+# Production Dockerfile
+
+FROM node:14
+
+# Install dependencies
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --production
+
+# Copy application code
+COPY . .
+
+# Build application (if needed)
+# RUN npm run build
+
+# Expose port (if needed)
+EXPOSE 3000
+
+# Command to run your app
+CMD ["node", "server.js"] 
