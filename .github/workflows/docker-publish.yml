@@ -21,6 +21,7 @@ env:
 
 jobs:
   sonarcloud:
+    needs: codeql
     name: SonarQube Cloud
     runs-on: ubuntu-latest
     steps:
