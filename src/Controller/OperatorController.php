@@ -420,11 +420,8 @@ class OperatorController extends AbstractController
     public function trainingListNewOperator(ValidatorInterface $validator, Request $request, int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
     {
 
-        // $this->logger->info('Full request', $request->request->all());
         $team = $this->teamRepository->find($teamId);
-        // $this->logger->info('team', [$team->getName()]);
         $uap = $this->uapRepository->find($uapId);
-        // $this->logger->info('uap', [$uap->getName()]);
         $operatorCode = $request->request->get('newOperatorCode');
 
         $surname = $request->request->get('newOperatorSurname');
@@ -490,8 +487,6 @@ class OperatorController extends AbstractController
             // For example, you can separate them with new lines when displaying in text format:
             $errorsString = implode("\n", $errorMessages);
 
-            // If you need to return JSON response:
-            // return new JsonResponse(['errors' => $errorMessages], Response::HTTP_BAD_REQUEST);
 
             // $this->logger->info('danger', [$errorsString]);
             return $this->redirectToRoute('app_render_training_records', [
@@ -976,15 +971,8 @@ class OperatorController extends AbstractController
             }
         }
 
-        // $this->logger->info('app_suggest_names rawSuggestions', $rawSuggestions);
         // Serialize the entire array of entities at once using groups
         $serializedSuggestions = json_encode($rawSuggestions);
-        // $serializedSuggestions = $serializer->serialize($rawSuggestions, 'json', [
-        //     'groups' => 'operator_details'
-        // ]);
-
-        // // $this->logger->info('app_suggest_names serialized suggestions', json_decode($serializedSuggestions));
-        // // $this->logger->info('app_suggest_names serialized suggestions', json_decode($serializedSuggestions));
 
         // Since $serializedSuggestions is a JSON string, return it directly with JsonResponse
         return new JsonResponse($serializedSuggestions, 200, [], true);
@@ -996,7 +984,7 @@ class OperatorController extends AbstractController
     #[Route('/operator/detail/{operatorId}', name: 'app_operator_detail')]
     public function printOpeDetail(int $operatorId)
     {
-        $operator = $this->operatorRepository->findOneBy(['id', $operatorId]);
+        $operator = $this->operatorRepository->find($operatorId);
         // $this->logger->info('operator', [$operator]);
 
         // $pdfContent = $this->pdfGeneratorService->generateOperatorPdf($operator);
@@ -1101,16 +1089,6 @@ class OperatorController extends AbstractController
                         $suffix++;
                     }
                 }
-
-                // $this->logger->info(sprintf(
-                //     'code: %s, firstname: %s, surname: %s, name: %s, team: %s, uap: %s',
-                //     $code,
-                //     $firstname,
-                //     $surname,
-                //     $name,
-                //     $team->getName(),
-                //     $uap->getName()
-                // ));
             }
 
             // Commit the transaction
@@ -1263,7 +1241,7 @@ class OperatorController extends AbstractController
         $currentUser = $this->getUser();
         $this->logger->info('current user', [$currentUser]);
         $this->logger->info('role granted', [$this->authChecker->isGranted('ROLE_MANAGER')]);
-        
+
         if (!empty($currentUser) && $this->authChecker->isGranted('ROLE_MANAGER')) {
             $user               = $this->userRepository->find($currentUser);
             $this->logger->info(' user', [$user]);
