@@ -1,41 +1,32 @@
 // docauposte2/assets/js/incident-cascading-dropdowns.js
 
+/* global zoneIdFromServer, productLineIdFromServer */
+
+// Import necessary functions from other modules
 import { getEntityData } from './server-variable.js';
 import { filterData, populateDropdown, resetDropdowns, preselectValues } from './dropdown-utils.js';
 
-
+// Declare variables to hold data fetched from the server
 let incidentZoneData = null;
 let incidentProductLinesData = null;
 let incidentCategoriesData = null;
 
+// Event listener for when the page loads via Turbo
 document.addEventListener("turbo:load", () => {
   getEntityData()
     .then((data) => {
+      // Assign fetched data to variables
       incidentZoneData = data.zones;
       incidentProductLinesData = data.productLines;
       incidentCategoriesData = data.incidentCategories;
 
-      // const incidentCategoryDropdown = document.getElementById("incident_incidentCategory");
-      // if (incidentCategoryDropdown) {
-      //   const incidentCategoryValue = incidentCategoryDropdown.options.selectedIndex;
-      //   console.log('incidentCategoryValue', incidentCategoryValue)
-      // }
-      // preselectValues([
-      //   {
-      //     dropdown: incidentCategoryDropdown,
-      //     data: incidentCategoriesData,
-      //     id: incidentCategoryValue,
-      //     options: { defaultText: 'Sélectionner une Catégorie d\'Incident' },
-      //   },
-      // ]);
-
-
+      // Initialize dropdowns and reset them
       initCascadingDropdowns();
       resetDropdowns(
         document.getElementById("incident_zone"),
         document.getElementById("incident_productLine"),
-        // document.getElementById("incident_incidentCategory")
       );
+      // Preselect dropdown values based on server data
       preselectDropdownValues();
     })
     .catch((error) => {
@@ -43,37 +34,36 @@ document.addEventListener("turbo:load", () => {
     });
 });
 
+/**
+ * Initializes cascading dropdown menus for zones, product lines, and incident categories.
+ */
 function initCascadingDropdowns() {
   const zoneDropdown = document.getElementById("incident_zone");
   const productLineDropdown = document.getElementById("incident_productLine");
   const incidentCategoryDropdown = document.getElementById("incident_incidentCategory");
 
-
   if (zoneDropdown && productLineDropdown && incidentCategoryDropdown) {
+    // Populate zone dropdown with data
     populateDropdown(zoneDropdown, incidentZoneData, {
       defaultText: 'Sélectionner une Zone',
     });
 
-
     let incidentCategoryValue = parseInt(incidentCategoryDropdown.options.selectedIndex, 10);
 
-    // let incidentCategoryValue = incidentCategoryDropdown.options.selectedIndex;
-
-    console.log('incidentCategoryValue', incidentCategoryValue)
-    console.log('incidentCategoryValue = true', incidentCategoryValue === 0)
-
     if (incidentCategoryValue === 0) {
+      // Populate incident category dropdown if no value is selected
       populateDropdown(incidentCategoryDropdown, incidentCategoriesData, {
         defaultText: 'Sélectionner une Catégorie d\'Incident',
         textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
       });
     }
 
-
+    // Event listener for when the zone dropdown value changes
     zoneDropdown.addEventListener("change", (event) => {
       const selectedValue = parseInt(event.target.value);
       const filteredProductLines = filterData(incidentProductLinesData, "zone_id", selectedValue);
 
+      // Populate product line dropdown based on selected zone
       populateDropdown(productLineDropdown, filteredProductLines, {
         defaultText: 'Sélectionner une Ligne',
         textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
@@ -85,12 +75,12 @@ function initCascadingDropdowns() {
   }
 }
 
-
-
+/**
+ * Preselects dropdown values based on data from the server.
+ */
 function preselectDropdownValues() {
   const zoneDropdown = document.getElementById("incident_zone");
   const productLineDropdown = document.getElementById("incident_productLine");
-
 
   preselectValues([
     {
@@ -113,17 +103,11 @@ function preselectDropdownValues() {
   if (productLineIdFromServer && productLineDropdown) {
     productLineDropdown.value = productLineIdFromServer;
   }
-
-
-
-
-
 }
 
-
-
-
-
+/**
+ * Event listener for creating a new incident category.
+ */
 document.addEventListener("turbo:load", function () {
   let createIncidentCategoryButton = document.getElementById(
     "create_incident_incidentCategory"
@@ -133,6 +117,7 @@ document.addEventListener("turbo:load", function () {
     createIncidentCategoryButton.addEventListener("click", function (e) {
       e.preventDefault();
 
+      // Get the value from the incident category name input
       let incidentCategoryName = document
         .getElementById("incident_incidentCategory_name")
         .value.trim();
@@ -151,14 +136,13 @@ document.addEventListener("turbo:load", function () {
 
           // Check if the operation was successful
           if (response.success) {
-            // Clear the input field after a successful submission
-            document.getElementById("incident_incidentCategory_name").value =
-              "";
+            // Clear the input field after successful submission
+            document.getElementById("incident_incidentCategory_name").value = "";
 
             // Force a reload of the page
             location.reload();
           } else {
-            // Handle failure, e.g. show error message
+            // Handle failure, e.g., show error message
             console.error(response.message);
           }
         } else {
@@ -181,8 +165,9 @@ document.addEventListener("turbo:load", function () {
   }
 });
 
-
-
+/**
+ * Event listener for modifying an incident form.
+ */
 let modifyIncidentForm = document.querySelector("#modifyIncidentForm");
 if (modifyIncidentForm) {
   modifyIncidentForm.addEventListener("submit", function (event) {
@@ -196,35 +181,25 @@ if (modifyIncidentForm) {
 
     // Get the CSRF token
     let csrfTokenInput = document.querySelector("#incident__token");
-
-    // Get the CSRF token value
     let csrfTokenValue = csrfTokenInput.value;
 
     // Add the CSRF token to formData
     formData.append("incident[_token]", csrfTokenValue);
 
     if (fileInput.files.length > 0) {
-      // A file was selected
+      // A file was selected; add it to formData
       let file = fileInput.files[0];
-
-      // Add the file to formData
       formData.append("incident[file]", file);
     }
 
-    // Get the dropdown elements
-
-    let incidentProductLineDropdown = document.getElementById(
-      "incident_productLine"
-    );
-    // Get the name input
+    // Get the dropdown elements and name input
+    let incidentProductLineDropdown = document.getElementById("incident_productLine");
     let nameInput = document.getElementById("incident_name");
 
-    // Get the selected values
+    // Get and append the selected values
     if (incidentProductLineDropdown) {
       let productLineValue = parseInt(
-        incidentProductLineDropdown.options[
-          incidentProductLineDropdown.selectedIndex
-        ].value,
+        incidentProductLineDropdown.value,
         10
       );
       formData.append("incident[productLine]", productLineValue);
@@ -232,51 +207,44 @@ if (modifyIncidentForm) {
 
     // Get the name value
     let nameValue = nameInput.value;
-
-    // Add the values to formData
     if (nameValue) {
       formData.append("incident[name]", nameValue);
     }
 
-    let autoDisplayPriority = document.getElementById("incident_autoDisplayPriority")
+    // Get and append auto display priority
+    let autoDisplayPriority = document.getElementById("incident_autoDisplayPriority");
     if (autoDisplayPriority) {
       let autoDisplayPriorityValue = parseInt(
-        autoDisplayPriority.options[
-          autoDisplayPriority.selectedIndex
-        ].value,
-        6
+        autoDisplayPriority.value,
+        6  // Default value if parsing fails
       );
       formData.append("incident[autoDisplayPriority]", autoDisplayPriorityValue);
     }
 
-    let incidentCategory = document.getElementById("incident_incidentCategory")
+    // Get and append incident category
+    let incidentCategory = document.getElementById("incident_incidentCategory");
     if (incidentCategory) {
       let incidentCategoryValue = parseInt(
-        incidentCategory.options[
-          incidentCategory.selectedIndex
-        ].value,
+        incidentCategory.value,
         10
       );
-      console.log('incidentCategoryValue', incidentCategoryValue)
-      formData.append("incident[incidentCategory]", incidentCategoryValue)
+      formData.append("incident[incidentCategory]", incidentCategoryValue);
     }
 
-
-    // Get the incident ID from the URL
+    // Get the action URL from the form's action attribute
     let form = document.getElementById("modifyIncidentForm");
     let actionUrl = form.getAttribute("action");
 
-    // Send formData to server...
+    // Send formData to server
     fetch(actionUrl, {
       method: "POST",
       body: formData,
-    }).then((response) => {
-      console.log('response', response)
-      window.location.reload(true)
     })
+      .then(() => {
+        window.location.reload(true);
+      })
       .catch((error) => {
         console.error("Error:", error);
       });
-
   });
 }

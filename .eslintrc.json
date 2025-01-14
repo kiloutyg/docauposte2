@@ -1,0 +1,21 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": 12,
+        "sourceType": "module"
+    },
+    "rules": {
+        "no-unused-vars": "warn",
+        "no-console": "off",
+        "prefer-const": "error",
+        // Add additional rules as needed
+    },
+    "globals": {
+        "zoneIdFromServer": "readonly",
+        "productLineIdFromServer": "readonly"
+    }
+}
