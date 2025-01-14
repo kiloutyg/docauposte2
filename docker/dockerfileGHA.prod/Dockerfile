@@ -1,6 +1,7 @@
-FROM php:8.2-apache-bookworm
-RUN addgroup -S nonroot \
-  && adduser -S nonroot -G nonroot
+FROM php:8.4-apache-bookworm
+
+RUN addgroup --system nonroot \
+  && adduser --system --ingroup nonroot nonroot
 
 USER nonroot
 
