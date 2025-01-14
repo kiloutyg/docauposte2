@@ -29,7 +29,7 @@ RUN sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/sites-avail
 
 # install nodejs 
 RUN mkdir -p /etc/apt/keyrings
-RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+RUN curl --tlsv1.2 -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
 RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
 RUN apt-get update -y \
   && apt-get install --no-install-recommends -y nodejs \
@@ -46,5 +46,5 @@ RUN php -r "unlink('composer-setup.php');"
 RUN mv composer.phar /usr/bin/composer && chmod +x /usr/bin/composer
 
 # install symfony cli
-RUN curl -sS https://get.symfony.com/cli/installer | bash \
+RUN curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
