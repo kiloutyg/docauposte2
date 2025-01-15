@@ -94,6 +94,8 @@ FROM base AS building
 USER nonroot
 
 COPY --chown=nonroot:nonroot --chmod=644 . .
+RUN ls -la
+
 
 # Install dependencies and perform build steps
 RUN composer install \
