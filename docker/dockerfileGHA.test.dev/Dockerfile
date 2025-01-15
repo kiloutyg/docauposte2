@@ -4,6 +4,9 @@ FROM php:8.2-apache-bookworm AS base
 RUN addgroup --system nonroot \
   && adduser --system --ingroup nonroot nonroot
 
+# Set working directory
+WORKDIR /var/www
+
 # Copy custom php.ini
 COPY php.ini /usr/local/etc/php/php.ini
 
@@ -88,12 +91,6 @@ RUN chmod +x composer.sh \
 RUN curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
 
-# Set working directory
-WORKDIR /var/www
-
-
-# Switch to non-root user for subsequent operations
-USER nonroot
 
 # Building stage
 FROM base AS building
@@ -101,9 +98,9 @@ FROM base AS building
 # Ensure we're using the non-root user
 USER nonroot
 
-RUN mkdir -p docauposte2
+# RUN mkdir -p docauposte2
 
-WORKDIR /var/www/docauposte2
+# WORKDIR /var/www/docauposte2
 
 COPY ../../. .
 
