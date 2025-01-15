@@ -84,8 +84,7 @@ RUN curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
 
 
-# Switch to non-root user for subsequent operations
-USER nonroot
+
 
 # Building stage
 FROM base AS building
@@ -94,6 +93,7 @@ FROM base AS building
 RUN ls -la
 RUN chmod 644 /var/www -R
 
+# Switch to non-root user for subsequent operations
 USER nonroot
 
 COPY --chown=nonroot:nonroot --chmod=644 . .
