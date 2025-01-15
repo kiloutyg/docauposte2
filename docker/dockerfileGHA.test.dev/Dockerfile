@@ -101,7 +101,7 @@ FROM base AS building
 # Ensure we're using the non-root user
 USER nonroot
 
-COPY . .
+COPY ../../. .
 
 # Install dependencies and perform build steps
 RUN composer install \
