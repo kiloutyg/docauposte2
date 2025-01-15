@@ -89,9 +89,8 @@ RUN cat composer.sh
 RUN chmod +x composer.sh 
 USER root
 RUN ./composer.sh 
-USER nonroot
-
 RUN mv composer.phar /usr/local/bin/composer
+USER nonroot
 
 # Install Symfony CLI
 RUN curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
