@@ -28,9 +28,12 @@ RUN docker-php-ext-install \
   opcache \
   xsl \
   gd \
-  bcmath \
-  && pecl install xdebug imagick \
-  && docker-php-ext-enable \
+  bcmath
+
+RUN pecl install xdebug \
+  imagick
+  
+RUN docker-php-ext-enable \
   xdebug \
   mysqli \
   pdo_mysql \
