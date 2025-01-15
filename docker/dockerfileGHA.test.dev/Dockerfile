@@ -8,7 +8,7 @@ RUN addgroup --system nonroot \
 WORKDIR /var/www
 
 # Copy custom php.ini
-COPY php.ini /usr/local/etc/php/php.ini
+COPY ./docker/dockerfileGHA.test.dev/php.ini /usr/local/etc/php/php.ini
 
 # Run commands that require root privileges
 RUN a2enmod rewrite \
@@ -74,7 +74,7 @@ RUN mkdir -p /etc/apt/keyrings \
 RUN npm install --ignore-scripts -g npm@11 \
   && npm install --ignore-scripts -g yarn
 
-COPY composer.sh composer.sh
+COPY ./docker/dockerfileGHA.test.dev/composer.sh composer.sh
 RUN chmod +x composer.sh \
   && /usr/bin/bash composer.sh \
   && mv composer.phar /usr/local/bin/composer
