@@ -59,6 +59,7 @@ RUN git config --global user.email "floriandkhissi@gmail.com" \
 
 # Set default vhost to target /symfony/app/public
 RUN sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/sites-available/000-default.conf
+RUN rm -rf html
 
 # Install Node.js
 RUN mkdir -p /etc/apt/keyrings \
@@ -91,13 +92,14 @@ FROM base AS building
 
 # Ensure we're using the non-root user
 RUN ls -la
+
 RUN chmod 644 /var/www -R
 
 # Switch to non-root user for subsequent operations
-USER nonroot
 
 COPY --chown=nonroot:nonroot --chmod=644 . .
 RUN ls -la
+USER nonroot
 
 
 # Install dependencies and perform build steps
