@@ -93,7 +93,7 @@ FROM base AS building
 # Ensure we're using the non-root user
 USER nonroot
 
-COPY . .
+COPY --chown=nonroot:nonroot --chmod=644 . .
 
 # Install dependencies and perform build steps
 RUN composer install \
