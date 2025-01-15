@@ -79,14 +79,6 @@ RUN chmod +x composer.sh \
   && /usr/bin/bash composer.sh \
   && mv composer.phar /usr/local/bin/composer
 
-# Install Composer
-# RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-#   && php -r "if (hash_file('sha384', 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
-#   && php composer-setup.php \
-#   && php -r "unlink('composer-setup.php');" \
-#   && mv composer.phar /usr/bin/composer \
-#   && chmod +x /usr/bin/composer
-
 # Install Symfony CLI
 RUN curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
@@ -100,10 +92,6 @@ FROM base AS building
 
 # Ensure we're using the non-root user
 USER nonroot
-
-RUN mkdir -p docauposte2
-
-WORKDIR /var/www/docauposte2
 
 COPY . .
 
