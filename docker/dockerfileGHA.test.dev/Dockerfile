@@ -1,8 +1,10 @@
 FROM php:8.2-apache-bookworm AS base
 
 # Create a non-root user and group
-RUN addgroup --system nonroot \
-  && adduser --system --ingroup nonroot nonroot
+# RUN addgroup --system nonroot \
+#   && adduser --system --ingroup nonroot nonroot
+RUN addgroup nonroot \
+  && adduser --ingroup nonroot nonroot
 
 # Set working directory
 WORKDIR /var/www
