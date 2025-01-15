@@ -81,12 +81,13 @@ USER nonroot
 
 COPY --chown=nonroot:nonroot --chmod=644 ./docker/dockerfileGHA.test.dev/composer.sh .
 RUN ls -la
+RUN cat composer.sh
 # RUN chmod +x composer.sh \
 #   && /usr/bin/bash composer.sh \
 #   && mv composer.phar /usr/local/bin/composer
 
 RUN chmod +x composer.sh 
-RUN ./composer.sh 
+SHELL ["composer.sh"] 
 RUN mv composer.phar /usr/local/bin/composer
 
 # Install Symfony CLI
