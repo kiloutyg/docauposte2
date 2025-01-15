@@ -1,4 +1,4 @@
-FROM php:8.4-apache-bookworm AS base
+FROM php:8.3-apache-bookworm AS base
 
 # Copy custom php.ini
 COPY php.ini /usr/local/etc/php/php.ini
@@ -8,6 +8,7 @@ RUN a2enmod rewrite \
   && service apache2 restart
 
 RUN apt-get update -y \
+  && apt-get upgrade -y \
   && apt-get install --no-install-recommends -y \
   ca-certificates \
   curl \
@@ -16,7 +17,7 @@ RUN apt-get update -y \
   git \
   wget \
   gnupg \
-  && apt-get install --no-install-recommends -y libmagickwand-dev \
+  libmagickwand-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -32,7 +33,7 @@ RUN docker-php-ext-install \
 
 RUN pecl install xdebug \
   imagick
-  
+
 RUN docker-php-ext-enable \
   xdebug \
   mysqli \
