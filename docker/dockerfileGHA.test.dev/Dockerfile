@@ -77,7 +77,7 @@ RUN npm install --ignore-scripts -g npm@11 \
 
 USER nonroot
 
-COPY ./docker/dockerfileGHA.test.dev/composer.sh composer.sh
+COPY --chown=nonroot:nonroot --chmod=644 ./docker/dockerfileGHA.test.dev/composer.sh .
 RUN ls -la
 RUN chmod +x composer.sh \
   && /usr/bin/bash composer.sh \
