@@ -101,7 +101,11 @@ FROM base AS building
 # Ensure we're using the non-root user
 USER nonroot
 
-COPY ../.. .
+RUN mkdir -p docauposte2
+
+WORKDIR /var/www/docauposte2
+
+COPY ../../. .
 
 # Install dependencies and perform build steps
 RUN composer install \
