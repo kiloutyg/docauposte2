@@ -104,7 +104,7 @@ USER nonroot
 COPY . .
 
 # Install dependencies and perform build steps
-RUN /usr/local/bin/composer install \
+RUN composer install \
   && yarn install --ignore-scripts \
   && composer clear-cache \
   # Clear the cache
