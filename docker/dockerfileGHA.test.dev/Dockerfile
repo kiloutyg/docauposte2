@@ -87,7 +87,10 @@ RUN cat composer.sh
 #   && mv composer.phar /usr/local/bin/composer
 
 RUN chmod +x composer.sh 
+USER root
 RUN ./composer.sh 
+USER nonroot
+
 RUN mv composer.phar /usr/local/bin/composer
 
 # Install Symfony CLI
