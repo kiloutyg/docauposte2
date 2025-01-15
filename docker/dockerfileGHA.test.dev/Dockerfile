@@ -91,9 +91,11 @@ USER nonroot
 FROM base AS building
 
 # Ensure we're using the non-root user
-USER nonroot
 RUN ls -la
 RUN chmod 644 /var/www -R
+
+USER nonroot
+
 COPY --chown=nonroot:nonroot --chmod=644 . .
 RUN ls -la
 
