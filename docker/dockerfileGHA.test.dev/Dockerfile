@@ -92,7 +92,8 @@ FROM base AS building
 
 # Ensure we're using the non-root user
 USER nonroot
-
+RUN ls -la
+RUN chmod 644 /var/www -R
 COPY --chown=nonroot:nonroot --chmod=644 . .
 RUN ls -la
 
