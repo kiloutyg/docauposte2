@@ -1,10 +1,10 @@
 FROM php:8.2-apache-bookworm AS base
 
 # Create a non-root user and group
-# RUN addgroup --system nonroot \
-#   && adduser --system --ingroup nonroot nonroot
-RUN addgroup nonroot \
-  && adduser --ingroup nonroot nonroot
+RUN addgroup --system nonroot \
+  && adduser --system --ingroup nonroot nonroot
+# RUN addgroup nonroot \
+#   && adduser --ingroup nonroot nonroot
 
 # Set working directory
 WORKDIR /var/www
@@ -81,9 +81,13 @@ USER nonroot
 
 COPY --chown=nonroot:nonroot --chmod=644 ./docker/dockerfileGHA.test.dev/composer.sh .
 RUN ls -la
-RUN chmod +x composer.sh \
-  && /usr/bin/bash composer.sh \
-  && mv composer.phar /usr/local/bin/composer
+# RUN chmod +x composer.sh \
+#   && /usr/bin/bash composer.sh \
+#   && mv composer.phar /usr/local/bin/composer
+
+RUN chmod +x composer.sh 
+RUN /usr/bin/bash composer.sh 
+RUN mv composer.phar /usr/local/bin/composer
 
 # Install Symfony CLI
 RUN curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
