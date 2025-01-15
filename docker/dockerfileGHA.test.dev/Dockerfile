@@ -75,7 +75,10 @@ RUN mkdir -p /etc/apt/keyrings \
 RUN npm install --ignore-scripts -g npm@11 \
   && npm install --ignore-scripts -g yarn
 
+USER nonroot
+
 COPY ./docker/dockerfileGHA.test.dev/composer.sh composer.sh
+RUN ls -la
 RUN chmod +x composer.sh \
   && /usr/bin/bash composer.sh \
   && mv composer.phar /usr/local/bin/composer
@@ -97,9 +100,9 @@ RUN chmod 644 /var/www -R
 
 COPY --chown=nonroot:nonroot --chmod=644 . .
 RUN ls -la
-RUN cat composer.json
 # Switch to non-root user for subsequent operations
 USER nonroot
+RUN cat composer.json
 
 # Install dependencies and perform build steps
 RUN composer install \
