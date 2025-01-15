@@ -75,7 +75,7 @@ RUN npm install --ignore-scripts -g npm@11 \
 #   && mv composer.phar /usr/bin/composer \
 #   && chmod +x /usr/bin/composer
 
-COPY .composer.sh composer.sh
+COPY composer.sh composer.sh
 RUN chmod +x composer.sh
 RUN /usr/bin/bash composer.sh
 
