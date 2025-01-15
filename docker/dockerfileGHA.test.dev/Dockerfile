@@ -92,17 +92,20 @@ RUN curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
 
 
+# Switch to non-root user for subsequent operations
+USER nonroot
+
 # Building stage
 FROM base AS building
 
 # Ensure we're using the non-root user
 USER nonroot
 
-# RUN mkdir -p docauposte2
+RUN mkdir -p docauposte2
 
-# WORKDIR /var/www/docauposte2
+WORKDIR /var/www/docauposte2
 
-COPY ../../. .
+COPY . .
 
 # Install dependencies and perform build steps
 RUN composer install \
