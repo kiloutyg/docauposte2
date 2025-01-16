@@ -98,19 +98,12 @@ WORKDIR /var/www
 # Copy application code with correct ownership
 COPY --chown=nonroot:nonroot . /var/www
 
-RUN cp .env.test .env
-
 # Install dependencies and perform build steps
-RUN composer install \
+RUN  cp .env.test .env \
+  && composer install \
   && yarn install --ignore-scripts \
   && composer clear-cache \
   && php ./bin/console cache:clear --no-warmup --env=dev \
   && php ./bin/console cache:warmup --env=dev \
-  && chmod -R u+rwX,go=rX /var/www \
-  && rm -rf migrations \
-  && mkdir -p migrations \
-  && php ./bin/console make:migration \
-  && php ./bin/console doctrine:migrations:migrate \
-  && yarn encore dev --watch
-
-  RUN rm .env
+  && yarn encore dev --watch \
+  && rm .env
