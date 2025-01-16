@@ -88,6 +88,9 @@ USER nonroot
 # Building stage
 FROM base AS building
 
+RUN echo $PWD
+RUN ls -la
+
 WORKDIR /var/www
 
 # Switch to System User
