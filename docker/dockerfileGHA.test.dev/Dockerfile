@@ -21,36 +21,34 @@ RUN apt update -y \
   && apt install --no-install-recommends -y \
   ca-certificates \
   curl \
+  git \
+  gnupg \
+  libmagickwand-dev \
   libxslt-dev \
   libzip-dev \
-  git \
   wget \
-  gnupg \
-  libmagickwand-dev 
-
-RUN docker-php-ext-install \
-  pdo \
-  mysqli \
-  pdo_mysql \
-  zip \
-  opcache \
-  xsl \
+  && docker-php-ext-install \
+  bcmath \
   gd \
-  bcmath
-
-RUN pecl install xdebug \
-  imagick
-
-RUN docker-php-ext-enable \
-  xdebug \
   mysqli \
-  pdo_mysql \
-  pdo \
-  zip \
   opcache \
+  pdo \
+  pdo_mysql \
   xsl \
+  zip\
+  && RUN pecl install \
   imagick \
-  gd
+  xdebug \
+  && docker-php-ext-enable \
+  gd \
+  imagick \
+  mysqli \
+  opcache \
+  pdo \
+  pdo_mysql \
+  xsl \
+  xdebug \
+  zip 
 
 # Set global git configuration and adjust Apache configuration
 RUN git config --global user.email "floriandkhissi@gmail.com" \
