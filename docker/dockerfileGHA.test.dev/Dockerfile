@@ -99,12 +99,14 @@ USER root
 # RUN chown nonroot:nonroot /var/www -R \
 #   && chmod 644 /var/www -R
 
-# Switch to System User
-# USER nonroot
-# COPY --chown=nonroot:nonroot --chmod=644 . .
+WORKDIR /var
 
-USER www-data
-COPY --chown=www-data:www-data --chmod=644 . .
+# Switch to System User
+USER nonroot
+COPY --chown=nonroot:nonroot --chmod=644 . ./www
+
+# USER www-data
+# COPY --chown=www-data:www-data --chmod=644 . .
 RUN echo $PWD
 RUN ls -la
 
