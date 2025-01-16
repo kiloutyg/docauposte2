@@ -106,7 +106,7 @@ RUN chown nonroot:nonroot /var/www -R \
 USER nonroot
 
 COPY --chown=nonroot:nonroot --chmod=644 . .
-
+RUN echo $PWD
 RUN ls -la
 
 # Install dependencies and perform build steps
