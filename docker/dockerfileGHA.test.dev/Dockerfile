@@ -107,12 +107,12 @@ RUN ls -la
 
 USER root
 RUN chmod 644 /var/www -R
-USER nonroot
+# Switch to non-root user for subsequent operations
 
 COPY --chown=nonroot:nonroot --chmod=644 . .
 RUN ls -la
-# Switch to non-root user for subsequent operations
 RUN cat composer.json
+USER nonroot
 
 # Install dependencies and perform build steps
 RUN composer install \
