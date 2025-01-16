@@ -104,7 +104,8 @@ RUN echo $PWD
 RUN ls -la
 # Switch to System User
 USER nonroot
-COPY --chown=nonroot:nonroot --chmod=644 . www/
+
+COPY --chown=nonroot:nonroot --chmod=644 . /var/www/
 
 # USER www-data
 # COPY --chown=www-data:www-data --chmod=644 . .
