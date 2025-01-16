@@ -56,7 +56,7 @@ RUN git config --global user.email "floriandkhissi@gmail.com" \
   && git config --global --add safe.directory /var/www \
   # Set default vhost to target /symfony/app/public
   && sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/sites-available/000-default.conf \
-  && rm -rf html
+  && rm -rf /var/www
 
 # Install Node.js
 RUN mkdir -p /etc/apt/keyrings \
