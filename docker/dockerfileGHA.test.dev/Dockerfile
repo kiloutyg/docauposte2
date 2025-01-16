@@ -5,7 +5,9 @@ RUN addgroup --system nonroot \
   && adduser --system --ingroup nonroot nonroot
 
 # Set working directory
-WORKDIR /var/www
+WORKDIR /var
+RUN chown nonroot:nonroot www/ -R \
+&& chmod 644 www/ -R
 
 # Copy custom php.ini
 COPY ./docker/dockerfileGHA.test.dev/php.ini /usr/local/etc/php/php.ini
@@ -55,9 +57,7 @@ RUN git config --global user.email "floriandkhissi@gmail.com" \
   && git config --global user.name "Florian Dkhissi" \
   && git config --global --add safe.directory /var/www \
   # Set default vhost to target /symfony/app/public
-  && sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/sites-available/000-default.conf \
-  && chown nonroot:nonroot www/ -R \
-  && chmod 644 www/ -R
+  && sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/sites-available/000-default.conf
 
 # Install Node.js
 RUN mkdir -p /etc/apt/keyrings \
