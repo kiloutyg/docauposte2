@@ -104,4 +104,4 @@ RUN  cp .env.test .env \
   && php ./bin/console cache:clear --no-warmup --env=dev \
   && php ./bin/console cache:warmup --env=dev \
   && yarn encore dev \
-  && rm .env node_modules vendor
+  && rm -rf .env node_modules vendor
