@@ -99,8 +99,8 @@ FROM base AS building
 # Switch to Root User
 USER root
 
-RUN chown nonroot:nonroot /var/www -R \
-  && chmod 644 /var/www -R
+# RUN chown nonroot:nonroot /var/www -R \
+#   && chmod 644 /var/www -R
 
 # Switch to System User
 USER nonroot
