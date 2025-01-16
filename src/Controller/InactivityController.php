@@ -77,7 +77,7 @@ class InactivityController extends AbstractController
 
 
     // Render the redirected incidents page
-    #[Route('/productline/{productLineId}/redirected_incident/{incidentId}', name: 'redirected_incident')]
+    #[Route('/productLine/{productLineId}/redirected_incident/{incidentId}', name: 'redirected_incident')]
     public function redirectedIncident(int $productLineId = null, int $incidentId = null)
     {
 
@@ -86,7 +86,7 @@ class InactivityController extends AbstractController
         $productLine    = $response[1];
 
         return $this->render(
-            '/services/incidents/redirected_incidents_view.html.twig',
+            '/services/incident/redirected_incident_view.html.twig',
             [
                 'incidentId'        => $incident->getId(),
                 'incidentCategory'  => $incident->getIncidentCategory(),

@@ -159,7 +159,7 @@ class ValidationController extends AbstractController
     #[Route('/validation/disapproved/modify/{approbationId}', name: 'app_validation_disapproved_modify')]
     public function disapprovedValidationModification(int $approbationId = null, Request $request): Response
     {
-        $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
+        $approbation = $this->approbationRepository->find($approbationId);
         $validation  = $approbation->getValidation();
         $upload      = $validation->getUpload();
 

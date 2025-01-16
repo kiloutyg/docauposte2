@@ -1,0 +1,124 @@
+<div
+	class="align-items-center text-white bg-secondary my-5 py-4 text-center ">
+	<h5>
+		<strong>
+			Liste des documents :
+		</strong>
+	</h5>
+	{% if (groupincidents is defined) and (groupincidents is not empty) %}
+		<div
+			class="accordion"
+			id="accordionIncidentsList">
+			{% set outerIndex = 0 %}
+			{% for zoneName, zone in groupincidents %}
+				{% set outerIndex = outerIndex + 1 %}
+				<div
+					class="accordion-item">
+					<h2
+						class="accordion-header"
+						id="headingZoneIncidentsList{{ outerIndex }}">
+						<button
+							class="accordion-button collapsed"
+							type="button"
+							data-bs-toggle="collapse"
+							data-bs-target="#collapseZoneIncidentsList{{ outerIndex }}"
+							aria-expanded="false"
+							aria-controls="collapseZoneIncidentsList{{ outerIndex }}">
+							Zone:
+							{{ zoneName|split('.')|first|upper }}
+						</button>
+					</h2>
+					<div
+						id="collapseZoneIncidentsList{{ outerIndex }}"
+						class="accordion-collapse collapse"
+						aria-labelledby="headingZoneIncidentsList{{ outerIndex }}"
+						data-bs-parent="#accordionIncidentsList">
+						<div
+							class="accordion-body">
+							{% set middleIndex = 0 %}
+							{% for productLineName, productLine in zone %}
+								{% set middleIndex = middleIndex + 1 %}
+								<div
+									class="accordion"
+									id="productLineAccordionIncidentsList{{ outerIndex }}-{{ middleIndex }}">
+									<div
+										class="accordion-item">
+										<h2
+											class="accordion-header"
+											id="headingProductLineIncidentsList{{ outerIndex }}-{{ middleIndex }}">
+											<button
+												class="accordion-button collapsed"
+												type="button"
+												data-bs-toggle="collapse"
+												data-bs-target="#collapseProductLineIncidentsList{{ outerIndex }}-{{ middleIndex }}"
+												aria-expanded="false"
+												aria-controls="collapseProductLineIncidentsList{{ outerIndex }}-{{ middleIndex }}">
+												Produit:
+												{{ productLineName|split('.')|first|upper }}
+											</button>
+										</h2>
+										<div
+											id="collapseProductLineIncidentsList{{ outerIndex }}-{{ middleIndex }}"
+											class="accordion-collapse collapse"
+											aria-labelledby="headingProductLineIncidentsList{{ outerIndex }}-{{ middleIndex }}"
+											data-bs-parent="#collapseZoneIncidentsList{{ outerIndex }}">
+
+											<ul
+												class="accordion-body">
+												{% for incident in productLine %}
+													<li
+														class="form-control shadow d-flex justify-content-between align-items-center mb-3 shadow-lg"
+														style="display: flex;">
+														<a
+															href="{{ path('app_incident_download_file', { 'incidentId': incident.id }) }}" class="btn btn-link"
+															target="_blank"
+															style="flex: 1; text-align: left;">
+															-
+															{{ incident.name|upper }}
+														</a>
+														{% if app.user is same as(incident.uploader) or (incident.uploader) is empty or is_granted ('ROLE_LINE_ADMIN')  %}
+															<div
+																class="ml-auto">
+																<div
+																	style="flex: 1; text-align: right;">
+																	{{ incident.uploadedAt|date('d/m/Y') }}
+																	<br>
+																	{{incident.uploader is not empty ? 'par ' ~  
+																incident.uploader.username|upper|split('.')|last : ''}}
+																</div>
+																<a
+																	href="{{ path('app_incident_modify_file', {'incidentId': incident.id}) }}" class="btn btn-modify shadow"
+																	style="flex: 1; text-align: center;">
+																	Modifier
+																</a>
+																{% if is_granted('ROLE_ADMIN') %}
+																	<a
+																		href="{{ path('app_incident_delete_file', { 'incidentId': incident.id, 'productLineId': incident.productLine.id }) }}" class="btn btn-danger shadow delete-incident"
+																		style="flex: 1; text-align: center;">
+																		Supprimer
+																	</a>
+																{% endif %}
+															</div>
+														{% endif %}
+													</li>
+												{% endfor %}
+											</ul>
+										</div>
+									</div>
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	{% else %}
+		<div
+			class="alert alert-danger">
+			<a
+				href="{{ path('app_base') }}">
+				Il n'y a pas de documents disponible
+			</a>
+		</div>
+	{% endif %}
+</div>

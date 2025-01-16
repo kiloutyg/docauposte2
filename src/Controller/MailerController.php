@@ -76,7 +76,7 @@ class MailerController extends AbstractController
         return $this->redirectToRoute('app_base');
     }
 
-    #[Route('/mail/mailadupdate', name: 'mailadupdate')]
+    #[Route('/mail/mailupdate', name: 'mailupdate')]
     public function updateEmailAddress(): Response
     {
         $usersUpdated = [];
@@ -134,7 +134,7 @@ class MailerController extends AbstractController
     }
 
 
-    #[Route('/mail/maildev', name: 'mailaddev')]
+    #[Route('/mail/maildev', name: 'maildev')]
     public function devEmailAddress(): Response
     {
         $usersUpdated = [];
@@ -144,6 +144,8 @@ class MailerController extends AbstractController
             $username = $user->getUsername();
             // $this->logger->info('username: ' . $username);
             $newEmail = "florian.dkhissi+{$username}@opmobility.com";
+            // $newEmail = "florian.dkhissi@opmobility.com";
+
             $oldEmail = $user->getEmailAddress();
             // $this->logger->info('oldEmail: ' . $oldEmail);
             // $this->logger->info('newEmail: ' . $newEmail);

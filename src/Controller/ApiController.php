@@ -77,10 +77,10 @@ class ApiController extends AbstractController
             ];
         }, $this->entityFetchingService->getButtons());
 
-        $incidentsCategories = array_map(function ($incidentsCategory) {
+        $incidentCategories = array_map(function ($incidentCategory) {
             return [
-                'id'    => $incidentsCategory->getId(),
-                'name'  => $incidentsCategory->getName(),
+                'id'    => $incidentCategory->getId(),
+                'name'  => $incidentCategory->getName(),
             ];
         }, $this->entityFetchingService->getIncidentCategories());
 
@@ -97,7 +97,7 @@ class ApiController extends AbstractController
             'productLines'          => $productLines,
             'categories'            => $categories,
             'buttons'               => $buttons,
-            'incidentsCategories'   => $incidentsCategories,
+            'incidentCategories'    => $incidentCategories,
             'departments'           => $departments,
 
         ];
@@ -143,11 +143,6 @@ class ApiController extends AbstractController
         $validatorNumber = $settings->getValidatorNumber();
 
         $incidentAutoDisplayTimer = ($this->settingsRepository->getIncidentAutoDisplayTimerInSeconds() * 100);
-
-
-        $this->logger->info('incidentAutoDisplayTimer', [
-            $incidentAutoDisplayTimer
-        ]);
 
         $responseData = [
             'uploadValidation' => $uploadValidation,

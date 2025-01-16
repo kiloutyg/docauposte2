@@ -15,37 +15,6 @@
 
 {% block body %}
 
-	{% if zoneIdFromServer is not defined %}
-		{% if zone is defined and zone is not null %}
-			<script>
-				zoneIdFromServer = parseInt('{{ zone.getId() }}')
-			</script>
-		{% endif %}
-	{% endif %}
-
-	{% if productLineIdFromServer is not defined %}
-		{% if productLine is defined and productLine is not null %}
-			<script>
-				productLineIdFromServer = parseInt('{{ productLine.getId() }}')
-			</script>
-		{% endif %}
-	{% endif %}
-
-	{% if categoryIdFromServer is not defined %}
-		{% if category is defined and category is not null %}
-			<script>
-				categoryIdFromServer = parseInt('{{ category.getId() }}')
-			</script>
-		{% endif %}
-	{% endif %}
-
-	{% if buttonIdFromServer is not defined %}
-		{% if button is defined and button is not null %}
-			<script>
-				buttonIdFromServer = parseInt('{{ button.getId() }}')
-			</script>
-		{% endif %}
-	{% endif %}
 
 	<div
 		class="row align-items-center">
@@ -248,7 +217,7 @@
 				{% if is_granted('ROLE_SUPER_ADMIN') %}
 					{{ render(controller('App\\Controller\\IncidentController::incidentManagementView'), options = []) }}
 				{% else %}
-					{% include "services/incidents/incidents.html.twig" %}
+					{% include "services/incident/incident.html.twig" %}
 				{% endif %}
 			{% endif %}
 

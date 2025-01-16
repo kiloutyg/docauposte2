@@ -100,7 +100,7 @@ class IncidentController extends AbstractController
         $incidentCategories = $this->entityFetchingService->getIncidentCategories();
 
         return $this->render(
-            'services/incidents/incidents.html.twig',
+            'services/incident/incident.html.twig',
             [
                 'groupincidents'            => $groupIncidents,
                 'incidentCategories'        => $incidentCategories,
@@ -125,7 +125,7 @@ class IncidentController extends AbstractController
         // If there is an incident we render the incidents page with the incident data and the next incident id to redirect to the next incident page
         if ($incident) {
             return $this->render(
-                '/services/incidents/incidents_view.html.twig',
+                '/services/incident/incident_view.html.twig',
                 [
                     'incidentId'        => $incident ? $incident->getId() : null,
                     'incident'          => $incident,
@@ -152,14 +152,14 @@ class IncidentController extends AbstractController
 
 
     // Logic to create a new IncidentCategory and display a message
-    #[Route('/incident/incident_incidentsCategory_creation', name: 'incident_incidentsCategory_creation')]
+    #[Route('/incident/incident_incidentCategory_creation', name: 'incident_incidentCategory_creation')]
     public function incidentCategoryCreation(Request $request): JsonResponse
     {
         // Get the data from the request
         $data = json_decode($request->getContent(), true);
 
         // Get the name of the incident category
-        $incidentCategoryName = $data['incident_incidentsCategory_name'] ?? null;
+        $incidentCategoryName = $data['incident_incidentCategory_name'] ?? null;
 
         // Get the existing incident category name
         $existingIncidentCategory = $this->incidentCategoryRepository->findOneBy(['name' => $incidentCategoryName]);
@@ -185,20 +185,19 @@ class IncidentController extends AbstractController
 
 
     // Create a route for incidentCategory deletion. It depends on the entitydeletionService.
-    #[Route('/incident/delete/incident_incidentsCategory_deletion/{incidentCategoryId}', name: 'incident_incidentsCategory_deletion')]
-    public function incidentCategoryDeletion(int $incidentCategoryId, Request $request): Response
+    #[Route('/incident/delete/incident_incidentCategory_deletion/{incidentCategoryId}', name: 'incident_incidentCategory_deletion')]
+    public function incidentCategoryDeletion(int $incidentCategoryId, Request $request)
     {
         $entityType = "incidentCategory";
         $entity = $this->entitydeletionService->deleteEntity($entityType, $incidentCategoryId);
-        $originUrl = $request->headers->get('referer');
 
         if ($entity == true) {
 
             $this->addFlash('success', $entityType . ' has been deleted');
-            return $this->redirect($originUrl);
+            return $this->redirectToOriginUrl($request);
         } else {
             $this->addFlash('danger',  $entityType . '  does not exist');
-            return $this->redirect($originUrl);
+            return $this->redirectToOriginUrl($request);
         }
     }
 
@@ -207,21 +206,19 @@ class IncidentController extends AbstractController
 
     // Create a route to upload an incident file. It depends on the IncidentService.
     #[Route('/incident/incident_uploading', name: 'generic_upload_incident_files')]
-    public function genericUploadOfIncidentFiles(Request $request): Response
+    public function genericUploadOfIncidentFiles(Request $request)
     {
-
-        $originUrl = $request->headers->get('referer');
 
         // Check if the form is submitted 
         if ($request->isMethod('POST')) {
             // Use the IncidentService to handle the upload of the Incidents files
             $name = $this->incidentService->uploadIncidentFiles($request);
             $this->addFlash('success', 'Le document '  . $name .  ' a été correctement chargé');
-            return $this->redirect($originUrl);
+            return $this->redirectToOriginUrl($request);
         } else {
             // Show an error message if the form is not submitted
             $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
-            return $this->redirect($originUrl);
+            return $this->redirectToOriginUrl($request);
         }
     }
 
@@ -241,109 +238,86 @@ class IncidentController extends AbstractController
 
 
 
-    // Create a route to visualize the file in the modifcation view.
-    #[Route('/incident/modify_download_incident/{id}', name: 'modify_incident_download_file')]
-    public function modify_download_file(int $id = null): Response
-    {
-        $file       = $this->incidentRepository->findOneBy(['id' => $id]);
-        $path       = $file->getPath();
-        $file       = new File($path);
-        return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
-    }
-
-
-
 
     // Create a route to delete a file
     #[Route('/incident/delete/{productLineId}/{incidentId}', name: 'incident_delete_file')]
-    public function delete_file(int $incidentId, int $productLineId, Request $request): Response
+    public function delete_file(int $incidentId, int $productLineId, Request $request)
     {
-        $productLineEntity = $this->productLineRepository->findoneBy(['id' => $productLineId]);
-        $originUrl = $request->headers->get('referer');
+        $productLineEntity = $this->productLineRepository->find($productLineId);
         $incidentEntity = $this->incidentRepository->find($incidentId);
 
         // Check if the user is the creator of the upload or if he is a super admin
         if ($this->authChecker->isGranted('ROLE_ADMIN')) {
             // Use the incidentService to handle file deletion
             $name = $this->incidentService->deleteIncidentFile($incidentEntity, $productLineEntity);
-        } else if ($this->getUser() === $incidentEntity->getUploader()) {
+        } elseif ($this->getUser() === $incidentEntity->getUploader()) {
             // Use the incidentService to handle file deletion
             $name = $this->incidentService->deleteIncidentFile($incidentEntity, $productLineEntity);
         } else {
             $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer ce document.');
-            return $this->redirectToRoute($originUrl);
+            return $this->redirectToOriginUrl($request);
         }
         $this->addFlash('success', 'File ' . $name . ' deleted');
 
-        return $this->redirect($originUrl);
+        return $this->redirectToOriginUrl($request);
     }
 
 
-    
+
 
     // Create a route to modify a file and or display the modification page
     #[Route('/incident/modify_incident/{incidentId}', name: 'incident_modify_file')]
-    public function modify_incident_file(Request $request, int $incidentId): Response
+    public function modify_incident_file(Request $request, int $incidentId)
     {
         // Retrieve the current incident entity based on the incidentId
         $incident = $this->incidentRepository->find($incidentId);
-        $productLine = $incident->getProductLine();
-        $zone = $productLine->getZone();
-        $originUrl = $request->headers->get('referer');
-        $user = $this->getUser();
 
-        if (!$incident) {
-            $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
-            return $this->redirect($originUrl);
-        }
 
         // Create a form to modify the Upload entity
         $form = $this->createForm(IncidentType::class, $incident);
 
-        // Handle the form data on POST requests
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Process the form data and modify the Upload entity
-            try {
-                $this->incidentService->modifyIncidentFile($incident, $user);
-                $this->addFlash('success', 'Le fichier a été modifié.');
-                return $this->redirect($originUrl);
-            } catch (\Exception $e) {
-                // $this->addFlash('error', $e->getMessage());
-                $this->addFlash('error', 'Le fichier n\'a pas été modifié. Veuillez réessayer.');
-
-                return $this->redirect($originUrl);
-            }
-        }
-
-        // Convert the errors to an array
-        $errorMessages = [];
-        if ($form->isSubmitted() && !$form->isValid()) {
-            // Get form errors
-            $errors = $form->getErrors(true);
-
-            foreach ($errors as $error) {
-                $errorMessages[] = $error->getMessage();
-            }
-
-            // Return the errors in the JSON response
-            $this->addFlash('error', 'Invalid form. Check the entered data.');
-            return $this->redirect($originUrl);
-        }
-
-        // If it's a POST request but the form is not valid or not submitted
         if ($request->isMethod('POST')) {
+
+            // Handle the form data on POST requests
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+
+                // Process the form data and modify the Upload entity
+                return $this->incidentService->modifyIncidentFile($incident);
+            }
+
+            // Convert the errors to an array
+            $errorMessages = [];
+            if ($form->isSubmitted() && !$form->isValid()) {
+                // Get form errors
+                $errors = $form->getErrors(true);
+
+                foreach ($errors as $error) {
+                    $errorMessages[] = $error->getMessage();
+                }
+
+            }
+
+            // If it's a POST request but the form is not valid or not submitted
             $this->addFlash('error', 'Invalid form. Errors: ' . implode(', ', $errorMessages));
-            return $this->redirect($originUrl);
+            return $this->redirectToOriginUrl($request);
         }
 
+        $productLine = $incident->getProductLine();
+        $zone = $productLine->getZone();
         // If it's a GET request, render the form
-        return $this->render('services/incidents/incidents_modification.html.twig', [
+        return $this->render('services/incident/incident_modification.html.twig', [
             'form'          => $form->createView(),
             'zone'          => $zone,
             'productLine'   => $productLine,
             'incident'      => $incident
         ]);
+    }
+
+    public function redirectToOriginUrl($request)
+    {
+        $originUrl = $request->headers->get('referer');
+        return $this->redirect($originUrl);
     }
 }

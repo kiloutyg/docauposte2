@@ -5,22 +5,11 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-	{% set lastZone = null %}
-	{% set lastProductLine = null %}
-	{% set lastCategory = null %}
-	{% set lastButton = null %}
+	{% block javascripts %}
+		{{ parent() }}
 
-	<script>
-
-		{% if upload is defined and upload is not null %}
-{% set button = upload.button %}
-{% set category = button.category %}
-{% set productLine = category.productLine %}
-{% set zone = productLine.zone %}
-{% endif %}
-{% if zone is defined and zone is not null %}
-zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine is defined and productLine is not null %}productLineIdFromServer = parseInt('{{ productLine.getId() }}');{% endif %}{% if category is defined and category is not null %}categoryIdFromServer = parseInt('{{ category.getId() }}');{% endif %}{% if button is defined and button is not null %}buttonIdFromServer = parseInt('{{ button.getId() }}');{% endif %}
-	</script>
+		{{ encore_entry_script_tags('cascading-dropdowns') }}
+	{% endblock %}
 
 
 	<div
@@ -33,7 +22,7 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 						<aside
 							class="position-absolute end-0">
 							<a
-								href="{{ path('app_productLine_admin', {productLineId: upload.button.category.productline.id}) }}" class="btn shadow bg-dark position-absolute end-0"
+								href="{{ path('app_productLine_admin', {productLineId: upload.button.category.productLine.id}) }}" class="btn shadow bg-dark position-absolute end-0"
 								style="color:white">
 								<span
 									class="fa fa-gear"></span>
@@ -41,9 +30,9 @@ zoneIdFromServer = parseInt('{{ zone.getId() }}');{% endif %}{% if productLine i
 									<span
 										class="button-text">
 										Centre d'Admin de
-										{{upload.button.category.productline.name|split('.')|first|upper}}
+										{{upload.button.category.productLine.name|split('.')|first|upper}}
 										de la zone
-										{{upload.button.category.productline.zone.name|split('.')|first|upper}}
+										{{upload.button.category.productLine.zone.name|split('.')|first|upper}}
 									</span>
 								</strong>
 							</a>

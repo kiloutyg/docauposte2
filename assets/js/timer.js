@@ -5,7 +5,9 @@ export function timer(delay, locationString) {
 
     const resetTimer = () => {
         clearTimeout(time);
+
         time = setTimeout(inactivity, delay || 300000); // Default to 5 minutes
+
     };
 
     const inactivity = () => {
@@ -21,7 +23,6 @@ export function timer(delay, locationString) {
                 console.error('Error notifying server of inactivity:', error);
                 resetTimer();
             });
-
     };
     if (locationString === 'inactivity_check') {
         // Attach event listeners using a helper function
