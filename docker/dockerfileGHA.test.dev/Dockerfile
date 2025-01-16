@@ -98,6 +98,8 @@ WORKDIR /var/www
 # Copy application code with correct ownership
 COPY --chown=nonroot:nonroot . /var/www
 
+RUN cp .env.test .env
+
 # # Install dependencies and perform build steps
 # RUN composer install \
 #   && yarn install --ignore-scripts \
@@ -110,6 +112,7 @@ COPY --chown=nonroot:nonroot . /var/www
 #   && php ./bin/console make:migration \
 #   && php ./bin/console doctrine:migrations:migrate \
 #   && yarn encore dev --watch
+
 # Install dependencies and perform build steps
 RUN composer install 
 RUN  yarn install --ignore-scripts 
