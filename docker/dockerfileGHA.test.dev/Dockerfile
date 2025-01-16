@@ -93,8 +93,9 @@ RUN ls -la
 
 WORKDIR /var/www
 
-# Switch to System User
-USER nonroot
+RUN whoami
+RUN echo $PWD
+RUN ls -la
 
 COPY --chown=nonroot:nonroot --chmod=644 . .
 
