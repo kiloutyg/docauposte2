@@ -3,8 +3,6 @@ FROM php:8.2-apache-bookworm AS base
 # Create a non-root user and group
 RUN addgroup --system nonroot \
   && adduser --system --ingroup nonroot nonroot
-# RUN addgroup nonroot \
-#   && adduser --ingroup nonroot nonroot
 
 # Set working directory
 WORKDIR /var/www
@@ -27,7 +25,6 @@ RUN apt update -y \
   wget \
   gnupg \
   libmagickwand-dev 
-
 
 RUN docker-php-ext-install \
   pdo \
@@ -103,9 +100,11 @@ USER root
 #   && chmod 644 /var/www -R
 
 # Switch to System User
-USER nonroot
+# USER nonroot
+# COPY --chown=nonroot:nonroot --chmod=644 . .
 
-COPY --chown=nonroot:nonroot --chmod=644 . .
+USER www-data
+COPY --chown=www-data:www-data --chmod=644 . .
 RUN echo $PWD
 RUN ls -la
 
