@@ -105,12 +105,13 @@ FROM base AS building
 # Ensure we're using the non-root user
 RUN ls -la
 
+USER root
 RUN chmod 644 /var/www -R
+USER nonroot
 
 COPY --chown=nonroot:nonroot --chmod=644 . .
 RUN ls -la
 # Switch to non-root user for subsequent operations
-USER nonroot
 RUN cat composer.json
 
 # Install dependencies and perform build steps
