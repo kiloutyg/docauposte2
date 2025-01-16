@@ -26,10 +26,10 @@ RUN apt-get update -y \
   git \
   wget \
   gnupg \
-  libmagickwand-dev \
+  libmagickwand-dev 
 
 
-  RUN docker-php-ext-install \
+RUN docker-php-ext-install \
   pdo \
   mysqli \
   pdo_mysql \
