@@ -100,7 +100,8 @@ USER root
 #   && chmod 644 /var/www -R
 
 WORKDIR /var
-
+RUN echo $PWD
+RUN ls -la
 # Switch to System User
 USER nonroot
 COPY --chown=nonroot:nonroot --chmod=644 . www/
