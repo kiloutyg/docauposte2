@@ -7,7 +7,7 @@ RUN addgroup --system nonroot \
 # Set working directory
 WORKDIR /var
 RUN chown nonroot:nonroot www/ -R \
-&& chmod 644 www/ -R
+  && chmod 644 www/ -R
 
 # Copy custom php.ini
 COPY ./docker/dockerfileGHA.test.dev/php.ini /usr/local/etc/php/php.ini
@@ -87,6 +87,8 @@ USER nonroot
 
 # Building stage
 FROM base AS building
+
+WORKDIR /var/www
 
 # Switch to System User
 USER nonroot
