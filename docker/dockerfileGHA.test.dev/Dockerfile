@@ -79,16 +79,18 @@ COPY --chown=nonroot:nonroot --chmod=644 ./docker/dockerfileGHA.test.dev/compose
 RUN chmod +x composer.sh
 
 # Switch to Root User
-USER root
+USER nonroot
 
 # Install Composer and Symfony CLI
 RUN ./composer.sh \
-  && mv composer.phar /usr/local/bin/composer \
-  && curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
+  && curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash 
+
+USER root
+
+RUN mv composer.phar /usr/local/bin/composer \
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
 
 # Switch to System User on base
-USER nonroot
 
 # Building stage
 FROM base AS building
