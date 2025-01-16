@@ -105,5 +105,5 @@ RUN  cp .env.test .env \
   && composer clear-cache \
   && php ./bin/console cache:clear --no-warmup --env=dev \
   && php ./bin/console cache:warmup --env=dev \
-  && yarn encore dev --watch \
+  && yarn encore dev \
   && rm .env
