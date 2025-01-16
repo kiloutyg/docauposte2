@@ -56,7 +56,8 @@ RUN git config --global user.email "floriandkhissi@gmail.com" \
   && git config --global --add safe.directory /var/www \
   # Set default vhost to target /symfony/app/public
   && sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/sites-available/000-default.conf \
-  && rm -rf /var/www
+  && chown nonroot:nonroot www/ -R \
+  && chmod 644 www/ -R
 
 # Install Node.js
 RUN mkdir -p /etc/apt/keyrings \
@@ -71,49 +72,28 @@ RUN mkdir -p /etc/apt/keyrings \
   && apt clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Switch to System User
-USER nonroot
-
 COPY --chown=nonroot:nonroot --chmod=644 ./docker/dockerfileGHA.test.dev/composer.sh .
 
 RUN chmod +x composer.sh
 
-# Switch to Root User
-USER nonroot
-
 # Install Composer and Symfony CLI
 RUN ./composer.sh \
-  && curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash 
-
-USER root
-
-RUN mv composer.phar /usr/local/bin/composer \
+  && mv composer.phar /usr/local/bin/composer \
+  && curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
 
 # Switch to System User on base
+USER nonroot
 
 # Building stage
 FROM base AS building
 
-# Switch to Root User
-USER root
-
-# RUN chown nonroot:nonroot /var/www -R \
-#   && chmod 644 /var/www -R
-
-WORKDIR /var
-RUN echo $PWD
-RUN ls -la
 # Switch to System User
 USER nonroot
 
-COPY --chown=nonroot:nonroot --chmod=644 . /var/www/
+COPY --chown=nonroot:nonroot --chmod=644 . .
 
-# USER www-data
-# COPY --chown=www-data:www-data --chmod=644 . .
 RUN echo $PWD
-RUN ls -la
-WORKDIR /var/www
 RUN ls -la
 
 # Install dependencies and perform build steps
