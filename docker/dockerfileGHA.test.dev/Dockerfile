@@ -36,7 +36,7 @@ RUN apt update -y \
   pdo_mysql \
   xsl \
   zip\
-  && RUN pecl install \
+  && pecl install \
   imagick \
   xdebug \
   && docker-php-ext-enable \
