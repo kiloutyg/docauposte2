@@ -27,10 +27,9 @@ RUN apt-get update -y \
   wget \
   gnupg \
   libmagickwand-dev \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN docker-php-ext-install \
+
+  RUN docker-php-ext-install \
   pdo \
   mysqli \
   pdo_mysql \
@@ -57,74 +56,68 @@ RUN docker-php-ext-enable \
 # Set global git configuration
 RUN git config --global user.email "floriandkhissi@gmail.com" \
   && git config --global user.name "Florian Dkhissi" \
-  && git config --global --add safe.directory /var/www
-
-# Set default vhost to target /symfony/app/public
-RUN sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/sites-available/000-default.conf
-RUN rm -rf html
+  && git config --global --add safe.directory /var/www \
+  # Set default vhost to target /symfony/app/public
+  && sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/sites-available/000-default.conf \
+  && rm -rf html
 
 # Install Node.js
 RUN mkdir -p /etc/apt/keyrings \
   && curl --tlsv1.2 -fsS https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | \
   gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
-  && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_23.x nodistro main" | \
+  && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" | \
   tee /etc/apt/sources.list.d/nodesource.list \
-  && apt-get update -y \
   && apt-get install --no-install-recommends -y nodejs \
   && apt-get clean \
+  && npm install --ignore-scripts -g npm@11 \
+  && npm install --ignore-scripts -g yarn \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN npm install --ignore-scripts -g npm@11 \
-  && npm install --ignore-scripts -g yarn
-
+# Switch to System User
 USER nonroot
 
 COPY --chown=nonroot:nonroot --chmod=644 ./docker/dockerfileGHA.test.dev/composer.sh .
-RUN ls -la
-RUN cat composer.sh
-# RUN chmod +x composer.sh \
-#   && /usr/bin/bash composer.sh \
-#   && mv composer.phar /usr/local/bin/composer
 
-RUN chmod +x composer.sh 
+RUN chmod +x composer.sh
+
+# Switch to Root User
 USER root
-RUN ./composer.sh 
-RUN mv composer.phar /usr/local/bin/composer
 
-# Install Symfony CLI
-RUN curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
+# Install Composer and Symfony CLI
+RUN ./composer.sh \
+  && mv composer.phar /usr/local/bin/composer \
+  && curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
 
-
+# Switch to System User on base
 USER nonroot
-
 
 # Building stage
 FROM base AS building
 
-# Ensure we're using the non-root user
-RUN ls -la
-
+# Switch to Root User
 USER root
 
-# RUN chmod 644 /var/www -R
-RUN chown nonroot:nonroot /var/www -R
+RUN chown nonroot:nonroot /var/www -R \
+  && chmod 644 /var/www -R
 
+# Switch to System User
 USER nonroot
 
-# Switch to non-root user for subsequent operations
 COPY --chown=nonroot:nonroot --chmod=644 . .
+
 RUN ls -la
-RUN cat composer.json
 
 # Install dependencies and perform build steps
 RUN composer install \
   && yarn install --ignore-scripts \
   && composer clear-cache \
+  && ls -la \
+  && echo $PWD \
   # Clear the cache
-  && php bin/console cache:clear --no-warmup --env=dev \
+  && php ./bin/console cache:clear --no-warmup --env=dev \
   # Warm up the cache
-  && php bin/console cache:warmup --env=dev \
+  && php ./bin/console cache:warmup --env=dev \
   # Set permissions
   && chmod 644 . -R \
   # Remove old migrations folder and files
@@ -132,7 +125,7 @@ RUN composer install \
   # Create the migrations directory
   && mkdir -p migrations \
   # Create the database and run the migrations
-  && php bin/console make:migration \
-  && php bin/console doctrine:migrations:migrate \
+  && php ./bin/console make:migration \
+  && php ./bin/console doctrine:migrations:migrate \
   # Build the assets
   && yarn encore dev --watch
