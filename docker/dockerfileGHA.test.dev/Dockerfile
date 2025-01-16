@@ -100,28 +100,17 @@ COPY --chown=nonroot:nonroot . /var/www
 
 RUN cp .env.test .env
 
-# # Install dependencies and perform build steps
-# RUN composer install \
-#   && yarn install --ignore-scripts \
-#   && composer clear-cache \
-#   && php ./bin/console cache:clear --no-warmup --env=dev \
-#   && php ./bin/console cache:warmup --env=dev \
-#   && chmod -R u+rwX,go=rX /var/www \
-#   && rm -rf migrations \
-#   && mkdir -p migrations \
-#   && php ./bin/console make:migration \
-#   && php ./bin/console doctrine:migrations:migrate \
-#   && yarn encore dev --watch
-
 # Install dependencies and perform build steps
-RUN composer install 
-RUN  yarn install --ignore-scripts 
-RUN  composer clear-cache 
-RUN  php ./bin/console cache:clear --no-warmup --env=dev 
-RUN  php ./bin/console cache:warmup --env=dev 
-RUN  chmod -R u+rwX,go=rX /var/www 
-RUN  rm -rf migrations 
-RUN  mkdir -p migrations 
-RUN  php ./bin/console make:migration 
-RUN  php ./bin/console doctrine:migrations:migrate 
-RUN  yarn encore dev --watch
+RUN composer install \
+  && yarn install --ignore-scripts \
+  && composer clear-cache \
+  && php ./bin/console cache:clear --no-warmup --env=dev \
+  && php ./bin/console cache:warmup --env=dev \
+  && chmod -R u+rwX,go=rX /var/www \
+  && rm -rf migrations \
+  && mkdir -p migrations \
+  && php ./bin/console make:migration \
+  && php ./bin/console doctrine:migrations:migrate \
+  && yarn encore dev --watch
+
+  RUN rm .env
