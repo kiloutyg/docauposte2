@@ -16,9 +16,9 @@ COPY ./docker/dockerfileGHA.test.dev/php.ini /usr/local/etc/php/php.ini
 RUN a2enmod rewrite \
   && service apache2 restart
 
-RUN apt-get update -y \
-  && apt-get upgrade -y \
-  && apt-get install --no-install-recommends -y \
+RUN apt update -y \
+  && apt upgrade -y \
+  && apt install --no-install-recommends -y \
   ca-certificates \
   curl \
   libxslt-dev \
@@ -67,8 +67,8 @@ RUN mkdir -p /etc/apt/keyrings \
   gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
   && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" | \
   tee /etc/apt/sources.list.d/nodesource.list \
-  && apt-get install --no-install-recommends -y nodejs \
-  && apt-get clean \
+  && apt install --no-install-recommends -y nodejs \
+  && apt clean \
   && npm install --ignore-scripts -g npm@11 \
   && npm install --ignore-scripts -g yarn \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
