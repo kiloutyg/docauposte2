@@ -95,12 +95,18 @@ WORKDIR /var/www
 
 RUN whoami
 RUN echo $PWD
-RUN ls -la
+
+USER root
+RUN ls -l
+USER nonroot
 
 COPY --chown=nonroot:nonroot --chmod=644 . .
 
 RUN echo $PWD
-RUN ls -la
+
+USER root
+RUN ls -l
+USER nonroot
 
 # Install dependencies and perform build steps
 RUN composer install \
