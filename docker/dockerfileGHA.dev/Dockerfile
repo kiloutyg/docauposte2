@@ -50,10 +50,8 @@ RUN apt update -y \
 RUN git config --global user.email "floriandkhissi@gmail.com" \
   && git config --global user.name "Florian Dkhissi" \
   && git config --global --add safe.directory /var/www \
-  && sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/sites-available/000-default.conf
-
-# Install Node.js
-RUN mkdir -p /etc/apt/keyrings \
+  && sed -i -e "s/\/var\/www\/html/\/var\/www\/public/g" /etc/apache2/sites-available/000-default.conf \
+  && mkdir -p /etc/apt/keyrings \
   && curl --tlsv1.2 -fsS https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | \
   gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
   && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_23.x nodistro main" | \
