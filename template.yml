@@ -99,7 +99,7 @@ spec:
   restartPolicy: Always
   containers:
     - name: web
-      image: ghcr.io/${GITHUB_USER}/docauposte2:main
+      image: ghcr.io/${GITHUB_USER}/docauposte2:${APP_CONTEXT}-latest
       command: ["./${APP_CONTEXT}-entrypoint.sh"]
       env:
         - name: no_proxy
