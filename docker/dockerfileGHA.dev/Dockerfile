@@ -2,10 +2,6 @@
 
 FROM php:8.2-apache-bookworm AS base
 
-# Create a non-root user and group
-RUN addgroup --system nonroot \
-  && adduser --system --ingroup nonroot nonroot
-
 # Set working directory
 WORKDIR /var/www
 
@@ -70,7 +66,7 @@ RUN mkdir -p /etc/apt/keyrings \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Copy composer.sh script
-COPY --chown=nonroot:nonroot --chmod=755 ./docker/dockerfileGHA.test.dev/composer.sh /usr/local/bin/composer.sh
+COPY ./docker/dockerfileGHA.test.dev/composer.sh /usr/local/bin/composer.sh
 
 # Install Composer and Symfony CLI
 RUN /usr/local/bin/composer.sh \
@@ -78,31 +74,3 @@ RUN /usr/local/bin/composer.sh \
   && rm /usr/local/bin/composer.sh \
   && curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
-
-# Change ownership of the working directory
-RUN chown -R nonroot:nonroot /var/www
-
-# Switch to non-root user
-USER nonroot
-
-# Building stage
-FROM base AS building
-
-# Switch to non-root user
-USER nonroot
-
-# Set working directory
-WORKDIR /var/www
-
-# Copy application code with correct ownership
-COPY --chown=nonroot:nonroot --chmod=755 . /var/www
-
-# Install dependencies and perform build steps
-RUN  cp .env.test .env \
-  && composer install \
-  && yarn install --ignore-scripts \
-  && composer clear-cache \
-  && php ./bin/console cache:clear --no-warmup --env=dev \
-  && php ./bin/console cache:warmup --env=dev \
-  && yarn encore dev \
-  && rm -rf .env node_modules vendor
