@@ -46,3 +46,9 @@ symfony copy.lock
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
 ###< php-cs-fixer/shim ###
+
+
+.yarn
+.composer
+.cache
+.php-cs-fixer.dist.php
