@@ -1,4 +1,0 @@
-[submodule "docauposte2.wiki"]
-	path = wiki
-	url = https://github.com/kiloutyg/docauposte2.wiki.git
-	branch = main

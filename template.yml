@@ -30,7 +30,7 @@ spec:
           value: run/secrets/database_password
       ports:
         - containerPort: 3306
-      volumeMounts :
+      volumeMounts:
         - name: secrets
           mountPath: /run/secrets
           readOnly: true
@@ -92,6 +92,10 @@ metadata:
     traefik.http.services.docauposte-web.loadbalancer.server.port: 80
     traefik.http.middlewares.strip-docauposte-web-prefix.stripPrefix.prefixes: /docauposte
 spec:
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0
+    fsGroup: 1129600513
   restartPolicy: Always
   containers:
     - name: web
