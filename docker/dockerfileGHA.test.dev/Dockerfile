@@ -63,21 +63,19 @@ RUN mkdir -p /etc/apt/keyrings \
   && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_23.x nodistro main" | \
   tee /etc/apt/sources.list.d/nodesource.list \
   && apt update -y \
-  && apt install -y nodejs \
+  && apt install --no-install-recommends -y nodejs \
   && npm install --ignore-scripts -g npm@11 \
   && npm install --ignore-scripts -g yarn \
   && apt clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Copy composer.sh script
-COPY ./docker/dockerfileGHA.test.dev/composer.sh /usr/local/bin/composer.sh
-
-# Set execute permission for composer.sh
-RUN chmod +x /usr/local/bin/composer.sh
+COPY --chown=nonroot:nonroot --chmod=755 ./docker/dockerfileGHA.test.dev/composer.sh /usr/local/bin/composer.sh
 
 # Install Composer and Symfony CLI
 RUN /usr/local/bin/composer.sh \
   && mv composer.phar /usr/local/bin/composer \
+  && rm /usr/local/bin/composer.sh \
   && curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
 
@@ -89,6 +87,9 @@ USER nonroot
 
 # Building stage
 FROM base AS building
+
+# Switch to non-root user
+USER nonroot
 
 # Set working directory
 WORKDIR /var/www
