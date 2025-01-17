@@ -95,7 +95,7 @@ USER nonroot
 WORKDIR /var/www
 
 # Copy application code with correct ownership
-COPY --chown=nonroot:nonroot . /var/www
+COPY --chown=nonroot:nonroot --chmod=755 . /var/www
 
 # Install dependencies and perform build steps
 RUN  cp .env.test .env \
