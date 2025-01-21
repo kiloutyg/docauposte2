@@ -534,6 +534,7 @@ class UploadService extends AbstractController
         $isTraining = $file->isTraining();
         $hasOldUpload = $file->getOldUpload() !== null;
         $originUrl = $request->headers->get('Referer');
+        
 
         if ($isValidated === false && $isForcedDisplay === false) {
             if ($settings->IsTraining() && $isTraining) {
