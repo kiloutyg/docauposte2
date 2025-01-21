@@ -270,17 +270,11 @@ class UploadService extends AbstractController
             }
         };
 
-        if ($request->request->get('training-needed') === 'true') {
-            $upload->setTraining(true);
-        } else {
-            $upload->setTraining(false);
-        }
 
-        if ($request->request->get('display-needed') === 'true') {
-            $upload->setForcedDisplay(true);
-        } else {
-            $upload->setForcedDisplay(false);
-        }
+        $upload->setTraining(filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN));
+
+        $upload->setForcedDisplay(filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN));
+
 
         // If new file exists, process it and delete the old one
         if ($newFile) {
@@ -348,6 +342,12 @@ class UploadService extends AbstractController
     public function modifyDisapprovedFile(Upload $upload, User $user, Request $request)
     {
 
+        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->full request', [$request->request->all()]);
+
+        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->$request->request->get(training-needed)', [$request->request->get('training-needed')]);
+        $trainingNeeded = filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN);
+        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->trainingNeeded', [$trainingNeeded]);
+
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
         // Public directory
@@ -394,6 +394,10 @@ class UploadService extends AbstractController
                 $upload->setUploader($user);
             }
         }
+
+        if ($upload->isTraining() != $trainingNeeded) {
+            $upload->setTraining($trainingNeeded);
+        }
         $upload->setValidated(null);
         $upload->setUploadedAt(new \DateTime());
 
@@ -404,6 +408,9 @@ class UploadService extends AbstractController
 
         $this->validationService->resetApprobation($upload, $request);
     }
+
+
+
 
 
     // This function is responsible for the logic of grouping the uploads files by parent entities
@@ -521,6 +528,7 @@ class UploadService extends AbstractController
         $isTraining = $file->isTraining();
         $hasOldUpload = $file->getOldUpload() !== null;
         $originUrl = $request->headers->get('Referer');
+
 
         if ($isValidated === false && $isForcedDisplay === false) {
             if ($settings->IsTraining() && $isTraining) {

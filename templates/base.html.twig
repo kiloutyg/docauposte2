@@ -26,50 +26,18 @@
 			{{ encore_entry_script_tags('toast') }}
 			{{ encore_entry_script_tags('confirmation') }}
 
-
-			{% if zoneIdFromServer is not defined %}
-				<script>
-					var zoneIdFromServer = null
-				</script>
-				{% if zone is defined and zone is not null %}
-					<script>
-						zoneIdFromServer = parseInt('{{ zone.getId() }}')
-					</script>
-				{% endif %}
-			{% endif %}
-
-			{% if productLineIdFromServer is not defined %}
-				<script>
-					var productLineIdFromServer = null
-				</script>
-				{% if productLine is defined and productLine is not null %}
-					<script>
-						productLineIdFromServer = parseInt('{{ productLine.getId() }}')
-					</script>
-				{% endif %}
-			{% endif %}
-
-			{% if categoryIdFromServer is not defined %}
-				<script>
-					var categoryIdFromServer = null
-				</script>
-				{% if category is defined and category is not null %}
-					<script>
-						categoryIdFromServer = parseInt('{{ category.getId() }}')
-					</script>
-				{% endif %}
-			{% endif %}
-
-			{% if buttonIdFromServer is not defined %}
-				<script>
-					var buttonIdFromServer = null
-				</script>
-				{% if button is defined and button is not null %}
-					<script>
-						buttonIdFromServer = parseInt('{{ button.getId() }}')
-					</script>
-				{% endif %}
-			{% endif %}
+			<script>
+				var zoneIdFromServer = {{ zone.getId()|default('null')|json_encode|raw }};
+			</script>
+			<script>
+				var productLineIdFromServer = {{ productLine.getId()|default('null')|json_encode|raw }};
+			</script>
+			<script>
+				var categoryIdFromServer = {{ category.getId()|default('null')|json_encode|raw }};
+			</script>
+			<script>
+				var buttonIdFromServer = {{ button.getId()|default('null')|json_encode|raw }};
+			</script>
 
 		{% endblock %}
 		{% include "services/_toasts.html.twig" %}

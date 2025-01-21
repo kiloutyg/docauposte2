@@ -5,55 +5,55 @@
 	{{ parent() }}
 {% endblock %}
 {% block body %}
-	{% block javascripts %}
-		{{ parent() }}
 
+
+	{% block javascripts %}
+
+		{{ parent() }}
 		{{ encore_entry_script_tags('cascading-dropdowns') }}
+		{{ encore_entry_script_tags('document-validator') }}
+
 	{% endblock %}
 
-
+	<div>
+		<aside
+			class="position-absolute end-0">
+			<a
+				href="{{ path('app_productLine_admin', {productLineId: upload.button.category.productLine.id}) }}" class="btn shadow bg-dark"
+				style="color:white">
+				<span
+					class="fa fa-gear"></span>
+				<strong>
+					<span
+						class="button-text">
+						Centre d'Admin de
+						{{upload.button.category.productLine.name|split('.')|first|upper}}
+						de la zone
+						{{upload.button.category.productLine.zone.name|split('.')|first|upper}}
+					</span>
+				</strong>
+			</a>
+		</aside>
+	</div>
 	<div
 		class="card border-0 shadow rounded-3 my-5 bg-secondary">
 		<div
 			class="card-body ">
-			{% if DisapprovedFile|length > 0 %}
-				{% if app.user %}
-					{% if is_granted('ROLE_LINE_ADMIN') %}
-						<aside
-							class="position-absolute end-0">
-							<a
-								href="{{ path('app_productLine_admin', {productLineId: upload.button.category.productLine.id}) }}" class="btn shadow bg-dark position-absolute end-0"
-								style="color:white">
-								<span
-									class="fa fa-gear"></span>
-								<strong>
-									<span
-										class="button-text">
-										Centre d'Admin de
-										{{upload.button.category.productLine.name|split('.')|first|upper}}
-										de la zone
-										{{upload.button.category.productLine.zone.name|split('.')|first|upper}}
-									</span>
-								</strong>
-							</a>
-						</aside>
-					{% endif %}
-				{% endif %}
-			{% endif %}
-
 			<div
 				class="row d-flex align-items-center gy-lg-0 gy-5">
-				<p
-					class="text-white m-0">
-					<h3
-						style="color:white">
-						Modification du fichier
-						<strong>
-							{{upload.filename}}
-						</strong>
-						:
-					</h3>
-				</p>
+				<div>
+					<p
+						class="text-white m-0">
+						<h3
+							style="color:white">
+							Modification du fichier
+							<strong>
+								{{upload.filename}}
+							</strong>
+							:
+						</h3>
+					</p>
+				</div>
 
 				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyDisapprovedForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_validation_disapproved_modify_by_upload', {'uploadId': upload.id})}) }}
 
@@ -146,7 +146,7 @@
 					<div
 						class="ratio ratio-4x3">
 						<iframe
-							src="{{ path('app_download_file_from_path', { 'uploadId': upload.id }) }}" target="_blank"></iframe>
+							src="{{ path('app_download_invalidation_file', { uploadId: upload.id }) }}" target="_blank"></iframe>
 					</div>
 					<hr
 						class="my-4">
@@ -160,9 +160,7 @@
 							) }}
 							<div
 								class="d-flex align-items-left mt-2 ">
-
-								{{ include('services/operators/training_toggles/training_toggle_component.html.twig', {checkStatus: true}) }}
-
+								{{ include('services/operators/training_toggles/training_toggle_component.html.twig', {checkStatus: false}) }}
 							</div>
 						</div>
 					</div>
@@ -333,5 +331,4 @@
 			</div>
 		</div>
 	</div>
-
 {% endblock %}

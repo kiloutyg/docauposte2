@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\Routing\Annotation\Route;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +28,7 @@ use App\Service\ValidationService;
 class ValidationController extends AbstractController
 {
 
-    // private $logger;
+    private $logger;
 
     // Repository methods
     private $approbationRepository;
@@ -43,7 +45,7 @@ class ValidationController extends AbstractController
 
     public function __construct(
 
-        // LoggerInterface                 $logger,
+        LoggerInterface                 $logger,
 
         // Repository methods
         ApprobationRepository           $approbationRepository,
@@ -56,7 +58,7 @@ class ValidationController extends AbstractController
         UploadService                   $uploadService,
 
     ) {
-        // $this->logger                       = $logger;
+        $this->logger                       = $logger;
 
         // Variables related to the repositories
         $this->approbationRepository        = $approbationRepository;
@@ -197,8 +199,7 @@ class ValidationController extends AbstractController
                 'upload'       => $upload,
                 'user'         => $this->getUser(),
                 'form'         => $form->createView(),
-                'approbations' => $approbations,
-
+                'approbations' => $approbations
             ]);
         } else {
             $this->addFlash('error', 'Le fichier a bien été modifié.');
@@ -212,9 +213,9 @@ class ValidationController extends AbstractController
     #[Route('/validation/disapproved/modifyByUpload/{uploadId}', name: 'app_validation_disapproved_modify_by_upload')]
     public function disapprovedValidationModificationByUpload(int $uploadId = null, Request $request): Response
     {
+
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $validation = $upload->getValidation();
-
 
         $approbations = [];
         $approbations = $validation->getApprobations(['Approval' => false]);
@@ -235,7 +236,6 @@ class ValidationController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
-
 
             if ($form->isSubmitted() && $form->isValid()) {
                 $this->uploadService->modifyDisapprovedFile($upload, $user, $request);

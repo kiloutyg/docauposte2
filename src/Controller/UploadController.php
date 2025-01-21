@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-// use \Psr\Log\LoggerInterface;
+use \Psr\Log\LoggerInterface;
 
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,7 +31,7 @@ class UploadController extends AbstractController
 {
 
     private $security;
-    // private $logger;
+    private $logger;
     private $authChecker;
 
     // Repository methods
@@ -50,6 +50,7 @@ class UploadController extends AbstractController
 
     public function __construct(
 
+        LoggerInterface                 $logger,
         Security                        $security,
         AuthorizationCheckerInterface   $authChecker,
 
@@ -66,7 +67,7 @@ class UploadController extends AbstractController
 
     ) {
         $this->security                     = $security;
-        // $this->logger                       = $logger;
+        $this->logger                       = $logger;
 
         $this->authChecker                  = $authChecker;
 
@@ -84,12 +85,14 @@ class UploadController extends AbstractController
 
 
 
+
     // This function is responsible for rendering the upload interface
     #[Route('/upload', name: 'upload')]
     public function index(): Response
     {
         return $this->render('/services/uploads/upload.html.twig', []);
     }
+
 
 
 
@@ -116,6 +119,7 @@ class UploadController extends AbstractController
 
         // Get the URL of the page from which the request originated
         $originUrl = $request->headers->get('referer');
+
 
         // Check if the URL contains the word "button" to bypass issue when uploading stuff directly from a button page
         if (strpos($originUrl, 'button') !== false) {    // Find the position of the word "button"
@@ -274,17 +278,18 @@ class UploadController extends AbstractController
             return $this->redirectToRoute('app_base');
         }
     }
-    // 
-    // 
-    // 
-    // 
+
+
+
+
+
+
     // Testing separting the post and get in two different method to see if the issue of not reloading the pages and persisting the comments can be resolved through
     // the reorganization of the code
     #[Route('/modification/modifying/{uploadId}', name: 'modifying_file')]
     public function modifyingFile(Request $request, int $uploadId): Response
     {
         // Log the request
-        // $this->logger->info('fullrequest', ['request' => $request->request->all()]);
         $originUrl = $request->headers->get('referer');
 
         if (!$request->isMethod('POST')) {
@@ -293,7 +298,7 @@ class UploadController extends AbstractController
         };
 
         // Retrieve the current upload entity based on the uploadId
-        $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $upload = $this->uploadRepository->find($uploadId);
         // Check if there is a file to modify
         if (!$upload) {
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
@@ -305,24 +310,31 @@ class UploadController extends AbstractController
         $form = $this->createForm(UploadType::class, $upload);
 
         $trainingNeeded = filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN);
+
         $forcedDisplay = filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN);
+
         $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
 
         $neededValidator = $this->settingsService->getSettings()->getValidatorNumber();
         $enoughValidator = $this->validationService->checkNumberOfValidator($request, $neededValidator);
 
+
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
+            $this->logger->info('form is submitted and valid', [$form]);
+
             try {
                 if ($trainingNeeded == null || $forcedDisplay == null) {
                     $comment = $request->request->get('modificationComment');
                     if ($upload->getFile() && $upload->getValidation() != null && empty($comment) && $request->request->get('modification-outlined' == '')) {
+                        $this->logger->info('Le commentaire est vide. Commenter votre modification est obligatoire.');
                         $this->addFlash('error', 'Le commentaire est vide. Commenter votre modification est obligatoire.');
                         return $this->redirectToRoute('app_category_admin', [
                             'categoryId' => $categoryId
                         ]);
                     } elseif ($newValidation && !$enoughValidator) {
+                        $this->logger->info('Selectionner au moins ' . $neededValidator . ' validateurs pour valider le fichier.');
                         $this->addFlash('error', 'Selectionner au moins ' . $neededValidator . ' validateurs pour valider le fichier.');
                         return $this->redirectToRoute('app_category_admin', [
                             'categoryId' => $categoryId
@@ -330,18 +342,20 @@ class UploadController extends AbstractController
                     }
                 }
                 $this->uploadService->modifyFile($upload, $request);
+                $this->logger->info('Le fichier a été modifié.');
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirectToRoute('app_category_admin', [
                     'categoryId' => $categoryId
                 ]);
             } catch (\Exception $e) {
+                $this->logger->info('error', [$e->getMessage()]);
                 $this->addFlash('error', $e->getMessage());
                 return $this->redirectToRoute('app_category_admin', [
                     'categoryId' => $categoryId
                 ]);
             }
         } else {
-            // Return the errors in the JSON response
+            $this->logger->info('Invalid form. Check the entered data.');
             $this->addFlash('error', 'Invalid form. Check the entered data.');
             return $this->redirectToRoute('app_category_admin', [
                 'categoryId' => $categoryId
