@@ -214,21 +214,6 @@ class ValidationController extends AbstractController
     public function disapprovedValidationModificationByUpload(int $uploadId = null, Request $request): Response
     {
 
-        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->full request', [$request->request->all()]);
-
-        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->$request->request->get(training-needed)', [$request->request->get('training-needed')]);
-        $trainingNeeded = filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN);
-        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->trainingNeeded', [$trainingNeeded]);
-
-        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->$request->request->get(display-needed)', [$request->request->get('display-needed')]);
-        $forcedDisplay = filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN);
-        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->forcedDisplay', [$forcedDisplay]);
-
-        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->$request->request->get(validatorRequired)', [$request->request->get('validatorRequired')]);
-        $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
-        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->newValidation', [$newValidation]);
-
-
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $validation = $upload->getValidation();
 

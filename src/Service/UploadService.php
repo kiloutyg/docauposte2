@@ -270,17 +270,11 @@ class UploadService extends AbstractController
             }
         };
 
-        if ($request->request->get('training-needed') === 'true') {
-            $upload->setTraining(true);
-        } else {
-            $upload->setTraining(false);
-        }
 
-        if ($request->request->get('display-needed') === 'true') {
-            $upload->setForcedDisplay(true);
-        } else {
-            $upload->setForcedDisplay(false);
-        }
+        $upload->setTraining(filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN));
+
+        $upload->setForcedDisplay(filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN));
+
 
         // If new file exists, process it and delete the old one
         if ($newFile) {
@@ -534,7 +528,7 @@ class UploadService extends AbstractController
         $isTraining = $file->isTraining();
         $hasOldUpload = $file->getOldUpload() !== null;
         $originUrl = $request->headers->get('Referer');
-        
+
 
         if ($isValidated === false && $isForcedDisplay === false) {
             if ($settings->IsTraining() && $isTraining) {

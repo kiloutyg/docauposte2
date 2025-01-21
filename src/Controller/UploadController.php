@@ -121,21 +121,6 @@ class UploadController extends AbstractController
         $originUrl = $request->headers->get('referer');
 
 
-
-        $this->logger->info('$request->request->get(training-needed)', [$request->request->get('training-needed')]);
-        $trainingNeeded = filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN);
-        $this->logger->info('trainingNeeded', [$trainingNeeded]);
-
-        $this->logger->info('$request->request->get(display-needed)', [$request->request->get('display-needed')]);
-        $forcedDisplay = filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN);
-        $this->logger->info('forcedDisplay', [$forcedDisplay]);
-
-        $this->logger->info('$request->request->get(validatorRequired)', [$request->request->get('validatorRequired')]);
-        $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
-        $this->logger->info('newValidation', [$newValidation]);
-
-
-
         // Check if the URL contains the word "button" to bypass issue when uploading stuff directly from a button page
         if (strpos($originUrl, 'button') !== false) {    // Find the position of the word "button"
             $buttonPos = strpos($originUrl, 'button');
@@ -324,20 +309,11 @@ class UploadController extends AbstractController
         // Create a form to modify the Upload entity
         $form = $this->createForm(UploadType::class, $upload);
 
-        $this->logger->info('full request', [$request->request->all()]);
-
-        $this->logger->info('$request->request->get(training-needed)', [$request->request->get('training-needed')]);
         $trainingNeeded = filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN);
-        $this->logger->info('trainingNeeded', [$trainingNeeded]);
 
-        $this->logger->info('$request->request->get(display-needed)', [$request->request->get('display-needed')]);
         $forcedDisplay = filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN);
-        $this->logger->info('forcedDisplay', [$forcedDisplay]);
 
-        $this->logger->info('$request->request->get(validatorRequired)', [$request->request->get('validatorRequired')]);
         $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
-        $this->logger->info('newValidation', [$newValidation]);
-
 
         $neededValidator = $this->settingsService->getSettings()->getValidatorNumber();
         $enoughValidator = $this->validationService->checkNumberOfValidator($request, $neededValidator);
@@ -353,7 +329,6 @@ class UploadController extends AbstractController
                     $comment = $request->request->get('modificationComment');
                     if ($upload->getFile() && $upload->getValidation() != null && empty($comment) && $request->request->get('modification-outlined' == '')) {
                         $this->logger->info('Le commentaire est vide. Commenter votre modification est obligatoire.');
-
                         $this->addFlash('error', 'Le commentaire est vide. Commenter votre modification est obligatoire.');
                         return $this->redirectToRoute('app_category_admin', [
                             'categoryId' => $categoryId
