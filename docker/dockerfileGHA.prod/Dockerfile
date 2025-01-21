@@ -10,7 +10,7 @@ RUN addgroup --system nonroot \
 WORKDIR /var/www
 
 # Copy custom php.ini
-COPY ./docker/dockerfileGHA.test.dev/php.ini /usr/local/etc/php/php.ini
+COPY ./docker/dockerfileGHA.prod/php.ini /usr/local/etc/php/php.ini
 
 # Run commands that require root privileges
 RUN a2enmod rewrite \
@@ -68,7 +68,7 @@ RUN git config --global user.email "floriandkhissi@gmail.com" \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Copy composer.sh script
-COPY --chown=nonroot:nonroot --chmod=755 ./docker/dockerfileGHA.test.dev/composer.sh /usr/local/bin/composer.sh
+COPY --chown=nonroot:nonroot --chmod=755 ./docker/dockerfileGHA.prod/composer.sh /usr/local/bin/composer.sh
 
 # Install Composer and Symfony CLI
 RUN /usr/local/bin/composer.sh \
