@@ -35,6 +35,7 @@ function initCascadingDropdowns() {
   const categoryDropdown = document.getElementById("category");
   const buttonDropdown = document.getElementById("upload_button");
 
+
   if (zoneDropdown && productLineDropdown && categoryDropdown) {
     populateDropdown(zoneDropdown, zonesData, {
       defaultText: 'Sélectionner une Zone',
@@ -84,6 +85,12 @@ function preselectDropdownValues() {
   const categoryDropdown = document.getElementById("category");
   const buttonDropdown = document.getElementById("upload_button");
 
+  console.log('preselect dropdown stuff');
+  console.log('zoneIdFromServer', zoneIdFromServer);
+  console.log('productLineIdFromServer', productLineIdFromServer)
+  console.log('categoryIdFromServer', categoryIdFromServer)
+  console.log('buttonIdFromServer', buttonIdFromServer)
+
   preselectValues([
     {
       dropdown: zoneDropdown,
@@ -121,70 +128,80 @@ function preselectDropdownValues() {
   }
 }
 
-// Event listener for form submit event
-let modifyForm = document.querySelector("#modifyForm");
-if (modifyForm) {
-  modifyForm.addEventListener("submit", function (event) {
-    event.preventDefault();
+// // Event listener for form submit event
+// let modifyForm = document.querySelector("#modifyForm");
+// if (modifyForm) {
+//   modifyForm.addEventListener("submit", function (event) {
+//     event.preventDefault();
+//     console.log('form submited');
+//     console.log('querySelectorAll', document.querySelectorAll())
+//     // Create a new FormData object
+//     let formData = new FormData();
+//     console.log('form submited data', formData);
 
-    // Create a new FormData object
-    let formData = new FormData();
+//     // Get the file input element
+//     let fileInput = document.querySelector("#upload_file");
 
-    // Get the file input element
-    let fileInput = document.querySelector("#upload_file");
+//     // Get the CSRF token
+//     let csrfTokenInput = document.querySelector("#upload__token");
 
-    // Get the CSRF token
-    let csrfTokenInput = document.querySelector("#upload__token");
+//     // Get the CSRF token value
+//     let csrfTokenValue = csrfTokenInput.value;
 
-    // Get the CSRF token value
-    let csrfTokenValue = csrfTokenInput.value;
+//     // Add the CSRF token to formData
+//     formData.append("upload[_token]", csrfTokenValue);
 
-    // Add the CSRF token to formData
-    formData.append("upload[_token]", csrfTokenValue);
+//     if (fileInput.files.length > 0) {
+//       // A file was selected
+//       let file = fileInput.files[0];
 
-    if (fileInput.files.length > 0) {
-      // A file was selected
-      let file = fileInput.files[0];
+//       // Add the file to formData
+//       formData.append("upload[file]", file);
+//     }
 
-      // Add the file to formData
-      formData.append("upload[file]", file);
-    }
+//     let trainingNeeded = document.querySelector('training-needed');
+//     formData.append("training-needed", trainingNeeded);
 
-    // Get the dropdown elements
+//     let forcedDisplay = document.querySelector('display-needed');
+//     formData.append("display-needed", forcedDisplay);
 
-    let buttonDropdown = document.getElementById("upload_button");
-    if (buttonDropdown) {
-      let buttonValue = parseInt(
-        buttonDropdown.options[buttonDropdown.selectedIndex].value,
-        10
-      ); // Add the values to formData
-      formData.append("upload[button]", buttonValue);
-    }
-    // Get the filename input
-    let filenameInput = document.getElementById("upload_filename");
+//     let validatorRequired = document.querySelector('validatorRequired');
+//     formData.append("validatorRequired", validatorRequired);
 
-    // Get the selected values
+//     // Get the dropdown elements
 
-    // Get the filename value
-    let filenameValue = filenameInput.value;
+//     let buttonDropdown = document.getElementById("upload_button");
+//     if (buttonDropdown) {
+//       let buttonValue = parseInt(
+//         buttonDropdown.options[buttonDropdown.selectedIndex].value,
+//         10
+//       ); // Add the values to formData
+//       formData.append("upload[button]", buttonValue);
+//     }
+//     // Get the filename input
+//     let filenameInput = document.getElementById("upload_filename");
 
-    if (filenameValue) {
-      formData.append("upload[filename]", filenameValue);
-    }
+//     // Get the selected values
 
-    // Get the upload ID from the URL
-    let form = document.getElementById("modifyForm");
-    let actionUrl = form.getAttribute("action");
+//     // Get the filename value
+//     let filenameValue = filenameInput.value;
 
-    // Send formData to server...
-    fetch(actionUrl, {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response)
-      .catch((error) => {
-        then((response) => response.json());
-        console.error("Error:", error);
-      });
-  });
-}
+//     if (filenameValue) {
+//       formData.append("upload[filename]", filenameValue);
+//     }
+
+//     // Get the upload ID from the URL
+//     let form = document.getElementById("modifyForm");
+//     let actionUrl = form.getAttribute("action");
+
+//     // Send formData to server...
+//     fetch(actionUrl, {
+//       method: "POST",
+//       body: formData,
+//     })
+//       .then((response) => console.log('response', response))
+//       .catch((error) => {
+//         console.error("Error:", error);
+//       });
+//   });
+// }

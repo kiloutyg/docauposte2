@@ -348,6 +348,12 @@ class UploadService extends AbstractController
     public function modifyDisapprovedFile(Upload $upload, User $user, Request $request)
     {
 
+        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->full request', [$request->request->all()]);
+
+        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->$request->request->get(training-needed)', [$request->request->get('training-needed')]);
+        $trainingNeeded = filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN);
+        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->trainingNeeded', [$trainingNeeded]);
+
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
         // Public directory
@@ -394,6 +400,10 @@ class UploadService extends AbstractController
                 $upload->setUploader($user);
             }
         }
+
+        if ($upload->isTraining() != $trainingNeeded) {
+            $upload->setTraining($trainingNeeded);
+        }
         $upload->setValidated(null);
         $upload->setUploadedAt(new \DateTime());
 
@@ -404,6 +414,9 @@ class UploadService extends AbstractController
 
         $this->validationService->resetApprobation($upload, $request);
     }
+
+
+
 
 
     // This function is responsible for the logic of grouping the uploads files by parent entities

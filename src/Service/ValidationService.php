@@ -61,6 +61,9 @@ class ValidationService extends AbstractController
         $this->trainingRecordService    = $trainingRecordService;
     }
 
+
+
+    
     public function createValidation(Upload $upload, Request $request)
     {
         // Create empty arrays to store values for validator_department and validator_user
@@ -126,10 +129,14 @@ class ValidationService extends AbstractController
         return $validation;
     }
 
+
+
+
+
+
     public function updateValidation(Upload $upload, Request $request)
     {
-        // // $this->logger->info('updateValidation in validationService: upload: ' . $upload->getId() . ' request: ' . $request->request->all());
-
+        // // $this->logger->info('updateValidation in validationService: upload: ' . $upload->getId() . ' request: ' . $request->request->all())
 
         // Get the Validation instance associated with the Upload instance
         $validation = $upload->getValidation();
@@ -192,6 +199,10 @@ class ValidationService extends AbstractController
         return;
     }
 
+
+
+
+
     public function createApprobationProcess(
         $validation,
         User $validator_user = null
@@ -215,6 +226,10 @@ class ValidationService extends AbstractController
         return;
     }
 
+
+
+
+
     public function createDepartmentApprobationProcess(
         $validation,
         Department $validator_department = null
@@ -237,6 +252,9 @@ class ValidationService extends AbstractController
         // Return the Approbation instance
         return $approbation;
     }
+
+
+
 
 
     public function validationApproval(Approbation $approbation, Request $request)
@@ -276,6 +294,10 @@ class ValidationService extends AbstractController
     }
 
 
+
+
+
+
     public function approbationCheck(Validation $validation)
     {
         // Get the ID of the Validation instance
@@ -300,6 +322,9 @@ class ValidationService extends AbstractController
             $this->updateValidationAndUploadStatus($validation, $status);
         }
     }
+
+
+
 
 
     // This method will also activate the notification email to the uploader
@@ -347,6 +372,10 @@ class ValidationService extends AbstractController
         }
         return;
     }
+
+
+
+
 
     public function resetApprobation(Upload $upload, Request $request, ?bool $globalModification = false)
     {
@@ -400,7 +429,6 @@ class ValidationService extends AbstractController
                     $this->mailerService->sendDisapprovedModifiedEmail($approbation);
                 }
 
-
                 // Persist the Approbation instance to the database
                 $this->em->persist($approbation);
             }
@@ -422,6 +450,10 @@ class ValidationService extends AbstractController
         return;
     }
 
+
+
+
+
     public function updateValidationRecycle(Upload $upload)
     {
         if ($upload->getValidation() == null) {
@@ -435,6 +467,8 @@ class ValidationService extends AbstractController
 
 
 
+
+
     public function remindCheck(array $users)
     {
         $today = new \DateTime();
@@ -443,8 +477,6 @@ class ValidationService extends AbstractController
         $uploadsWaitingValidationRaw = [];
 
         $uploaders = [];
-
-
 
         if ($today->format('d') % 2 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
 
@@ -516,6 +548,10 @@ class ValidationService extends AbstractController
         }
     }
 
+
+
+
+
     public function qualityCheckUp()
     {
         $today = new \DateTime();
@@ -551,6 +587,9 @@ class ValidationService extends AbstractController
             }
         }
     }
+
+
+
 
 
     public function checkNumberOfValidator(Request $request, Int $neededValidator): bool

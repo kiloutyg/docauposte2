@@ -31,3 +31,4 @@ export function getSettingsData() {
   }
   return settingsDataPromise;
 }
+

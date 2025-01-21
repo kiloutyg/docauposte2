@@ -1,3 +1,15 @@
+<script>
+	var zoneIdFromServer = {{ upload.button.category.productLine.zone.getId()|default('null')|json_encode|raw }};
+</script>
+<script>
+	var productLineIdFromServer = {{ upload.button.category.productLine.getId()|default('null')|json_encode|raw }};
+</script>
+<script>
+	var categoryIdFromServer = {{ upload.button.category.getId()|default('null')|json_encode|raw }};
+</script>
+<script>
+	var buttonIdFromServer = {{ upload.button.getId()|default('null')|json_encode|raw }};
+</script>
 <div
 	class="accordion mx-auto col-8 mb-1 justify-content-center"
 	id="accordionOtherModifications">
@@ -31,24 +43,21 @@
 					class="mb-3">
 					{{ form_label(form.filename, 'Nouveau nom du fichier:', {'label_attr': {'class': 'form-label', 'style': 'color:black'}}
 					) }}
-					{{ form_widget(form.filename, {'attr': {'class': 'form-control', 'id': 'filename', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)', 'maxlength': '30'}}
+					{{ form_widget(form.filename, {'attr': {'class': 'form-control', 'id': 'filename', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)'}}
 					) }}
 				</div>
 				<div
 					style='color:black'>
 					{# Display the current button hierarchy #}
-						Zone:
-						{{ upload.button.category.productLine.zone.name|split('.')|first|upper }}
-						>
-						Produit:
-						{{ upload.button.category.productLine.name|split('.')|first|upper }}
-						>
-						Categorie:
-						{{ upload.button.category.name|split('.')|first|upper }}
-						>
-						Bouton:
-						{{ upload.button.name|split('.')|first|upper }}
-						:
+					Zone:
+					{{ upload.button.category.productLine.zone.name|split('.')|first|upper }}
+					> Produit:
+					{{ upload.button.category.productLine.name|split('.')|first|upper }}
+					> Categorie:
+					{{ upload.button.category.name|split('.')|first|upper }}
+					> Bouton:
+					{{ upload.button.name|split('.')|first|upper }}
+					:
 				</div>
 				<div
 					class="row">

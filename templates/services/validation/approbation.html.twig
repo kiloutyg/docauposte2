@@ -1,33 +1,9 @@
-{% block stylesheets %}
-	{{
-		encore_entry_link_tags("app")
-        }}
-{% endblock %}
-
+{% extends 'blank.html.twig' %}
 {% block javascripts %}
-
-	{{ encore_entry_script_tags('app') }}
-	{{ encore_entry_script_tags('document-validator') }}
-	{{ encore_entry_script_tags('confirmation') }}
-	{{ encore_entry_script_tags('toast') }}
-	{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
-	{{ encore_entry_script_tags('cascading-dropdowns') }}
-	{{ encore_entry_script_tags('department-creation') }}
+	{{ parent() }}
+		{{ encore_entry_script_tags('confirmation') }}
 {% endblock %}
-<head>
-	<meta
-		charset="UTF-8"/>
-	<meta
-		name="viewport"
-		content="width=device-width, initial-scale=1">
-	<link
-		rel="icon"
-		type="image/ico"
-		href="{{ asset('OPmobility_icon.svg') }}"/>
-</head>
 {% block body %}
-
-
 	<div
 		class=" d-flex align-items-center flex-row"
 		style="background-color:#0E3571;">
