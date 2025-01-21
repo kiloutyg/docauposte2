@@ -55,7 +55,10 @@ metadata:
     app: docauposte-phpmyadmin
     traefik.enable: true
     traefik.http.routers.docauposte-phpmyadmin.rule: PathPrefix(`/dappma`)
-    traefik.http.routers.docauposte-phpmyadmin.entrypoints: web
+    traefik.http.routers.docauposte-phpmyadmin.entrypoints: websecure
+    traefik.http.routers.docauposte-phpmyadmin.tls: true
+    # Remove or comment out the certresolver if using dedicated certificate files
+    traefik.http.routers.docauposte-phpmyadmin.tls.certresolver: myresolver
     traefik.http.routers.docauposte-phpmyadmin.middlewares: strip-docauposte-phpmyadmin-prefix
     traefik.http.services.docauposte-phpmyadmin.loadbalancer.server.port: 80
     traefik.http.middlewares.strip-docauposte-phpmyadmin-prefix.stripPrefix.prefixes: /dappma
@@ -87,7 +90,10 @@ metadata:
     app: docauposte-web
     traefik.enable: true
     traefik.http.routers.docauposte-web.rule: PathPrefix(`/docauposte`)
-    traefik.http.routers.docauposte-web.entrypoints: web
+    traefik.http.routers.docauposte-web.entrypoints: websecure
+    traefik.http.routers.docauposte-web.tls: true
+    # Remove or comment out the certresolver if using dedicated certificate files
+    traefik.http.routers.docauposte-web.tls.certresolver: myresolver
     traefik.http.routers.docauposte-web.middlewares: strip-docauposte-web-prefix
     traefik.http.services.docauposte-web.loadbalancer.server.port: 80
     traefik.http.middlewares.strip-docauposte-web-prefix.stripPrefix.prefixes: /docauposte
