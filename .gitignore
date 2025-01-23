@@ -2,6 +2,7 @@
 .env
 .env.local
 /secrets/*
+/ssl
 /.env.local.php
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
@@ -52,5 +53,3 @@ symfony copy.lock
 .composer
 .cache
 .php-cs-fixer.dist.php
-
-ssl
