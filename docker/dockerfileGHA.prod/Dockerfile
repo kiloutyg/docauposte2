@@ -101,7 +101,7 @@ RUN \
   # Move Symfony CLI to a global location
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony \
   # Change /var/www ownership
-  && chown -R nonroot:nonroot /var/www
+  && chown -R nonroot:nonroot /var/www 
 
 # Switch to non-root user
 USER nonroot
@@ -112,11 +112,14 @@ FROM base AS building
 # Switch to non-root user
 USER nonroot
 
+
+RUN mkdir -p /var/www/building \
+  && chown -R nonroot:nonroot /var/www/building 
 # Set working directory
-WORKDIR /var/www
+WORKDIR /var/www/building
 
 # Copy application code with correct ownership
-COPY --chown=nonroot:nonroot --chmod=755 . /var/www
+COPY --chown=nonroot:nonroot --chmod=755 . /var/www/building
 
 # Install dependencies and perform build steps
 RUN  cp .env.test .env \
@@ -126,4 +129,9 @@ RUN  cp .env.test .env \
   && php ./bin/console cache:clear --no-warmup --env=prod \
   && php ./bin/console cache:warmup --env=prod \
   && yarn encore prod \
-  && rm -rf .env node_modules vendor
+  && cp -r ./public /var/www/public \
+  && rm -rf /var/www/building
+
+WORKDIR /var/www
+
+CMD [ "exec apache2-foreground" ]
