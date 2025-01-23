@@ -113,13 +113,13 @@ FROM base AS building
 USER nonroot
 
 
-RUN mkdir -p /building \
-  && chown -R nonroot:nonroot /building 
+RUN mkdir -p /var/www/building \
+  && chown -R nonroot:nonroot /var/www/building 
 # Set working directory
 WORKDIR /building
 
 # Copy application code with correct ownership
-COPY --chown=nonroot:nonroot --chmod=755 . /building
+COPY --chown=nonroot:nonroot --chmod=755 . /var/www/building
 
 # Install dependencies and perform build steps
 RUN  cp .env.test .env \
@@ -130,7 +130,7 @@ RUN  cp .env.test .env \
   && php ./bin/console cache:warmup --env=prod \
   && yarn encore prod \
   && cp -r ./public /var/www/public \
-  && rm -rf /building
+  && rm -rf /var/www/building
 
 WORKDIR /var/www
 
