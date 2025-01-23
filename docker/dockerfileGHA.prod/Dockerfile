@@ -116,7 +116,7 @@ USER nonroot
 RUN mkdir -p /var/www/building \
   && chown -R nonroot:nonroot /var/www/building 
 # Set working directory
-WORKDIR /building
+WORKDIR /var/www/building
 
 # Copy application code with correct ownership
 COPY --chown=nonroot:nonroot --chmod=755 . /var/www/building
