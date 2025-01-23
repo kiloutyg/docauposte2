@@ -45,16 +45,32 @@ spec:
       ports:
         - containerPort: 3306
       volumeMounts:
-        - mountPath: /run/secrets
+        - mountPath: /run/secrets/root_password
           readOnly: true
-          name: secrets
+          name: root_password
+        - mountPath: /run/secrets/database_name
+          readOnly: true
+          name: database_name
+        - mountPath: /run/secrets/database_user
+          readOnly: true
+          name: database_user
+        - mountPath: /run/secrets/database_password
+          readOnly: true
+          name: database_password
         - mountPath: /var/lib/mysql
           name: database-data
         - mountPath: /etc/localtime
           name: localtime-settings
-        - mountPath: /etc/mysql/ssl
           readOnly: true
-          name: ssl-certificates
+        - mountPath: /etc/mysql/ssl/ca-cert.pem
+          name: ca-cert
+          readOnly: true
+        - mountPath: /etc/mysql/ssl/server-cert.pem
+          name: server-cert
+          readOnly: true
+        - mountPath: /etc/mysql/ssl/server-key.pem
+          name: server-key
+          readOnly: true
         - mountPath: /etc/mysql/my.cnf
           readOnly: true
           name: mysql-config
@@ -67,9 +83,21 @@ spec:
   dnsPolicy: Default
   volumes:
     - hostPath:
-        path: ./secrets
-        type: Directory
-      name: secrets
+        path: ./secrets/root_password
+        type: File
+      name: root_password
+    - hostPath:
+        path: ./secrets/database_name
+        type: File
+      name: database_name
+    - hostPath:
+        path: ./secrets/database_user
+        type: File
+      name: database_user
+    - hostPath:
+        path: ./secrets/database_password
+        type: File
+      name: database_password
     - hostPath:
         path: ./database_data
         type: DirectoryOrCreate
@@ -78,9 +106,17 @@ spec:
         path: /etc/localtime
       name: localtime-settings
     - hostPath:
-        path: ./secrets/ssl
-        type: Directory
-      name: ssl-certificates
+        path: ./secrets/ssl/ca-cert.pem
+        type: File
+      name: ca-cert
+    - hostPath:
+        path: ./secrets/ssl/server-cert.pem
+        type: File
+      name: server-cert
+    - hostPath:
+        path: ./secrets/ssl/server-key.pem
+        type: File
+      name: server-key
     - hostPath:
         path: ./my.cnf
         type: File
@@ -129,14 +165,28 @@ spec:
           value: "true"
         - name: PMA_SSL_CA
           value: /etc/phpmyadmin/ssl/ca-cert.pem
+        # Un-comment if using client authentication
+        # - name: PMA_SSL_CERT
+        #   value: /etc/phpmyadmin/ssl/client-cert.pem
+        # - name: PMA_SSL_KEY
+        #   value: /etc/phpmyadmin/ssl/client-key.pem
       volumeMounts:
         - mountPath: /etc/phpmyadmin/config.user.inc.php
           name: phpmyadmin-config
+          readOnly: true
         - mountPath: /etc/localtime
           name: localtime-settings
-        - mountPath: /etc/phpmyadmin/ssl
           readOnly: true
+        - mountPath: /etc/phpmyadmin/ssl
           name: ssl-certificates
+          readOnly: true
+        # Un-comment if using client authentication
+        # - mountPath: /etc/phpmyadmin/ssl/client-cert.pem
+        #   name: client-cert
+        #   readOnly: true
+        # - mountPath: /etc/phpmyadmin/ssl/client-key.pem
+        #   name: client-key
+        #   readOnly: true
       resources:
         limits:
           memory: 1000Mi
@@ -153,9 +203,18 @@ spec:
         path: /etc/localtime
       name: localtime-settings
     - hostPath:
-        path: ./secrets/ssl
-        type: Directory
-      name: ssl-certificates
+        path: ./secrets/ssl/ca-cert.pem
+        type: File
+      name: ca-cert
+    # Un-comment if using client authentication
+    # - hostPath:
+    #     path: ./secrets/ssl/client-cert.pem
+    #     type: File
+    #   name: client-cert
+    # - hostPath:
+    #     path: ./secrets/ssl/client-key.pem
+    #     type: File
+    #   name: client-key
 ---
 apiVersion: v1
 kind: LimitRange
@@ -210,9 +269,23 @@ spec:
           name: web-data
         - mountPath: /etc/localtime
           name: localtime-settings
-        - mountPath: /etc/ssl/certs/ca-cert.pem
           readOnly: true
-          name: ca-certificate
+        - mountPath: /etc/ssl/certs/ca-cert.pem
+          name: ca-certificates
+          readOnly: true
+        - mountPath: /etc/ssl/certs/server-cert.pem
+          name: server-certificates
+          readOnly: true
+        - mountPath: /etc/ssl/certs/server-key.pem
+          name: server-key
+          readOnly: true
+        # Un-comment if using client authentication
+        # - mountPath: /etc/ssl/certs/client-cert.pem
+        #   name: client-cert
+        #   readOnly: true
+        # - mountPath: /etc/ssl/certs/client-key.pem
+        #   name: client-key
+        #   readOnly: true
       resources:
         limits:
           memory: 2000Mi
@@ -231,4 +304,21 @@ spec:
     - hostPath:
         path: ./secrets/ssl/ca-cert.pem
         type: File
-      name: ca-certificate
+      name: ca-certificates
+    - hostPath:
+        path: ./secrets/ssl/server-cert.pem
+        type: File
+      name: server-certificates
+    - hostPath:
+        path: ./secrets/ssl/server-key.pem
+        type: File
+      name: server-key
+    # Un-comment if using client authentication
+    # - hostPath:
+    #     path: ./secrets/ssl/client-cert.pem
+    #     type: File
+    #   name: client-cert
+    # - hostPath:
+    #     path: ./secrets/ssl/client-key.pem
+    #     type: File
+    #   name: client-key

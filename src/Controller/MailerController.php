@@ -63,7 +63,7 @@ class MailerController extends AbstractController
     }
 
 
-    #[Route('/mail/testmail', name: 'testmail')]
+    #[Route('/mail/testmail', name: 'test_mail')]
     public function testMail(): Response
     {
         $subject = "Test Email";
@@ -76,7 +76,7 @@ class MailerController extends AbstractController
         return $this->redirectToRoute('app_base');
     }
 
-    #[Route('/mail/mailupdate', name: 'mailupdate')]
+    #[Route('/mail/mailupdate', name: 'mail_update')]
     public function updateEmailAddress(): Response
     {
         $usersUpdated = [];
@@ -134,21 +134,24 @@ class MailerController extends AbstractController
     }
 
 
-    #[Route('/mail/maildev', name: 'maildev')]
+    #[Route('/maildev', name: 'mail_dev')]
     public function devEmailAddress(): Response
     {
+
+        if ($this->getParameter('kernel.environment') != 'dev') {
+            $this->addFlash('warning', 'Change the environment to dev to change mail addresses to dev mode.');
+            return $this->redirectToRoute('app_base');
+        }
+
         $usersUpdated = [];
         $htmlContent = "<h1>Email Address Updates</h1>"; // Start your HTML content
 
         foreach ($this->entityFetchingService->getUsers() as $user) {
             $username = $user->getUsername();
-            // $this->logger->info('username: ' . $username);
             // $newEmail = "florian.dkhissi+{$username}@opmobility.com";
             $newEmail = "florian.dkhissi@opmobility.com";
 
             $oldEmail = $user->getEmailAddress();
-            // $this->logger->info('oldEmail: ' . $oldEmail);
-            // $this->logger->info('newEmail: ' . $newEmail);
 
             // Check if the new email already exists in the database
             $existingUser = $this->userRepository->findOneBy(['emailAddress' => $newEmail]);
@@ -159,11 +162,7 @@ class MailerController extends AbstractController
 
             if ($oldEmail !== $newEmail) {
                 $user->setEmailAddress($newEmail);
-                // $this->logger->info('user email now: ' . $user->getEmailAddress());
 
-                // Persist and flush inside the loop is not efficient, should be done outside
-                // $this->em->persist($user);
-                // $this->em->flush();
 
                 $usersUpdated[] = $user;
                 $emailAfterUpdate = $user->getEmailAddress();
@@ -171,11 +170,9 @@ class MailerController extends AbstractController
                 $htmlContent .= "<p>{$username}'s email address updated to {$emailAfterUpdate}</p>"; // Append to the HTML content
             }
         }
-
         // Persist and flush after all updates
         if (!empty($usersUpdated)) {
             foreach ($usersUpdated as $updatedUser) {
-                // $this->logger->info('updatedUser: ', [$updatedUser]);
                 $this->em->persist($updatedUser);
             }
             $this->em->flush();
@@ -191,41 +188,6 @@ class MailerController extends AbstractController
         }
 
         $this->addFlash('alert', 'No email addresses were updated');
-        return $this->redirectToRoute('app_base');
-    }
-
-
-
-    // test mail and method remindertouploader
-    #[Route('/mail/mail_test', name: 'remindertouploader')]
-    public function reminderToUploader(): Response
-    {
-
-        // $uploader = $this->userRepository->findOneBy(['username' => 'aamr.fadili']);
-        $uploader = $this->userRepository->findOneBy(['username' => 'camille.gindrey']);
-
-        // $this->logger->info('uploader' . $uploader->getUsername());
-        $message = $this->mailerService->sendReminderEmailToUploader($uploader);
-
-        $this->addFlash('alert', $message);
-        return $this->redirectToRoute('app_base');
-    }
-
-
-    // A route to test the sendReminderEmailToAllUsers method
-    #[Route('/mail/mail_test_reminder', name: 'mail_test_reminder')]
-    public function testReminderEmailToUploader(): Response
-    {
-        // $nonValidatedValidations[] = $this->validationRepository->findBy(['status' => !true]);
-        $nonValidatedValidations = $this->validationRepository->findNonValidatedValidations();
-        // $this->logger->info('nonValidatedValidations: ', [$nonValidatedValidations]);
-
-        foreach ($nonValidatedValidations as $validation) {
-            $uploads[] = $validation->getUpload();
-        }
-        // $this->logger->info('uploads: ', [$uploads]);
-
-        $this->mailerService->sendReminderEmailToAllUsers($uploads);
         return $this->redirectToRoute('app_base');
     }
 }

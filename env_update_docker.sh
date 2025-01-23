@@ -124,9 +124,9 @@ variables=(
     "PLANT_TRIGRAM=${PLANT_TRIGRAM}"
     "GITHUB_USER=${GITHUB_USER}"
     "FACILITY_NAME=${FACILITY_NAME}"
-    "MYSQL_SSL_KEY=/var/www/ssl/server-key.pem"
-    "MYSQL_SSL_CERT=/var/www/ssl/server-cert.pem"
-    "MYSQL_SSL_CA=/var/www/ssl/ca-cert.pem"
+    "MYSQL_SSL_KEY=/etc/ssl/certs/server-key.pem"
+    "MYSQL_SSL_CERT=/etc/ssl/certs/server-cert.pem"
+    "MYSQL_SSL_CA=/etc/ssl/certs/ca-cert.pem"
 )
 
 for var in "${variables[@]}"; do
