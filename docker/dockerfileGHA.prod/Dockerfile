@@ -99,8 +99,9 @@ RUN \
   # Download and install Symfony CLI
   && curl --tlsv1.2 -sS https://get.symfony.com/cli/installer | bash \
   # Move Symfony CLI to a global location
-  && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
-
+  && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony \
+  # Change /var/www ownership
+  && chown -R nonroot:nonroot /var/www
 
 # Switch to non-root user
 USER nonroot
