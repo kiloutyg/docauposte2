@@ -113,10 +113,10 @@ FROM base AS building
 USER nonroot
 
 # Set working directory
-WORKDIR /var/www
+WORKDIR /building
 
 # Copy application code with correct ownership
-COPY --chown=nonroot:nonroot --chmod=755 . /var/www
+COPY --chown=nonroot:nonroot --chmod=755 . /building
 
 # Install dependencies and perform build steps
 RUN  cp .env.test .env \
@@ -126,4 +126,9 @@ RUN  cp .env.test .env \
   && php ./bin/console cache:clear --no-warmup --env=prod \
   && php ./bin/console cache:warmup --env=prod \
   && yarn encore prod \
-  && rm -rf .env node_modules vendor
+  && cp -r ./public /var/www/public \
+  && rm -rf /building
+
+WORKDIR /var/www
+
+CMD [ "exec apache2-foreground" ]
