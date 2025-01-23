@@ -52,3 +52,5 @@ symfony copy.lock
 .composer
 .cache
 .php-cs-fixer.dist.php
+
+ssl

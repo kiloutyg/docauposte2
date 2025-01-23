@@ -12,8 +12,8 @@ WORKDIR /var/www
 # Copy custom php.ini
 COPY ./docker/dockerfileGHA.prod/php.ini /usr/local/etc/php/php.ini
 
-# Run commands that require root privileges
-RUN a2enmod rewrite \
+RUN  ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime \
+  && a2enmod rewrite \
   && service apache2 restart
 
 RUN apt update -y \
