@@ -101,7 +101,9 @@ RUN \
   # Move Symfony CLI to a global location
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony \
   # Change /var/www ownership
-  && chown -R nonroot:nonroot /var/www
+  && chown -R nonroot:nonroot /var/www \
+  && mkdir -p /building \
+  && chown -R nonroot:nonroot /building 
 
 # Switch to non-root user
 USER nonroot
