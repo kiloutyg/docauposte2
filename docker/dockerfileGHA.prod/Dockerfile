@@ -6,7 +6,7 @@ FROM php:8.2-apache-bookworm AS base
 WORKDIR /var/www
 
 # Copy custom php.ini configuration into the container
-COPY ./docker/dockerfileGHA.dev/php.ini /usr/local/etc/php/php.ini
+COPY ./docker/dockerfileGHA.prod/php.ini /usr/local/etc/php/php.ini
 
 # Configure system settings and install necessary packages and extensions
 RUN \
