@@ -101,9 +101,7 @@ RUN \
   # Move Symfony CLI to a global location
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony \
   # Change /var/www ownership
-  && chown -R nonroot:nonroot /var/www \
-  && mkdir -p /building \
-  && chown -R nonroot:nonroot /building 
+  && chown -R nonroot:nonroot /var/www 
 
 # Switch to non-root user
 USER nonroot
@@ -114,6 +112,9 @@ FROM base AS building
 # Switch to non-root user
 USER nonroot
 
+
+RUN mkdir -p /building \
+  && chown -R nonroot:nonroot /building 
 # Set working directory
 WORKDIR /building
 
