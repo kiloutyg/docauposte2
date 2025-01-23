@@ -129,7 +129,6 @@ class FrontController extends AbstractController
     public function base(): Response
     {
 
-
         $users = $this->entityFetchingService->getUsers();
         $settings = $this->settingsService->getSettings();
         if ($settings->isUploadValidation() && $this->entityFetchingService->getValidations() != null) {
