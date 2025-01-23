@@ -130,4 +130,4 @@ RUN  cp .env.test .env \
 
 WORKDIR /var/www
 
-CMD [ "exec apache2-foreground" ]
+CMD [ "apache2-foreground" ]
