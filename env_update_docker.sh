@@ -95,10 +95,28 @@ sed -i "s|^APP_ENV=prod.*|APP_ENV=dev|" .env;
 sed -i "s|^# MAILER_DSN=.*|MAILER_DSN=smtp://smtp.corp.ponet:25?verify_peer=0|" .env;
 sed -i "s|^# MAILER_SENDER_EMAIL=.* |MAILER_SENDER_EMAIL=${PLANT_TRIGRAM}.docauposte@opmobility.com|" .env;
 
-# add_to_file ".env" "HOSTNAME=${HOSTNAME}";
-# add_to_file ".env" "PLANT_TRIGRAM=${PLANT_TRIGRAM}";
-# add_to_file ".env" "GITHUB_USER=${GITHUB_USER}";
-# add_to_file ".env" "FACILITY_NAME=${FACILITY_NAME}";
+
+# Define the SSL directory
+SSL_DIR="./secrets/ssl"
+
+# Check if SSL directory exists
+if [ -d "$SSL_DIR" ]; then
+    echo "SSL directory exists: $SSL_DIR"
+else
+    echo "SSL directory does not exist: $SSL_DIR"
+    echo "Executing script to create SSL directory and certificates..."
+
+    # Execute the script to create the directory and certificates
+    ./cert-gen.sh
+
+    # Check if the SSL directory now exists
+    if [ -d "$SSL_DIR" ]; then
+        echo "SSL directory and certificates created successfully."
+    else
+        echo "Error: Failed to create SSL directory and certificates."
+        exit 1
+    fi
+fi
 
 
 variables=(
@@ -106,6 +124,9 @@ variables=(
     "PLANT_TRIGRAM=${PLANT_TRIGRAM}"
     "GITHUB_USER=${GITHUB_USER}"
     "FACILITY_NAME=${FACILITY_NAME}"
+    "MYSQL_SSL_KEY=/etc/ssl/certs/server-key.pem"
+    "MYSQL_SSL_CERT=/etc/ssl/certs/server-cert.pem"
+    "MYSQL_SSL_CA=/etc/ssl/certs/ca-cert.pem"
 )
 
 for var in "${variables[@]}"; do
@@ -120,9 +141,14 @@ for var in "${variables[@]}"; do
         sed -i "s|^${escaped_key}=.*|${escaped_key}=${escaped_value}|" .env
         echo "Updated ${key} in .env"
     else
-        sed -i "/^MYSQL_PASSWORD=/a\\
+        if grep -q "^MYSQL_PASSWORD=" .env; then
+            sed -i "/^MYSQL_PASSWORD=/a\\
 ${escaped_key}=${escaped_value}" .env
-        echo "Added ${key} to .env"
+            echo "Added ${key} after MYSQL_PASSWORD= in .env"
+        else
+            echo "${escaped_key}=${escaped_value}" >> .env
+            echo "Added ${key} at the end of .env"
+        fi
     fi
 done
 
