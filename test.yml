@@ -1,0 +1,288 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: docauposte-database-service
+spec:
+  selector:
+    app: docauposte-database
+  ports:
+    - port: 3306
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: docauposte-database-pod-limits-range
+  namespace: docauposte-database-pod-limits
+spec:
+  limits:
+    - defaultRequest:
+        memory: 4000Mi
+        ephemeral-storage: 5000Mi
+        cpu: 4
+      type: Container
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: docauposte-database-pod
+  namespace: docauposte-database-pod-limits
+  labels:
+    app: docauposte-database
+spec:
+  restartPolicy: Always
+  containers:
+    - name: database
+      image: docker.io/library/mariadb:latest
+      env:
+        - name: MARIADB_ROOT_PASSWORD_FILE
+          value: run/secrets/root_password
+        - name: MARIADB_DATABASE_FILE
+          value: run/secrets/database_name
+        - name: MARIADB_USER_FILE
+          value: run/secrets/database_user
+        - name: MARIADB_PASSWORD_FILE
+          value: run/secrets/database_password
+      ports:
+        - containerPort: 3306
+      volumeMounts:
+        - mountPath: /run/secrets/root_password
+          readOnly: true
+          name: root_password
+        - mountPath: /run/secrets/database_name
+          readOnly: true
+          name: database_name
+        - mountPath: /run/secrets/database_user
+          readOnly: true
+          name: database_user
+        - mountPath: /run/secrets/database_password
+          readOnly: true
+          name: database_password
+        - mountPath: /var/lib/mysql
+          name: database-data
+        - mountPath: /etc/localtime
+          name: localtime-settings
+          readOnly: true
+        - mountPath: /etc/mysql/ssl/ca-cert.pem
+          name: ca-cert
+          readOnly: true
+        - mountPath: /etc/mysql/ssl/server-cert.pem
+          name: server-cert
+          readOnly: true
+        - mountPath: /etc/mysql/ssl/server-key.pem
+          name: server-key
+          readOnly: true
+        - mountPath: /etc/mysql/my.cnf
+          readOnly: true
+          name: mysql-config
+      resources:
+        limits:
+          memory: 4000Mi
+          ephemeral-storage: 5000Mi
+        requests:
+          cpu: 4
+  dnsPolicy: Default
+  volumes:
+    - hostPath:
+        path: ./secrets/root_password
+        type: File
+      name: root_password
+    - hostPath:
+        path: ./secrets/database_name
+        type: File
+      name: database_name
+    - hostPath:
+        path: ./secrets/database_user
+        type: File
+      name: database_user
+    - hostPath:
+        path: ./secrets/database_password
+        type: File
+      name: database_password
+    - hostPath:
+        path: ./database_data
+        type: DirectoryOrCreate
+      name: database-data
+    - hostPath:
+        path: /etc/localtime
+      name: localtime-settings
+    - hostPath:
+        path: ./secrets/ssl/ca-cert.pem
+        type: File
+      name: ca-cert
+    - hostPath:
+        path: ./secrets/ssl/server-cert.pem
+        type: File
+      name: server-cert
+    - hostPath:
+        path: ./secrets/ssl/server-key.pem
+        type: File
+      name: server-key
+    - hostPath:
+        path: ./my.cnf
+        type: File
+      name: mysql-config
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: docauposte-phpmyadmin-pod-limits-range
+  namespace: docauposte-phpmyadmin-pod-limits
+spec:
+  limits:
+    - defaultRequest:
+        memory: 1000Mi
+        ephemeral-storage: 500Mi
+        cpu: 1
+      type: Container
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: docauposte-phpmyadmin-pod
+  namespace: docauposte-phpmyadmin-pod-limits
+  labels:
+    app: docauposte-phpmyadmin
+    traefik.enable: true
+    traefik.http.routers.docauposte-phpmyadmin.rule: "Host(`sanclp0031`) && PathPrefix(`/dappma`)"
+    traefik.http.routers.docauposte-phpmyadmin.entrypoints: websecure
+    traefik.http.routers.docauposte-phpmyadmin.tls: true
+    # Remove or comment out the certresolver if using dedicated certificate files
+    traefik.http.routers.docauposte-phpmyadmin.tls.certresolver: myresolver
+    traefik.http.routers.docauposte-phpmyadmin.middlewares: strip-docauposte-phpmyadmin-prefix
+    traefik.http.services.docauposte-phpmyadmin.loadbalancer.server.port: 80
+    traefik.http.middlewares.strip-docauposte-phpmyadmin-prefix.stripPrefix.prefixes: /dappma
+spec:
+  restartPolicy: Always
+  containers:
+    - name: phpmyadmin
+      image: docker.io/phpmyadmin/phpmyadmin
+      env:
+        - name: PMA_HOST
+          value: database
+        - name: PMA_ABSOLUTE_URI
+          value: https://SANCLP0031/dappma
+        - name: PMA_SSL
+          value: "true"
+        - name: PMA_SSL_CA
+          value: /etc/phpmyadmin/ssl/ca-cert.pem
+      volumeMounts:
+        - mountPath: /etc/phpmyadmin/config.user.inc.php
+          name: phpmyadmin-config
+          readOnly: true
+        - mountPath: /etc/localtime
+          name: localtime-settings
+          readOnly: true
+        - mountPath: /etc/phpmyadmin/ssl/ca-cert.pem
+          name: ca-certificates
+          readOnly: true
+      resources:
+        limits:
+          memory: 1000Mi
+          ephemeral-storage: 500Mi
+        requests:
+          cpu: 1
+  dnsPolicy: Default
+  volumes:
+    - hostPath:
+        path: ./config.user.inc.php
+        type: File
+      name: phpmyadmin-config
+    - hostPath:
+        path: /etc/localtime
+      name: localtime-settings
+    - hostPath:
+        path: ./secrets/ssl/ca-cert.pem
+        type: Directory
+      name: ca-certificates
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: docauposte-web-pod-limits-range
+  namespace: docauposte-web-pod-limits
+spec:
+  limits:
+    - defaultRequest:
+        memory: 2000Mi
+        ephemeral-storage: 10000Mi
+        cpu: 4
+      type: Container
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: docauposte-web-pod
+  namespace: docauposte-web-pod-limits
+  labels:
+    app: docauposte-web
+    traefik.enable: true
+    traefik.http.routers.docauposte-web.rule: "Host(`sanclp0031`) && PathPrefix(`/docauposte`)"
+    traefik.http.routers.docauposte-web.entrypoints: websecure
+    traefik.http.routers.docauposte-web.tls: true
+    # Remove or comment out the certresolver if using dedicated certificate files
+    traefik.http.routers.docauposte-web.tls.certresolver: myresolver
+    traefik.http.routers.docauposte-web.middlewares: strip-docauposte-web-prefix
+    traefik.http.services.docauposte-web.loadbalancer.server.port: 80
+    traefik.http.middlewares.strip-docauposte-web-prefix.stripPrefix.prefixes: /docauposte
+spec:
+  restartPolicy: Always
+  containers:
+    - name: web
+      image: ghcr.io/kiloutyg/docauposte2:prod-latest
+      # command: ["./dev-entrypoint.sh"]
+      env:
+        - name: no_proxy
+          value: .ponet
+        - name: http_proxy
+          value: http://10.0.0.1:80
+        - name: APP_TIMEZONE
+          value: Europe/Paris
+        - name: https_proxy
+          value: http://10.0.0.1:80
+      volumeMounts:
+        - mountPath: /var/www/public/doc
+          name: web-data
+        - mountPath: /etc/localtime
+          name: localtime-settings
+          readOnly: true
+        - mountPath: /etc/ssl/certs/ca-cert.pem
+          name: ca-certificates
+          readOnly: true
+        - mountPath: /etc/ssl/certs/server-cert.pem
+          name: server-certificates
+          readOnly: true
+        - mountPath: /etc/ssl/certs/server-key.pem
+          name: server-key
+          readOnly: true
+      resources:
+        limits:
+          memory: 4000Mi
+          ephemeral-storage: 15000Mi
+        requests:
+          cpu: 4
+  dnsPolicy: Default
+  volumes:
+    - hostPath:
+        path: ./public/doc
+        type: Directory
+      name: web-data
+    - hostPath:
+        path: .env
+        type: File
+      name: dotenv
+    - hostPath:
+        path: /etc/localtime
+      name: localtime-settings
+      readOnly: true
+    - hostPath:
+        path: ./secrets/ssl/ca-cert.pem
+        type: File
+      name: ca-certificates
+    - hostPath:
+        path: ./secrets/ssl/server-cert.pem
+        type: File
+      name: server-certificates
+    - hostPath:
+        path: ./secrets/ssl/server-key.pem
+        type: File
+      name: server-key

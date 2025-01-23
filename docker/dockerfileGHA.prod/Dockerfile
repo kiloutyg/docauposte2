@@ -2,10 +2,6 @@
 
 FROM php:8.2-apache-bookworm AS base
 
-# Create a non-root user and group
-RUN addgroup --system nonroot \
-  && adduser --system --ingroup nonroot nonroot
-
 # Set the working directory inside the container
 WORKDIR /var/www
 
@@ -101,25 +97,25 @@ RUN \
   # Move Symfony CLI to a global location
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony \
   # Change /var/www ownership
-  && chown -R nonroot:nonroot /var/www 
+  && chown -R www-data:www-data /var/www 
 
 # Switch to non-root user
-USER nonroot
+USER www-data
 
 # Building stage
 FROM base AS building
 
 # Switch to non-root user
-USER nonroot
+USER www-data
 
 
 RUN mkdir -p /var/www/building \
-  && chown -R nonroot:nonroot /var/www/building 
+  && chown -R www-data:www-data /var/www/building 
 # Set working directory
 WORKDIR /var/www/building
 
 # Copy application code with correct ownership
-COPY --chown=nonroot:nonroot --chmod=755 . /var/www/building
+COPY --chown=www-data:www-data --chmod=755 . /var/www/building
 
 # Install dependencies and perform build steps
 RUN  cp .env.test .env \
