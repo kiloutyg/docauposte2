@@ -112,6 +112,8 @@ RUN \
 COPY composer.json composer.lock ./
 COPY package.json yarn.lock ./
 
+COPY webpack.config.js ./
+
 # Copy application source code
 COPY bin/ bin/
 COPY config/ config/
