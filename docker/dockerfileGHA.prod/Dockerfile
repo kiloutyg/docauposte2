@@ -111,7 +111,7 @@ RUN \
 # Copy composer and yarn configuration files
 COPY composer.json composer.lock ./
 COPY package.json yarn.lock ./
-
+COPY symfony.lock ./
 COPY webpack.config.js ./
 
 # Copy application source code
