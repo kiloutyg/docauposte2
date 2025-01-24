@@ -56,3 +56,4 @@ symfony copy.lock
 
 
 test.yml
+.dockerignore
