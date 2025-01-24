@@ -108,36 +108,29 @@ RUN \
   # Enable the configuration
   && a2enconf servername
 
+# Copy composer and yarn configuration files
+COPY composer.json composer.lock ./
+COPY package.json yarn.lock ./
+
+# Copy application source code
+COPY bin/ bin/
+COPY config/ config/
+COPY public/ public/
+COPY src/ src/
+COPY templates/ templates/
+COPY assets/ assets/
+
+# Copy the entrypoint script and set execution permissions
+COPY ./docker/dockerfileGHA.prod/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Adjust ownership and permissions
+RUN chown -R www-data:www-data /var/www
+
 # Switch to non-root user
 USER www-data
 
-# Building stage
-FROM base AS building
-
-# Switch to non-root user
-USER www-data
-
-RUN mkdir -p /var/www/building \
-  && chown -R www-data:www-data /var/www/building 
-# Set working directory
-WORKDIR /var/www/building
-
-# Copy application code with correct ownership
-COPY --chown=www-data:www-data --chmod=755 . /var/www/building
-
-# Install dependencies and perform build steps
-RUN  cp .env.test .env \
-  && composer install \
-  && yarn install --ignore-scripts \
-  && composer clear-cache \
-  && php ./bin/console cache:clear --no-warmup --env=prod \
-  && php ./bin/console cache:warmup --env=prod \
-  && yarn encore prod \
-  && cp -r ./public /var/www/public \
-  && rm -rf /var/www/building
-
-WORKDIR /var/www
+# Set the entrypoint
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 EXPOSE 80
-
-CMD [ "apache2-foreground" ]
