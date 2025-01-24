@@ -130,4 +130,6 @@ RUN  cp .env.test .env \
 
 WORKDIR /var/www
 
+EXPOSE 80
+
 CMD [ "apache2-foreground" ]
