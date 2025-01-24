@@ -97,7 +97,13 @@ RUN \
   # Move Symfony CLI to a global location
   && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony \
   # Change /var/www ownership
-  && chown -R www-data:www-data /var/www 
+  && chown -R www-data:www-data /var/www \
+  # Configure the port 8080 as exposed and used by apache
+  && echo "Listen 8080" >> /etc/apache2/ports.conf \
+  # Set ServerName Directive
+  && echo "ServerName localhost" >> /etc/apache2/conf-available/servername.conf \
+  # Enable the configuration
+  && a2enconf servername
 
 # Switch to non-root user
 USER www-data
@@ -107,7 +113,6 @@ FROM base AS building
 
 # Switch to non-root user
 USER www-data
-
 
 RUN mkdir -p /var/www/building \
   && chown -R www-data:www-data /var/www/building 
@@ -130,6 +135,6 @@ RUN  cp .env.test .env \
 
 WORKDIR /var/www
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD [ "apache2-foreground" ]
