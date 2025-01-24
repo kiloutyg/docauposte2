@@ -11,7 +11,6 @@ composer clear-cache
 php bin/console cache:clear --no-warmup --env=prod
 php bin/console cache:warmup --env=prod
 
-
 # Set the permissions 
 chmod -R 777 /var/www/var/cache/prod/pools
 chown -R www-data:www-data /var/www/var/cache/prod
