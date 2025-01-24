@@ -100,7 +100,7 @@ RUN \
   # Change /var/www ownership
   && chown -R www-data:www-data /var/www \
   # Configure the port 8080 as exposed and used by apache
-  && sed -i "s|^Listen 80.*|Listen 8080|" /etc/apache2/ports.conf \
+  # && sed -i "s|^Listen 80.*|Listen 8080|" /etc/apache2/ports.conf \
   # Grant apache2 the capability to bind to port 80
   && setcap 'cap_net_bind_service=+ep' /usr/sbin/apache2 \
   # Set ServerName Directive
@@ -138,6 +138,6 @@ RUN  cp .env.test .env \
 
 WORKDIR /var/www
 
-EXPOSE 8080
+EXPOSE 80
 
 CMD [ "apache2-foreground" ]
