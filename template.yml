@@ -147,7 +147,7 @@ metadata:
     traefik.http.routers.docauposte-phpmyadmin.entrypoints: websecure
     traefik.http.routers.docauposte-phpmyadmin.tls: true
     # Remove or comment out the certresolver if using dedicated certificate files
-    traefik.http.routers.docauposte-phpmyadmin.tls.certresolver: myresolver
+    # traefik.http.routers.docauposte-phpmyadmin.tls.certresolver: myresolver
     traefik.http.routers.docauposte-phpmyadmin.middlewares: strip-docauposte-phpmyadmin-prefix
     traefik.http.services.docauposte-phpmyadmin.loadbalancer.server.port: 80
     traefik.http.middlewares.strip-docauposte-phpmyadmin-prefix.stripPrefix.prefixes: /dappma
@@ -165,11 +165,6 @@ spec:
           value: "true"
         - name: PMA_SSL_CA
           value: /etc/phpmyadmin/ssl/ca-cert.pem
-        # Un-comment if using client authentication
-        # - name: PMA_SSL_CERT
-        #   value: /etc/phpmyadmin/ssl/client-cert.pem
-        # - name: PMA_SSL_KEY
-        #   value: /etc/phpmyadmin/ssl/client-key.pem
       volumeMounts:
         - mountPath: /etc/phpmyadmin/config.user.inc.php
           name: phpmyadmin-config
@@ -225,7 +220,7 @@ metadata:
     traefik.http.routers.docauposte-web.entrypoints: websecure
     traefik.http.routers.docauposte-web.tls: true
     # Remove or comment out the certresolver if using dedicated certificate files
-    traefik.http.routers.docauposte-web.tls.certresolver: myresolver
+    # traefik.http.routers.docauposte-web.tls.certresolver: myresolver
     traefik.http.routers.docauposte-web.middlewares: strip-docauposte-web-prefix
     traefik.http.services.docauposte-web.loadbalancer.server.port: 80
     traefik.http.middlewares.strip-docauposte-web-prefix.stripPrefix.prefixes: /docauposte
