@@ -180,13 +180,6 @@ spec:
         - mountPath: /etc/phpmyadmin/ssl
           name: ssl-certificates
           readOnly: true
-        # Un-comment if using client authentication
-        # - mountPath: /etc/phpmyadmin/ssl/client-cert.pem
-        #   name: client-cert
-        #   readOnly: true
-        # - mountPath: /etc/phpmyadmin/ssl/client-key.pem
-        #   name: client-key
-        #   readOnly: true
       resources:
         limits:
           memory: 1000Mi
@@ -206,15 +199,6 @@ spec:
         path: ./secrets/ssl/ca-cert.pem
         type: File
       name: ca-cert
-    # Un-comment if using client authentication
-    # - hostPath:
-    #     path: ./secrets/ssl/client-cert.pem
-    #     type: File
-    #   name: client-cert
-    # - hostPath:
-    #     path: ./secrets/ssl/client-key.pem
-    #     type: File
-    #   name: client-key
 ---
 apiVersion: v1
 kind: LimitRange
@@ -267,6 +251,10 @@ spec:
       volumeMounts:
         - mountPath: /var/www
           name: web-data
+        - mountPath: /var/www/public/doc
+          name: doc
+        - mountPath: /var/www/.env
+          name: dotenv
         - mountPath: /etc/localtime
           name: localtime-settings
           readOnly: true
@@ -279,13 +267,6 @@ spec:
         - mountPath: /etc/ssl/certs/server-key.pem
           name: server-key
           readOnly: true
-        # Un-comment if using client authentication
-        # - mountPath: /etc/ssl/certs/client-cert.pem
-        #   name: client-cert
-        #   readOnly: true
-        # - mountPath: /etc/ssl/certs/client-key.pem
-        #   name: client-key
-        #   readOnly: true
       resources:
         limits:
           memory: 2000Mi
@@ -298,6 +279,14 @@ spec:
         path: ./
         type: Directory
       name: web-data
+    - hostPath:
+        path: ./public/doc
+        type: Directory
+      name: doc
+    - hostPath:
+        path: .env
+        type: File
+      name: dotenv
     - hostPath:
         path: /etc/localtime
       name: localtime-settings
@@ -313,12 +302,3 @@ spec:
         path: ./secrets/ssl/server-key.pem
         type: File
       name: server-key
-    # Un-comment if using client authentication
-    # - hostPath:
-    #     path: ./secrets/ssl/client-cert.pem
-    #     type: File
-    #   name: client-cert
-    # - hostPath:
-    #     path: ./secrets/ssl/client-key.pem
-    #     type: File
-    #   name: client-key

@@ -57,3 +57,5 @@ symfony copy.lock
 
 test.yml
 .dockerignore
+*.pem
+*.key
