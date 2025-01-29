@@ -317,7 +317,7 @@ spec:
         type: Directory
       name: doc
     - hostPath:
-        path: ${PWD}/secrets/.env
+        path: ${PWD}/.env
         type: File
       name: dotenv
     - hostPath:

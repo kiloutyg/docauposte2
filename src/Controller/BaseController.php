@@ -10,6 +10,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class BaseController extends AbstractController
 {
     private function __construct() {
-        // Empty construct function here for static 
+        // Empty construct function here for static.
     }
 }
