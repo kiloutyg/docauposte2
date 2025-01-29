@@ -30,17 +30,40 @@ metadata:
     app: docauposte-database
 spec:
   restartPolicy: Always
+  initContainers:
+    - name: copy-certificates-and-fix-permission-for-db
+      image: docker.io/library/busybox:stable
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          cp /source/ca-cert.pem /db-certs/;
+          cp /source/server-cert.pem /db-certs/;
+          cp /source/server-key.pem /db-certs/;
+          chmod +x fix-permissions-db.sh;
+          sh /tmp/fix-permissions-db.sh;
+      volumeMounts:
+        - mountPath: /source/ca-cert.pem
+          name: ca-cert
+        - mountPath: /source/server-cert.pem
+          name: server-cert
+        - mountPath: /source/server-key.pem
+          name: server-key
+        - mountPath: /db-certs
+          name: db-certs
+        - mountPath: /tmp/fix-permissions-db.sh
+          name: fix-permissions-db-script
+          readOnly: true
   containers:
     - name: database
       image: docker.io/library/mariadb:latest
       env:
-        - name: MARIADB_ROOT_PASSWORD_FILE
+        - name: MARIADB_ROOT_PASSWORD_File
           value: run/secrets/root_password
-        - name: MARIADB_DATABASE_FILE
+        - name: MARIADB_DATABASE_File
           value: run/secrets/database_name
-        - name: MARIADB_USER_FILE
+        - name: MARIADB_USER_File
           value: run/secrets/database_user
-        - name: MARIADB_PASSWORD_FILE
+        - name: MARIADB_PASSWORD_File
           value: run/secrets/database_password
       ports:
         - containerPort: 3306
@@ -62,18 +85,12 @@ spec:
         - mountPath: /etc/localtime
           name: localtime-settings
           readOnly: true
-        - mountPath: /etc/mysql/ssl/ca-cert.pem
-          name: ca-cert
-          readOnly: true
-        - mountPath: /etc/mysql/ssl/server-cert.pem
-          name: server-cert
-          readOnly: true
-        - mountPath: /etc/mysql/ssl/server-key.pem
-          name: server-key
-          readOnly: true
         - mountPath: /etc/mysql/my.cnf
           readOnly: true
           name: mysql-config
+        - mountPath: /etc/mysql/ssl
+          name: db-certs
+          readOnly: true
       resources:
         limits:
           memory: 4000Mi
@@ -83,44 +100,50 @@ spec:
   dnsPolicy: Default
   volumes:
     - hostPath:
-        path: ./secrets/root_password
+        path: ${PWD}/secrets/root_password
         type: File
       name: root_password
     - hostPath:
-        path: ./secrets/database_name
+        path: ${PWD}/secrets/database_name
         type: File
       name: database_name
     - hostPath:
-        path: ./secrets/database_user
+        path: ${PWD}/secrets/database_user
         type: File
       name: database_user
     - hostPath:
-        path: ./secrets/database_password
+        path: ${PWD}/secrets/database_password
         type: File
       name: database_password
     - hostPath:
-        path: ./database_data
-        type: DirectoryOrCreate
+        path: ${PWD}/database_data
+        type: Directory
       name: database-data
     - hostPath:
         path: /etc/localtime
       name: localtime-settings
     - hostPath:
-        path: ./secrets/ssl/ca-cert.pem
+        path: ${PWD}/secrets/ssl/ca-cert.pem
         type: File
       name: ca-cert
     - hostPath:
-        path: ./secrets/ssl/server-cert.pem
+        path: ${PWD}/secrets/ssl/server-cert.pem
         type: File
       name: server-cert
     - hostPath:
-        path: ./secrets/ssl/server-key.pem
+        path: ${PWD}/secrets/ssl/server-key.pem
         type: File
       name: server-key
     - hostPath:
-        path: ./my.cnf
+        path: ${PWD}/my.cnf
         type: File
       name: mysql-config
+    - hostPath:
+        path: ${PWD}/fix-permissions-db.sh
+        type: File
+      name: fix-permissions-db-script
+    - name: db-certs
+      emptyDir: {}
 ---
 apiVersion: v1
 kind: LimitRange
@@ -143,7 +166,7 @@ metadata:
   labels:
     app: docauposte-phpmyadmin
     traefik.enable: true
-    traefik.http.routers.docauposte-phpmyadmin.rule: "Host(`${HOSTNAME}`) && PathPrefix(`/dappma`)"
+    traefik.http.routers.docauposte-phpmyadmin.rule: "Host(`${DOMAIN_NAME}`) && PathPrefix(`/dappma`) || Host(`${HOSTNAME}`) && PathPrefix(`/dappma`)"
     traefik.http.routers.docauposte-phpmyadmin.entrypoints: websecure
     traefik.http.routers.docauposte-phpmyadmin.tls: true
     # Remove or comment out the certresolver if using dedicated certificate files
@@ -184,14 +207,14 @@ spec:
   dnsPolicy: Default
   volumes:
     - hostPath:
-        path: ./config.user.inc.php
+        path: ${PWD}/config.user.inc.php
         type: File
       name: phpmyadmin-config
     - hostPath:
         path: /etc/localtime
       name: localtime-settings
     - hostPath:
-        path: ./secrets/ssl/ca-cert.pem
+        path: ${PWD}/secrets/ssl/ca-cert.pem
         type: File
       name: ca-cert
 ---
@@ -216,7 +239,7 @@ metadata:
   labels:
     app: docauposte-web
     traefik.enable: true
-    traefik.http.routers.docauposte-web.rule: "Host(`${HOSTNAME}`) && PathPrefix(`/docauposte`)"
+    traefik.http.routers.docauposte-web.rule: "Host(`${HOSTNAME}`) && PathPrefix(`/docauposte`) || Host(`${HOSTNAME}`) && PathPrefix(`/docauposte`)"
     traefik.http.routers.docauposte-web.entrypoints: websecure
     traefik.http.routers.docauposte-web.tls: true
     # Remove or comment out the certresolver if using dedicated certificate files
@@ -225,15 +248,38 @@ metadata:
     traefik.http.services.docauposte-web.loadbalancer.server.port: 80
     traefik.http.middlewares.strip-docauposte-web-prefix.stripPrefix.prefixes: /docauposte
 spec:
-  securityContext:
-    runAsUser: 0
-    runAsGroup: 0
-    fsGroup: 1129600513
   restartPolicy: Always
+  initContainers:
+  - name: copy-certificates-and-fix-permission-for-dap
+    image: docker.io/library/busybox:stable
+    command: ["/bin/sh", "-c"]
+    args:
+      - |
+        cp /source/ca-cert.pem /dap-certs/;
+        cp /source/server-cert.pem /dap-certs/;
+        cp /source/server-key.pem /dap-certs/;
+        chmod +x fix-permissions-dap.sh;
+        sh /tmp/fix-permissions-dap.sh;
+    volumeMounts:
+      - mountPath: /source/ca-cert.pem
+        name: ca-cert
+      - mountPath: /source/server-cert.pem
+        name: server-cert
+      - mountPath: /source/server-key.pem
+        name: server-key
+      - mountPath: /dap-certs
+        name: dap-certs
+      - mountPath: /var/www/public/doc
+        name: doc
+      - mountPath: /var/www/.env
+        name: dotenv
+      - mountPath: /tmp/fix-permissions-dap.sh
+        name: fix-permissions-dap-script
+        readOnly: true
   containers:
     - name: web
       image: ghcr.io/${GITHUB_USER}/docauposte2:${APP_CONTEXT}-latest
-      command: ["./${APP_CONTEXT}-entrypoint.sh"]
+      # command: ["./dev-entrypoint.sh"]
       env:
         - name: no_proxy
           value: .ponet
@@ -244,23 +290,15 @@ spec:
         - name: https_proxy
           value: ${PROXY_ENV}
       volumeMounts:
-        - mountPath: /var/www
-          name: web-data
+        # - mountPath: /var/www
+        #   name: web-data
         - mountPath: /var/www/public/doc
           name: doc
         - mountPath: /var/www/.env
           name: dotenv
-        - mountPath: /etc/localtime
-          name: localtime-settings
           readOnly: true
-        - mountPath: /etc/ssl/certs/ca-cert.pem
-          name: ca-certificates
-          readOnly: true
-        - mountPath: /etc/ssl/certs/server-cert.pem
-          name: server-certificates
-          readOnly: true
-        - mountPath: /etc/ssl/certs/server-key.pem
-          name: server-key
+        - mountPath: /etc/ssl/my-certs
+          name: dap-certs
           readOnly: true
       resources:
         limits:
@@ -270,30 +308,33 @@ spec:
           cpu: 4
   dnsPolicy: Default
   volumes:
+    # - hostPath:
+    #     path: ${PWD}/
+    #     type: Directory
+    #   name: web-data
     - hostPath:
-        path: ./
-        type: Directory
-      name: web-data
-    - hostPath:
-        path: ./public/doc
+        path: ${PWD}/public/doc
         type: Directory
       name: doc
     - hostPath:
-        path: .env
+        path: ${PWD}/secrets/.env
         type: File
       name: dotenv
     - hostPath:
-        path: /etc/localtime
-      name: localtime-settings
-    - hostPath:
-        path: ./secrets/ssl/ca-cert.pem
+        path: ${PWD}/fix-permissions-dap.sh
         type: File
-      name: ca-certificates
+      name: fix-permissions-dap-script
     - hostPath:
-        path: ./secrets/ssl/server-cert.pem
+        path: ${PWD}/secrets/ssl/ca-cert.pem
         type: File
-      name: server-certificates
+      name: ca-cert
     - hostPath:
-        path: ./secrets/ssl/server-key.pem
+        path: ${PWD}/secrets/ssl/server-cert.pem
+        type: File
+      name: server-cert
+    - hostPath:
+        path: ${PWD}/secrets/ssl/server-key.pem
         type: File
       name: server-key
+    - name: dap-certs
+      emptyDir: {}
