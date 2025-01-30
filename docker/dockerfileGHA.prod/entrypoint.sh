@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Caching dotrenv variable
-composer dump-env prod
-
 # Install PHP dependencies
 composer install --no-dev --optimize-autoloader
+
+# Caching dotenv variable
+composer dump-env prod
 
 # Install JavaScript dependencies
 yarn install --ignore-scripts --production
