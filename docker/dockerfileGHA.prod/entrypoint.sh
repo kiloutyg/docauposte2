@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Caching dotrenv variable
+composer dump-env prod
+
 # Install PHP dependencies
 composer install --no-dev --optimize-autoloader
 
