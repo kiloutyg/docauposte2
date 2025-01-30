@@ -38,7 +38,7 @@
         "symfony/yaml": ">=6.3",
         "tecnickcom/tcpdf": ">=6.8",
         "tomasvotruba/barcode-bundle": ">=1.5",
-        "twig/twig": ">=2.12|>=3.0"
+        "twig/twig": ">=2.12|>=3.19"
     },
     "config": {
         "allow-plugins": {
@@ -86,9 +86,6 @@
             "allow-contrib": true,
             "require": ">=6.3",
             "docker": false
-        },
-        "runtime": {
-            "dotenv_path": "../../etc/ssl/my-certs/.env"
         }
     },
     "require-dev": {
