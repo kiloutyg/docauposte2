@@ -86,6 +86,9 @@
             "allow-contrib": true,
             "require": ">=6.3",
             "docker": false
+        },
+        "runtime": {
+            "dotenv_path": "/etc/ssl/my-certs/.env"
         }
     },
     "require-dev": {
