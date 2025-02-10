@@ -8,7 +8,7 @@ yarn install;
 composer clear-cache;
 
 # Set the permissions
-chmod 777 . -R;
+# chmod 777 . -R;
 
 # Clear the cache
 php bin/console cache:clear --no-warmup --env=dev;
@@ -17,10 +17,10 @@ php bin/console cache:clear --no-warmup --env=dev;
 php bin/console cache:warmup --env=dev;
 
 # Remove old migrations folder and files
-rm -rf migrations;
+# rm -rf migrations;
 
 # Create the migrations directory
-mkdir -p migrations;
+# mkdir -p migrations;
 
 # Create the database and run the migrations
 php bin/console make:migration;

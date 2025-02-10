@@ -25,7 +25,7 @@ yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 
 ###> symfony/maker-bundle ###
-/migrations/*
+# /migrations/*
 ###> symfony/maker-bundle ###
 
 ###> VSC stuff ###
