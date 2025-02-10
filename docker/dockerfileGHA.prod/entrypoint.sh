@@ -15,6 +15,9 @@ yarn install --ignore-scripts --production
 # Clear Composer cache
 composer clear-cache
 
+# Run the migrations
+php bin/console doctrine:migrations:migrate;
+
 # Clear and warm up Symfony cache
 php ./bin/console cache:clear --no-warmup --env=prod
 php ./bin/console cache:warmup --env=prod
