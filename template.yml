@@ -39,7 +39,7 @@ spec:
           cp /source/ca-cert.pem /db-certs/;
           cp /source/server-cert.pem /db-certs/;
           cp /source/server-key.pem /db-certs/;
-          chmod +x fix-permissions-db.sh;
+          chmod +x /tmp/fix-permissions-db.sh;
           sh /tmp/fix-permissions-db.sh;
       volumeMounts:
         - mountPath: /source/ca-cert.pem
@@ -258,7 +258,7 @@ spec:
         cp /source/ca-cert.pem /dap-certs/;
         cp /source/server-cert.pem /dap-certs/;
         cp /source/server-key.pem /dap-certs/;
-        chmod +x fix-permissions-dap.sh;
+        chmod +x /tmp/fix-permissions-dap.sh;
         sh /tmp/fix-permissions-dap.sh;
     volumeMounts:
       - mountPath: /source/ca-cert.pem
@@ -275,7 +275,6 @@ spec:
         name: dotenv
       - mountPath: /tmp/fix-permissions-dap.sh
         name: fix-permissions-dap-script
-        readOnly: true
   containers:
     - name: web
       image: ghcr.io/${GITHUB_USER}/docauposte2:${APP_CONTEXT}-latest
@@ -292,11 +291,10 @@ spec:
       volumeMounts:
         # - mountPath: /var/www
         #   name: web-data
+        # - mountPath: /var/www/dev-entrypoint.sh
+        #   name: dev-entrypoint
         - mountPath: /var/www/public/doc
           name: doc
-        - mountPath: /var/www/.env
-          name: dotenv
-          readOnly: true
         - mountPath: /etc/ssl/my-certs
           name: dap-certs
           readOnly: true
@@ -312,6 +310,10 @@ spec:
     #     path: ${PWD}/
     #     type: Directory
     #   name: web-data
+    # - hostPath:
+    #     path: ./dev-entrypoint.sh
+    #     type: File
+    #   name: dev-entrypoint
     - hostPath:
         path: ${PWD}/public/doc
         type: Directory
