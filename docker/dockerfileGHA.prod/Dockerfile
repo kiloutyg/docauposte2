@@ -121,6 +121,7 @@ COPY public/ public/
 COPY src/ src/
 COPY templates/ templates/
 COPY assets/ assets/
+COPY migrations/ migrations/
 
 # Copy the entrypoint script and set execution permissions
 COPY ./docker/dockerfileGHA.prod/entrypoint.sh /usr/local/bin/entrypoint.sh
