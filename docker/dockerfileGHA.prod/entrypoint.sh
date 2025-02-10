@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Move EnvVars to project dir
-mv /etc/ssl/my-certs/.env /var/www/
+cp /etc/ssl/my-certs/.env /var/www/
 
 # Install PHP dependencies
 composer install --no-dev --optimize-autoloader
