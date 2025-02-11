@@ -137,7 +137,7 @@ class MailerController extends AbstractController
     #[Route('/maildev', name: 'mail_dev')]
     public function devEmailAddress(): Response
     {
-        if ($this->getParameter('kernel.environment') != 'dev' && !$this->isGranted('ROLE_SUPER_ADMIN') ) {
+        if ($this->getParameter('kernel.environment') != 'dev' && !$this->isGranted('ROLE_SUPER_ADMIN')) {
             $this->addFlash('warning', 'Change the environment to dev to change mail addresses to dev mode.');
             return $this->redirectToRoute('app_base');
         }
@@ -154,7 +154,7 @@ class MailerController extends AbstractController
 
             // Check if the new email already exists in the database
             $existingUser = $this->userRepository->findOneBy(['emailAddress' => $newEmail]);
-            if ($existingUser && $existingUser->getId() !== $user->getId()) {
+            if (($existingUser && $existingUser->getId() !== $user->getId()) || $user->getRoles('ROLE_SUPER_ADMIN')) {
                 $this->logger->warning("Email $newEmail already exists for another user. Skipping update for user $username.");
                 continue; // Skip this user to avoid duplication
             }
