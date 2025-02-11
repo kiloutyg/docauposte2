@@ -17,7 +17,7 @@ openssl req -new -x509 -nodes -days 3600 \
 openssl req -newkey rsa:2048 -days 3600 \
     -nodes -keyout ./secrets/ssl/server-key.pem \
     -out ./secrets/ssl/server-req.pem \
-    -subj "/CN=docauposte-database-pod"
+    -subj "/CN=database"
 
 openssl x509 -req -in ./secrets/ssl/server-req.pem -days 3600 \
     -CA ./secrets/ssl/ca-cert.pem -CAkey ./secrets/ssl/ca-key.pem -set_serial 01 \
