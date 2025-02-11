@@ -137,8 +137,7 @@ class MailerController extends AbstractController
     #[Route('/maildev', name: 'mail_dev')]
     public function devEmailAddress(): Response
     {
-
-        if ($this->getParameter('kernel.environment') != 'dev') {
+        if ($this->getParameter('kernel.environment') != 'dev' && !$this->isGranted('ROLE_SUPER_ADMIN') ) {
             $this->addFlash('warning', 'Change the environment to dev to change mail addresses to dev mode.');
             return $this->redirectToRoute('app_base');
         }
