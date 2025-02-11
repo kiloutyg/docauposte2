@@ -12,6 +12,8 @@ doctrine:
             !php/const 'PDO::MYSQL_ATTR_SSL_CERT': '%env(MYSQL_SSL_CERT)%'
             # SSL CA authority
             !php/const 'PDO::MYSQL_ATTR_SSL_CA': '%env(MYSQL_SSL_CA)%'
+            # SSL does not check for valid CA
+            !php/const PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT: false
         # IMPORTANT: You MUST configure your server version,
         # either here or in the DATABASE_URL env var (see .env file)
         #server_version: '15'
