@@ -227,13 +227,13 @@ if [ "${APP_CONTEXT_SH}" == "prod" ]
 
 
         # Wait until the container is listed as running
-        until [ "$(podman ps -q -f name=web-docauposte)" ]; do
-        echo "Waiting for container web-docauposte to start..."
+        until [ "$(podman ps -q -f name=docauposte-web)" ]; do
+        echo "Waiting for container docauposte-web to start..."
         sleep 1
         done
 
         # Wait until the webpack compiled successfully
-        until podman logs --since 10s --tail 10 web-docauposte 2>&1 | grep -q "webpack compiled successfully"; do
+        until podman logs --since 10s --tail 10 docauposte-web 2>&1 | grep -q "webpack compiled successfully"; do
         echo "Waiting for the webpack to be compiled" 
         sleep 10
         done

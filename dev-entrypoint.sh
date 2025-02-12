@@ -27,4 +27,3 @@ php bin/console doctrine:migrations:migrate;
 # Build the assets and start the server
 exec apache2-foreground &
 yarn encore dev --watch
-
