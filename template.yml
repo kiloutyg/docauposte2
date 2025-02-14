@@ -31,14 +31,14 @@ metadata:
 spec:
   restartPolicy: Always
   initContainers:
-    - name: copy-certificates-and-fix-permission-for-db
+    - name: copy-certificates-and-fix-permission-for-dap-db
       image: docker.io/library/busybox:stable
       command: ["/bin/sh", "-c"]
       args:
         - |
-          cp /source/ca-cert.pem /db-certs/;
-          cp /source/server-cert.pem /db-certs/;
-          cp /source/server-key.pem /db-certs/;
+          cp /source/ca-cert.pem /dap-db-certs/;
+          cp /source/server-cert.pem /dap-db-certs/;
+          cp /source/server-key.pem /dap-db-certs/;
           chmod +x /tmp/fix-permissions-db.sh;
           sh /tmp/fix-permissions-db.sh;
       volumeMounts:
@@ -48,8 +48,8 @@ spec:
           name: server-cert
         - mountPath: /source/server-key.pem
           name: server-key
-        - mountPath: /db-certs
-          name: db-certs
+        - mountPath: /dap-db-certs
+          name: dap-db-certs
         - mountPath: /tmp/fix-permissions-db.sh
           name: fix-permissions-db-script
           readOnly: true
@@ -57,13 +57,13 @@ spec:
     - name: database
       image: docker.io/library/mariadb:latest
       env:
-        - name: MARIADB_ROOT_PASSWORD_File
+        - name: MARIADB_ROOT_PASSWORD_FILE
           value: run/secrets/root_password
-        - name: MARIADB_DATABASE_File
+        - name: MARIADB_DATABASE_FILE
           value: run/secrets/database_name
-        - name: MARIADB_USER_File
+        - name: MARIADB_USER_FILE
           value: run/secrets/database_user
-        - name: MARIADB_PASSWORD_File
+        - name: MARIADB_PASSWORD_FILE
           value: run/secrets/database_password
       ports:
         - containerPort: 3306
@@ -89,7 +89,7 @@ spec:
           readOnly: true
           name: mysql-config
         - mountPath: /etc/mysql/ssl
-          name: db-certs
+          name: dap-db-certs
           readOnly: true
       resources:
         limits:
@@ -142,7 +142,7 @@ spec:
         path: ${PWD}/fix-permissions-db.sh
         type: File
       name: fix-permissions-db-script
-    - name: db-certs
+    - name: dap-db-certs
       emptyDir: {}
 ---
 apiVersion: v1
@@ -166,7 +166,7 @@ metadata:
   labels:
     app: docauposte-phpmyadmin
     traefik.enable: true
-    traefik.http.routers.docauposte-phpmyadmin.rule: "Host(`${DOMAIN_NAME}`) && PathPrefix(`/dappma`) || Host(`${HOSTNAME}`) && PathPrefix(`/dappma`)"
+    traefik.http.routers.docauposte-phpmyadmin.rule: "Host(`${DOMAIN_NAME}`) && PathPrefix(`/dappma`) || Host(`${DOMAIN_NAME}.ad.ponet`) && PathPrefix(`/dappma`) || Host(`${HOSTNAME}`) && PathPrefix(`/dappma`)"
     traefik.http.routers.docauposte-phpmyadmin.entrypoints: websecure
     traefik.http.routers.docauposte-phpmyadmin.tls: true
     # Remove or comment out the certresolver if using dedicated certificate files
@@ -195,8 +195,8 @@ spec:
         - mountPath: /etc/localtime
           name: localtime-settings
           readOnly: true
-        - mountPath: /etc/phpmyadmin/ssl
-          name: ssl-certificates
+        - mountPath: /etc/phpmyadmin/ssl/ca-cert.pem
+          name: ca-cert
           readOnly: true
       resources:
         limits:

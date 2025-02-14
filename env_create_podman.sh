@@ -181,7 +181,7 @@ MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0
 # Format described at https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url
 # IMPORTANT: You MUST configure your server version, either here or in config/packages/doctrine.yaml
 
-DATABASE_URL=mysql://root:\${MYSQL_ROOT_PASSWORD}@database/\${MYSQL_DATABASE}?charset=utf8mb4&serverVersion=MariaDB-11.6.2&sslmode=verify_ca&sslrootcert=/etc/ssl/certs/ca-cert.pem
+DATABASE_URL=mysql://root:\${MYSQL_ROOT_PASSWORD}@docauposte-database-pod/\${MYSQL_DATABASE}?charset=utf8mb4&serverVersion=MariaDB-11.6.2&sslmode=verify_ca&sslrootcert=/etc/ssl/certs/ca-cert.pem
 
 ###< doctrine/doctrine-bundle ###
 
@@ -227,13 +227,13 @@ if [ "${APP_CONTEXT_SH}" == "prod" ]
 
 
         # Wait until the container is listed as running
-        until [ "$(podman ps -q -f name=web-docauposte)" ]; do
-        echo "Waiting for container web-docauposte to start..."
+        until [ "$(podman ps -q -f name=docauposte-web)" ]; do
+        echo "Waiting for container docauposte-web to start..."
         sleep 1
         done
 
         # Wait until the webpack compiled successfully
-        until podman logs --since 10s --tail 10 web-docauposte 2>&1 | grep -q "webpack compiled successfully"; do
+        until podman logs --since 10s --tail 10 docauposte-web 2>&1 | grep -q "webpack compiled successfully"; do
         echo "Waiting for the webpack to be compiled" 
         sleep 10
         done
