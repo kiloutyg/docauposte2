@@ -16,8 +16,8 @@ metadata:
 spec:
   limits:
     - defaultRequest:
-        memory: 4000Mi
-        ephemeral-storage: 5000Mi
+        memory: 8000Mi
+        ephemeral-storage: 10000Mi
         cpu: 4
       type: Container
 ---
@@ -39,8 +39,9 @@ spec:
           cp /source/ca-cert.pem /dap-db-certs/;
           cp /source/server-cert.pem /dap-db-certs/;
           cp /source/server-key.pem /dap-db-certs/;
-          chmod +x /tmp/fix-permissions-db.sh;
-          sh /tmp/fix-permissions-db.sh;
+          chown mysql:mysql /dap-db-certs/*.pem;
+          chmod 644 /dap-db-certs/ca-cert.pem /dap-db-certs/server-cert.pem;
+          chmod 644 /dap-db-certs/server-key.pem;
       volumeMounts:
         - mountPath: /source/ca-cert.pem
           name: ca-cert
@@ -50,9 +51,6 @@ spec:
           name: server-key
         - mountPath: /dap-db-certs
           name: dap-db-certs
-        - mountPath: /tmp/fix-permissions-db.sh
-          name: fix-permissions-db-script
-          readOnly: true
   containers:
     - name: database
       image: docker.io/library/mariadb:latest
@@ -67,6 +65,8 @@ spec:
           value: run/secrets/database_password
       ports:
         - containerPort: 3306
+          hostPath: 3306
+          protocol: TCP
       volumeMounts:
         - mountPath: /run/secrets/root_password
           readOnly: true
@@ -93,8 +93,8 @@ spec:
           readOnly: true
       resources:
         limits:
-          memory: 4000Mi
-          ephemeral-storage: 5000Mi
+          memory: 8000Mi
+          ephemeral-storage: 10000Mi
         requests:
           cpu: 4
   dnsPolicy: Default
@@ -138,10 +138,6 @@ spec:
         path: ${PWD}/my.cnf
         type: File
       name: mysql-config
-    - hostPath:
-        path: ${PWD}/fix-permissions-db.sh
-        type: File
-      name: fix-permissions-db-script
     - name: dap-db-certs
       emptyDir: {}
 ---
@@ -166,7 +162,7 @@ metadata:
   labels:
     app: docauposte-phpmyadmin
     traefik.enable: true
-    traefik.http.routers.docauposte-phpmyadmin.rule: "Host(`${DOMAIN_NAME}`) && PathPrefix(`/dappma`) || Host(`${DOMAIN_NAME}.ad.ponet`) && PathPrefix(`/dappma`) || Host(`${HOSTNAME}`) && PathPrefix(`/dappma`)"
+    traefik.http.routers.docauposte-phpmyadmin.rule: "Host(`${HOSTNAME}.ad.ponet`) && PathPrefix(`/dappma`) || Host(`${DOMAIN_NAME}.corp.ponet`) && PathPrefix(`/dappma`)"
     traefik.http.routers.docauposte-phpmyadmin.entrypoints: websecure
     traefik.http.routers.docauposte-phpmyadmin.tls: true
     # Remove or comment out the certresolver if using dedicated certificate files
@@ -181,9 +177,9 @@ spec:
       image: docker.io/phpmyadmin/phpmyadmin
       env:
         - name: PMA_HOST
-          value: database
+          value: docauposte-database-pod
         - name: PMA_ABSOLUTE_URI
-          value: https://${HOSTNAME}/dappma/
+          value: https://${DOMAIN_NAME}.corp.ponet/dappma/
         - name: PMA_SSL
           value: "true"
         - name: PMA_SSL_CA
@@ -239,7 +235,7 @@ metadata:
   labels:
     app: docauposte-web
     traefik.enable: true
-    traefik.http.routers.docauposte-web.rule: "Host(`${HOSTNAME}`) && PathPrefix(`/docauposte`) || Host(`${HOSTNAME}`) && PathPrefix(`/docauposte`)"
+    traefik.http.routers.docauposte-web.rule: "Host(`${HOSTNAME}.ad.ponet`) && PathPrefix(`/docauposte`) || Host(`${DOMAIN_NAME}.corp.ponet`) && PathPrefix(`/docauposte`)"
     traefik.http.routers.docauposte-web.entrypoints: websecure
     traefik.http.routers.docauposte-web.tls: true
     # Remove or comment out the certresolver if using dedicated certificate files
@@ -250,31 +246,35 @@ metadata:
 spec:
   restartPolicy: Always
   initContainers:
-  - name: copy-certificates-and-fix-permission-for-dap
-    image: docker.io/library/busybox:stable
-    command: ["/bin/sh", "-c"]
-    args:
-      - |
-        cp /source/ca-cert.pem /dap-certs/;
-        cp /source/server-cert.pem /dap-certs/;
-        cp /source/server-key.pem /dap-certs/;
-        chmod +x /tmp/fix-permissions-dap.sh;
-        sh /tmp/fix-permissions-dap.sh;
-    volumeMounts:
-      - mountPath: /source/ca-cert.pem
-        name: ca-cert
-      - mountPath: /source/server-cert.pem
-        name: server-cert
-      - mountPath: /source/server-key.pem
-        name: server-key
-      - mountPath: /dap-certs
-        name: dap-certs
-      - mountPath: /var/www/public/doc
-        name: doc
-      - mountPath: /var/www/.env
-        name: dotenv
-      - mountPath: /tmp/fix-permissions-dap.sh
-        name: fix-permissions-dap-script
+    - name: copy-certificates-and-fix-permission-for-dap
+      image: docker.io/library/busybox:stable
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          cp /source/ca-cert.pem /dap-certs/;
+          cp /source/server-cert.pem /dap-certs/;
+          cp /source/server-key.pem /dap-certs/;
+          cp /source/.env /dap-certs/;
+          chmod 750 /var/www/public/doc;
+          chown -R www-data:www-data /var/www/public/doc;
+          chmod 640 /dap-certs/.env;
+          chown www-data:www-data /dap-certs/.env;
+          chmod 644 /dap-certs/ca-cert.pem /dap-certs/server-cert.pem;
+          chmod 644 /dap-certs/server-key.pem;
+          chown www-data:www-data /dap-certs/*.pem;
+      volumeMounts:
+        - mountPath: /source/ca-cert.pem
+          name: ca-cert
+        - mountPath: /source/server-cert.pem
+          name: server-cert
+        - mountPath: /source/server-key.pem
+          name: server-key
+        - mountPath: /dap-certs
+          name: dap-certs
+        - mountPath: /var/www/public/doc
+          name: doc
+        - mountPath: /var/www/.env
+          name: dotenv
   containers:
     - name: web
       image: ghcr.io/${GITHUB_USER}/docauposte2:${APP_CONTEXT}-latest
@@ -300,8 +300,8 @@ spec:
           readOnly: true
       resources:
         limits:
-          memory: 2000Mi
-          ephemeral-storage: 10000Mi
+          memory: 4000Mi
+          ephemeral-storage: 15000Mi
         requests:
           cpu: 4
   dnsPolicy: Default
@@ -322,10 +322,6 @@ spec:
         path: ${PWD}/.env
         type: File
       name: dotenv
-    - hostPath:
-        path: ${PWD}/fix-permissions-dap.sh
-        type: File
-      name: fix-permissions-dap-script
     - hostPath:
         path: ${PWD}/secrets/ssl/ca-cert.pem
         type: File
