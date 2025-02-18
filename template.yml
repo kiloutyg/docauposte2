@@ -53,7 +53,7 @@ spec:
           name: dap-db-certs
   containers:
     - name: database
-      image: docker.io/library/mariadb:latest
+      image: docker.io/library/mariadb:lts-ubi9
       env:
         - name: MARIADB_ROOT_PASSWORD_FILE
           value: run/secrets/root_password
@@ -165,8 +165,6 @@ metadata:
     traefik.http.routers.docauposte-phpmyadmin.rule: "Host(`${HOSTNAME}.ad.ponet`) && PathPrefix(`/dappma`) || Host(`${DOMAIN_NAME}.corp.ponet`) && PathPrefix(`/dappma`)"
     traefik.http.routers.docauposte-phpmyadmin.entrypoints: websecure
     traefik.http.routers.docauposte-phpmyadmin.tls: true
-    # Remove or comment out the certresolver if using dedicated certificate files
-    # traefik.http.routers.docauposte-phpmyadmin.tls.certresolver: myresolver
     traefik.http.routers.docauposte-phpmyadmin.middlewares: strip-docauposte-phpmyadmin-prefix
     traefik.http.services.docauposte-phpmyadmin.loadbalancer.server.port: 80
     traefik.http.middlewares.strip-docauposte-phpmyadmin-prefix.stripPrefix.prefixes: /dappma
@@ -174,7 +172,7 @@ spec:
   restartPolicy: Always
   containers:
     - name: phpmyadmin
-      image: docker.io/phpmyadmin/phpmyadmin
+      image: docker.io/phpmyadmin/phpmyadmin:5.2.2-apache
       env:
         - name: PMA_HOST
           value: docauposte-database-pod
@@ -238,8 +236,6 @@ metadata:
     traefik.http.routers.docauposte-web.rule: "Host(`${HOSTNAME}.ad.ponet`) && PathPrefix(`/docauposte`) || Host(`${DOMAIN_NAME}.corp.ponet`) && PathPrefix(`/docauposte`)"
     traefik.http.routers.docauposte-web.entrypoints: websecure
     traefik.http.routers.docauposte-web.tls: true
-    # Remove or comment out the certresolver if using dedicated certificate files
-    # traefik.http.routers.docauposte-web.tls.certresolver: myresolver
     traefik.http.routers.docauposte-web.middlewares: strip-docauposte-web-prefix
     traefik.http.services.docauposte-web.loadbalancer.server.port: 80
     traefik.http.middlewares.strip-docauposte-web-prefix.stripPrefix.prefixes: /docauposte
@@ -297,6 +293,9 @@ spec:
           name: doc
         - mountPath: /etc/ssl/my-certs
           name: dap-certs
+          readOnly: true
+        - mountPath: /etc/localtime
+          name: localtime-settings
           readOnly: true
       resources:
         limits:
