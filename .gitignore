@@ -44,12 +44,6 @@ composer-unused.phar
 composer copy.json
 composer copy.lock
 symfony copy.lock
-###> php-cs-fixer/shim ###
-/.php-cs-fixer.php
-/.php-cs-fixer.cache
-###< php-cs-fixer/shim ###
-
-
 .yarn
 .composer
 .cache

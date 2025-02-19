@@ -181,7 +181,7 @@ MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0
 # Format described at https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#connecting-using-a-url
 # IMPORTANT: You MUST configure your server version, either here or in config/packages/doctrine.yaml
 
-DATABASE_URL=mysql://root:\${MYSQL_ROOT_PASSWORD}@docauposte-database-pod/\${MYSQL_DATABASE}?charset=utf8mb4&serverVersion=MariaDB-11.6.2&sslmode=verify_ca&sslrootcert=/etc/ssl/certs/ca-cert.pem
+DATABASE_URL=mysql://root:\${MYSQL_ROOT_PASSWORD}@docauposte-database-pod/\${MYSQL_DATABASE}?charset=utf8mb4&serverVersion=11.4.5-MariaDB
 
 ###< doctrine/doctrine-bundle ###
 

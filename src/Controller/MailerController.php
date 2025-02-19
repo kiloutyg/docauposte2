@@ -134,6 +134,7 @@ class MailerController extends AbstractController
     }
 
 
+
     #[Route('/maildev', name: 'mail_dev')]
     public function devEmailAddress(): Response
     {
@@ -154,7 +155,10 @@ class MailerController extends AbstractController
 
             // Check if the new email already exists in the database
             $existingUser = $this->userRepository->findOneBy(['emailAddress' => $newEmail]);
-            if (($existingUser && $existingUser->getId() !== $user->getId()) || $user->getRoles('ROLE_SUPER_ADMIN')) {
+            if (
+                ($existingUser && $existingUser->getId() !== $user->getId()) ||
+                in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
+            ) {
                 $this->logger->warning("Email $newEmail already exists for another user. Skipping update for user $username.");
                 continue; // Skip this user to avoid duplication
             }

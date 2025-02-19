@@ -2,6 +2,9 @@
 
 # Install the app dependencies 
 composer install;
+
+composer dump-env dev
+
 yarn install;
 composer clear-cache;
 
@@ -15,7 +18,7 @@ php bin/console cache:warmup --env=dev;
 chmod 755 . -R;
 
 # Set the permissions
-chown -R www-data:www-data /var/www/var/cache/dev/pools;
+chown -R www-data:www-data /var/www/var/;
 
 # Create the migrations directory
 # mkdir -p migrations;
