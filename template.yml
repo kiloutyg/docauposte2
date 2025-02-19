@@ -53,7 +53,7 @@ spec:
           name: dap-db-certs
   containers:
     - name: database
-      image: docker.io/library/mariadb:lts-ubi9
+      image: docker.io/library/mariadb:lts-noble
       env:
         - name: MARIADB_ROOT_PASSWORD_FILE
           value: run/secrets/root_password
