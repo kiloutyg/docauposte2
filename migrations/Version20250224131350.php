@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250219091511 extends AbstractMigration
+final class Version20250224131350 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -29,9 +29,9 @@ final class Version20250219091511 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE trainer DROP demoted');
+        $this->addSql('ALTER TABLE settings ADD auto_display_incident TINYINT(1) DEFAULT NULL, ADD auto_display_incident_timer VARCHAR(255) DEFAULT NULL COMMENT \'(DC2Type:dateinterval)\', ADD auto_delete_operator_delay VARCHAR(255) DEFAULT NULL COMMENT \'(DC2Type:dateinterval)\', DROP incident_auto_display, DROP incident_auto_display_timer, DROP operator_inactivity_delay, DROP operator_auto_delete_delay, CHANGE upload_validation upload_validation TINYINT(1) DEFAULT NULL, CHANGE validator_number validator_number INT DEFAULT NULL, CHANGE operator_retraining_delay operator_retraining_delay VARCHAR(255) DEFAULT NULL COMMENT \'(DC2Type:dateinterval)\'');
         $this->addSql('ALTER TABLE user CHANGE roles roles JSON NOT NULL COMMENT \'(DC2Type:json)\'');
         $this->addSql('ALTER TABLE operator DROP inactive_since');
-        $this->addSql('ALTER TABLE settings ADD auto_display_incident TINYINT(1) DEFAULT NULL, ADD auto_display_incident_timer VARCHAR(255) DEFAULT NULL COMMENT \'(DC2Type:dateinterval)\', ADD auto_delete_operator_delay VARCHAR(255) DEFAULT NULL COMMENT \'(DC2Type:dateinterval)\', DROP incident_auto_display, DROP incident_auto_display_timer, DROP operator_inactivity_delay, DROP operator_auto_delete_delay, CHANGE upload_validation upload_validation TINYINT(1) DEFAULT NULL, CHANGE validator_number validator_number INT DEFAULT NULL, CHANGE operator_retraining_delay operator_retraining_delay VARCHAR(255) DEFAULT NULL COMMENT \'(DC2Type:dateinterval)\'');
+        $this->addSql('ALTER TABLE trainer DROP demoted');
     }
 }
