@@ -17,7 +17,7 @@
 				data-operator-admin-search-target="operatorAdminSearchNameInput"
 				data-action="keyup->operator-admin-search#submitSearchForm"
 				class="form-control shadow col"
-				type="text"
+				type="search"
 				name="search_name"
 				id="search_name"
 				placeholder="Recherche par nom">
@@ -26,7 +26,7 @@
 				data-operator-admin-search-target="operatorAdminSearchCodeInput"
 				data-action="keyup->operator-admin-search#submitSearchForm"
 				class="form-control shadow col"
-				type="text"
+				type="search"
 				pattern="\d{1,5}"
 				maxlength="5"
 				name="search_code"
@@ -37,19 +37,36 @@
 				data-operator-admin-search-target="operatorAdminSearchTeamInput"
 				data-action="keyup->operator-admin-search#submitSearchForm"
 				class="form-control shadow col"
-				type="text"
+				type="search"
 				name="search_team"
 				id="search_team"
-				placeholder="Recherche par Equipe">
+				placeholder="Recherche par Equipe"
+				list="team-list">
+			<datalist
+				id="team-list">
+				{% for team in teams %}
+					<option
+						value="{{ team.name }}"></option>
+				{% endfor %}
+			</datalist>
+
 
 			<input
 				data-operator-admin-search-target="operatorAdminSearchUapInput"
 				data-action="keyup->operator-admin-search#submitSearchForm"
 				class="form-control shadow col"
-				type="text"
+				type="search"
 				name="search_uap"
 				id="search_uap"
-				placeholder="Recherche par UAP">
+				placeholder="Recherche par UAP"
+				list="uap-list">
+			<datalist
+				id="uap-list">
+				{% for uap in uaps %}
+					<option
+						value="{{ uap.name }}"></option>
+				{% endfor %}
+			</datalist>
 
 			<select
 				data-operator-admin-search-target="operatorAdminSearchIsTrainerInput"

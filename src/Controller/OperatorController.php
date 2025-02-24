@@ -205,8 +205,10 @@ class OperatorController extends AbstractController
         // $this->logger->info('message in flashbag', $flashes);
 
         return $this->render('services/operators/operators_admin.html.twig', [
-            'newOperatorForm' => $newOperatorForm->createView(),
-            'operatorForms' => $operatorForms,
+            'newOperatorForm'   => $newOperatorForm->createView(),
+            'operatorForms'     => $operatorForms,
+            'teams'             => $this->entityFetchingService->getTeams(),
+            'uaps'              => $this->entityFetchingService->getUaps(),
         ]);
     }
 
