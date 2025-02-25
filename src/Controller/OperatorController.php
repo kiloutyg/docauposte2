@@ -449,7 +449,7 @@ class OperatorController extends AbstractController
 
         if ($existingOperator != null) {
             // $this->logger->info('existingOperator', [$existingOperator->getName()]);
-            if ($existingOperator->getTeam() == $team && $existingOperator->getUap() == $uap) {
+            if ($existingOperator->getTeam() == $team && $existingOperator->getUaps()->contains($uap)) {
                 $this->addFlash('danger', 'Cet opérateur existe déjà dans cette equipe et uap');
                 return $this->redirectToRoute('app_training_list', [
                     'uploadId' => $uploadId,
@@ -458,7 +458,7 @@ class OperatorController extends AbstractController
                 ]);
             } else {
                 $existingOperator->setTeam($team);
-                $existingOperator->setUap($uap);
+                $existingOperator->addUap($uap);
                 $this->em->persist($existingOperator);
                 $this->em->flush();
                 $this->addFlash('success', 'L\'opérateur a bien été ajouté et son equipe et son UAP ont été modifiées');
@@ -473,7 +473,7 @@ class OperatorController extends AbstractController
         $operator = new Operator();
         $operator->setName($operatorName);
         $operator->setTeam($team);
-        $operator->setUap($uap);
+        $operator->addUap($uap);
         $operator->setCode($operatorCode);
 
         $errors = $validator->validate($operator);
@@ -539,7 +539,9 @@ class OperatorController extends AbstractController
     {
         $upload = $this->uploadRepository->find($uploadId);
 
-        $selectedOperators = $this->operatorRepository->findBy(['team' => $teamId, 'uap' => $uapId], ['team' => 'ASC', 'uap' => 'ASC']);
+        // $selectedOperators = $this->operatorRepository->findBy(['team' => $teamId, 'uap' => $uapId], ['team' => 'ASC', 'uap' => 'ASC']);
+        $selectedOperators = $this->operatorRepository->findByTeamAndUap($teamId, $uapId);
+
 
         usort($selectedOperators, function ($a, $b) {
             list($firstNameA, $surnameA) = explode('.', $a->getName());
@@ -810,7 +812,7 @@ class OperatorController extends AbstractController
                         'name' => $operator->getName(),
                         'code' => $operator->getCode(),
                         'team' => $operator->getTeam()->getName(),
-                        'uap' => $operator->getUap()->getName(),
+                        'uap' => $operator->getUaps()->first()->getName(),
                     ]
                 ]);
             }
@@ -1065,7 +1067,7 @@ class OperatorController extends AbstractController
                 $operator->setCode($code);
                 $operator->setName($name);
                 $operator->setTeam($team);
-                $operator->setUap($uap);
+                $operator->addUap($uap);
 
                 // Validate the operator
                 $errors = $validator->validate($operator);

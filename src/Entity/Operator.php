@@ -36,10 +36,6 @@ class Operator
     #[Groups(['operator_details'])]
     private ?Team $team = null;
 
-    #[ORM\ManyToOne(inversedBy: 'operators')]
-    #[Groups(['operator_details'])]
-    private ?Uap $uap = null;
-
     #[ORM\OneToMany(mappedBy: 'operator', targetEntity: TrainingRecord::class)]
     private Collection $trainingRecords;
 
@@ -69,7 +65,7 @@ class Operator
     /**
      * @var Collection<int, Uap>
      */
-    #[ORM\ManyToMany(targetEntity: Uap::class, mappedBy: 'Ope')]
+    #[ORM\ManyToMany(targetEntity: Uap::class, mappedBy: 'operators')]
     private Collection $uaps;
 
 
@@ -136,17 +132,6 @@ class Operator
         return $this;
     }
 
-    public function getUap(): ?Uap
-    {
-        return $this->uap;
-    }
-
-    public function setUap(?Uap $uap): static
-    {
-        $this->uap = $uap;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, TrainingRecord>
@@ -272,7 +257,7 @@ class Operator
     {
         if (!$this->uaps->contains($uap)) {
             $this->uaps->add($uap);
-            $uap->addOpe($this);
+            $uap->addOperators($this);
         }
 
         return $this;
@@ -281,7 +266,7 @@ class Operator
     public function removeUap(Uap $uap): static
     {
         if ($this->uaps->removeElement($uap)) {
-            $uap->removeOpe($this);
+            $uap->removeOperators($this);
         }
 
         return $this;

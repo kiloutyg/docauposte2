@@ -24,19 +24,16 @@ class Uap
     #[Groups(['operator_details'])]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'uap', targetEntity: Operator::class)]
-    private Collection $operators;
-
     /**
      * @var Collection<int, Operator>
      */
     #[ORM\ManyToMany(targetEntity: Operator::class, inversedBy: 'uaps')]
-    private Collection $Ope;
+    private Collection $operators;
 
     public function __construct()
     {
+        // $this->operators = new ArrayCollection();
         $this->operators = new ArrayCollection();
-        $this->Ope = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -56,56 +53,28 @@ class Uap
         return $this;
     }
 
+
+
     /**
      * @return Collection<int, Operator>
      */
-    public function getOperator(): Collection
+    public function getOperators(): Collection
     {
         return $this->operators;
     }
 
-    public function addOperator(Operator $operator): static
+    public function addOperators(Operator $operators): static
     {
-        if (!$this->operators->contains($operator)) {
-            $this->operators->add($operator);
-            $operator->setUap($this);
+        if (!$this->operators->contains($operators)) {
+            $this->operators->add($operators);
         }
 
         return $this;
     }
 
-    public function removeOperator(Operator $operator): static
+    public function removeOperators(Operator $operators): static
     {
-        if ($this->operators->removeElement($operator)) {
-            // set the owning side to null (unless already changed)
-            if ($operator->getUap() === $this) {
-                $operator->setUap(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Operator>
-     */
-    public function getOpe(): Collection
-    {
-        return $this->Ope;
-    }
-
-    public function addOpe(Operator $ope): static
-    {
-        if (!$this->Ope->contains($ope)) {
-            $this->Ope->add($ope);
-        }
-
-        return $this;
-    }
-
-    public function removeOpe(Operator $ope): static
-    {
-        $this->Ope->removeElement($ope);
+        $this->operators->removeElement($operators);
 
         return $this;
     }

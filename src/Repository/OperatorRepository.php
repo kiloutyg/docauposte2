@@ -54,10 +54,14 @@ class OperatorRepository extends ServiceEntityRepository
             if ($a->getTeam()->getId() != $b->getTeam()->getId()) {
                 return strcmp($a->getTeam()->getName(), $b->getTeam()->getName());
             }
-            // If 'team' is the same, move on to compare by 'uap'
-            if ($a->getUap()->getId() != $b->getUap()->getId()) {
-                return strcmp($a->getUap()->getName(), $b->getUap()->getName());
+            // Compare by first UAP (assuming we want to sort by the first UAP in the collection)
+            $uapsA = $a->getUaps()->first();
+            $uapsB = $b->getUaps()->first();
+
+            if ($uapsA && $uapsB && $uapsA->getId() != $uapsB->getId()) {
+                return strcmp($uapsA->getName(), $uapsB->getName());
             }
+            return 0;
         });
 
         return $operators;
@@ -73,7 +77,7 @@ class OperatorRepository extends ServiceEntityRepository
         // Fetch all operators with their team and UAP
         $operators = $this->createQueryBuilder('o')
             ->join('o.team', 't')
-            ->join('o.uap', 'u')
+            ->leftJoin('o.uaps', 'u')
             ->select('o, t, u')
             ->getQuery()
             ->getResult();
@@ -95,7 +99,9 @@ class OperatorRepository extends ServiceEntityRepository
                 return $teamComparison;
             }
             // If team name is the same, compare by UAP name
-            if ($a->getUap() !== null && $b->getUap() !== null && $uapComparison = strcmp($a->getUap()->getName(), $b->getUap()->getName())) {
+            $uapsA = $a->getUaps()->first();
+            $uapsB = $b->getUaps()->first();
+            if ($uapsA && $uapsB && $uapComparison = strcmp($uapsA->getName(), $uapsB->getName())) {
                 return $uapComparison;
             }
             // If UAP name is the same, compare by last name
@@ -120,7 +126,7 @@ class OperatorRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.team', 't')
-            ->leftJoin('o.uap', 'u');
+            ->leftJoin('o.uaps', 'u');
 
         if (!empty($name)) {
             $qb->andWhere('LOWER(o.name) LIKE :name')
@@ -197,8 +203,10 @@ class OperatorRepository extends ServiceEntityRepository
             if ($a->getTeam() !== null && $b->getTeam() !== null && $teamComparison = strcmp($a->getTeam()->getName(), $b->getTeam()->getName())) {
                 return $teamComparison;
             }
-            // If team name is the same, compare by UAP name
-            if ($a->getUap() !== null && $b->getUap() !== null && $uapComparison = strcmp($a->getUap()->getName(), $b->getUap()->getName())) {
+            // If team name is the same, Compare UAPs (using first UAP for sorting)
+            $uapsA = $a->getUaps()->first();
+            $uapsB = $b->getUaps()->first();
+            if ($uapsA && $uapsB && $uapComparison = strcmp($uapsA->getName(), $uapsB->getName())) {
                 return $uapComparison;
             }
             // If UAP name is the same, compare by last name
@@ -342,8 +350,35 @@ class OperatorRepository extends ServiceEntityRepository
     }
 
 
+    public function findByTeamAndUap(int $teamId, int $uapId): array
+    {
+        return $this->createQueryBuilder('o')
+            ->join('o.team', 't')
+            ->leftJoin('o.uaps', 'u')
+            ->where('t.id = :teamId')
+            ->andWhere('u.id = :uapId')
+            ->setParameter('teamId', $teamId)
+            ->setParameter('uapId', $uapId)
+            ->orderBy('t.name', 'ASC')
+            ->addOrderBy('u.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
-
+    public function findByCodeAndTeamAndUap(string $codeOpe, int $teamId, int $uapId): ?Operator
+    {
+        return $this->createQueryBuilder('o')
+            ->join('o.team', 't')
+            ->leftJoin('o.uaps', 'u')
+            ->where('o.code = :codeOpe')
+            ->andWhere('t.id = :teamId')
+            ->andWhere('u.id = :uapId')
+            ->setParameter('codeOpe', $codeOpe)
+            ->setParameter('teamId', $teamId)
+            ->setParameter('uapId', $uapId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
     // public function findBySearchQuery($search)
     // {
