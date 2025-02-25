@@ -246,7 +246,6 @@ class OperatorController extends AbstractController
     #[Route('/operator/edit/{id}', name: 'app_operator_edit')]
     public function editOperatorAction(Request $request, Operator $operator): Response
     {
-        $this->logger->info('Full request editOperatorAction', $request->request->all());
 
         $form = $this->createForm(OperatorType::class, $operator, [
             'operator_id' => $operator->getId(),
@@ -256,9 +255,10 @@ class OperatorController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $trainerBool = $form->get('isTrainer')->getData();
-            $this->logger->info('isTrainer form key value', [$trainerBool]);
+            $uaps = $form->get('uaps')->getData();
 
             if ($trainerBool == true) {
+
                 if ($operator->getTrainer() == null) {
                     $trainer = new Trainer();
                     $trainer->setOperator($operator);
@@ -271,13 +271,16 @@ class OperatorController extends AbstractController
                 $this->em->persist($trainer);
             } else {
                 $trainer = $operator->getTrainer();
-                if ($trainer != null && $trainer->getTrainingRecords() != null) {
-                    $trainer->setDemoted(true);
-                } else {
-                    $operator->setIsTrainer(false);
-                    $this->em->remove($trainer);
+                if ($trainer != null) {
+                    if (!$trainer->getTrainingRecords()->isEmpty()) {
+                        $trainer->setDemoted(true);
+                        $this->em->persist($trainer);
+                    } else {
+                        $operator->setIsTrainer(false);
+                        $this->em->remove($trainer);
+                        $this->em->flush();
+                    }
                 }
-                $this->em->persist($trainer);
             }
             if ($operator->getTobedeleted() != null) {
                 $operator->setTobedeleted(null);
@@ -285,6 +288,17 @@ class OperatorController extends AbstractController
                 $operator->setInactiveSince(null);
                 $operator->setTobedeleted(null);
             }
+
+            $this->logger->info('uaps', [$uaps->getValues()]);
+            $this->logger->info('count of uaps', [count($uaps->getValues())]);
+            if (count($uaps->getValues()) > 1) {
+                $operator->getUaps()->clear();
+                foreach ($uaps as $uap) {
+                    $this->logger->info('uap', [$uap]);
+                    $operator->addUap($uap);
+                }
+            }
+
             try {
                 $this->em->persist($operator);
                 $this->em->flush();

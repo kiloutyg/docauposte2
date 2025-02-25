@@ -46,7 +46,7 @@ class Operator
     #[Groups(['operator_details'])]
     private ?string $code = null;
 
-    #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'operator', cascade: ['remove'])]
     private ?Trainer $trainer = null;
 
     #[ORM\Column(nullable: true)]

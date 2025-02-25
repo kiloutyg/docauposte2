@@ -15,7 +15,7 @@ class Trainer
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'trainer', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'trainer')]
     private ?Operator $operator = null;
 
     #[ORM\OneToMany(mappedBy: 'trainer', targetEntity: TrainingRecord::class)]

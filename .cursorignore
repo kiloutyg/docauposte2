@@ -7,9 +7,7 @@
 /var/
 /secrets/
 /public/
-/.github/
 /.gitignore
-/.git/
 /.vscode/
 /.env
 /.env.local

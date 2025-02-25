@@ -129,7 +129,7 @@ class OperatorType extends AbstractType
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
                     'required' => true,
-                    'size' => '1',
+                    'size' => '2',
                     'data-bs-toggle' => 'tooltip',  // Bootstrap tooltip
                     'title' => 'Maintenez Ctrl pour sélectionner plusieurs UAP',
                 ],
