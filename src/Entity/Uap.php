@@ -27,9 +27,16 @@ class Uap
     #[ORM\OneToMany(mappedBy: 'uap', targetEntity: Operator::class)]
     private Collection $operators;
 
+    /**
+     * @var Collection<int, Operator>
+     */
+    #[ORM\ManyToMany(targetEntity: Operator::class, inversedBy: 'uaps')]
+    private Collection $Ope;
+
     public function __construct()
     {
         $this->operators = new ArrayCollection();
+        $this->Ope = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -75,6 +82,30 @@ class Uap
                 $operator->setUap(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Operator>
+     */
+    public function getOpe(): Collection
+    {
+        return $this->Ope;
+    }
+
+    public function addOpe(Operator $ope): static
+    {
+        if (!$this->Ope->contains($ope)) {
+            $this->Ope->add($ope);
+        }
+
+        return $this;
+    }
+
+    public function removeOpe(Operator $ope): static
+    {
+        $this->Ope->removeElement($ope);
 
         return $this;
     }

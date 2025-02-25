@@ -66,10 +66,17 @@ class Operator
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $inactiveSince = null;
 
+    /**
+     * @var Collection<int, Uap>
+     */
+    #[ORM\ManyToMany(targetEntity: Uap::class, mappedBy: 'Ope')]
+    private Collection $uaps;
+
 
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
+        $this->uaps = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -249,6 +256,33 @@ class Operator
     public function setInactiveSince(?\DateTimeInterface $inactiveSince): static
     {
         $this->inactiveSince = $inactiveSince;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Uap>
+     */
+    public function getUaps(): Collection
+    {
+        return $this->uaps;
+    }
+
+    public function addUap(Uap $uap): static
+    {
+        if (!$this->uaps->contains($uap)) {
+            $this->uaps->add($uap);
+            $uap->addOpe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUap(Uap $uap): static
+    {
+        if ($this->uaps->removeElement($uap)) {
+            $uap->removeOpe($this);
+        }
 
         return $this;
     }
