@@ -3,56 +3,55 @@
 namespace App\Service;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\Form;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-
-// use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Contracts\Cache\CacheInterface;
 
-// use App\Repository\UapRepository;
-// use App\Repository\TeamRepository;
 use App\Repository\OperatorRepository;
+use App\Repository\UapRepository;
 
 use App\Service\EntityDeletionService;
 
+use App\Entity\Operator;
+use App\Entity\Trainer;
+
 class OperatorService extends AbstractController
 {
-    // private   $logger;
+    private   $logger;
     private   $projectDir;
     private   $em;
     private   $cache;
 
     private   $operatorRepository;
-    // private   $uapRepository;
-    // private   $teamRepository;
+    private   $uapRepository;
 
     private     $entityDeletionService;
 
     public function __construct(
-        // LoggerInterface         $logger,
+        LoggerInterface         $logger,
         ParameterBagInterface   $params,
         EntityManagerInterface  $em,
         CacheInterface          $cache,
 
-
         OperatorRepository      $operatorRepository,
-        // UapRepository           $uapRepository,
-        // TeamRepository          $teamRepository,
+        UapRepository           $uapRepository,
 
         EntityDeletionService   $entityDeletionService
 
     ) {
-        // $this->logger                   = $logger;
+        $this->logger                   = $logger;
         $this->projectDir               = $params->get('kernel.project_dir');
         $this->em                       = $em;
         $this->cache                    = $cache;
 
         $this->operatorRepository       = $operatorRepository;
-        // $this->uapRepository            = $uapRepository;
-        // $this->teamRepository           = $teamRepository;
+        $this->uapRepository            = $uapRepository;
 
         $this->entityDeletionService    = $entityDeletionService;
     }
@@ -118,5 +117,67 @@ class OperatorService extends AbstractController
             ];
             return $countArray;
         }
+    }
+
+
+    public function editOperatorService(Form $form, Request $request, Operator $operator)
+    {
+
+        $trainerBool = $form->get('isTrainer')->getData();
+        $newUapsArray = $form->get('uaps')->getData()->toArray();
+
+
+        if ($trainerBool == true) {
+            if ($operator->getTrainer() == null) {
+                $trainer = new Trainer();
+                $trainer->setOperator($operator);
+                $trainer->setDemoted(false);
+                $operator->setTrainer($trainer);
+            } else {
+                $trainer = $operator->getTrainer();
+                $trainer->setDemoted(false);
+            }
+            $this->em->persist($trainer);
+        } else {
+
+            $trainer = $operator->getTrainer();
+            if ($trainer != null) {
+                if (!$trainer->getTrainingRecords()->isEmpty()) {
+                    $trainer->setDemoted(true);
+                    $this->em->persist($trainer);
+                } else {
+                    $operator->setIsTrainer(false);
+                    $this->em->remove($trainer);
+                }
+            }
+        }
+
+        if ($operator->getTobedeleted() != null) {
+            $operator->setTobedeleted(null);
+            $operator->setLasttraining(new \DateTime());
+            $operator->setInactiveSince(null);
+            $operator->setTobedeleted(null);
+        }
+
+        if (!empty($newUapsArray)) {
+
+            $allUaps = $this->uapRepository->findAll();
+            foreach ($allUaps as $uap) {
+                $uap->removeOperator($operator);
+            }
+
+            foreach ($newUapsArray as $newUap) {
+                $newUap->addOperator($operator);
+                $this->em->persist($newUap);
+            }
+        }
+
+        try {
+            $this->em->flush();
+        } catch (\Exception $e) {
+            throw $e;
+        }
+
+        return true;
     }
 }

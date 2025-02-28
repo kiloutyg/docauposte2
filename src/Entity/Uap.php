@@ -32,7 +32,6 @@ class Uap
 
     public function __construct()
     {
-        // $this->operators = new ArrayCollection();
         $this->operators = new ArrayCollection();
     }
 
@@ -63,18 +62,18 @@ class Uap
         return $this->operators;
     }
 
-    public function addOperators(Operator $operators): static
+    public function addOperator(Operator $operator): static
     {
-        if (!$this->operators->contains($operators)) {
-            $this->operators->add($operators);
+        if (!$this->operators->contains($operator)) {
+            $this->operators->add($operator);
         }
 
         return $this;
     }
 
-    public function removeOperators(Operator $operators): static
+    public function removeOperator(Operator $operator): static
     {
-        $this->operators->removeElement($operators);
+        $this->operators->removeElement($operator);
 
         return $this;
     }

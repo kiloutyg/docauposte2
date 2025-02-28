@@ -176,6 +176,7 @@ class OperatorRepository extends ServiceEntityRepository
         }
 
         $result = $this->orderOperator($qb->getQuery()->getResult());
+        $this->logger->info('results from search query', $result);
         return $result;
     }
 
@@ -205,7 +206,9 @@ class OperatorRepository extends ServiceEntityRepository
             }
             // If team name is the same, Compare UAPs (using first UAP for sorting)
             $uapsA = $a->getUaps()->first();
+
             $uapsB = $b->getUaps()->first();
+
             if ($uapsA && $uapsB && $uapComparison = strcmp($uapsA->getName(), $uapsB->getName())) {
                 return $uapComparison;
             }

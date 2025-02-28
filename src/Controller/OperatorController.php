@@ -47,6 +47,7 @@ use App\Service\EntityDeletionService;
 use App\Service\EntityFetchingService;
 use App\Service\TrainingRecordService;
 use App\Service\PdfGeneratorService;
+use App\Service\OperatorService;
 
 
 class OperatorController extends AbstractController
@@ -73,6 +74,7 @@ class OperatorController extends AbstractController
     private $trainingRecordService;
     private $pdfGeneratorService;
     private $entityFetchingService;
+    private $operatorService;
 
 
 
@@ -99,6 +101,7 @@ class OperatorController extends AbstractController
         TrainingRecordService           $trainingRecordService,
         PdfGeneratorService             $pdfGeneratorService,
         EntityFetchingService           $entityFetchingService,
+        OperatorService                 $operatorService,
 
     ) {
         // $this->cache                        = $cache;
@@ -124,6 +127,7 @@ class OperatorController extends AbstractController
         $this->trainingRecordService        = $trainingRecordService;
         $this->pdfGeneratorService          = $pdfGeneratorService;
         $this->entityFetchingService        = $entityFetchingService;
+        $this->operatorService              = $operatorService;
     }
 
     private function operatorEntitySearch(Request $request): array
@@ -185,8 +189,12 @@ class OperatorController extends AbstractController
         }
 
         $operatorForms = [];
+        $this->logger->info('operators', [$operators]);
+
         // Create and handle forms
         foreach ($operators as $operator) {
+            $this->logger->info('operator', [$operator->getUaps()->getValues()]);
+
             $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
                 'operator_id' => $operator->getId(),
             ])->createView();
@@ -247,111 +255,69 @@ class OperatorController extends AbstractController
     public function editOperatorAction(Request $request, Operator $operator): Response
     {
 
+        if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
+            $operators = $this->operatorEntitySearch($request);
+            $operatorForms = [];
+            $this->logger->info('operators', [$operators]);
+
+            // Create and handle forms
+            foreach ($operators as $operator) {
+                $this->logger->info('operator', [$operator]);
+
+                $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
+                    'operator_id' => $operator->getId(),
+                ])->createView();
+            }
+            $this->logger->info('operatorsForm', [$operatorForms]);
+        }
+
         $form = $this->createForm(OperatorType::class, $operator, [
             'operator_id' => $operator->getId(),
         ]);
 
+        $this->logger->info('operator after form creation', [$operator]);
+        $this->logger->info('operator uaps after form creation', [$operator->getUaps()->getValues()]);
+
+        $error = false;
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-            $trainerBool = $form->get('isTrainer')->getData();
-            $uaps = $form->get('uaps')->getData();
-
-            if ($trainerBool == true) {
-
-                if ($operator->getTrainer() == null) {
-                    $trainer = new Trainer();
-                    $trainer->setOperator($operator);
-                    $trainer->setDemoted(false);
-                    $operator->setTrainer($trainer);
-                } else {
-                    $trainer = $operator->getTrainer();
-                    $trainer->setDemoted(false);
-                }
-                $this->em->persist($trainer);
-            } else {
-                $trainer = $operator->getTrainer();
-                if ($trainer != null) {
-                    if (!$trainer->getTrainingRecords()->isEmpty()) {
-                        $trainer->setDemoted(true);
-                        $this->em->persist($trainer);
-                    } else {
-                        $operator->setIsTrainer(false);
-                        $this->em->remove($trainer);
-                        $this->em->flush();
-                    }
-                }
-            }
-            if ($operator->getTobedeleted() != null) {
-                $operator->setTobedeleted(null);
-                $operator->setLasttraining(new \DateTime());
-                $operator->setInactiveSince(null);
-                $operator->setTobedeleted(null);
-            }
-
-            $this->logger->info('uaps', [$uaps->getValues()]);
-            $this->logger->info('count of uaps', [count($uaps->getValues())]);
-            if (count($uaps->getValues()) > 1) {
-                $operator->getUaps()->clear();
-                foreach ($uaps as $uap) {
-                    $this->logger->info('uap', [$uap]);
-                    $operator->addUap($uap);
-                }
-            }
-
             try {
-                $this->em->persist($operator);
-                $this->em->flush();
-                $this->cache->delete('operators_list');
-
-                // $this->logger->info('editOperatorAction, operateur bien modifié', [$operator]);
+                $this->operatorService->editOperatorService($form, $request, $operator);
                 $this->addFlash('success', 'L\'opérateur a bien été modifié');
-
-                if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
-                    $operators = $this->operatorEntitySearch($request);
-                } else {
-                    $operators = [];
-                }
-                $operatorForms = [];
-                // Create and handle forms
-                foreach ($operators as $operator) {
-                    $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
-                        'operator_id' => $operator->getId(),
-                    ])->createView();
-                }
-
-                // Return the updated frame content
-                return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
-                    'operatorForms' => $operatorForms,
-                ]);
             } catch (\Exception $e) {
                 $this->addFlash('danger', 'L\'opérateur n\'a pas pu être modifié. Erreur: ' . $e->getMessage());
                 $this->logger->error('Error while editing operator in try catch', [$e->getMessage()]);
-
-                // Render the form again with error message
-                return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
-                    'operatorForms' => [$operator->getId() => $form->createView()],
-                ]);
+                $error = true;
             }
+        } else {
+            $this->logger->error('Error in submitting form while editing operator');
+            $error = true;
         }
 
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            $this->logger->error('Error in submitting form while editing operator');
-            $this->addFlash('danger', 'Erreur lors de la soumission du formulaire');
-            return $this->redirectToRoute('app_operator');
+        $this->logger->info('operator', [$operator]);
 
-            // Render the form again with error message
+        if ($error) {
+            $this->logger->info('error true');
             return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
                 'operatorForms' => [$operator->getId() => $form->createView()],
             ]);
-        }
+        } else if (isset($operatorForms)) {
+            $this->logger->info('operatorsForms isset');
+            return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
+                'operatorForms' => $operatorForms,
+            ]);
+        } else {
+            $this->logger->info('there is only operator', [[$operator], [$operator->getUaps()->getValues()]]);
+            return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
+                'form' => $form->createView(),
+                'operator' => $operator,
+                'operatorForms' => $operatorForms = [],
 
-        // $this->logger->info('editOperatorAction reach return to template"');
-        return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
-            'form' => $form->createView(),
-            'operator' => $operator
-        ]);
+            ]);
+        }
     }
+
+
 
 
 

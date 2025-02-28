@@ -257,7 +257,7 @@ class Operator
     {
         if (!$this->uaps->contains($uap)) {
             $this->uaps->add($uap);
-            $uap->addOperators($this);
+            $uap->addOperator($this);
         }
 
         return $this;
@@ -266,7 +266,7 @@ class Operator
     public function removeUap(Uap $uap): static
     {
         if ($this->uaps->removeElement($uap)) {
-            $uap->removeOperators($this);
+            $uap->removeOperator($this);
         }
 
         return $this;
