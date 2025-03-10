@@ -519,7 +519,6 @@ class OperatorController extends AbstractController
     {
         $upload = $this->uploadRepository->find($uploadId);
 
-        // $selectedOperators = $this->operatorRepository->findBy(['team' => $teamId, 'uap' => $uapId], ['team' => 'ASC', 'uap' => 'ASC']);
         $selectedOperators = $this->operatorRepository->findByTeamAndUap($teamId, $uapId);
 
 
