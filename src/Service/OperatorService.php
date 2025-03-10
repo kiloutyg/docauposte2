@@ -120,57 +120,11 @@ class OperatorService extends AbstractController
     }
 
 
-    public function editOperatorService(Form $form, Request $request, Operator $operator)
+    public function editOperatorService(Form $form, Operator $operator)
     {
-
-        $trainerBool = $form->get('isTrainer')->getData();
-        $newUapsArray = $form->get('uaps')->getData()->toArray();
-
-
-        if ($trainerBool == true) {
-            if ($operator->getTrainer() == null) {
-                $trainer = new Trainer();
-                $trainer->setOperator($operator);
-                $trainer->setDemoted(false);
-                $operator->setTrainer($trainer);
-            } else {
-                $trainer = $operator->getTrainer();
-                $trainer->setDemoted(false);
-            }
-            $this->em->persist($trainer);
-        } else {
-
-            $trainer = $operator->getTrainer();
-            if ($trainer != null) {
-                if (!$trainer->getTrainingRecords()->isEmpty()) {
-                    $trainer->setDemoted(true);
-                    $this->em->persist($trainer);
-                } else {
-                    $operator->setIsTrainer(false);
-                    $this->em->remove($trainer);
-                }
-            }
-        }
-
-        if ($operator->getTobedeleted() != null) {
-            $operator->setTobedeleted(null);
-            $operator->setLasttraining(new \DateTime());
-            $operator->setInactiveSince(null);
-            $operator->setTobedeleted(null);
-        }
-
-        if (!empty($newUapsArray)) {
-
-            $allUaps = $this->uapRepository->findAll();
-            foreach ($allUaps as $uap) {
-                $uap->removeOperator($operator);
-            }
-
-            foreach ($newUapsArray as $newUap) {
-                $newUap->addOperator($operator);
-                $this->em->persist($newUap);
-            }
-        }
+        $this->handleTrainerStatus($form->get('isTrainer')->getData(), $operator);
+        $this->reactivateOperatorIfNeeded($operator);
+        $this->updateOperatorUaps($form->get('uaps')->getData()->toArray(), $operator);
 
         try {
             $this->em->flush();
@@ -179,5 +133,88 @@ class OperatorService extends AbstractController
         }
 
         return true;
+    }
+
+    /**
+     * Handle trainer status updates for an operator
+     */
+    private function handleTrainerStatus(bool $isTrainer, Operator $operator): void
+    {
+        $trainer = $operator->getTrainer();
+
+        if ($isTrainer) {
+            $this->promoteToTrainer($operator, $trainer);
+        } else {
+            $this->demoteFromTrainer($operator, $trainer);
+        }
+    }
+
+    /**
+     * Promote an operator to trainer status
+     */
+    private function promoteToTrainer(Operator $operator, ?Trainer $trainer): void
+    {
+        if ($trainer === null) {
+            $trainer = new Trainer();
+            $trainer->setOperator($operator);
+            $operator->setTrainer($trainer);
+        }
+
+        $trainer->setDemoted(false);
+        $this->em->persist($trainer);
+    }
+
+    /**
+     * Demote an operator from trainer status
+     */
+    private function demoteFromTrainer(Operator $operator, ?Trainer $trainer): void
+    {
+        if ($trainer === null) {
+            return;
+        }
+
+        if (!$trainer->getTrainingRecords()->isEmpty()) {
+            $trainer->setDemoted(true);
+            $this->em->persist($trainer);
+        } else {
+            $operator->setIsTrainer(false);
+            $this->em->remove($trainer);
+        }
+    }
+
+    /**
+     * Reactivate an operator if they were marked for deletion
+     */
+    private function reactivateOperatorIfNeeded(Operator $operator): void
+    {
+        if ($operator->getTobedeleted() === null) {
+            return;
+        }
+
+        $operator->setTobedeleted(null);
+        $operator->setLasttraining(new \DateTime());
+        $operator->setInactiveSince(null);
+    }
+
+    /**
+     * Update the UAPs associated with an operator
+     */
+    private function updateOperatorUaps(array $newUapsArray, Operator $operator): void
+    {
+        if (empty($newUapsArray)) {
+            return;
+        }
+
+        // Remove operator from all UAPs
+        $allUaps = $this->uapRepository->findAll();
+        foreach ($allUaps as $uap) {
+            $uap->removeOperator($operator);
+        }
+
+        // Add operator to selected UAPs
+        foreach ($newUapsArray as $newUap) {
+            $newUap->addOperator($operator);
+            $this->em->persist($newUap);
+        }
     }
 }

@@ -282,7 +282,7 @@ class OperatorController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $this->operatorService->editOperatorService($form, $request, $operator);
+                $this->operatorService->editOperatorService($form, $operator);
                 $this->addFlash('success', 'L\'opérateur a bien été modifié');
             } catch (\Exception $e) {
                 $this->addFlash('danger', 'L\'opérateur n\'a pas pu être modifié. Erreur: ' . $e->getMessage());
