@@ -126,11 +126,7 @@ class OperatorService extends AbstractController
         $this->reactivateOperatorIfNeeded($operator);
         $this->updateOperatorUaps($form->get('uaps')->getData()->toArray(), $operator);
 
-        try {
-            $this->em->flush();
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        $this->em->flush();
 
         return true;
     }
