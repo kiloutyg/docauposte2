@@ -233,7 +233,7 @@ class OperatorController extends AbstractController
             $trainer->setDemoted(false);
             $this->em->persist($trainer);
             $newOperator->setTrainer($trainer);
-        } else if ($trainerBool != true) {
+        } elseif ($trainerBool != true) {
             $trainer = $newOperator->getTrainer();
             $newOperator->setTrainer(null);
             if ($trainer != null) {
@@ -301,7 +301,7 @@ class OperatorController extends AbstractController
             return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
                 'operatorForms' => [$operator->getId() => $form->createView()],
             ]);
-        } else if (isset($operatorForms)) {
+        } elseif (isset($operatorForms)) {
             $this->logger->info('operatorsForms isset');
             return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
                 'operatorForms' => $operatorForms,
@@ -1207,7 +1207,7 @@ class OperatorController extends AbstractController
                     return $this->redirect($originUrl);
                 }
             }
-        } else if ($request->getMethod() == 'GET') {
+        } elseif ($request->getMethod() == 'GET') {
             return $this->render('services/operators/team_uap_operator_management.html.twig', [
                 'teams'     => $teams,
                 'uaps'      => $uaps,

@@ -63,7 +63,7 @@ class ValidationService extends AbstractController
 
 
 
-    
+
     public function createValidation(Upload $upload, Request $request)
     {
         // Create empty arrays to store values for validator_department and validator_user
@@ -367,7 +367,7 @@ class ValidationService extends AbstractController
         if ($validation->isStatus() === true && $upload->isForcedDisplay() === false) {
             $this->mailerService->sendApprovalEmail($validation);
             $this->trainingRecordService->updateTrainingRecord($upload);
-        } else if ($validation->isStatus() === true) {
+        } elseif ($validation->isStatus() === true) {
             $this->mailerService->sendApprovalEmail($validation);
         }
         return;
