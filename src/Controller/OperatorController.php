@@ -765,23 +765,23 @@ class OperatorController extends AbstractController
     {
         $parsedRequest = json_decode($request->getContent(), true);
 
-        // $this->logger->info('Full request', $parsedRequest);
+        $this->logger->info('Full request', $parsedRequest);
 
         $enteredCode = $parsedRequest['code'];
-        // $this->logger->info('enteredCode', [$enteredCode]);
+        $this->logger->info('enteredCode', [$enteredCode]);
 
         $operatorId = (int)$parsedRequest['operatorId'];
-        // $this->logger->info('operatorId', [$operatorId]);
+        $this->logger->info('operatorId', [$operatorId]);
 
-        $controllerOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'team' => $teamId, 'uap' => $uapId]);
-        // $this->logger->info('controllerOperator', [$controllerOperator]);
+        $controllerOperator = $this->operatorRepository->findByCodeAndTeamAndUap($enteredCode, $teamId, $uapId);
+        $this->logger->info('controllerOperator', [$controllerOperator]);
 
         if ($controllerOperator != null) {
             $controllerOperatorId = $controllerOperator->getId();
-            // $this->logger->info('controllerOperatorId', [$controllerOperatorId]);
+            $this->logger->info('controllerOperatorId', [$controllerOperatorId]);
 
             $controllerOperatorId === $operatorId ? $operator = $controllerOperator : $operator = null;
-            // $this->logger->info('operator', [$operator]);
+            $this->logger->info('operator', [$operator]);
 
             if ($operator !== null) {
                 // Found operator
@@ -1233,7 +1233,7 @@ class OperatorController extends AbstractController
             $operator           = $this->operatorRepository->findOneBy(['name' => $user->getUsername()]);
             $this->logger->info('operator', [$operator]);
 
-            if ($operator->isIsTrainer()) {
+            if ($operator != null && $operator->isIsTrainer()) {
                 return new JsonResponse([
                     'found'         => true,
                     'name'          => $operator->getName(),
