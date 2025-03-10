@@ -5,26 +5,9 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
 
 
     static targets = [
-        "operatorFormFirstname",
-        "operatorFormLastname",
-        "operatorFormCode",
-        "operatorFormTeam",
-        "operatorFormUap",
-        "operatorFormIsTrainer",
+        "operatorFormCode"
     ];
 
-
-    connect() {
-        // Store initial values if needed
-        this.initialValues = {
-            initialFirstname: this.operatorFormFirstnameTarget.value,
-            initialLastname: this.operatorFormLastnameTarget.value,
-            initialCode: this.operatorFormCodeTarget.value,
-            initialTeam: this.operatorFormTeamTarget.value,
-            initialUap: this.operatorFormUapTarget.value,
-            initialIsTrainer: this.operatorFormIsTrainerTarget.checked,
-        };
-    }
 
 
 
