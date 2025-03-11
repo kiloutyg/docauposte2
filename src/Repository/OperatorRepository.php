@@ -42,36 +42,52 @@ class OperatorRepository extends ServiceEntityRepository
         usort(
             $operators,
             function ($a, $b) {
+                $result = 0; // Default comparison result (equal)
 
+                // Team comparison
                 $teamA = $a->getTeam();
                 $teamB = $b->getTeam();
-                if ($teamA && $teamB && $teamA->getId() != $teamB->getId()) {
-                    return strcmp($teamA->getName(), $teamB->getName());
+                if ($result == 0 && $teamA && $teamB && $teamA->getId() != $teamB->getId()) {
+                    $result = strcmp($teamA->getName(), $teamB->getName());
                 }
 
-                $uapsA = $a->getUaps()->first();
-                $uapsB = $b->getUaps()->first();
-                if ($uapsA && $uapsB && $uapsA->getId() != $uapsB->getId()) {
-                    return strcmp($uapsA->getName(), $uapsB->getName());
-                }
-                
-                // Lower cases
-                $fullNameA = strtolower($a->getName());
-                $fullNameB = strtolower($b->getName());
-                try {
-                    // Split names to separate first name and last name
-                    list($firstNameA, $lastNameA) = explode('.', $fullNameA);
-                    list($firstNameB, $lastNameB) = explode('.', $fullNameB);
-                    // If UAP name is the same, compare by last name
-                    if ($lastNameComparison = strcmp($lastNameA, $lastNameB)) {
-                        return $lastNameComparison;
+                // UAP comparison (only if previous comparison resulted in equality)
+                if ($result == 0) {
+                    $uapsA = $a->getUaps()->first();
+                    $uapsB = $b->getUaps()->first();
+                    if ($uapsA && $uapsB && $uapsA->getId() != $uapsB->getId()) {
+                        $result = strcmp($uapsA->getName(), $uapsB->getName());
                     }
-                    return strcmp($firstNameA, $firstNameB);
-                } catch (\Exception $e) {
-                    return strcmp($fullNameA, $fullNameB);
                 }
+
+                // Name comparison (only if previous comparisons resulted in equality)
+                if ($result == 0) {
+                    // Lower cases
+                    $fullNameA = strtolower($a->getName());
+                    $fullNameB = strtolower($b->getName());
+
+                    try {
+                        // Split names to separate first name and last name
+                        list($firstNameA, $lastNameA) = explode('.', $fullNameA);
+                        list($firstNameB, $lastNameB) = explode('.', $fullNameB);
+
+                        // Compare last names
+                        $result = strcmp($lastNameA, $lastNameB);
+
+                        // If last names are equal, compare first names
+                        if ($result == 0) {
+                            $result = strcmp($firstNameA, $firstNameB);
+                        }
+                    } catch (\Exception $e) {
+                        // Fallback if name format is unexpected
+                        $result = strcmp($fullNameA, $fullNameB);
+                    }
+                }
+
+                return $result;
             }
         );
+
         return $operators;
     }
 
@@ -86,9 +102,8 @@ class OperatorRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        $orderedOperators = $this->operatorComparison($operators);
 
-        return $orderedOperators;
+        return $this->operatorComparison($operators);
     }
 
 
@@ -138,9 +153,7 @@ class OperatorRepository extends ServiceEntityRepository
             // If $trainer is null, and you want to select all without any filter on IsTrainer, do not add any where clause related to IsTrainer.
             // No further action needed if you want all records regardless of trainer status.
         }
-
-        $result = $this->operatorComparison($qb->getQuery()->getResult());
-        return $result;
+        return $this->operatorComparison($qb->getQuery()->getResult());
     }
 
 
