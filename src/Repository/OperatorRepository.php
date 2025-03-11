@@ -47,7 +47,7 @@ class OperatorRepository extends ServiceEntityRepository
                 // Team comparison
                 $teamA = $a->getTeam();
                 $teamB = $b->getTeam();
-                if ($result == 0 && $teamA && $teamB && $teamA->getId() != $teamB->getId()) {
+                if ($teamA && $teamB && $teamA->getId() != $teamB->getId()) {
                     $result = strcmp($teamA->getName(), $teamB->getName());
                 }
 
@@ -74,7 +74,7 @@ class OperatorRepository extends ServiceEntityRepository
                         // Compare last names
                         $result = strcmp($lastNameA, $lastNameB);
 
-                        // If last names are equal, compare first names
+                        // If last names are equal, then compare first names
                         if ($result == 0) {
                             $result = strcmp($firstNameA, $firstNameB);
                         }
