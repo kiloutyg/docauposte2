@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use \Psr\Log\LoggerInterface;
+// use \Psr\Log\LoggerInterface;
 
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,7 +31,7 @@ class UploadController extends AbstractController
 {
 
     private $security;
-    private $logger;
+    // private $logger;
     private $authChecker;
 
     // Repository methods
@@ -50,7 +50,7 @@ class UploadController extends AbstractController
 
     public function __construct(
 
-        LoggerInterface                 $logger,
+        // // LoggerInterface                 $logger,
         Security                        $security,
         AuthorizationCheckerInterface   $authChecker,
 
@@ -67,7 +67,7 @@ class UploadController extends AbstractController
 
     ) {
         $this->security                     = $security;
-        $this->logger                       = $logger;
+        // // $this->logger                       = $logger;
 
         $this->authChecker                  = $authChecker;
 
@@ -322,19 +322,19 @@ class UploadController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
-            $this->logger->info('form is submitted and valid', [$form]);
+            // $this->logger->info('form is submitted and valid', [$form]);
 
             try {
                 if ($trainingNeeded == null || $forcedDisplay == null) {
                     $comment = $request->request->get('modificationComment');
                     if ($upload->getFile() && $upload->getValidation() != null && empty($comment) && $request->request->get('modification-outlined' == '')) {
-                        $this->logger->info('Le commentaire est vide. Commenter votre modification est obligatoire.');
+                        // $this->logger->info('Le commentaire est vide. Commenter votre modification est obligatoire.');
                         $this->addFlash('error', 'Le commentaire est vide. Commenter votre modification est obligatoire.');
                         return $this->redirectToRoute('app_category_admin', [
                             'categoryId' => $categoryId
                         ]);
                     } elseif ($newValidation && !$enoughValidator) {
-                        $this->logger->info('Selectionner au moins ' . $neededValidator . ' validateurs pour valider le fichier.');
+                        // $this->logger->info('Selectionner au moins ' . $neededValidator . ' validateurs pour valider le fichier.');
                         $this->addFlash('error', 'Selectionner au moins ' . $neededValidator . ' validateurs pour valider le fichier.');
                         return $this->redirectToRoute('app_category_admin', [
                             'categoryId' => $categoryId
@@ -342,20 +342,20 @@ class UploadController extends AbstractController
                     }
                 }
                 $this->uploadService->modifyFile($upload, $request);
-                $this->logger->info('Le fichier a été modifié.');
+                // $this->logger->info('Le fichier a été modifié.');
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirectToRoute('app_category_admin', [
                     'categoryId' => $categoryId
                 ]);
             } catch (\Exception $e) {
-                $this->logger->info('error', [$e->getMessage()]);
+                // $this->logger->info('error', [$e->getMessage()]);
                 $this->addFlash('error', $e->getMessage());
                 return $this->redirectToRoute('app_category_admin', [
                     'categoryId' => $categoryId
                 ]);
             }
         } else {
-            $this->logger->info('Invalid form. Check the entered data.');
+            // $this->logger->info('Invalid form. Check the entered data.');
             $this->addFlash('error', 'Invalid form. Check the entered data.');
             return $this->redirectToRoute('app_category_admin', [
                 'categoryId' => $categoryId

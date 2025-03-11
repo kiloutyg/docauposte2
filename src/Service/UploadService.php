@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use Psr\Log\LoggerInterface;
+// use Psr\Log\LoggerInterface;
 
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -29,7 +29,7 @@ class UploadService extends AbstractController
 {
     private $manager;
     private $projectDir;
-    private $logger;
+    // private $logger;
 
     private $uploadRepository;
 
@@ -42,7 +42,7 @@ class UploadService extends AbstractController
     public function __construct(
         EntityManagerInterface  $manager,
         ParameterBagInterface   $params,
-        LoggerInterface         $logger,
+        // // LoggerInterface         $logger,
 
         UploadRepository        $uploadRepository,
 
@@ -53,7 +53,7 @@ class UploadService extends AbstractController
 
         $this->manager               = $manager;
         $this->projectDir            = $params->get(name: 'kernel.project_dir');
-        $this->logger                = $logger;
+        // // $this->logger                = $logger;
 
         $this->uploadRepository      = $uploadRepository;
 
@@ -342,11 +342,11 @@ class UploadService extends AbstractController
     public function modifyDisapprovedFile(Upload $upload, User $user, Request $request)
     {
 
-        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->full request', [$request->request->all()]);
+        // $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->full request', [$request->request->all()]);
 
-        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->$request->request->get(training-needed)', [$request->request->get('training-needed')]);
+        // $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->$request->request->get(training-needed)', [$request->request->get('training-needed')]);
         $trainingNeeded = filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN);
-        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->trainingNeeded', [$trainingNeeded]);
+        // $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->trainingNeeded', [$trainingNeeded]);
 
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
