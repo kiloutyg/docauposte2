@@ -12,12 +12,6 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-
-use Symfony\Component\Validator\Constraints as Assert;
-
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 class TeamType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -32,7 +26,9 @@ class TeamType extends AbstractType
                     'class' => 'form-control',
                     'placeholder' => 'Nom de l\'équipe',
                     'id' => 'name',
-                    'required' => true
+                    'required' => true,
+                    'data-name-validation-target' => 'teamUapName',
+                    'data-action' => 'keyup->name-validation#validateTeamUapName',
                 ],
             ])
             ->add('save', SubmitType::class, [

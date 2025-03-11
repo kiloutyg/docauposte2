@@ -12,8 +12,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-
 class UapType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -28,7 +26,9 @@ class UapType extends AbstractType
                     'class' => 'form-control',
                     'placeholder' => 'Nom de l\'Uap',
                     'id' => 'name',
-                    'required' => true
+                    'required' => true,
+                    'data-name-validation-target' => 'teamUapName',
+                    'data-action' => 'keyup->name-validation#validateTeamUapName',
                 ]
             ])
             ->add('save', SubmitType::class, [
