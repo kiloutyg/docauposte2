@@ -14,13 +14,9 @@ use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 
 /**
- * @extends RepositoryEntityRepository<Operator>
- *
- * @method Operator|null find($id, $lockMode = null, $lockVersion = null)
- * @method Operator|null findOneBy(array $criteria, array $orderBy = null)
- * @method Operator[]    findAll()
- * @method Operator[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<Operator>
  */
+
 class OperatorRepository extends ServiceEntityRepository
 {
     private $logger;
@@ -41,39 +37,47 @@ class OperatorRepository extends ServiceEntityRepository
     }
 
 
-
-
-    public function findAllOrdered()
+    protected function operatorComparison(array $operators): array
     {
-        // $this->logger->info('Finding all operators ordered.');
+        usort(
+            $operators,
+            function ($a, $b) {
 
-        $operators = $this->findOperatorsSortedByLastNameFirstName();
+                $teamA = $a->getTeam();
+                $teamB = $b->getTeam();
+                if ($teamA && $teamB && $teamA->getId() != $teamB->getId()) {
+                    return strcmp($teamA->getName(), $teamB->getName());
+                }
 
-        usort($operators, function ($a, $b) {
-            // Compare by 'team'
-            if ($a->getTeam()->getId() != $b->getTeam()->getId()) {
-                return strcmp($a->getTeam()->getName(), $b->getTeam()->getName());
+                $uapsA = $a->getUaps()->first();
+                $uapsB = $b->getUaps()->first();
+                if ($uapsA && $uapsB && $uapsA->getId() != $uapsB->getId()) {
+                    return strcmp($uapsA->getName(), $uapsB->getName());
+                }
+                
+                // Lower cases
+                $fullNameA = strtolower($a->getName());
+                $fullNameB = strtolower($b->getName());
+                try {
+                    // Split names to separate first name and last name
+                    list($firstNameA, $lastNameA) = explode('.', $fullNameA);
+                    list($firstNameB, $lastNameB) = explode('.', $fullNameB);
+                    // If UAP name is the same, compare by last name
+                    if ($lastNameComparison = strcmp($lastNameA, $lastNameB)) {
+                        return $lastNameComparison;
+                    }
+                    return strcmp($firstNameA, $firstNameB);
+                } catch (\Exception $e) {
+                    return strcmp($fullNameA, $fullNameB);
+                }
             }
-            // Compare by first UAP (assuming we want to sort by the first UAP in the collection)
-            $uapsA = $a->getUaps()->first();
-            $uapsB = $b->getUaps()->first();
-
-            if ($uapsA && $uapsB && $uapsA->getId() != $uapsB->getId()) {
-                return strcmp($uapsA->getName(), $uapsB->getName());
-            }
-            return 0;
-        });
-
+        );
         return $operators;
     }
 
 
-
-
-
-    public function findOperatorsSortedByLastNameFirstName()
+    public function findAllOrdered(): array
     {
-        // $this->logger->info('Finding operators sorted last name, and first name.');
         // Fetch all operators with their team and UAP
         $operators = $this->createQueryBuilder('o')
             ->join('o.team', 't')
@@ -82,48 +86,14 @@ class OperatorRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        // Sort the operators in PHP
-        usort($operators, function ($a, $b) {
-            // Split names to separate first name and last name
-            list($firstNameA, $lastNameA) = explode('.', $a->getName());
-            list($firstNameB, $lastNameB) = explode('.', $b->getName());
+        $orderedOperators = $this->operatorComparison($operators);
 
-            // Normalize for case insensitive comparison
-            $lastNameA = strtolower($lastNameA);
-            $lastNameB = strtolower($lastNameB);
-            $firstNameA = strtolower($firstNameA);
-            $firstNameB = strtolower($firstNameB);
-
-            // Compare by team name
-            if ($a->getTeam() !== null && $b->getTeam() !== null && $teamComparison = strcmp($a->getTeam()->getName(), $b->getTeam()->getName())) {
-                return $teamComparison;
-            }
-            // If team name is the same, compare by UAP name
-            $uapsA = $a->getUaps()->first();
-            $uapsB = $b->getUaps()->first();
-            if ($uapsA && $uapsB && $uapComparison = strcmp($uapsA->getName(), $uapsB->getName())) {
-                return $uapComparison;
-            }
-            // If UAP name is the same, compare by last name
-            if ($lastNameComparison = strcmp($lastNameA, $lastNameB)) {
-                return $lastNameComparison;
-            }
-            // If last name is the same, compare by first name
-            return strcmp($firstNameA, $firstNameB);
-        });
-
-        return $operators;
+        return $orderedOperators;
     }
-
-
-
 
 
     public function findBySearchQuery($name, $code, $team, $uap, $trainer)
     {
-
-        // $this->logger->info('Finding operators by search query.');
-
         $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.team', 't')
             ->leftJoin('o.uaps', 'u');
@@ -145,7 +115,6 @@ class OperatorRepository extends ServiceEntityRepository
                 ->setParameter('uap', '%' . strtolower($uap) . '%');
         }
 
-        // // $this->logger->info('Trainer value in repository methods: ' . $trainer);
         // Handling trainer value based on true, false, or null
         switch ($trainer) {
             case "true":
@@ -159,71 +128,20 @@ class OperatorRepository extends ServiceEntityRepository
                 break;
         }
 
-        // // $this->logger->info('Trainer value after handling: ' . $trainer);
-
         if ($trainer === true) {
-            // // $this->logger->info('Trainer value true, select those who are trainer.');
             $qb->setParameter('trainerStatus', true)
                 ->andWhere('o.IsTrainer = :trainerStatus');
         } elseif ($trainer === false) {
-            // // $this->logger->info('Trainer value false, select those who are not trainers or undefined.');
             $qb->setParameter('trainerStatus', false)
                 ->andWhere('o.IsTrainer = :trainerStatus OR o.IsTrainer IS NULL');
         } elseif ($trainer === null) {
             // If $trainer is null, and you want to select all without any filter on IsTrainer, do not add any where clause related to IsTrainer.
-            // // $this->logger->info('Trainer value is null, no filter applied on trainer status.');
             // No further action needed if you want all records regardless of trainer status.
         }
 
-        $result = $this->orderOperator($qb->getQuery()->getResult());
-        $this->logger->info('results from search query', $result);
+        $result = $this->operatorComparison($qb->getQuery()->getResult());
         return $result;
     }
-
-
-
-
-
-    public function orderOperator($operators)
-    {
-
-        // $this->logger->info('Ordering operators by team, UAP, last name, and first name.');
-
-        usort($operators, function ($a, $b) {
-            // Split names to separate first name and last name
-            list($firstNameA, $lastNameA) = explode('.', $a->getName());
-            list($firstNameB, $lastNameB) = explode('.', $b->getName());
-
-            // Normalize for case insensitive comparison
-            $lastNameA = strtolower($lastNameA);
-            $lastNameB = strtolower($lastNameB);
-            $firstNameA = strtolower($firstNameA);
-            $firstNameB = strtolower($firstNameB);
-
-            // Compare by team name
-            if ($a->getTeam() !== null && $b->getTeam() !== null && $teamComparison = strcmp($a->getTeam()->getName(), $b->getTeam()->getName())) {
-                return $teamComparison;
-            }
-            // If team name is the same, Compare UAPs (using first UAP for sorting)
-            $uapsA = $a->getUaps()->first();
-
-            $uapsB = $b->getUaps()->first();
-
-            if ($uapsA && $uapsB && $uapComparison = strcmp($uapsA->getName(), $uapsB->getName())) {
-                return $uapComparison;
-            }
-            // If UAP name is the same, compare by last name
-            if ($lastNameComparison = strcmp($lastNameA, $lastNameB)) {
-                return $lastNameComparison;
-            }
-            // If last name is the same, compare by first name
-            return strcmp($firstNameA, $firstNameB);
-        });
-
-        return $operators;
-    }
-
-
 
 
 
@@ -266,7 +184,6 @@ class OperatorRepository extends ServiceEntityRepository
     // Used in the methods that add the tobedeleted datetime value in the appropriate field to the operator entity
     public function findOperatorWithNoRecentTraining()
     {
-        // $this->logger->info('Finding operators with no recent training.');
         # Related to Settings -> OperatorRetrainingDelay
         $operatorRetrainingDateInterval = $this->settingsService->getSettings()->getOperatorRetrainingDelay();
         $retrainingDelay = new \DateTime('now');
@@ -281,18 +198,14 @@ class OperatorRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        // $this->logger->info('operators to be retrained: ', [$operators]);
         return $operators;
     }
-
-
 
 
 
     // Used in the methods that check for operators to be deleted, count them, display them in appropriate views etc
     public function findInActiveOperators()
     {
-        // $this->logger->info('Finding operators with no recent training.');
         # Related to Settings -> OperatorInactivityDelay
         $operatorInactivityDateInterval = $this->settingsService->getSettings()->getOperatorInactivityDelay();
         $inactiveDelay = new \DateTime('now');
@@ -305,7 +218,6 @@ class OperatorRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        // $this->logger->info('inactive operators: ', [$operators]);
         return $operators;
     }
 
@@ -313,7 +225,6 @@ class OperatorRepository extends ServiceEntityRepository
     // Used in the methods that check for operators to be deleted, count them, display them in appropriate views etc
     public function findDeactivatedOperators()
     {
-        // $this->logger->info('Finding operators with no recent training.');
         # Related to Settings -> OperatorInactivityDelay
         $operatorInactivityDateInterval = $this->settingsService->getSettings()->getOperatorInactivityDelay();
         $inactiveDelay = new \DateTime('now');
@@ -326,7 +237,6 @@ class OperatorRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        // $this->logger->info('inactive operators: ', [$operators]);
         return $operators;
     }
 
@@ -334,7 +244,6 @@ class OperatorRepository extends ServiceEntityRepository
     // Used in the methods that delete the operator entity
     public function findOperatorToBeDeleted()
     {
-        // $this->logger->info('Finding operators to be deleted.');
         # Related to Settings -> OperatorAutoDeleteDelay
         $operatorAutoDeleteDateInterval = $this->settingsService->getSettings()->getOperatorAutoDeleteDelay();
         $autoDeleteDelay = new \DateTime();
@@ -347,7 +256,6 @@ class OperatorRepository extends ServiceEntityRepository
             ->getQuery()
             ->getScalarResult();
 
-        // $this->logger->info('To be deleted operators: ' . json_encode($operatorIds));
         // Extract IDs from the result
         return array_column($operatorIds, 'id');
     }
