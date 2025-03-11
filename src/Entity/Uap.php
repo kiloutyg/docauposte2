@@ -10,8 +10,12 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 
 #[ORM\Entity(repositoryClass: UapRepository::class)]
+#[UniqueEntity(fields: 'name', message: 'Une UAP avec ce nom existe déjà.')]
 class Uap
 {
     #[ORM\Id]
@@ -20,7 +24,10 @@ class Uap
     #[Groups(['operator_details'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 3, max: 180)]
+    #[Assert\Regex(pattern: '/^[A-Z-]{3,}$(?<!-)$/', message: 'Format invalide. Veuillez saisir sous la forme UAP')]
     #[Groups(['operator_details'])]
     private ?string $name = null;
 
@@ -31,7 +38,7 @@ class Uap
     private Collection $operators;
 
     public function __construct()
-    {
+    {   
         $this->operators = new ArrayCollection();
     }
 

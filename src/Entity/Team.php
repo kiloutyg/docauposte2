@@ -10,8 +10,12 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 
 #[ORM\Entity(repositoryClass: TeamRepository::class)]
+#[UniqueEntity(fields: 'name', message: 'Une équipe avec ce nom existe déjà.')]
 class Team
 {
     #[ORM\Id]
@@ -23,7 +27,10 @@ class Team
     #[ORM\OneToMany(mappedBy: 'team', targetEntity: Operator::class)]
     private Collection $operators;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 3, max: 180)]
+    #[Assert\Regex(pattern: '/^[A-Z-]+$(?<!-)$/', message: 'Format invalide. Veuillez saisir sous la forme EQUIPE')]
     #[Groups(['operator_details'])]
     private ?string $name = null;
 
