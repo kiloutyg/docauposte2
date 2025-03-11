@@ -28,8 +28,8 @@ class TrainingRecordRepository extends ServiceEntityRepository
             return strcmp($a->getTeam()->getName(), $b->getTeam()->getName());
         }
         // If 'team' is the same, move on to compare by 'uap'
-        if ($a->getUap()->getName() != $b->getUap()->getName()) {
-            return strcmp($a->getUap()->getName(), $b->getUap()->getName());
+        if ($a->getUaps()->first()->getName() != $b->getUaps()->first()->getName()) {
+            return strcmp($a->getUaps()->first()->getName(), $b->getUaps()->first()->getName());
         }
 
         // If 'uap' is also the same, finally compare by 'surname.firstname'

@@ -1,0 +1,14 @@
+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+/vendor/
+/node_modules/
+/public/doc/
+/migrations/
+/database_data/
+/var/
+/secrets/
+/public/
+/.gitignore
+/.vscode/
+/.env
+/.env.local
+*.lock

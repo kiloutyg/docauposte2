@@ -126,7 +126,7 @@ class AccountController extends AbstractController
                 'user'          => $user,
                 'error'         => $error,
             ]);
-        } else if ($request->isMethod('POST')) {
+        } elseif ($request->isMethod('POST')) {
 
             $error = $authenticationUtils->getLastAuthenticationError();
             $usermod = $this->accountService->modifyAccount($request, $currentUser, $user);

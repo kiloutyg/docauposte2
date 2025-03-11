@@ -12,7 +12,7 @@ export default class OperatorAdminCreationController extends Controller {
         "newOperatorFirstname",
         "newOperatorCode",
         "newOperatorTeam",
-        "newOperatorUap",
+        "newOperatorUaps",
         "newOperatorIsTrainer",
         "newOperatorNameMessage",
         "newOperatorCodeMessage",
@@ -242,7 +242,7 @@ export default class OperatorAdminCreationController extends Controller {
             this.newOperatorNameMessageTarget.textContent = "";
             this.newOperatorTransferMessageTarget.textContent = "";
             this.newOperatorTeamTarget.value = "";
-            this.newOperatorUapTarget.value = "";
+            this.newOperatorUapsTarget.value = "";
             this.newOperatorIsTrainerTarget.checked = null;
             this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions 
             this.suggestionsResults = [];
@@ -452,7 +452,7 @@ export default class OperatorAdminCreationController extends Controller {
                 this.newOperatorLastnameTarget.value = lastname;
                 this.newOperatorCodeTarget.value = code;
                 this.newOperatorTeamTarget.value = team;
-                this.newOperatorUapTarget.value = uap;
+                this.newOperatorUapsTarget.value = uap;
                 
                 if (isTrainer === '1') {
                     this.newOperatorIsTrainerTarget.checked = true;

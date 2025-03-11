@@ -53,7 +53,7 @@ security:
         - { path: ^/department, roles: ROLE_SUPER_ADMIN }
         - { path: ^/operator/delete-uap-or-team, roles: ROLE_SUPER_ADMIN }
         - { path: ^/account, roles: ROLE_SUPER_ADMIN }
-
+        - { path: ^/uap, roles: ROLE_SUPER_ADMIN }
         - { path: ^/mail, roles: ROLE_SUPER_ADMIN }
 
         - { path: ^/incident, roles: ROLE_LINE_ADMIN }
@@ -72,7 +72,6 @@ security:
         - { path: ^/operator/admin, roles: ROLE_MANAGER }
         - { path: ^/training-record/delete-weeks-old, roles: ROLE_MANAGER }
         - { path: ^/admin, roles: ROLE_MANAGER }
-
         # - { path: ^/operator, roles: ROLE_MANAGER }
 
 when@test:

@@ -47,6 +47,7 @@ use App\Service\EntityDeletionService;
 use App\Service\EntityFetchingService;
 use App\Service\TrainingRecordService;
 use App\Service\PdfGeneratorService;
+use App\Service\OperatorService;
 
 
 class OperatorController extends AbstractController
@@ -73,6 +74,7 @@ class OperatorController extends AbstractController
     private $trainingRecordService;
     private $pdfGeneratorService;
     private $entityFetchingService;
+    private $operatorService;
 
 
 
@@ -99,6 +101,7 @@ class OperatorController extends AbstractController
         TrainingRecordService           $trainingRecordService,
         PdfGeneratorService             $pdfGeneratorService,
         EntityFetchingService           $entityFetchingService,
+        OperatorService                 $operatorService,
 
     ) {
         // $this->cache                        = $cache;
@@ -124,6 +127,7 @@ class OperatorController extends AbstractController
         $this->trainingRecordService        = $trainingRecordService;
         $this->pdfGeneratorService          = $pdfGeneratorService;
         $this->entityFetchingService        = $entityFetchingService;
+        $this->operatorService              = $operatorService;
     }
 
     private function operatorEntitySearch(Request $request): array
@@ -185,8 +189,12 @@ class OperatorController extends AbstractController
         }
 
         $operatorForms = [];
+        $this->logger->info('operators', [$operators]);
+
         // Create and handle forms
         foreach ($operators as $operator) {
+            $this->logger->info('operator', [$operator->getUaps()->getValues()]);
+
             $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
                 'operator_id' => $operator->getId(),
             ])->createView();
@@ -225,7 +233,7 @@ class OperatorController extends AbstractController
             $trainer->setDemoted(false);
             $this->em->persist($trainer);
             $newOperator->setTrainer($trainer);
-        } else if ($trainerBool != true) {
+        } elseif ($trainerBool != true) {
             $trainer = $newOperator->getTrainer();
             $newOperator->setTrainer(null);
             if ($trainer != null) {
@@ -246,98 +254,70 @@ class OperatorController extends AbstractController
     #[Route('/operator/edit/{id}', name: 'app_operator_edit')]
     public function editOperatorAction(Request $request, Operator $operator): Response
     {
-        $this->logger->info('Full request editOperatorAction', $request->request->all());
+
+        if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
+            $operators = $this->operatorEntitySearch($request);
+            $operatorForms = [];
+            $this->logger->info('operators', [$operators]);
+
+            // Create and handle forms
+            foreach ($operators as $operator) {
+                $this->logger->info('operator', [$operator]);
+
+                $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
+                    'operator_id' => $operator->getId(),
+                ])->createView();
+            }
+            $this->logger->info('operatorsForm', [$operatorForms]);
+        }
 
         $form = $this->createForm(OperatorType::class, $operator, [
             'operator_id' => $operator->getId(),
         ]);
 
+        $this->logger->info('operator after form creation', [$operator]);
+        $this->logger->info('operator uaps after form creation', [$operator->getUaps()->getValues()]);
+
+        $error = false;
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-            $trainerBool = $form->get('isTrainer')->getData();
-            $this->logger->info('isTrainer form key value', [$trainerBool]);
-
-            if ($trainerBool == true) {
-                if ($operator->getTrainer() == null) {
-                    $trainer = new Trainer();
-                    $trainer->setOperator($operator);
-                    $trainer->setDemoted(false);
-                    $operator->setTrainer($trainer);
-                } else {
-                    $trainer = $operator->getTrainer();
-                    $trainer->setDemoted(false);
-                }
-                $this->em->persist($trainer);
-            } else {
-                $trainer = $operator->getTrainer();
-                if ($trainer != null && $trainer->getTrainingRecords() != null) {
-                    $trainer->setDemoted(true);
-                } else {
-                    $operator->setIsTrainer(false);
-                    $this->em->remove($trainer);
-                }
-                $this->em->persist($trainer);
-            }
-            if ($operator->getTobedeleted() != null) {
-                $operator->setTobedeleted(null);
-                $operator->setLasttraining(new \DateTime());
-                $operator->setInactiveSince(null);
-                $operator->setTobedeleted(null);
-            }
             try {
-                $this->em->persist($operator);
-                $this->em->flush();
-                $this->cache->delete('operators_list');
-
-                // $this->logger->info('editOperatorAction, operateur bien modifié', [$operator]);
+                $this->operatorService->editOperatorService($form, $operator);
                 $this->addFlash('success', 'L\'opérateur a bien été modifié');
-
-                if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
-                    $operators = $this->operatorEntitySearch($request);
-                } else {
-                    $operators = [];
-                }
-                $operatorForms = [];
-                // Create and handle forms
-                foreach ($operators as $operator) {
-                    $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
-                        'operator_id' => $operator->getId(),
-                    ])->createView();
-                }
-
-                // Return the updated frame content
-                return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
-                    'operatorForms' => $operatorForms,
-                ]);
             } catch (\Exception $e) {
                 $this->addFlash('danger', 'L\'opérateur n\'a pas pu être modifié. Erreur: ' . $e->getMessage());
                 $this->logger->error('Error while editing operator in try catch', [$e->getMessage()]);
-
-                // Render the form again with error message
-                return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
-                    'operatorForms' => [$operator->getId() => $form->createView()],
-                ]);
+                $error = true;
             }
+        } else {
+            $this->logger->error('Error in submitting form while editing operator');
+            $error = true;
         }
 
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            $this->logger->error('Error in submitting form while editing operator');
-            $this->addFlash('danger', 'Erreur lors de la soumission du formulaire');
-            return $this->redirectToRoute('app_operator');
+        $this->logger->info('operator', [$operator]);
 
-            // Render the form again with error message
+        if ($error) {
+            $this->logger->info('error true');
             return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
                 'operatorForms' => [$operator->getId() => $form->createView()],
             ]);
-        }
+        } elseif (isset($operatorForms)) {
+            $this->logger->info('operatorsForms isset');
+            return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
+                'operatorForms' => $operatorForms,
+            ]);
+        } else {
+            $this->logger->info('there is only operator', [[$operator], [$operator->getUaps()->getValues()]]);
+            return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
+                'form' => $form->createView(),
+                'operator' => $operator,
+                'operatorForms' => $operatorForms = [],
 
-        // $this->logger->info('editOperatorAction reach return to template"');
-        return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
-            'form' => $form->createView(),
-            'operator' => $operator
-        ]);
+            ]);
+        }
     }
+
+
 
 
 
@@ -449,7 +429,7 @@ class OperatorController extends AbstractController
 
         if ($existingOperator != null) {
             // $this->logger->info('existingOperator', [$existingOperator->getName()]);
-            if ($existingOperator->getTeam() == $team && $existingOperator->getUap() == $uap) {
+            if ($existingOperator->getTeam() == $team && $existingOperator->getUaps()->contains($uap)) {
                 $this->addFlash('danger', 'Cet opérateur existe déjà dans cette equipe et uap');
                 return $this->redirectToRoute('app_training_list', [
                     'uploadId' => $uploadId,
@@ -458,7 +438,7 @@ class OperatorController extends AbstractController
                 ]);
             } else {
                 $existingOperator->setTeam($team);
-                $existingOperator->setUap($uap);
+                $existingOperator->addUap($uap);
                 $this->em->persist($existingOperator);
                 $this->em->flush();
                 $this->addFlash('success', 'L\'opérateur a bien été ajouté et son equipe et son UAP ont été modifiées');
@@ -473,7 +453,7 @@ class OperatorController extends AbstractController
         $operator = new Operator();
         $operator->setName($operatorName);
         $operator->setTeam($team);
-        $operator->setUap($uap);
+        $operator->addUap($uap);
         $operator->setCode($operatorCode);
 
         $errors = $validator->validate($operator);
@@ -539,7 +519,8 @@ class OperatorController extends AbstractController
     {
         $upload = $this->uploadRepository->find($uploadId);
 
-        $selectedOperators = $this->operatorRepository->findBy(['team' => $teamId, 'uap' => $uapId], ['team' => 'ASC', 'uap' => 'ASC']);
+        $selectedOperators = $this->operatorRepository->findByTeamAndUap($teamId, $uapId);
+
 
         usort($selectedOperators, function ($a, $b) {
             list($firstNameA, $surnameA) = explode('.', $a->getName());
@@ -783,23 +764,23 @@ class OperatorController extends AbstractController
     {
         $parsedRequest = json_decode($request->getContent(), true);
 
-        // $this->logger->info('Full request', $parsedRequest);
+        $this->logger->info('Full request', $parsedRequest);
 
         $enteredCode = $parsedRequest['code'];
-        // $this->logger->info('enteredCode', [$enteredCode]);
+        $this->logger->info('enteredCode', [$enteredCode]);
 
         $operatorId = (int)$parsedRequest['operatorId'];
-        // $this->logger->info('operatorId', [$operatorId]);
+        $this->logger->info('operatorId', [$operatorId]);
 
-        $controllerOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'team' => $teamId, 'uap' => $uapId]);
-        // $this->logger->info('controllerOperator', [$controllerOperator]);
+        $controllerOperator = $this->operatorRepository->findByCodeAndTeamAndUap($enteredCode, $teamId, $uapId);
+        $this->logger->info('controllerOperator', [$controllerOperator]);
 
         if ($controllerOperator != null) {
             $controllerOperatorId = $controllerOperator->getId();
-            // $this->logger->info('controllerOperatorId', [$controllerOperatorId]);
+            $this->logger->info('controllerOperatorId', [$controllerOperatorId]);
 
             $controllerOperatorId === $operatorId ? $operator = $controllerOperator : $operator = null;
-            // $this->logger->info('operator', [$operator]);
+            $this->logger->info('operator', [$operator]);
 
             if ($operator !== null) {
                 // Found operator
@@ -810,7 +791,7 @@ class OperatorController extends AbstractController
                         'name' => $operator->getName(),
                         'code' => $operator->getCode(),
                         'team' => $operator->getTeam()->getName(),
-                        'uap' => $operator->getUap()->getName(),
+                        'uap' => $operator->getUaps()->first()->getName(),
                     ]
                 ]);
             }
@@ -1065,7 +1046,7 @@ class OperatorController extends AbstractController
                 $operator->setCode($code);
                 $operator->setName($name);
                 $operator->setTeam($team);
-                $operator->setUap($uap);
+                $operator->addUap($uap);
 
                 // Validate the operator
                 $errors = $validator->validate($operator);
@@ -1225,7 +1206,7 @@ class OperatorController extends AbstractController
                     return $this->redirect($originUrl);
                 }
             }
-        } else if ($request->getMethod() == 'GET') {
+        } elseif ($request->getMethod() == 'GET') {
             return $this->render('services/operators/team_uap_operator_management.html.twig', [
                 'teams'     => $teams,
                 'uaps'      => $uaps,
@@ -1251,7 +1232,7 @@ class OperatorController extends AbstractController
             $operator           = $this->operatorRepository->findOneBy(['name' => $user->getUsername()]);
             $this->logger->info('operator', [$operator]);
 
-            if ($operator->isIsTrainer()) {
+            if ($operator != null && $operator->isIsTrainer()) {
                 return new JsonResponse([
                     'found'         => true,
                     'name'          => $operator->getName(),

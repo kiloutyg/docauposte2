@@ -31,11 +31,12 @@
 			</div>
 		</div>
 	</ul>
+
 	<ul>
 		{% if operatorForms|length > 0 %}
+
 			{% for operatorId, operatorForm in operatorForms %}
 			{% form_theme operatorForm 'bootstrap_5_layout.html.twig' %}
-
 				{% if operatorForm.vars.data.tobedeleted is not empty %}
 					{{ form_start(operatorForm, {'attr': {'class': 'row bg-dark', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
 				{% else %}
@@ -51,7 +52,6 @@
 						'data-action': field == 'code' ? 'keyup->operator-admin-edit#editedCodeChecker' : null,
 						'data-operator-admin-edit-target': field == 'isTrainer' ? 'operatorFormIsTrainer' : 'operatorForm' ~ field|capitalize}}) }}
 				{% endfor %}
-
 				{% if operatorForm.vars.data.tobedeleted is not empty %}
 					<div
 						class="col my-auto mx-auto">

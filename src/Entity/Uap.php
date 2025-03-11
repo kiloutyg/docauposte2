@@ -24,7 +24,10 @@ class Uap
     #[Groups(['operator_details'])]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'uap', targetEntity: Operator::class)]
+    /**
+     * @var Collection<int, Operator>
+     */
+    #[ORM\ManyToMany(targetEntity: Operator::class, inversedBy: 'uaps')]
     private Collection $operators;
 
     public function __construct()
@@ -49,10 +52,12 @@ class Uap
         return $this;
     }
 
+
+
     /**
      * @return Collection<int, Operator>
      */
-    public function getOperator(): Collection
+    public function getOperators(): Collection
     {
         return $this->operators;
     }
@@ -61,7 +66,6 @@ class Uap
     {
         if (!$this->operators->contains($operator)) {
             $this->operators->add($operator);
-            $operator->setUap($this);
         }
 
         return $this;
@@ -69,12 +73,7 @@ class Uap
 
     public function removeOperator(Operator $operator): static
     {
-        if ($this->operators->removeElement($operator)) {
-            // set the owning side to null (unless already changed)
-            if ($operator->getUap() === $this) {
-                $operator->setUap(null);
-            }
-        }
+        $this->operators->removeElement($operator);
 
         return $this;
     }

@@ -351,9 +351,9 @@ class ViewsModificationService extends AbstractController
                 foreach ($entity->getProductLines() as $productLine) {
                     $this->updateEntityNameInheritance('productLine', $productLine, $newName, $field, $originalValue);
                 }
-            } else if ($field === 'sortOrder') {
+            } elseif ($field === 'sortOrder') {
                 $this->updateSortOrders($repository->findAllExceptOne($id), $entity, $newName, $originalValue);
-            } else if ($field === 'creator') {
+            } elseif ($field === 'creator') {
                 foreach ($entity->getProductLines() as $productLine) {
                     $this->updateEntity('productLine', $productLine, $field, $newName, $originalValue);
                 }
@@ -366,7 +366,7 @@ class ViewsModificationService extends AbstractController
                 foreach ($entity->getIncidents() as $incident) {
                     $this->updateDocumentPath('incident', $incident, $newName, $originalValue);
                 }
-            } else if ($field === 'sortOrder') {
+            } elseif ($field === 'sortOrder') {
                 $parentEntityId = $entity->getZone()->getId();
                 $this->updateSortOrders($repository->findAllExceptOneByParent($id, $parentEntityId, $parentEntityName), $entity, $newName, $originalValue);
             }
@@ -375,7 +375,7 @@ class ViewsModificationService extends AbstractController
                 foreach ($entity->getButtons() as $button) {
                     $this->updateEntityNameInheritance('button', $button, $newName, $field, $originalValue);
                 }
-            } else if ($field === 'sortOrder') {
+            } elseif ($field === 'sortOrder') {
                 $parentEntityId = $entity->getProductLine()->getId();
                 $this->updateSortOrders($repository->findAllExceptOne($id, $parentEntityId, $parentEntityName), $entity, $newName, $originalValue);
             }
@@ -387,7 +387,7 @@ class ViewsModificationService extends AbstractController
                 foreach ($entity->getOldUploads() as $oldUpload) {
                     $this->updateDocumentPath('oldupload', $oldUpload, $newName, $originalValue);
                 }
-            } else if ($field === 'sortOrder') {
+            } elseif ($field === 'sortOrder') {
                 $parentEntityId = $entity->getCategory()->getId();
                 $this->updateSortOrders($repository->findAllExceptOneByParent($id, $parentEntityId, $parentEntityName), $entity, $newName, $originalValue);
             }

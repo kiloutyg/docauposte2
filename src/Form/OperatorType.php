@@ -9,15 +9,15 @@ use App\Entity\Uap;
 use App\Form\DataTransformer\FirstNameTransformer;
 use App\Form\DataTransformer\LastNameTransformer;
 
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\SearchType;
 
+use Symfony\Component\Form\Extension\Core\Type\SearchType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -119,15 +119,19 @@ class OperatorType extends AbstractType
                     'style' => 'font-weight:  color: #ffffff;'
                 ]
             ])
-            ->add('uap', EntityType::class, [
+            ->add('uaps', EntityType::class, [
                 'class' => Uap::class,
                 'label' => false,
                 'choice_label' => 'name',
                 'placeholder' => 'UAP',
-
+                'multiple' => true,
+                'expanded' => false,
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
-                    'required' => true
+                    'required' => true,
+                    'size' => '2',
+                    'data-bs-toggle' => 'tooltip',  // Bootstrap tooltip
+                    'title' => 'Maintenez Ctrl pour sélectionner plusieurs UAP',
                 ],
                 'row_attr' => [
                     'class' => 'col'

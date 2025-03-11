@@ -36,10 +36,6 @@ class Operator
     #[Groups(['operator_details'])]
     private ?Team $team = null;
 
-    #[ORM\ManyToOne(inversedBy: 'operators')]
-    #[Groups(['operator_details'])]
-    private ?Uap $uap = null;
-
     #[ORM\OneToMany(mappedBy: 'operator', targetEntity: TrainingRecord::class)]
     private Collection $trainingRecords;
 
@@ -50,7 +46,7 @@ class Operator
     #[Groups(['operator_details'])]
     private ?string $code = null;
 
-    #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'operator', cascade: ['remove'])]
     private ?Trainer $trainer = null;
 
     #[ORM\Column(nullable: true)]
@@ -66,10 +62,17 @@ class Operator
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $inactiveSince = null;
 
+    /**
+     * @var Collection<int, Uap>
+     */
+    #[ORM\ManyToMany(targetEntity: Uap::class, mappedBy: 'operators')]
+    private Collection $uaps;
+
 
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
+        $this->uaps = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -129,17 +132,6 @@ class Operator
         return $this;
     }
 
-    public function getUap(): ?Uap
-    {
-        return $this->uap;
-    }
-
-    public function setUap(?Uap $uap): static
-    {
-        $this->uap = $uap;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, TrainingRecord>
@@ -249,6 +241,33 @@ class Operator
     public function setInactiveSince(?\DateTimeInterface $inactiveSince): static
     {
         $this->inactiveSince = $inactiveSince;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Uap>
+     */
+    public function getUaps(): Collection
+    {
+        return $this->uaps;
+    }
+
+    public function addUap(Uap $uap): static
+    {
+        if (!$this->uaps->contains($uap)) {
+            $this->uaps->add($uap);
+            $uap->addOperator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUap(Uap $uap): static
+    {
+        if ($this->uaps->removeElement($uap)) {
+            $uap->removeOperator($this);
+        }
 
         return $this;
     }
