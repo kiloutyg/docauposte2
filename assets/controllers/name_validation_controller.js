@@ -4,14 +4,12 @@ export default class extends Controller {
     static targets = ["teamUapName", "message"];
 
     validateTeamUapName() {
-        const regex = /^[A-Z-]{3,}$(?<!-)$/;
-
-        var name = this.teamUapNameTarget.value;
+        const regex = /^(?!-)(?!.*--)[A-Z-]{3,}(?<!-)$/;
+        let isValid = true;
+        let name = this.teamUapNameTarget.value;
 
         if (name != '') {
-            var isValid = regex.test(name);
-        } else {
-            var isValid = true;
+            isValid = regex.test(name);
         }
 
         if (isValid) {
