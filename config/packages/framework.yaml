@@ -34,8 +34,6 @@ framework:
             "x-forwarded-prefix",
         ]
     # or, if your proxy instead uses the "Forwarded" header
-    # trusted_headers: ['forwarded']
-
 when@test:
     framework:
         test: true
