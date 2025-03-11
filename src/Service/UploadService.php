@@ -2,8 +2,6 @@
 
 namespace App\Service;
 
-// use Psr\Log\LoggerInterface;
-
 use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +27,6 @@ class UploadService extends AbstractController
 {
     private $manager;
     private $projectDir;
-    // private $logger;
 
     private $uploadRepository;
 
@@ -42,7 +39,6 @@ class UploadService extends AbstractController
     public function __construct(
         EntityManagerInterface  $manager,
         ParameterBagInterface   $params,
-        // // LoggerInterface         $logger,
 
         UploadRepository        $uploadRepository,
 
@@ -53,7 +49,6 @@ class UploadService extends AbstractController
 
         $this->manager               = $manager;
         $this->projectDir            = $params->get(name: 'kernel.project_dir');
-        // // $this->logger                = $logger;
 
         $this->uploadRepository      = $uploadRepository;
 
@@ -76,9 +71,6 @@ class UploadService extends AbstractController
             // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
             if ($request->request->get('validatorRequired') == 'true') {
                 foreach ($request->request->keys() as $key) {
-                    // if (strpos($key, 'validator_department') !== false) {
-                    //     $validated = null;
-                    // } else
                     if (strpos($key, 'validator_user') !== false) {
                         $validated = null;
                     }
@@ -186,10 +178,8 @@ class UploadService extends AbstractController
     public function modifyFile(Upload $upload, Request $request)
     {
 
-        // $this->logger->info('fullrequest inside upload service', ['request' => $request->request->all()]);
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
-        // $this->logger->info('is newfile empty ' . empty($newfile));
 
         $user = $this->getUser();
 
@@ -214,10 +204,8 @@ class UploadService extends AbstractController
         $comment = $request->request->get('modificationComment');
 
         $modificationOutlined = $request->request->get('modification-outlined');
-        // $this->logger->info('modification-outlined', ['modification-outlined' => $modificationOutlined]);
 
         $preExistingValidation = !empty($upload->getValidation());
-        // $this->logger->info('preExistingValidation', ['preExistingValidation' => $preExistingValidation]);
 
         $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
 
@@ -232,10 +220,8 @@ class UploadService extends AbstractController
             // Retire the old file if a new one has been uploaded.
             if (!empty($newfile)) {
                 try {
-                    // $this->logger->info('try to retire oldfile when validator is required');
                     $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
                 } catch (\Exception $e) {
-                    // $this->logger->info('Issues while retiring oldUpload' . $e);
                     throw $e;
                 }
             }
@@ -249,7 +235,6 @@ class UploadService extends AbstractController
 
             if ($preExistingValidation && ($modificationOutlined == null || $modificationOutlined == '' || $modificationOutlined == 'heavy-modification')) {
                 if ($validated === null) {
-                    // $this->logger->info('Has an existing validation and is non minor modification');
                     $this->validationService->updateValidation($upload, $request);
                 }
             } else {
@@ -270,7 +255,6 @@ class UploadService extends AbstractController
             }
         };
 
-
         $upload->setTraining(filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN));
 
         $upload->setForcedDisplay(filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN));
@@ -280,11 +264,8 @@ class UploadService extends AbstractController
         if ($newFile) {
 
             try { // Retire the old file
-                // $this->logger->info('try to retire oldfile when there is a newfile');
-
                 $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
             } catch (\exception $e) {
-                // $this->logger->info('Issues during retiring oldUpload' . $e);
                 throw $e;
             }
             // Check if the file is of the right type
@@ -299,7 +280,6 @@ class UploadService extends AbstractController
             try {
                 $newFile->move($folderPath . '/', $upload->getFilename());
             } catch (\Exception $e) {
-                // $this->logger->info('issues while moving the file to path' . $e);
                 throw $e;
             }
             // Update the file path in the upload object
@@ -342,11 +322,7 @@ class UploadService extends AbstractController
     public function modifyDisapprovedFile(Upload $upload, User $user, Request $request)
     {
 
-        // $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->full request', [$request->request->all()]);
-
-        // $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->$request->request->get(training-needed)', [$request->request->get('training-needed')]);
         $trainingNeeded = filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN);
-        // $this->logger->info('ValidationController::disapprovedValidationModificationByUpload->trainingNeeded', [$trainingNeeded]);
 
         // Get the new file directly from the Upload object
         $newFile = $upload->getFile();
@@ -422,7 +398,6 @@ class UploadService extends AbstractController
         // Group uploads by zone, productLine, category, and button
         foreach ($uploads as $upload) {
 
-            // $this->logger->info('upload in groupAllUpload service', $upload);
 
             $zoneName        = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
             $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
@@ -589,9 +564,7 @@ class UploadService extends AbstractController
 
     public function downloadFileFromMethods(string $path): Response
     {
-        // $this->logger->info('path', ['path' => $path]);
         $file = new File($path);
-        // $this->logger->info('file', ['file' => $file]);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
@@ -605,7 +578,6 @@ class UploadService extends AbstractController
         $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
 
         $path = $this->determineFilePath($file);
-        // $this->logger->info('path', ['path' => $path]);
         return $this->downloadFileFromMethods($path);
     }
 
@@ -618,12 +590,9 @@ class UploadService extends AbstractController
     {
 
         if (!$file->isValidated()) {
-            // $this->logger->info('is validated', ['validated' => $file->isValidated()]);
             if ($file->isForcedDisplay() === true || $file->isForcedDisplay() === null) {
-                // $this->logger->info('is forced display on or null', ['forcedDisplay' => $file->isForcedDisplay()]);
                 return $file->getPath();
             } elseif ($file->getOldUpload() != null) {
-                // $this->logger->info('is old upload', ['oldUpload' => $file->getOldUpload()]);
                 $oldUpload = $file->getOldUpload();
                 return $oldUpload->getPath();
             }
