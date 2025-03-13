@@ -280,21 +280,15 @@ class IncidentController extends AbstractController
             if ($form->isSubmitted() && $form->isValid()) {
                 // Process the form data and modify the Upload entity
                 return $this->incidentService->modifyIncidentFile($incident);
-            } else {
-                // Extract validation errors and add them to flash messages
-                if ($form->isSubmitted()) {
-                    foreach ($form->getErrors(true) as $error) {
-                        $this->addFlash('error', $error->getMessage());
-                    }
-                    // If no specific errors were found, show a generic message
-                    if (count($form->getErrors(true)) === 0) {
-                        $this->addFlash('error', 'Invalid form. Check the entered data.');
-                    }
-                } else {
-                    $this->addFlash('error', 'Invalid form. Could not get submitted. Check the entered data.');
+            } elseif ($form->isSubmitted()) {
+                foreach ($form->getErrors(true) as $error) {
+                    $this->addFlash('error', $error->getMessage());
                 }
+            } else {
+                $this->addFlash('error', 'Invalid form. Could not get submitted. Check the entered data.');
             }
         }
+
 
         // Create a form to modify the Upload entity
         $form = $this->createForm(IncidentType::class, $incident);
