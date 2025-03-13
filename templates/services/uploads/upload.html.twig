@@ -50,7 +50,8 @@
 											<div
 												class="row d-flex align-items-center gy-5">
 												<div
-													class="fallback">
+													class="fallback"
+													data-controller="filename-validation">
 													<label
 														for="file"
 														class="form-label"
@@ -62,13 +63,17 @@
 														class="form-control"
 														id="file"
 														name="file"
+														data-filename-validation-target='filename'
+														data-action='keyup->filename-validation#validateFilename'
 														accept=".pdf"
 														required>
-
+													<div
+														data-filename-validation-target="message"
+														class="filename-message"></div>
 													<div
 														class="mb-3">
 														<label
-															for="newFileName"
+															for="newFilename"
 															class="form-label"
 															style="color:white">
 															Nom du fichier :
@@ -76,10 +81,16 @@
 														<input
 															type="text"
 															class="form-control"
-															id="newFileName"
-															name="newFileName"
+															id="newFilename"
+															data-filename-validation-target='newFilename'
+															data-action='keyup->filename-validation#validateNewFilename'
+															name="newFilename"
 															placeholder="Entrer un nouveau nom de fichier (optionnel)">
+
 													</div>
+													<div
+														data-filename-validation-target="message"
+														class="newFilename-message"></div>
 													{% include 'services/uploads/uploads_components/cascading_dropdowns.html.twig' %}
 												</div>
 											</div>

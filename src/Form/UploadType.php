@@ -31,7 +31,7 @@ class UploadType extends AbstractType
                 [
                     'label' => 'Select a file to upload:',
                     'mapped' => true,
-                    'required' => false,
+                    'required' => false
                 ]
             )
             // Adds a text input field for the filename to the form
@@ -42,6 +42,10 @@ class UploadType extends AbstractType
                     'label' => 'Nouveau nom du fichier:',
                     'required' => false,
                     'empty_data' => null,
+                    'attr' => [
+                        'data-filename-validation-target' => 'filename',
+                        'data-action' => 'keyup->filename-validation#validateFilename'
+                    ]
                 ]
             )
             // Adds an entity field for selecting a button to the form

@@ -19,7 +19,7 @@ use App\Service\TrainingRecordService;
 use App\Service\IncidentService;
 use App\Service\EntityDeletionService;
 use App\Service\UploadService;
-use App\Service\FolderCreationService;
+use App\Service\FolderService;
 
 // This controller is responsible for rendering the super admin interface an managing the logic of the super admin interface
 class SuperAdminController extends AbstractController
@@ -32,7 +32,7 @@ class SuperAdminController extends AbstractController
 
     private $entityFetchingService;
     private $trainingRecordService;
-    private $folderCreationService;
+    private $folderService;
     private $entitydeletionService;
     private $incidentService;
     private $uploadService;
@@ -48,7 +48,7 @@ class SuperAdminController extends AbstractController
         TrainingRecordService           $trainingRecordService,
         UploadService                   $uploadService,
         EntityDeletionService           $entitydeletionService,
-        FolderCreationService           $folderCreationService,
+        FolderService           $folderService,
         IncidentService                 $incidentService,
 
     ) {
@@ -59,7 +59,7 @@ class SuperAdminController extends AbstractController
         $this->zoneRepository               = $zoneRepository;
 
         $this->uploadService                = $uploadService;
-        $this->folderCreationService        = $folderCreationService;
+        $this->folderService        = $folderService;
         $this->incidentService              = $incidentService;
         $this->entitydeletionService        = $entitydeletionService;
         $this->trainingRecordService        = $trainingRecordService;
@@ -125,7 +125,7 @@ class SuperAdminController extends AbstractController
                 $zone->setCreator($this->getUser());
                 $this->em->persist($zone);
                 $this->em->flush();
-                $this->folderCreationService->folderStructure($zonename);
+                $this->folderService->folderStructure($zonename);
                 $this->addFlash('success', 'La zone a été créée');
                 return $this->redirectToRoute('app_super_admin');
             }

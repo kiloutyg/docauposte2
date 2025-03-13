@@ -1,0 +1,101 @@
+<?php
+
+namespace App\Service;
+
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+
+use App\Entity\Upload;
+
+// This class is responsible for the logic of creating and deleting the folder structure used to store the files and organize them in the server filesystem making it easier to manage.
+class FolderService
+{
+    protected $doc_dir;
+    protected $logger;
+
+    public function __construct(
+        ParameterBagInterface $params,
+        LoggerInterface $logger
+    ) {
+        $this->doc_dir = $params->get(name: 'kernel.project_dir') . '/public/doc';
+        $this->logger = $logger;
+    }
+
+    // This function creates the folder structure for a given entity
+    public function folderStructure(string $folderName)
+    {
+        $folderPath = '';
+        // Then the function creates the folder using the dedicated function
+        foreach ($this->pathParts($folderName) as $part) {
+            $folderPath .= '/' . $part;
+            $this->createFolder($folderPath);
+        }
+    }
+
+    // This function deletes the folder structure for a given entity
+    public function deleteFolderStructure($folderName)
+    {
+        $this->deleteFolder($this->pathFindingDoc($folderName));
+    }
+
+    // This function creates a folder and chmod it to 0755
+    public function createFolder($folderPath)
+    {
+        if (!file_exists($folderPath)) {
+            try {
+                mkdir($folderPath, 0755, true);
+            } catch (\Exception $e) {
+                throw $e;
+            };
+        }
+    }
+
+    // This function deletes a folder
+    public function deleteFolder($folderPath)
+    {
+        if (file_exists($folderPath)) {
+            try {
+                rmdir($folderPath);
+            } catch (\Exception $e) {
+                throw $e;
+            };
+        }
+    }
+
+    public function updateFolderStructureAndName($oldName, $newName): bool
+    {
+        if (rename($this->pathFindingDoc($oldName), $this->pathFindingDoc($newName))) {
+            return true;
+        } else {
+            throw new \Exception('updateFolderStructureAndName: Could not rename the folder');
+        }
+    }
+
+    public function uploadPath(Upload $upload): string
+    {
+        return $this->pathFindingDoc($upload->getButton()->getName(), $upload->getFilename());
+    }
+
+
+    public function pathFindingDoc(string $entityName, ?string $addonName = null)
+    {
+        $parts = $this->pathParts($entityName);
+        $path = $this->doc_dir;
+        foreach ($parts as $part) {
+            $path .= '/' . $part;
+        }
+        if ($addonName) {
+            $path = $path . '/' . $addonName;
+        }
+        return $path;
+    }
+
+
+    public function pathParts(string $name): array
+    {
+        $parts      = explode('.', $name);
+        $parts      = array_reverse($parts);
+        return $parts;
+    }
+}

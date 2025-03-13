@@ -17,7 +17,7 @@ use App\Repository\OldUploadRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\UserRepository;
 
-use App\Service\FolderCreationService;
+use App\Service\FolderService;
 
 class ViewsModificationService extends AbstractController
 {
@@ -34,7 +34,7 @@ class ViewsModificationService extends AbstractController
     private $incidentRepository;
     private $userRepository;
 
-    private $folderCreationService;
+    private $folderService;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -50,7 +50,7 @@ class ViewsModificationService extends AbstractController
         IncidentRepository $incidentRepository,
         UserRepository $userRepository,
 
-        FolderCreationService $folderCreationService
+        FolderService $folderService
     ) {
         $this->em                       = $em;
         $this->projectDir               = $params->get('kernel.project_dir');
@@ -65,7 +65,7 @@ class ViewsModificationService extends AbstractController
         $this->incidentRepository       = $incidentRepository;
         $this->userRepository          = $userRepository;
 
-        $this->folderCreationService    = $folderCreationService;
+        $this->folderService    = $folderService;
     }
 
     public function updateTheUpdatingOfTheSortOrder()
@@ -182,7 +182,7 @@ class ViewsModificationService extends AbstractController
             case 'name':
                 $entity->setName($newValue);
                 $this->updateByParentEntity($entityType, $entityId, $newValue, $field);
-                $this->folderCreationService->updateFolderStructureAndName($originalValue, $newValue);
+                $this->folderService->updateFolderStructureAndName($originalValue, $newValue);
                 break;
             case 'creator':
                 $creator = $this->userRepository->findOneBy(['id' => $newValue]);

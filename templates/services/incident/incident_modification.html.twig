@@ -40,7 +40,8 @@
 
 				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyIncidentForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_incident_modify_file', {'incidentId': incident.id})}) }}
 				<div
-					class="fallback">
+					class="fallback"
+					data-controller="filename-validation">
 					<div
 						class="mb-3">
 						{{ form_label(form.file, 'Choisissez un nouveau ficher:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}
@@ -49,7 +50,9 @@
 						{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}
 						) }}
 					</div>
-
+					<div
+						data-filename-validation-target="message"
+						class="newFilename-message "></div>
 					<div
 						class="mb-3">
 						{{ form_label(form.name, 'Nouveau nom du fichier:', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}
@@ -57,16 +60,13 @@
 						{{ form_widget(form.name, {'attr': {'class': 'form-control', 'id': 'name', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)'}}
 						) }}
 					</div>
+
 					<div
 						style="color:white">
-
-						{# Display the current button hierarchy #}
-
 						Zone:
 						{{ incident.productLine.zone.name|split('.')|first|upper }}
 						&nbsp;>&nbsp;Ligne:
 						{{ incident.productLine.name|split('.')|first|upper}}
-
 					</div>
 
 					<div

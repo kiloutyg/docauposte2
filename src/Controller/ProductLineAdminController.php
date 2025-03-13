@@ -21,7 +21,7 @@ use App\Repository\CategoryRepository;
 
 use App\Service\EntityDeletionService;
 use App\Service\UploadService;
-use App\Service\FolderCreationService;
+use App\Service\FolderService;
 use App\Service\IncidentService;
 use App\Service\EntityHeritanceService;
 use App\Service\SettingsService;
@@ -43,7 +43,7 @@ class ProductLineAdminController extends AbstractController
 
     // Services methods
     private $incidentService;
-    private $folderCreationService;
+    private $folderService;
     private $entityHeritanceService;
     private $entitydeletionService;
     private $uploadService;
@@ -63,7 +63,7 @@ class ProductLineAdminController extends AbstractController
         // Services methods
         IncidentService                 $incidentService,
         EntityHeritanceService          $entityHeritanceService,
-        FolderCreationService           $folderCreationService,
+        FolderService           $folderService,
         EntityDeletionService           $entitydeletionService,
         UploadService                   $uploadService,
         SettingsService                 $settingsService,
@@ -81,7 +81,7 @@ class ProductLineAdminController extends AbstractController
         // Variables related to the services
         $this->incidentService              = $incidentService;
         $this->entityHeritanceService       = $entityHeritanceService;
-        $this->folderCreationService        = $folderCreationService;
+        $this->folderService        = $folderService;
         $this->uploadService                = $uploadService;
         $this->entitydeletionService        = $entitydeletionService;
         $this->settingsService              = $settingsService;
@@ -167,7 +167,7 @@ class ProductLineAdminController extends AbstractController
                 $category->setCreator($this->getUser());
                 $this->em->persist($category);
                 $this->em->flush();
-                $this->folderCreationService->folderStructure($categoryname);
+                $this->folderService->folderStructure($categoryname);
                 $this->addFlash('success', 'La catégorie a été créée');
                 return $this->redirectToRoute('app_productLine_admin', ['productLineId' => $productLineId]);
             }
@@ -184,7 +184,7 @@ class ProductLineAdminController extends AbstractController
         // Check if the user is the creator of the entity or if he is a super admin
         if ($this->authChecker->isGranted("ROLE_LINE_ADMIN")) {
             // This function is used to delete a category and all the infants entity attached to it, it depends on the EntityDeletionService class. 
-            // The folder is deleted by the FolderCreationService class through the EntityDeletionService class.
+            // The folder is deleted by the FolderService class through the EntityDeletionService class.
             $response = $this->entitydeletionService->deleteEntity($entityType, $categoryId);
         } else {
             $productLineId = $category->getProductLine()->getId();

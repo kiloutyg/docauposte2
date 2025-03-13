@@ -38,11 +38,15 @@
 			data-bs-parent="#accordionOtherModifications"
 			class="accordion-collapse collapse ">
 			<div
-				class="col-10 mx-auto">
+				class="col-10 mx-auto"
+				data-controller="filename-validation">
 				<div
 					class="mb-3">
 					{{ form_label(form.filename, 'Nouveau nom du fichier:', {'label_attr': {'class': 'form-label', 'style': 'color:black'}}
 					) }}
+					<div
+						data-filename-validation-target="message"
+						class="newFilename-message "></div>
 					{{ form_widget(form.filename, {'attr': {'class': 'form-control', 'id': 'filename', 'placeholder': 'Entrer un nouveau nom de fichier (optionnel)'}}
 					) }}
 				</div>

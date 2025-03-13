@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -23,12 +23,13 @@ use App\Service\EntityDeletionService;
 use App\Service\UploadService;
 use App\Service\ValidationService;
 use App\Service\SettingsService;
+use App\Service\NamingService;
 
 // This controlle is responsible for managing the logic of the upload interface
 #[Route('/', name: 'app_')]
 class UploadController extends AbstractController
 {
-
+    private $logger;
     private $security;
     private $authChecker;
 
@@ -42,11 +43,13 @@ class UploadController extends AbstractController
     private $entitydeletionService;
     private $uploadService;
     private $settingsService;
+    private $namingService;
 
 
 
 
     public function __construct(
+        LoggerInterface                 $logger,
 
         Security                        $security,
         AuthorizationCheckerInterface   $authChecker,
@@ -60,9 +63,11 @@ class UploadController extends AbstractController
         ValidationService               $validationService,
         EntityDeletionService           $entitydeletionService,
         UploadService                   $uploadService,
-        SettingsService                 $settingsService
+        SettingsService                 $settingsService,
+        NamingService                   $namingService,
 
     ) {
+        $this->logger                       = $logger;
         $this->security                     = $security;
 
         $this->authChecker                  = $authChecker;
@@ -76,6 +81,7 @@ class UploadController extends AbstractController
         $this->uploadService                = $uploadService;
         $this->entitydeletionService        = $entitydeletionService;
         $this->settingsService              = $settingsService;
+        $this->namingService                = $namingService;
     }
 
 
@@ -121,22 +127,23 @@ class UploadController extends AbstractController
             // Truncate the string to remove everything after the last '/'
             $originUrl = substr($originUrl, 0, $slashPos);
         }
+
         // Retrieve the User object
         $user = $this->getUser();
-        // Retrieve the button and the newFileName from the request
+        // Retrieve the button and the newFilename from the request
         $button      = $request->request->get('button');
-        $newFileName = $request->request->get('newFileName');
         // Find the Button entity in the repository based on its ID
-        $buttonEntity = $this->buttonRepository->findoneBy(['id' => $button]);
+        $buttonEntity = $this->buttonRepository->find($button);
+
+        // Filename checks to see if compliant and if a newname has been chosen by user
+        if (!$this->namingService->filenameChecks($request, $request->request->get('newFilename'))) {
+            return $this->redirect($originUrl);
+        } else {
+            $filename = $this->namingService->filenameChecks($request, $request->request->get('newFilename'));
+        };
+
         // Check if the file already exists by comparing the filename and the button
         $conflictFile = '';
-        $filename     = '';
-        $file         = $request->files->get('file');
-        if ($newFileName) {
-            $filename = $newFileName;
-        } else {
-            $filename = $file->getClientOriginalName();
-        }
         $conflictFile = $this->uploadRepository->findOneBy(['button' => $buttonEntity, 'filename' => $filename]);
         // If the file already exists, return an error message
         if ($conflictFile) {
@@ -144,7 +151,7 @@ class UploadController extends AbstractController
             return $this->redirect($originUrl);
         } else {
             // Use the UploadService to handle file uploads
-            $name = $this->uploadService->uploadFiles($request, $buttonEntity, $user, $newFileName);
+            $name = $this->uploadService->uploadFiles($request, $buttonEntity, $user, $filename);
             $this->addFlash('success', 'Le document ' . $name . ' a été correctement chargé');
             return $this->redirect($originUrl);
         }
@@ -156,7 +163,7 @@ class UploadController extends AbstractController
 
     // create a route to redirect to the correct views of a file
     #[Route('/download/{uploadId}', name: 'download_file')]
-    public function filterDownloadFile(int $uploadId = null, Request $request): Response
+    public function filterDownloadFile(Request $request, ?int $uploadId = null): Response
     {
         if ($uploadId) {
             return $this->uploadService->filterDownloadFile($uploadId, $request);
@@ -194,7 +201,7 @@ class UploadController extends AbstractController
 
     // create a route to download a file in more simple terms to display the file
     #[Route('/download/invalidation/{uploadId}', name: 'download_invalidation_file')]
-    public function downloadInValidationFile(int $uploadId = null, Request $request): Response
+    public function downloadInValidationFile(Request $request, ?int $uploadId = null): Response
     {
         if ($uploadId) {
             return $this->uploadService->downloadInValidationFile($uploadId);
@@ -213,7 +220,7 @@ class UploadController extends AbstractController
     // create a route to delete a file
     #[Route('/delete/upload/{uploadId}', name: 'delete_file')]
 
-    public function deleteFile(int $uploadId = null, Request $request): RedirectResponse
+    public function deleteFile(Request $request, ?int $uploadId = null): RedirectResponse
     {
         $originUrl = $request->headers->get('Referer');
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
@@ -238,7 +245,7 @@ class UploadController extends AbstractController
 
     // create a route to modify a file and or display the modification page
     #[Route('/modification/view/{uploadId}', name: 'modify_file')]
-    public function fileModificationView(int $uploadId = null, Request $request,): Response
+    public function fileModificationView(Request $request, ?int $uploadId = null): Response
     {
         // Retrieve the current upload entity based on the uploadId
         $upload      = $this->uploadRepository->find($uploadId);
@@ -278,12 +285,11 @@ class UploadController extends AbstractController
     #[Route('/modification/modifying/{uploadId}', name: 'modifying_file')]
     public function modifyingFile(Request $request, int $uploadId): Response
     {
-        // Log the request
-        $originUrl = $request->headers->get('referer');
-
         if (!$request->isMethod('POST')) {
             $this->addFlash('warning', 'Invalid request.');
-            return $this->redirectToRoute('app_base');
+            return $this->redirectToRoute('app_modify_file', [
+                'uploadId' => $uploadId
+            ]);
         };
 
         // Retrieve the current upload entity based on the uploadId
@@ -291,15 +297,18 @@ class UploadController extends AbstractController
         // Check if there is a file to modify
         if (!$upload) {
             $this->addFlash('error', 'Le fichier n\'a pas été trouvé.');
-            return $this->redirect($originUrl);
+            return $this->redirectToRoute('app_modify_file', [
+                'uploadId' => $uploadId
+            ]);
         }
 
-        $categoryId  = $upload->getButton()->getCategory()->getId();
+        // Checking if filename use is compliant
+        $this->namingService->requestUploadFilenameChecks($request);
+
         // Create a form to modify the Upload entity
         $form = $this->createForm(UploadType::class, $upload);
 
         $trainingNeeded = filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN);
-
         $forcedDisplay = filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN);
 
         $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
@@ -307,42 +316,39 @@ class UploadController extends AbstractController
         $neededValidator = $this->settingsService->getSettings()->getValidatorNumber();
         $enoughValidator = $this->validationService->checkNumberOfValidator($request, $neededValidator);
 
-
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             // Process the form data and modify the Upload entity
-
             try {
                 if ($trainingNeeded == null || $forcedDisplay == null) {
                     $comment = $request->request->get('modificationComment');
                     if ($upload->getFile() && $upload->getValidation() != null && empty($comment) && $request->request->get('modification-outlined' == '')) {
                         $this->addFlash('error', 'Le commentaire est vide. Commenter votre modification est obligatoire.');
-                        return $this->redirectToRoute('app_category_admin', [
-                            'categoryId' => $categoryId
-                        ]);
                     } elseif ($newValidation && !$enoughValidator) {
                         $this->addFlash('error', 'Selectionner au moins ' . $neededValidator . ' validateurs pour valider le fichier.');
-                        return $this->redirectToRoute('app_category_admin', [
-                            'categoryId' => $categoryId
-                        ]);
                     }
                 }
                 $this->uploadService->modifyFile($upload, $request);
                 $this->addFlash('success', 'Le fichier a été modifié.');
-                return $this->redirectToRoute('app_category_admin', [
-                    'categoryId' => $categoryId
-                ]);
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_category_admin', [
-                    'categoryId' => $categoryId
-                ]);
             }
         } else {
-            $this->addFlash('error', 'Invalid form. Check the entered data.');
-            return $this->redirectToRoute('app_category_admin', [
-                'categoryId' => $categoryId
-            ]);
+            // Extract validation errors and add them to flash messages
+            if ($form->isSubmitted()) {
+                foreach ($form->getErrors(true) as $error) {
+                    $this->addFlash('error', $error->getMessage());
+                }
+                // If no specific errors were found, show a generic message
+                if (count($form->getErrors(true)) === 0) {
+                    $this->addFlash('error', 'Invalid form. Check the entered data.');
+                }
+            } else {
+                $this->addFlash('error', 'Invalid form. Could not get submitted. Check the entered data.');
+            }
         }
+        return $this->redirectToRoute('app_modify_file', [
+            'uploadId' => $uploadId
+        ]);
     }
 }
