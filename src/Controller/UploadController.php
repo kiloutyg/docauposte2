@@ -140,7 +140,7 @@ class UploadController extends AbstractController
             return $this->redirect($originUrl);
         } else {
             $filename = $this->namingService->filenameChecks($request, $request->request->get('newFilename'));
-        };
+        }
 
         // Check if the file already exists by comparing the filename and the button
         $conflictFile = '';

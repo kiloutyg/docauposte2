@@ -4,22 +4,19 @@ namespace App\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Psr\Log\LoggerInterface;
 
 use App\Repository\ProductLineRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
 
 use App\Entity\Incident;
-use App\Entity\User;
 
 use App\Service\NamingService;
 use App\Service\FolderService;
+use App\Service\FileTypeService;
 
 
 // This class is responsible for the logic of managing the incidents files
@@ -27,31 +24,26 @@ class IncidentService extends AbstractController
 {
 
     private $manager;
-    private $projectDir;
-    private $logger;
-
     private $productLineRepository;
     private $incidentRepository;
     private $incidentCategoryRepository;
 
     private $namingService;
     private $folderService;
+    private $fileTypeService;
 
     public function __construct(
         EntityManagerInterface $manager,
-        ParameterBagInterface $params,
-        LoggerInterface $logger,
 
         IncidentRepository $incidentRepository,
         ProductLineRepository $productLineRepository,
         IncidentCategoryRepository $incidentCategoryRepository,
 
         NamingService $namingService,
-        FolderService $folderService
+        FolderService $folderService,
+        FileTypeService $fileTypeService,
     ) {
         $this->manager = $manager;
-        $this->projectDir = $params->get('kernel.project_dir');
-        $this->logger = $logger;
 
         $this->productLineRepository = $productLineRepository;
         $this->incidentRepository = $incidentRepository;
@@ -59,6 +51,7 @@ class IncidentService extends AbstractController
 
         $this->namingService = $namingService;
         $this->folderService = $folderService;
+        $this->fileTypeService = $fileTypeService;
     }
 
 
@@ -68,7 +61,6 @@ class IncidentService extends AbstractController
         // Get the URL of the page from which the request originated
         $originUrl = $request->headers->get('referer');
 
-        $allowedExtensions = ['pdf'];
         $files = $request->files->all();
 
         $incidentCategory = $this->incidentCategoryRepository->find($request->request->get('incident_incidentCategory'));
@@ -79,21 +71,13 @@ class IncidentService extends AbstractController
 
         foreach ($files as $file) {
 
-            // Check if the file is a pdf
-            $extension = $file->guessExtension();
-            if (!in_array($extension, $allowedExtensions)) {
-                return $this->addFlash('error', 'Le fichier doit être un pdf');;
-            }
-            if ($file->getMimeType() != 'application/pdf') {
-                return $this->addFlash('error', 'Le fichier doit être un pdf');;
-            }
-
+            $this->fileTypeService->checkFileType($file);
             // Filename checks to see if compliant and if a newname has been chosen by user
             if (!$this->namingService->filenameChecks($request, $request->request->get('incident_newFileName'))) {
                 return $this->redirect($originUrl);
             } else {
                 $name = $this->namingService->filenameChecks($request, $request->request->get('incident_newFileName'));
-            };
+            }
 
             // Dynamic folder creation in the case it does not aleady exist
             $folderPath = $this->folderService->pathFindingDoc($productLine->getName());

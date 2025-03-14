@@ -27,7 +27,6 @@ use App\Service\FileTypeService;
 // This class is used to manage the uploads files and logic
 class UploadService extends AbstractController
 {
-    private $logger;
     private $em;
 
     private $uploadRepository;
@@ -40,7 +39,6 @@ class UploadService extends AbstractController
 
 
     public function __construct(
-        LoggerInterface         $logger,
         EntityManagerInterface  $em,
 
         UploadRepository        $uploadRepository,
@@ -51,7 +49,6 @@ class UploadService extends AbstractController
         FolderService           $folderService,
         FileTypeService         $fileTypeService,
     ) {
-        $this->logger                = $logger;
         $this->em                    = $em;
 
         $this->uploadRepository      = $uploadRepository;
@@ -146,7 +143,7 @@ class UploadService extends AbstractController
         $upload->setForcedDisplay($displayNeeded);
         // Set the validated boolean property
         $upload->setValidated($validated);
-        // return $validated;
+
         if ($validated === null) {
             $this->validationService->createValidation($upload, $request);
         }
@@ -180,7 +177,6 @@ class UploadService extends AbstractController
                 throw $e;
             }
         }
-
         $this->modifyUploadTrainingValidationChecker($request, $upload, $user);
 
         $upload->setTraining(filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN));
@@ -243,48 +239,141 @@ class UploadService extends AbstractController
 
 
 
+    // public function modifyUploadTrainingValidationChecker(Request $request, Upload $upload, User $user): void
+    // {
+    //     $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
+    //     $modificationOutlined = $request->request->get('modification-outlined');
+    //     $preExistingValidation = !empty($upload->getValidation());
+    //     if ($newValidation) {
+
+    //         foreach ($request->request->keys() as $key) {
+    //             if (strpos($key, 'validator_user') !== false) {
+    //                 $validated = null;
+    //             }
+    //         }
+
+    //         // Set the validated boolean property
+    //         $upload->setValidated($validated);
+    //         // Update the uploader in the upload object
+    //         $upload->setUploader($user);
+    //         // Set the revision 
+    //         $upload->setRevision(1);
+
+    //         if ($preExistingValidation && ($modificationOutlined == null || $modificationOutlined == '' || $modificationOutlined == 'heavy-modification')) {
+    //             if ($validated === null) {
+    //                 $this->validationService->updateValidation($upload, $request);
+    //             }
+    //         } else {
+    //             if ($validated === null) {
+    //                 $this->validationService->createValidation($upload, $request);
+    //             }
+    //         }
+    //     } else {
+    //         $validated = true;
+    //         $comment = $request->request->get('modificationComment');
+    //         if ($preExistingValidation && $comment != null) {
+    //             if ($modificationOutlined == 'minor-modification') {
+    //                 $comment = $comment . ' (modification mineure)';
+    //             }
+    //             $preExistingValidationEntity = $upload->getValidation();
+    //             $preExistingValidationEntity->setComment($comment);
+    //             $this->em->persist($preExistingValidationEntity);
+    //             $this->em->flush();
+    //         }
+    //     }
+    // }
+
     public function modifyUploadTrainingValidationChecker(Request $request, Upload $upload, User $user): void
     {
         $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
-        $modificationOutlined = $request->request->get('modification-outlined');
         $preExistingValidation = !empty($upload->getValidation());
+
         if ($newValidation) {
-
-            foreach ($request->request->keys() as $key) {
-                if (strpos($key, 'validator_user') !== false) {
-                    $validated = null;
-                }
-            }
-
-            // Set the validated boolean property
-            $upload->setValidated($validated);
-            // Update the uploader in the upload object
-            $upload->setUploader($user);
-            // Set the revision 
-            $upload->setRevision(1);
-
-            if ($preExistingValidation && ($modificationOutlined == null || $modificationOutlined == '' || $modificationOutlined == 'heavy-modification')) {
-                if ($validated === null) {
-                    $this->validationService->updateValidation($upload, $request);
-                }
-            } else {
-                if ($validated === null) {
-                    $this->validationService->createValidation($upload, $request);
-                }
-            }
+            $this->handleRequiredValidation($request, $upload, $user, $preExistingValidation);
         } else {
-            $validated = true;
-            $comment = $request->request->get('modificationComment');
-            if ($preExistingValidation && $comment != null) {
-                if ($modificationOutlined == 'minor-modification') {
-                    $comment = $comment . ' (modification mineure)';
-                }
-                $preExistingValidationEntity = $upload->getValidation();
-                $preExistingValidationEntity->setComment($comment);
-                $this->em->persist($preExistingValidationEntity);
-                $this->em->flush();
+            $this->handleNoValidationRequired($request, $upload, $preExistingValidation);
+        }
+    }
+
+    /**
+     * Handle the case when validation is required for the upload
+     */
+    private function handleRequiredValidation(Request $request, Upload $upload, User $user, bool $preExistingValidation): void
+    {
+        $validated = $this->determineValidationStatus($request);
+        $modificationOutlined = $request->request->get('modification-outlined');
+
+        // Set the validated boolean property
+        $upload->setValidated($validated);
+
+        // Update the uploader in the upload object
+        $upload->setUploader($user);
+
+        // Set the revision 
+        $upload->setRevision(1);
+
+        if ($validated === null) {
+            $this->updateOrCreateValidation($upload, $request, $preExistingValidation, $modificationOutlined);
+        }
+    }
+
+    /**
+     * Handle the case when no validation is required for the upload
+     */
+    private function handleNoValidationRequired(Request $request, Upload $upload, bool $preExistingValidation): void
+    {
+        $upload->setValidated(true); // TODO : Check if this is an issue
+
+        $comment = $request->request->get('modificationComment');
+        if ($preExistingValidation && $comment != null) {
+            $this->updateExistingValidationComment($upload, $request, $comment);
+        }
+    }
+
+    /**
+     * Determine if the upload needs validation based on request parameters
+     */
+    private function determineValidationStatus(Request $request): ?bool
+    {
+        foreach ($request->request->keys() as $key) {
+            if (strpos($key, 'validator_user') !== false) {
+                return null; // Needs validation
             }
         }
+        return true; // No validation needed
+    }
+
+    /**
+     * Update or create validation records based on existing validation and modification type
+     */
+    private function updateOrCreateValidation(Upload $upload, Request $request, bool $preExistingValidation, ?string $modificationOutlined): void
+    {
+        $isHeavyModification = $modificationOutlined == null ||
+            $modificationOutlined == '' ||
+            $modificationOutlined == 'heavy-modification';
+
+        if ($preExistingValidation && $isHeavyModification) {
+            $this->validationService->updateValidation($upload, $request);
+        } else {
+            $this->validationService->createValidation($upload, $request);
+        }
+    }
+
+    /**
+     * Update the comment on an existing validation
+     */
+    private function updateExistingValidationComment(Upload $upload, Request $request, string $comment): void
+    {
+        $modificationOutlined = $request->request->get('modification-outlined');
+
+        if ($modificationOutlined == 'minor-modification') {
+            $comment = $comment . ' (modification mineure)';
+        }
+
+        $preExistingValidationEntity = $upload->getValidation();
+        $preExistingValidationEntity->setComment($comment);
+        $this->em->persist($preExistingValidationEntity);
+        $this->em->flush();
     }
 
 

@@ -11,14 +11,14 @@ use App\Entity\Upload;
 // This class is responsible for the logic of creating and deleting the folder structure used to store the files and organize them in the server filesystem making it easier to manage.
 class FolderService
 {
-    protected $doc_dir;
+    protected $docDir;
     protected $logger;
 
     public function __construct(
         ParameterBagInterface $params,
         LoggerInterface $logger
     ) {
-        $this->doc_dir = $params->get(name: 'kernel.project_dir') . '/public/doc';
+        $this->docDir = $params->get(name: 'kernel.project_dir') . '/public/doc';
         $this->logger = $logger;
     }
 
@@ -46,8 +46,12 @@ class FolderService
             try {
                 mkdir($folderPath, 0755, true);
             } catch (\Exception $e) {
-                throw $e;
-            };
+                $this->logger->error('Failed to create folder: ' . $folderPath, [
+                    'exception' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                throw $e; // Optionally still rethrow after logging
+            }
         }
     }
 
@@ -58,8 +62,12 @@ class FolderService
             try {
                 rmdir($folderPath);
             } catch (\Exception $e) {
-                throw $e;
-            };
+                $this->logger->error('Failed to delete folder: ' . $folderPath, [
+                    'exception' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                throw $e; // Optionally still rethrow after logging
+            }
         }
     }
 
@@ -81,7 +89,7 @@ class FolderService
     public function pathFindingDoc(string $entityName, ?string $addonName = null)
     {
         $parts = $this->pathParts($entityName);
-        $path = $this->doc_dir;
+        $path = $this->docDir;
         foreach ($parts as $part) {
             $path .= '/' . $part;
         }
