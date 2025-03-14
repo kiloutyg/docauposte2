@@ -98,7 +98,7 @@ class ValidationController extends AbstractController
 
     #[Route('/validation/approbation/{approbationId}', name: 'app_validation_approbation')]
     public function validationApprobationPage(
-        int $approbationId = null
+        ?int $approbationId = null
     ): Response {
         $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
         if ($approbation->isApproval() !== null) {
