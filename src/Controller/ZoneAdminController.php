@@ -23,7 +23,7 @@ use App\Repository\ProductLineRepository;
 
 use App\Service\EntityDeletionService;
 use App\Service\UploadService;
-use App\Service\FolderCreationService;
+use App\Service\FolderService;
 use App\Service\IncidentService;
 use App\Service\EntityHeritanceService;
 use App\Service\SettingsService;
@@ -46,7 +46,7 @@ class ZoneAdminController extends AbstractController
 
     // Services methods
     private $incidentService;
-    private $folderCreationService;
+    private $folderService;
     private $entityHeritanceService;
     private $entitydeletionService;
     private $uploadService;
@@ -69,7 +69,7 @@ class ZoneAdminController extends AbstractController
         // Services methods
         IncidentService                 $incidentService,
         EntityHeritanceService          $entityHeritanceService,
-        FolderCreationService           $folderCreationService,
+        FolderService           $folderService,
         EntityDeletionService           $entitydeletionService,
         UploadService                   $uploadService,
         SettingsService                 $settingsService,
@@ -88,7 +88,7 @@ class ZoneAdminController extends AbstractController
         // Variables related to the services
         $this->incidentService              = $incidentService;
         $this->entityHeritanceService       = $entityHeritanceService;
-        $this->folderCreationService        = $folderCreationService;
+        $this->folderService        = $folderService;
         $this->uploadService                = $uploadService;
         $this->entitydeletionService        = $entitydeletionService;
         $this->settingsService              = $settingsService;
@@ -166,7 +166,7 @@ class ZoneAdminController extends AbstractController
                 $this->em->persist($productLine);
                 $this->em->flush();
 
-                $this->folderCreationService->folderStructure($productLineName);
+                $this->folderService->folderStructure($productLineName);
 
                 $this->addFlash('success', 'The Product Line has been created');
                 return $this->redirectToRoute('app_zone_admin', ['zoneId' => $zoneId]);
@@ -187,7 +187,7 @@ class ZoneAdminController extends AbstractController
         // Check if the user is the creator of the entity or if he is a super admin
         if ($this->authChecker->isGranted("ROLE_LINE_ADMIN")) {
             // This function is used to delete a category and all the infants entity attached to it, it depends on the EntityDeletionService class. 
-            // The folder is deleted by the FolderCreationService class through the EntityDeletionService class.
+            // The folder is deleted by the FolderService class through the EntityDeletionService class.
             $response = $this->entitydeletionService->deleteEntity($entityType, $productLine->getId());
         } else {
             $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer cette ligne.');

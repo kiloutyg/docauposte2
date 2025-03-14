@@ -52,6 +52,10 @@ class IncidentType extends AbstractType
                     'label' => 'Nouveau nom du fichier d\'incident:',
                     'required' => false,
                     'empty_data' => null,
+                    'attr' => [
+                        'data-filename-validation-target' => 'filename',
+                        'data-action' => 'keyup->filename-validation#validateFilename'
+                    ]
                 ]
             )
             ->add(

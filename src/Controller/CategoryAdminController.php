@@ -22,7 +22,7 @@ use App\Repository\ButtonRepository;
 
 use App\Service\EntityDeletionService;
 use App\Service\UploadService;
-use App\Service\FolderCreationService;
+use App\Service\FolderService;
 use App\Service\IncidentService;
 use App\Service\EntityHeritanceService;
 use App\Service\ErrorService;
@@ -42,7 +42,7 @@ class CategoryAdminController extends AbstractController
 
     // Services methods
     private $incidentService;
-    private $folderCreationService;
+    private $folderService;
     private $entityHeritanceService;
     private $entitydeletionService;
     private $uploadService;
@@ -63,7 +63,7 @@ class CategoryAdminController extends AbstractController
         // Services methods
         IncidentService                 $incidentService,
         EntityHeritanceService          $entityHeritanceService,
-        FolderCreationService           $folderCreationService,
+        FolderService           $folderService,
         EntityDeletionService           $entitydeletionService,
         UploadService                   $uploadService,
         ErrorService                    $errorService,
@@ -81,7 +81,7 @@ class CategoryAdminController extends AbstractController
         // Variables related to the services
         $this->incidentService              = $incidentService;
         $this->entityHeritanceService       = $entityHeritanceService;
-        $this->folderCreationService        = $folderCreationService;
+        $this->folderService        = $folderService;
         $this->uploadService                = $uploadService;
         $this->entitydeletionService        = $entitydeletionService;
         $this->errorService                 = $errorService;
@@ -89,7 +89,7 @@ class CategoryAdminController extends AbstractController
 
     #[Route('/{categoryId}', name: 'admin')]
     // This function is responsible for rendering the category's admin interface. 
-    public function categoryAdmin(int $categoryId = null, Category $category = null): Response
+    public function categoryAdmin(?int $categoryId = null, ?Category $category = null): Response
     {
         $pageLevel = 'category';
         if ($category === null) {
@@ -154,7 +154,7 @@ class CategoryAdminController extends AbstractController
             if ($button) {
                 $this->addFlash('danger', 'Le bouton existe déjà');
                 return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
-                // If the button does not exist, create it and redirect to the category manager page and display a flash message. It depends on the FolderCreationService class.
+                // If the button does not exist, create it and redirect to the category manager page and display a flash message. It depends on the FolderService class.
             } else {
                 $count = $this->buttonRepository->count(['category' => $categoryId]);
                 $sortOrder = $count + 1;
@@ -165,7 +165,7 @@ class CategoryAdminController extends AbstractController
                 $button->setCreator($this->getUser());
                 $this->em->persist($button);
                 $this->em->flush();
-                $this->folderCreationService->folderStructure($buttonname);
+                $this->folderService->folderStructure($buttonname);
 
                 $this->addFlash('success', 'Le bouton a été créé');
                 return $this->redirectToRoute('app_category_admin', ['categoryId' => $categoryId]);
@@ -186,7 +186,7 @@ class CategoryAdminController extends AbstractController
         // Check if the user is the creator of the button or if he is a super admin
         if ($this->authChecker->isGranted("ROLE_LINE_ADMIN")) {
             // This function is used to delete a button and all the uploads attached to it, it depends on the EntityDeletionService class. 
-            // The folder is deleted by the FolderCreationService class through the EntityDeletionService class.
+            // The folder is deleted by the FolderService class through the EntityDeletionService class.
             $response = $this->entitydeletionService->deleteEntity($entityType, $buttonId);
         } else {
             $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer cette ' . $entityType . '.');

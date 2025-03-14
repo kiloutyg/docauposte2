@@ -28,7 +28,7 @@ use App\Repository\UapRepository;
 use App\Repository\TrainerRepository;
 
 use App\Service\IncidentService;
-use App\Service\FolderCreationService;
+use App\Service\FolderService;
 
 
 // This class is responsible for managing the deletion of entities, their related entities from the database
@@ -49,7 +49,7 @@ class EntityDeletionService
     private $incidentRepository;
     private $incidentCategoryRepository;
     private $incidentService;
-    private $folderCreationService;
+    private $folderService;
     private $departmentRepository;
     private $userRepository;
     private $validationRepository;
@@ -77,7 +77,7 @@ class EntityDeletionService
         IncidentRepository              $incidentRepository,
         IncidentCategoryRepository      $incidentCategoryRepository,
         IncidentService                 $incidentService,
-        FolderCreationService           $folderCreationService,
+        FolderService           $folderService,
         DepartmentRepository            $departmentRepository,
         UserRepository                  $userRepository,
         ValidationRepository            $validationRepository,
@@ -101,7 +101,7 @@ class EntityDeletionService
         $this->incidentRepository           = $incidentRepository;
         $this->incidentCategoryRepository   = $incidentCategoryRepository;
         $this->incidentService              = $incidentService;
-        $this->folderCreationService        = $folderCreationService;
+        $this->folderService        = $folderService;
         $this->departmentRepository         = $departmentRepository;
         $this->userRepository               = $userRepository;
         $this->validationRepository         = $validationRepository;
@@ -184,7 +184,7 @@ class EntityDeletionService
             foreach ($entity->getProductLines() as $productLine) {
                 $this->deleteEntity('productLine', $productLine->getId());
             }
-            $this->folderCreationService->deleteFolderStructure($entity->getName());
+            $this->folderService->deleteFolderStructure($entity->getName());
         } elseif ($entityType === 'productLine') {
             foreach ($entity->getCategories() as $category) {
                 $this->deleteEntity('category', $category->getId());
@@ -193,17 +193,17 @@ class EntityDeletionService
             foreach ($entity->getIncidents() as $incident) {
                 $this->deleteEntity('incident', $incident->getId());
             }
-            $this->folderCreationService->deleteFolderStructure($entity->getName());
+            $this->folderService->deleteFolderStructure($entity->getName());
         } elseif ($entityType === 'category') {
             foreach ($entity->getButtons() as $button) {
                 $this->deleteEntity('button', $button->getId());
             }
-            $this->folderCreationService->deleteFolderStructure($entity->getName());
+            $this->folderService->deleteFolderStructure($entity->getName());
         } elseif ($entityType === 'button') {
             foreach ($entity->getUploads() as $upload) {
                 $this->deleteEntity('upload', $upload->getId());
             }
-            $this->folderCreationService->deleteFolderStructure($entity->getName());
+            $this->folderService->deleteFolderStructure($entity->getName());
         } elseif ($entityType === 'user') {
             foreach ($entity->getUploads() as $upload) {
                 $this->deleteEntity('upload', $upload->getId());
@@ -218,7 +218,7 @@ class EntityDeletionService
         } elseif ($entityType === 'upload') {
             $this->deleteFile($entity->getId());
         } elseif ($entityType === 'incident') {
-            $this->incidentService->deleteIncidentFile($entity, $entity->getProductLine());
+            $this->incidentService->deleteIncidentFile($entity);
         } elseif ($entityType === 'department') {
             foreach ($entity->getUsers() as $user) {
                 $entity->removeUser($user);

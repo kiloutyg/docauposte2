@@ -22,7 +22,7 @@ use App\Form\UploadType;
 
 use App\Service\UploadService;
 use App\Service\ValidationService;
-
+use App\Service\NamingService;
 
 
 class ValidationController extends AbstractController
@@ -39,7 +39,7 @@ class ValidationController extends AbstractController
     // Services methods
     private $validationService;
     private $uploadService;
-
+    private $namingService;
 
 
 
@@ -56,6 +56,7 @@ class ValidationController extends AbstractController
         // Services methods
         ValidationService               $validationService,
         UploadService                   $uploadService,
+        NamingService                   $namingService,
 
     ) {
         $this->logger                       = $logger;
@@ -68,6 +69,7 @@ class ValidationController extends AbstractController
         // Variables related to the services
         $this->validationService            = $validationService;
         $this->uploadService                = $uploadService;
+        $this->namingService                = $namingService;
     }
 
 
@@ -86,13 +88,12 @@ class ValidationController extends AbstractController
             $this->addFlash('error', 'Le fichier n\'a pas été validé.');
             return $this->redirect($originUrl);
         }
-
         return $this->render('services/validation/validation.html.twig', [
-
             'upload' => $upload,
             'user'   => $this->getUser(),
         ]);
     }
+
 
 
     #[Route('/validation/approbation/{approbationId}', name: 'app_validation_approbation')]
@@ -112,9 +113,11 @@ class ValidationController extends AbstractController
     }
 
 
+
     #[Route('/validation/approbation/download/{approbationId}', name: 'app_validation_approbation_file')]
-    public function validationDownloadFile(int $approbationId = null): Response
-    {
+    public function validationDownloadFile(
+        ?int $approbationId = null
+    ): Response {
         $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
         $validation  = $approbation->getValidation();
         $file        = $validation->getUpload();
@@ -125,9 +128,12 @@ class ValidationController extends AbstractController
     }
 
 
+
     #[Route('/validation/download/{uploadId}', name: 'app_validation_view_file')]
-    public function validationFileView(int $uploadId = null, Request $request): Response
-    {
+    public function validationFileView(
+        Request $request,
+        ?int $uploadId = null,
+    ): Response {
 
         $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
 
@@ -144,10 +150,13 @@ class ValidationController extends AbstractController
         }
     }
 
-    #[Route('/validation/approval/{approbationId}', name: 'app_validation_approval')]
 
-    public function validationApproval(Request $request, int $approbationId = null): Response
-    {
+
+    #[Route('/validation/approval/{approbationId}', name: 'app_validation_approval')]
+    public function validationApproval(
+        Request $request,
+        ?int $approbationId = null
+    ): Response {
         $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
 
         $this->validationService->validationApproval($approbation, $request);
@@ -159,8 +168,10 @@ class ValidationController extends AbstractController
 
 
     #[Route('/validation/disapproved/modify/{approbationId}', name: 'app_validation_disapproved_modify')]
-    public function disapprovedValidationModification(int $approbationId = null, Request $request): Response
-    {
+    public function disapprovedValidationModification(
+        Request $request,
+        ?int $approbationId = null
+    ): Response {
         $approbation = $this->approbationRepository->find($approbationId);
         $validation  = $approbation->getValidation();
         $upload      = $validation->getUpload();
@@ -184,9 +195,10 @@ class ValidationController extends AbstractController
         $form->remove('modificationType');
 
         if ($request->isMethod('POST')) {
+
+            $this->namingService->requestUploadFilenameChecks($request);
+
             $form->handleRequest($request);
-
-
             if ($form->isSubmitted() && $form->isValid()) {
                 $this->uploadService->modifyDisapprovedFile($upload, $user, $request);
                 $this->addFlash('success', 'Le fichier a été modifié.');
@@ -211,8 +223,10 @@ class ValidationController extends AbstractController
     // 
     // 
     #[Route('/validation/disapproved/modifyByUpload/{uploadId}', name: 'app_validation_disapproved_modify_by_upload')]
-    public function disapprovedValidationModificationByUpload(int $uploadId = null, Request $request): Response
-    {
+    public function disapprovedValidationModificationByUpload(
+        Request $request,
+        ?int $uploadId = null
+    ): Response {
 
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $validation = $upload->getValidation();
@@ -235,8 +249,10 @@ class ValidationController extends AbstractController
         $form->remove('modificationType');
 
         if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
 
+            $this->namingService->requestUploadFilenameChecks($request);
+
+            $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $this->uploadService->modifyDisapprovedFile($upload, $user, $request);
                 $this->addFlash('success', 'Le fichier a été modifié.');
@@ -256,34 +272,4 @@ class ValidationController extends AbstractController
             return $this->redirect($originUrl);
         }
     }
-
-    // 
-    // 
-    // 
-    // 
-
-    // public function validatedListUploadsRender(array $uploads = null): Response
-    // {
-    //     // $this->logger->info('Uploads: ', [$uploads]);
-    //     if (count($uploads) === 1) {
-
-    //         $upload = $this->->getEntityById('upload', $uploads[0]->getId());
-    //         // $this->logger->info('Upload: ', [$upload]);
-    //         $validation = $this->->getEntitiesByParentId('validation', $uploads[0]->getId());
-    //         // $this->logger->info('Validation: ', [$validation]);
-    //         // // $this->logger->info('Validation[0: ', [$validation[0]]);
-    //         // // $this->logger->info('Validationtoarray: ', [$validation->toArray()]);
-
-    //         $approbations = $this->->getEntitiesByParentId('approbation', $validation->getId());
-    //         // $approbations = $validation[0]->getApprobations();
-    //     } else {
-    //         $uploads = [];
-    //         $approbations = [];
-    //     }
-
-    //     return $this->render('services/validation/validation_list_components/validation_list_button.html.twig', [
-    //         'uploads'      => $uploads,
-    //         'localApprobations' => $approbations,
-    //     ]);
-    // }
 }

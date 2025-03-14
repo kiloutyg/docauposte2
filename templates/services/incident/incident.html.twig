@@ -34,7 +34,8 @@
 							<div
 								class="card border-0 shadow rounded-3 my-5 bg-secondary">
 								<div
-									class="card-body ">
+									class="card-body "
+									data-controller="filename-validation">
 									<div
 										class="row d-flex align-items-center gy-lg-0 gy-5">
 
@@ -57,10 +58,15 @@
 														id="incident_file"
 														name="incident_file"
 														accept=".pdf"
+														data-filename-validation-target='filename'
+														data-action='keyup->filename-validation#validateFilename'
 														required>
 
 													<div
 														class="mb-3">
+														<div
+															data-filename-validation-target="message"
+															class="filename-message"></div>
 														<label
 															for="incident_newFileName"
 															style="color:white"
@@ -73,7 +79,12 @@
 															class="form-control"
 															id="incident_newFileName"
 															name="incident_newFileName"
+															data-filename-validation-target='newFilename'
+															data-action='keyup->filename-validation#validateNewFilename'
 															placeholder="Entrer un nouveau nom de fichier (optionnel)">
+														<div
+															data-filename-validation-target="message"
+															class="newFilename-message"></div>
 													</div>
 													{% include 'services/incident/cascading_dropdowns_incident.html.twig' %}
 												</div>

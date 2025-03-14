@@ -93,7 +93,7 @@
 																</a>
 																{% if is_granted('ROLE_ADMIN') %}
 																	<a
-																		href="{{ path('app_incident_delete_file', { 'incidentId': incident.id, 'productLineId': incident.productLine.id }) }}" class="btn btn-danger shadow delete-incident"
+																		href="{{ path('app_incident_delete_file', { 'incidentId': incident.id }) }}" class="btn btn-danger shadow delete-incident"
 																		style="flex: 1; text-align: center;">
 																		Supprimer
 																	</a>

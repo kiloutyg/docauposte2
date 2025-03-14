@@ -1,17 +1,41 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static targets = ["filename", "message"];
+    static targets = ["filename", "newFilename", "message"];
 
     validateFilename() {
-        const regex = /^(?!-)(?!.*--)[a-zA-Z-]{2,}(?<!-)\.(?!-)(?!.*--)[a-zA-Z-]{2,}(?<!-)$/;
-        const isValid = regex.test(this.filenameTarget.value);
+        const regex = /^[\p{L}0-9][\p{L}0-9() _.'-]{2,253}[\p{L}0-9]$/gmu;
 
+        let isValid = true;
+        let name = this.filenameTarget.value;
+        console.log('name', name);
+        if (name != '') {
+            isValid = regex.test(name);
+        }
+        console.log('isValid', isValid);
         if (isValid) {
             this.messageTarget.textContent = "";
         } else {
-            this.messageTarget.textContent = "Format invalide. Veuillez saisir sous la forme prénom.nom.";
-            this.messageTarget.style.color = "red"; // Display the message in red color.
+            this.messageTarget.textContent = "Format de nom de fichier invalide. Utilisez uniquement des lettres, chiffres, parenthèses, tirets, points et underscores. Le nom ne doit pas commencer ou finir par un point ou un tiret.";
+            this.messageTarget.style.color = "DarkRed"; // Display the message in red color.
+        }
+    }
+
+    validateNewFilename() {
+        const regex = /^[\p{L}0-9][\p{L}0-9() _.'-]{2,253}[\p{L}0-9]$/gmu;
+
+        let isValid = true;
+        let name = this.newFilenameTarget.value;
+        console.log('name', name);
+        if (name != '') {
+            isValid = regex.test(name);
+        }
+        console.log('isValid', isValid);
+        if (isValid) {
+            this.messageTarget.textContent = "";
+        } else {
+            this.messageTarget.textContent = "Format de nom de fichier invalide. Utilisez uniquement des lettres, chiffres, parenthèses, tirets, points et underscores. Le nom ne doit pas commencer ou finir par un point ou un tiret.";
+            this.messageTarget.style.color = "DarkRed"; // Display the message in red color.
         }
     }
 
