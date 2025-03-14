@@ -22,6 +22,7 @@ use App\Service\ValidationService;
 use App\Service\OldUploadService;
 use App\Service\SettingsService;
 use App\Service\FolderService;
+use App\Service\FileTypeService;
 
 // This class is used to manage the uploads files and logic
 class UploadService extends AbstractController
@@ -35,7 +36,7 @@ class UploadService extends AbstractController
     private $oldUploadService;
     private $settingsService;
     private $folderService;
-
+    private $fileTypeService;
 
 
     public function __construct(
@@ -47,7 +48,8 @@ class UploadService extends AbstractController
         ValidationService       $validationService,
         OldUploadService        $oldUploadService,
         SettingsService         $settingsService,
-        FolderService           $folderService
+        FolderService           $folderService,
+        FileTypeService         $fileTypeService,
     ) {
         $this->logger                = $logger;
         $this->em                    = $em;
@@ -58,53 +60,19 @@ class UploadService extends AbstractController
         $this->oldUploadService      = $oldUploadService;
         $this->settingsService       = $settingsService;
         $this->folderService         = $folderService;
+        $this->fileTypeService       = $fileTypeService;
     }
 
     // This function is responsible for the logic of uploading the uploads files
     public function uploadFiles(Request $request, $button, User $user, $filename)
     {
-        // Define the allowed file extensions
-        $allowedExtensions = ['pdf'];
         // Get all the files from the request
         $files = $request->files->all();
+
         // Iterate over each file
         foreach ($files as $file) {
-            // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
-            if ($request->request->get('validatorRequired') == 'true') {
-                foreach ($request->request->keys() as $key) {
-                    if (strpos($key, 'validator_user') !== false) {
-                        $validated = null;
-                    }
-                }
-            } else {
-                $validated = true;
-            };
 
-            if ($request->request->get('training-needed') === 'true') {
-                $trainingNeeded = true;
-            } else {
-                $trainingNeeded = false;
-            }
-
-            if ($request->request->get('display-needed') === 'true') {
-                $displayNeeded = true;
-            } else {
-                $displayNeeded = false;
-            }
-
-            // Check if the file is of the right type
-            // Get the file extension
-            $extension = $file->guessExtension();
-            // Check if the extension is in the list of allowed extensions
-            if (!in_array($extension, $allowedExtensions)) {
-                return $this->addFlash('error', 'Le fichier doit être un pdf');
-            }
-            // Check the MIME type of the file
-            if ($file->getMimeType() != 'application/pdf') {
-                return $this->addFlash('error', 'Le fichier doit être un pdf');
-            }
-            // Specify the revision number starting from 1
-            $revision = 1;
+            $this->fileTypeService->checkFileType($file);
 
             // Construct the full path of the file
             $folderPath = $this->folderService->pathFindingDoc($button->getName());
@@ -114,6 +82,7 @@ class UploadService extends AbstractController
 
             // Create a new Upload object
             $upload = new Upload();
+
             // Set the file property using the path
             $upload->setFile(new File($path));
             // Set the filename property
@@ -126,32 +95,62 @@ class UploadService extends AbstractController
             $upload->setUploader($user);
             // Set the uploadedAt property to the current date and time
             $upload->setUploadedAt(new \DateTime());
-            // Set the validated boolean property
-            $upload->setValidated($validated);
+
             // Set the revision property
-            $upload->setRevision($revision);
-            // Set the training property
-            $upload->setTraining($trainingNeeded);
-            // Set the display property
-            $upload->setForcedDisplay($displayNeeded);
+            $upload->setRevision(1);
+
             // Persist the upload object
             $this->em->persist($upload);
+
+            // Set training and validation related stuff
+            $this->uploadTrainingValidationChecker($request, $upload);
         }
 
         // Save the changes to the database
         $this->em->flush();
-        $this->logger->info('$upload from used var', [$upload]);
-        $uploadEntity = $this->uploadRepository->findOneBy(['filename' => $filename, 'button' => $button]);
-        $this->logger->info('$uploadEntity', [$uploadEntity]);
-        if ($validated === null) {
-            $this->validationService->createValidation($uploadEntity, $request);
-        }
+
         // Return the name of the last uploaded file
         return $filename;
     }
 
 
 
+    public function uploadTrainingValidationChecker(Request $request, Upload $upload): void
+    {
+        // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
+        if ($request->request->get('validatorRequired') == 'true') {
+            foreach ($request->request->keys() as $key) {
+                if (strpos($key, 'validator_user') !== false) {
+                    $validated = null;
+                }
+            }
+        } else {
+            $validated = true;
+        };
+
+        if ($request->request->get('training-needed') === 'true') {
+            $trainingNeeded = true;
+        } else {
+            $trainingNeeded = false;
+        }
+
+        if ($request->request->get('display-needed') === 'true') {
+            $displayNeeded = true;
+        } else {
+            $displayNeeded = false;
+        }
+
+        // Set the training property
+        $upload->setTraining($trainingNeeded);
+        // Set the display property
+        $upload->setForcedDisplay($displayNeeded);
+        // Set the validated boolean property
+        $upload->setValidated($validated);
+        // return $validated;
+        if ($validated === null) {
+            $this->validationService->createValidation($upload, $request);
+        }
+    }
 
 
     // This function is responsible for the logic of modifying the uploads files
@@ -169,59 +168,20 @@ class UploadService extends AbstractController
         // New file path
         $path = $this->folderService->uploadPath($upload);
 
-        $comment = $request->request->get('modificationComment');
-
         $modificationOutlined = $request->request->get('modification-outlined');
 
         $preExistingValidation = !empty($upload->getValidation());
 
-        $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
-
-        if ($newValidation) {
-
-            foreach ($request->request->keys() as $key) {
-                if (strpos($key, 'validator_user') !== false) {
-                    $validated = null;
-                }
+        // Retire the old file if a new one has been uploaded.
+        if (!empty($newfile)) {
+            try {
+                $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
+            } catch (\Exception $e) {
+                throw $e;
             }
+        }
 
-            // Retire the old file if a new one has been uploaded.
-            if (!empty($newfile)) {
-                try {
-                    $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
-                } catch (\Exception $e) {
-                    throw $e;
-                }
-            }
-
-            // Set the validated boolean property
-            $upload->setValidated($validated);
-            // Update the uploader in the upload object
-            $upload->setUploader($user);
-            // Set the revision 
-            $upload->setRevision(1);
-
-            if ($preExistingValidation && ($modificationOutlined == null || $modificationOutlined == '' || $modificationOutlined == 'heavy-modification')) {
-                if ($validated === null) {
-                    $this->validationService->updateValidation($upload, $request);
-                }
-            } else {
-                if ($validated === null) {
-                    $this->validationService->createValidation($upload, $request);
-                }
-            }
-        } else {
-            $validated = true;
-            if ($preExistingValidation && $comment != null) {
-                if ($modificationOutlined == 'minor-modification') {
-                    $comment = $comment . ' (modification mineure)';
-                }
-                $preExistingValidationEntity = $upload->getValidation();
-                $preExistingValidationEntity->setComment($comment);
-                $this->em->persist($preExistingValidationEntity);
-                $this->em->flush();
-            }
-        };
+        $this->modifyUploadTrainingValidationChecker($request, $upload, $user);
 
         $upload->setTraining(filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN));
 
@@ -236,10 +196,9 @@ class UploadService extends AbstractController
             } catch (\exception $e) {
                 throw $e;
             }
-            // Check if the file is of the right type
-            if ($newFile->getMimeType() != 'application/pdf') {
-                throw new \Exception('Le fichier doit être un pdf');
-            }
+
+            $this->fileTypeService->checkFileType($newFile);
+
             // Remove old file if it exists
             if (file_exists($oldFilePath)) {
                 unlink($oldFilePath);
@@ -284,6 +243,50 @@ class UploadService extends AbstractController
 
 
 
+    public function modifyUploadTrainingValidationChecker(Request $request, Upload $upload, User $user): void
+    {
+        $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
+        $modificationOutlined = $request->request->get('modification-outlined');
+        $preExistingValidation = !empty($upload->getValidation());
+        if ($newValidation) {
+
+            foreach ($request->request->keys() as $key) {
+                if (strpos($key, 'validator_user') !== false) {
+                    $validated = null;
+                }
+            }
+
+            // Set the validated boolean property
+            $upload->setValidated($validated);
+            // Update the uploader in the upload object
+            $upload->setUploader($user);
+            // Set the revision 
+            $upload->setRevision(1);
+
+            if ($preExistingValidation && ($modificationOutlined == null || $modificationOutlined == '' || $modificationOutlined == 'heavy-modification')) {
+                if ($validated === null) {
+                    $this->validationService->updateValidation($upload, $request);
+                }
+            } else {
+                if ($validated === null) {
+                    $this->validationService->createValidation($upload, $request);
+                }
+            }
+        } else {
+            $validated = true;
+            $comment = $request->request->get('modificationComment');
+            if ($preExistingValidation && $comment != null) {
+                if ($modificationOutlined == 'minor-modification') {
+                    $comment = $comment . ' (modification mineure)';
+                }
+                $preExistingValidationEntity = $upload->getValidation();
+                $preExistingValidationEntity->setComment($comment);
+                $this->em->persist($preExistingValidationEntity);
+                $this->em->flush();
+            }
+        }
+    }
+
 
     // This function is responsible for the logic of modifying the uploads files
     public function modifyDisapprovedFile(Upload $upload, User $user, Request $request, ?string $newFilename = null)
@@ -299,10 +302,9 @@ class UploadService extends AbstractController
         $path = $this->folderService->uploadPath($upload);
         // If new file exists, process it and delete the old one
         if ($newFile) {
-            // Check if the file is of the right type
-            if ($newFile->getMimeType() != 'application/pdf') {
-                throw new \Exception('Le fichier doit être un pdf');
-            }
+
+            $this->fileTypeService->checkFileType($newFile);
+
             // Remove old file if it exists
             if (file_exists($oldFilePath)) {
                 unlink($oldFilePath);
@@ -547,7 +549,7 @@ class UploadService extends AbstractController
 
 
     // create a route to download a file in more simple terms to display the file
-    public function downloadInValidationFile(int $uploadId = null)
+    public function downloadInValidationFile(?int $uploadId = null)
     {
         // Retrieve the origin URL
         $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);

@@ -205,7 +205,7 @@ class ValidationService extends AbstractController
 
     public function createApprobationProcess(
         $validation,
-        User $validator_user = null
+        ?User $validator_user = null
     ) {
         // Create a new Approbation instance
         $approbation = new Approbation();
@@ -232,7 +232,7 @@ class ValidationService extends AbstractController
 
     public function createDepartmentApprobationProcess(
         $validation,
-        Department $validator_department = null
+        ?Department $validator_department = null
     ) {
         // Create a new Approbation instance
         $approbation = new Approbation();
