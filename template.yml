@@ -2,7 +2,7 @@ apiVersion: v1
 kind: LimitRange
 metadata:
   name: docauposte-database-pod-limits-range
-  namespace: docauposte-database-pod-limits
+  namespace: docauposte
 spec:
   limits:
     - defaultRequest:
@@ -15,7 +15,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: docauposte-database-pod
-  namespace: docauposte-database-pod-limits
+  namespace: docauposte
   labels:
     app: docauposte-database
 spec:
@@ -58,7 +58,6 @@ spec:
           value: run/secrets/database_user
         - name: MARIADB_PASSWORD_FILE
           value: run/secrets/database_password
-      ports:
       volumeMounts:
         - mountPath: /run/secrets/root_password
           readOnly: true
@@ -137,7 +136,7 @@ apiVersion: v1
 kind: LimitRange
 metadata:
   name: docauposte-phpmyadmin-pod-limits-range
-  namespace: docauposte-phpmyadmin-pod-limits
+  namespace: docauposte
 spec:
   limits:
     - defaultRequest:
@@ -150,7 +149,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: docauposte-phpmyadmin-pod
-  namespace: docauposte-phpmyadmin-pod-limits
+  namespace: docauposte
   labels:
     app: docauposte-phpmyadmin
     traefik.enable: true
@@ -216,7 +215,7 @@ apiVersion: v1
 kind: LimitRange
 metadata:
   name: docauposte-web-pod-limits-range
-  namespace: docauposte-web-pod-limits
+  namespace: docauposte
 spec:
   limits:
     - defaultRequest:
@@ -229,7 +228,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: docauposte-web-pod
-  namespace: docauposte-web-pod-limits
+  namespace: docauposte
   labels:
     app: docauposte-web
     traefik.enable: true
