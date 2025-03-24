@@ -76,15 +76,15 @@ class IncidentService extends AbstractController
             if (!$this->namingService->filenameChecks($request, $request->request->get('incident_newFileName'))) {
                 return $this->redirect($originUrl);
             } else {
-                $name = $this->namingService->filenameChecks($request, $request->request->get('incident_newFileName'));
+                $originalFullName = $this->namingService->filenameChecks($request, $request->request->get('incident_newFileName'));
+                $originalName = pathinfo($originalFullName, PATHINFO_FILENAME); // Gets name without extension
+                $fileExtension = pathinfo($originalFullName, PATHINFO_EXTENSION); // Gets original extension
+                $name = $originalName . '_' . uniqid('', true) . '.' . $fileExtension;
             }
 
             // Dynamic folder creation in the case it does not aleady exist
             $folderPath = $this->folderService->pathFindingDoc($productLine->getName());
             $path = $folderPath . '/' . $name;
-
-            $originalName = pathinfo($name, PATHINFO_FILENAME); // Gets the filename without extension
-            $fileExtension = pathinfo($name, PATHINFO_EXTENSION); // Gets the file extension
 
             if (file_exists($path)) {
                 $iteration = count($this->incidentRepository->findBy(['name' => $name, 'ProductLine' => $productLine]));
@@ -204,7 +204,7 @@ class IncidentService extends AbstractController
 
 
 
-    public function displayIncident(int $productLineId = null, int $incidentId = null)
+    public function displayIncident(?int $productLineId = null, ?int $incidentId = null)
     {
 
         $incidentEntity = null;

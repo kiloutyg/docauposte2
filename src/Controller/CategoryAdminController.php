@@ -135,7 +135,7 @@ class CategoryAdminController extends AbstractController
 
     // This function is used to create a new button to which is attached the uploads.
     #[Route('/create_button/{categoryId}', name: 'admin_create_button')]
-    public function createButton(Request $request, int $categoryId = null)
+    public function createButton(Request $request, ?int $categoryId = null)
     {
         // Check if button name does not contain the disallowed characters
         if (!preg_match("/^[^.]+$/", $request->request->get('buttonname'))) {

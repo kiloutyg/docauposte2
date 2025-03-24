@@ -65,4 +65,6 @@ class NamingService extends AbstractController
         $requestArray['incident']['name'] = $newName;
         $request->request->replace($requestArray);
     }
+
+
 }
