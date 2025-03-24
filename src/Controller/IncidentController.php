@@ -289,7 +289,6 @@ class IncidentController extends AbstractController
             }
         }
 
-
         // Create a form to modify the Upload entity
         $form = $this->createForm(IncidentType::class, $incident);
         $productLine = $incident->getProductLine();

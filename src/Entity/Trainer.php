@@ -21,9 +21,6 @@ class Trainer
     #[ORM\OneToMany(mappedBy: 'trainer', targetEntity: TrainingRecord::class)]
     private Collection $trainingRecords;
 
-    #[ORM\ManyToOne(inversedBy: 'trainers')]
-    private ?Upload $upload = null;
-
     #[ORM\Column(options: ['default' => false])]
     private ?bool $demoted;
 
@@ -75,18 +72,6 @@ class Trainer
                 $trainingRecord->setTrainer(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getUpload(): ?Upload
-    {
-        return $this->upload;
-    }
-
-    public function setUpload(?Upload $upload): static
-    {
-        $this->upload = $upload;
 
         return $this;
     }
