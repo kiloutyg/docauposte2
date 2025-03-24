@@ -17,8 +17,10 @@ class NamingService extends AbstractController
     {
         if ($request->files->get('file')) {
             $file = $request->files->get('file');
+            $entityType = 'upload';
         } elseif ($request->files->get('incident_file')) {
             $file = $request->files->get('incident_file');
+            $entityType = 'incident';
         }
         if ($newFilename) {
             $filename = $newFilename;
@@ -31,12 +33,12 @@ class NamingService extends AbstractController
             $this->addFlash('error', 'Le document ' . $filename . ' n\'est pas nommé correctement chargé');
             return false;
         }
-        
-        $originalName = pathinfo($filename, PATHINFO_FILENAME); // Gets name without extension
-        $fileExtension = pathinfo($filename, PATHINFO_EXTENSION); // Gets original extension
 
-        $newName = $originalName . '_' . uniqid('', true) . '.' . $fileExtension;
-        return $newName;
+        if ($entityType === 'incident') {
+            return $this->filenameUniqid($filename);
+        } else {
+            return $newName;
+        }
     }
 
     public function nameChecks(string $originalName, ?string $newFilename = null): string
@@ -69,5 +71,12 @@ class NamingService extends AbstractController
         $newName = $this->nameChecks($requestArray['incident']['name']);
         $requestArray['incident']['name'] = $newName;
         $request->request->replace($requestArray);
+    }
+
+    public function filenameUniqid(string $filename)
+    {
+        $originalName = pathinfo($filename, PATHINFO_FILENAME); // Gets name without extension
+        $fileExtension = pathinfo($filename, PATHINFO_EXTENSION); // Gets original extension
+        return $originalName . '_' . uniqid('', true) . '.' . $fileExtension;
     }
 }

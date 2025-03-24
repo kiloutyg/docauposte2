@@ -219,7 +219,6 @@ class UploadController extends AbstractController
 
     // create a route to delete a file
     #[Route('/delete/upload/{uploadId}', name: 'delete_file')]
-
     public function deleteFile(Request $request, ?int $uploadId = null): RedirectResponse
     {
         $originUrl = $request->headers->get('Referer');

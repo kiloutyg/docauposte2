@@ -30,7 +30,6 @@ class Incident
     #[Assert\Regex(pattern: "/^[\p{L}0-9][\p{L}0-9()_.'-]{2,253}[\p{L}0-9]$/mu", message: 'Format de nom de fichier invalide. Utilisez uniquement des lettres, chiffres, parenthèses, tirets, points et underscores. Le nom ne doit pas commencer ou finir par un point ou un tiret.')]
     private ?string $name = null;
 
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $uploaded_at = null;
 
@@ -41,9 +40,6 @@ class Incident
     #[ORM\ManyToOne(inversedBy: 'incidents')]
     #[ORM\JoinColumn(nullable: false)]
     private ?ProductLine $productLine = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?bool $active = null;
 
     #[ORM\Column(length: 255)]
     private ?string $path = null;
@@ -125,19 +121,6 @@ class Incident
 
         return $this;
     }
-
-    public function isActive(): ?bool
-    {
-        return $this->active;
-    }
-
-    public function setActive(?bool $active): self
-    {
-        $this->active = $active;
-
-        return $this;
-    }
-
 
     public function getPath(): ?string
     {
