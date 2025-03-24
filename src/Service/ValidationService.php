@@ -26,6 +26,7 @@ class ValidationService extends AbstractController
     private   $logger;
     private   $em;
     private   $projectDir;
+    private   $params;
 
     private   $userRepository;
     private   $validationRepository;
@@ -52,6 +53,7 @@ class ValidationService extends AbstractController
         $this->logger                   = $logger;
         $this->em                       = $em;
         $this->projectDir               = $params->get('kernel.project_dir');
+        $this->params                   = $params;
 
         $this->userRepository           = $userRepository;
         $this->validationRepository     = $validationRepository;
@@ -478,7 +480,7 @@ class ValidationService extends AbstractController
 
         $uploaders = [];
 
-        if ($today->format('d') % 2 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false)) {
+        if ($this->params->get('kernel.environment') !== 'dev' && ($today->format('d') % 2 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false))) {
 
             $nonValidatedValidations = $this->validationRepository->findNonValidatedValidations();
 

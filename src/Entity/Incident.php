@@ -7,13 +7,17 @@ use App\Repository\IncidentRepository;
 use Doctrine\DBAL\Types\Types;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping\UniqueConstraint;
+
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: IncidentRepository::class)]
-#[Broadcast]
+#[Table(name: 'incident')]
+#[UniqueConstraint(name: 'unique_name_by_product_line', columns: ['name', 'product_line_id'])]
 class Incident
 {
     #[ORM\Id]
@@ -24,7 +28,7 @@ class Incident
     private ?File $file = null;
 
 
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 180)]
     #[Assert\Regex(pattern: "/^[\p{L}0-9][\p{L}0-9()_.'-]{2,253}[\p{L}0-9]$/mu", message: 'Format de nom de fichier invalide. Utilisez uniquement des lettres, chiffres, parenthèses, tirets, points et underscores. Le nom ne doit pas commencer ou finir par un point ou un tiret.')]
