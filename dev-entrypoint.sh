@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Install the app dependencies 
-composer install;
+composer install --dev;
 
 composer dump-env dev
 
@@ -14,16 +14,13 @@ php bin/console cache:clear --no-warmup --env=dev;
 # Warm up the cache
 php bin/console cache:warmup --env=dev;
 
+# Set the ownership
+chown -R www-data:www-data /var/www/var/;
+chown -R www-data:www-data /var/www/public/;
+chown -R www-data:www-data /var/www/migrations/;
+
 # Set the permissions
 chmod 755 . -R;
-
-# # Set the permissions
-# chown -R www-data:www-data /var/www/var/;
-
-# chmod 777 /var/www/var/ -R;
-
-# Create the migrations directory
-# mkdir -p migrations;
 
 # Create the database and run the migrations
 php bin/console make:migration;

@@ -10,5 +10,5 @@
 *.gitignore
 *.vscode*
 *.env*
-*.env.local*
+*.env.local.php
 *.lock*
