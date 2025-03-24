@@ -31,6 +31,11 @@ class NamingService extends AbstractController
             $this->addFlash('error', 'Le document ' . $filename . ' n\'est pas nommé correctement chargé');
             return false;
         }
+        
+        $originalName = pathinfo($filename, PATHINFO_FILENAME); // Gets name without extension
+        $fileExtension = pathinfo($filename, PATHINFO_EXTENSION); // Gets original extension
+
+        $newName = $originalName . '_' . uniqid('', true) . '.' . $fileExtension;
         return $newName;
     }
 
@@ -65,6 +70,4 @@ class NamingService extends AbstractController
         $requestArray['incident']['name'] = $newName;
         $request->request->replace($requestArray);
     }
-
-
 }

@@ -76,24 +76,13 @@ class IncidentService extends AbstractController
             if (!$this->namingService->filenameChecks($request, $request->request->get('incident_newFileName'))) {
                 return $this->redirect($originUrl);
             } else {
-                $originalFullName = $this->namingService->filenameChecks($request, $request->request->get('incident_newFileName'));
-                $originalName = pathinfo($originalFullName, PATHINFO_FILENAME); // Gets name without extension
-                $fileExtension = pathinfo($originalFullName, PATHINFO_EXTENSION); // Gets original extension
-                $name = $originalName . '_' . uniqid('', true) . '.' . $fileExtension;
+                $name = $this->namingService->filenameChecks($request, $request->request->get('incident_newFileName'));
             }
 
             // Dynamic folder creation in the case it does not aleady exist
             $folderPath = $this->folderService->pathFindingDoc($productLine->getName());
             $path = $folderPath . '/' . $name;
-
-            if (file_exists($path)) {
-                $iteration = count($this->incidentRepository->findBy(['name' => $name, 'ProductLine' => $productLine]));
-                $storageName = $originalName . '-' . ($iteration + 1) . '.' . $fileExtension;
-                $path       = $folderPath . '/' . $storageName;
-                $file->move($folderPath . '/', $storageName);
-            } else {
-                $file->move($folderPath . '/', $name);
-            }
+            $file->move($folderPath . '/', $name);
 
             $incident = new incident();
             $incident->setFile(new File($path));
