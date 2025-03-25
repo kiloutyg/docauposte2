@@ -578,7 +578,7 @@ class OperatorController extends AbstractController
     {
 
         try {
-            $this->trainingRecordService->trainingRecordtreatment($request);
+            $this->trainingRecordService->trainingRecordTreatment($request);
         } catch (\Exception $e) {
             $this->logger->error('error during training record treatment', [$e]);
         } finally {
