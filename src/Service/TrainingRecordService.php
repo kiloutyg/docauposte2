@@ -229,15 +229,14 @@ class TrainingRecordService extends AbstractController
         if (!$existingTrainingRecord) {
             $this->logger->info('!$existingTrainingRecord', [true]);
             $existingTrainingRecord = new TrainingRecord();
+            $existingTrainingRecord->setOperator($trainerOperator);
+            $existingTrainingRecord->setTrainer($trainerEntity);
+            $existingTrainingRecord->setUpload($upload);
         }
 
-        $existingTrainingRecord->setOperator($trainerOperator);
-        $existingTrainingRecord->setUpload($upload);
         $existingTrainingRecord->setDate(new \DateTime());
         $existingTrainingRecord->setTrained(true);
-        $existingTrainingRecord->setTrainer($trainerEntity);
         $this->em->persist($existingTrainingRecord);
-
 
         $trainerOperator->setLasttraining(new \DateTime());
         $trainerOperator->setTobedeleted(null);
