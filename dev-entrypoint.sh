@@ -22,10 +22,6 @@ chown -R www-data:www-data /var/www/migrations/;
 # Set the permissions
 chmod 755 . -R;
 
-# Create the database and run the migrations
-php bin/console make:migration;
-php bin/console doctrine:migrations:migrate;
-
 # Build the assets and start the server
 exec apache2-foreground &
 yarn encore dev --watch

@@ -13,8 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Zone;
 
 use App\Repository\ZoneRepository;
-use App\Repository\uploadRepository;
-use App\Repository\incidentRepository;
+use App\Repository\UploadRepository;
+use App\Repository\IncidentRepository;
 
 use App\Service\EntityFetchingService;
 use App\Service\TrainingRecordService;
@@ -182,23 +182,27 @@ class SuperAdminController extends AbstractController
 
 
     // Update method for any stuff necessary during dev
-    #[Route('/admin/update', name: 'update')]
+    #[Route('/super_admin/update', name: 'super_admin_update')]
     public function updateDB()
     {
-        $uploads = $this->uploadRepository->findAll();
-        foreach ($uploads as $upload) {
-            $similarNamedUploads = $this->uploadRepository->findBy(['filename' => $upload->getFilename()]);
-            foreach ($similarNamedUploads as $similarNamedUpload) {
-                if ($upload->getId() != $similarNamedUpload->getId()) {
-                    $originalName = pathinfo($similarNamedUpload->getFilename(), PATHINFO_FILENAME);
-                    $fileExtension = pathinfo($similarNamedUpload->getFilename(), PATHINFO_EXTENSION);
-                    $similarNamedUpload->setFilename($originalName . '_' . uniqid('', true) . '.' . $fileExtension);
-                    $this->em->persist($similarNamedUpload);
-                }
-            }
-        }
 
-        $incidents = $this->incidentRepository->findAll();
+
+        // $uploads = $this->entityFetchingService->getUploads();
+        // foreach ($uploads as $upload) {
+        //     $similarNamedUploads = $this->uploadRepository->findBy(['filename' => $upload->getFilename()]);
+        //     foreach ($similarNamedUploads as $similarNamedUpload) {
+        //         if ($upload->getId() != $similarNamedUpload->getId()) {
+        //             $originalName = pathinfo($similarNamedUpload->getFilename(), PATHINFO_FILENAME);
+        //             $fileExtension = pathinfo($similarNamedUpload->getFilename(), PATHINFO_EXTENSION);
+        //             $similarNamedUpload->setFilename($originalName . '_' . uniqid('', true) . '.' . $fileExtension);
+        //             $this->em->persist($similarNamedUpload);
+        //         }
+        //     }
+        // }
+
+
+
+        $incidents = $this->entityFetchingService->getIncidents();
         foreach ($incidents as $incident) {
             $similarNamedincidents = $this->incidentRepository->findBy(['name' => $incident->getName()]);
             foreach ($similarNamedincidents as $similarNamedincident) {
@@ -210,6 +214,15 @@ class SuperAdminController extends AbstractController
                 }
             }
         }
+
+
+        // $operators = $this->entityFetchingService->getOperators();
+        // foreach ($operators as $operator) {
+        //     $currentUap = $operator->getUap();
+        //     $operator->addUap($currentUap);
+        //     $this->em->persist($operator);
+        // }
+
 
         $this->em->flush();
 

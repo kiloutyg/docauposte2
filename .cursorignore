@@ -2,7 +2,6 @@
 *vendor*
 *node_modules*
 *public*doc*
-*migrations*
 *database_data*
 *var*
 *secrets*
