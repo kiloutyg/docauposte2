@@ -61,6 +61,7 @@ class FrontController extends AbstractController
         EntityManagerInterface          $em,
         LoggerInterface                 $logger,
 
+        
         CategoryRepository              $categoryRepository,
         ButtonRepository                $buttonRepository,
         ZoneRepository                  $zoneRepository,
@@ -167,7 +168,7 @@ class FrontController extends AbstractController
     // Render the zone page
     #[Route('/zone/{zoneId}', name: 'zone')]
     public function zone(
-        int $zoneId = null,
+        ?int $zoneId = null,
     ): Response {
 
         $zone = $this->zoneRepository->find($zoneId);
@@ -190,7 +191,7 @@ class FrontController extends AbstractController
 
     // Render the productLine page and redirect to the mandatory incident page if there is one
     #[Route('/productLine/{productLineId}', name: 'productLine')]
-    public function productLine(int $productLineId = null, ProductLine $productLine = null): Response
+    public function productLine(?int $productLineId = null, ?ProductLine $productLine = null): Response
     {
 
         if (!$productLine) {
@@ -231,7 +232,7 @@ class FrontController extends AbstractController
 
     // Render the category page and redirect to the button page if there is only one button in the category
     #[Route('/category/{categoryId}', name: 'category')]
-    public function category(int $categoryId = null, Category $category = null): Response
+    public function category(?int $categoryId = null, ?Category $category = null): Response
     {
 
         $buttons = [];
@@ -257,9 +258,10 @@ class FrontController extends AbstractController
 
 
 
+
     // Render the button page and redirect to the upload page if there is only one upload in the button
     #[Route('/button/{buttonId}', name: 'button')]
-    public function buttonDisplay(int $buttonId = null, Button $button = null): Response
+    public function buttonDisplay(?int $buttonId = null, ?Button $button = null): Response
     {
         if (!$button) {
             $button = $this->buttonRepository->find($buttonId);
@@ -282,4 +284,9 @@ class FrontController extends AbstractController
             ]);
         }
     }
+
+
+
+
+
 }

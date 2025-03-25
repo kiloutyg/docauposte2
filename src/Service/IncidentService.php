@@ -82,18 +82,7 @@ class IncidentService extends AbstractController
             // Dynamic folder creation in the case it does not aleady exist
             $folderPath = $this->folderService->pathFindingDoc($productLine->getName());
             $path = $folderPath . '/' . $name;
-
-            $originalName = pathinfo($name, PATHINFO_FILENAME); // Gets the filename without extension
-            $fileExtension = pathinfo($name, PATHINFO_EXTENSION); // Gets the file extension
-
-            if (file_exists($path)) {
-                $iteration = count($this->incidentRepository->findBy(['name' => $name, 'ProductLine' => $productLine]));
-                $storageName = $originalName . '-' . ($iteration + 1) . '.' . $fileExtension;
-                $path       = $folderPath . '/' . $storageName;
-                $file->move($folderPath . '/', $storageName);
-            } else {
-                $file->move($folderPath . '/', $name);
-            }
+            $file->move($folderPath . '/', $name);
 
             $incident = new incident();
             $incident->setFile(new File($path));
@@ -204,7 +193,7 @@ class IncidentService extends AbstractController
 
 
 
-    public function displayIncident(int $productLineId = null, int $incidentId = null)
+    public function displayIncident(?int $productLineId = null, ?int $incidentId = null)
     {
 
         $incidentEntity = null;

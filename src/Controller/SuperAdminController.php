@@ -13,6 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Zone;
 
 use App\Repository\ZoneRepository;
+use App\Repository\UploadRepository;
+use App\Repository\IncidentRepository;
 
 use App\Service\EntityFetchingService;
 use App\Service\TrainingRecordService;
@@ -29,6 +31,8 @@ class SuperAdminController extends AbstractController
     private $em;
 
     private $zoneRepository;
+    private $uploadRepository;
+    private $incidentRepository;
 
     private $entityFetchingService;
     private $trainingRecordService;
@@ -43,12 +47,14 @@ class SuperAdminController extends AbstractController
         ParameterBagInterface           $params,
 
         ZoneRepository                  $zoneRepository,
+        UploadRepository                $uploadRepository,
+        IncidentRepository              $incidentRepository,
 
         EntityFetchingService           $entityFetchingService,
         TrainingRecordService           $trainingRecordService,
         UploadService                   $uploadService,
         EntityDeletionService           $entitydeletionService,
-        FolderService           $folderService,
+        FolderService                   $folderService,
         IncidentService                 $incidentService,
 
     ) {
@@ -57,9 +63,11 @@ class SuperAdminController extends AbstractController
         $this->public_dir                   = $this->projectDir . '/public';
 
         $this->zoneRepository               = $zoneRepository;
+        $this->uploadRepository             = $uploadRepository;
+        $this->incidentRepository           = $incidentRepository;
 
         $this->uploadService                = $uploadService;
-        $this->folderService        = $folderService;
+        $this->folderService                = $folderService;
         $this->incidentService              = $incidentService;
         $this->entitydeletionService        = $entitydeletionService;
         $this->trainingRecordService        = $trainingRecordService;
@@ -168,5 +176,56 @@ class SuperAdminController extends AbstractController
             $this->addFlash('danger', 'Vous n\'êtes pas autorisé à accéder à cette page');
             return $this->redirectToRoute('app_login');
         }
+    }
+
+
+
+
+    // Update method for any stuff necessary during dev
+    #[Route('/super_admin/update', name: 'super_admin_update')]
+    public function updateDB()
+    {
+
+
+        // $uploads = $this->entityFetchingService->getUploads();
+        // foreach ($uploads as $upload) {
+        //     $similarNamedUploads = $this->uploadRepository->findBy(['filename' => $upload->getFilename()]);
+        //     foreach ($similarNamedUploads as $similarNamedUpload) {
+        //         if ($upload->getId() != $similarNamedUpload->getId()) {
+        //             $originalName = pathinfo($similarNamedUpload->getFilename(), PATHINFO_FILENAME);
+        //             $fileExtension = pathinfo($similarNamedUpload->getFilename(), PATHINFO_EXTENSION);
+        //             $similarNamedUpload->setFilename($originalName . '_' . uniqid('', true) . '.' . $fileExtension);
+        //             $this->em->persist($similarNamedUpload);
+        //         }
+        //     }
+        // }
+
+
+
+        $incidents = $this->entityFetchingService->getIncidents();
+        foreach ($incidents as $incident) {
+            $similarNamedincidents = $this->incidentRepository->findBy(['name' => $incident->getName()]);
+            foreach ($similarNamedincidents as $similarNamedincident) {
+                if ($incident->getId() != $similarNamedincident->getId()) {
+                    $originalName = pathinfo($similarNamedincident->getName(), PATHINFO_FILENAME);
+                    $fileExtension = pathinfo($similarNamedincident->getName(), PATHINFO_EXTENSION);
+                    $similarNamedincident->setName($originalName . '_' . uniqid('', true) . '.' . $fileExtension);
+                    $this->em->persist($similarNamedincident);
+                }
+            }
+        }
+
+
+        // $operators = $this->entityFetchingService->getOperators();
+        // foreach ($operators as $operator) {
+        //     $currentUap = $operator->getUap();
+        //     $operator->addUap($currentUap);
+        //     $this->em->persist($operator);
+        // }
+
+
+        $this->em->flush();
+
+        return $this->redirectToRoute('app_base');
     }
 }

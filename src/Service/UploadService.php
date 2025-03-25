@@ -92,13 +92,10 @@ class UploadService extends AbstractController
             $upload->setUploader($user);
             // Set the uploadedAt property to the current date and time
             $upload->setUploadedAt(new \DateTime());
-
             // Set the revision property
             $upload->setRevision(1);
-
             // Persist the upload object
             $this->em->persist($upload);
-
             // Set training and validation related stuff
             $this->uploadTrainingValidationChecker($request, $upload);
         }

@@ -6,8 +6,8 @@ metadata:
 spec:
   limits:
     - defaultRequest:
-        memory: 8000Mi
-        ephemeral-storage: 10000Mi
+        memory: 16000Mi
+        ephemeral-storage: 20000Mi
         cpu: 4
       type: Container
 ---

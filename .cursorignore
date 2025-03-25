@@ -2,7 +2,6 @@
 *vendor*
 *node_modules*
 *public*doc*
-*migrations*
 *database_data*
 *var*
 *secrets*
@@ -10,5 +9,5 @@
 *.gitignore
 *.vscode*
 *.env*
-*.env.local*
+*.env.local.php
 *.lock*

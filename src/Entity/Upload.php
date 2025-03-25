@@ -10,11 +10,15 @@ use Doctrine\DBAL\Types\Types;
 use App\Entity\OldUpload;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UploadRepository::class)]
+#[Table(name: 'upload')]
+#[UniqueConstraint(name: 'unique_filename_by_button', columns: ['filename', 'button_id'])]
 class Upload
 {
     #[ORM\Id]
@@ -25,10 +29,11 @@ class Upload
 
     private ?File $file = null;
 
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 180)]
-    #[Assert\Regex(pattern: "/^[\p{L}0-9][\p{L}0-9()_.'-]{2,253}[\p{L}0-9]$/mu", message: 'Format de nom de fichier invalide. Utilisez uniquement des lettres, chiffres, parenthèses, tirets, points et underscores. Le nom ne doit pas commencer ou finir par un point ou un tiret.')]
+    #[Assert\Regex(pattern: "/^[\p{L}0-9][\p{L}0-9()_.'-]{2,253}[\p{L}0-9]$/mu", message: 'Format de nom de fichier invalide. Utilisez uniquement des lettres, chiffres, parenthèses, tirets, points et underscores. Le nom ne doit pas commencer ou finir par un point ou un tiret. Le nom doit être unique.')]
+
     private ?string $filename = null;
 
     #[ORM\Column(length: 255)]
@@ -59,9 +64,6 @@ class Upload
     #[ORM\OneToMany(mappedBy: 'Upload', cascade: ['persist', 'remove'], targetEntity: TrainingRecord::class)]
     private Collection $trainingRecords;
 
-    #[ORM\OneToMany(mappedBy: 'upload', targetEntity: Trainer::class)]
-    private Collection $trainers;
-
     #[ORM\Column(nullable: true)]
     private ?bool $training = null;
 
@@ -71,7 +73,6 @@ class Upload
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
-        $this->trainers = new ArrayCollection();
     }
 
 
@@ -234,36 +235,6 @@ class Upload
             // set the owning side to null (unless already changed)
             if ($trainingRecord->getUpload() === $this) {
                 $trainingRecord->setUpload(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Trainer>
-     */
-    public function getTrainers(): Collection
-    {
-        return $this->trainers;
-    }
-
-    public function addTrainer(Trainer $trainer): static
-    {
-        if (!$this->trainers->contains($trainer)) {
-            $this->trainers->add($trainer);
-            $trainer->setUpload($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTrainer(Trainer $trainer): static
-    {
-        if ($this->trainers->removeElement($trainer)) {
-            // set the owning side to null (unless already changed)
-            if ($trainer->getUpload() === $this) {
-                $trainer->setUpload(null);
             }
         }
 

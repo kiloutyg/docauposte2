@@ -497,7 +497,6 @@ class OperatorController extends AbstractController
         // $this->logger->info('Full request', $request->request->all());
 
         // Process the POST request
-
         $teamId = $request->request->get('team-trainingRecord-select');
         $uapId = $request->request->get('uap-trainingRecord-select');
         if ($teamId == null || $uapId == null) {
@@ -520,7 +519,6 @@ class OperatorController extends AbstractController
         $upload = $this->uploadRepository->find($uploadId);
 
         $selectedOperators = $this->operatorRepository->findByTeamAndUap($teamId, $uapId);
-
 
         usort($selectedOperators, function ($a, $b) {
             list($firstNameA, $surnameA) = explode('.', $a->getName());
@@ -553,11 +551,9 @@ class OperatorController extends AbstractController
             }
         }
 
-
         if (!empty($unorderedTrainingRecords)) {
             $trainingRecords = $this->trainingRecordService->getOrderedTrainingRecordsByTrainingRecordsArray($unorderedTrainingRecords);
         }
-
 
         // $this->logger->info('trainingRecords', [$trainingRecords]);
 
@@ -584,18 +580,7 @@ class OperatorController extends AbstractController
         $operators = [];
         $operators = $request->request->all('operators');
         $upload = $this->uploadRepository->find($uploadId);
-        $trainerId = $request->request->get('trainerId');
-
-        $trainerEntityWithUpload = $this->trainerRepository->findOneBy(['operator' => $trainerId, 'upload' => $upload]);
-        if ($trainerEntityWithUpload == null) {
-            // $this->logger->info('operator ID', [$trainerId]);
-            $trainerOperator = $this->operatorRepository->find($trainerId);
-            $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $trainerOperator]);
-            // $this->logger->info('trainerEntity', [$trainerEntity]);
-        } else {
-            // $this->logger->info('trainerEntityWithUpload', [$trainerEntityWithUpload]);
-            $trainerOperator = $this->operatorRepository->find($trainerId);
-        };
+        $trainerOperator = $this->operatorRepository->find($request->request->get('trainerId'));
 
         foreach ($operators as $operator) {
             // $this->logger->info('does the key exist', [array_key_exists("trained", $operator)]);
