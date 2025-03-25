@@ -61,7 +61,7 @@ class FrontController extends AbstractController
         EntityManagerInterface          $em,
         LoggerInterface                 $logger,
 
-        
+
         CategoryRepository              $categoryRepository,
         ButtonRepository                $buttonRepository,
         ZoneRepository                  $zoneRepository,
@@ -284,9 +284,6 @@ class FrontController extends AbstractController
             ]);
         }
     }
-
-
-
 
 
 }

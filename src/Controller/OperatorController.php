@@ -534,7 +534,7 @@ class OperatorController extends AbstractController
         $inTrainingOperatorsByTrainer = []; // Array of operators in training grouped by trainer
 
         foreach ($selectedOperators as $operator) {
-            $records = $this->trainingRecordRepository->findBy(['operator' => $operator, 'Upload' => $uploadId]);
+            $records = $this->trainingRecordRepository->findBy(['operator' => $operator, 'upload' => $uploadId]);
             $unorderedTrainingRecords = array_merge($trainingRecords, $records);
 
             $record = $records[0] ?? null;
@@ -574,85 +574,20 @@ class OperatorController extends AbstractController
 
 
     #[Route('/operator/trainingRecord/form/{uploadId}/{teamId}/{uapId}', name: 'app_training_record_form')]
-    public function trainingRecordForm(int $uploadId, Request $request, ?int $teamId = null, ?int $uapId = null): Response
+    public function trainingRecordFormManagement(int $uploadId, Request $request, ?int $teamId = null, ?int $uapId = null): Response
     {
-        // $this->logger->info('Full request', $request->request->all());
-        $operators = [];
-        $operators = $request->request->all('operators');
-        $upload = $this->uploadRepository->find($uploadId);
-        $trainerOperator = $this->operatorRepository->find($request->request->get('trainerId'));
 
-        foreach ($operators as $operator) {
-            // $this->logger->info('does the key exist', [array_key_exists("trained", $operator)]);
-
-            if (array_key_exists("trained", $operator)) {
-
-                // $this->logger->info('operator', [$operator]);
-                $operatorEntity = $this->operatorRepository->find($operator['id']);
-                $trained = ($operator['trained'] === '') ? null : (($operator['trained'] === 'true') ? true : false);
-
-                // $this->logger->info('operator name and is he trained',     [
-                //     'name'    => $operatorEntity->getName(),
-                //     'trained' => $trained
-                // ]);
-                if ($trained === null) {
-                    break;
-                }
-
-                // Get all training records as a collection
-                $operatorTrainingRecords = $operatorEntity->getTrainingRecords();
-                // Filter the collection to find the record with the matching $upload
-                $filteredRecords = $operatorTrainingRecords->filter(function ($trainingRecord) use ($upload) {
-                    return $trainingRecord->getUpload() === $upload;
-                });
-
-                // Check if a TrainingRecord exists in the filtered collection
-                if (!$filteredRecords->isEmpty()) {
-                    $existingTrainingRecord = $filteredRecords->first();
-
-                    // Make sure $existingTrainingRecord is indeed a TrainingRecord instance
-                    if ($existingTrainingRecord instanceof TrainingRecord) {
-                        $existingTrainingRecord->setTrained($trained);
-                        $existingTrainingRecord->setTrainer($trainerEntity);
-                        $existingTrainingRecord->setDate(new \DateTime());
-                        $this->em->persist($existingTrainingRecord);
-                        $operatorEntity->setLasttraining(new \DateTime());
-                        $operatorEntity->setTobedeleted(null);
-                        $operatorEntity->setInactiveSince(null);
-                        $this->em->persist($operatorEntity);
-                    }
-                } else {
-                    // If the collection was empty, create a new TrainingRecord
-                    $trainingRecord = new TrainingRecord();
-                    $trainingRecord->setOperator($operatorEntity);
-                    $trainingRecord->setUpload($upload);
-                    $trainingRecord->setDate(new \DateTime());
-                    $trainingRecord->setTrained($trained);
-                    $trainingRecord->setTrainer($trainerEntity);
-                    $this->em->persist($trainingRecord);
-                    $operatorEntity->setLasttraining(new \DateTime());
-                    $operatorEntity->setTobedeleted(null);
-                    $operatorEntity->setInactiveSince(null);
-                    $this->em->persist($operatorEntity);
-                }
-
-                // Flush changes for each operator
-                $this->em->flush();
-                $this->cache->delete('operators_list');
-            }
+        try {
+            $this->trainingRecordService->trainingRecordtreatment($request);
+        } catch (\Exception $e) {
+            $this->logger->error('error during training record treatment', [$e]);
+        } finally {
+            return $this->redirectToRoute('app_render_training_records', [
+                'uploadId' => $uploadId,
+                'teamId' => $teamId,
+                'uapId' => $uapId,
+            ]);
         }
-
-        $trainerOperator->setLasttraining(new \DateTime());
-        $trainerOperator->setTobedeleted(null);
-        $trainerOperator->setInactiveSince(null);
-        $this->em->persist($trainerOperator);
-        $this->em->flush();
-
-        return $this->redirectToRoute('app_render_training_records', [
-            'uploadId' => $uploadId,
-            'teamId' => $teamId,
-            'uapId' => $uapId,
-        ]);
     }
 
 
@@ -827,7 +762,7 @@ class OperatorController extends AbstractController
     {
         $parsedRequest = json_decode($request->getContent(), true);
 
-        // $this->logger->info('Full request', $parsedRequest);
+        $this->logger->info('Full request', $parsedRequest);
 
         if (key_exists('code', $parsedRequest)) {
             $enteredCode = $parsedRequest['code'];
@@ -843,33 +778,14 @@ class OperatorController extends AbstractController
             $enteredName = null;
         };
 
-        if (key_exists('uploadId', $parsedRequest)) {
-            $uploadId = $parsedRequest['uploadId'];
-            // $this->logger->info('uploadId', [$uploadId]);
-            $upload = $this->uploadRepository->find($uploadId);
-        } else {
-            $upload = null;
-        };
-
         if ($enteredCode != null) {
             $existingOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'name' => $enteredName, 'IsTrainer' => true]);
             if ($existingOperator !== null) {
-                $uploadTrainer = $this->trainerRepository->findOneBy(['operator' => $existingOperator, 'upload' => $upload]);
-                if ($uploadTrainer !== null) {
-                    return new JsonResponse([
-                        'found'         => true,
-                        'name'          => $existingOperator->getName(),
-                        'code'          => $existingOperator->getCode(),
-                        'trainerId'     => $existingOperator->getId(),
-                        'uploadTrainer' => true,
-                    ]);
-                }
                 return new JsonResponse([
                     'found'         => true,
                     'name'          => $existingOperator->getName(),
                     'code'          => $existingOperator->getCode(),
                     'trainerId'     => $existingOperator->getId(),
-                    'uploadTrainer' => false,
 
                 ]);
             } else {
