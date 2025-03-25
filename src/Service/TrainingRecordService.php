@@ -2,14 +2,23 @@
 
 namespace App\Service;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
+
+use Doctrine\ORM\EntityManagerInterface;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+use Symfony\Component\HttpFoundation\Request;
 
 use App\Entity\Upload;
 use App\Entity\TrainingRecord;
+use App\Entity\Operator;
+use App\Entity\Trainer;
 
 use App\Repository\TrainingRecordRepository;
+use App\Repository\OperatorRepository;
+use App\Repository\UploadRepository;
+use App\Repository\TrainerRepository;
 
 use App\Service\EntityDeletionService;
 
@@ -21,6 +30,9 @@ class TrainingRecordService extends AbstractController
     protected $em;
 
     protected $trainingRecordRepository;
+    protected $operatorRepository;
+    protected $uploadRepository;
+    protected $trainerRepository;
 
     private $entityDeletionService;
 
@@ -30,6 +42,9 @@ class TrainingRecordService extends AbstractController
         EntityManagerInterface          $em,
 
         TrainingRecordRepository        $trainingRecordRepository,
+        OperatorRepository              $operatorRepository,
+        UploadRepository                $uploadRepository,
+        TrainerRepository               $trainerRepository,
 
         EntityDeletionService           $entityDeletionService
 
@@ -38,24 +53,24 @@ class TrainingRecordService extends AbstractController
         $this->em                           = $em;
 
         $this->trainingRecordRepository     = $trainingRecordRepository;
+        $this->operatorRepository           = $operatorRepository;
+        $this->uploadRepository             = $uploadRepository;
+        $this->trainerRepository            = $trainerRepository;
 
         $this->entityDeletionService        = $entityDeletionService;
     }
 
     public function updateTrainingRecord(Upload $upload)
     {
-        // $this->logger->info('TrainingRecordService: updateTrainingRecord: upload: ' . $upload->getId());
         $trainingRecords = $upload->getTrainingRecords();
         $trained = false;
         if ($trainingRecords->isEmpty()) {
-            // $this->logger->info('TrainingRecordService: updateTrainingRecord: trainingRecords is empty');
             return;
         } else {
             foreach ($trainingRecords as $trainingRecord) {
-                // $this->logger->info('TrainingRecordService: updateTrainingRecord: trainingRecord: ' . $trainingRecord->getId());
                 $trainingRecord->setTrained($trained);
                 $this->em->persist($trainingRecord);
-                $this->em->flush($trainingRecord);
+                $this->em->flush();
             }
         }
         return;
@@ -64,30 +79,28 @@ class TrainingRecordService extends AbstractController
     public function getOrderedTrainingRecordsByUpload($upload)
     {
         $trainingRecords = $upload->getTrainingRecords()->toArray();
-        $operators = array_map(function ($record) {
-            return $record->getOperator();
-        }, $trainingRecords);
-        usort($operators, [$this->trainingRecordRepository, 'compareOperator']);
-        return $this->orderedTrainingRecordsLoop($operators, $trainingRecords);
+
+        return $this->orderedTrainingRecordsLoop($trainingRecords);
     }
 
 
     public function getOrderedTrainingRecordsByTrainingRecordsArray($trainingRecords)
     {
-        $operators = array_map(function ($record) {
-            return $record->getOperator();
-        }, $trainingRecords);
-        usort($operators, [$this->trainingRecordRepository, 'compareOperator']);
-        return $this->orderedTrainingRecordsLoop($operators, $trainingRecords);
+        return $this->orderedTrainingRecordsLoop($trainingRecords);
     }
 
-    private function orderedTrainingRecordsLoop(array $operators, array $trainingRecords)
+    private function orderedTrainingRecordsLoop(array $trainingRecords)
     {
+        $operators = array_map(function ($trainingRecord) {
+            return $trainingRecord->getOperator();
+        }, $trainingRecords);
+        usort($operators, [$this->trainingRecordRepository, 'compareOperator']);
+
         $orderedTrainingRecords = [];
         foreach ($operators as $operator) {
-            foreach ($trainingRecords as $record) {
-                if ($record->getOperator() === $operator) {
-                    $orderedTrainingRecords[] = $record;
+            foreach ($trainingRecords as $trainingRecord) {
+                if ($trainingRecord->getOperator() === $operator) {
+                    $orderedTrainingRecords[] = $trainingRecord;
                     break; // Assuming each operator is associated with a single record
                 }
             }
@@ -95,38 +108,98 @@ class TrainingRecordService extends AbstractController
         return $orderedTrainingRecords;
     }
 
-    public function cheatTrain(string $date)
-    {
-        // $this->logger->info('TrainingRecordService: cheatTrain: date: ' . $date);
-        $date = (new \DateTime($date));
-        $trainingRecords = $this->trainingRecordRepository->findBy(['date' => $date]);
-        // $this->logger->info('TrainingRecordService: cheatTrain: trainingRecords: ' . count($trainingRecords));
-        foreach ($trainingRecords as $trainingRecord) {
-            if ($trainingRecord->isTrained() === false) {
-                $trainingRecord->setTrained(trained: true);
-                $this->em->persist($trainingRecord);
-                $this->em->flush($trainingRecord);
-            }
-        }
-        return;
-    }
-
     public function deleteWeeksOldTrainingRecords(int $trainingRecordId)
     {
         $trainingRecord = $this->trainingRecordRepository->find($trainingRecordId);
-        // $this->logger->info('TrainingRecordService: deleteWeeksOldTrainingRecords', ['trainingRecordId' => $trainingRecord->getId()]);
         $today = new \DateTime();
         if ($trainingRecord->getDate() < $today->modify('-1 week')) {
-            // $this->logger->info('TrainingRecordService: deleteWeeksOldTrainingRecords: trainingRecord is too old');
             return false;
         } else {
             $response = $this->entityDeletionService->deleteEntity('trainingRecord', $trainingRecord->getId());
         }
         if ($response != '' || $response != null) {
-            // $this->logger->info('TrainingRecordService: deleteWeeksOldTrainingRecords: response: ' . $response);
             return true;
         } else {
             return false;
         }
+    }
+
+
+    public function trainingRecordTreatment(Request $request)
+    {
+        $operators = [];
+        $operators = $request->request->all('operators');
+        $upload = $this->uploadRepository->find($request->attributes->get('uploadId'));
+        $trainerOperator = $this->operatorRepository->find($request->request->get('trainerId'));
+        $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $trainerOperator]);
+
+        foreach ($operators as $operator) {
+            if (array_key_exists("trained", $operator)) {
+
+                if ($operator['trained'] === 'true') {
+                    $trained = true;
+                } else {
+                    continue;
+                }
+
+                $operatorEntity = $this->operatorRepository->find($operator['id']);
+                // Get all training records as a collection
+                $operatorTrainingRecords = $operatorEntity->getTrainingRecords();
+                // Filter the collection to find the record with the matching $upload
+                $filteredRecords = $operatorTrainingRecords->filter(function ($trainingRecord) use ($upload) {
+                    return $trainingRecord->getUpload() === $upload;
+                });
+
+                // If the collection is empty, create a new TrainingRecord
+                if ($filteredRecords->isEmpty()) {
+                    $trainingRecord = new TrainingRecord();
+                    $trainingRecord->setOperator($operatorEntity);
+                    $trainingRecord->setUpload($upload);
+                } else {
+                    $trainingRecord = $filteredRecords->first();
+                }
+                $trainingRecord->setTrained($trained);
+                $trainingRecord->setTrainer($trainerEntity);
+                $trainingRecord->setDate(new \DateTime());
+                $this->em->persist($trainingRecord);
+                $operatorEntity->setLasttraining(new \DateTime());
+                $operatorEntity->setTobedeleted(null);
+                $operatorEntity->setInactiveSince(null);
+                $this->em->persist($operatorEntity);
+            }
+        }
+
+        try {
+            $this->trainerOperatorTrainingRecordCheck($trainerOperator, $trainerEntity, $upload);
+        } catch (\Exception $e) {
+            $this->logger->error('error during trainerOperatorTrainingRecordCheck', [$e]);
+        } finally {
+            $this->em->flush();
+            return;
+        }
+    }
+
+
+
+    public function trainerOperatorTrainingRecordCheck(Operator $trainerOperator, Trainer $trainerEntity, Upload $upload)
+    {
+        $existingTrainingRecord = $this->trainingRecordRepository->findOneBy(['upload' => $upload, 'operator' => $trainerOperator]);
+        if (!$existingTrainingRecord) {
+            $existingTrainingRecord = new TrainingRecord();
+            $existingTrainingRecord->setOperator($trainerOperator);
+            $existingTrainingRecord->setTrainer($trainerEntity);
+            $existingTrainingRecord->setUpload($upload);
+        }
+
+        $existingTrainingRecord->setDate(new \DateTime());
+        $existingTrainingRecord->setTrained(true);
+        $this->em->persist($existingTrainingRecord);
+
+        $trainerOperator->setLasttraining(new \DateTime());
+        $trainerOperator->setTobedeleted(null);
+        $trainerOperator->setInactiveSince(null);
+        $this->em->persist($trainerOperator);
+
+        return;
     }
 }

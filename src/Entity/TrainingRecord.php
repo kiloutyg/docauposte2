@@ -17,7 +17,7 @@ class TrainingRecord
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'trainingRecords')]
-    private ?Upload $Upload = null;
+    private ?Upload $upload = null;
 
     #[ORM\ManyToOne(inversedBy: 'trainingRecords')]
     private ?Operator $operator = null;
@@ -41,12 +41,12 @@ class TrainingRecord
 
     public function getUpload(): ?Upload
     {
-        return $this->Upload;
+        return $this->upload;
     }
 
-    public function setUpload(?Upload $Upload): static
+    public function setUpload(?Upload $upload): static
     {
-        $this->Upload = $Upload;
+        $this->upload = $upload;
 
         return $this;
     }

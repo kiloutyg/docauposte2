@@ -85,7 +85,6 @@ export default class OperatorTrainerController extends Controller {
     async checkTrainerExistence(field, value) {
         const payload = {};
         payload[field] = value;
-        payload['uploadId'] = this.trainerOperatorNameTarget.dataset.uploadId;
         // If the field is 'code', also take the value of the name from the target.
         if (field === 'code') {
             payload['name'] = this.trainerOperatorNameTarget.value;

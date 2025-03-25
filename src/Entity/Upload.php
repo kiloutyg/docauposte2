@@ -61,7 +61,7 @@ class Upload
     #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
     private ?OldUpload $OldUpload = null;
 
-    #[ORM\OneToMany(mappedBy: 'Upload', cascade: ['persist', 'remove'], targetEntity: TrainingRecord::class)]
+    #[ORM\OneToMany(mappedBy: 'upload', cascade: ['persist', 'remove'], targetEntity: TrainingRecord::class)]
     private Collection $trainingRecords;
 
     #[ORM\Column(nullable: true)]
