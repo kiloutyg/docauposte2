@@ -71,7 +71,7 @@ class Operator
     /**
      * @var Collection<int, Iluo>
      */
-    #[ORM\ManyToMany(targetEntity: Iluo::class, mappedBy: 'operator')]
+    #[ORM\OneToMany(targetEntity: Iluo::class, mappedBy: 'operator')]
     private Collection $iluos;
 
 

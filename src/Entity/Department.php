@@ -30,11 +30,25 @@ class Department
     #[ORM\OneToMany(targetEntity: Workstation::class, mappedBy: 'department')]
     private Collection $workstations;
 
+    /**
+     * @var Collection<int, Uap>
+     */
+    #[ORM\OneToMany(targetEntity: Uap::class, mappedBy: 'department')]
+    private Collection $uap;
+
+    /**
+     * @var Collection<int, Zone>
+     */
+    #[ORM\OneToMany(targetEntity: Zone::class, mappedBy: 'department')]
+    private Collection $zone;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->approbations = new ArrayCollection();
         $this->workstations = new ArrayCollection();
+        $this->uap = new ArrayCollection();
+        $this->zone = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -138,6 +152,66 @@ class Department
             // set the owning side to null (unless already changed)
             if ($workstation->getDepartment() === $this) {
                 $workstation->setDepartment(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Uap>
+     */
+    public function getUap(): Collection
+    {
+        return $this->uap;
+    }
+
+    public function addUap(Uap $uap): static
+    {
+        if (!$this->uap->contains($uap)) {
+            $this->uap->add($uap);
+            $uap->setDepartment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUap(Uap $uap): static
+    {
+        if ($this->uap->removeElement($uap)) {
+            // set the owning side to null (unless already changed)
+            if ($uap->getDepartment() === $this) {
+                $uap->setDepartment(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Zone>
+     */
+    public function getZone(): Collection
+    {
+        return $this->zone;
+    }
+
+    public function addZone(Zone $zone): static
+    {
+        if (!$this->zone->contains($zone)) {
+            $this->zone->add($zone);
+            $zone->setDepartment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeZone(Zone $zone): static
+    {
+        if ($this->zone->removeElement($zone)) {
+            // set the owning side to null (unless already changed)
+            if ($zone->getDepartment() === $this) {
+                $zone->setDepartment(null);
             }
         }
 

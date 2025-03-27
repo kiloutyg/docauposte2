@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\IluoRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -16,11 +14,8 @@ class Iluo
     #[ORM\Column]
     private ?int $id = null;
 
-    /**
-     * @var Collection<int, Operator>
-     */
-    #[ORM\ManyToMany(targetEntity: Operator::class, inversedBy: 'iluos')]
-    private Collection $operator;
+    #[ORM\ManyToOne(inversedBy: 'iluos')]
+    private ?Operator $operator;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $startDate = null;
@@ -43,36 +38,19 @@ class Iluo
     #[ORM\OneToOne(mappedBy: 'iluo', cascade: ['persist', 'remove'])]
     private ?IluoChecklist $iluoChecklist = null;
 
-    public function __construct()
-    {
-        $this->operator = new ArrayCollection();
-    }
-
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return Collection<int, Operator>
-     */
-    public function getOperator(): Collection
+    public function getOperator(): Operator
     {
         return $this->operator;
     }
 
-    public function addOperator(Operator $operator): static
+    public function setOperator(?Operator $operator): static
     {
-        if (!$this->operator->contains($operator)) {
-            $this->operator->add($operator);
-        }
-
-        return $this;
-    }
-
-    public function removeOperator(Operator $operator): static
-    {
-        $this->operator->removeElement($operator);
+        $this->operator = $operator;
 
         return $this;
     }

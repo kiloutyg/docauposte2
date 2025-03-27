@@ -37,6 +37,9 @@ class Uap
     #[ORM\ManyToMany(targetEntity: Operator::class, inversedBy: 'uaps')]
     private Collection $operators;
 
+    #[ORM\ManyToOne(inversedBy: 'uap')]
+    private ?Department $department = null;
+
     public function __construct()
     {
         $this->operators = new ArrayCollection();
@@ -81,6 +84,18 @@ class Uap
     public function removeOperator(Operator $operator): static
     {
         $this->operators->removeElement($operator);
+
+        return $this;
+    }
+
+    public function getDepartment(): ?Department
+    {
+        return $this->department;
+    }
+
+    public function setDepartment(?Department $department): static
+    {
+        $this->department = $department;
 
         return $this;
     }

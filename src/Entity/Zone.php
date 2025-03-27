@@ -38,6 +38,9 @@ class Zone
     #[ORM\OneToMany(targetEntity: Workstation::class, mappedBy: 'zone')]
     private Collection $workstations;
 
+    #[ORM\ManyToOne(inversedBy: 'zone')]
+    private ?Department $department = null;
+
     public function __construct()
     {
         $this->productLines = new ArrayCollection();
@@ -141,6 +144,18 @@ class Zone
                 $workstation->setZone(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDepartment(): ?Department
+    {
+        return $this->department;
+    }
+
+    public function setDepartment(?Department $department): static
+    {
+        $this->department = $department;
 
         return $this;
     }
