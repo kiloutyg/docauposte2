@@ -213,4 +213,33 @@ class OperatorService extends AbstractController
             $this->em->persist($newUap);
         }
     }
+
+
+    /**
+     * Process new operator entity
+     */
+    public function processNewOperator(Operator $newOperator, $form)
+    {
+
+        $trainerBool = $form->get('isTrainer')->getData();
+        if ($trainerBool == true) {
+            $trainer = new Trainer();
+            $trainer->setOperator($newOperator);
+            $trainer->setDemoted(false);
+            $this->em->persist($trainer);
+            $newOperator->setTrainer($trainer);
+        } elseif ($trainerBool != true) {
+            $trainer = $newOperator->getTrainer();
+            $newOperator->setTrainer(null);
+            if ($trainer != null) {
+                $this->em->remove($trainer);
+            }
+        };
+        $operator = $form->getData();
+        $this->em->persist($operator);
+        $this->em->flush();
+
+        return $operator->getId();
+    }
+
 }

@@ -40,9 +40,16 @@ class Uap
     #[ORM\ManyToOne(inversedBy: 'uap')]
     private ?Department $department = null;
 
+    /**
+     * @var Collection<int, Workstation>
+     */
+    #[ORM\OneToMany(targetEntity: Workstation::class, mappedBy: 'uap')]
+    private Collection $workstations;
+
     public function __construct()
     {
         $this->operators = new ArrayCollection();
+        $this->workstations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -96,6 +103,36 @@ class Uap
     public function setDepartment(?Department $department): static
     {
         $this->department = $department;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Workstation>
+     */
+    public function getWorkstations(): Collection
+    {
+        return $this->workstations;
+    }
+
+    public function addWorkstation(Workstation $workstation): static
+    {
+        if (!$this->workstations->contains($workstation)) {
+            $this->workstations->add($workstation);
+            $workstation->setUap($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWorkstation(Workstation $workstation): static
+    {
+        if ($this->workstations->removeElement($workstation)) {
+            // set the owning side to null (unless already changed)
+            if ($workstation->getUap() === $this) {
+                $workstation->setUap(null);
+            }
+        }
 
         return $this;
     }

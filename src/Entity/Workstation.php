@@ -36,6 +36,9 @@ class Workstation
     #[ORM\OneToMany(targetEntity: Iluo::class, mappedBy: 'workstation')]
     private Collection $iluos;
 
+    #[ORM\ManyToOne(inversedBy: 'workstations')]
+    private ?Uap $uap = null;
+
     public function __construct()
     {
         $this->iluos = new ArrayCollection();
@@ -132,6 +135,18 @@ class Workstation
                 $iluo->setWorkstation(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUap(): ?Uap
+    {
+        return $this->uap;
+    }
+
+    public function setUap(?Uap $uap): static
+    {
+        $this->uap = $uap;
 
         return $this;
     }

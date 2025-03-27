@@ -171,14 +171,12 @@ class OperatorController extends AbstractController
 
         if ($newOperatorForm->isSubmitted() && $newOperatorForm->isValid()) {
             try {
-                $newOperatorId = $this->processNewOperator($newOperator, $newOperatorForm, $request);
+                $newOperatorId = $this->operatorService->processNewOperator($newOperator, $newOperatorForm);
                 $this->addFlash('success', 'L\'opérateur a bien été ajouté');
                 // Generate the print detail URL
                 $printUrl = $this->generateUrl('app_operator_detail', ['operatorId' => $newOperatorId]);
-
                 // Store the print URL in the session
                 $request->getSession()->set('print_operator_url', $printUrl);
-
                 // Redirect to app_operator with a special parameter
                 return $this->redirectToRoute('app_operator', ['open_print' => true]);
             } catch (\Exception $e) {
@@ -228,29 +226,6 @@ class OperatorController extends AbstractController
 
 
 
-    private function processNewOperator(Operator $newOperator, $form, Request $request)
-    {
-
-        $trainerBool = $form->get('isTrainer')->getData();
-        if ($trainerBool == true) {
-            $trainer = new Trainer();
-            $trainer->setOperator($newOperator);
-            $trainer->setDemoted(false);
-            $this->em->persist($trainer);
-            $newOperator->setTrainer($trainer);
-        } elseif ($trainerBool != true) {
-            $trainer = $newOperator->getTrainer();
-            $newOperator->setTrainer(null);
-            if ($trainer != null) {
-                $this->em->remove($trainer);
-            }
-        };
-        $operator = $form->getData();
-        $this->em->persist($operator);
-        $this->em->flush();
-
-        return $operator->getId();
-    }
 
 
 
