@@ -37,7 +37,7 @@ export default class OperatorAdminCreationController extends Controller {
             if (isValid) {
                 if (this.newOperatorFirstnameTarget.value.trim() === "") {
                     this.newOperatorFirstnameTarget.disabled = false;
-                    this.newOperatorFirstnameTarget.focus();
+                    // this.newOperatorFirstnameTarget.focus();
                 }
                 this.validateNewOperatorFirstname();
             }
