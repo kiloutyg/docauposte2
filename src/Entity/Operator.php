@@ -68,11 +68,18 @@ class Operator
     #[ORM\ManyToMany(targetEntity: Uap::class, mappedBy: 'operators')]
     private Collection $uaps;
 
+    /**
+     * @var Collection<int, Iluo>
+     */
+    #[ORM\OneToMany(targetEntity: Iluo::class, mappedBy: 'operator')]
+    private Collection $iluos;
+
 
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
         $this->uaps = new ArrayCollection();
+        $this->iluos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -267,6 +274,33 @@ class Operator
     {
         if ($this->uaps->removeElement($uap)) {
             $uap->removeOperator($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Iluo>
+     */
+    public function getIluos(): Collection
+    {
+        return $this->iluos;
+    }
+
+    public function addIluo(Iluo $iluo): static
+    {
+        if (!$this->iluos->contains($iluo)) {
+            $this->iluos->add($iluo);
+            $iluo->addOperator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIluo(Iluo $iluo): static
+    {
+        if ($this->iluos->removeElement($iluo)) {
+            $iluo->removeOperator($this);
         }
 
         return $this;

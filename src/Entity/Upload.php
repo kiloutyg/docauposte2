@@ -70,9 +70,23 @@ class Upload
     #[ORM\Column(nullable: true)]
     private ?bool $forcedDisplay = null;
 
+    /**
+     * @var Collection<int, Steps>
+     */
+    #[ORM\ManyToMany(targetEntity: Steps::class, mappedBy: 'uploads')]
+    private Collection $steps;
+
+    /**
+     * @var Collection<int, Workstation>
+     */
+    #[ORM\OneToMany(targetEntity: Workstation::class, mappedBy: 'upload')]
+    private Collection $workstations;
+
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
+        $this->steps = new ArrayCollection();
+        $this->workstations = new ArrayCollection();
     }
 
 
@@ -261,6 +275,63 @@ class Upload
     public function setForcedDisplay(?bool $forcedDisplay): static
     {
         $this->forcedDisplay = $forcedDisplay;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Steps>
+     */
+    public function getSteps(): Collection
+    {
+        return $this->steps;
+    }
+
+    public function addStep(Steps $step): static
+    {
+        if (!$this->steps->contains($step)) {
+            $this->steps->add($step);
+            $step->addUpload($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStep(Steps $step): static
+    {
+        if ($this->steps->removeElement($step)) {
+            $step->removeUpload($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Workstation>
+     */
+    public function getWorkstations(): Collection
+    {
+        return $this->workstations;
+    }
+
+    public function addWorkstation(Workstation $workstation): static
+    {
+        if (!$this->workstations->contains($workstation)) {
+            $this->workstations->add($workstation);
+            $workstation->setUpload($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWorkstation(Workstation $workstation): static
+    {
+        if ($this->workstations->removeElement($workstation)) {
+            // set the owning side to null (unless already changed)
+            if ($workstation->getUpload() === $this) {
+                $workstation->setUpload(null);
+            }
+        }
 
         return $this;
     }
