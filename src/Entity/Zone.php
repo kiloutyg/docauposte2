@@ -32,9 +32,16 @@ class Zone
     #[ORM\ManyToOne(inversedBy: 'zones')]
     private ?User $Creator = null;
 
+    /**
+     * @var Collection<int, Workstation>
+     */
+    #[ORM\OneToMany(targetEntity: Workstation::class, mappedBy: 'zone')]
+    private Collection $workstations;
+
     public function __construct()
     {
         $this->productLines = new ArrayCollection();
+        $this->workstations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -104,6 +111,36 @@ class Zone
     public function setCreator(?User $Creator): static
     {
         $this->Creator = $Creator;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Workstation>
+     */
+    public function getWorkstations(): Collection
+    {
+        return $this->workstations;
+    }
+
+    public function addWorkstation(Workstation $workstation): static
+    {
+        if (!$this->workstations->contains($workstation)) {
+            $this->workstations->add($workstation);
+            $workstation->setZone($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWorkstation(Workstation $workstation): static
+    {
+        if ($this->workstations->removeElement($workstation)) {
+            // set the owning side to null (unless already changed)
+            if ($workstation->getZone() === $this) {
+                $workstation->setZone(null);
+            }
+        }
 
         return $this;
     }
