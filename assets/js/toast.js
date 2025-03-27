@@ -1,19 +1,17 @@
 document.addEventListener("turbo:load", () => {
-  var toastLiveExample = document.getElementById("liveToast");
+  // Initialize all toasts
+  document.querySelectorAll('.toast').forEach((toast) => {
+    toast.classList.add("show");
 
-  if (toastLiveExample) {
-    toastLiveExample.classList.add("show");
-  }
-});
+    // Set up fade out after 2 seconds
+    setTimeout(() => {
+      toast.style.transition = 'opacity 0.5s';
+      toast.style.opacity = '0';
 
-
-
-document.addEventListener('DOMContentLoaded', (event) => {
-  setTimeout(() => {
-    document.querySelectorAll('.toast').forEach((message) => {
-      message.style.transition = 'opacity 0.5s';
-      message.style.opacity = '0';
-      setTimeout(() => message.remove(), 300); // Remove from DOM after fade out
-    });
-  }, 2000); // 2 seconds
+      // Remove from DOM after fade animation
+      toast.addEventListener('transitionend', () => {
+        toast.remove();
+      });
+    }, 2000);
+  });
 });
