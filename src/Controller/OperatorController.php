@@ -165,17 +165,22 @@ class OperatorController extends AbstractController
     {
         // // $this->logger->info('search query with full request', $request->request->all());
 
-        // $countArray = $this->operatorService->operatorCheckForAutoDelete();
-
         $newOperator = new Operator();
         $newOperatorForm = $this->createForm(OperatorType::class, $newOperator);
         $newOperatorForm->handleRequest($request);
 
         if ($newOperatorForm->isSubmitted() && $newOperatorForm->isValid()) {
             try {
-                $this->processNewOperator($newOperator, $newOperatorForm, $request);
+                $newOperatorId = $this->processNewOperator($newOperator, $newOperatorForm, $request);
                 $this->addFlash('success', 'L\'opérateur a bien été ajouté');
-                return $this->redirectToRoute('app_operator');
+                // Generate the print detail URL
+                $printUrl = $this->generateUrl('app_operator_detail', ['operatorId' => $newOperatorId]);
+
+                // Store the print URL in the session
+                $request->getSession()->set('print_operator_url', $printUrl);
+
+                // Redirect to app_operator with a special parameter
+                return $this->redirectToRoute('app_operator', ['open_print' => true]);
             } catch (\Exception $e) {
                 $this->addFlash('danger', 'L\'opérateur n\'a pas pu être ajouté' . $e->getMessage());
                 return $this->redirectToRoute('app_operator');
@@ -243,7 +248,8 @@ class OperatorController extends AbstractController
         $operator = $form->getData();
         $this->em->persist($operator);
         $this->em->flush();
-        $this->cache->delete('operators_list');
+
+        return $operator->getId();
     }
 
 

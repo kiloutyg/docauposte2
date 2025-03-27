@@ -81,4 +81,10 @@
 				{% include '/services/operators/admin_component/_adminListOperator.html.twig' %}
 			</turbo-frame>
 		</div>
+		{% if app.request.query.get('open_print') and app.session.get('print_operator_url') %}
+			<script>
+				window.open('{{ app.session.get('print_operator_url') }}', '_blank');
+				{% do app.session.remove('print_operator_url') %}
+			</script>
+		{% endif %}
 	{% endblock %}

@@ -37,7 +37,7 @@ export default class OperatorAdminCreationController extends Controller {
             if (isValid) {
                 if (this.newOperatorFirstnameTarget.value.trim() === "") {
                     this.newOperatorFirstnameTarget.disabled = false;
-                    this.newOperatorFirstnameTarget.focus();
+                    // this.newOperatorFirstnameTarget.focus();
                 }
                 this.validateNewOperatorFirstname();
             }
@@ -57,7 +57,6 @@ export default class OperatorAdminCreationController extends Controller {
             if (isValid) {
                 let combinedName = `${this.newOperatorFirstnameTarget.value.trim()}.${this.newOperatorLastnameTarget.value.trim()}`;
                 this.newOperatorNameTarget = combinedName.toLowerCase();
-
                 let invertedCombined = `${this.newOperatorLastnameTarget.value.trim()}.${this.newOperatorFirstnameTarget.value.trim()}`;
                 this.newOperatorInvertedNameTarget = invertedCombined.toLowerCase();
                 this.validateNewOperatorName();
