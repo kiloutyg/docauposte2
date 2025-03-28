@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Model\EmploymentType;
 use App\Repository\OperatorRepository;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -62,6 +63,7 @@ class Operator
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $inactiveSince = null;
 
+
     /**
      * @var Collection<int, Uap>
      */
@@ -73,6 +75,9 @@ class Operator
      */
     #[ORM\OneToMany(targetEntity: Iluo::class, mappedBy: 'operator')]
     private Collection $iluos;
+
+    #[ORM\Column(nullable: true, enumType: EmploymentType::class)]
+    private ?EmploymentType $employmentType = null;
 
 
     public function __construct()
@@ -291,7 +296,7 @@ class Operator
     {
         if (!$this->iluos->contains($iluo)) {
             $this->iluos->add($iluo);
-            $iluo->addOperator($this);
+            $iluo->setOperator($this);
         }
 
         return $this;
@@ -300,8 +305,22 @@ class Operator
     public function removeIluo(Iluo $iluo): static
     {
         if ($this->iluos->removeElement($iluo)) {
-            $iluo->removeOperator($this);
+            if ($iluo->getOperator() === $this) {
+                $iluo->setOperator(null);
+            }
         }
+
+        return $this;
+    }
+
+    public function getEmploymentType(): ?EmploymentType
+    {
+        return $this->employmentType;
+    }
+
+    public function setEmploymentType(?EmploymentType $employmentType): static
+    {
+        $this->employmentType = $employmentType;
 
         return $this;
     }
