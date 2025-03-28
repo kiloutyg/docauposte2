@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	ILUO Admin	|
+	{{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+	<div
+		class="inner-container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+		<div
+			class="accordion my-3"
+			id="accordionIluo">
+			{{ render(controller('App\\Controller\\IluoController::generalElementsAdminPageGet'), options = []) }}
+			{{ render(controller('App\\Controller\\IluoController::checklistAdminPageGet'), options = []) }}
+			{{ render(controller('App\\Controller\\IluoController::workstationAdminPageGet'), options = []) }}
+		</div>
+	</div>
+{% endblock %}

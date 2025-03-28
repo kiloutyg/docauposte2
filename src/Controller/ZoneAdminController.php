@@ -99,7 +99,7 @@ class ZoneAdminController extends AbstractController
 
     // This function is responsible for rendering the zone admin interface
     #[Route('/{zoneId}', name: 'admin')]
-    public function zoneAdmin(int $zoneId = null, Zone $zone = null): Response
+    public function zoneAdmin(?int $zoneId = null, ?Zone $zone = null): Response
     {
         $pageLevel = 'zone';
         if ($zone === null && $zoneId != null) {
@@ -137,7 +137,7 @@ class ZoneAdminController extends AbstractController
 
     // Creation of new productLine
     #[Route('/create_productline/{zoneId}', name: 'admin_create_productline')]
-    public function createProductLine(Request $request, int $zoneId = null): Response
+    public function createProductLine(Request $request, ?int $zoneId = null): Response
     {
 
         if (!preg_match("/^[^.]+$/", $request->request->get('productLineName'))) {

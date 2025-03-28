@@ -37,7 +37,7 @@ class Uap
     #[ORM\ManyToMany(targetEntity: Operator::class, inversedBy: 'uaps')]
     private Collection $operators;
 
-    #[ORM\ManyToOne(inversedBy: 'uap')]
+    #[ORM\ManyToOne(inversedBy: 'uaps')]
     private ?Department $department = null;
 
     /**

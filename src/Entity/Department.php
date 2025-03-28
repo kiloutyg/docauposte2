@@ -34,21 +34,21 @@ class Department
      * @var Collection<int, Uap>
      */
     #[ORM\OneToMany(targetEntity: Uap::class, mappedBy: 'department')]
-    private Collection $uap;
+    private Collection $uaps;
 
     /**
      * @var Collection<int, Zone>
      */
     #[ORM\OneToMany(targetEntity: Zone::class, mappedBy: 'department')]
-    private Collection $zone;
+    private Collection $zones;
 
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->approbations = new ArrayCollection();
         $this->workstations = new ArrayCollection();
-        $this->uap = new ArrayCollection();
-        $this->zone = new ArrayCollection();
+        $this->uaps = new ArrayCollection();
+        $this->zones = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -161,27 +161,27 @@ class Department
     /**
      * @return Collection<int, Uap>
      */
-    public function getUap(): Collection
+    public function getUaps(): Collection
     {
-        return $this->uap;
+        return $this->uaps;
     }
 
-    public function addUap(Uap $uap): static
+    public function addUap(Uap $uaps): static
     {
-        if (!$this->uap->contains($uap)) {
-            $this->uap->add($uap);
-            $uap->setDepartment($this);
+        if (!$this->uaps->contains($uaps)) {
+            $this->uaps->add($uaps);
+            $uaps->setDepartment($this);
         }
 
         return $this;
     }
 
-    public function removeUap(Uap $uap): static
+    public function removeUap(Uap $uaps): static
     {
-        if ($this->uap->removeElement($uap)) {
+        if ($this->uaps->removeElement($uaps)) {
             // set the owning side to null (unless already changed)
-            if ($uap->getDepartment() === $this) {
-                $uap->setDepartment(null);
+            if ($uaps->getDepartment() === $this) {
+                $uaps->setDepartment(null);
             }
         }
 
@@ -193,25 +193,25 @@ class Department
      */
     public function getZone(): Collection
     {
-        return $this->zone;
+        return $this->zones;
     }
 
-    public function addZone(Zone $zone): static
+    public function addZone(Zone $zones): static
     {
-        if (!$this->zone->contains($zone)) {
-            $this->zone->add($zone);
-            $zone->setDepartment($this);
+        if (!$this->zones->contains($zones)) {
+            $this->zones->add($zones);
+            $zones->setDepartment($this);
         }
 
         return $this;
     }
 
-    public function removeZone(Zone $zone): static
+    public function removeZone(Zone $zones): static
     {
-        if ($this->zone->removeElement($zone)) {
+        if ($this->zones->removeElement($zones)) {
             // set the owning side to null (unless already changed)
-            if ($zone->getDepartment() === $this) {
-                $zone->setDepartment(null);
+            if ($zones->getDepartment() === $this) {
+                $zones->setDepartment(null);
             }
         }
 

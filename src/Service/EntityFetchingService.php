@@ -26,6 +26,7 @@ use App\Repository\TrainingRecordRepository;
 use App\Repository\TrainerRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
+use App\Repository\ProductsRepository;
 
 
 class EntityFetchingService extends AbstractController
@@ -51,6 +52,7 @@ class EntityFetchingService extends AbstractController
     private $operatorRepository;
     private $trainingRecordRepository;
     private $trainerRepository;
+    private $productsRepository;
 
     public function __construct(
         LoggerInterface                 $logger,
@@ -74,6 +76,7 @@ class EntityFetchingService extends AbstractController
         TrainingRecordRepository        $trainingRecordRepository,
         TrainerRepository               $trainerRepository,
         IncidentRepository              $incidentRepository,
+        ProductsRepository              $productsRepository
     ) {
         $this->logger                       = $logger;
 
@@ -96,6 +99,7 @@ class EntityFetchingService extends AbstractController
         $this->operatorRepository           = $operatorRepository;
         $this->trainingRecordRepository     = $trainingRecordRepository;
         $this->trainerRepository            = $trainerRepository;
+        $this->productsRepository           = $productsRepository;
     }
 
 
@@ -261,5 +265,11 @@ class EntityFetchingService extends AbstractController
         }
 
         return $groupedValidatedUploads;
+    }
+
+
+    public function getProducts()
+    {
+        return $this->productsRepository->findAll();
     }
 }

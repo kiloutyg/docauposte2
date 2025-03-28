@@ -164,43 +164,11 @@ class SuperAdminController extends AbstractController
     }
 
 
-    // A route that use a method to revalid automatically every training records of a certain date
-    #[Route('super_admin/cheattrain/{year}/{month}/{day}', name: 'app_super_admin_cheat_train')]
-    public function cheatTrain(string $year, string $month, string $day)
-    {
-        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
-            $date = $year . '-' . $month . '-' . $day;
-            $this->trainingRecordService->cheatTrain($date);
-            return $this->redirectToRoute('app_super_admin');
-        } else {
-            $this->addFlash('danger', 'Vous n\'êtes pas autorisé à accéder à cette page');
-            return $this->redirectToRoute('app_login');
-        }
-    }
-
-
-
 
     // Update method for any stuff necessary during dev
     #[Route('/super_admin/update', name: 'super_admin_update')]
     public function updateDB()
     {
-
-
-        // $uploads = $this->entityFetchingService->getUploads();
-        // foreach ($uploads as $upload) {
-        //     $similarNamedUploads = $this->uploadRepository->findBy(['filename' => $upload->getFilename()]);
-        //     foreach ($similarNamedUploads as $similarNamedUpload) {
-        //         if ($upload->getId() != $similarNamedUpload->getId()) {
-        //             $originalName = pathinfo($similarNamedUpload->getFilename(), PATHINFO_FILENAME);
-        //             $fileExtension = pathinfo($similarNamedUpload->getFilename(), PATHINFO_EXTENSION);
-        //             $similarNamedUpload->setFilename($originalName . '_' . uniqid('', true) . '.' . $fileExtension);
-        //             $this->em->persist($similarNamedUpload);
-        //         }
-        //     }
-        // }
-
-
 
         $incidents = $this->entityFetchingService->getIncidents();
         foreach ($incidents as $incident) {
@@ -214,15 +182,6 @@ class SuperAdminController extends AbstractController
                 }
             }
         }
-
-
-        // $operators = $this->entityFetchingService->getOperators();
-        // foreach ($operators as $operator) {
-        //     $currentUap = $operator->getUap();
-        //     $operator->addUap($currentUap);
-        //     $this->em->persist($operator);
-        // }
-
 
         $this->em->flush();
 

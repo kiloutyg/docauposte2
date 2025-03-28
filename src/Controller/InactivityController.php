@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\SecurityBundle\Security;
 
 use App\Service\SettingsService;
@@ -78,7 +78,7 @@ class InactivityController extends AbstractController
 
     // Render the redirected incidents page
     #[Route('/productLine/{productLineId}/redirected_incident/{incidentId}', name: 'redirected_incident')]
-    public function redirectedIncident(int $productLineId = null, int $incidentId = null)
+    public function redirectedIncident(?int $productLineId = null, ?int $incidentId = null): Response
     {
 
         $response = $this->incidentService->displayIncident($productLineId, $incidentId);
