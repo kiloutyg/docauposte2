@@ -169,20 +169,24 @@ class OperatorController extends AbstractController
         $newOperatorForm = $this->createForm(OperatorType::class, $newOperator);
         $newOperatorForm->handleRequest($request);
 
-        if ($newOperatorForm->isSubmitted() && $newOperatorForm->isValid()) {
-            try {
-                $newOperatorId = $this->operatorService->processNewOperator($newOperator, $newOperatorForm);
-                $this->addFlash('success', 'L\'opérateur a bien été ajouté');
-                // Generate the print detail URL
-                $printUrl = $this->generateUrl('app_operator_detail', ['operatorId' => $newOperatorId]);
-                // Store the print URL in the session
-                $request->getSession()->set('print_operator_url', $printUrl);
-                // Redirect to app_operator with a special parameter
-                return $this->redirectToRoute('app_operator', ['open_print' => true]);
-            } catch (\Exception $e) {
-                $this->addFlash('danger', 'L\'opérateur n\'a pas pu être ajouté' . $e->getMessage());
-                return $this->redirectToRoute('app_operator');
+        if ($newOperatorForm->isSubmitted()) {
+            if ($newOperatorForm->isValid()) {
+                try {
+                    $newOperatorId = $this->operatorService->processNewOperator($newOperator, $newOperatorForm);
+                    $this->addFlash('success', 'L\'opérateur a bien été ajouté');
+                    // Generate the print detail URL
+                    $printUrl = $this->generateUrl('app_operator_detail', ['operatorId' => $newOperatorId]);
+                    // Store the print URL in the session
+                    $request->getSession()->set('print_operator_url', $printUrl);
+                    // Redirect to app_operator with a special parameter
+                    return $this->redirectToRoute('app_operator', ['open_print' => true]);
+                } catch (\Exception $e) {
+                    $this->addFlash('danger', 'L\'opérateur n\'a pas pu être ajouté' . $e->getMessage());
+                    return $this->redirectToRoute('app_operator');
+                }
             }
+            $this->addFlash('danger', 'L\'opérateur n\'a pas pu être ajouté' . $newOperatorForm->getErrors());
+            return $this->redirectToRoute('app_operator');
         }
 
         if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
@@ -847,15 +851,11 @@ class OperatorController extends AbstractController
 
     // Route to print the operator detail in a pdf
     #[Route('/operator/detail/{operatorId}', name: 'app_operator_detail')]
-    public function printOpeDetail(int $operatorId)
+    public function printOpeDetail(int $operatorId): string
     {
         $operator = $this->operatorRepository->find($operatorId);
-        // $this->logger->info('operator', [$operator]);
 
-        // $pdfContent = $this->pdfGeneratorService->generateOperatorPdf($operator);
-        $this->pdfGeneratorService->generateOperatorPdf($operator);
-
-        return true;
+        return $this->pdfGeneratorService->generateOperatorPdf($operator);
     }
 
 

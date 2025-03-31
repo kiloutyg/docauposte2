@@ -236,10 +236,10 @@ class OperatorService extends AbstractController
             }
         };
         $operator = $form->getData();
+        $this->logger->info('operator in processNewOperator', [$operator]);
         $this->em->persist($operator);
         $this->em->flush();
 
         return $operator->getId();
     }
-
 }

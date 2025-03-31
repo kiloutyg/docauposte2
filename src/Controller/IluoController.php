@@ -61,7 +61,7 @@ class IluoController extends AbstractController
         return $this->redirectToRoute('app_base');
     }
 
-    #[Route('iluo_delete_entity/{entityType}/{entityId}', name: 'delete_entity')]
+    #[Route('admin/delete_entity/{entityType}/{entityId}', name: 'delete_entity')]
     public function deleteIluoEntity(string $entityType, int $entityId)
     {
         try {
@@ -74,7 +74,7 @@ class IluoController extends AbstractController
     }
 
 
-    #[Route('general_elements_admin', name: 'general_elements_admin')]
+    #[Route('admin/general_elements', name: 'general_elements_admin')]
     public function generalElementsAdminPageGet(Request $request): Response
     {
         if ($request->isMethod('GET')) {
@@ -85,7 +85,7 @@ class IluoController extends AbstractController
 
 
 
-    #[Route('checklist_admin', name: 'checklist_admin')]
+    #[Route('admin/checklist', name: 'checklist_admin')]
     public function checklistAdminPageGet(Request $request): Response
     {
         if ($request->isMethod('GET')) {
@@ -96,7 +96,7 @@ class IluoController extends AbstractController
 
 
 
-    #[Route('workstation_admin', name: 'workstation_admin')]
+    #[Route('admin/workstation', name: 'workstation_admin')]
     public function workstationAdminPageGet(Request $request): Response
     {
         if ($request->isMethod('GET')) {
@@ -106,7 +106,7 @@ class IluoController extends AbstractController
     }
 
 
-    #[Route('product_general_elements_admin', name: 'product_general_elements_admin')]
+    #[Route('admin/product_general_elements', name: 'product_general_elements_admin')]
     public function productGeneralElementsAdminPageGet(Request $request): Response
     {
         $products = $this->entityFetchingService->getProducts();
