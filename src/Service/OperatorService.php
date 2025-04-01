@@ -236,7 +236,11 @@ class OperatorService extends AbstractController
             }
         };
         $operator = $form->getData();
-        $this->logger->info('operator in processNewOperator', [$operator]);
+        $uaps = $operator->getUaps();
+        foreach ($uaps as $uap) {
+            $uap->addOperator($operator);
+            $this->em->persist($uap);
+        }
         $this->em->persist($operator);
         $this->em->flush();
 

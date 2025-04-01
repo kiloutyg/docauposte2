@@ -181,11 +181,11 @@ class OperatorController extends AbstractController
                     // Redirect to app_operator with a special parameter
                     return $this->redirectToRoute('app_operator', ['open_print' => true]);
                 } catch (\Exception $e) {
-                    $this->addFlash('danger', 'L\'opérateur n\'a pas pu être ajouté' . $e->getMessage());
-                    return $this->redirectToRoute('app_operator');
+                    $this->logger->error('error' . $e->getMessage());
                 }
             }
-            $this->addFlash('danger', 'L\'opérateur n\'a pas pu être ajouté' . $newOperatorForm->getErrors());
+            $this->logger->error('error' . $newOperatorForm->getErrors());
+            $this->addFlash('danger', 'L\'opérateur n\'a pas pu être ajouté');
             return $this->redirectToRoute('app_operator');
         }
 

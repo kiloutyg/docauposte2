@@ -41,8 +41,6 @@ class EntityDeletionService
     private $logger;
     private $projectDir;
 
-    private $params;
-
     private $folderService;
     private $incidentService;
 
