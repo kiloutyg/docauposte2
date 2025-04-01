@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\products;
+use App\Form\TypeComponent\DisplayType;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,7 +24,7 @@ class ProductType extends AbstractType
 
         $builder
             ->add('name', TextType::class, [
-                'label' => 'Nom de l\'Uap',
+                'label' => 'Nom du Produit',
                 'label_attr' => [
                     'style' => 'color: #ffffff;'
                 ],
@@ -40,7 +41,8 @@ class ProductType extends AbstractType
                 'label' => 'Ajouter',
                 'attr' => [
                     'class' => 'btn btn-primary btn-login text-uppercase fw-bold mt-2 mb-3 submit-entity-creation',
-                    'type' => 'submit'
+                    'type' => 'submit',
+                    'data-name-validation-target' => 'saveButton',
                 ]
             ]);
     }

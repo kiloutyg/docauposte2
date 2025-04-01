@@ -9,6 +9,8 @@ use App\Entity\Uap;
 use App\Form\DataTransformer\FirstNameTransformer;
 use App\Form\DataTransformer\LastNameTransformer;
 
+use Doctrine\ORM\EntityRepository;
+
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 use Symfony\Component\Form\AbstractType;
@@ -101,6 +103,12 @@ class OperatorType extends AbstractType
             ])
             ->add('team', EntityType::class, [
                 'class' => Team::class,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('t')
+                        ->where('t.name != :undefined')
+                        ->setParameter('undefined', 'INDEFINI')
+                        ->orderBy('t.name', 'ASC');
+                },
                 'label' => false,
                 'choice_label' => 'name',
                 'placeholder' => 'Équipe',
@@ -119,6 +127,12 @@ class OperatorType extends AbstractType
             ])
             ->add('uaps', EntityType::class, [
                 'class' => Uap::class,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.name != :undefined')
+                        ->setParameter('undefined', 'INDEFINI')
+                        ->orderBy('u.name', 'ASC');
+                },
                 'label' => false,
                 'choice_label' => 'name',
                 'placeholder' => 'UAP',

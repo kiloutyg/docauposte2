@@ -5,30 +5,32 @@
 namespace App\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
+
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
+use App\Service\FolderService;
+use App\Service\IncidentService;
 
-use App\Repository\ZoneRepository;
-use App\Repository\ProductLineRepository;
-use App\Repository\CategoryRepository;
 use App\Repository\ButtonRepository;
-use App\Repository\UploadRepository;
-use App\Repository\IncidentRepository;
-use App\Repository\IncidentCategoryRepository;
+use App\Repository\CategoryRepository;
 use App\Repository\DepartmentRepository;
-use App\Repository\UserRepository;
-use App\Repository\ValidationRepository;
+use App\Repository\IncidentCategoryRepository;
+use App\Repository\IncidentRepository;
 use App\Repository\OldUploadRepository;
 use App\Repository\OperatorRepository;
-use App\Repository\TrainingRecordRepository;
+use App\Repository\ProductLineRepository;
+use App\Repository\ProductsRepository;
 use App\Repository\TeamRepository;
-use App\Repository\UapRepository;
 use App\Repository\TrainerRepository;
+use App\Repository\TrainingRecordRepository;
+use App\Repository\UapRepository;
+use App\Repository\UploadRepository;
+use App\Repository\UserRepository;
+use App\Repository\ValidationRepository;
+use App\Repository\ZoneRepository;
 
-use App\Service\IncidentService;
-use App\Service\FolderService;
 
 
 // This class is responsible for managing the deletion of entities, their related entities from the database
@@ -37,80 +39,82 @@ class EntityDeletionService
 {
     private $em;
     private $logger;
-    protected $projectDir;
+    private $projectDir;
 
-    protected $params;
-
-    private $zoneRepository;
-    private $productLineRepository;
-    private $categoryRepository;
-    private $buttonRepository;
-    private $uploadRepository;
-    private $incidentRepository;
-    private $incidentCategoryRepository;
-    private $incidentService;
     private $folderService;
+    private $incidentService;
+
+    private $buttonRepository;
+    private $categoryRepository;
     private $departmentRepository;
-    private $userRepository;
-    private $validationRepository;
+    private $incidentCategoryRepository;
+    private $incidentRepository;
     private $OldUploadRepository;
     private $operatorRepository;
-    private $trainingRecordRepository;
+    private $productLineRepository;
+    private $productsRepository;
     private $teamRepository;
-    private $uapRepository;
     private $trainerRepository;
-
+    private $trainingRecordRepository;
+    private $uapRepository;
+    private $uploadRepository;
+    private $userRepository;
+    private $validationRepository;
+    private $zoneRepository;
 
 
     public function __construct(
-        EntityManagerInterface          $em,
-        LoggerInterface                 $logger,
+        EntityManagerInterface              $em,
+        LoggerInterface                     $logger,
 
-        ParameterBagInterface           $params,
+        ParameterBagInterface               $params,
 
+        FolderService                       $folderService,
+        IncidentService                     $incidentService,
 
-        ZoneRepository                  $zoneRepository,
-        ProductLineRepository           $productLineRepository,
-        CategoryRepository              $categoryRepository,
-        ButtonRepository                $buttonRepository,
-        UploadRepository                $uploadRepository,
-        IncidentRepository              $incidentRepository,
-        IncidentCategoryRepository      $incidentCategoryRepository,
-        IncidentService                 $incidentService,
-        FolderService           $folderService,
-        DepartmentRepository            $departmentRepository,
-        UserRepository                  $userRepository,
-        ValidationRepository            $validationRepository,
-        OldUploadRepository             $OldUploadRepository,
-        OperatorRepository              $operatorRepository,
-        TrainingRecordRepository        $trainingRecordRepository,
-        TeamRepository                  $teamRepository,
-        UapRepository                   $uapRepository,
-        TrainerRepository               $trainerRepository
+        ButtonRepository                    $buttonRepository,
+        CategoryRepository                  $categoryRepository,
+        DepartmentRepository                $departmentRepository,
+        IncidentCategoryRepository          $incidentCategoryRepository,
+        IncidentRepository                  $incidentRepository,
+        OldUploadRepository                 $OldUploadRepository,
+        OperatorRepository                  $operatorRepository,
+        ProductLineRepository               $productLineRepository,
+        ProductsRepository                  $productsRepository,
+        TeamRepository                      $teamRepository,
+        TrainerRepository                   $trainerRepository,
+        TrainingRecordRepository            $trainingRecordRepository,
+        UapRepository                       $uapRepository,
+        UploadRepository                    $uploadRepository,
+        UserRepository                      $userRepository,
+        ValidationRepository                $validationRepository,
+        ZoneRepository                      $zoneRepository
     ) {
         $this->em                           = $em;
         $this->logger                       = $logger;
 
         $this->projectDir                   = $params->get(name: 'kernel.project_dir');
 
-        $this->zoneRepository               = $zoneRepository;
-        $this->productLineRepository        = $productLineRepository;
-        $this->categoryRepository           = $categoryRepository;
-        $this->buttonRepository             = $buttonRepository;
-        $this->uploadRepository             = $uploadRepository;
-        $this->incidentRepository           = $incidentRepository;
-        $this->incidentCategoryRepository   = $incidentCategoryRepository;
+        $this->folderService                = $folderService;
         $this->incidentService              = $incidentService;
-        $this->folderService        = $folderService;
+
+        $this->buttonRepository             = $buttonRepository;
+        $this->categoryRepository           = $categoryRepository;
         $this->departmentRepository         = $departmentRepository;
-        $this->userRepository               = $userRepository;
-        $this->validationRepository         = $validationRepository;
+        $this->incidentCategoryRepository   = $incidentCategoryRepository;
+        $this->incidentRepository           = $incidentRepository;
         $this->OldUploadRepository          = $OldUploadRepository;
         $this->operatorRepository           = $operatorRepository;
-        $this->trainingRecordRepository     = $trainingRecordRepository;
+        $this->productLineRepository        = $productLineRepository;
+        $this->productsRepository           = $productsRepository;
         $this->teamRepository               = $teamRepository;
-        $this->uapRepository                = $uapRepository;
         $this->trainerRepository            = $trainerRepository;
+        $this->trainingRecordRepository     = $trainingRecordRepository;
+        $this->uapRepository                = $uapRepository;
+        $this->uploadRepository             = $uploadRepository;
+        $this->userRepository               = $userRepository;
+        $this->validationRepository         = $validationRepository;
+        $this->zoneRepository               = $zoneRepository;
     }
 
     // This function is responsible for deleting an entity and its related entities from the database and the server filesystem
@@ -166,6 +170,9 @@ class EntityDeletionService
                 break;
             case 'trainer':
                 $repository = $this->trainerRepository;
+                break;
+            case 'products':
+                $repository = $this->productsRepository;
                 break;
         }
         // If the repository is not found or the entity is not found in the database, return false
@@ -259,9 +266,8 @@ class EntityDeletionService
             }
         } elseif ($entityType === 'uap') {
             $unDefinedUap = $this->uapRepository->findOneBy(['name' => 'INDEFINI']);
-            // $this->logger->info('UnDefined UAP: ', [$unDefinedUap]);
             foreach ($entity->getOperator() as $operator) {
-                $operator->setUap($unDefinedUap);
+                $operator->addUap($unDefinedUap);
                 $this->em->persist($operator);
             }
         }

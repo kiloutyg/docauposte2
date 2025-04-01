@@ -1,10 +1,16 @@
 <turbo-frame
-	id="productManagement">
-	{{ form_start(productForm) }}
+	id="productManagement"
+	class="">
+
+	{{ form_start(productForm, { attr: { method: 'POST', action: path('app_iluo_product_general_elements_admin')}}
+	) }}
 	{{ form_end(productForm) }}
+	<div
+		data-name-validation-target="productNameMessage"
+		class="productName-message"></div>
 	{% if products is not empty %}
 		<div
-			class="mt-auto mb-auto accordion"
+			class=" mt-auto mb-auto accordion"
 			id="accordionProductList">
 			<div
 				class="accordion-item shadow-lg shadow-lg-inset border border-dark">
@@ -39,13 +45,13 @@
 										class="col-4 ">
 										{{ product.name }}
 									</strong>
-									{# 
-																		{% if is_granted('ROLE_SUPER_ADMIN') %}
-																			<a
-																				href="{{path('app_delete_product', {'entityType': 'product', 'entityId': product.id})}}" class="btn btn-danger delete-Product col-4 shadow">
-																				Supprimer
-																			</a>
-																		{% endif %} #}
+
+									{% if is_granted('ROLE_SUPER_ADMIN') %}
+										<a
+											href="{{path('app_iluo_delete_entity', {'entityType': 'products', 'entityId': product.id})}}" class="btn btn-danger delete-product col-4 shadow">
+											Supprimer
+										</a>
+									{% endif %}
 
 								</li>
 							{% endfor %}
@@ -55,4 +61,5 @@
 			</div>
 		</div>
 	{% endif %}
+
 </turbo-frame>

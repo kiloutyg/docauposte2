@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static targets = ["teamUapName", "productName", "message"];
+    static targets = ["teamUapName", "productName", "teamUapNameMessage", "productNameMessage", "saveButton"];
 
     validateTeamUapName() {
         const regex = /^(?!-)(?!.*--)[A-Z-]{3,}(?<!-)$/;
@@ -13,10 +13,10 @@ export default class extends Controller {
         }
 
         if (isValid) {
-            this.messageTarget.textContent = "";
+            this.teamUapNameMessageTarget.textContent = "";
         } else {
-            this.messageTarget.textContent = "Format invalide. Veuillez saisir sous la forme UAP ou TEAM";
-            this.messageTarget.style.color = "DarkRed"; // Display the message in red color.
+            this.teamUapNameMessageTarget.textContent = "Format invalide. Veuillez saisir sous la forme UAP ou TEAM";
+            this.teamUapNameMessageTarget.style.color = "DarkRed"; // Display the message in red color.
         }
     }
 
@@ -29,12 +29,14 @@ export default class extends Controller {
             isValid = regex.test(name);
         }
         if (isValid) {
-            this.messageTarget.textContent = "";
+            this.productNameMessageTarget.textContent = "";
+            this.saveButtonTarget.disabled = false;
         } else {
-            this.messageTarget.textContent = "Format invalide. Veuillez saisir sous la forme UAP ou TEAM";
-            this.messageTarget.style.color = "DarkRed"; // Display the message in red color.
+            this.productNameMessageTarget.textContent = "Format invalide. Veuillez saisir sous la forme: UA42";
+            this.productNameMessageTarget.style.color = "DarkRed"; // Display the message in red color.
+            this.saveButtonTarget.disabled = true;
         }
     }
 
-    
+
 }

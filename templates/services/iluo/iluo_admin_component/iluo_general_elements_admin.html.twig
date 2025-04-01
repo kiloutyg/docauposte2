@@ -29,18 +29,14 @@
 					<div
 						class="card-body">
 						<div
-							class="row">
+							class=" row card border-0 shadow rounded-3 my-5 bg-secondary">
 							<div
-								class="card border-0 shadow rounded-3 my-5 bg-secondary">
-								<div
-									class="card-body "
-									data-controller="name-validation">
-									<turbo-frame
-										id="productManagement">
-										{{ render(controller('App\\Controller\\IluoController::productGeneralElementsAdminPageGet'), options = []) }}
-
-									</turbo-frame>
-								</div>
+								class="card-body "
+								data-controller="name-validation">
+								<turbo-frame
+									id="productManagement">
+									{{ render(controller('App\\Controller\\IluoController::productGeneralElementsAdminPageGet'), options = []) }}
+								</turbo-frame>
 							</div>
 						</div>
 					</div>
