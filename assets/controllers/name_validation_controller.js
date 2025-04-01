@@ -22,7 +22,7 @@ export default class extends Controller {
 
 
     validateProductName() {
-        const regex = /^[A-Z]{1,}[0-9]{1,}$/;
+        const regex = /^[A-Z]+\d+$/;
         let isValid = true;
         let name = this.productNameTarget.value;
         if (name != '') {
@@ -32,7 +32,7 @@ export default class extends Controller {
             this.productNameMessageTarget.textContent = "";
             this.saveButtonTarget.disabled = false;
         } else {
-            this.productNameMessageTarget.textContent = "Format invalide. Veuillez saisir sous la forme: UA42";
+            this.productNameMessageTarget.textContent = "Format invalide. Veuillez saisir sous la forme: ABC123";
             this.productNameMessageTarget.style.color = "DarkRed"; // Display the message in red color.
             this.saveButtonTarget.disabled = true;
         }
