@@ -24,7 +24,7 @@ export default class extends Controller {
     validateProductName() {
         const regex = /^[A-Z]+\d+$/;
         let isValid = true;
-        let name = this.productNameTarget.value;
+        let name = this.productNameTarget.value.toUpperCase();
         if (name != '') {
             isValid = regex.test(name);
         }

@@ -2,14 +2,18 @@
 
 namespace App\Entity;
 
-use App\Repository\ProductLineRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\UX\Turbo\Attribute\Broadcast;
-
 use App\Entity\Zone;
 
+use App\Repository\ProductLineRepository;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
+use Doctrine\ORM\Mapping as ORM;
+
+use Symfony\Component\Validator\Constraints as Assert;
+
+use Symfony\UX\Turbo\Attribute\Broadcast;
 
 #[ORM\Entity(repositoryClass: ProductLineRepository::class)]
 #[Broadcast]
@@ -21,6 +25,7 @@ class ProductLine
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'productLines')]

@@ -29,7 +29,7 @@ class ProductType extends AbstractType
                     'style' => 'color: #ffffff;'
                 ],
                 'attr' => [
-                    'class' => 'form-control',
+                    'class' => 'form-control capitalize-all-letters',
                     'placeholder' => 'Nom du Produit',
                     'id' => 'name',
                     'required' => true,

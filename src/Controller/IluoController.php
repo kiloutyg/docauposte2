@@ -113,7 +113,7 @@ class IluoController extends AbstractController
         $newProduct = new Products;
         $productForm = $this->createForm(ProductType::class, $newProduct);
         if ($request->isMethod('POST')) {
-            $this->productGeneralElementsFormManagement($productForm, $request);
+            return $this->productGeneralElementsFormManagement($productForm, $request);
         }
         return $this->render('/services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_product_general_elements_admin.html.twig', [
             'productForm' => $productForm->createView(),

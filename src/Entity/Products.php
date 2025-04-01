@@ -3,11 +3,17 @@
 namespace App\Entity;
 
 use App\Repository\ProductsRepository;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
+
 #[ORM\Entity(repositoryClass: ProductsRepository::class)]
+#[UniqueEntity(fields: 'name', message: 'Un Produit avec ce nom existe déjà.')]
 class Products
 {
     #[ORM\Id]
@@ -15,7 +21,8 @@ class Products
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true, unique: true)]
+    #[Assert\NotBlank]
     private ?string $name = null;
 
     /**
