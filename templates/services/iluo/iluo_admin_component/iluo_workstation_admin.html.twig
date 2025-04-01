@@ -1,0 +1,42 @@
+{% if is_granted('ROLE_MANAGER') %}
+
+	<div
+		class="accordion-item">
+		<h2
+			class="accordion-header"
+			id="headingIluoWorkstationMannagement">
+			<button
+				class="accordion-button fs-3 collapsed"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target="#collapseIluoWorkstationMannagement"
+				aria-expanded="false"
+				aria-controls="collapseIluoWorkstationMannagement">
+				<strong>
+					Formulaire de gestions des Postes ILUO :
+				</strong>
+			</button>
+		</h2>
+		<div
+			id="collapseIluoWorkstationMannagement"
+			class="accordion-collapse collapse"
+			aria-labelledby="headingIluoWorkstationMannagement"
+			data-bs-parent="#accordionIluo">
+			<div
+				class="accordion-body accordion-bg shadow shadow-inset">
+				<div
+					class="card border-0 shadow rounded-3 my-5">
+					<div
+						class="card-body">
+						<div
+							class="row">
+
+							<div
+								class="card border-0 shadow rounded-3 my-5 bg-secondary"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endif %}

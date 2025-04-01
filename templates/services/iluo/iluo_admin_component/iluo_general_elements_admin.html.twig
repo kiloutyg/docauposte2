@@ -1,0 +1,47 @@
+{% if is_granted('ROLE_MANAGER') %}
+
+	<div
+		class="accordion-item">
+		<h2
+			class="accordion-header"
+			id="headingIluoGeneralElementsMannagement">
+			<button
+				class="accordion-button fs-3 collapsed"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target="#collapseIluoGeneralElementsMannagement"
+				aria-expanded="false"
+				aria-controls="collapseIluoGeneralElementsMannagement">
+				<strong>
+					Formulaire de gestions des Elements Généraux ILUO :
+				</strong>
+			</button>
+		</h2>
+		<div
+			id="collapseIluoGeneralElementsMannagement"
+			class="accordion-collapse collapse"
+			aria-labelledby="headingIluoGeneralElementsMannagement"
+			data-bs-parent="#accordionIluo">
+			<div
+				class="accordion-body accordion-bg shadow shadow-inset">
+				<div
+					class="card border-0 shadow rounded-3 my-5">
+					<div
+						class="card-body">
+						<div
+							class=" row card border-0 shadow rounded-3 my-5 bg-secondary">
+							<div
+								class="card-body "
+								data-controller="name-validation">
+								<turbo-frame
+									id="productManagement">
+									{{ render(controller('App\\Controller\\IluoController::productGeneralElementsAdminPageGet'), options = []) }}
+								</turbo-frame>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endif %}

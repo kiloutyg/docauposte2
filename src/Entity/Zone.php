@@ -38,7 +38,7 @@ class Zone
     #[ORM\OneToMany(targetEntity: Workstation::class, mappedBy: 'zone')]
     private Collection $workstations;
 
-    #[ORM\ManyToOne(inversedBy: 'zone')]
+    #[ORM\ManyToOne(inversedBy: 'zones')]
     private ?Department $department = null;
 
     public function __construct()

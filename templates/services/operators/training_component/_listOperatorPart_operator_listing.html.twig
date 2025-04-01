@@ -18,7 +18,7 @@
 			class="mx-auto">
 			{{ operator.team.name }}
 			&nbsp;
-			{{ operator.uaps.first.name }}
+			{{ operator.uaps.first != "" ? operator.uaps.first.name  : '0000000' }}
 		</li>
 		<li
 			style="flex:0.01; text-align: center;"
@@ -33,4 +33,4 @@
 			{{ trainingRecord != null ? (trainingRecord.trained ? 'Formé le ' ~ trainingRecord.date|date('d/m/Y') : 'À requalifier') : 'À former' }}
 		</li>
 	</ul>
-</strong>
+</strong></li>
