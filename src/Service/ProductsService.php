@@ -29,8 +29,9 @@ class ProductsService extends AbstractController
 
     public function productCreationFormProcessing(Form $productForm): string
     {
-        $productData = $productForm->getData();
         try {
+            $productData = $productForm->getData();
+            $productData->setName(strtoupper($productData->getName()));
             $this->em->persist($productData);
             $this->em->flush();
         } finally {

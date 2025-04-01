@@ -8,6 +8,20 @@
 	<div
 		data-name-validation-target="productNameMessage"
 		class="productName-message"></div>
+	<div
+		id="flash-messages">
+
+		{% for label, messages in app.flashes %}
+			<div
+				class="alert alert-{{ label }}">
+				{% for message in messages %}
+					<p>
+						{{ message }}
+					</p>
+				{% endfor %}
+			</div>
+		{% endfor %}
+	</div>
 	{% if products is not empty %}
 		<div
 			class=" mt-auto mb-auto accordion"
@@ -48,7 +62,7 @@
 
 									{% if is_granted('ROLE_SUPER_ADMIN') %}
 										<a
-											href="{{path('app_iluo_delete_entity', {'entityType': 'products', 'entityId': product.id})}}" class="btn btn-danger delete-product col-4 shadow">
+											href="{{path('app_iluo_delete_entity', {'entityType': 'products', 'entityId': product.id})}}" class="btn btn-danger delete-products col-4 shadow">
 											Supprimer
 										</a>
 									{% endif %}
