@@ -261,7 +261,7 @@ class EntityDeletionService
             $unDefinedUap = $this->uapRepository->findOneBy(['name' => 'INDEFINI']);
             // $this->logger->info('UnDefined UAP: ', [$unDefinedUap]);
             foreach ($entity->getOperator() as $operator) {
-                $operator->setUap($unDefinedUap);
+                $operator->addUap($unDefinedUap);
                 $this->em->persist($operator);
             }
         }

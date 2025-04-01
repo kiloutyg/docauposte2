@@ -33,7 +33,9 @@ class Operator
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'operators')]
+
     #[Groups(['operator_details'])]
+    #[Assert\NotNull]
     private ?Team $team = null;
 
     #[ORM\OneToMany(mappedBy: 'operator', targetEntity: TrainingRecord::class)]
@@ -66,6 +68,8 @@ class Operator
      * @var Collection<int, Uap>
      */
     #[ORM\ManyToMany(targetEntity: Uap::class, mappedBy: 'operators')]
+    #[Assert\NotNull]
+    #[Assert\Count(min: 1, minMessage: "Un opérateur doit être assigné à au moins une UAP")]
     private Collection $uaps;
 
 
