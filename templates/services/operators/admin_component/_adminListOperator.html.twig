@@ -1,7 +1,7 @@
 <turbo-frame
 	id="adminListOperator">
 	<ul>
-		
+
 		<div
 			class="row">
 			{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
@@ -73,7 +73,8 @@
 
 
 			{{ form_end(operatorForm) }}
-
+			<hr
+				class="my-4">
 		{% endfor %}
 	{% else %}
 		<div

@@ -7,14 +7,13 @@
 
 {% block javascripts %}
 	{{ parent() }}
-	{{ encore_entry_script_tags('confirmation') }}
 {% endblock %}
 
 {% block body %}
 	<div
-		class="inner-container d-flex justify-content-center align-items-center flex-grow-1">
+		class="container-fluid px-4 d-flex align-items-center flex-xxl-grow-1">
 		<div
-			class="accordion my-3"
+			class="accordion w-100"
 			id="accordionIluo">
 			{{ render(controller('App\\Controller\\IluoController::generalElementsAdminPageGet'), options = []) }}
 			{{ render(controller('App\\Controller\\IluoController::checklistAdminPageGet'), options = []) }}

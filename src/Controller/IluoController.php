@@ -16,8 +16,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use App\Entity\Products;
+use App\Entity\ShiftLeaders;
 
 use App\Form\ProductType;
+use App\Form\ShiftLeadersType;
 
 use App\Service\EntityFetchingService;
 use App\Service\EntityDeletionService;
@@ -135,5 +137,20 @@ class IluoController extends AbstractController
             $this->addFlash('error', 'Invalid form ' . $productForm->getErrors());
         }
         return $this->redirectToRoute('app_iluo_product_general_elements_admin');
+    }
+
+    #[Route('admin/shiftleaders_general_elements', name: 'shiftleaders_general_elements_admin')]
+    public function shiftleadersGeneralElementsAdminPageGet(Request $request): Response
+    {
+        $shiftLeaders = $this->entityFetchingService->getShiftLeaders();
+        $newShiftLeaders = new ShiftLeaders;
+        $shiftLeadersForm = $this->createForm(ShiftLeadersType::class, $newShiftLeaders);
+        if ($request->isMethod('POST')) {
+            $this->logger->info('shiftLeaders ', [$request->request->all()]);
+        }
+        return $this->render('/services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_shiftleaders_general_elements_admin.html.twig', [
+            'shiftLeadersForm' => $shiftLeadersForm->createView(),
+            'shiftLeaders'    => $shiftLeaders,
+        ]);
     }
 }

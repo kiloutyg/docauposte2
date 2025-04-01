@@ -1,18 +1,16 @@
 <turbo-frame
-	id="productManagement"
+	id="shiftleadersManagement"
 	class="container row">
 
-	{{ form_start(productForm, { attr: {class: 'col-6 d-flex flex-column', method: 'POST', action: path('app_iluo_product_general_elements_admin')}}
+	{{ form_start(shiftLeadersForm, { attr: {class: 'col-6 d-flex', method: 'POST', action: path('app_iluo_shiftleaders_general_elements_admin')}}
 	) }}
 	<div
 		class="col-12">
-		{{ form_label(productForm.name) }}
-		{{ form_widget(productForm.name) }}
-		{{ form_widget(productForm.save) }}
+		{{ form_label(shiftLeadersForm.user) }}
+		{{ form_widget(shiftLeadersForm.user) }}
+		{{ form_widget(shiftLeadersForm.save) }}
 	</div>
-	<div
-		class="productName-message"
-		data-name-validation-target="productNameMessage"></div>
+
 	<div
 		id="flash-messages">
 		{% for label, messages in app.flashes %}
@@ -26,53 +24,51 @@
 			</div>
 		{% endfor %}
 	</div>
-	{{ form_end(productForm) }}
+	{{ form_end(shiftLeadersForm) }}
 
 
-	{% if products is not empty %}
+	{% if shiftLeaders is not empty %}
 		<div
 			class="col-6 mt-auto mb-auto accordion"
-			id="accordionProductList">
+			id="accordionShiftLeaderList">
 			<div
 				class="accordion-item shadow-lg shadow-lg-inset border border-dark">
 				<h2
 					class="accordion-header"
-					id="headingProductList">
+					id="headingShiftLeaderList">
 					<button
 						class="accordion-button bg-white text-dark collapsed"
 						type="button"
 						data-bs-toggle="collapse"
-						data-bs-target="#collapseProductList"
+						data-bs-target="#collapseShiftLeaderList"
 						aria-expanded="false"
-						aria-controls="collapseProductList">
+						aria-controls="collapseShiftLeaderList">
 						<strong>
-							Liste des Produits
+							Liste des Managers d'équipe
 						</strong>
 					</button>
 				</h2>
 				<div
-					id="collapseProductList"
+					id="collapseShiftLeaderList"
 					class="accordion-collapse collapse "
-					aria-labelledby="headingProductList"
-					data-bs-parent="#accordionProductList">
+					aria-labelledby="headingShiftLeaderList"
+					data-bs-parent="#accordionShiftLeaderList">
 					<div
 						class="accordion-body bg-white text-dark">
 						<ul
 							class="list-group">
-							{% for product in products %}
+							{% for shiftLeader in shiftLeaders %}
 								<li
 									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
 									<strong>
-										{{ product.name }}
+										{{ shiftLeader.user.username }}
 									</strong>
-
 									{% if is_granted('ROLE_SUPER_ADMIN') %}
 										<a
-											href="{{path('app_iluo_delete_entity', {'entityType': 'products', 'entityId': product.id})}}" class="btn btn-danger delete-productsshadow">
+											href="{{path('app_iluo_delete_entity', {'entityType': 'shiftLeaders', 'entityId': shiftLeader.id})}}" class="btn btn-danger delete-shiftLeadersshadow">
 											Supprimer
 										</a>
 									{% endif %}
-
 								</li>
 							{% endfor %}
 						</ul>
@@ -81,6 +77,4 @@
 			</div>
 		</div>
 	{% endif %}
-
-
 </turbo-frame>

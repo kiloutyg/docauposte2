@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Entity\products;
-use App\Form\TypeComponent\DisplayType;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
