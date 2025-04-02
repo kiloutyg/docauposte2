@@ -154,6 +154,14 @@ class FrontController extends AbstractController
             }
         }
 
+        if ($this->getParameter('kernel.environment') === 'dev') {
+            $this->logger->info('Is in dev environment and in the loop that should give me tests situation for flash messages');
+            $this->addFlash('warning', 'TEST 1');
+            $this->addFlash('error', 'TEST 2');
+            $this->addFlash('info', 'TEST 3');
+            $this->addFlash('success', 'TEST 4');
+        }
+
         return $this->render(
             'base.html.twig',
             [
@@ -284,6 +292,4 @@ class FrontController extends AbstractController
             ]);
         }
     }
-
-
 }
