@@ -118,6 +118,7 @@ class IluoController extends AbstractController
         $newProduct = new Products;
         $productForm = $this->createForm(ProductType::class, $newProduct);
         if ($request->isMethod('POST')) {
+            $this->logger->info('products form submitted', [$request->request->all()]);
             return $this->generalElementsFormManagement('products', $productForm, $request);
         }
         return $this->render('/services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_products_general_elements_admin.html.twig', [
@@ -146,6 +147,7 @@ class IluoController extends AbstractController
 
     public function generalElementsFormManagement(string $entityType, Form $form, Request $request): Response
     {
+        $this->logger->info('generalElementsFormManagement', [$entityType, $form, $request]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
@@ -169,13 +171,17 @@ class IluoController extends AbstractController
                 // Call the appropriate method
                 $entityName = $service->$methodName($form);
                 $this->addFlash('success', "L'entité $entityName a bien été ajoutée.");
+                
             } catch (\Exception $e) {
+                $this->logger->error('Issue in form submission', [$e->getMessage()]);
                 $this->addFlash('error', 'Issue in form submission ' . $e->getMessage());
             }
         } elseif ($form->isSubmitted()) {
+            $this->logger->error('Invalid form', [$form->getErrors()]);
             $this->addFlash('error', 'Invalid form ' . $form->getErrors());
         }
         $route = 'app_iluo_' . strtolower($entityType) . '_general_elements_admin';
+        $this->logger->info('Redirecting to route', [$route]);
         return $this->redirectToRoute($route);
     }
 }
