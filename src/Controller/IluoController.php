@@ -34,8 +34,8 @@ class IluoController extends AbstractController
     private $authChecker;
     private $entityFetchingService;
     private $entityDeletionService;
-    private $productsService;
-    private $shiftLeadersService;
+    private $productsService; // Used to call the methods in the services by the generalElementsFormManagement method
+    private $shiftLeadersService; // Used to call the methods in the services by the generalElementsFormManagement method
     public function __construct(
         LoggerInterface                 $logger,
         AuthorizationCheckerInterface   $authChecker,
@@ -126,21 +126,6 @@ class IluoController extends AbstractController
         ]);
     }
 
-    // public function productGeneralElementsFormManagement(Form $productForm, Request $request): Response
-    // {
-    //     $productForm->handleRequest($request);
-    //     if ($productForm->isSubmitted() && $productForm->isValid()) {
-    //         try {
-    //             $productName = $this->productsService->productsCreationFormProcessing($productForm);
-    //             $this->addFlash('success', "Le produit $productName a bien été ajouté.");
-    //         } catch (\Exception $e) {
-    //             $this->addFlash('error', 'Issue in form submission ' . $e->getMessage());
-    //         }
-    //     } elseif ($productForm->isSubmitted()) {
-    //         $this->addFlash('error', 'Invalid form ' . $productForm->getErrors());
-    //     }
-    //     return $this->redirectToRoute('app_iluo_product_general_elements_admin');
-    // }
 
     #[Route('admin/shiftleaders_general_elements', name: 'shiftleaders_general_elements_admin')]
     public function shiftLeadersGeneralElementsAdminPageGet(Request $request): Response
@@ -158,23 +143,6 @@ class IluoController extends AbstractController
         ]);
     }
 
-
-
-    // public function shiftLeadersGeneralElementsFormManagement(Form $shiftLeaderForm, Request $request): Response
-    // {
-    //     $shiftLeaderForm->handleRequest($request);
-    //     if ($shiftLeaderForm->isSubmitted() && $shiftLeaderForm->isValid()) {
-    //         try {
-    //             $shiftLeadersName = $this->shiftLeadersService->shiftLeadersCreationFormProcessing($shiftLeaderForm);
-    //             $this->addFlash('success', "Le produit $shiftLeadersName a bien été ajouté.");
-    //         } catch (\Exception $e) {
-    //             $this->addFlash('error', 'Issue in form submission ' . $e->getMessage());
-    //         }
-    //     } elseif ($shiftLeaderForm->isSubmitted()) {
-    //         $this->addFlash('error', 'Invalid form ' . $shiftLeaderForm->getErrors());
-    //     }
-    //     return $this->redirectToRoute('app_iluo_shiftleaders_general_elements_admin');
-    // }
 
     public function generalElementsFormManagement(string $entityType, Form $form, Request $request): Response
     {
