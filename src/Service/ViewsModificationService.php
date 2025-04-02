@@ -198,12 +198,7 @@ class ViewsModificationService extends AbstractController
     //     
     public function updateSortOrders($otherEntities, $entity, $newValue)
     {
-        // $this->logger->info('entity name' . $entity->getName());
-        // $this->logger->info('entity id' . $entity->getId());
-        // $this->logger->info('newValue: ' . $newValue);
-
         $originalValue = $entity->getSortorder();
-        // $this->logger->info('originalValue: ' . $originalValue);
 
         $entity->setSortorder($newValue);
         $entityCount = count($otherEntities);

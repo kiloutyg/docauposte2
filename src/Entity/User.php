@@ -69,6 +69,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'Creator', targetEntity: Button::class)]
     private Collection $buttons;
 
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: ShiftLeaders::class)]
+    private ?ShiftLeaders $shiftLeader = null;
 
     public function __construct()
     {
@@ -445,6 +447,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $button->setCreator(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getShiftLeader(): ?ShiftLeaders
+    {
+        return $this->shiftLeader;
+    }
+
+    public function setShiftLeader(?ShiftLeaders $shiftLeader): static
+    {
+        $this->shiftLeader = $shiftLeader;
 
         return $this;
     }

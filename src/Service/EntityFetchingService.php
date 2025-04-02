@@ -22,6 +22,7 @@ use App\Repository\OldUploadRepository;
 use App\Repository\UapRepository;
 use App\Repository\TeamRepository;
 use App\Repository\OperatorRepository;
+use App\Repository\ShiftLeadersRepository;
 use App\Repository\TrainingRecordRepository;
 use App\Repository\TrainerRepository;
 use App\Repository\IncidentRepository;
@@ -48,6 +49,7 @@ class EntityFetchingService extends AbstractController
     private $userRepository;
     private $oldUploadRepository;
     private $uapRepository;
+    private $shiftLeadersRepository;
     private $teamRepository;
     private $operatorRepository;
     private $trainingRecordRepository;
@@ -73,6 +75,7 @@ class EntityFetchingService extends AbstractController
         UapRepository                   $uapRepository,
         TeamRepository                  $teamRepository,
         OperatorRepository              $operatorRepository,
+        ShiftLeadersRepository          $shiftLeadersRepository,
         TrainingRecordRepository        $trainingRecordRepository,
         TrainerRepository               $trainerRepository,
         IncidentRepository              $incidentRepository,
@@ -97,6 +100,7 @@ class EntityFetchingService extends AbstractController
         $this->uapRepository                = $uapRepository;
         $this->teamRepository               = $teamRepository;
         $this->operatorRepository           = $operatorRepository;
+        $this->shiftLeadersRepository       = $shiftLeadersRepository;
         $this->trainingRecordRepository     = $trainingRecordRepository;
         $this->trainerRepository            = $trainerRepository;
         $this->productsRepository           = $productsRepository;
@@ -271,5 +275,10 @@ class EntityFetchingService extends AbstractController
     public function getProducts()
     {
         return $this->productsRepository->findAll();
+    }
+
+    public function getShiftLeaders()
+    {
+        return $this->shiftLeadersRepository->findAll();
     }
 }

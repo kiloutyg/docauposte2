@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250327154229 extends AbstractMigration
+final class Version20250401145157 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,12 +20,12 @@ final class Version20250327154229 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE operator ADD employment_type VARCHAR(255) DEFAULT NULL');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_B3BA5A5A5E237E06 ON products (name)');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE operator DROP employment_type');
+        $this->addSql('DROP INDEX UNIQ_B3BA5A5A5E237E06 ON products');
     }
 }

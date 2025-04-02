@@ -18,11 +18,8 @@ window.addEventListener("turbo:load", () => {
   const downloadRefusedUploadButtons = document.querySelectorAll(".download-refused-upload");
   const downloadRefusedButOldButtons = document.querySelectorAll(".download-refused-but-old");
   const downloadNonValidatedButOldUploadButtons = document.querySelectorAll(".download-non-validated-but-old");
-
   const deleteTeamButtons = document.querySelectorAll(".delete-team");
   const deleteUapButtons = document.querySelectorAll(".delete-uap");
-  const deleteOperatorsButtons = document.querySelectorAll(".delete-operator");
-  const submitOperatorsModificationButtons = document.querySelectorAll(".submit-operator-modification");
 
   const confirmationHandler = (event, message) => {
     const confirmed = confirm(message);
@@ -202,6 +199,21 @@ window.addEventListener("turbo:load", () => {
       );
     });
   });
+});
+
+
+window.addEventListener("turbo:frame-load", () => {
+
+  const deleteOperatorsButtons = document.querySelectorAll(".delete-operator");
+  const submitOperatorsModificationButtons = document.querySelectorAll(".submit-operator-modification");
+  const deleteProductsButtons = document.querySelectorAll(".delete-products");
+
+  const confirmationHandler = (event, message) => {
+    const confirmed = confirm(message);
+    if (!confirmed) {
+      event.preventDefault();
+    }
+  };
 
   deleteOperatorsButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
@@ -217,6 +229,15 @@ window.addEventListener("turbo:load", () => {
       confirmationHandler(
         event,
         "Êtes vous sûr de vouloir soumettre ces modifications?"
+      );
+    });
+  });
+
+  deleteProductsButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "Êtes vous sûr de vouloir supprimer ce Produit?"
       );
     });
   });
