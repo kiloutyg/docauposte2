@@ -27,7 +27,7 @@ class ProductsService extends AbstractController
         $this->productsRepository = $productsRepository;
     }
 
-    public function productCreationFormProcessing(Form $productForm): string
+    public function productsCreationFormProcessing(Form $productForm): string
     {
         try {
             $productData = $productForm->getData();
