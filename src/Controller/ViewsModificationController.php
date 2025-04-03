@@ -91,6 +91,7 @@ class ViewsModificationController extends AbstractController
             ];
         }
 
+        $this->logger->info('entitiesToUpdate', [$entitiesToUpdate]);
 
         // Process the updates
         foreach ($entitiesToUpdate as $updateInfo) {

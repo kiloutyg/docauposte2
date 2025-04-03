@@ -197,9 +197,9 @@ class ViewsModificationService extends AbstractController
     //     
     public function updateSortOrders($otherEntities, $entity, $newValue)
     {
-        $originalValue = $entity->getSortorder();
+        $originalValue = $entity->getSortOrder();
 
-        $entity->setSortorder($newValue);
+        $entity->setSortOrder($newValue);
         $entityCount = count($otherEntities);
 
         // Moved to a higher position (i.e., lower value)

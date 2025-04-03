@@ -174,7 +174,8 @@ class FrontController extends AbstractController
         $zone = $this->zoneRepository->find($zoneId);
 
         $productLinesInZone = [];
-        $productLinesInZone = $zone->getProductLines();
+        $productLinesInZone = $this->entityFetchingService->getProductLinesByZone($zone);
+
         if (count($productLinesInZone) === 1 && !$this->authChecker->isGranted('ROLE_LINE_ADMIN')) {
             return $this->productLine(null, $productLinesInZone[0]);
         } else {
@@ -198,7 +199,7 @@ class FrontController extends AbstractController
             $productLine = $this->productLineRepository->find($productLineId);
         }
 
-        $categoriesInLine = $productLine->getCategories();
+        $categoriesInLine = $this->entityFetchingService->getCategoriesByProductLine($productLine);
 
         $incidentsInProductLine = [];
         $incidentsInProductLine = $this->incidentRepository->findBy(
@@ -240,7 +241,7 @@ class FrontController extends AbstractController
             $category = $this->categoryRepository->find($categoryId);
         }
 
-        $buttons = $category->getButtons();
+        $buttons = $this->entityFetchingService->getButtonsByCategory($category);
 
         if (count($buttons) === 1) {
             return $this->buttonDisplay(null, $buttons[0]);
