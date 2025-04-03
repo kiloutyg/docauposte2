@@ -2,15 +2,6 @@
 
 namespace App\Service;
 
-use Doctrine\ORM\EntityManagerInterface;
-
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-
 use App\Entity\User;
 
 use App\Repository\UserRepository;
@@ -18,8 +9,18 @@ use App\Repository\DepartmentRepository;
 
 use App\Service\EntityDeletionService;
 
+use Doctrine\ORM\EntityManagerInterface;
+
+use Psr\Log\LoggerInterface;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
+
 // This class is responsible for managing the user accounts logic
-class AccountService
+class AccountService extends AbstractController
 {
 
     private $userRepository;
@@ -98,17 +99,10 @@ class AccountService
             if (count($errors) > 0) {
                 $errorMessages = [];
                 foreach ($errors as $violation) {
-                    // You can use ->getPropertyPath() if you need to show the field name
-                    // $errorMessages[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
                     $errorMessages[] = $violation->getMessage();
                 }
 
-                // Now you have an array of user-friendly messages you can display
-                // For example, you can separate them with new lines when displaying in text format:
                 $errorsString = implode("\n", $errorMessages);
-
-                // If you need to return JSON response:
-                // return new JsonResponse(['errors' => $errorMessages], Response::HTTP_BAD_REQUEST);
 
                 throw new \Exception($errorsString);
             }
@@ -118,7 +112,6 @@ class AccountService
 
             return  $user;
         }
-
     }
 
 
@@ -127,59 +120,66 @@ class AccountService
 
 
     // This function is responsible for modifying a user account and persisting the modification to the database
-    public function modifyAccount(Request $request, UserInterface $currentUser, User $user)
+    public function modifyAccount(Request $request, User $user)
     {
-        if ($request->getMethod() == 'POST') {
-
-            $departmentId = $request->request->get('department');
-            $department = $this->departmentRepository->findOneBy(['id' => $departmentId]);
-            $emailAddress = $request->request->get('emailAddress');
-
-            // Check if the current user is a super admin
-            if (in_array('ROLE_SUPER_ADMIN', $currentUser->getRoles())) {
-
-                // Get the user to be modified
-                if ($user) {
-                    if ($request->request->get('username') != '') {
-                        $newName = $request->request->get('username');
-
-                        if ($this->userRepository->findOneBy(['username' => $newName])) {
-                            return 'Ce nom d\'utilisateur est déja utilisé.';
-                        } else {
-                            $password = $user->getPassword();
-                            $password = $this->passwordHasher->hashPassword($user, $password);
-                            $user->setUsername($newName); // Set the new username
-                            $user->setPassword($password);
-                        }
-                    };
-                    if ($request->request->get('password') != '') {
-                        $password = $request->request->get('password');
-                        $password = $this->passwordHasher->hashPassword($user, $password);
-                        $user->setPassword($password);
-                    };
-                    if ($request->request->get('role') != '') {
-                        $role = $request->request->get('role');
-                        $user->setRoles([$role]);
-                    };
-                    if ($request->request->get('department') != '') {
-                        $department = $this->departmentRepository->findOneBy(['id' => $request->request->get('department')]);
-                        $user->setDepartment($department);
-                    };
-                    if ($request->request->get('emailAddress') != '') {
-                        $emailAddress = $request->request->get('emailAddress');
-                        $user->setEmailAddress($emailAddress);
-                    };
-
-                    $this->manager->persist($user);
-                    $this->manager->flush();
-
-                    return $user;
+        $modified = '';
+        try {
+            if ($request->request->get('username') != '') {
+                $user->setUsername($request->request->get('username'));
+                $modified .= 'Nom d\'utilisateur, ';
+            };
+            if ($request->request->get('password') != '') {
+                $password = $this->passwordHasher->hashPassword($user, $request->request->get('password'));
+                $user->setPassword($password);
+                $modified .= 'Mot de passe, ';
+            };
+            if ($request->request->get('role') != '') {
+                $user->setRoles([$request->request->get('role')]);
+                $modified .= 'Rôle, ';
+            };
+            if ($request->request->get('department') != '') {
+                $department = $this->departmentRepository->findOneBy(['id' => $request->request->get('department')]);
+                $user->setDepartment($department);
+                $modified .= 'Service, ';
+            };
+            if ($request->request->get('emailAddress') != '') {
+                $user->setEmailAddress($request->request->get('emailAddress'));
+                $modified .= 'Adresse email, ';
+            };
+            $errorsString = '';
+            $errors = $this->validator->validate($user);
+            if (count($errors) > 0) {
+                $errorMessages = [];
+                foreach ($errors as $violation) {
+                    $errorMessages[] = $violation->getMessage();
                 }
+                $errorsString = implode("\n", $errorMessages);
+                throw new \Exception($errorsString);
             }
-        }
+            if ($modified === '' || $modified === null || $errorsString !== '') {
+                $modified = 'rien';
+            }
+            $modified = rtrim($modified, ', ');
+            $this->manager->persist($user);
+            $this->manager->flush();
 
-        return null;
+            return $modified;
+        } catch (\Exception $e) {
+            $this->logger->error('account modification error', [
+                ' modified account' => $user,
+                'modifier' => $this->getUser(),
+                'error' => $e->getMessage()
+            ]);
+            throw $e;  // Re-throw the exception so it propagates to the controller
+        } finally {
+            $this->logger->info('account modification attempt', [
+                'modified account' => $user,
+                'modifier' => $this->getUser()
+            ]);
+        }
     }
+
+
 
     // This function is responsible for deleting a user account from the database
     public function deleteUser($id)

@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Doctrine\ORM\EntityManagerInterface;
 
-use  \Psr\Log\LoggerInterface;
+use \Psr\Log\LoggerInterface;
 
 use App\Entity\ProductLine;
 use App\Entity\Category;
@@ -152,14 +152,6 @@ class FrontController extends AbstractController
                 $this->addFlash('info', ($countArray['findDeactivatedOperators'] === 1 ? $countArray['findDeactivatedOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['findDeactivatedOperators'] . ' opérateurs inactifs sont à supprimer. ') .
                     ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
             }
-        }
-
-        if ($this->getParameter('kernel.environment') === 'dev') {
-            $this->logger->info('Is in dev environment and in the loop that should give me tests situation for flash messages');
-            $this->addFlash('warning', 'TEST 1');
-            $this->addFlash('error', 'TEST 2');
-            $this->addFlash('info', 'TEST 3');
-            $this->addFlash('success', 'TEST 4');
         }
 
         return $this->render(

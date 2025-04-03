@@ -2,21 +2,6 @@
 
 namespace App\Controller;
 
-use Psr\Log\LoggerInterface;
-
-use Doctrine\ORM\EntityManagerInterface;
-
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-
-use Symfony\Component\Routing\Annotation\Route;
-
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\Security\Core\User\UserInterface;
-
 use App\Entity\User;
 use App\Entity\Department;
 
@@ -26,6 +11,21 @@ use App\Repository\DepartmentRepository;
 use App\Service\AccountService;
 use App\Service\EntityFetchingService;
 use App\Service\EntityDeletionService;
+
+use Doctrine\ORM\EntityManagerInterface;
+
+use Psr\Log\LoggerInterface;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+use Symfony\Component\Routing\Annotation\Route;
+
+use Symfony\Component\Security\Core\User\UserInterface;
+
 
 #[Route('/account', name: 'app_account_')]
 class AccountController extends AbstractController
@@ -42,6 +42,7 @@ class AccountController extends AbstractController
     private $entityDeletionService;
 
     public function __construct(
+
         LoggerInterface $logger,
 
         EntityManagerInterface $em,
@@ -73,34 +74,23 @@ class AccountController extends AbstractController
     #[Route(path: '/create', name: 'create')]
     public function createAccountController(Request $request): Response
     {
-        $this->logger->info('full request', [$request]);
-
         if ($request->isMethod('POST')) {
-
-            $this->logger->info('isPOST');
-
             try {
-                $this->logger->info('isPost and will go to service');
-
                 $this->accountService->createAccount($request);
-
                 $this->addFlash('success', 'Le compte a bien été créé.');
             } catch (\Exception $e) {
                 // Catch and handle the exception.
                 $this->addFlash('danger', $e->getMessage());
             }
             return $this->redirectToRoute('app_super_admin');
-        } else {
-            $this->logger->info('iSGET');
-
-            return $this->render(
-                '/services/accountservices/create_account.html.twig',
-                [
-                    'departments' => $this->entityFetchingService->getDepartments(),
-                    'users'       => $this->entityFetchingService->getUsers(),
-                ]
-            );
         }
+        return $this->render(
+            '/services/accountservices/create_account.html.twig',
+            [
+                'departments' => $this->entityFetchingService->getDepartments(),
+                'users'       => $this->entityFetchingService->getUsers(),
+            ]
+        );
     }
 
 
@@ -108,45 +98,48 @@ class AccountController extends AbstractController
 
 
 
-
-    // This function is responsible for rendering the account modifiying interface destined to the super admin
+    /**
+     * This function is responsible for rendering the account modification interface destined to the super admin.//+
+     */
     #[Route(path: '/modify_account/{userId}', name: 'modify_account')]
-    public function modify_account(UserInterface $currentUser, int $userId, AuthenticationUtils $authenticationUtils, Request $request): Response
+    public function modifyAccountGet(int $userId, Request $request): Response
     {
-        $error = $authenticationUtils->getLastAuthenticationError();
-        $user = $this->userRepository->find($userId);
-        $originUrl = $request->headers->get('Referer');
-
-        if ($request->isMethod('GET')) {
-            if (in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
-                $this->addFlash('danger', 'Le compte ne peut être modifié');
-                return $this->redirect($originUrl);
-            }
-            return $this->render('services/accountservices/modify_account_view.html.twig', [
-                'user'          => $user,
-                'error'         => $error,
-            ]);
-        } elseif ($request->isMethod('POST')) {
-
-            $error = $authenticationUtils->getLastAuthenticationError();
-            $usermod = $this->accountService->modifyAccount($request, $currentUser, $user);
-
-            if ($usermod instanceof User) {
-                $this->addFlash('success', 'Le compte ' . $usermod->getUsername() . ' a été modifié');
-                return $this->redirectToRoute('app_super_admin');
-            };
+        if (!($user = $this->userRepository->find($userId))) {
+            $this->addFlash('warning', 'This User does not exist');
             return $this->redirectToRoute('app_super_admin');
         }
+        if ($request->isMethod('GET')) {
+            return $this->render('services/accountservices/modify_account_view.html.twig', [
+                'user'          => $user
+            ]);
+        } else {
+            return $this->modifyAccountPost($user, $request);
+        }
     }
 
 
+    public function modifyAccountPost(User $user, Request $request)
+    {
+        if (in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            $this->logger->error('SuperAdmin account modification try');
+            return $this->redirectToRoute('app_super_admin');
+        }
+        try {
+            $modified = $this->accountService->modifyAccount($request, $user);
+            $this->addFlash('success', $modified . ' du compte ' . $user->getUsername() . ' a été modifié');
+        } catch (\Exception $e) {
+            $this->addFlash('danger', 'Error during ' . $user->getUsername() . 'account modification. ' . $e->getMessage());
+        } finally {
+            return $this->redirectToRoute('app_account_modify_account', ['userId' => $user->getId()]);
+        }
+    }
 
 
 
 
     // This function is responsible for managing the logic of the account deletion
-    #[Route(path: '/delete_account/basic', name: 'delete_account_basic')]
-    public function delete_account_basic(Request $request): Response
+    #[Route(path: '/delete_account/block', name: 'block_account')]
+    public function blockAccount(Request $request): Response
     {
         $userId = $request->query->get('userId');
         $originUrl = $request->headers->get('Referer');
@@ -165,7 +158,7 @@ class AccountController extends AbstractController
 
     // This function is responsible for managing the unblocking of an account
     #[Route(path: '/delete_account/unblock_account', name: 'unblock_account')]
-    public function unblock_account(Request $request): Response
+    public function unblockAccount(Request $request): Response
     {
         $userId = $request->query->get('userId');
         $originUrl = $request->headers->get('Referer');
@@ -184,7 +177,7 @@ class AccountController extends AbstractController
 
     // This function is responsible for managing the logic of the account deletion
     #[Route(path: '/delete_account', name: 'delete_account')]
-    public function delete_account(Request $request): Response
+    public function deleteAccount(Request $request): Response
     {
         $userId = $request->query->get('userId');
         $originUrl = $request->headers->get('Referer');

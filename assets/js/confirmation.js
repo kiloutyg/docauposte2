@@ -3,7 +3,10 @@ window.addEventListener("turbo:load", () => {
   const deleteProductLineButtons = document.querySelectorAll(".delete-productLine");
   const deleteCategoryButtons = document.querySelectorAll(".delete-category");
   const deleteButtonButtons = document.querySelectorAll(".delete-button");
+  const createUserButtons = document.querySelectorAll(".create-user");
+  const modifyUserButtons = document.querySelectorAll(".modify-user");
   const deleteUserButtons = document.querySelectorAll(".delete-user");
+  const transferWorkButtons = document.querySelectorAll(".transfer-work");
   const deleteUserButtonsDefinitively = document.querySelectorAll(".definitively-delete-user");
   const deleteUploadButtons = document.querySelectorAll(".delete-upload");
   const deleteIncidentButtons = document.querySelectorAll(".delete-incident");
@@ -18,11 +21,8 @@ window.addEventListener("turbo:load", () => {
   const downloadRefusedUploadButtons = document.querySelectorAll(".download-refused-upload");
   const downloadRefusedButOldButtons = document.querySelectorAll(".download-refused-but-old");
   const downloadNonValidatedButOldUploadButtons = document.querySelectorAll(".download-non-validated-but-old");
-
   const deleteTeamButtons = document.querySelectorAll(".delete-team");
   const deleteUapButtons = document.querySelectorAll(".delete-uap");
-  const deleteOperatorsButtons = document.querySelectorAll(".delete-operator");
-  const submitOperatorsModificationButtons = document.querySelectorAll(".submit-operator-modification");
 
   const confirmationHandler = (event, message) => {
     const confirmed = confirm(message);
@@ -61,6 +61,30 @@ window.addEventListener("turbo:load", () => {
       confirmationHandler(
         event,
         "Êtes vous sûr de vouloir supprimer ce Bouton?"
+      );
+    });
+  });
+  createUserButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "Êtes vous sûr de vouloir crée cet Utilisateur?"
+      );
+    });
+  });
+  modifyUserButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "Êtes vous sûr de vouloir modifier cet Utilisateur?"
+      );
+    });
+  });
+  transferWorkButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "Êtes vous sûr de vouloir transferer l'historique de tache de cet Utilisateur?"
       );
     });
   });
@@ -202,6 +226,21 @@ window.addEventListener("turbo:load", () => {
       );
     });
   });
+});
+
+
+window.addEventListener("turbo:frame-load", () => {
+
+  const deleteOperatorsButtons = document.querySelectorAll(".delete-operator");
+  const submitOperatorsModificationButtons = document.querySelectorAll(".submit-operator-modification");
+  const deleteProductsButtons = document.querySelectorAll(".delete-products");
+
+  const confirmationHandler = (event, message) => {
+    const confirmed = confirm(message);
+    if (!confirmed) {
+      event.preventDefault();
+    }
+  };
 
   deleteOperatorsButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
@@ -217,6 +256,15 @@ window.addEventListener("turbo:load", () => {
       confirmationHandler(
         event,
         "Êtes vous sûr de vouloir soumettre ces modifications?"
+      );
+    });
+  });
+
+  deleteProductsButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(
+        event,
+        "Êtes vous sûr de vouloir supprimer ce Produit?"
       );
     });
   });
