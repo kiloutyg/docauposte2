@@ -2,6 +2,12 @@
 {% block title %}
 	BaseViewModification
 {% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{encore_entry_script_tags('views-modification-value-tracker') }}
+{% endblock %}
+
 {% block body %}
 	<div
 		class="card border-0 shadow rounded-3 my-5">
@@ -71,7 +77,7 @@
 														<select
 															name="zone_{{ zone.id }}_creator"
 															value=""
-															class="zoneCreatorSelect"
+															class="zoneCreatorSelect  me-2"
 															id="zoneCreateor{{ zone.id }}"
 															placeholder="Créateur de la Zone">
 
@@ -137,7 +143,7 @@
 																			<select
 																				name="productLine_{{ productLine.id }}_creator"
 																				value=""
-																				class="productLineCreatorSelect"
+																				class="productLineCreatorSelect me-2"
 																				id="productLineCreateor{{ productLine.id }}"
 																				placeholder="Créateur de la Ligne">
 
@@ -204,7 +210,7 @@
 																								<select
 																									name="category_{{ category.id }}_creator"
 																									value=""
-																									class="categoryCreatorSelect"
+																									class="categoryCreatorSelect  me-2"
 																									id="categoryCreator{{ category.id }}"
 																									placeholder="Créateur de la catégorie">
 																									{% for user in users %}
@@ -239,7 +245,7 @@
 																											<select
 																												name="button_{{ button.id }}_sortOrder"
 																												value=""
-																												class="buttonSortOrderSelect"
+																												class="buttonSortOrderSelect  me-2"
 																												id="buttonSortOrder{{ button.id }}"
 																												placeholder="Placement du bouton">
 																												{% for k in 1..buttonsCounts %}
