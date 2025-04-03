@@ -37,6 +37,8 @@ class ViewsModificationController extends AbstractController
         );
     }
 
+    
+
     #[Route('/view/viewmod/modifying', name: 'app_views_modification')]
     public function viewsModification(Request $request)
     {
