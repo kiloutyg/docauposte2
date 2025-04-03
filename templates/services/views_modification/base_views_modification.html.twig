@@ -5,7 +5,7 @@
 
 {% block javascripts %}
 	{{ parent() }}
-	{# {{encore_entry_script_tags('views-modification-value-tracker') }} #}
+	{{encore_entry_script_tags('views-modification-value-tracker') }}
 {% endblock %}
 
 {% block body %}
@@ -54,12 +54,12 @@
 													class="accordion-body">
 													<div
 														class="  d-flex justify-content-between align-items-center ">
-														{# <input
-																																											type="text"
-																																											name="zone_{{zone.id}}_name"
-																																											value="{{zone.name}}" class=""
-																																											id="zoneName{{zone.id}}"
-																																											placeholder="Nom de la zone"> #}
+														<input
+															type="text"
+															name="zone_{{zone.id}}_name"
+															value="{{zone.name}}" class=""
+															id="zoneName{{zone.id}}"
+															placeholder="Nom de la zone">
 
 														<select
 															name="zone_{{zone.id}}_sortOrder"
@@ -119,12 +119,12 @@
 																		class="accordion-body">
 																		<div
 																			class=" d-flex justify-content-between align-items-center ">
-																			{# <input
-																																																										type="text"
-																																																										name="productLine_{{ productLine.id }}_name"
-																																																										value="{{ productLine.name|split('.')|first }}" class=""
-																																																										id="productLineName{{ productLine.id }}"
-																																																										placeholder="Nom de la productLine"> #}
+																			<input
+																				type="text"
+																				name="productLine_{{ productLine.id }}_name"
+																				value="{{ productLine.name|split('.')|first }}" class=""
+																				id="productLineName{{ productLine.id }}"
+																				placeholder="Nom de la productLine">
 
 																			<select
 																				name="productLine_{{ productLine.id }}_sortOrder"
@@ -186,12 +186,12 @@
 																							class="shadow-lg shadow-lg-inset border border-dark rounded-3">
 																							<div
 																								class=" d-flex justify-content-between align-items-center ">
-																								{# <input
-																																																																									type="text"
-																																																																									name="category_{{ category.id }}_name"
-																																																																									value="{{ category.name|split('.')|first }}" class=""
-																																																																									id="categoryName{{ category.id }}"
-																																																																									placeholder="Nom de la categorie"> #}
+																								<input
+																									type="text"
+																									name="category_{{ category.id }}_name"
+																									value="{{ category.name|split('.')|first }}" class=""
+																									id="categoryName{{ category.id }}"
+																									placeholder="Nom de la categorie">
 
 																								<select
 																									name="category_{{ category.id }}_sortOrder"
@@ -234,13 +234,13 @@
 																												<strong>
 																													{{button.name|split('.')|first|upper}}
 																												</strong>
-																												{# <input
-																																																																																					class="form-control w-75"
-																																																																																					type="text"
-																																																																																					name="button_{{ button.id }}_name"
-																																																																																					value="{{ button.name|split('.')|first }}" class=""
-																																																																																					id="buttonName{{ button.id }}"
-																																																																																					placeholder="Nom du bouton"> #}
+																												<input
+																													class="form-control w-75"
+																													type="text"
+																													name="button_{{ button.id }}_name"
+																													value="{{ button.name|split('.')|first }}" class=""
+																													id="buttonName{{ button.id }}"
+																													placeholder="Nom du bouton">
 																											</div>
 																											<select
 																												name="button_{{ button.id }}_sortOrder"
