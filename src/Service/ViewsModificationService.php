@@ -197,31 +197,66 @@ class ViewsModificationService extends AbstractController
     //     
     public function updateSortOrders($otherEntities, $entity, $newValue)
     {
+        $entityCount = count($otherEntities) + 1;
         $originalValue = $entity->getSortOrder();
 
-        $entity->setSortOrder($newValue);
-        $entityCount = count($otherEntities);
+        // Ensure newValue stays within valid bounds
+        if ($newValue < 1) {
+            $newValue = 1;
+        }
+        if ($newValue > $entityCount) {
+            $newValue = $entityCount;
+        }
 
-        // Moved to a higher position (i.e., lower value)
-        if ($newValue < $originalValue) {
+        // First ensure all entities have valid sort orders (fix duplicates)
+        $usedSortOrders = [];
+        $needsReorganizing = false;
+
+        // Add current entity's sort order to the used list
+        $usedSortOrders[$originalValue] = true;
+
+        // Check for duplicates and out-of-bounds values
+        foreach ($otherEntities as $otherEntity) {
+            $sortOrder = $otherEntity->getSortOrder();
+
+            // If sort order is invalid or duplicate, mark for reorganization
+            if ($sortOrder < 1 || $sortOrder > $entityCount || isset($usedSortOrders[$sortOrder])) {
+                $needsReorganizing = true;
+                break;
+            }
+            $usedSortOrders[$sortOrder] = true;
+        }
+
+        // If we found duplicates or invalid values, reassign all sort orders sequentially
+        if ($needsReorganizing) {
+            $currentOrder = 1;
             foreach ($otherEntities as $otherEntity) {
-                $otherSortOrder = $otherEntity->getSortOrder();
-                if ($otherSortOrder >= $newValue && $otherSortOrder < $originalValue) {
-                    $otherEntity->setSortOrder($otherSortOrder + 1);
+                if ($currentOrder == $newValue) {
+                    $currentOrder++; // Skip the position we want for our target entity
+                }
+                $otherEntity->setSortOrder($currentOrder++);
+            }
+        } else {
+            // If no duplicates, proceed with normal reordering
+            if ($newValue < $originalValue) {
+                foreach ($otherEntities as $otherEntity) {
+                    $otherSortOrder = $otherEntity->getSortOrder();
+                    if ($otherSortOrder >= $newValue && $otherSortOrder < $originalValue) {
+                        $otherEntity->setSortOrder($otherSortOrder + 1);
+                    }
+                }
+            } else {
+                foreach ($otherEntities as $otherEntity) {
+                    $otherSortOrder = $otherEntity->getSortOrder();
+                    if ($otherSortOrder <= $newValue && $otherSortOrder > $originalValue) {
+                        $otherEntity->setSortOrder($otherSortOrder - 1);
+                    }
                 }
             }
         }
-        // Moved to a lower position (i.e., higher value)
-        elseif ($newValue > $originalValue) {
-            foreach ($otherEntities as $otherEntity) {
-                $otherSortOrder = $otherEntity->getSortOrder();
-                if ($otherSortOrder <= $newValue && $otherSortOrder > $originalValue) {
-                    $otherEntity->setSortOrder($otherSortOrder - 1);
-                }
-            }
-        }
-        // Set the sortOrder for the entity being changed
-        $entity->setSortorder($newValue);
+
+        // Finally set the target entity's sort order
+        $entity->setSortOrder($newValue);
     }
     // 
     // 
