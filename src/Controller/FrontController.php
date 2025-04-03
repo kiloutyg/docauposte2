@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Doctrine\ORM\EntityManagerInterface;
 
-use  \Psr\Log\LoggerInterface;
+use \Psr\Log\LoggerInterface;
 
 use App\Entity\ProductLine;
 use App\Entity\Category;
@@ -154,14 +154,6 @@ class FrontController extends AbstractController
             }
         }
 
-        if ($this->getParameter('kernel.environment') === 'dev') {
-            $this->logger->info('Is in dev environment and in the loop that should give me tests situation for flash messages');
-            $this->addFlash('warning', 'TEST 1');
-            $this->addFlash('error', 'TEST 2');
-            $this->addFlash('info', 'TEST 3');
-            $this->addFlash('success', 'TEST 4');
-        }
-
         return $this->render(
             'base.html.twig',
             [
@@ -182,7 +174,8 @@ class FrontController extends AbstractController
         $zone = $this->zoneRepository->find($zoneId);
 
         $productLinesInZone = [];
-        $productLinesInZone = $zone->getProductLines();
+        $productLinesInZone = $this->entityFetchingService->getProductLinesByZone($zone);
+
         if (count($productLinesInZone) === 1 && !$this->authChecker->isGranted('ROLE_LINE_ADMIN')) {
             return $this->productLine(null, $productLinesInZone[0]);
         } else {
@@ -206,7 +199,7 @@ class FrontController extends AbstractController
             $productLine = $this->productLineRepository->find($productLineId);
         }
 
-        $categoriesInLine = $productLine->getCategories();
+        $categoriesInLine = $this->entityFetchingService->getCategoriesByProductLine($productLine);
 
         $incidentsInProductLine = [];
         $incidentsInProductLine = $this->incidentRepository->findBy(
@@ -248,7 +241,7 @@ class FrontController extends AbstractController
             $category = $this->categoryRepository->find($categoryId);
         }
 
-        $buttons = $category->getButtons();
+        $buttons = $this->entityFetchingService->getButtonsByCategory($category);
 
         if (count($buttons) === 1) {
             return $this->buttonDisplay(null, $buttons[0]);

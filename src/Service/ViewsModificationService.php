@@ -50,7 +50,7 @@ class ViewsModificationService extends AbstractController
         IncidentRepository $incidentRepository,
         UserRepository $userRepository,
 
-        FolderService $folderService
+        FolderService $folderService,
     ) {
         $this->em                       = $em;
         $this->projectDir               = $params->get('kernel.project_dir');
@@ -63,9 +63,9 @@ class ViewsModificationService extends AbstractController
         $this->uploadRepository         = $uploadRepository;
         $this->oldUploadRepository      = $oldUploadRepository;
         $this->incidentRepository       = $incidentRepository;
-        $this->userRepository          = $userRepository;
+        $this->userRepository           = $userRepository;
 
-        $this->folderService    = $folderService;
+        $this->folderService            = $folderService;
     }
 
     public function updateTheUpdatingOfTheSortOrder()
@@ -123,7 +123,6 @@ class ViewsModificationService extends AbstractController
     //     
     public function defineEntityType($entityType)
     {
-        // $this->logger->info('defineEntityType: entityType: ' . $entityType);
         $repository = null;
         switch ($entityType) {
             case 'zone':
@@ -198,16 +197,10 @@ class ViewsModificationService extends AbstractController
     //     
     public function updateSortOrders($otherEntities, $entity, $newValue)
     {
-        // $this->logger->info('entity name' . $entity->getName());
-        // $this->logger->info('entity id' . $entity->getId());
-        // $this->logger->info('newValue: ' . $newValue);
+        $originalValue = $entity->getSortOrder();
 
-        $originalValue = $entity->getSortorder();
-        // $this->logger->info('originalValue: ' . $originalValue);
-
-        $entity->setSortorder($newValue);
+        $entity->setSortOrder($newValue);
         $entityCount = count($otherEntities);
-        // $this->logger->info('entityCount: ' . $entityCount);
 
         // Moved to a higher position (i.e., lower value)
         if ($newValue < $originalValue) {
@@ -215,7 +208,6 @@ class ViewsModificationService extends AbstractController
                 $otherSortOrder = $otherEntity->getSortOrder();
                 if ($otherSortOrder >= $newValue && $otherSortOrder < $originalValue) {
                     $otherEntity->setSortOrder($otherSortOrder + 1);
-                    // $this->logger->info('Incrementing sortOrder for entity with ID: ' . $otherEntity->getId());
                 }
             }
         }
@@ -225,7 +217,6 @@ class ViewsModificationService extends AbstractController
                 $otherSortOrder = $otherEntity->getSortOrder();
                 if ($otherSortOrder <= $newValue && $otherSortOrder > $originalValue) {
                     $otherEntity->setSortOrder($otherSortOrder - 1);
-                    // $this->logger->info('Decrementing sortOrder for entity with ID: ' . $otherEntity->getId());
                 }
             }
         }
@@ -240,12 +231,9 @@ class ViewsModificationService extends AbstractController
 
         $entityNameParts = [];
         $entityNameParts = explode('.', $entity->getName());
-        // $entityNameParts = array_reverse($entityNameParts);
 
         $entityName = $entityNameParts[0];
-        // $this->logger->info('updateEntityNameInheritance: entityName: ' . $entityName);
         $newName = $entityName . '.' . $newParentName;
-        // $this->logger->info('updateEntityNameInheritance: newName: ' . $newName);
 
         $entityId = $entity->getId();
         $entity->setName($newName);
@@ -311,28 +299,27 @@ class ViewsModificationService extends AbstractController
                 break;
             case 'productLine':
                 $repository = $this->productLineRepository;
-                $parentEntityName = 'Zone';
+                $parentEntityName = 'zone';
                 break;
             case 'category':
                 $repository = $this->categoryRepository;
-                $parentEntityName = 'ProductLine';
+                $parentEntityName = 'productLine';
                 break;
             case 'button':
                 $repository = $this->buttonRepository;
-                $parentEntityName = 'Category';
+                $parentEntityName = 'category';
                 break;
             case 'upload':
                 $repository = $this->uploadRepository;
-                $parentEntityName = 'Button';
+                $parentEntityName = 'button';
                 break;
             case 'incident':
                 $repository = $this->incidentRepository;
-                $parentEntityName = 'ProductLine';
-
+                $parentEntityName = 'productLine';
                 break;
             case 'oldupload':
                 $repository = $this->oldUploadRepository;
-                $parentEntityName = 'Button';
+                $parentEntityName = 'button';
                 break;
         }
         // If the entity type is not valid, return an empty array
@@ -349,10 +336,10 @@ class ViewsModificationService extends AbstractController
         if ($entityType === 'zone') {
             if ($field === 'name') {
                 foreach ($entity->getProductLines() as $productLine) {
-                    $this->updateEntityNameInheritance('productLine', $productLine, $newName, $field, $originalValue);
+                    $this->updateEntityNameInheritance('productLine', $productLine, $newName, $field);
                 }
             } elseif ($field === 'sortOrder') {
-                $this->updateSortOrders($repository->findAllExceptOne($id), $entity, $newName, $originalValue);
+                $this->updateSortOrders($repository->findAllExceptOne($id), $entity, $newName);
             } elseif ($field === 'creator') {
                 foreach ($entity->getProductLines() as $productLine) {
                     $this->updateEntity('productLine', $productLine, $field, $newName, $originalValue);
@@ -361,35 +348,35 @@ class ViewsModificationService extends AbstractController
         } elseif ($entityType === 'productLine') {
             if ($field === 'name') {
                 foreach ($entity->getCategories() as $category) {
-                    $this->updateEntityNameInheritance('category', $category, $newName, $field, $originalValue);
+                    $this->updateEntityNameInheritance('category', $category, $newName, $field);
                 }
                 foreach ($entity->getIncidents() as $incident) {
-                    $this->updateDocumentPath('incident', $incident, $newName, $originalValue);
+                    $this->updateDocumentPath('incident', $incident, $newName);
                 }
             } elseif ($field === 'sortOrder') {
                 $parentEntityId = $entity->getZone()->getId();
-                $this->updateSortOrders($repository->findAllExceptOneByParent($id, $parentEntityId, $parentEntityName), $entity, $newName, $originalValue);
+                $this->updateSortOrders($repository->findAllExceptOneByParent($id, $parentEntityId, $parentEntityName), $entity, $newName);
             }
         } elseif ($entityType === 'category') {
             if ($field === 'name') {
                 foreach ($entity->getButtons() as $button) {
-                    $this->updateEntityNameInheritance('button', $button, $newName, $field, $originalValue);
+                    $this->updateEntityNameInheritance('button', $button, $newName, $field);
                 }
             } elseif ($field === 'sortOrder') {
                 $parentEntityId = $entity->getProductLine()->getId();
-                $this->updateSortOrders($repository->findAllExceptOne($id, $parentEntityId, $parentEntityName), $entity, $newName, $originalValue);
+                $this->updateSortOrders($repository->findAllExceptOne($id), $entity, $newName);
             }
         } elseif ($entityType === 'button') {
             if ($field === 'name') {
                 foreach ($entity->getUploads() as $upload) {
-                    $this->updateDocumentPath('upload', $upload, $newName, $originalValue);
+                    $this->updateDocumentPath('upload', $upload, $newName);
                 }
                 foreach ($entity->getOldUploads() as $oldUpload) {
-                    $this->updateDocumentPath('oldupload', $oldUpload, $newName, $originalValue);
+                    $this->updateDocumentPath('oldupload', $oldUpload, $newName);
                 }
             } elseif ($field === 'sortOrder') {
                 $parentEntityId = $entity->getCategory()->getId();
-                $this->updateSortOrders($repository->findAllExceptOneByParent($id, $parentEntityId, $parentEntityName), $entity, $newName, $originalValue);
+                $this->updateSortOrders($repository->findAllExceptOneByParent($id, $parentEntityId, $parentEntityName), $entity, $newName);
             }
         }
     }
