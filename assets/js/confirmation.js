@@ -1,245 +1,56 @@
-window.addEventListener("turbo:load", () => {
-  const deleteZoneButtons = document.querySelectorAll(".delete-zone");
-  const deleteProductLineButtons = document.querySelectorAll(".delete-productLine");
-  const deleteCategoryButtons = document.querySelectorAll(".delete-category");
-  const deleteButtonButtons = document.querySelectorAll(".delete-button");
-  const deleteUserButtons = document.querySelectorAll(".delete-user");
-  const deleteUserButtonsDefinitively = document.querySelectorAll(".definitively-delete-user");
-  const deleteUploadButtons = document.querySelectorAll(".delete-upload");
-  const deleteIncidentButtons = document.querySelectorAll(".delete-incident");
-  const deleteIncidentCategoryButtons = document.querySelectorAll(".delete-incidentCategory");
-  const deleteDepartmentButtons = document.querySelectorAll(".delete-department");
-  const submitApprovalButtons = document.querySelectorAll(".submit-approval");
-  const submitDisapprovalModifcationButtons = document.querySelectorAll(".submit-disapproval-modification");
-  const submitUploadModifcationButtons = document.querySelectorAll(".submit-upload-modification");
-  const submitIncidentModifcationButtons = document.querySelectorAll(".submit-incident-modification");
-  const submitViewsModifcationButtons = document.querySelectorAll(".submit-views-modification");
-  const downloadNonValidatedUploadButtons = document.querySelectorAll(".download-non-validated-upload");
-  const downloadRefusedUploadButtons = document.querySelectorAll(".download-refused-upload");
-  const downloadRefusedButOldButtons = document.querySelectorAll(".download-refused-but-old");
-  const downloadNonValidatedButOldUploadButtons = document.querySelectorAll(".download-non-validated-but-old");
-  const deleteTeamButtons = document.querySelectorAll(".delete-team");
-  const deleteUapButtons = document.querySelectorAll(".delete-uap");
+// Define the confirmation handler once outside both event listeners
+const confirmationHandler = (event, message) => {
+  const confirmed = confirm(message);
+  if (!confirmed) {
+    event.preventDefault();
+  }
+};
 
-  const confirmationHandler = (event, message) => {
-    const confirmed = confirm(message);
-    if (!confirmed) {
-      event.preventDefault();
-    }
-  };
+// Utility function to attach confirmations to elements
+const attachConfirmation = (selector, message) => {
+  document.querySelectorAll(selector).forEach((button) => {
+    button.addEventListener("click", (event) => {
+      confirmationHandler(event, message);
+    });
+  });
+};
 
-  deleteZoneButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir supprimer cette Zone?"
-      );
-    });
-  });
+// Main initialization function
+const initConfirmations = () => {
+  // Define all your button types and messages
+  const confirmations = [
+    { selector: ".delete-zone", message: "Êtes vous sûr de vouloir supprimer cette Zone?" },
+    { selector: ".delete-productLine", message: "Êtes vous sûr de vouloir supprimer cette Ligne?" },
+    { selector: ".delete-category", message: "Êtes vous sûr de vouloir supprimer cette categorie?" },
+    { selector: ".delete-button", message: "Êtes vous sûr de vouloir supprimer ce Bouton?" },
+    { selector: ".delete-user", message: "Êtes vous sûr de vouloir supprimer cet Utilisateur?" },
+    { selector: ".definitively-delete-user", message: "Êtes vous sûr de vouloir supprimer cet Utilisateur? Celà supprimera également tous les incidents et documents liés à cet utilisateur." },
+    { selector: ".delete-upload", message: "Êtes vous sûr de vouloir supprimer ce Document?" },
+    { selector: ".delete-incident", message: "Êtes vous sûr de vouloir supprimer cet Incident?" },
+    { selector: ".delete-incidentCategory", message: "Êtes vous sûr de vouloir supprimer ce Type d'Incident?" },
+    { selector: ".delete-department", message: "Êtes vous sûr de vouloir supprimer ce Service?" },
+    { selector: ".submit-approval", message: "Êtes vous sûr de vouloir soumettre ce formulaire de validation?" },
+    { selector: ".submit-disapproval-modification", message: "Êtes vous sûr de vouloir soumettre ces modifications?" },
+    { selector: ".submit-upload-modification", message: "Êtes vous sûr de vouloir soumettre ces modifications?" },
+    { selector: ".submit-incident-modification", message: "Êtes vous sûr de vouloir soumettre ces modifications?" },
+    { selector: ".submit-views-modification", message: "Êtes vous sûr de vouloir soumettre ces modifications?" },
+    { selector: ".download-non-validated-upload", message: "CE DOCUMENT N'A PAS ENCORE ÉTÉ VALIDÉ. CONTINUER DE TOUTE MANIÈRE? EN CAS DE QUESTION, CONTACTER VOTRE RESPONSABLE." },
+    { selector: ".download-refused-upload", message: "CE DOCUMENT A ÉTÉ REFUSÉ. CONTINUER DE TOUTE MANIÈRE? EN CAS DE QUESTION, CONTACTEZ VOTRE RESPONSABLE." },
+    { selector: ".download-refused-but-old", message: "LE NOUVEAU DOCUMENT A ÉTÉ REFUSÉ, LE PRÉCÉDENT SERA AFFICHÉ. EN CAS DE QUESTION, CONTACTEZ VOTRE RESPONSABLE." },
+    { selector: ".download-non-validated-but-old", message: "CE DOCUMENT N'A PAS ENCORE ÉTÉ VALIDÉ. LE PRÉCÉDENT SERA AFFICHÉ. EN CAS DE QUESTION, CONTACTEZ VOTRE RESPONSABLE." },
+    { selector: ".delete-team", message: "Êtes vous sûr de vouloir supprimer cette Equipe?" },
+    { selector: ".delete-uap", message: "Êtes vous sûr de vouloir supprimer cet UAP?" },
+    { selector: ".delete-operator", message: "Êtes vous sûr de vouloir supprimer cet Opérateur?" },
+    { selector: ".submit-operator-modification", message: "Êtes vous sûr de vouloir soumettre ces modifications?" },
+    { selector: ".delete-products", message: "Êtes vous sûr de vouloir supprimer ce Produit?" }
+  ];
 
-  deleteProductLineButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir supprimer cette Ligne?"
-      );
-    });
+  // Attach all confirmations
+  confirmations.forEach(conf => {
+    attachConfirmation(conf.selector, conf.message);
   });
-  deleteCategoryButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir supprimer cette categorie?"
-      );
-    });
-  });
-  deleteButtonButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir supprimer ce Bouton?"
-      );
-    });
-  });
-  deleteUserButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir supprimer cet Utilisateur?"
-      );
-    });
-  });
-  deleteUserButtonsDefinitively.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir supprimer cet Utilisateur? Celà supprimera également tous les incidents et documents liés à cet utilisateur."
-      );
-    });
-  });
-  deleteUploadButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir supprimer ce Document?"
-      );
-    });
-  });
-  deleteIncidentButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir supprimer cet Incident?"
-      );
-    });
-  });
-  deleteIncidentCategoryButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir supprimer ce Type d'Incident?"
-      );
-    });
-  });
-  deleteDepartmentButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir supprimer ce Service?"
-      );
-    });
-  });
-  submitApprovalButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir soumettre ce formulaire de validation?"
-      );
-    });
-  });
-  submitDisapprovalModifcationButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir soumettre ces modifications?"
-      );
-    });
-  });
-  submitUploadModifcationButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir soumettre ces modifications?"
-      );
-    });
-  });
-  submitIncidentModifcationButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir soumettre ces modifications?"
-      );
-    });
-  });
-  submitViewsModifcationButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir soumettre ces modifications?"
-      );
-    });
-  });
-  downloadNonValidatedUploadButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "CE DOCUMENT N'A PAS ENCORE ÉTÉ VALIDÉ. CONTINUER DE TOUTE MANIÈRE? EN CAS DE QUESTION, CONTACTER VOTRE RESPONSABLE."
-      );
-    });
-  });
-  downloadNonValidatedButOldUploadButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "CE DOCUMENT N'A PAS ENCORE ÉTÉ VALIDÉ. LE PRÉCÉDENT SERA AFFICHÉ. EN CAS DE QUESTION, CONTACTEZ VOTRE RESPONSABLE."
-      );
-    });
-  });
-  downloadRefusedUploadButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "CE DOCUMENT A ÉTÉ REFUSÉ. CONTINUER DE TOUTE MANIÈRE? EN CAS DE QUESTION, CONTACTEZ VOTRE RESPONSABLE."
-      );
-    });
-  });
-  downloadRefusedButOldButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "LE NOUVEAU DOCUMENT A ÉTÉ REFUSÉ, LE PRÉCÉDENT SERA AFFICHÉ. EN CAS DE QUESTION, CONTACTEZ VOTRE RESPONSABLE."
-      );
-    });
-  });
+};
 
-  deleteTeamButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir supprimer cette Equipe?"
-      );
-    });
-  });
-
-  deleteUapButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir supprimer cet UAP?"
-      );
-    });
-  });
-});
-
-
-window.addEventListener("turbo:frame-load", () => {
-
-  const deleteOperatorsButtons = document.querySelectorAll(".delete-operator");
-  const submitOperatorsModificationButtons = document.querySelectorAll(".submit-operator-modification");
-  const deleteProductsButtons = document.querySelectorAll(".delete-products");
-
-  const confirmationHandler = (event, message) => {
-    const confirmed = confirm(message);
-    if (!confirmed) {
-      event.preventDefault();
-    }
-  };
-
-  deleteOperatorsButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir supprimer cet Opérateur?"
-      );
-    });
-  });
-
-  submitOperatorsModificationButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir soumettre ces modifications?"
-      );
-    });
-  });
-
-  deleteProductsButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      confirmationHandler(
-        event,
-        "Êtes vous sûr de vouloir supprimer ce Produit?"
-      );
-    });
-  });
-
-});
+// Initialize on both regular page load and turbo frame loads
+window.addEventListener("turbo:load", initConfirmations);
+window.addEventListener("turbo:frame-load", initConfirmations);
