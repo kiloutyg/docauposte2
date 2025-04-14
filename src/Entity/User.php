@@ -75,6 +75,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: ShiftLeaders::class)]
     private ?ShiftLeaders $shiftLeader = null;
 
+    #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Operator $operator = null;
+
     public function __construct()
     {
         $this->uploads = new ArrayCollection();
@@ -462,6 +465,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setShiftLeader(?ShiftLeaders $shiftLeader): static
     {
         $this->shiftLeader = $shiftLeader;
+
+        return $this;
+    }
+
+    public function getOperator(): ?Operator
+    {
+        return $this->operator;
+    }
+
+    public function setOperator(?Operator $operator): static
+    {
+        $this->operator = $operator;
 
         return $this;
     }

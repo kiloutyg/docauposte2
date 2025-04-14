@@ -83,6 +83,9 @@ class Operator
     #[ORM\Column(nullable: true, enumType: EmploymentType::class)]
     private ?EmploymentType $employmentType = null;
 
+    #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist', 'remove'])]
+    private ?User $user = null;
+
 
     public function __construct()
     {
@@ -325,6 +328,28 @@ class Operator
     public function setEmploymentType(?EmploymentType $employmentType): static
     {
         $this->employmentType = $employmentType;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($user === null && $this->user !== null) {
+            $this->user->setOperator(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($user !== null && $user->getOperator() !== $this) {
+            $user->setOperator($this);
+        }
+
+        $this->user = $user;
 
         return $this;
     }
