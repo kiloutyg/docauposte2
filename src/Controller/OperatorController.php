@@ -800,16 +800,14 @@ class OperatorController extends AbstractController
 
 
     #[Route('operator/suggest-names', name: 'app_suggest_names')]
-    public function suggestNames(Request $request, SerializerInterface $serializer): JsonResponse
+    public function suggestNames(Request $request): JsonResponse
     {
         $parsedRequest = json_decode($request->getContent(), true);
-        // $this->logger->info('app_suggest_names parsedRequest', $parsedRequest);
 
         $name = $parsedRequest['name'];
 
-        /////////////// serialized data ////////////////////////
         $rawSuggestions = $this->operatorRepository->findByNameLikeForSuggestions($name);
-        // $this->logger->info('app_suggest_names Raw suggestions', $rawSuggestions);
+        $this->logger->info('app_suggest_names Raw suggestions', $rawSuggestions);
 
         $teams = $this->teamRepository->findAll();
         $teamIndex = [];
@@ -823,20 +821,21 @@ class OperatorController extends AbstractController
             $uapIndex[$uap->getId()] = $uap->getName();
         }
 
-
-        foreach ($rawSuggestions as $key => &$suggestion) {
+        foreach ($rawSuggestions as $key => &$suggestionKey) {
             // Check and assign team name if available
-            if (isset($suggestion['team_id']) && isset($teamIndex[$suggestion['team_id']])) {
-                $suggestion['team_name'] = $teamIndex[$suggestion['team_id']];
+            if (isset($suggestionKey['team_id']) && isset($teamIndex[$suggestionKey['team_id']])) {
+                $suggestionKey['team_name'] = $teamIndex[$suggestionKey['team_id']];
             } else {
-                $suggestion['team_name'] = 'nope'; // Or handle it as appropriate
+                $suggestionKey['team_name'] = 'NoTeam'; // Or handle it as appropriate
             }
 
+            $this->logger->info('app_suggest_names suggestion operator entity', [$this->operatorRepository->find($suggestionKey['id'])]);
+            // TODO : Check how to display first UAP name if available
             // Check and assign UAP name if available
-            if (isset($suggestion['uap_id']) && isset($uapIndex[$suggestion['uap_id']])) {
-                $suggestion['uap_name'] = $uapIndex[$suggestion['uap_id']];
+            if (isset($suggestionKey['uap_id']) && isset($uapIndex[$suggestionKey['uap_id']])) {
+                $suggestionKey['uap_name'] = $uapIndex[$suggestionKey['uap_id']];
             } else {
-                $suggestion['uap_name'] = 'nope'; // Or handle it as appropriate
+                $suggestionKey['uap_name'] = 'NoUAP'; // Or handle it as appropriate
             }
         }
 

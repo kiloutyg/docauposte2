@@ -86,8 +86,41 @@
 		</div>
 		<div
 			class="form-control mb-3">
-			{% include 'services/accountservices/role_affectation.html.twig' %}
+			{% include 'services/account_services/role_affectation.html.twig' %}
 		</div>
+		{% if operatorSuggestions is defined and operatorSuggestions is not empty %}
+			<div
+				class="form-control mb-3">
+
+				{% if operatorSuggestions|length > 1 %}
+					<label>
+						Select the corresponding Operator entity :
+					</label>
+					{% for operatorSuggestion in operatorSuggestions %}
+						{{operatorSuggestion.name}}
+						<input
+							aria-label="Select if true"
+							class="tooltips"
+							type="checkbox"
+							name="operator"
+							value="{{operatorSuggestion.id }}">
+					{% endfor %}
+				{% else %}
+					<label>
+						Is this the correct Operator entity :
+					</label>
+					{{operatorSuggestions.name}}
+					<input
+						aria-label="Select if true"
+						class="tooltips"
+						type="checkbox"
+						name="operator"
+						value="{{operatorSuggestions.id }}">
+				{% endif %}
+
+			</div>
+		{% endif %}
+
 		<div
 			class="form-control mb-3">
 			<div>

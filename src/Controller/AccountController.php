@@ -85,7 +85,7 @@ class AccountController extends AbstractController
             return $this->redirectToRoute('app_super_admin');
         }
         return $this->render(
-            '/services/accountservices/create_account.html.twig',
+            '/services/account_services/create_account.html.twig',
             [
                 'departments' => $this->entityFetchingService->getDepartments(),
                 'users'       => $this->entityFetchingService->getUsers(),
@@ -109,8 +109,10 @@ class AccountController extends AbstractController
             return $this->redirectToRoute('app_super_admin');
         }
         if ($request->isMethod('GET')) {
-            return $this->render('services/accountservices/modify_account_view.html.twig', [
-                'user'          => $user
+
+            return $this->render('services/account_services/modify_account_view.html.twig', [
+                'user'                  => $user,
+                'operatorSuggestions'   => $this->entityFetchingService->getOperatorSuggestionByUsername($user->getUsername()),
             ]);
         } else {
             return $this->modifyAccountPost($user, $request);

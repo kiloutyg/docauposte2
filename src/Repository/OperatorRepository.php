@@ -162,7 +162,7 @@ class OperatorRepository extends ServiceEntityRepository
     {
         // $this->logger->info('Finding operators by name for suggestions.');
 
-        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) {
+        if (!preg_match('/^[a-z]+(-[a-z]+)*(\.[a-z]+(-[a-z]+)*)?$/i', $name)) {
             throw new \InvalidArgumentException("Invalid name format.");
         }
 

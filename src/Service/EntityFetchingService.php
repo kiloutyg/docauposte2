@@ -25,7 +25,7 @@ use App\Repository\TrainerRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
 use App\Repository\ProductsRepository;
-
+use Doctrine\Common\Collections\Collection;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -295,5 +295,15 @@ class EntityFetchingService extends AbstractController
     public function getShiftLeaders()
     {
         return $this->shiftLeadersRepository->findAll();
+    }
+
+    public function getOperatorSuggestionByUsername(string $username)
+    {
+
+        if (!($response = $this->operatorRepository->findOneBy(['name' => $username]))) {
+
+            $suggestions = $this->operatorRepository->findByNameLikeForSuggestions($username);
+        }
+        return $response;
     }
 }
