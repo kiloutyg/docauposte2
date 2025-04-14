@@ -2,12 +2,9 @@
 
 namespace App\Service;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-use Psr\Log\LoggerInterface;
-
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
+use App\Entity\Zone;
+use App\Entity\ProductLine;
+use App\Entity\Category;
 
 use App\Repository\ZoneRepository;
 use App\Repository\ProductLineRepository;
@@ -28,6 +25,12 @@ use App\Repository\TrainerRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
 use App\Repository\ProductsRepository;
+
+use Psr\Log\LoggerInterface;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+use Symfony\Contracts\Cache\CacheInterface;
 
 
 class EntityFetchingService extends AbstractController
@@ -130,6 +133,11 @@ class EntityFetchingService extends AbstractController
         return $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']);
     }
 
+    public function getProductLinesByZone(Zone $zone)
+    {
+        return $this->productLineRepository->findBy(['zone' => $zone->getId()], ['SortOrder' => 'ASC']);
+    }
+
 
     public function getIncidents()
     {
@@ -148,12 +156,20 @@ class EntityFetchingService extends AbstractController
         return $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']);
     }
 
+    public function getCategoriesByProductLine(ProductLine $productLine)
+    {
+        return $this->categoryRepository->findBy(['productLine' => $productLine->getId()], ['SortOrder' => 'ASC']);
+    }
 
     public function getButtons()
     {
         return $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']);
     }
 
+    public function getButtonsByCategory(Category $category)
+    {
+        return $this->buttonRepository->findBy(['category' => $category->getId()], ['SortOrder' => 'ASC']);
+    }
 
     public function getUploads()
     {
@@ -180,7 +196,6 @@ class EntityFetchingService extends AbstractController
     {
         return $this->groupUploads($this->uploadRepository->findAllValidatedUploadsWithAssociations());
     }
-
 
 
     public function getApprobations()

@@ -34,6 +34,7 @@ class Operator
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'operators')]
+
     #[Groups(['operator_details'])]
     #[Assert\NotNull]
     private ?Team $team = null;

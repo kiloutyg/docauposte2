@@ -4,7 +4,7 @@ export default class extends Controller {
     static targets = ["username", "message"];
 
     validateUsername() {
-        const regex = /^(?!-)(?!.*--)[a-zA-Z-]{2,}(?<!-)\.(?!-)(?!.*--)[a-zA-Z-]{2,}(?<!-)$/;
+        const regex = /^(?!-)(?!.*--)[a-z-]{2,}(?<!-)\.(?!-)(?!.*--)[a-z-]{2,}(?<!-)$/;
         const isValid = regex.test(this.usernameTarget.value);
 
         if (isValid) {

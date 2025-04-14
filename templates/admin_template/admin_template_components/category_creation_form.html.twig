@@ -97,11 +97,18 @@
 													{% for category in productLine.categories %}
 														<li
 															class="form-control d-flex justify-content-between align-items-center mb-2">
-															<a
-																href="{{path('app_category_admin', {categoryId: category.id} )}}" class="btn btn-dark">
-																{{ category.name|split('.')|first|upper }}
-															</a>
+															<div
+																class="flex-grow-1">
+																<a
+																	href="{{path('app_category_admin', {categoryId: category.id} )}}" class="btn btn-dark">
+																	{{ category.name|split('.')|first|upper }}
+																</a>
+															</div>
 															{% if is_granted ('ROLE_LINE_ADMIN') or app.user is same as( category.creator) %}
+																<a
+																	href="{{path('app_base_views_modification')}}" class="btn btn-info m-2">
+																	Modifier
+																</a>
 																<a
 																	href="{{path('app_productLine_admin_delete_category', {categoryId: category.id})}}" class="btn btn-danger delete-category">
 																	Supprimer

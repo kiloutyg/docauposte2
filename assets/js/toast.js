@@ -12,6 +12,6 @@ document.addEventListener("turbo:load", () => {
       toast.addEventListener('transitionend', () => {
         toast.remove();
       });
-    }, 6000);
+    }, 10000);
   });
 });

@@ -13,7 +13,7 @@
 
 	<form
 		class="form col-sm-10 col-md-9 col-lg-8 mx-auto"
-		method="post"
+		method="POST"
 		action="{{path('app_account_modify_account', {userId: user.id})}}">
 
 	{% else %}
@@ -28,15 +28,6 @@
 			class="form col-sm-10 col-md-9 col-lg-8 mx-auto"
 			method="POST"
 			action="{{ path('app_account_create') }}">
-		{% endif %}
-
-		{% if error is defined %}
-			{% if error %}
-				<div
-					class="alert alert-danger">
-					{{ error.messageKey|trans(error.messageData, 'security') }}
-				</div>
-			{% endif %}
 		{% endif %}
 
 		<div
@@ -121,15 +112,11 @@
 				</select>
 			</div>
 		</div>
-		<input
-			type="hidden"
-			name="_csrf_token"
-			value="{{ csrf_token('authenticate') }}">
 		{% if user is defined %}
 			<div
 				class="d-grid">
 				<button
-					class="btn btn-primary btn-login text-uppercase fw-bold"
+					class="btn btn-primary btn-login text-uppercase fw-bold modify-user  mb-2"
 					type="submit">
 					Modification du compte
 				</button>
@@ -184,7 +171,7 @@
 				{% endif %}
 			{% else %}
 				<a
-					href="{{path('app_account_delete_account_basic', {userId: user.id})}}" class="col-4 mx-auto btn btn-danger delete-user">
+					href="{{path('app_account_block_account', {userId: user.id})}}" class="col-4 mx-auto btn btn-danger delete-user">
 					Supprimer (Bloquer le compte)
 				</a>
 			{% endif %}
@@ -193,7 +180,7 @@
 		<div
 			class="d-grid col-6 mx-auto">
 			<button
-				class="btn btn-primary btn-login text-uppercase fw-bold"
+				class="btn btn-primary btn-login text-uppercase fw-bold create-user"
 				type="submit">
 				Création du compte
 			</button>
