@@ -22,7 +22,7 @@ class Approbation
     private ?User $UserApprobator = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $Approval = null;
+    private ?bool $approval = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $Comment = null;
@@ -64,12 +64,12 @@ class Approbation
 
     public function isApproval(): ?bool
     {
-        return $this->Approval;
+        return $this->approval;
     }
 
-    public function setApproval(?bool $Approval): static
+    public function setApproval(?bool $approval): static
     {
-        $this->Approval = $Approval;
+        $this->approval = $approval;
 
         return $this;
     }
