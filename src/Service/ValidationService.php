@@ -313,18 +313,18 @@ class ValidationService extends AbstractController
         // Create an empty array to store Approbation instances
 
         $status       = null;
-        $ApprobationCount = count($this->approbationRepository->findBy(['Validation' => $validationId]));
-        $NegApprobations = $this->approbationRepository->findBy(['Validation' => $validationId, 'approval' => false]);
-        $PosApprobations = $this->approbationRepository->findBy(['Validation' => $validationId, 'approval' => true]);
-        $NoApprobations  = $this->approbationRepository->findBy(['Validation' => $validationId, 'approval' => null]);
+        $approbationCount = count($this->approbationRepository->findBy(['Validation' => $validationId]));
+        $negApprobations = $this->approbationRepository->findBy(['Validation' => $validationId, 'approval' => false]);
+        $posApprobations = $this->approbationRepository->findBy(['Validation' => $validationId, 'approval' => true]);
+        $noApprobations  = $this->approbationRepository->findBy(['Validation' => $validationId, 'approval' => null]);
 
-        if ($NegApprobations) {
+        if ($negApprobations) {
             $status = false;
             $this->updateValidationAndUploadStatus($validation, $status);
-        } elseif ($NoApprobations) {
+        } elseif ($noApprobations) {
             $status = null;
             return;
-        } elseif (count($PosApprobations) === $ApprobationCount) {
+        } elseif (count($posApprobations) === $approbationCount) {
             $status = true;
             $this->updateValidationAndUploadStatus($validation, $status);
         }
