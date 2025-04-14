@@ -259,8 +259,12 @@ class ValidationService extends AbstractController
 
 
 
-    public function validationApproval(Approbation $approbation, Request $request)
+    public function validationApproval(Approbation $approbation, Request $request): bool
     {
+
+        // Set return bool value to true
+        $return = true;
+
         // Get the value of the 'approvalRadio' input from the request
         $approvalStr = $request->request->get('approvalRadio');
 
@@ -282,17 +286,18 @@ class ValidationService extends AbstractController
         // Persist the Approbation instance to the database
         $this->em->persist($approbation);
         // Flush changes to the database
-        $this->em->flush($approbation);
+        $this->em->flush();
+
         // Get the Validation object associated with the Approbation instance
         $validation = $approbation->getValidation();
 
         if ($approbation->isApproval() === false) {
+            $return = false;
             $this->mailerService->sendDisapprobationEmail($validation);
         }
         // Call the approbationCheck method to check if all approbations are approved
         $this->approbationCheck($validation);
-
-        // No need to return anything       
+        return $return;
     }
 
 
@@ -309,9 +314,9 @@ class ValidationService extends AbstractController
 
         $status       = null;
         $ApprobationCount = count($this->approbationRepository->findBy(['Validation' => $validationId]));
-        $NegApprobations = $this->approbationRepository->findBy(['Validation' => $validationId, 'Approval' => false]);
-        $PosApprobations = $this->approbationRepository->findBy(['Validation' => $validationId, 'Approval' => true]);
-        $NoApprobations  = $this->approbationRepository->findBy(['Validation' => $validationId, 'Approval' => null]);
+        $NegApprobations = $this->approbationRepository->findBy(['Validation' => $validationId, 'approval' => false]);
+        $PosApprobations = $this->approbationRepository->findBy(['Validation' => $validationId, 'approval' => true]);
+        $NoApprobations  = $this->approbationRepository->findBy(['Validation' => $validationId, 'approval' => null]);
 
         if ($NegApprobations) {
             $status = false;
@@ -503,8 +508,8 @@ class ValidationService extends AbstractController
             foreach ($validators as $validator) {
                 $uploadsWaitingValidation = [];
                 $uploadsRefused = [];
-                $approbationsNotAnswered = $this->approbationRepository->findBy(['UserApprobator' => $validator, 'Approval' => null]);
-                $approbationsRefused = $this->approbationRepository->findBy(['UserApprobator' => $validator, 'Approval' => false]);
+                $approbationsNotAnswered = $this->approbationRepository->findBy(['UserApprobator' => $validator, 'approval' => null]);
+                $approbationsRefused = $this->approbationRepository->findBy(['UserApprobator' => $validator, 'approval' => false]);
                 foreach ($approbationsNotAnswered as $approbationNotAnswered) {
                     $upload = $approbationNotAnswered->getValidation()->getUpload();
                     $uploadedAt = $upload->getUploadedAt();
@@ -559,7 +564,6 @@ class ValidationService extends AbstractController
         $today = new \DateTime();
         $fileName = 'quality_email_sent.txt';
         $filePath = $this->projectDir . '/public/doc/' . $fileName;
-
 
         if (
             // $today->format('d') == $today->format('t') &&
