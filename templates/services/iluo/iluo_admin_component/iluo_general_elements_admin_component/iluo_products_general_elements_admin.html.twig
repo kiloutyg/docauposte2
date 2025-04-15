@@ -1,8 +1,8 @@
 <turbo-frame
 	id="productManagement"
-	class="container row">
+	class="container row mx-auto px-0 px-md-2">
 
-	{{ form_start(productForm, { attr: {class: 'col-6 d-flex flex-column', method: 'POST', action: path('app_iluo_products_general_elements_admin')}}
+	{{ form_start(productForm, { attr: {class: 'col-lg-6 col-md-12 col-sm-12 d-flex flex-column', method: 'POST', action: path('app_iluo_products_general_elements_admin')}}
 	) }}
 	<div
 		class="col-12">
@@ -31,7 +31,7 @@
 
 	{% if products is not empty %}
 		<div
-			class="col-6 mt-auto mb-auto accordion"
+			class="col-lg-6 col-md-12 col-sm-12  mt-auto mb-auto accordion"
 			id="accordionProductList">
 			<div
 				class="accordion-item shadow-lg shadow-lg-inset border border-dark">
