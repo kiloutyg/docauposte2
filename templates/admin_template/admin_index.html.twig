@@ -32,6 +32,7 @@
 				<div
 					class='my-3'>
 					<aside
+						aria-label="Super admin page access"
 						class="end-0">
 						<a
 							href="{{ path('app_super_admin') }}" class="btn shadow bg-dark "
@@ -81,10 +82,11 @@
 
 		{% elseif pageLevel is same as('productLine') %}
 
-			{% if  is_granted('ROLE_ADMIN') %}
+			{% if is_granted('ROLE_ADMIN') %}
 				<div
 					class='my-3'>
 					<aside
+						aria-label="zone admin page access"
 						class="end-0">
 						<a
 							href="{{ path('app_zone_admin', {zoneId: zone.id}) }}" class="btn shadow bg-dark "
@@ -139,6 +141,7 @@
 				<div
 					class='my-3'>
 					<aside
+						aria-label="Line admin page access"
 						class="end-0">
 						<a
 							href="{{ path('app_productLine_admin', {productLineId: productLine.id}) }}" class="btn shadow  bg-dark "
