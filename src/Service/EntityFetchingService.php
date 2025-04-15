@@ -315,7 +315,7 @@ class EntityFetchingService extends AbstractController
         $rawSuggestions = array_merge($firstnameSuggestions, $lastnameSuggestions);
         $suggestions = array_unique($rawSuggestions, SORT_REGULAR);
         $response = [];
-        foreach ($suggestions as $key => &$suggestionKey) {
+        foreach ($suggestions as &$suggestionKey) {
             if (isset($suggestionKey['id'])) {
                 $response[] = $this->operatorRepository->find($suggestionKey['id']);
             }
