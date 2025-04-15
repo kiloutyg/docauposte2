@@ -109,10 +109,9 @@ class AccountController extends AbstractController
             return $this->redirectToRoute('app_super_admin');
         }
         if ($request->isMethod('GET')) {
-
             return $this->render('services/account_services/modify_account_view.html.twig', [
                 'user'                  => $user,
-                'operatorSuggestions'   => $this->entityFetchingService->getOperatorSuggestionByUsername($user->getUsername()),
+                'operatorSuggestions'   => $this->entityFetchingService->getOperatorSuggestionByUsername($user->getUsername()) ?? null,
             ]);
         } else {
             return $this->modifyAccountPost($user, $request);

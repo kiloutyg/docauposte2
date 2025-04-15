@@ -6,6 +6,7 @@ use App\Entity\User;
 
 use App\Repository\UserRepository;
 use App\Repository\DepartmentRepository;
+use App\Repository\OperatorRepository;
 
 use App\Service\EntityDeletionService;
 
@@ -14,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -25,6 +27,7 @@ class AccountService extends AbstractController
 
     private $userRepository;
     private $departmentRepository;
+    private $operatorRepository;
 
     private $entityDeletionService;
 
@@ -40,6 +43,7 @@ class AccountService extends AbstractController
 
         UserRepository $userRepository,
         DepartmentRepository $departmentRepository,
+        OperatorRepository $operatorRepository,
 
         EntityDeletionService $entityDeletionService,
 
@@ -54,6 +58,7 @@ class AccountService extends AbstractController
     ) {
         $this->userRepository = $userRepository;
         $this->departmentRepository = $departmentRepository;
+        $this->operatorRepository = $operatorRepository;
 
         $this->entityDeletionService = $entityDeletionService;
 
@@ -146,6 +151,13 @@ class AccountService extends AbstractController
                 $user->setEmailAddress($request->request->get('emailAddress'));
                 $modified .= 'Adresse email, ';
             };
+            if ($request->request->get('operator') != '') {
+                $operator = $this->operatorRepository->find($request->request->get('operator'));
+                $this->logger->info('operator', [$operator]);
+                $user->setOperator($operator);
+                $modified .= 'Identité d\'opérateur liée, ';
+            }
+
             $errorsString = '';
             $errors = $this->validator->validate($user);
             if (count($errors) > 0) {

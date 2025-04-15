@@ -300,10 +300,27 @@ class EntityFetchingService extends AbstractController
     public function getOperatorSuggestionByUsername(string $username)
     {
 
-        if (!($response = $this->operatorRepository->findOneBy(['name' => $username]))) {
+        $explodedUsername = explode('.', $username);
+        $firstname = $explodedUsername[0] ?? null;
+        $lastname  = $explodedUsername[1] ?? null;
 
-            $suggestions = $this->operatorRepository->findByNameLikeForSuggestions($username);
+        if ($firstname) {
+            $firstnameSuggestions = $this->operatorRepository->findByNameLikeForSuggestions($firstname);
         }
+
+        if ($lastname) {
+            $lastnameSuggestions = $this->operatorRepository->findByNameLikeForSuggestions($lastname);
+        }
+
+        $rawSuggestions = array_merge($firstnameSuggestions, $lastnameSuggestions);
+        $suggestions = array_unique($rawSuggestions, SORT_REGULAR);
+        $response = [];
+        foreach ($suggestions as $key => &$suggestionKey) {
+            if (isset($suggestionKey['id'])) {
+                $response[] = $this->operatorRepository->find($suggestionKey['id']);
+            }
+        }
+
         return $response;
     }
 }

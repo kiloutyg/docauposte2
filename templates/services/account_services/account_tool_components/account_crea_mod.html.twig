@@ -12,7 +12,7 @@
 	</h3>
 
 	<form
-		class="form col-sm-10 col-md-9 col-lg-8 mx-auto"
+		class="form col-sm-11 col-md-10 col-lg-9 mx-auto"
 		method="POST"
 		action="{{path('app_account_modify_account', {userId: user.id})}}">
 
@@ -25,7 +25,7 @@
 			</strong>
 		</h3>
 		<form
-			class="form col-sm-10 col-md-9 col-lg-8 mx-auto"
+			class="form col-sm-11 col-md-10 col-lg-9 mx-auto"
 			method="POST"
 			action="{{ path('app_account_create') }}">
 		{% endif %}
@@ -88,39 +88,43 @@
 			class="form-control mb-3">
 			{% include 'services/account_services/role_affectation.html.twig' %}
 		</div>
+
 		{% if operatorSuggestions is defined and operatorSuggestions is not empty %}
+			{% if user.operator is defined and user.operator is not empty %}
+				{% set correspondingOperatorId = user.operator.id %}
+			{% endif %}
 			<div
 				class="form-control mb-3">
-
-				{% if operatorSuggestions|length > 1 %}
-					<label>
-						Select the corresponding Operator entity :
-					</label>
+				<label
+					class="form-label">
+					Select the corresponding Operator entity:
+				</label>
+				<div
+					class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2">
 					{% for operatorSuggestion in operatorSuggestions %}
-						{{operatorSuggestion.name}}
-						<input
-							aria-label="Select if true"
-							class="tooltips"
-							type="checkbox"
-							name="operator"
-							value="{{operatorSuggestion.id }}">
-					{% endfor %}
-				{% else %}
-					<label>
-						Is this the correct Operator entity :
-					</label>
-					{{operatorSuggestions.name}}
-					<input
-						aria-label="Select if true"
-						class="tooltips"
-						type="checkbox"
-						name="operator"
-						value="{{operatorSuggestions.id }}">
-				{% endif %}
+						<div
+							class="col">
+							<div
+								class="form-check border rounded">
+								<input
+									type="checkbox"
+									class="form-check-input"
+									name="operator"
+									id="operator-{{ operatorSuggestion.id }}"
+									value="{{operatorSuggestion.id }}" {% if correspondingOperatorId is defined and operatorSuggestion.id is same as correspondingOperatorId %} checked="true"
+									{% endif %}>
+								<label
+									class="form-check-label small"
+									for="operator-{{ operatorSuggestion.id }}">
+									{{operatorSuggestion.name}}
+								</label>
 
+							</div>
+						</div>
+					{% endfor %}
+				</div>
 			</div>
 		{% endif %}
-
 		<div
 			class="form-control mb-3">
 			<div>
