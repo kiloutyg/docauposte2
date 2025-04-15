@@ -259,7 +259,6 @@ class EntityDeletionService
             }
         } elseif ($entityType === 'team') {
             $unDefinedTeam = $this->teamRepository->findOneBy(['name' => 'INDEFINI']);
-            // $this->logger->info('UnDefined Team: ', [$unDefinedTeam]);
             foreach ($entity->getOperator() as $operator) {
                 $operator->setTeam($unDefinedTeam);
                 $this->em->persist($operator);

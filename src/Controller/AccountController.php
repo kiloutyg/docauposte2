@@ -142,15 +142,13 @@ class AccountController extends AbstractController
     #[Route(path: '/delete_account/block', name: 'block_account')]
     public function blockAccount(Request $request): Response
     {
-        $userId = $request->query->get('userId');
-        $originUrl = $request->headers->get('Referer');
         try {
-            $this->accountService->blockUser($userId);
+            $this->accountService->blockUser($this->userRepository->find($request->query->get('userId')));
             $this->addFlash('danger',  'Le compte a été bloqué, il ne peut pas être supprimé car il est lié à des incidents, des uploads, des validations ou des approbations.');
         } catch (\Exception $e) {
             $this->addFlash('danger',  'Le compte ne peut pas être bloqué : ' . $e->getMessage());
         }
-        return $this->redirect($originUrl);
+        return $this->redirectToRoute('app_super_admin');
     }
 
 
@@ -161,15 +159,13 @@ class AccountController extends AbstractController
     #[Route(path: '/delete_account/unblock_account', name: 'unblock_account')]
     public function unblockAccount(Request $request): Response
     {
-        $userId = $request->query->get('userId');
-        $originUrl = $request->headers->get('Referer');
         try {
-            $this->accountService->unblockUser($userId);
+            $this->accountService->unblockUser($this->userRepository->find($request->query->get('userId')));
             $this->addFlash('success',  'Le compte a été débloqué, vous devez réaffecter un Mot de passe et un Role à l\'utilisateur.');
         } catch (\Exception $e) {
             $this->addFlash('danger',  'Le compte ne peut pas être débloqué : ' . $e->getMessage());
         }
-        return $this->redirect($originUrl);
+        return $this->redirectToRoute('app_super_admin');
     }
 
 
@@ -180,16 +176,14 @@ class AccountController extends AbstractController
     #[Route(path: '/delete_account', name: 'delete_account')]
     public function deleteAccount(Request $request): Response
     {
-        $userId = $request->query->get('userId');
-        $originUrl = $request->headers->get('Referer');
         $username = $this->userRepository->find($userId)->getUsername();
         try {
-            $this->accountService->deleteUser($userId);
+            $this->entityDeletionService->deleteEntity('user', $request->query->get('userId'));
             $this->addFlash('success',  'Le compte de ' . $username . ' a été supprimé');
         } catch (\Exception $e) {
             $this->addFlash('danger',  'Le compte ne peut pas être supprimé : ' . $e->getMessage());
         }
-        return $this->redirect($originUrl);
+        return $this->redirectToRoute('app_super_admin');
     }
 
 
@@ -203,7 +197,7 @@ class AccountController extends AbstractController
         // Get the data from the request
         $data = json_decode($request->getContent(), true);
 
-        // Get the name of the department 
+        // Get the name of the department
         $departmentName = $data['department_name'] ?? null;
 
         // Get the existing department name
@@ -217,9 +211,9 @@ class AccountController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Ce service existe déjà']);
             // If the department does not exist, we create it
         } else {
-            $Department = new Department();
-            $Department->setName($departmentName);
-            $this->em->persist($Department);
+            $department = new Department();
+            $department->setName($departmentName);
+            $this->em->persist($department);
             $this->em->flush();
 
             return new JsonResponse(['success' => true, 'message' => 'Le service a été créé']);
@@ -231,16 +225,12 @@ class AccountController extends AbstractController
     public function departmentDeletion(int $departmentId, Request $request): Response
     {
         $entityType = "department";
-        $response = $this->entityDeletionService->deleteEntity($entityType, $departmentId);
-        $originUrl = $request->headers->get('referer');
-
-        if ($response == true) {
-
+        if ($this->entityDeletionService->deleteEntity($entityType, $departmentId)) {
             $this->addFlash('success', $entityType . ' has been deleted');
-            return $this->redirect($originUrl);
+            return $this->redirect($request->headers->get('referer'));
         } else {
             $this->addFlash('danger',  $entityType . '  does not exist');
-            return $this->redirect($originUrl);
+            return $this->redirect($request->headers->get('referer'));
         }
     }
 
@@ -248,12 +238,13 @@ class AccountController extends AbstractController
     #[Route('/delete_account/transfer_work/{userId}', name: 'transfer_work')]
     public function transferWork(Request $request, int $userId): Response
     {
-        $originUrl = $request->headers->get('Referer');
+        $originalUser = $this->userRepository->find($userId);
+        $recipient = $this->userRepository->find($request->request->get('work-transfer-recipient'));
         try {
-            $this->accountService->transferWork($request, $userId);
+            $this->accountService->transferWork($originalUser, $recipient);
         } catch (\Exception $e) {
             $this->addFlash('danger',  'Le travail n\'a pas pu être transféré : ' . $e->getMessage());
-            return $this->redirect($originUrl);
+            return $this->redirectToRoute('app_super_admin');
         }
         $this->addFlash('success', 'Le travail a été transféré');
         return $this->redirectToRoute('app_super_admin');
