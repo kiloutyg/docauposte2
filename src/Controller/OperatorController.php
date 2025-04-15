@@ -804,46 +804,15 @@ class OperatorController extends AbstractController
     {
         $parsedRequest = json_decode($request->getContent(), true);
 
-        $name = $parsedRequest['name'];
+        $rawSuggestions = $this->operatorRepository->findByNameLikeForSuggestions($parsedRequest['name']);
 
-        $rawSuggestions = $this->operatorRepository->findByNameLikeForSuggestions($name);
-        $this->logger->info('app_suggest_names Raw suggestions', $rawSuggestions);
-
-        $teams = $this->teamRepository->findAll();
-        $teamIndex = [];
-        foreach ($teams as $team) {
-            $teamIndex[$team->getId()] = $team->getName();
+        foreach ($rawSuggestions as &$suggestion) {
+            $suggestion['team_name'] = $suggestion['team_name'] ?? 'NoTeam';
+            $suggestion['uap_name'] = $suggestion['uap_name'] ?? 'NoUaps';
         }
-
-        $uaps = $this->uapRepository->findAll();
-        $uapIndex = [];
-        foreach ($uaps as $uap) {
-            $uapIndex[$uap->getId()] = $uap->getName();
-        }
-
-        foreach ($rawSuggestions as $key => &$suggestionKey) {
-            // Check and assign team name if available
-            if (isset($suggestionKey['team_id']) && isset($teamIndex[$suggestionKey['team_id']])) {
-                $suggestionKey['team_name'] = $teamIndex[$suggestionKey['team_id']];
-            } else {
-                $suggestionKey['team_name'] = 'NoTeam'; // Or handle it as appropriate
-            }
-
-            $this->logger->info('app_suggest_names suggestion operator entity', [$this->operatorRepository->find($suggestionKey['id'])]);
-            // TODO : Check how to display first UAP name if available
-            // Check and assign UAP name if available
-            if (isset($suggestionKey['uap_id']) && isset($uapIndex[$suggestionKey['uap_id']])) {
-                $suggestionKey['uap_name'] = $uapIndex[$suggestionKey['uap_id']];
-            } else {
-                $suggestionKey['uap_name'] = 'NoUAP'; // Or handle it as appropriate
-            }
-        }
-
-        // Serialize the entire array of entities at once using groups
-        $serializedSuggestions = json_encode($rawSuggestions);
 
         // Since $serializedSuggestions is a JSON string, return it directly with JsonResponse
-        return new JsonResponse($serializedSuggestions, 200, [], true);
+        return new JsonResponse(json_encode($rawSuggestions), 200, [], true);
     }
 
 
