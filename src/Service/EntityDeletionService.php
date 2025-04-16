@@ -127,78 +127,13 @@ class EntityDeletionService
     {
         $this->logger->info('deleteEntity: entityType: ' . $entityType . 'id: ' . $id);
 
-        // Get the repository for the entity type
-        $repository = null;
-        switch ($entityType) {
-            case 'zone':
-                $repository = $this->zoneRepository;
-                break;
-            case 'productLine':
-                $repository = $this->productLineRepository;
-                break;
-            case 'category':
-                $repository = $this->categoryRepository;
-                break;
-            case 'button':
-                $repository = $this->buttonRepository;
-                break;
-            case 'user':
-                $repository = $this->userRepository;
-                break;
-            case 'upload':
-                $repository = $this->uploadRepository;
-                break;
-            case 'incident':
-                $repository = $this->incidentRepository;
-                break;
-            case 'incidentCategory':
-                $repository = $this->incidentCategoryRepository;
-                break;
-            case 'department':
-                $repository = $this->departmentRepository;
-                break;
-            case 'validation':
-                $repository = $this->validationRepository;
-                break;
-            case 'oldUpload':
-                $repository = $this->OldUploadRepository;
-                break;
-            case 'operator':
-                $repository = $this->operatorRepository;
-                break;
-            case 'trainingRecord':
-                $repository = $this->trainingRecordRepository;
-                break;
-            case 'team':
-                $repository = $this->teamRepository;
-                break;
-            case 'uap':
-                $repository = $this->uapRepository;
-                break;
-            case 'trainer':
-                $repository = $this->trainerRepository;
-                break;
-            case 'products':
-                $repository = $this->productsRepository;
-                break;
-            case 'shiftLeaders':
-                $repository = $this->shiftLeadersRepository;
-                break;
-            default:
-                $this->logger->error('Invalid entity type');
-                throw new \Exception('Invalid entity type');
-        }
-        // If the repository is not found or the entity is not found in the database, return false
-        if (!$repository) {
-            $this->logger->error('Repository not found or entity not found in the database');
-            throw new \Exception('Repository not found or entity not found in the database');
-        }
-        // Get the entity from the database
-        $entity = $repository->find($id);
+        $entity = $this->entityObjectRetrieving($entityType, $id);
+
         if (!$entity) {
             $this->logger->error('Entity not found in the database');
-            throw new \Exception('Entity not found in the database');
+            throw new \InvalidArgumentException('Entity not found in the database');
         }
+
         $this->logger->info('to be deleted entity details: ', [$entity]);
 
         // Deletion logic for related entities, folder and files
@@ -211,7 +146,6 @@ class EntityDeletionService
             foreach ($entity->getCategories() as $category) {
                 $this->deleteEntity('category', $category->getId());
             }
-
             foreach ($entity->getIncidents() as $incident) {
                 $this->deleteEntity('incident', $incident->getId());
             }
@@ -253,7 +187,6 @@ class EntityDeletionService
                 $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $entity]);
                 $this->logger->info('trainerEntity details: ', [$trainerEntity]);
                 $this->logger->info('trainerEntity trainingRecords: ', [$trainerEntity->getTrainingRecords()]);
-
                 if (!$trainerEntity->getTrainingRecords()->isEmpty()) {
                     $entity->setToBeDeleted(new \DateTime('now'));
                     try {
@@ -272,7 +205,7 @@ class EntityDeletionService
             $trainer->removeTrainingRecord($entity);
         } elseif ($entityType === 'trainer') {
             if (!$entity->getTrainingRecords()->isEmpty()) {
-                throw new \Exception('Trainer has training records');
+                throw new \InvalidArgumentException('Trainer has training records');
             } else {
                 $entity->getOperator()->setIsTrainer(false);
             }
@@ -303,8 +236,9 @@ class EntityDeletionService
 
 
     // This function is responsible for the logic of deleting the uploads files
-    public function deleteFile(int $uploadId)
-    {
+    public function deleteFile(
+        int $uploadId
+    ) {
         $upload     = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         if ($upload->getOldUpload() != null) {
             $oldUploadId = $upload->getOldUpload()->getId();
@@ -336,8 +270,9 @@ class EntityDeletionService
 
 
     // This function is responsible for the logic of deleting the OldUploads files
-    public function deleteOldFile(int $oldUploadId)
-    {
+    public function deleteOldFile(
+        int $oldUploadId
+    ) {
 
         $oldUpload = $this->OldUploadRepository->findOneBy(['id' => $oldUploadId]);
 
@@ -347,6 +282,24 @@ class EntityDeletionService
         }
         $this->em->remove($oldUpload);
         $this->em->flush();
-        return;
+    }
+
+
+    public function entityObjectRetrieving(
+        string $entityType,
+        int $id
+    ): Object|Bool {
+
+        // Get the repository for the entity type
+        $repository = null;
+
+        $repositoryProperty = lcfirst($entityType) . 'Repository';
+        if (!property_exists($this, $repositoryProperty)) {
+            throw new \InvalidArgumentException("Repository not found for entity type: $repositoryProperty");
+        }
+        $repository = $this->$repositoryProperty;
+
+
+        return $repository->find($id);
     }
 }
