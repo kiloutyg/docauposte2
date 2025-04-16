@@ -34,8 +34,8 @@ class IluoController extends AbstractController
     private $authChecker;
     private $entityFetchingService;
     private $entityDeletionService;
-    private $productsService; // Used to call the methods in the services by the generalElementsFormManagement method
-    private $shiftLeadersService; // Used to call the methods in the services by the generalElementsFormManagement method
+    private $productsService;
+    private $shiftLeadersService;
     public function __construct(
         LoggerInterface                 $logger,
         AuthorizationCheckerInterface   $authChecker,
@@ -57,25 +57,13 @@ class IluoController extends AbstractController
 
 
     #[Route('admin', name: 'admin')]
-    public function baseAdminPageGet(): Response
+    public function baseAdminPageGet(Request $request): Response
     {
-        if ($this->authChecker->isGranted('ROLE_LINE_ADMIN')) {
+        if ($request->isMethod('GET') && $this->authChecker->isGranted('ROLE_LINE_ADMIN')) {
             return $this->render('/services/iluo/iluo_admin.html.twig');
         }
         $this->addFlash('warning', 'Accés non authorisé');
         return $this->redirectToRoute('app_base');
-    }
-
-    #[Route('admin/delete_entity/{entityType}/{entityId}', name: 'delete_entity')]
-    public function deleteIluoEntity(string $entityType, int $entityId)
-    {
-        try {
-            $this->entityDeletionService->deleteEntity($entityType, $entityId);
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Issue while trying to delete the entity' . $e->getMessage());
-        } finally {
-            return $this->redirectToRoute('app_iluo_admin');
-        }
     }
 
 
@@ -153,25 +141,19 @@ class IluoController extends AbstractController
             try {
                 // Convert entityType to service property name (e.g., 'shiftLeaders' -> 'shiftLeadersService')
                 $serviceProperty = lcfirst($entityType) . 'Service';
-
                 if (!property_exists($this, $serviceProperty)) {
                     throw new \InvalidArgumentException("Service not found for entity type: $entityType");
                 }
-
-                // Get the appropriate service
                 $service = $this->$serviceProperty;
 
-                // Build the method name (e.g., 'shiftLeadersCreationFormProcessing')
+                // Call the appropriate method
                 $methodName = lcfirst($entityType) . 'CreationFormProcessing';
-
                 if (!method_exists($service, $methodName)) {
                     throw new \InvalidArgumentException("Method $methodName not found in service");
                 }
 
-                // Call the appropriate method
                 $entityName = $service->$methodName($form);
                 $this->addFlash('success', "L'entité $entityName a bien été ajoutée.");
-                
             } catch (\Exception $e) {
                 $this->logger->error('Issue in form submission', [$e->getMessage()]);
                 $this->addFlash('error', 'Issue in form submission ' . $e->getMessage());
@@ -180,8 +162,31 @@ class IluoController extends AbstractController
             $this->logger->error('Invalid form', [$form->getErrors()]);
             $this->addFlash('error', 'Invalid form ' . $form->getErrors());
         }
+
+        return $this->redirectToRoute($this->routeNameDetermination($entityType));
+    }
+
+
+    #[Route('admin/delete_entity/{entityType}/{entityId}', name: 'delete_entity')]
+    public function deleteIluoEntity(string $entityType, int $entityId)
+    {
+        $this->logger->debug('Deleting entity of type: ' . $entityType . 'with id: ' . $entityId);
+        try {
+            $this->entityDeletionService->deleteEntity($entityType, $entityId);
+            $this->addFlash('success', 'Le ' . $entityType . ' a bien été supprimé.');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Issue while trying to delete the entity' . $e->getMessage());
+            $this->logger->error('Error while deleting entity', [$e->getMessage()]);
+        } finally {
+            return $this->redirectToRoute($this->routeNameDetermination($entityType));
+        }
+    }
+
+
+    public function routeNameDetermination(string $entityType): string
+    {
         $route = 'app_iluo_' . strtolower($entityType) . '_general_elements_admin';
         $this->logger->info('Redirecting to route', [$route]);
-        return $this->redirectToRoute($route);
+        return $route;
     }
 }

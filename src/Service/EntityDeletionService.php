@@ -4,6 +4,7 @@
 
 namespace App\Service;
 
+use App\Entity\ShiftLeaders;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Psr\Log\LoggerInterface;
@@ -22,6 +23,7 @@ use App\Repository\OldUploadRepository;
 use App\Repository\OperatorRepository;
 use App\Repository\ProductLineRepository;
 use App\Repository\ProductsRepository;
+use App\Repository\ShiftLeadersRepository;
 use App\Repository\TeamRepository;
 use App\Repository\TrainerRepository;
 use App\Repository\TrainingRecordRepository;
@@ -53,6 +55,7 @@ class EntityDeletionService
     private $operatorRepository;
     private $productLineRepository;
     private $productsRepository;
+    private $shiftLeadersRepository;
     private $teamRepository;
     private $trainerRepository;
     private $trainingRecordRepository;
@@ -81,6 +84,7 @@ class EntityDeletionService
         OperatorRepository                  $operatorRepository,
         ProductLineRepository               $productLineRepository,
         ProductsRepository                  $productsRepository,
+        ShiftLeadersRepository              $shiftLeadersRepository,
         TeamRepository                      $teamRepository,
         TrainerRepository                   $trainerRepository,
         TrainingRecordRepository            $trainingRecordRepository,
@@ -107,6 +111,7 @@ class EntityDeletionService
         $this->operatorRepository           = $operatorRepository;
         $this->productLineRepository        = $productLineRepository;
         $this->productsRepository           = $productsRepository;
+        $this->shiftLeadersRepository       = $shiftLeadersRepository;
         $this->teamRepository               = $teamRepository;
         $this->trainerRepository            = $trainerRepository;
         $this->trainingRecordRepository     = $trainingRecordRepository;
@@ -120,6 +125,8 @@ class EntityDeletionService
     // This function is responsible for deleting an entity and its related entities from the database and the server filesystem
     public function deleteEntity(string $entityType, int $id): bool
     {
+        $this->logger->info('deleteEntity: entityType: ' . $entityType . 'id: ' . $id);
+
         // Get the repository for the entity type
         $repository = null;
         switch ($entityType) {
@@ -174,15 +181,23 @@ class EntityDeletionService
             case 'products':
                 $repository = $this->productsRepository;
                 break;
+            case 'shiftLeaders':
+                $repository = $this->shiftLeadersRepository;
+                break;
+            default:
+                $this->logger->error('Invalid entity type');
+                throw new \Exception('Invalid entity type');
         }
         // If the repository is not found or the entity is not found in the database, return false
         if (!$repository) {
-            return false;
+            $this->logger->error('Repository not found or entity not found in the database');
+            throw new \Exception('Repository not found or entity not found in the database');
         }
         // Get the entity from the database
         $entity = $repository->find($id);
         if (!$entity) {
-            return false;
+            $this->logger->error('Entity not found in the database');
+            throw new \Exception('Entity not found in the database');
         }
         $this->logger->info('to be deleted entity details: ', [$entity]);
 
@@ -241,9 +256,13 @@ class EntityDeletionService
 
                 if (!$trainerEntity->getTrainingRecords()->isEmpty()) {
                     $entity->setToBeDeleted(new \DateTime('now'));
-                    $this->em->persist($entity);
-                    $this->em->flush();
-                    return false;
+                    try {
+                        $this->em->persist($entity);
+                        $this->em->flush();
+                    } catch (\Exception $e) {
+                        $this->logger->error('Error deleting department: ', [$e->getMessage()]);
+                        throw $e;
+                    }
                 } else {
                     $this->deleteEntity('trainer', $trainerEntity->getId());
                 }
@@ -253,7 +272,7 @@ class EntityDeletionService
             $trainer->removeTrainingRecord($entity);
         } elseif ($entityType === 'trainer') {
             if (!$entity->getTrainingRecords()->isEmpty()) {
-                return false;
+                throw new \Exception('Trainer has training records');
             } else {
                 $entity->getOperator()->setIsTrainer(false);
             }
@@ -271,10 +290,14 @@ class EntityDeletionService
             }
         }
         $this->logger->info('deleted entity details: ', [$entity]);
-        $this->em->remove($entity);
-        $this->em->flush();
-
-        return true;
+        try {
+            $this->em->remove($entity);
+            $this->em->flush();
+            return true;
+        } catch (\Exception $e) {
+            $this->logger->error('Error deleting entity: ', [$e->getMessage()]);
+            throw $e;
+        }
     }
 
 

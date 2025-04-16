@@ -42,7 +42,8 @@ const initConfirmations = () => {
     { selector: ".delete-uap", message: "Êtes vous sûr de vouloir supprimer cet UAP?" },
     { selector: ".delete-operator", message: "Êtes vous sûr de vouloir supprimer cet Opérateur?" },
     { selector: ".submit-operator-modification", message: "Êtes vous sûr de vouloir soumettre ces modifications?" },
-    { selector: ".delete-products", message: "Êtes vous sûr de vouloir supprimer ce Produit?" }
+    { selector: ".delete-products", message: "Êtes vous sûr de vouloir supprimer ce Produit?" },
+    { selector: ".delete-shiftLeaders", message: "Êtes vous sûr de vouloir enlever cet utilisateur de la liste des ShiftLeaders?" },
   ];
 
   // Attach all confirmations

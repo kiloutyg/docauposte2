@@ -25,6 +25,7 @@ class ProductType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Nom du Produit',
                 'label_attr' => [
+                    'class' => 'form-label fs-4',
                     'style' => 'color: #ffffff;'
                 ],
                 'attr' => [

@@ -93,21 +93,15 @@ p {
     font-family: "Fira Sans", sans-serif;
 }
 
-// form {
-//     display: table;
-// }
+form {
+    display: table;
+}
 
-label,
 input {
     display: table-cell;
     margin-bottom: 10px;
-    margin: 0.6rem;
 }
 
-label {
-    padding-right: 10px;
-    margin: 5%;
-}
 
 legend {
     background-color: #000;
@@ -455,11 +449,15 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
 }
 
 
+/* Create a new class for tooltip functionality without changing button appearance */
 .tooltips {
     position: relative;
     /* les .tooltips deviennent référents */
     cursor: help;
-    /* Rounded corners */
+}
+
+/* Add a separate class for circular tooltips */
+.tooltips-circle {
     border-radius: 50%;
 }
 
@@ -485,8 +483,8 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
     font-size: 1.2rem;
 }
 
-[aria-label]:hover:before,
-[aria-label]:focus:before {
+.tooltips[aria-label]:hover:before,
+.tooltips[aria-label]:focus:before {
     content: "▼";
     position: absolute;
     top: -1em;
@@ -498,7 +496,7 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
 }
 
 /* pas de contour durant le :focus */
-[aria-label]:focus {
+.tooltips[aria-label]:focus {
     outline: none;
 }
 

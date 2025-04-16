@@ -26,7 +26,7 @@ class ShiftLeadersType extends AbstractType
 
         $builder
             ->add('user', EntityType::class, [
-                'label' => 'Manager',
+                'label' => 'Désignation Manager',
                 'class' => User::class,
                 'choice_label' => 'username',
                 'query_builder' => function (EntityRepository $er) {
@@ -38,7 +38,7 @@ class ShiftLeadersType extends AbstractType
                         ->orderBy('u.username', 'ASC');
                 },
                 'label_attr' => [
-                    'class' => 'form-label',
+                    'class' => 'form-label fs-4',
                     'style' => 'color: #ffffff;'
                 ],
                 'placeholder' => 'Ajouter un Shift-Leader :',
