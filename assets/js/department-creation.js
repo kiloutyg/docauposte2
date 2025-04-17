@@ -1,7 +1,10 @@
 
 import { getEntityData } from './server-variable.js';
+
 // Declaring variable 
 let departmentsData = null;
+
+// Function to fetch department data
 // // Event listener to fetch department data and initialize cascading dropdowns
 document.addEventListener("turbo:load", function () {
   getEntityData()
@@ -17,6 +20,8 @@ document.addEventListener("turbo:load", function () {
       console.error('error catching server variable', error)
     });
 });
+
+
 
 // This line declares a variable named departmentsData without assigning it a value.
 
@@ -86,6 +91,8 @@ function initCascadingDropdowns() {
     resetDropdowns();
   }
 }
+
+
 
 // This is a function named initCascadingDropdowns that initializes the cascading dropdowns. 
 // It first gets the dropdown element with the id "department". 
@@ -268,4 +275,3 @@ function createSelectElement() {
     createNewSelect(e.target.value, e.target.id);
   });
 }
-
