@@ -72,10 +72,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'Creator', targetEntity: Button::class)]
     private Collection $buttons;
 
-    #[ORM\OneToOne(mappedBy: 'user', targetEntity: ShiftLeaders::class)]
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: ShiftLeaders::class, cascade: ['remove'])]
     private ?ShiftLeaders $shiftLeader = null;
 
-    #[ORM\OneToOne(mappedBy: 'user', targetEntity: QualityRep::class)]
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: QualityRep::class, cascade: ['remove'])]
     private ?QualityRep $qualityRep = null;
 
     #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]

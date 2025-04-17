@@ -76,7 +76,7 @@
 											id="modify_user_account"
 											href="{{path('app_account_modify_account', {userId: shiftLeader.user.id})}}" aria-label="Modify the User Entity"
 											data-turbo-frame="_top"
-											class="btn btn-info m-1 tooltips">
+											class="btn btn-info m-1 tooltips-above">
 											<span
 												class="d-none d-md-inline">
 												UserMod
@@ -91,9 +91,9 @@
 											</span>
 										</a>
 										<a
-											href="{{path('app_iluo_delete_entity', {'entityType': 'shiftLeaders', 'entityId': shiftLeader.id})}}" data-turbo-frame="_top"
+											href="{{path('app_iluo_delete_entity', {'entityType': 'shiftLeaders', 'entityId': shiftLeader.id})}}" 
 											aria-label="Delete the ShiftLeader Entity, not the User"
-											class="btn btn-danger delete-shiftLeaders shadow tooltips">
+											class="btn btn-danger delete-shiftLeaders shadow tooltips-above">
 											<span
 												class="d-none d-md-inline">
 												Supprimer

@@ -54,7 +54,7 @@ class Operator
 
     #[ORM\Column(nullable: true)]
     #[Groups(['operator_details'])]
-    private ?bool $IsTrainer = null;
+    private ?bool $isTrainer = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $lasttraining = null;
@@ -83,7 +83,7 @@ class Operator
     #[ORM\Column(nullable: true, enumType: EmploymentType::class)]
     private ?EmploymentType $employmentType = null;
 
-    #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist'])]
     private ?User $user = null;
 
 
@@ -218,12 +218,12 @@ class Operator
 
     public function isIsTrainer(): ?bool
     {
-        return $this->IsTrainer;
+        return $this->isTrainer;
     }
 
-    public function setIsTrainer(?bool $IsTrainer): static
+    public function setIsTrainer(?bool $isTrainer): static
     {
-        $this->IsTrainer = $IsTrainer;
+        $this->isTrainer = $isTrainer;
 
         return $this;
     }

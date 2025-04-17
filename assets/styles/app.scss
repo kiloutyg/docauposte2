@@ -450,20 +450,20 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
 
 
 /* Create a new class for tooltip functionality without changing button appearance */
-.tooltips {
+.tooltips-above {
     position: relative;
-    /* les .tooltips deviennent référents */
+    /* les .tooltips-above deviennent référents */
     cursor: help;
 }
 
-/* Add a separate class for circular tooltips */
-.tooltips-circle {
+/* Add a separate class for circular tooltips-above */
+.tooltips-above-circle {
     border-radius: 50%;
 }
 
 /* Generate ::after pseudo-element on hover and focus */
-.tooltips:hover::after,
-.tooltips:focus::after {
+.tooltips-above:hover::after,
+.tooltips-above:focus::after {
     /* Display the content of the aria-label attribute */
     content: attr(aria-label);
     /* on affiche aria-label */
@@ -483,8 +483,8 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
     font-size: 1.2rem;
 }
 
-.tooltips[aria-label]:hover:before,
-.tooltips[aria-label]:focus:before {
+.tooltips-above[aria-label]:hover:before,
+.tooltips-above[aria-label]:focus:before {
     content: "▼";
     position: absolute;
     top: -1em;
@@ -496,11 +496,61 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
 }
 
 /* pas de contour durant le :focus */
-.tooltips[aria-label]:focus {
+.tooltips-above[aria-label]:focus {
     outline: none;
 }
 
 
+/* Create a new class for tooltip functionality without changing button appearance */
+.tooltips-below {
+    position: relative;
+    /* les .tooltips-above deviennent référents */
+    cursor: help;
+}
+
+/* Add a separate class for circular tooltips-above */
+.tooltips-below-circle {
+    border-radius: 50%;
+}
+
+/* Generate ::after pseudo-element on hover and focus */
+.tooltips-below:hover::after,
+.tooltips-below:focus::after {
+    /* Display the content of the aria-label attribute */
+    content: attr(aria-label);
+    /* on affiche aria-label */
+    position: absolute;
+    top: -2.4em;
+    left: 50%;
+    transform: translateX(-50%);
+    /* on centre horizontalement  */
+    z-index: 1;
+    /* pour s'afficher au dessus des éléments en position relative */
+    white-space: nowrap;
+    /* Allow text to wrap */
+    padding: 5px 14px;
+    background: #413219;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 1.2rem;
+}
+
+.tooltips-below[aria-label]:hover:before,
+.tooltips-below[aria-label]:focus:before {
+    content: "▼";
+    position: absolute;
+    top: -1em;
+    left: 50%;
+    transform: translateX(-50%);
+    /* on centre horizontalement  */
+    font-size: 20px;
+    color: #413219;
+}
+
+/* pas de contour durant le :focus */
+.tooltips-below[aria-label]:focus {
+    outline: none;
+}
 
 .pretty-toggle {
     --s: 25px;

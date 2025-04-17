@@ -15,7 +15,7 @@ class ShiftLeaders
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'shiftLeader', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'shiftLeader', cascade: ['persist'])]
     private ?User $user = null;
 
     /**

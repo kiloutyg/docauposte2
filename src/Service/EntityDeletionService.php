@@ -23,6 +23,7 @@ use App\Repository\OldUploadRepository;
 use App\Repository\OperatorRepository;
 use App\Repository\ProductLineRepository;
 use App\Repository\ProductsRepository;
+use App\Repository\QualityRepRepository;
 use App\Repository\ShiftLeadersRepository;
 use App\Repository\TeamRepository;
 use App\Repository\TrainerRepository;
@@ -55,6 +56,7 @@ class EntityDeletionService
     private $operatorRepository;
     private $productLineRepository;
     private $productsRepository;
+    private $qualityRepRepository;
     private $shiftLeadersRepository;
     private $teamRepository;
     private $trainerRepository;
@@ -84,6 +86,7 @@ class EntityDeletionService
         OperatorRepository                  $operatorRepository,
         ProductLineRepository               $productLineRepository,
         ProductsRepository                  $productsRepository,
+        QualityRepRepository                $qualityRepRepository,
         ShiftLeadersRepository              $shiftLeadersRepository,
         TeamRepository                      $teamRepository,
         TrainerRepository                   $trainerRepository,
@@ -111,6 +114,7 @@ class EntityDeletionService
         $this->operatorRepository           = $operatorRepository;
         $this->productLineRepository        = $productLineRepository;
         $this->productsRepository           = $productsRepository;
+        $this->qualityRepRepository         = $qualityRepRepository;
         $this->shiftLeadersRepository       = $shiftLeadersRepository;
         $this->teamRepository               = $teamRepository;
         $this->trainerRepository            = $trainerRepository;
@@ -125,7 +129,7 @@ class EntityDeletionService
     // This function is responsible for deleting an entity and its related entities from the database and the server filesystem
     public function deleteEntity(string $entityType, int $id): bool
     {
-        $this->logger->info('deleteEntity: entityType: ' . $entityType . 'id: ' . $id);
+        $this->logger->debug('deleteEntity: entityType: ' . $entityType . 'id: ' . $id);
 
         $entity = $this->entityObjectRetrieving($entityType, $id);
 
@@ -134,7 +138,7 @@ class EntityDeletionService
             throw new \InvalidArgumentException('Entity not found in the database');
         }
 
-        $this->logger->info('to be deleted entity details: ', [$entity]);
+        $this->logger->debug('to be deleted entity details: ', [$entity]);
 
         // Deletion logic for related entities, folder and files
         if ($entityType === 'zone') {
@@ -185,8 +189,8 @@ class EntityDeletionService
             }
             if ($entity->isIsTrainer()) {
                 $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $entity]);
-                $this->logger->info('trainerEntity details: ', [$trainerEntity]);
-                $this->logger->info('trainerEntity trainingRecords: ', [$trainerEntity->getTrainingRecords()]);
+                $this->logger->debug('trainerEntity details: ', [$trainerEntity]);
+                $this->logger->debug('trainerEntity trainingRecords: ', [$trainerEntity->getTrainingRecords()]);
                 if (!$trainerEntity->getTrainingRecords()->isEmpty()) {
                     $entity->setToBeDeleted(new \DateTime('now'));
                     try {
@@ -222,7 +226,7 @@ class EntityDeletionService
                 $this->em->persist($operator);
             }
         }
-        $this->logger->info('deleted entity details: ', [$entity]);
+        $this->logger->debug('deleted entity details: ', [$entity]);
         try {
             $this->em->remove($entity);
             $this->em->flush();

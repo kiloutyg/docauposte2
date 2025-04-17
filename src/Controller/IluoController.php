@@ -26,6 +26,7 @@ use App\Form\QualityRepType;
 use App\Service\EntityFetchingService;
 use App\Service\EntityDeletionService;
 use App\Service\ProductsService;
+use App\Service\QualityRepService;
 use App\Service\ShiftLeadersService;
 
 
@@ -37,15 +38,17 @@ class IluoController extends AbstractController
     private $entityFetchingService;
     private $entityDeletionService;
     private $productsService;
+    private $qualityRepService;
     private $shiftLeadersService;
     public function __construct(
         LoggerInterface                 $logger,
         AuthorizationCheckerInterface   $authChecker,
 
-        EntityFetchingService           $entityFetchingService,
-        EntityDeletionService           $entityDeletionService,
-        ProductsService                 $productsService,
-        ShiftLeadersService             $shiftLeadersService
+        EntityFetchingService               $entityFetchingService,
+        EntityDeletionService               $entityDeletionService,
+        ProductsService                     $productsService,
+        QualityRepService                   $qualityRepService,
+        ShiftLeadersService                 $shiftLeadersService
     ) {
         $this->logger                       = $logger;
         $this->authChecker                  = $authChecker;
@@ -53,6 +56,7 @@ class IluoController extends AbstractController
         $this->entityFetchingService        = $entityFetchingService;
         $this->entityDeletionService        = $entityDeletionService;
         $this->productsService              = $productsService;
+        $this->qualityRepService            = $qualityRepService;
         $this->shiftLeadersService          = $shiftLeadersService;
     }
 
@@ -136,12 +140,13 @@ class IluoController extends AbstractController
     #[Route('admin/qualityrep_general_elements', name: 'qualityrep_general_elements_admin')]
     public function qualityRepGeneralElementsAdminPageGet(Request $request): Response
     {
+        $this->logger->debug('qualityRep form submitted', [$request->request->all()]);
         $qualityRep = $this->entityFetchingService->getQualityRep();
         $newQualityRep = new QualityRep;
         $qualityRepForm = $this->createForm(QualityRepType::class, $newQualityRep);
         if ($request->isMethod('POST')) {
             $this->logger->info('qualityRep form submitted', [$request->request->all()]);
-            return $this->generalElementsFormManagement('shiftLeaders', $qualityRepForm, $request);
+            return $this->generalElementsFormManagement('qualityRep', $qualityRepForm, $request);
         }
         return $this->render('/services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_qualityrep_general_elements_admin.html.twig', [
             'qualityRepForm' => $qualityRepForm->createView(),
@@ -189,8 +194,8 @@ class IluoController extends AbstractController
             $this->entityDeletionService->deleteEntity($entityType, $entityId);
             $this->addFlash('success', 'Le ' . $entityType . ' a bien été supprimé.');
         } catch (\Exception $e) {
-            $this->addFlash('error', 'Issue while trying to delete the entity' . $e->getMessage());
-            $this->logger->error('Error while deleting entity', [$e->getMessage()]);
+            $this->addFlash('error', 'Issue while trying to delete the entity ' . $e->getMessage());
+            $this->logger->error('Error while deleting entity ', [$e->getMessage()]);
         } finally {
             return $this->redirectToRoute($this->routeNameDetermination($entityType));
         }
