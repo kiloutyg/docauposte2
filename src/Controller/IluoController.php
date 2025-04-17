@@ -79,7 +79,6 @@ class IluoController extends AbstractController
     }
 
 
-
     #[Route('admin/checklist', name: 'checklist_admin')]
     public function checklistAdminPageGet(Request $request): Response
     {
@@ -88,7 +87,6 @@ class IluoController extends AbstractController
         }
         return $this->redirectToRoute('app_base');
     }
-
 
 
     #[Route('admin/workstation', name: 'workstation_admin')]
@@ -134,6 +132,7 @@ class IluoController extends AbstractController
         ]);
     }
 
+
     #[Route('admin/qualityrep_general_elements', name: 'qualityrep_general_elements_admin')]
     public function qualityRepGeneralElementsAdminPageGet(Request $request): Response
     {
@@ -150,6 +149,7 @@ class IluoController extends AbstractController
         ]);
     }
 
+
     public function generalElementsFormManagement(string $entityType, Form $form, Request $request): Response
     {
         $this->logger->info('generalElementsFormManagement', [$entityType, $form, $request]);
@@ -162,13 +162,11 @@ class IluoController extends AbstractController
                     throw new \InvalidArgumentException("Service not found for entity type: $entityType");
                 }
                 $service = $this->$serviceProperty;
-
                 // Call the appropriate method
                 $methodName = lcfirst($entityType) . 'CreationFormProcessing';
                 if (!method_exists($service, $methodName)) {
                     throw new \InvalidArgumentException("Method $methodName not found in service");
                 }
-
                 $entityName = $service->$methodName($form);
                 $this->addFlash('success', "L'entité $entityName a bien été ajoutée.");
             } catch (\Exception $e) {
@@ -179,7 +177,6 @@ class IluoController extends AbstractController
             $this->logger->error('Invalid form', [$form->getErrors()]);
             $this->addFlash('error', 'Invalid form ' . $form->getErrors());
         }
-
         return $this->redirectToRoute($this->routeNameDetermination($entityType));
     }
 
