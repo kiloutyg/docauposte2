@@ -34,7 +34,6 @@
 								scope="col">
 								Supprimer
 							</th>
-
 						</tr>
 					</thead>
 					<tbody>
@@ -49,18 +48,7 @@
 										{{ user.roles|json_encode|convert_encoding('UTF-8', 'UTF-8') }}
 									</td>
 									<td>
-										{% set matchingDepartments ="" %}
-
-										{% if user.department is not null %}
-											{% for department in departments %}
-												{% if user.department.id is same as(department.id) %}
-													{{department.name|upper}}
-												{% endif %}
-											{% endfor %}
-
-										{% else %}
-											inconnu
-										{% endif %}
+										{{user.department.name ?? 'inconnu' }}
 									</td>
 									<td>
 										{% if user.emailAddress %}
@@ -69,7 +57,6 @@
 											inconnu
 										{% endif %}
 									</td>
-
 									<td>
 										<a
 											href="{{path('app_account_modify_account', {userId: user.id})}}" class="btn btn-danger">
@@ -89,7 +76,6 @@
 													Supprimer definitivement
 												</a>
 											{% endif %}
-
 										{% else %}
 											<a
 												href="{{path('app_account_block_account', {userId: user.id})}}" class="btn btn-danger delete-user">

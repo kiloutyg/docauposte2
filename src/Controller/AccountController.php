@@ -3,10 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Entity\Department;
 
 use App\Repository\UserRepository;
-use App\Repository\DepartmentRepository;
 
 use App\Service\AccountService;
 use App\Service\EntityFetchingService;
@@ -20,12 +18,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Symfony\Component\Routing\Annotation\Route;
-
-use Symfony\Component\Security\Core\User\UserInterface;
-
 
 #[Route('/account', name: 'app_account_')]
 class AccountController extends AbstractController
@@ -35,8 +29,6 @@ class AccountController extends AbstractController
     private $em;
 
     private $userRepository;
-    private $departmentRepository;
-
     private $accountService;
     private $entityFetchingService;
     private $entityDeletionService;
@@ -48,7 +40,6 @@ class AccountController extends AbstractController
         EntityManagerInterface $em,
 
         UserRepository $userRepository,
-        DepartmentRepository $departmentRepository,
 
         AccountService $accountService,
         EntityFetchingService $entityFetchingService,
@@ -60,7 +51,6 @@ class AccountController extends AbstractController
         $this->em = $em;
 
         $this->userRepository = $userRepository;
-        $this->departmentRepository = $departmentRepository;
 
         $this->accountService = $accountService;
         $this->entityFetchingService = $entityFetchingService;
@@ -87,14 +77,10 @@ class AccountController extends AbstractController
         return $this->render(
             '/services/account_services/create_account.html.twig',
             [
-                'departments' => $this->entityFetchingService->getDepartments(),
                 'users'       => $this->entityFetchingService->getUsers(),
             ]
         );
     }
-
-
-
 
 
 
@@ -176,10 +162,9 @@ class AccountController extends AbstractController
     #[Route(path: '/delete_account', name: 'delete_account')]
     public function deleteAccount(Request $request): Response
     {
-        $username = $this->userRepository->find($userId)->getUsername();
         try {
             $this->entityDeletionService->deleteEntity('user', $request->query->get('userId'));
-            $this->addFlash('success',  'Le compte de ' . $username . ' a été supprimé');
+            $this->addFlash('success',  'Le compte de ' . $this->userRepository->find($request->query->get('userId'))->getUsername() . ' a été supprimé');
         } catch (\Exception $e) {
             $this->addFlash('danger',  'Le compte ne peut pas être supprimé : ' . $e->getMessage());
         }
@@ -190,49 +175,7 @@ class AccountController extends AbstractController
 
 
 
-    // Logic to create a new department and display a message
-    #[Route('/department/department_creation', name: 'department_creation')]
-    public function departmentCreation(Request $request): JsonResponse
-    {
-        // Get the data from the request
-        $data = json_decode($request->getContent(), true);
 
-        // Get the name of the department
-        $departmentName = $data['department_name'] ?? null;
-
-        // Get the existing department name
-        $existingDepartment = $this->departmentRepository->findOneBy(['name' => $departmentName]);
-
-        // Check if the department name is empty or if the department already exists
-        if (empty($departmentName)) {
-            return new JsonResponse(['success' => false, 'message' => 'Le nom du service ne peut pas être vide']);
-        }
-        if ($existingDepartment) {
-            return new JsonResponse(['success' => false, 'message' => 'Ce service existe déjà']);
-            // If the department does not exist, we create it
-        } else {
-            $department = new Department();
-            $department->setName($departmentName);
-            $this->em->persist($department);
-            $this->em->flush();
-
-            return new JsonResponse(['success' => true, 'message' => 'Le service a été créé']);
-        }
-    }
-
-    // Create a route for department deletion. It depends on the entitydeletionService.
-    #[Route('/department/department_deletion/{departmentId}', name: 'department_deletion')]
-    public function departmentDeletion(int $departmentId, Request $request): Response
-    {
-        $entityType = "department";
-        if ($this->entityDeletionService->deleteEntity($entityType, $departmentId)) {
-            $this->addFlash('success', $entityType . ' has been deleted');
-            return $this->redirect($request->headers->get('referer'));
-        } else {
-            $this->addFlash('danger',  $entityType . '  does not exist');
-            return $this->redirect($request->headers->get('referer'));
-        }
-    }
 
     // Create a route to allow transmission of work to another user before deleting the account with the delete_account method
     #[Route('/delete_account/transfer_work/{userId}', name: 'transfer_work')]

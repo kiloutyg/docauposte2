@@ -115,7 +115,7 @@ function resetDropdowns() {
   }
 }
 
-// This is a function named resetDropdowns that resets the dropdown with the id "department" to its default value by setting the selectedIndex property to 0.
+
 
 // Function to create a new department
 document.addEventListener("turbo:load", function () {
@@ -130,7 +130,7 @@ document.addEventListener("turbo:load", function () {
 
       // Create a new XMLHttpRequest object
       let xhr = new XMLHttpRequest();
-      xhr.open("POST", "/docauposte/account/department/department_creation");
+      xhr.open("POST", "/docauposte/department/creation");
       xhr.setRequestHeader("Content-Type", "application/json");
 
       // Set the onload event handler for the XMLHttpRequest
