@@ -5,6 +5,10 @@
 	|
 	{{ parent() }}
 {% endblock %}
+{% block javascript %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('department-creation') }}
+{% endblock %}
 {% block body %}
 	<div
 		class="card border-0 shadow rounded-3  my-3">

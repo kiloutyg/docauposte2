@@ -8,9 +8,7 @@
 			{{user.username|capitalize|split('.')|first }}
 			{{user.username|upper|split('.')|last }}
 		</strong>
-
 	</h3>
-
 	<form
 		class="form col-sm-11 col-md-10 col-lg-9 mx-auto"
 		method="POST"
@@ -86,7 +84,7 @@
 		</div>
 		<div
 			class="form-control mb-3">
-			{% include 'services/account_services/role_affectation.html.twig' %}
+			{% include 'services/account_services/account_tool_components/role_affectation.html.twig' %}
 		</div>
 
 		{% if operatorSuggestions is defined and operatorSuggestions is not empty %}
