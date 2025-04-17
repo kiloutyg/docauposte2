@@ -25,6 +25,7 @@ use App\Repository\TrainerRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
 use App\Repository\ProductsRepository;
+use App\Repository\QualityRepRepository;
 use Doctrine\Common\Collections\Collection;
 use Psr\Log\LoggerInterface;
 
@@ -58,6 +59,7 @@ class EntityFetchingService extends AbstractController
     private $trainingRecordRepository;
     private $trainerRepository;
     private $productsRepository;
+    private $qualityRepRepository;
 
     public function __construct(
         LoggerInterface                 $logger,
@@ -65,48 +67,51 @@ class EntityFetchingService extends AbstractController
         CacheInterface $cache,
 
         ApprobationRepository           $approbationRepository,
-        ValidationRepository            $validationRepository,
+        ButtonRepository                $buttonRepository,
+        CategoryRepository              $categoryRepository,
         DepartmentRepository            $departmentRepository,
         IncidentCategoryRepository      $incidentCategoryRepository,
-        CategoryRepository              $categoryRepository,
-        ButtonRepository                $buttonRepository,
-        UploadRepository                $uploadRepository,
-        ZoneRepository                  $zoneRepository,
-        ProductLineRepository           $productLineRepository,
-        UserRepository                  $userRepository,
+        IncidentRepository              $incidentRepository,
         OldUploadRepository             $oldUploadRepository,
-        UapRepository                   $uapRepository,
-        TeamRepository                  $teamRepository,
         OperatorRepository              $operatorRepository,
+        ProductLineRepository           $productLineRepository,
+        ProductsRepository              $productsRepository,
+        QualityRepRepository            $qualityRepRepository,
         ShiftLeadersRepository          $shiftLeadersRepository,
+        TeamRepository                  $teamRepository,
         TrainingRecordRepository        $trainingRecordRepository,
         TrainerRepository               $trainerRepository,
-        IncidentRepository              $incidentRepository,
-        ProductsRepository              $productsRepository
+        UapRepository                   $uapRepository,
+        UserRepository                  $userRepository,
+        UploadRepository                $uploadRepository,
+        ValidationRepository            $validationRepository,
+        ZoneRepository                  $zoneRepository,
+
     ) {
         $this->logger                       = $logger;
 
         $this->cache = $cache;
 
-        $this->departmentRepository         = $departmentRepository;
         $this->approbationRepository        = $approbationRepository;
-        $this->validationRepository         = $validationRepository;
+        $this->buttonRepository             = $buttonRepository;
+        $this->categoryRepository           = $categoryRepository;
+        $this->departmentRepository         = $departmentRepository;
         $this->incidentCategoryRepository   = $incidentCategoryRepository;
         $this->incidentRepository           = $incidentRepository;
-        $this->uploadRepository             = $uploadRepository;
-        $this->zoneRepository               = $zoneRepository;
-        $this->productLineRepository        = $productLineRepository;
-        $this->userRepository               = $userRepository;
-        $this->categoryRepository           = $categoryRepository;
-        $this->buttonRepository             = $buttonRepository;
         $this->oldUploadRepository          = $oldUploadRepository;
-        $this->uapRepository                = $uapRepository;
-        $this->teamRepository               = $teamRepository;
         $this->operatorRepository           = $operatorRepository;
+        $this->productLineRepository        = $productLineRepository;
+        $this->productsRepository           = $productsRepository;
+        $this->qualityRepRepository         = $qualityRepRepository;
         $this->shiftLeadersRepository       = $shiftLeadersRepository;
+        $this->teamRepository               = $teamRepository;
         $this->trainingRecordRepository     = $trainingRecordRepository;
         $this->trainerRepository            = $trainerRepository;
-        $this->productsRepository           = $productsRepository;
+        $this->validationRepository         = $validationRepository;
+        $this->uapRepository                = $uapRepository;
+        $this->uploadRepository             = $uploadRepository;
+        $this->userRepository               = $userRepository;
+        $this->zoneRepository               = $zoneRepository;
     }
 
 
@@ -295,6 +300,11 @@ class EntityFetchingService extends AbstractController
     public function getShiftLeaders()
     {
         return $this->shiftLeadersRepository->findAll();
+    }
+
+    public function getQualityRep()
+    {
+        return $this->qualityRepRepository->findAll();
     }
 
     public function getOperatorSuggestionByUsername(string $username)

@@ -75,6 +75,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: ShiftLeaders::class)]
     private ?ShiftLeaders $shiftLeader = null;
 
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: QualityRep::class)]
+    private ?QualityRep $qualityRep = null;
+
     #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Operator $operator = null;
 
@@ -468,6 +471,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getQualityRep(): ?QualityRep
+    {
+        return $this->qualityRep;
+    }
+
+    public function setQualityRep(?QualityRep $qualityRep): static
+    {
+        $this->qualityRep = $qualityRep;
+
+        return $this;
+    }
+
 
     public function getOperator(): ?Operator
     {

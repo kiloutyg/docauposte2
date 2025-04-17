@@ -17,9 +17,11 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use App\Entity\Products;
 use App\Entity\ShiftLeaders;
+use App\Entity\QualityRep;
 
 use App\Form\ProductType;
 use App\Form\ShiftLeadersType;
+use App\Form\QualityRepType;
 
 use App\Service\EntityFetchingService;
 use App\Service\EntityDeletionService;
@@ -132,6 +134,21 @@ class IluoController extends AbstractController
         ]);
     }
 
+    #[Route('admin/qualityrep_general_elements', name: 'qualityrep_general_elements_admin')]
+    public function qualityRepGeneralElementsAdminPageGet(Request $request): Response
+    {
+        $qualityRep = $this->entityFetchingService->getQualityRep();
+        $newQualityRep = new QualityRep;
+        $qualityRepForm = $this->createForm(QualityRepType::class, $newQualityRep);
+        if ($request->isMethod('POST')) {
+            $this->logger->info('qualityRep form submitted', [$request->request->all()]);
+            return $this->generalElementsFormManagement('shiftLeaders', $qualityRepForm, $request);
+        }
+        return $this->render('/services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_qualityrep_general_elements_admin.html.twig', [
+            'qualityRepForm' => $qualityRepForm->createView(),
+            'qualityRep'    => $qualityRep,
+        ]);
+    }
 
     public function generalElementsFormManagement(string $entityType, Form $form, Request $request): Response
     {
