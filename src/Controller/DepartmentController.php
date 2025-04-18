@@ -10,7 +10,6 @@ use Psr\Log\LoggerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -46,24 +45,43 @@ class DepartmentController extends AbstractController
     {
         return $this->render('services/department_services/department_management.html.twig', [
             'departments' => $this->entityFetchingService->getDepartments(),
+            'uaps' => $this->entityFetchingService->getUaps(),
         ]);
     }
 
 
     // Logic to create a new department and display a message
     #[Route('/creation', name: 'creation')]
-    public function departmentCreation(Request $request): JsonResponse
+    public function departmentCreation(Request $request): Response
     {
         try {
-            $response = $this->departmentService->departmentCreation($request);
-            $this->addFlash('success', 'Le service a bien été créé');
-            return new JsonResponse($response);
+            $departmentName = $this->departmentService->departmentCreation($request);
+            $this->addFlash('success', 'Le service ' . $departmentName . ' a bien été créé');
+            return $this->redirectToRoute('app_department_view');
         } catch (\Exception $e) {
             $this->addFlash('error', 'Erreur lors de la création du service : ' . $e->getMessage());
             $this->logger->error('Error during department creation', [$e->getMessage()]);
-            return new JsonResponse(['success' => false, 'message' => 'Erreur lors de la création du service : ' . $e->getMessage()]);
+            return $this->redirectToRoute('app_department_view');
         }
     }
+
+
+    // Logic to modify a new department and display a message
+    #[Route('/modification', name: 'modification')]
+    public function departmentModification(Request $request): Response
+    {
+        $this->logger->info('Full request', [$request->request->all()]);
+        try {
+            $departmentName = $this->departmentService->departmentModification($request);
+            $this->addFlash('success', 'Le service ' . $departmentName . ' a bien été modifié');
+            return $this->redirectToRoute('app_department_view');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de la modification du service : ' . $e->getMessage());
+            $this->logger->error('Error during department modification', [$e->getMessage()]);
+            return $this->redirectToRoute('app_department_view');
+        }
+    }
+
 
     // Create a route for department deletion. It depends on the entitydeletionService.
     #[Route('/deletion/{departmentId}', name: 'deletion')]

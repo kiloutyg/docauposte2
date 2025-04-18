@@ -261,7 +261,7 @@ class UploadService extends AbstractController
         // Update the uploader in the upload object
         $upload->setUploader($user);
 
-        // Set the revision 
+        // Set the revision
         $upload->setRevision(1);
 
         if ($validated === null) {

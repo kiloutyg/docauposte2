@@ -117,65 +117,6 @@ function resetDropdowns() {
 
 
 
-// Function to create a new department
-document.addEventListener("turbo:load", function () {
-  let createdepartmentButton = document.getElementById("create_department");
-
-  if (createdepartmentButton) {
-    createdepartmentButton.addEventListener("click", function (depcrea) {
-      depcrea.preventDefault();
-
-      // Get the value of the department name input field and trim any leading/trailing whitespace
-      let departmentName = document.getElementById("department_name").value.trim();
-
-      // Create a new XMLHttpRequest object
-      let xhr = new XMLHttpRequest();
-      xhr.open("POST", "/docauposte/department/creation");
-      xhr.setRequestHeader("Content-Type", "application/json");
-
-      // Set the onload event handler for the XMLHttpRequest
-      xhr.onload = function () {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          // Parse the JSON response
-          let response = JSON.parse(xhr.responseText);
-
-          // Show the message to the department
-          alert(response.message);
-
-          // Check if the operation was successful
-          if (response.success) {
-            // Clear the input field after a successful submission
-            document.getElementById("department_name").value = "";
-
-            // Force a reload of the page
-            location.reload();
-          } else {
-            // Handle failure, e.g. show error message
-            console.error(response.message);
-          }
-        } else {
-          // Handle other HTTP errors
-          console.error("The request failed!");
-        }
-      };
-
-      // Set the onerror event handler for the XMLHttpRequest
-      xhr.onerror = function () {
-        // Handle total failure of the request
-        console.error("The request could not be made!");
-      };
-
-      // Send the POST request with the department name as JSON payload
-      xhr.send(JSON.stringify({
-        department_name: departmentName,
-      }));
-    });
-  }
-});
-
-
-
-
 // This code adds an event listener to the document object for the "turbo:load" event. 
 // When the event is triggered, it fetches department data from the API endpoint /api/entity_data. 
 // Once the data is successfully received, it assigns the departments property of the data to the departmentsData variable. 

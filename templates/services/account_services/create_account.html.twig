@@ -33,32 +33,30 @@
 				class="accordion-body accordion-bg shadow shadow-inset">
 				<div
 					class="card border-0 shadow rounded-3 my-5 form-floating row mx-auto">
-
 					<div
 						class="accordion mx-auto justify-content-center"
 						id="accordionAccountView">
 						<div
 							class="col-12 border-0 shadow rounded-3 my-5 bg-secondary">
 							<div
-								class="card-body ">
+								class="card-body">
 								<div
-									class="align-items-center gy-lg-0 gy-5">
-
+									class="align-items-center">
 									<div
-										class="col-lg-8 col-md-10 col-sm-12 mx-auto">
-										<br>
+										class="col mx-auto">
+
 										{% include "services/account_services/account_tool_components/account_crea_mod.html.twig" %}
-
 										<hr
 											class="my-4">
+										<turbo-frame
+											loading="lazy"
+											class="px-0 px-md-2">
+											{{ render(controller('App\\Controller\\DepartmentController::departmentView'), options = []) }}
+										</turbo-frame>
+										{% include "services/account_services/account_tool_components/user_list.html.twig" %}
 
-										{{ render(controller('App\\Controller\\DepartmentController::departmentView'), options = []) }}
-
-										<hr
-											class="my-4">
 									</div>
 								</div>
-								{% include "services/account_services/account_tool_components/user_list.html.twig" %}
 							</div>
 						</div>
 					</div>

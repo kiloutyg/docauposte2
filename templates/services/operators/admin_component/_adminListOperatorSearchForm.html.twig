@@ -1,9 +1,9 @@
 <ul>
 	<div
-		class="card container mt-3"
+		class="card container mt-3 "
 		data-controller="operator-admin-search">
 		<form
-			class="row mt-2"
+			class="row mt-2 gap-1 align-items-center top"
 			method="post"
 			action="{{ path('app_operator') }}" data-turbo-frame="adminListOperator"
 			id="adminListOperator-form">
@@ -50,7 +50,6 @@
 				{% endfor %}
 			</datalist>
 
-
 			<input
 				data-operator-admin-search-target="operatorAdminSearchUapInput"
 				data-action="keyup->operator-admin-search#submitSearchForm"
@@ -68,38 +67,37 @@
 				{% endfor %}
 			</datalist>
 
-			<select
+			<input
+				type="search"
 				data-operator-admin-search-target="operatorAdminSearchIsTrainerInput"
 				data-action="change->operator-admin-search#submitSearchForm"
-				class="form-select shadow col "
+				class="form-control shadow col"
+				placeholder="Est-il Formateur?"
 				name="search_trainer"
-				id="search_trainer">
-				<option
-					selected
-					value="">
-					Est-il Formateur?
-				</option>
-				<option
-					value="all">
-					Tous
-				</option>
-				<option
-					value="true">
-					Formateur
-				</option>
-				<option
-					value="false">
-					Non Formateur
-				</option>
-			</select>
-
+				id="search_trainer"
+				list="trainer-list">
+				<datalist
+					id="trainer-list">
+					<option
+						value="all">
+						Tous
+					</option>
+					<option
+						value="true">
+						Formateur
+					</option>
+					<option
+						value="false">
+						Non Formateur
+					</option>
+				</datalist>
+			</input>
 
 			<input
 				data-operator-admin-search-target="operatorAdminSearchSubmit"
 				class="btn btn-primary col"
 				placeholder="Search"
 				type="submit">
-
 		</form>
 	</div>
 </ul>
