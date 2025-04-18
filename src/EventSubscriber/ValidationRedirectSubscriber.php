@@ -111,14 +111,13 @@ class ValidationRedirectSubscriber implements EventSubscriberInterface
         // Get the current route name from the request object
         $currentRoute = $request->get('_route');
 
-        // Check if there is a current user and the current route is not 'app_validation_disapproved_modify' and it is 'app_base'
-        if ($currentUser && $currentRoute !== 'app_validation_disapproved_modify' && $currentRoute == 'app_base') {
+        // Check if there is a current user and the current route is not 'app_validation_disapproved_modify_by_upload' and it is 'app_base'
+        if ($currentUser && $currentRoute !== 'app_validation_disapproved_modify_by_upload' && $currentRoute == 'app_base') {
             // Find any disapproved uploads by the current user
             $disapprovedUploadsbyUser = $this->uploadRepository->findBy(['uploader' => $currentUser, 'validated' => false]);
 
             // Iterate over each disapproved upload
             foreach ($disapprovedUploadsbyUser as $upload) {
-
                 $event->setResponse(new RedirectResponse($this->router->generate(
                     'app_validation_disapproved_modify_by_upload',
                     ['uploadId' => $upload->getId(),]

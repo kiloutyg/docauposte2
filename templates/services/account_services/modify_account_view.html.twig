@@ -5,6 +5,10 @@
 	|
 	{{ parent() }}
 {% endblock %}
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('department-creation') }}
+{% endblock %}
 {% block body %}
 	<div
 		class="card border-0 shadow rounded-3  my-3">
@@ -16,11 +20,10 @@
 					class="card-body ">
 					<div
 						class=" row align-items-center gy-lg-5 gy-5">
-						{% include "services/accountservices/account_tool_components/account_crea_mod.html.twig" %}
-
-
+						{% include "services/account_services/account_tool_components/account_crea_mod.html.twig" %}
 					</div>
 				</div>
 			</div>
 		</div>
-	{% endblock %}
+	</div>
+{% endblock %}

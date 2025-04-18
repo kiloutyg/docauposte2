@@ -28,10 +28,8 @@ abstract class BaseRepository extends ServiceEntityRepository
             ->join('e.' . $parentFieldName, 'p')
             ->where('e.id != :entityId')
             ->andWhere('p.id = :parentEntityId')
-            ->setParameters([
-                'entityId' => $entityId,
-                'parentEntityId' => $parentEntityId,
-            ])
+            ->setParameter('entityId', $entityId)
+            ->setParameter('parentEntityId', $parentEntityId,)
             ->getQuery()
             ->getResult();
     }

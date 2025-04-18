@@ -1,0 +1,51 @@
+{% if user is defined %}
+	{% set required = '' %}
+{% else %}
+	{% set required = 'required' %}
+{% endif %}
+<div>
+	<label
+		for="role">
+		Selectionnez le role du nouveau compte:
+	</label>
+	<select
+		class="form-control "
+		{{required}} name="role"
+		id="role">
+		<option
+			value="">
+			--Choisissez un role--
+		</option>
+		{% if users is defined and users is empty %}
+			<option
+				value="ROLE_SUPER_ADMIN">
+				Super Admin
+			</option>
+		{% elseif is_granted('ROLE_SUPER_ADMIN') %}
+			<option
+				value="ROLE_ADMIN_VALIDATOR">
+				Admin de zone Valideur
+			</option>
+			<option
+				value="ROLE_ADMIN">
+				Admin de Zone
+			</option>
+			<option
+				value="ROLE_LINE_ADMIN_VALIDATOR">
+				Admin de Ligne Valideur
+			</option>
+			<option
+				value="ROLE_LINE_ADMIN">
+				Admin de Ligne
+			</option>
+			<option
+				value="ROLE_MANAGER">
+				Manager
+			</option>
+			<option
+				value="ROLE_USER">
+				User
+			</option>
+		{% endif %}
+	</select>
+</div>

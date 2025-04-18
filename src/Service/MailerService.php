@@ -130,7 +130,10 @@ class MailerService extends AbstractController
         $upload = $validation->getUpload();
         $approbations = [];
         $approbators = [];
-        $approbations = $this->approbationRepository->findBy(['Validation' => $validation, 'Approval' => false]);
+        $approbations = $this->approbationRepository->findBy([
+            'Validation' => $validation,
+            'approval' => false
+        ]);
         foreach ($approbations as $approbation) {
             $approbators[] = $approbation->getUserApprobator();
         }

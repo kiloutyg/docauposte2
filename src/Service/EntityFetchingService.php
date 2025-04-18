@@ -2,12 +2,9 @@
 
 namespace App\Service;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-use Psr\Log\LoggerInterface;
-
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
+use App\Entity\Zone;
+use App\Entity\ProductLine;
+use App\Entity\Category;
 
 use App\Repository\ZoneRepository;
 use App\Repository\ProductLineRepository;
@@ -22,11 +19,19 @@ use App\Repository\OldUploadRepository;
 use App\Repository\UapRepository;
 use App\Repository\TeamRepository;
 use App\Repository\OperatorRepository;
+use App\Repository\ShiftLeadersRepository;
 use App\Repository\TrainingRecordRepository;
 use App\Repository\TrainerRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
 use App\Repository\ProductsRepository;
+use App\Repository\QualityRepRepository;
+use Doctrine\Common\Collections\Collection;
+use Psr\Log\LoggerInterface;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+use Symfony\Contracts\Cache\CacheInterface;
 
 
 class EntityFetchingService extends AbstractController
@@ -48,11 +53,13 @@ class EntityFetchingService extends AbstractController
     private $userRepository;
     private $oldUploadRepository;
     private $uapRepository;
+    private $shiftLeadersRepository;
     private $teamRepository;
     private $operatorRepository;
     private $trainingRecordRepository;
     private $trainerRepository;
     private $productsRepository;
+    private $qualityRepRepository;
 
     public function __construct(
         LoggerInterface                 $logger,
@@ -60,46 +67,51 @@ class EntityFetchingService extends AbstractController
         CacheInterface $cache,
 
         ApprobationRepository           $approbationRepository,
-        ValidationRepository            $validationRepository,
+        ButtonRepository                $buttonRepository,
+        CategoryRepository              $categoryRepository,
         DepartmentRepository            $departmentRepository,
         IncidentCategoryRepository      $incidentCategoryRepository,
-        CategoryRepository              $categoryRepository,
-        ButtonRepository                $buttonRepository,
-        UploadRepository                $uploadRepository,
-        ZoneRepository                  $zoneRepository,
-        ProductLineRepository           $productLineRepository,
-        UserRepository                  $userRepository,
+        IncidentRepository              $incidentRepository,
         OldUploadRepository             $oldUploadRepository,
-        UapRepository                   $uapRepository,
-        TeamRepository                  $teamRepository,
         OperatorRepository              $operatorRepository,
+        ProductLineRepository           $productLineRepository,
+        ProductsRepository              $productsRepository,
+        QualityRepRepository            $qualityRepRepository,
+        ShiftLeadersRepository          $shiftLeadersRepository,
+        TeamRepository                  $teamRepository,
         TrainingRecordRepository        $trainingRecordRepository,
         TrainerRepository               $trainerRepository,
-        IncidentRepository              $incidentRepository,
-        ProductsRepository              $productsRepository
+        UapRepository                   $uapRepository,
+        UserRepository                  $userRepository,
+        UploadRepository                $uploadRepository,
+        ValidationRepository            $validationRepository,
+        ZoneRepository                  $zoneRepository,
+
     ) {
         $this->logger                       = $logger;
 
         $this->cache = $cache;
 
-        $this->departmentRepository         = $departmentRepository;
         $this->approbationRepository        = $approbationRepository;
-        $this->validationRepository         = $validationRepository;
+        $this->buttonRepository             = $buttonRepository;
+        $this->categoryRepository           = $categoryRepository;
+        $this->departmentRepository         = $departmentRepository;
         $this->incidentCategoryRepository   = $incidentCategoryRepository;
         $this->incidentRepository           = $incidentRepository;
-        $this->uploadRepository             = $uploadRepository;
-        $this->zoneRepository               = $zoneRepository;
-        $this->productLineRepository        = $productLineRepository;
-        $this->userRepository               = $userRepository;
-        $this->categoryRepository           = $categoryRepository;
-        $this->buttonRepository             = $buttonRepository;
         $this->oldUploadRepository          = $oldUploadRepository;
-        $this->uapRepository                = $uapRepository;
-        $this->teamRepository               = $teamRepository;
         $this->operatorRepository           = $operatorRepository;
+        $this->productLineRepository        = $productLineRepository;
+        $this->productsRepository           = $productsRepository;
+        $this->qualityRepRepository         = $qualityRepRepository;
+        $this->shiftLeadersRepository       = $shiftLeadersRepository;
+        $this->teamRepository               = $teamRepository;
         $this->trainingRecordRepository     = $trainingRecordRepository;
         $this->trainerRepository            = $trainerRepository;
-        $this->productsRepository           = $productsRepository;
+        $this->validationRepository         = $validationRepository;
+        $this->uapRepository                = $uapRepository;
+        $this->uploadRepository             = $uploadRepository;
+        $this->userRepository               = $userRepository;
+        $this->zoneRepository               = $zoneRepository;
     }
 
 
@@ -126,6 +138,11 @@ class EntityFetchingService extends AbstractController
         return $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']);
     }
 
+    public function getProductLinesByZone(Zone $zone)
+    {
+        return $this->productLineRepository->findBy(['zone' => $zone->getId()], ['SortOrder' => 'ASC']);
+    }
+
 
     public function getIncidents()
     {
@@ -144,12 +161,20 @@ class EntityFetchingService extends AbstractController
         return $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']);
     }
 
+    public function getCategoriesByProductLine(ProductLine $productLine)
+    {
+        return $this->categoryRepository->findBy(['productLine' => $productLine->getId()], ['SortOrder' => 'ASC']);
+    }
 
     public function getButtons()
     {
         return $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']);
     }
 
+    public function getButtonsByCategory(Category $category)
+    {
+        return $this->buttonRepository->findBy(['category' => $category->getId()], ['SortOrder' => 'ASC']);
+    }
 
     public function getUploads()
     {
@@ -176,7 +201,6 @@ class EntityFetchingService extends AbstractController
     {
         return $this->groupUploads($this->uploadRepository->findAllValidatedUploadsWithAssociations());
     }
-
 
 
     public function getApprobations()
@@ -271,5 +295,42 @@ class EntityFetchingService extends AbstractController
     public function getProducts()
     {
         return $this->productsRepository->findAll();
+    }
+
+    public function getShiftLeaders()
+    {
+        return $this->shiftLeadersRepository->findAll();
+    }
+
+    public function getQualityRep()
+    {
+        return $this->qualityRepRepository->findAll();
+    }
+
+    public function getOperatorSuggestionByUsername(string $username)
+    {
+
+        $explodedUsername = explode('.', $username);
+        $firstname = $explodedUsername[0] ?? null;
+        $lastname  = $explodedUsername[1] ?? null;
+
+        if ($firstname) {
+            $firstnameSuggestions = $this->operatorRepository->findByNameLikeForSuggestions($firstname);
+        }
+
+        if ($lastname) {
+            $lastnameSuggestions = $this->operatorRepository->findByNameLikeForSuggestions($lastname);
+        }
+
+        $rawSuggestions = array_merge($firstnameSuggestions, $lastnameSuggestions);
+        $suggestions = array_unique($rawSuggestions, SORT_REGULAR);
+        $response = [];
+        foreach ($suggestions as &$suggestionKey) {
+            if (isset($suggestionKey['id'])) {
+                $response[] = $this->operatorRepository->find($suggestionKey['id']);
+            }
+        }
+
+        return $response;
     }
 }

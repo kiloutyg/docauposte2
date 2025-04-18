@@ -145,10 +145,10 @@ class OperatorRepository extends ServiceEntityRepository
 
         if ($trainer === true) {
             $qb->setParameter('trainerStatus', true)
-                ->andWhere('o.IsTrainer = :trainerStatus');
+                ->andWhere('o.isTrainer = :trainerStatus');
         } elseif ($trainer === false) {
             $qb->setParameter('trainerStatus', false)
-                ->andWhere('o.IsTrainer = :trainerStatus OR o.IsTrainer IS NULL');
+                ->andWhere('o.isTrainer = :trainerStatus OR o.isTrainer IS NULL');
         } elseif ($trainer === null) {
             // If $trainer is null, and you want to select all without any filter on IsTrainer, do not add any where clause related to IsTrainer.
             // No further action needed if you want all records regardless of trainer status.
@@ -160,9 +160,7 @@ class OperatorRepository extends ServiceEntityRepository
 
     public function findByNameLikeForSuggestions(string $name): array
     {
-        // $this->logger->info('Finding operators by name for suggestions.');
-
-        if (!preg_match('/^[a-z]+(-[a-z]+)*$/i', $name)) {
+        if (!preg_match('/^[a-z]+(-[a-z]+)*(\.[a-z]+(-[a-z]+)*)?$/i', $name)) {
             throw new \InvalidArgumentException("Invalid name format.");
         }
 
@@ -170,24 +168,20 @@ class OperatorRepository extends ServiceEntityRepository
         $searchPattern = '%' . $name . '%'; // Create a search pattern for LIKE
 
         // Adjusted query for newer DBAL versions
-        $sql = "SELECT * FROM operator WHERE SOUNDEX(name) = SOUNDEX(:name) OR name LIKE :pattern";
+        $sql = "SELECT o.id, o.name, o.code, t.id as team_id, t.name as team_name, u.id as uap_id, u.name as uap_name
+        FROM operator o
+        LEFT JOIN team t ON o.team_id = t.id
+        LEFT JOIN uap_operator ou ON o.id = ou.operator_id
+        LEFT JOIN uap u ON ou.uap_id = u.id
+        WHERE LOWER(o.name) LIKE :pattern OR SOUNDEX(o.name) = SOUNDEX(:name)";
 
-        // Use executeQuery for select statements
-        try {
-            $conn = $this->em->getConnection();
-            $stmt = $conn->executeQuery($sql, [
-                'name' => $name,
-                'pattern' => $searchPattern
-            ]);
-
-            // Use fetchAllAssociative to fetch data
-            return $stmt->fetchAllAssociative();
-        } catch (\Doctrine\DBAL\Exception $exception) {
-
-            // Log the error and possibly rethrow or handle gracefully
-            $this->logger->error('Database query error: ' . $exception->getMessage());
-            throw new \RuntimeException("Database query failed", 0, $exception);
-        }
+        return $this->getEntityManager()
+            ->getConnection()
+            ->executeQuery($sql, [
+                'pattern' => $searchPattern,
+                'name' => $name
+            ])
+            ->fetchAllAssociative();
     }
 
 
@@ -202,7 +196,7 @@ class OperatorRepository extends ServiceEntityRepository
         $retrainingDelay = new \DateTime('now');
         $retrainingDelay->sub($operatorRetrainingDateInterval);
 
-        $operators = $this->createQueryBuilder('o')
+        return $this->createQueryBuilder('o')
             ->where('o.lasttraining < :retrainingDelay')
             ->orWhere('o.lasttraining IS NULL')
             ->setParameter('retrainingDelay', $retrainingDelay)
@@ -210,8 +204,6 @@ class OperatorRepository extends ServiceEntityRepository
             ->andWhere('o.inactiveSince IS NULL')
             ->getQuery()
             ->getResult();
-
-        return $operators;
     }
 
 
@@ -224,14 +216,12 @@ class OperatorRepository extends ServiceEntityRepository
         $inactiveDelay = new \DateTime('now');
         $inactiveDelay->sub($operatorInactivityDateInterval);
 
-        $operators = $this->createQueryBuilder('o')
+        return $this->createQueryBuilder('o')
             ->where('o.inactiveSince < :inactiveDelay')
             ->setParameter('inactiveDelay', $inactiveDelay)
             ->andWhere('o.tobedeleted IS NULL')
             ->getQuery()
             ->getResult();
-
-        return $operators;
     }
 
 
@@ -243,14 +233,12 @@ class OperatorRepository extends ServiceEntityRepository
         $inactiveDelay = new \DateTime('now');
         $inactiveDelay->sub($operatorInactivityDateInterval);
 
-        $operators = $this->createQueryBuilder('o')
+        return $this->createQueryBuilder('o')
             ->where('o.inactiveSince < :inactiveDelay')
             ->setParameter('inactiveDelay', $inactiveDelay)
             ->andWhere('o.tobedeleted IS NOT NULL')
             ->getQuery()
             ->getResult();
-
-        return $operators;
     }
 
 

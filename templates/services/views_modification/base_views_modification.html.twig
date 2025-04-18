@@ -1,114 +1,275 @@
 {% extends 'base.html.twig' %}
-{% block title %}BaseViewModification
+{% block title %}
+	BaseViewModification
 {% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{encore_entry_script_tags('views-modification-value-tracker') }}
+{% endblock %}
+
 {% block body %}
-	<div class="card border-0 shadow rounded-3 my-5">
-		<div class="card-body">
-			<div class="row">
-				<div class="card border-0 shadow rounded-3 my-5 bg-secondary">
-					<div class="card-body">
-						<div class="row d-flex align-items-center gy-lg-0 gy-5">
-							<form class="form row" method="post" action="{{path('app_views_modification')}}">
-								<div class="accordion col-11 mx-auto mt-5 justify-content-center" id="accordionViewsMod">
+	<div
+		class="card border-0 shadow rounded-3 my-5">
+		<div
+			class="card-body">
+			<div
+				class="row">
+				<div
+					class="card border-0 shadow rounded-3 my-5 bg-secondary">
+					<div
+						class="card-body">
+						<div
+							class="row d-flex align-items-center gy-lg-0 gy-5">
+							<form
+								class="form row"
+								method="post"
+								action="{{path('app_views_modification')}}">
+								<div
+									class="accordion col-11 mx-auto mt-5 justify-content-center"
+									id="accordionViewsMod">
 									{% set zoneCounts = zones|length %}
 									{% for zone in zones %}
-										<div class="accordion-item shadow-lg shadow-lg-inset border border-dark rounded-3">
-											<button class="accordion-button accButViewMod collapsed" id="zoneViewsMod{{ zone.id }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZoneViewsMod{{zone.id}}" aria-expanded="false" aria-controls="collapseZoneViewsMod{{zone.id}}">
-												<strong>{{zone.name|split('.')|first|upper}}</strong>
+										<div
+											class="accordion-item shadow-lg shadow-lg-inset border border-dark rounded-3">
+											<button
+												class="accordion-button accButViewMod collapsed"
+												id="zoneViewsMod{{ zone.id }}"
+												type="button"
+												data-bs-toggle="collapse"
+												data-bs-target="#collapseZoneViewsMod{{zone.id}}"
+												aria-expanded="false"
+												aria-controls="collapseZoneViewsMod{{zone.id}}">
+												<strong>
+													{{zone.name|split('.')|first|upper}}
+												</strong>
 
 											</button>
-											<div id="collapseZoneViewsMod{{zone.id}}" class="accordion-collapse collapse" aria-labelledby="zoneViewsMod" data-bs-parent="#accordionViewsMod">
-												<div class="accordion-body">
+											<div
+												id="collapseZoneViewsMod{{zone.id}}"
+												class="accordion-collapse collapse"
+												aria-labelledby="zoneViewsMod"
+												data-bs-parent="#accordionViewsMod">
+												<div
+													class="accordion-body">
+													<div
+														class="  d-flex justify-content-between align-items-center ">
+														<input
+															type="text"
+															name="zone_{{zone.id}}_name"
+															value="{{zone.name}}" class=""
+															id="zoneName{{zone.id}}"
+															placeholder="Nom de la zone">
 
-													<input type="text" name="zone_{{zone.id}}_name" value="{{zone.name}}" class="" id="zoneName{{zone.id}}" placeholder="Nom de la zone">
+														<select
+															name="zone_{{zone.id}}_sortOrder"
+															value=""
+															class="zoneSortOrderSelect"
+															id="zoneSortOrder{{zone.id}}"
+															placeholder="Placement de la zone">
+															{% for k in 1..zoneCounts %}
+																<option
+																	value="{{k}}" {{ k == zone.sortOrder ? 'selected' : '' }}>
+																	{{k}}
+																</option>
+															{% endfor %}
+														</select>
+														<select
+															name="zone_{{ zone.id }}_creator"
+															value=""
+															class="zoneCreatorSelect  me-2"
+															id="zoneCreateor{{ zone.id }}"
+															placeholder="Créateur de la Zone">
 
-													<select name="zone_{{zone.id}}_sortOrder" value="" class="zoneSortOrderSelect" id="zoneSortOrder{{zone.id}}" placeholder="Placement de la zone">
-														{% for k in 1..zoneCounts %}
-															<option value="{{k}}" {{ k == zone.sortOrder ? 'selected' : '' }}>{{k}}</option>
-														{% endfor %}
-													</select>
-													<select name="zone_{{ zone.id }}_creator" value="" class="zoneCreatorSelect" id="zoneCreateor{{ zone.id }}" placeholder="Créateur de la Zone">
-
-														{% for user in users %}
-															<option value={{user.id}} {% if zone.Creator is not empty %} {{ user.id == zone.Creator.id ? 'selected' : '' }} {% endif %}>{{user.username|capitalize|split('.')|first }}
-																{{user.username|upper|split('.')|last }}</option>
-														{% endfor %}
-													</select>
+															{% for user in users %}
+																<option
+																	value={{user.id}} {% if zone.Creator is not empty %} {{ user.id == zone.Creator.id ? 'selected' : '' }} {% endif %}>
+																	{{user.username|capitalize|split('.')|first }}
+																	{{user.username|upper|split('.')|last }}
+																</option>
+															{% endfor %}
+														</select>
+													</div>
 													{% set productLinesCounts = zone.productLines|length %}
 													{% for productLine in zone.productLines %}
-														<div class="accordion" id="productLineAccordionViewsMod{{ productLine.id }}">
-															<div class="accortion-item shadow-lg shadow-lg-inset border border-dark rounded-3">
-																<button class="accordion-button accButViewMod collapsed" id="productLineViewsMod{{ productLine.id }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProductLineViewsMod{{productLine.id}}" aria-expanded="false" aria-controls="collapseProductLineViewsMod{{productLine.id}}">
-																	<strong>{{productLine.name|split('.')|first|upper}}</strong>
+														<div
+															class="accordion"
+															id="productLineAccordionViewsMod{{ productLine.id }}">
+															<div
+																class="accortion-item shadow-lg shadow-lg-inset border border-dark rounded-3">
+																<button
+																	class="accordion-button accButViewMod collapsed"
+																	id="productLineViewsMod{{ productLine.id }}"
+																	type="button"
+																	data-bs-toggle="collapse"
+																	data-bs-target="#collapseProductLineViewsMod{{productLine.id}}"
+																	aria-expanded="false"
+																	aria-controls="collapseProductLineViewsMod{{productLine.id}}">
+																	<strong>
+																		{{productLine.name|split('.')|first|upper}}
+																	</strong>
 
 																</button>
-																<div id="collapseProductLineViewsMod{{ productLine.id }}" class="accordion-collapse collapse" aria-labelledby="productLineViewsMod" data-bs-parent="#collapseZoneViewsMod{{ zone.id }}">
-																	<div class="accordion-body">
+																<div
+																	id="collapseProductLineViewsMod{{ productLine.id }}"
+																	class="accordion-collapse collapse "
+																	aria-labelledby="productLineViewsMod"
+																	data-bs-parent="#collapseZoneViewsMod{{ zone.id }}">
+																	<div
+																		class="accordion-body">
+																		<div
+																			class=" d-flex justify-content-between align-items-center ">
+																			<input
+																				type="text"
+																				name="productLine_{{ productLine.id }}_name"
+																				value="{{ productLine.name|split('.')|first }}" class=""
+																				id="productLineName{{ productLine.id }}"
+																				placeholder="Nom de la productLine">
 
-																		<input type="text" name="productLine_{{ productLine.id }}_name" value="{{ productLine.name|split('.')|first }}" class="" id="productLineName{{ productLine.id }}" placeholder="Nom de la productLine">
+																			<select
+																				name="productLine_{{ productLine.id }}_sortOrder"
+																				value=""
+																				class="productLineSortOrderSelect"
+																				id="productLineSortOrder{{ productLine.id }}"
+																				placeholder="Placement de la productLine">
+																				{% for k in 1..productLinesCounts %}
+																					<option
+																						value="{{k}}" {{ k == productLine.sortOrder ? 'selected' : '' }}>
+																						{{k}}
+																					</option>
+																				{% endfor %}
+																			</select>
 
-																		<select name="productLine_{{ productLine.id }}_sortOrder" value="" class="productLineSortOrderSelect" id="productLineSortOrder{{ productLine.id }}" placeholder="Placement de la productLine">
-																			{% for k in 1..productLinesCounts %}
-																				<option value="{{k}}" {{ k == productLine.sortOrder ? 'selected' : '' }}>{{k}}</option>
-																			{% endfor %}
-																		</select>
+																			<select
+																				name="productLine_{{ productLine.id }}_creator"
+																				value=""
+																				class="productLineCreatorSelect me-2"
+																				id="productLineCreateor{{ productLine.id }}"
+																				placeholder="Créateur de la Ligne">
 
-																		<select name="productLine_{{ productLine.id }}_creator" value="" class="productLineCreatorSelect" id="productLineCreateor{{ productLine.id }}" placeholder="Créateur de la Ligne">
-
-																			{% for user in users %}
-																				<option value={{user.id}} {% if productLine.Creator is not empty %} {{ user.id == productLine.Creator.id ? 'selected' : '' }} {% endif %}>{{user.username|capitalize|split('.')|first }}
-																					{{user.username|upper|split('.')|last }}</option>
-																			{% endfor %}
-																		</select>
+																				{% for user in users %}
+																					<option
+																						value={{user.id}} {% if productLine.Creator is not empty %} {{ user.id == productLine.Creator.id ? 'selected' : '' }} {% endif %}>
+																						{{user.username|capitalize|split('.')|first }}
+																						{{user.username|upper|split('.')|last }}
+																					</option>
+																				{% endfor %}
+																			</select>
+																		</div>
 
 																		{% set categoriesCounts = productLine.categories|length %}
 																		{% for category in productLine.categories %}
-																			<div class="accordion" id="categoryAccordionViewsMod{{ category.id }}">
-																				<div class="accordion-item shadow-lg shadow-lg-inset border border-dark rounded-3">
-																					<button class="accordion-button accButViewMod collapsed" id="categoryViewsMod{{ category.id }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategoryViewsMod{{category.id}}" aria-expanded="false" aria-controls="collapseCategoryViewsMod{{category.id}}">
-																						<strong>{{category.name|split('.')|first|upper}}</strong>
+																			<div
+																				class="accordion"
+																				id="categoryAccordionViewsMod{{ category.id }}">
+																				<div
+																					class="accordion-item shadow-lg shadow-lg-inset border border-dark rounded-3">
+																					<button
+																						class="accordion-button accButViewMod collapsed"
+																						id="categoryViewsMod{{ category.id }}"
+																						type="button"
+																						data-bs-toggle="collapse"
+																						data-bs-target="#collapseCategoryViewsMod{{category.id}}"
+																						aria-expanded="false"
+																						aria-controls="collapseCategoryViewsMod{{category.id}}">
+																						<strong>
+																							{{category.name|split('.')|first|upper}}
+																						</strong>
 
 																					</button>
-																					<div id="collapseCategoryViewsMod{{ category.id }}" class="accordion-collapse collapse" aria-labelledby="categoryViewsMod" data-bs-parent="#collapseproductLineViewsMod{{ productLine.id }}">
-																						<div class="shadow-lg shadow-lg-inset border border-dark rounded-3">
+																					<div
+																						id="collapseCategoryViewsMod{{ category.id }}"
+																						class="accordion-collapse collapse"
+																						aria-labelledby="categoryViewsMod"
+																						data-bs-parent="#collapseproductLineViewsMod{{ productLine.id }}">
+																						<div
+																							class="shadow-lg shadow-lg-inset border border-dark rounded-3">
+																							<div
+																								class=" d-flex justify-content-between align-items-center ">
+																								<input
+																									type="text"
+																									name="category_{{ category.id }}_name"
+																									value="{{ category.name|split('.')|first }}" class=""
+																									id="categoryName{{ category.id }}"
+																									placeholder="Nom de la categorie">
 
-																							<input type="text" name="category_{{ category.id }}_name" value="{{ category.name|split('.')|first }}" class="" id="categoryName{{ category.id }}" placeholder="Nom de la categorie">
+																								<select
+																									name="category_{{ category.id }}_sortOrder"
+																									value=""
+																									class="categorySortOrderSelect"
+																									id="categorySortOrder{{ category.id }}"
+																									placeholder="Placement de la categorie">
+																									{% for k in 1..categoriesCounts %}
+																										<option
+																											value="{{k}}" {{ k == category.sortOrder ? 'selected' : '' }}>
+																											{{k}}
+																										</option>
+																									{% endfor %}
+																								</select>
 
-																							<select name="category_{{ category.id }}_sortOrder" value="" class="categorySortOrderSelect" id="categorySortOrder{{ category.id }}" placeholder="Placement de la categorie">
-																								{% for k in 1..categoriesCounts %}
-																									<option value="{{k}}" {{ k == category.sortOrder ? 'selected' : '' }}>{{k}}</option>
-																								{% endfor %}
-																							</select>
-
-																							<select name="category_{{ category.id }}_creator" value="" class="categoryCreatorSelect" id="categoryCreator{{ category.id }}" placeholder="Créateur de la catégorie">
-																								{% for user in users %}
-																									<option value={{user.id}} {% if category.Creator is not empty %} {{ user.id == category.Creator.id ? 'selected' : '' }} {% endif %}>{{user.username|capitalize|split('.')|first }}
-																										{{user.username|upper|split('.')|last }}</option>
-																								{% endfor %}
-																							</select>
-
+																								<select
+																									name="category_{{ category.id }}_creator"
+																									value=""
+																									class="categoryCreatorSelect  me-2"
+																									id="categoryCreator{{ category.id }}"
+																									placeholder="Créateur de la catégorie">
+																									{% for user in users %}
+																										<option
+																											value={{user.id}} {% if category.Creator is not empty %} {{ user.id == category.Creator.id ? 'selected' : '' }} {% endif %}>
+																											{{user.username|capitalize|split('.')|first }}
+																											{{user.username|upper|split('.')|last }}
+																										</option>
+																									{% endfor %}
+																								</select>
+																							</div>
 																							{% set buttonsCounts = category.buttons|length %}
 																							{% for button in category.buttons %}
 																								<div>
-																									<div class="accordion-body shadow-lg-inset border border-dark rounded-3">
-
-																										<strong>{{button.name|split('.')|first|upper}}</strong>
-
-																										<input type="text" name="button_{{ button.id }}_name" value="{{ button.name|split('.')|first }}" class="" id="buttonName{{ button.id }}" placeholder="Nom du bouton">
-
-																										<select name="button_{{ button.id }}_sortOrder" value="" class="buttonSortOrderSelect" id="buttonSortOrder{{ button.id }}" placeholder="Placement du bouton">
-																											{% for k in 1..buttonsCounts %}
-																												<option value="{{k}}" {{ k == button.sortOrder ? 'selected' : '' }}>{{k}}</option>
-																											{% endfor %}
-																										</select>
-
-																										<select name="button_{{ button.id }}_creator" value="" class="buttonCreatorSelect" id="buttonCreateor{{ button.id }}" placeholder="Créateur du bouton">
-																											{% for user in users %}
-																												<option value={{user.id}} {% if button.Creator is not empty %} {{ user.id == button.Creator.id ? 'selected' : '' }} {% endif %}>{{user.username|capitalize|split('.')|first }}
-																													{{user.username|upper|split('.')|last }}</option>
-																											{% endfor %}
-																										</select>
-
+																									<div
+																										class="accordion-body shadow-lg-inset border border-dark rounded-3">
+																										<div
+																											class=" d-flex justify-content-between align-items-center ">
+																											<div
+																												class="flex-grow-1">
+																												<strong>
+																													{{button.name|split('.')|first|upper}}
+																												</strong>
+																												<input
+																													class="form-control w-75"
+																													type="text"
+																													name="button_{{ button.id }}_name"
+																													value="{{ button.name|split('.')|first }}" class=""
+																													id="buttonName{{ button.id }}"
+																													placeholder="Nom du bouton">
+																											</div>
+																											<select
+																												name="button_{{ button.id }}_sortOrder"
+																												value=""
+																												class="buttonSortOrderSelect  me-2"
+																												id="buttonSortOrder{{ button.id }}"
+																												placeholder="Placement du bouton">
+																												{% for k in 1..buttonsCounts %}
+																													<option
+																														value="{{k}}" {{ k == button.sortOrder ? 'selected' : '' }}>
+																														{{k}}
+																													</option>
+																												{% endfor %}
+																											</select>
+																											<select
+																												name="button_{{ button.id }}_creator"
+																												value=""
+																												class="buttonCreatorSelect"
+																												id="buttonCreateor{{ button.id }}"
+																												placeholder="Créateur du bouton">
+																												{% for user in users %}
+																													<option
+																														value={{user.id}} {% if button.Creator is not empty %} {{ user.id == button.Creator.id ? 'selected' : '' }} {% endif %}>
+																														{{user.username|capitalize|split('.')|first }}
+																														{{user.username|upper|split('.')|last }}
+																													</option>
+																												{% endfor %}
+																											</select>
+																										</div>
 																									</div>
 																								</div>
 																							{% endfor %}
@@ -127,8 +288,13 @@
 										</div>
 									{% endfor %}
 								</div>
-								<div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
-									<button type="submit" class="btn btn-primary mb-3 submit-views-modification">Modifier</button>
+								<div
+									class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
+									<button
+										type="submit"
+										class="btn btn-primary mb-3 submit-views-modification">
+										Modifier
+									</button>
 
 								</div>
 							</form>

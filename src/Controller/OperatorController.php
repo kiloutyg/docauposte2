@@ -800,51 +800,19 @@ class OperatorController extends AbstractController
 
 
     #[Route('operator/suggest-names', name: 'app_suggest_names')]
-    public function suggestNames(Request $request, SerializerInterface $serializer): JsonResponse
+    public function suggestNames(Request $request): JsonResponse
     {
         $parsedRequest = json_decode($request->getContent(), true);
-        // $this->logger->info('app_suggest_names parsedRequest', $parsedRequest);
 
-        $name = $parsedRequest['name'];
+        $rawSuggestions = $this->operatorRepository->findByNameLikeForSuggestions($parsedRequest['name']);
 
-        /////////////// serialized data ////////////////////////
-        $rawSuggestions = $this->operatorRepository->findByNameLikeForSuggestions($name);
-        // $this->logger->info('app_suggest_names Raw suggestions', $rawSuggestions);
-
-        $teams = $this->teamRepository->findAll();
-        $teamIndex = [];
-        foreach ($teams as $team) {
-            $teamIndex[$team->getId()] = $team->getName();
+        foreach ($rawSuggestions as &$suggestion) {
+            $suggestion['team_name'] = $suggestion['team_name'] ?? 'NoTeam';
+            $suggestion['uap_name'] = $suggestion['uap_name'] ?? 'NoUaps';
         }
-
-        $uaps = $this->uapRepository->findAll();
-        $uapIndex = [];
-        foreach ($uaps as $uap) {
-            $uapIndex[$uap->getId()] = $uap->getName();
-        }
-
-
-        foreach ($rawSuggestions as $key => &$suggestion) {
-            // Check and assign team name if available
-            if (isset($suggestion['team_id']) && isset($teamIndex[$suggestion['team_id']])) {
-                $suggestion['team_name'] = $teamIndex[$suggestion['team_id']];
-            } else {
-                $suggestion['team_name'] = 'nope'; // Or handle it as appropriate
-            }
-
-            // Check and assign UAP name if available
-            if (isset($suggestion['uap_id']) && isset($uapIndex[$suggestion['uap_id']])) {
-                $suggestion['uap_name'] = $uapIndex[$suggestion['uap_id']];
-            } else {
-                $suggestion['uap_name'] = 'nope'; // Or handle it as appropriate
-            }
-        }
-
-        // Serialize the entire array of entities at once using groups
-        $serializedSuggestions = json_encode($rawSuggestions);
 
         // Since $serializedSuggestions is a JSON string, return it directly with JsonResponse
-        return new JsonResponse($serializedSuggestions, 200, [], true);
+        return new JsonResponse(json_encode($rawSuggestions), 200, [], true);
     }
 
 

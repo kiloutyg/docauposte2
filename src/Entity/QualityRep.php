@@ -15,7 +15,7 @@ class QualityRep
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(cascade: ['persist'], inversedBy: 'qualityRep')]
     private ?User $user = null;
 
     /**

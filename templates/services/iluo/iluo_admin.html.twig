@@ -11,9 +11,9 @@
 
 {% block body %}
 	<div
-		class="inner-container d-flex justify-content-center align-items-center flex-grow-1">
+		class="container-fluid d-flex align-items-center flex-grow-1">
 		<div
-			class="accordion my-3"
+			class="accordion w-100"
 			id="accordionIluo">
 			{{ render(controller('App\\Controller\\IluoController::generalElementsAdminPageGet'), options = []) }}
 			{{ render(controller('App\\Controller\\IluoController::checklistAdminPageGet'), options = []) }}

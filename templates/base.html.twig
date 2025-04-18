@@ -172,19 +172,20 @@
 											Déconnexion
 										</a>
 									</p>
-									<div
-										style="width: 10px"></div>
-									<p>
-										<a
-											class="btn btn-outline-info"
-											href="{{path('app_tutorial')}}">
-											TUTO
-										</a>
-									</p>
+
+
 								{% endif %}
 						{% endif %}
 					{% endif %}
-
+					<div
+						style="width: 10px"></div>
+					<p>
+						<a
+							class="btn btn-outline-info"
+							href="{{path('app_tutorial')}}">
+							TUTO
+						</a>
+					</p>
 				</div>
 			</div>
 		</nav>
@@ -193,7 +194,6 @@
 			{% if usersExist is empty %}
 				<div
 					class="container ">
-
 					<h5
 						class="my-5">
 						<strong>
@@ -208,7 +208,7 @@
 								class="row">
 								<form
 									action="{{ path('app_create_super_admin') }}" method="post">
-									{% include "services/accountservices/create_account.html.twig" %}
+									{% include "services/account_services/create_account.html.twig" %}
 								</form>
 							</div>
 						</div>
@@ -279,51 +279,53 @@
 					</div>
 				</div>
 			{% endblock body %}
-		</body>
+		</div>
 	</body>
-</html></div><!-- Footer --><footer
-	class="container py-3 border-top  flex-shrink-0">
-<div
-	class="d-flex flex-wrap justify-content-between">
-	<div
-		class="col-md-5 d-flex align-items-center">
-		<span
-			class="me-1"
-			style="color: red">
-			<i
-				class="fas fa-copyright"></i>
-		</span>
-		<a
-			target="_blank"
-			href="http://topnet.corp.ponet/"
-			style="color: #25a1dd"
-			class="mb-3  mb-md-0 text-decoration-none lh-1">
-			OPmobility
-			{{ facilityName|capitalize }}
-		</a>
-	</div>
-	<div>
-		<a
-			href="javascript:void(0)"
-			onclick="event.preventDefault(); window.history.back();">
-			<i
-				class="fa fa-arrow-circle-o-left"
-				'aria-hidden="false"'>
-				Retour
-			</i>
-		</a>
-	</div>
-	<ul
-		class="nav col-md-5 justify-content-end list-unstyled d-flex">
-		<li
-			class="ms-3">
-			<a
-				class="text-muted"
-				target="_blank"
-				href="https://github.com/kiloutyg/">
-				<i
-					class="fab fa-github"></i>
-			</a>
-		</li>
-	</ul>
-</div></footer><!-- End Footer --></body></html>
+	<footer
+		class="container py-3 border-top  flex-shrink-0">
+		<div
+			class="d-flex flex-wrap justify-content-between">
+			<div
+				class="col-md-5 d-flex align-items-center">
+				<span
+					class="me-1"
+					style="color: red">
+					<i
+						class="fas fa-copyright"></i>
+				</span>
+				<a
+					target="_blank"
+					href="http://topnet.corp.ponet/"
+					style="color: #25a1dd"
+					class="mb-3  mb-md-0 text-decoration-none lh-1">
+					OPmobility
+					{{ facilityName|capitalize }}
+				</a>
+			</div>
+			<div>
+				<a
+					href="javascript:void(0)"
+					onclick="event.preventDefault(); window.history.back();">
+					<i
+						class="fa fa-arrow-circle-o-left"
+						'aria-hidden="false"'>
+						Retour
+					</i>
+				</a>
+			</div>
+			<ul
+				class="nav col-md-5 justify-content-end list-unstyled d-flex">
+				<li
+					class="ms-3">
+					<a
+						class="text-muted"
+						target="_blank"
+						href="https://github.com/kiloutyg/">
+						<i
+							class="fab fa-github"></i>
+					</a>
+				</li>
+			</ul>
+		</div>
+	</footer>
+</html>
