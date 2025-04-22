@@ -101,6 +101,7 @@ class AccountService extends AbstractController
         $modified = '';
         try {
             if ($request->request->get('username') != '') {
+                $this->logger->debug('$request->request->get(\'username\')', [$request->request->get('username')]);
                 $user->setUsername($request->request->get('username'));
                 $modified .= 'Nom d\'utilisateur, ';
             }
@@ -110,21 +111,25 @@ class AccountService extends AbstractController
                 $modified .= 'Mot de passe, ';
             }
             if ($request->request->get('role') != '') {
+                $this->logger->debug('$request->request->get(\'role\')', [$request->request->get('role')]);
                 $user->setRoles([$request->request->get('role')]);
                 $modified .= 'Rôle, ';
             }
             if ($request->request->get('department') != '') {
-                $department = $this->departmentRepository->find([$request->request->get('department')]);
+                $department = $this->departmentRepository->find((int)$request->request->get('department'));
+                $this->logger->debug('department $request->request->get', [$department]);
                 $user->setDepartment($department);
                 $modified .= 'Service, ';
             }
             if ($request->request->get('emailAddress') != '') {
+                $this->logger->debug('$request->request->get(\'emailAddress\')', [$request->request->get('emailAddress')]);
                 $user->setEmailAddress($request->request->get('emailAddress'));
                 $modified .= 'Adresse email, ';
             }
             if ($request->request->get('operator') != '') {
+                $this->logger->debug('$request->request->get(\'operator\')', [$request->request->get('operator')]);
                 $operator = $this->operatorRepository->find($request->request->get('operator'));
-                $this->logger->info('operator', [$operator]);
+                $this->logger->debug('operator', [$operator]);
                 $user->setOperator($operator);
                 $modified .= 'Identité d\'opérateur liée, ';
             }
@@ -137,6 +142,7 @@ class AccountService extends AbstractController
                     $errorMessages[] = $violation->getMessage();
                 }
                 $errorsString = implode("\n", $errorMessages);
+                $this->logger->error('Validation errors while modifying account', [$errorsString]);
                 throw new \Exception($errorsString);
             }
             if ($modified === '' || $modified === null || $errorsString !== '') {
@@ -148,7 +154,7 @@ class AccountService extends AbstractController
 
             return $modified;
         } catch (\Exception $e) {
-            $this->logger->error('account modification error', [
+            $this->logger->error('Account modification error', [
                 ' modified account' => $user,
                 'modifier' => $this->getUser(),
                 'error' => $e->getMessage()

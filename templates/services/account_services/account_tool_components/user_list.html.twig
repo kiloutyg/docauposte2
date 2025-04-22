@@ -72,7 +72,7 @@
 													{{ user.roles|json_encode|convert_encoding('UTF-8', 'UTF-8') }}
 												</td>
 												<td>
-													{{user.UserList.name ?? 'inconnu' }}
+													{{user.department.name ?? 'inconnu' }}
 												</td>
 												<td>
 													{% if user.emailAddress %}

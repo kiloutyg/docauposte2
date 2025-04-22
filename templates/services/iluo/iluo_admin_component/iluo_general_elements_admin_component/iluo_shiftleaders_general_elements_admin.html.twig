@@ -70,6 +70,10 @@
 											{% set uap = shiftLeader.user.operator.uaps|first %}
 											{{uap.name}}
 										</div>
+									{% elseif shiftLeader.user.department is defined and shiftLeader.user.department is not empty %}
+										<div>
+											{{shiftLeader.user.department.name}}
+										</div>
 									{% endif %}
 									{% if is_granted('ROLE_SUPER_ADMIN') %}
 										<a
@@ -91,8 +95,7 @@
 											</span>
 										</a>
 										<a
-											href="{{path('app_iluo_delete_entity', {'entityType': 'shiftLeaders', 'entityId': shiftLeader.id})}}" 
-											aria-label="Delete the ShiftLeader Entity, not the User"
+											href="{{path('app_iluo_delete_entity', {'entityType': 'shiftLeaders', 'entityId': shiftLeader.id})}}" aria-label="Delete the ShiftLeader Entity, not the User"
 											class="btn btn-danger delete-shiftLeaders shadow tooltips-above">
 											<span
 												class="d-none d-md-inline">

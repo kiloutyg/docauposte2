@@ -24,7 +24,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 180)]
     #[Assert\Regex(
-        pattern: '/^(it-[a-z]{3,}|[a-z]{3,}(?:-[a-z]{3,})?\.[a-z]{3,}(?:-[a-z]{3,})?)$/',
+        pattern: '/^(it-[a-z]+|[a-z]+(?:-[a-z]+)?\.[a-z]+(?:-[a-z]+)?)$/',
         message: 'Le nom d\'utilisateur doit être au format prénom.nom, prénom-nom.nom, ou it-polangres'
     )]
     private ?string $username = null;

@@ -98,57 +98,55 @@
 									name="department_uaps[]"
 									multiple="multiple"
 									size="2">
-									{% for uap in uaps %}
-										<option
-											value="{{uap.id}}" {% if uap.id in department.uaps|map(u => u.id) %} selected
-											{% endif %}>
-											{{uap.name|upper}}
-										</option>
-									{% endfor %}
-								</select>
-								<button
-									id="modify_department"
-									type="submit"
-									aria-label="Modify the department Entity"
-									class="btn btn-info tooltips-above">
-									<span
-										class="d-none d-md-inline">
-										Modifier
-									</span>
-									<i
-										class="fas fa-pen-to-square d-inline d-md-none"
-										aria-hidden="true"
-										title="Modifier"></i>
-									<span
-										class="visually-hidden">
-										Modifier
-									</span>
-								</button>
-								<a
-									id="delete_department"
-									href="{{ path('app_department_deletion', {departmentId : department.id}) }}" type="button"
-									aria-label="Delete the department Entity"
-									class="btn btn-danger shadow border border-dark-subtle delete-department">
-									<span
-										class="d-none d-md-inline tooltips-above">
-										Supprimer
-									</span>
-									<i
-										class="fas fa-trash d-inline d-md-none"
-										aria-hidden="true"
-										title="Supprimer"></i>
-									<span
-										class="visually-hidden">
-										Supprimer
-									</span>
-								</a>
-							</div>
-						</form>
-					{% endfor %}
+								{% for uap in uaps %}
+									<option
+										value="{{uap.id}}" {% if uap.id in department.uaps|map(u => u.id) %} selected
+										{% endif %}>
+										{{uap.name|upper}}
+									</option>
+								{% endfor %}
+							</select>
+							<button
+								id="modify_department"
+								type="submit"
+								aria-label="Modify the department Entity"
+								class="btn btn-info tooltips-above">
+								<span
+									class="d-none d-md-inline">
+									Modifier
+								</span>
+								<i
+									class="fas fa-pen-to-square d-inline d-md-none"
+									aria-hidden="true"
+									title="Modifier"></i>
+								<span
+									class="visually-hidden">
+									Modifier
+								</span>
+							</button>
+							<a
+								id="delete_department"
+								href="{{ path('app_department_deletion', {departmentId : department.id}) }}" type="button"
+								aria-label="Delete the department Entity"
+								class="btn btn-danger shadow border border-dark-subtle delete-department">
+								<span
+									class="d-none d-md-inline tooltips-above">
+									Supprimer
+								</span>
+								<i
+									class="fas fa-trash d-inline d-md-none"
+									aria-hidden="true"
+									title="Supprimer"></i>
+								<span
+									class="visually-hidden">
+									Supprimer
+								</span>
+							</a>
+						</div>
+					</form>
+				{% endfor %}
 
-				</div>
 			</div>
 		</div>
 	</div>
-
-</turbo-frame>
+</div></turbo-frame>

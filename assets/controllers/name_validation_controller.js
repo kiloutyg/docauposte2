@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static targets = ["teamUapName", "productName", "teamUapNameMessage", "productNameMessage", "saveButton"];
+    static targets = ["teamUapName", "teamUapNameMessage", "productName", "productNameMessage", "workstationName", "workstationNameMessage", "saveButton"];
 
     validateTeamUapName() {
         const regex = /^(?!-)(?!.*--)[A-Z-]{3,}(?<!-)$/;
@@ -38,5 +38,20 @@ export default class extends Controller {
         }
     }
 
-
+    validateWorkstationName() {
+        const regex = /^[A-Za-z0-9\s\-\/\(\)\+\.]+$/;
+        let isValid = true;
+        let name = this.workstationNameTarget.value.toUpperCase();
+        if (name != '') {
+            isValid = regex.test(name);
+        }
+        if (isValid) {
+            this.workstationNameMessageTarget.textContent = "";
+            this.saveButtonTarget.disabled = false;
+        } else {
+            this.workstationNameMessageTarget.textContent = "Format invalide. Veuillez saisir sous la forme: ABC123";
+            this.workstationNameMessageTarget.style.color = "DarkRed"; // Display the message in red color.
+            this.saveButtonTarget.disabled = true;
+        }
+    }
 }

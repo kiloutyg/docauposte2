@@ -18,10 +18,12 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use App\Entity\Products;
 use App\Entity\ShiftLeaders;
 use App\Entity\QualityRep;
+use App\Entity\Workstation;
 
 use App\Form\ProductType;
 use App\Form\ShiftLeadersType;
 use App\Form\QualityRepType;
+use App\Form\WorkstationType;
 
 use App\Service\EntityFetchingService;
 use App\Service\EntityDeletionService;
@@ -72,16 +74,7 @@ class IluoController extends AbstractController
         return $this->redirectToRoute('app_base');
     }
 
-
-    #[Route('admin/general_elements', name: 'general_elements_admin')]
-    public function generalElementsAdminPageGet(Request $request): Response
-    {
-        if ($request->isMethod('GET')) {
-            return $this->render('/services/iluo/iluo_admin_component/iluo_general_elements_admin.html.twig');
-        }
-        return $this->redirectToRoute('app_base');
-    }
-
+    // Checklist
 
     #[Route('admin/checklist', name: 'checklist_admin')]
     public function checklistAdminPageGet(Request $request): Response
@@ -93,6 +86,8 @@ class IluoController extends AbstractController
     }
 
 
+    // Workstation
+
     #[Route('admin/workstation', name: 'workstation_admin')]
     public function workstationAdminPageGet(Request $request): Response
     {
@@ -103,6 +98,34 @@ class IluoController extends AbstractController
     }
 
 
+    #[Route('admin/creation_workstation', name: 'creation_workstation_admin')]
+    public function creationWorkstationAdminPageGet(Request $request): Response
+    {
+        $workstations = $this->entityFetchingService->getWorkstations();
+        $newWorkstation = new Workstation();
+        $workstationForm = $this->createForm(WorkstationType::class, $newWorkstation);
+        if ($request->isMethod('POST')) {
+            $this->logger->info('workstation form submitted', [$request->request->all()]);
+            return $this->iluoComponentFormManagement('workstation', $workstationForm, $request);
+        }
+        return $this->render('/services/iluo/iluo_admin_component/iluo_workstation_admin_component/iluo_creation_workstation_admin.html.twig', [
+            'workstationForm' => $workstationForm->createView(),
+            'workstations' => $workstations,
+        ]);
+    }
+
+    // General elements
+
+
+    #[Route('admin/general_elements', name: 'general_elements_admin')]
+    public function generalElementsAdminPageGet(Request $request): Response
+    {
+        if ($request->isMethod('GET')) {
+            return $this->render('/services/iluo/iluo_admin_component/iluo_general_elements_admin.html.twig');
+        }
+        return $this->redirectToRoute('app_base');
+    }
+
     #[Route('admin/products_general_elements', name: 'products_general_elements_admin')]
     public function productsGeneralElementsAdminPageGet(Request $request): Response
     {
@@ -111,7 +134,7 @@ class IluoController extends AbstractController
         $productForm = $this->createForm(ProductType::class, $newProduct);
         if ($request->isMethod('POST')) {
             $this->logger->info('products form submitted', [$request->request->all()]);
-            return $this->generalElementsFormManagement('products', $productForm, $request);
+            return $this->iluoComponentFormManagement('products', $productForm, $request);
         }
         return $this->render('/services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_products_general_elements_admin.html.twig', [
             'productForm' => $productForm->createView(),
@@ -128,7 +151,7 @@ class IluoController extends AbstractController
         $shiftLeadersForm = $this->createForm(ShiftLeadersType::class, $newShiftLeaders);
         if ($request->isMethod('POST')) {
             $this->logger->info('shiftLeaders form submitted', [$request->request->all()]);
-            return $this->generalElementsFormManagement('shiftLeaders', $shiftLeadersForm, $request);
+            return $this->iluoComponentFormManagement('shiftLeaders', $shiftLeadersForm, $request);
         }
         return $this->render('/services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_shiftleaders_general_elements_admin.html.twig', [
             'shiftLeadersForm' => $shiftLeadersForm->createView(),
@@ -146,7 +169,7 @@ class IluoController extends AbstractController
         $qualityRepForm = $this->createForm(QualityRepType::class, $newQualityRep);
         if ($request->isMethod('POST')) {
             $this->logger->info('qualityRep form submitted', [$request->request->all()]);
-            return $this->generalElementsFormManagement('qualityRep', $qualityRepForm, $request);
+            return $this->iluoComponentFormManagement('qualityRep', $qualityRepForm, $request);
         }
         return $this->render('/services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_qualityrep_general_elements_admin.html.twig', [
             'qualityRepForm' => $qualityRepForm->createView(),
@@ -155,9 +178,30 @@ class IluoController extends AbstractController
     }
 
 
-    public function generalElementsFormManagement(string $entityType, Form $form, Request $request): Response
+
+
+    // Transversal elements
+
+    #[Route('admin/delete_entity/{entityType}/{entityId}', name: 'delete_entity')]
+    public function deleteIluoEntity(string $entityType, int $entityId)
     {
-        $this->logger->info('generalElementsFormManagement', [$entityType, $form, $request]);
+        $this->logger->debug('Deleting entity of type: ' . $entityType . 'with id: ' . $entityId);
+        try {
+            $this->entityDeletionService->deleteEntity($entityType, $entityId);
+            $this->addFlash('success', 'Le ' . $entityType . ' a bien été supprimé.');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Issue while trying to delete the entity ' . $e->getMessage());
+            $this->logger->error('Error while deleting entity ', [$e->getMessage()]);
+        } finally {
+            return $this->redirectToRoute($this->routeNameDetermination($entityType));
+        }
+    }
+
+
+
+    public function iluoComponentFormManagement(string $entityType, Form $form, Request $request): Response
+    {
+        $this->logger->info('iluoComponentFormManagement', [$entityType, $form, $request]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
@@ -186,25 +230,18 @@ class IluoController extends AbstractController
     }
 
 
-    #[Route('admin/delete_entity/{entityType}/{entityId}', name: 'delete_entity')]
-    public function deleteIluoEntity(string $entityType, int $entityId)
-    {
-        $this->logger->debug('Deleting entity of type: ' . $entityType . 'with id: ' . $entityId);
-        try {
-            $this->entityDeletionService->deleteEntity($entityType, $entityId);
-            $this->addFlash('success', 'Le ' . $entityType . ' a bien été supprimé.');
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Issue while trying to delete the entity ' . $e->getMessage());
-            $this->logger->error('Error while deleting entity ', [$e->getMessage()]);
-        } finally {
-            return $this->redirectToRoute($this->routeNameDetermination($entityType));
-        }
-    }
-
-
     public function routeNameDetermination(string $entityType): string
     {
-        $route = 'app_iluo_' . strtolower($entityType) . '_general_elements_admin';
+
+        if (in_array($entityType, ['products', 'shiftleaders', 'qualityrep'])) {
+            $route = 'app_iluo_' . strtolower($entityType) . '_general_elements_admin';
+        } elseif ($entityType === 'workstation') {
+            $route = 'app_iluo_' . strtolower($entityType) . '_workstation_admin';
+        } elseif ($entityType === 'checklist') {
+            $route = 'app_iluo_checklist_admin';
+        } else {
+            throw new \InvalidArgumentException("Invalid entity type: $entityType");
+        }
         $this->logger->info('Redirecting to route', [$route]);
         return $route;
     }

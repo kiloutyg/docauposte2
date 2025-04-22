@@ -59,30 +59,27 @@ class DepartmentService extends AbstractController
 
     public function departmentModification(Request $request): string
     {
-        $depId = $request->request->get('department_id');
+        $departmentId = $request->request->get('department_id');
         // Check if department_id is provided
-        if (!$depId) {
+        if (!$departmentId) {
             $this->logger->error('No department ID provided');
             throw new \InvalidArgumentException('Department ID is missing');
         }
 
-        $department = $this->departmentRepository->find($depId);
+        $department = $this->departmentRepository->find($departmentId);
         if (!$department) {
-            $this->logger->error('Department with ID' . $depId . 'not found ');
-            throw new \InvalidArgumentException(sprintf('Department with ID %s not found', $depId));
+            $this->logger->error('Department with ID' . $departmentId . 'not found ');
+            throw new \InvalidArgumentException(sprintf('Department with ID %s not found', $departmentId));
         }
 
         $departmentNameNew = $request->request->get('department_name_mod');
-
         if ($departmentNameNew != '') {
             $department->setName($departmentNameNew);
         } else {
             $departmentName = $department->getName();
         }
 
-
         $uaps = $request->request->all('department_uaps');
-
         if ($uaps != []) {
             $this->logger->info('$uaps not empty');
             foreach ($uaps as &$newUap) {
