@@ -26,6 +26,8 @@ use App\Repository\IncidentRepository;
 use App\Repository\IncidentCategoryRepository;
 use App\Repository\ProductsRepository;
 use App\Repository\QualityRepRepository;
+use App\Repository\WorkstationRepository;
+
 use Doctrine\Common\Collections\Collection;
 use Psr\Log\LoggerInterface;
 
@@ -60,6 +62,7 @@ class EntityFetchingService extends AbstractController
     private $trainerRepository;
     private $productsRepository;
     private $qualityRepRepository;
+    private $workstationRepository;
 
     public function __construct(
         LoggerInterface                 $logger,
@@ -85,6 +88,7 @@ class EntityFetchingService extends AbstractController
         UserRepository                  $userRepository,
         UploadRepository                $uploadRepository,
         ValidationRepository            $validationRepository,
+        WorkstationRepository           $workstationRepository,
         ZoneRepository                  $zoneRepository,
 
     ) {
@@ -107,10 +111,11 @@ class EntityFetchingService extends AbstractController
         $this->teamRepository               = $teamRepository;
         $this->trainingRecordRepository     = $trainingRecordRepository;
         $this->trainerRepository            = $trainerRepository;
-        $this->validationRepository         = $validationRepository;
         $this->uapRepository                = $uapRepository;
         $this->uploadRepository             = $uploadRepository;
         $this->userRepository               = $userRepository;
+        $this->validationRepository         = $validationRepository;
+        $this->workstationRepository        = $workstationRepository;
         $this->zoneRepository               = $zoneRepository;
     }
 
@@ -332,5 +337,11 @@ class EntityFetchingService extends AbstractController
         }
 
         return $response;
+    }
+
+
+    public function getWorkstations()
+    {
+        return $this->workstationRepository->findAll();
     }
 }

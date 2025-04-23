@@ -6,8 +6,11 @@ use App\Repository\WorkstationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: WorkstationRepository::class)]
+#[UniqueEntity(fields: 'name', message: 'Un poste de travail avec ce nom existe déjà.')]
 class Workstation
 {
     #[ORM\Id]
@@ -16,6 +19,12 @@ class Workstation
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 3, max: 255)]
+    #[Assert\Regex(
+        pattern: '/^[A-Za-z0-9\s\-\/\(\)\+\.]+$/',
+        message: 'Le nom de poste de travail doit être au format : Assy-P674-Poinçonneuse Peau'
+    )]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'workstations')]

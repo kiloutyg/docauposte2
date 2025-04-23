@@ -32,6 +32,7 @@ use App\Repository\UapRepository;
 use App\Repository\UploadRepository;
 use App\Repository\UserRepository;
 use App\Repository\ValidationRepository;
+use App\Repository\WorkstationRepository;
 use App\Repository\ZoneRepository;
 
 
@@ -52,7 +53,7 @@ class EntityDeletionService
     private $departmentRepository;
     private $incidentCategoryRepository;
     private $incidentRepository;
-    private $OldUploadRepository;
+    private $oldUploadRepository;
     private $operatorRepository;
     private $productLineRepository;
     private $productsRepository;
@@ -65,6 +66,7 @@ class EntityDeletionService
     private $uploadRepository;
     private $userRepository;
     private $validationRepository;
+    private $workstationRepository;
     private $zoneRepository;
 
 
@@ -82,7 +84,7 @@ class EntityDeletionService
         DepartmentRepository                $departmentRepository,
         IncidentCategoryRepository          $incidentCategoryRepository,
         IncidentRepository                  $incidentRepository,
-        OldUploadRepository                 $OldUploadRepository,
+        OldUploadRepository                 $oldUploadRepository,
         OperatorRepository                  $operatorRepository,
         ProductLineRepository               $productLineRepository,
         ProductsRepository                  $productsRepository,
@@ -95,6 +97,7 @@ class EntityDeletionService
         UploadRepository                    $uploadRepository,
         UserRepository                      $userRepository,
         ValidationRepository                $validationRepository,
+        WorkstationRepository               $workstationRepository,
         ZoneRepository                      $zoneRepository
     ) {
         $this->em                           = $em;
@@ -110,7 +113,7 @@ class EntityDeletionService
         $this->departmentRepository         = $departmentRepository;
         $this->incidentCategoryRepository   = $incidentCategoryRepository;
         $this->incidentRepository           = $incidentRepository;
-        $this->OldUploadRepository          = $OldUploadRepository;
+        $this->oldUploadRepository          = $oldUploadRepository;
         $this->operatorRepository           = $operatorRepository;
         $this->productLineRepository        = $productLineRepository;
         $this->productsRepository           = $productsRepository;
@@ -123,6 +126,7 @@ class EntityDeletionService
         $this->uploadRepository             = $uploadRepository;
         $this->userRepository               = $userRepository;
         $this->validationRepository         = $validationRepository;
+        $this->workstationRepository        = $workstationRepository;
         $this->zoneRepository               = $zoneRepository;
     }
 
@@ -278,7 +282,7 @@ class EntityDeletionService
         int $oldUploadId
     ) {
 
-        $oldUpload = $this->OldUploadRepository->findOneBy(['id' => $oldUploadId]);
+        $oldUpload = $this->oldUploadRepository->findOneBy(['id' => $oldUploadId]);
 
         $path = $oldUpload->getPath();
         if (file_exists($path)) {

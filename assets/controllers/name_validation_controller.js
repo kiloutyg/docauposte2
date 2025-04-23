@@ -49,7 +49,7 @@ export default class extends Controller {
             this.workstationNameMessageTarget.textContent = "";
             this.saveButtonTarget.disabled = false;
         } else {
-            this.workstationNameMessageTarget.textContent = "Format invalide. Veuillez saisir sous la forme: ABC123";
+            this.workstationNameMessageTarget.textContent = "Format invalide. Veuillez saisir sous la forme: Assy-P674-Poinçonneuse Peau";
             this.workstationNameMessageTarget.style.color = "DarkRed"; // Display the message in red color.
             this.saveButtonTarget.disabled = true;
         }

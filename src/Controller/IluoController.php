@@ -30,6 +30,7 @@ use App\Service\EntityDeletionService;
 use App\Service\ProductsService;
 use App\Service\QualityRepService;
 use App\Service\ShiftLeadersService;
+use App\Service\WorkstationService;
 
 
 #[Route('/iluo/', name: 'app_iluo_')]
@@ -42,6 +43,7 @@ class IluoController extends AbstractController
     private $productsService;
     private $qualityRepService;
     private $shiftLeadersService;
+    private $workstationService;
     public function __construct(
         LoggerInterface                 $logger,
         AuthorizationCheckerInterface   $authChecker,
@@ -50,7 +52,8 @@ class IluoController extends AbstractController
         EntityDeletionService               $entityDeletionService,
         ProductsService                     $productsService,
         QualityRepService                   $qualityRepService,
-        ShiftLeadersService                 $shiftLeadersService
+        ShiftLeadersService                 $shiftLeadersService,
+        WorkstationService                  $workstationService
     ) {
         $this->logger                       = $logger;
         $this->authChecker                  = $authChecker;
@@ -60,6 +63,7 @@ class IluoController extends AbstractController
         $this->productsService              = $productsService;
         $this->qualityRepService            = $qualityRepService;
         $this->shiftLeadersService          = $shiftLeadersService;
+        $this->workstationService           = $workstationService;
     }
 
 
@@ -85,34 +89,6 @@ class IluoController extends AbstractController
         return $this->redirectToRoute('app_base');
     }
 
-
-    // Workstation
-
-    #[Route('admin/workstation', name: 'workstation_admin')]
-    public function workstationAdminPageGet(Request $request): Response
-    {
-        if ($request->isMethod('GET')) {
-            return $this->render('/services/iluo/iluo_admin_component/iluo_workstation_admin.html.twig');
-        }
-        return $this->redirectToRoute('app_base');
-    }
-
-
-    #[Route('admin/creation_workstation', name: 'creation_workstation_admin')]
-    public function creationWorkstationAdminPageGet(Request $request): Response
-    {
-        $workstations = $this->entityFetchingService->getWorkstations();
-        $newWorkstation = new Workstation();
-        $workstationForm = $this->createForm(WorkstationType::class, $newWorkstation);
-        if ($request->isMethod('POST')) {
-            $this->logger->info('workstation form submitted', [$request->request->all()]);
-            return $this->iluoComponentFormManagement('workstation', $workstationForm, $request);
-        }
-        return $this->render('/services/iluo/iluo_admin_component/iluo_workstation_admin_component/iluo_creation_workstation_admin.html.twig', [
-            'workstationForm' => $workstationForm->createView(),
-            'workstations' => $workstations,
-        ]);
-    }
 
     // General elements
 
@@ -179,6 +155,51 @@ class IluoController extends AbstractController
 
 
 
+    // Workstation
+
+    #[Route('admin/workstation', name: 'workstation_admin')]
+    public function workstationAdminPageGet(Request $request): Response
+    {
+        if ($request->isMethod('GET')) {
+            return $this->render('/services/iluo/iluo_admin_component/iluo_workstation_admin.html.twig');
+        }
+        return $this->redirectToRoute('app_base');
+    }
+
+
+    #[Route('admin/creation_workstation', name: 'creation_workstation_admin')]
+    public function creationWorkstationAdminPageGet(Request $request): Response
+    {
+        $this->logger->debug('full request', [$request->request->all()]);
+
+        $newWorkstation = new Workstation();
+        $workstationForm = $this->createForm(WorkstationType::class, $newWorkstation);
+        if ($request->isMethod('POST')) {
+            // Check if this is an AJAX request for zone change
+            if ($request->request->has('ajax_zone_change')) {
+
+                $this->logger->debug('AJAX zone change request detected', [$request->request->all()]);
+
+                // Get the form data from the request
+                $formData = $request->request->has('workstation') ? $request->request->all('workstation') : [];
+                // Handle the form data
+                $workstationForm->submit($formData, false);
+
+                // Just render the form again with the updated upload field
+                return $this->render('services/iluo/iluo_admin_component/iluo_workstation_admin_component/iluo_creation_workstation_admin.html.twig', [
+                    'workstationForm' => $workstationForm->createView(),
+                    'workstations' => $this->entityFetchingService->getWorkstations(),
+                ]);
+            }
+            $this->logger->info('workstation form submitted', [$request->request->all()]);
+            return $this->iluoComponentFormManagement('workstation', $workstationForm, $request);
+        }
+        return $this->render('/services/iluo/iluo_admin_component/iluo_workstation_admin_component/iluo_creation_workstation_admin.html.twig', [
+            'workstationForm' => $workstationForm->createView(),
+            'workstations' => $this->entityFetchingService->getWorkstations(),
+        ]);
+    }
+
 
     // Transversal elements
 
@@ -207,6 +228,8 @@ class IluoController extends AbstractController
             try {
                 // Convert entityType to service property name (e.g., 'shiftLeaders' -> 'shiftLeadersService')
                 $serviceProperty = lcfirst($entityType) . 'Service';
+                $this->logger->info('Service property: ' . $serviceProperty);
+                // Check if service property exists in the current class
                 if (!property_exists($this, $serviceProperty)) {
                     throw new \InvalidArgumentException("Service not found for entity type: $entityType");
                 }
@@ -233,13 +256,14 @@ class IluoController extends AbstractController
     public function routeNameDetermination(string $entityType): string
     {
 
-        if (in_array($entityType, ['products', 'shiftleaders', 'qualityrep'])) {
+        if (in_array($entityType, ['products', 'shiftLeaders', 'qualityRep'])) {
             $route = 'app_iluo_' . strtolower($entityType) . '_general_elements_admin';
         } elseif ($entityType === 'workstation') {
-            $route = 'app_iluo_' . strtolower($entityType) . '_workstation_admin';
+            $route = 'app_iluo_creation_workstation_admin';
         } elseif ($entityType === 'checklist') {
             $route = 'app_iluo_checklist_admin';
         } else {
+            $this->logger->error('Invalid entity type', [$entityType]);
             throw new \InvalidArgumentException("Invalid entity type: $entityType");
         }
         $this->logger->info('Redirecting to route', [$route]);
