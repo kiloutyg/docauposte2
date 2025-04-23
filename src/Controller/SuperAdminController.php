@@ -107,9 +107,6 @@ class SuperAdminController extends AbstractController
 
 
 
-
-
-
     // Zone creation logic destined to the super admin, it also creates the folder structure for the zone
     #[Route('/super_admin/create_zone', name: 'app_super_admin_create_zone')]
     public function createZone(Request $request)

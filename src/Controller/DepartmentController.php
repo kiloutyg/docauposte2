@@ -46,6 +46,7 @@ class DepartmentController extends AbstractController
         return $this->render('services/department_services/department_management.html.twig', [
             'departments' => $this->entityFetchingService->getDepartments(),
             'uaps' => $this->entityFetchingService->getUaps(),
+            'zones' => $this->entityFetchingService->getZones(),
         ]);
     }
 

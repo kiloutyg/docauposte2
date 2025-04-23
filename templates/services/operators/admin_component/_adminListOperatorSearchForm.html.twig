@@ -7,12 +7,10 @@
 			method="post"
 			action="{{ path('app_operator') }}" data-turbo-frame="adminListOperator"
 			id="adminListOperator-form">
-
 			<input
 				type="hidden"
 				name="search"
 				value="true">
-
 			<input
 				data-operator-admin-search-target="operatorAdminSearchNameInput"
 				data-action="keyup->operator-admin-search#submitSearchForm"
@@ -21,7 +19,6 @@
 				name="search_name"
 				id="search_name"
 				placeholder="Recherche par nom">
-
 			<input
 				data-operator-admin-search-target="operatorAdminSearchCodeInput"
 				data-action="keyup->operator-admin-search#submitSearchForm"
@@ -32,7 +29,6 @@
 				name="search_code"
 				id="search_code"
 				placeholder="Recherche par CodeOpé">
-
 			<input
 				data-operator-admin-search-target="operatorAdminSearchTeamInput"
 				data-action="keyup->operator-admin-search#submitSearchForm"
@@ -45,6 +41,8 @@
 			<datalist
 				id="team-list">
 				{% for team in teams %}
+					{% if team.name is same as 'INDEFINI' %}
+					{% endif %}
 					<option
 						value="{{ team.name }}"></option>
 				{% endfor %}
@@ -62,6 +60,8 @@
 			<datalist
 				id="uap-list">
 				{% for uap in uaps %}
+					{% if uap.name is same as 'INDEFINI' %}
+					{% endif %}
 					<option
 						value="{{ uap.name }}"></option>
 				{% endfor %}

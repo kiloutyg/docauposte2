@@ -122,7 +122,7 @@ class EntityFetchingService extends AbstractController
 
     public function getUsers()
     {
-        return $this->userRepository->findAll();;
+        return $this->userRepository->findAll();
     }
 
 
@@ -189,9 +189,7 @@ class EntityFetchingService extends AbstractController
 
     public function getAllWithAssociations()
     {
-        $query = $this->uploadRepository->findAllWithAssociations();
-        $this->logger->info('query', $query);
-        return $query;
+        return $this->uploadRepository->findAllWithAssociations();
     }
 
 

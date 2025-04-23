@@ -10,12 +10,17 @@ use App\Entity\Uap;
 use App\Entity\Upload;
 use App\Entity\Zone;
 
+use App\Repository\ProductsRepository;
 use App\Repository\ZoneRepository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+
+use Symfony\Bundle\SecurityBundle\Security;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -30,22 +35,38 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkstationType extends AbstractType
 {
+    private $logger;
+    private $security;
+
+    private $productsRepository;
     private $zoneRepository;
 
     public function __construct(
-        ZoneRepository $zoneRepository,
+        LoggerInterface         $logger,
+        Security                $security,
+
+        ProductsRepository      $productsRepository,
+        ZoneRepository          $zoneRepository
     ) {
-        $this->zoneRepository   = $zoneRepository;
+        $this->logger               = $logger;
+        $this->security             = $security;
+
+        $this->productsRepository   = $productsRepository;
+        $this->zoneRepository       = $zoneRepository;
     }
 
-    private function getDefaultOptions($placeholder = '')
+    private function getDefaultOptions(string $placeholder = '', ?array $optionalAttr = []): array
     {
         return [
             'required' => false,
             'placeholder' => $placeholder,
-            'attr' => [
-                'class' => 'form-control mx-auto mt-2',
-            ],
+            'attr' => array_merge(
+                [
+                    'class' => 'form-control mx-auto mt-2',
+                ],
+                $optionalAttr
+            ),
+
             'label_attr' => [
                 'class' => 'form-label',
                 'style' => 'font-weight: bold; color: #ffffff;'
@@ -56,9 +77,12 @@ class WorkstationType extends AbstractType
         ];
     }
 
-    private function addUploadField($form, ?Zone $zone = null)
+    private function addUploadField($form, ?Zone $zone = null, ?Products $product = null): void
     {
-        $queryBuilder = function (EntityRepository $er) use ($zone): QueryBuilder {
+
+        $this->logger->debug('Adding upload field ', ['zone' => $zone, 'product' => $product]);
+
+        $queryBuilder = function (EntityRepository $er) use ($zone, $product): QueryBuilder {
             $qb = $er->createQueryBuilder('u')
                 ->leftJoin('u.validation', 'v')
                 ->where('v.id IS NOT NULL')
@@ -75,6 +99,15 @@ class WorkstationType extends AbstractType
                     ->setParameter('zoneId', $zone->getId());
             }
 
+            if ($product !== null) {
+                // Extract just the product name without spaces for better matching
+                $productNameSimplified = str_replace(' ', '', $product->getName());
+
+                // Match paths that contain the product name (case insensitive)
+                $qb->andWhere('LOWER(u.path) LIKE LOWER(:productPattern)')
+                    ->setParameter('productPattern', '%' . $productNameSimplified . '%');
+            }
+
             return $qb->orderBy('u.path', 'ASC');
         };
 
@@ -86,19 +119,54 @@ class WorkstationType extends AbstractType
                     'label' => 'SWI :',
                     'class' => Upload::class,
                     'choice_label' => 'filename',
-                    'query_builder' => $queryBuilder,
-                    'attr' => [
-                        'data-workstation-creation-target' => 'zone',
-                        'data-action' => 'change->workstation-creation#zoneChanged'
-                    ]
+                    'query_builder' => $queryBuilder
                 ],
-                $this->getDefaultOptions('Choisir une SWI :')
+                $this->getDefaultOptions('Choisir une SWI :', [
+                    'data-workstation-form-target' => 'upload',
+                    'data-action' => 'change->workstation-form#fieldsChanged'
+                ])
             )
         );
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        // Initialize default values
+        $userDepartment = null;
+        $userZone = null;
+        $userUap = null;
+
+        // Get the current user's information
+        $user = $this->security->getUser();
+
+        if ($user) {
+            // Get user's department
+            $userDepartment = $user->getDepartment();
+
+            // If user has a department, try to get a default zone and UAP
+            if ($userDepartment) {
+                // Get the first zone from the department's zones collection (if any)
+                $zones = $userDepartment->getZones();
+                if ($zones && !$zones->isEmpty()) {
+                    $userZone = $zones->first();
+                }
+
+                // Get the first UAP from the department's UAPs collection (if any)
+                $uaps = $userDepartment->getUaps();
+                if ($uaps && !$uaps->isEmpty()) {
+                    $userUap = $uaps->first();
+                }
+            }
+
+            // If no UAP found from department, try to get it from the user's operator
+            if (!$userUap) {
+                $userOperator = $user->getOperator();
+                if ($userOperator) {
+                    $userUap = $userOperator->getUaps();
+                }
+            }
+        }
+
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Nom du Poste de Travail',
@@ -127,7 +195,10 @@ class WorkstationType extends AbstractType
                         'class' => Products::class,
                         'choice_label' => 'name'
                     ],
-                    $this->getDefaultOptions('Choisir un Produit :')
+                    $this->getDefaultOptions('Choisir un Produit :', [
+                        'data-workstation-form-target' => 'product',
+                        'data-action' => 'change->workstation-form#fieldsChanged'
+                    ])
                 )
             )
             ->add(
@@ -138,8 +209,12 @@ class WorkstationType extends AbstractType
                         'label' => 'Service :',
                         'class' => Department::class,
                         'choice_label' => 'name',
+                        'data' => $userDepartment,
                     ],
-                    $this->getDefaultOptions('Choisir un Service :')
+                    $this->getDefaultOptions('Choisir un Service :', [
+                        'data-workstation-form-target' => 'department',
+                        'data-action' => 'change->workstation-form#fieldsChanged'
+                    ])
                 )
             )
             ->add(
@@ -150,12 +225,12 @@ class WorkstationType extends AbstractType
                         'label' => 'Zone :',
                         'class' => Zone::class,
                         'choice_label' => 'name',
-                        'attr' => [
-                            'data-workstation-creation-target' => 'zone',
-                            'data-action' => 'change->workstation-creation#zoneChanged'
-                        ]
+                        'data' => $userZone,
                     ],
-                    $this->getDefaultOptions('Choisir une Zone :')
+                    $this->getDefaultOptions('Choisir une Zone :', [
+                        'data-workstation-form-target' => 'zone',
+                        'data-action' => 'change->workstation-form#fieldsChanged'
+                    ])
                 )
             )
             ->add(
@@ -166,13 +241,28 @@ class WorkstationType extends AbstractType
                         'label' => 'UAP :',
                         'class' => Uap::class,
                         'choice_label' => 'name',
+                        'data' => $userUap,
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('u')
+                                ->where('u.name != :undefined')
+                                ->setParameter('undefined', 'INDEFINI')
+                                ->orderBy('u.name', 'ASC');
+                        },
                     ],
-                    $this->getDefaultOptions('Choisir une UAP :')
+                    $this->getDefaultOptions('Choisir une UAP :', [
+                        'data-workstation-form-target' => 'uap',
+                        'data-action' => 'change->workstation-form#fieldsChanged'
+                    ])
                 )
             );
+        if ($userZone) {
+            $this->addUploadField($builder, $userZone);
+        } else {
+            // Add the upload field initially without zone filtering
+            $this->addUploadField($builder);
+        }
 
-        // Add the upload field initially without zone filtering
-        $this->addUploadField($builder);
+
 
         // Add event listener to update the upload field when zone changes
         $builder->addEventListener(
@@ -181,13 +271,42 @@ class WorkstationType extends AbstractType
                 $data = $event->getData();
                 $form = $event->getForm();
 
+                $this->logger->info('Pre-submit event triggered');
+
                 // Check if zone is selected
                 if (isset($data['zone']) && !empty($data['zone'])) {
+                    $this->logger->debug('Updating upload field with zone: ' . $data['zone']);
                     // Get the Zone entity
                     $zone = $this->getZoneById($data['zone']);
 
-                    // Update the upload field with zone filtering
+                    // Update department and UAP based on zone
+                    if ($zone && $zone->getDepartment()) {
+                        $data['department'] = $zone->getDepartment()->getId();
+                        // Set first UAP from department if available
+                        if ($zone->getDepartment()->getUaps() && !$zone->getDepartment()->getUaps()->isEmpty()) {
+                            $data['uap'] = $zone->getDepartment()->getUaps()->first()->getId();
+                        }
+                    }
+                    // Update the event data with the modified values
+                    $event->setData($data);
+
+                    if (isset($data['products']) && !empty($data['products'])) {
+                        $this->logger->debug('Updating upload field with products: ' . $data['products']);
+                        // Get the Product entity
+                        $product = $this->getProductById($data['products']);
+                        // Update the upload field with zone filtering
+                        $this->addUploadField($form, $zone, $product);
+                    }
+                    // If no zone or product is selected, update the upload field without zone filtering
                     $this->addUploadField($form, $zone);
+                } elseif (isset($data['products']) && !empty($data['products'])) {
+                    $this->logger->debug('Updating upload field with products: ' . $data['products']);
+                    // Get the Product entity
+                    $product = $this->getProductById($data['products']);
+                    // Update the upload field with zone filtering
+                    $this->addUploadField($form, null, $product);
+                } else {
+                    $this->addUploadField($form);
                 }
             }
         );
@@ -210,6 +329,13 @@ class WorkstationType extends AbstractType
         return $this->zoneRepository->find($zoneId);
     }
 
+    /**
+     * Helper method to get Product entity by ID
+     */
+    private function getProductById($productId)
+    {
+        return $this->productsRepository->find($productId);
+    }
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

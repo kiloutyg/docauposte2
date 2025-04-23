@@ -191,7 +191,7 @@ class Department
     /**
      * @return Collection<int, Zone>
      */
-    public function getZone(): Collection
+    public function getZones(): Collection
     {
         return $this->zones;
     }

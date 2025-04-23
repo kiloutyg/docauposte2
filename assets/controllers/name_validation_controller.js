@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 
-export default class extends Controller {
+export default class NameValidationController extends Controller {
     static targets = ["teamUapName", "teamUapNameMessage", "productName", "productNameMessage", "workstationName", "workstationNameMessage", "saveButton"];
 
     validateTeamUapName() {
