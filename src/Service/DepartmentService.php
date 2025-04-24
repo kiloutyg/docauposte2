@@ -51,15 +51,13 @@ class DepartmentService extends AbstractController
                 $errorMessages[] = $violation->getMessage();
             }
             $errorsString = implode("\n", $errorMessages);
-            throw new \Exception($errorsString);
+            throw new \InvalidArgumentException($errorsString);
         }
 
         $this->em->persist($department);
         $this->em->flush();
         return $departmentName;
     }
-
-
 
     public function departmentModification(Request $request): string
     {
@@ -83,71 +81,161 @@ class DepartmentService extends AbstractController
             $departmentName = $department->getName();
         }
 
+        $this->departmentUapManagement($department, $request);
+
+        $this->departmentZoneManagement($department, $request);
+        $this->validatingDepartment($department);
+
+        $this->em->persist($department);
+        $this->em->flush();
+        return $departmentName;
+    }
+
+    public function departmentUapManagement(Department $department, Request $request)
+    {
         $uaps = $request->request->all('department_uaps');
-        if ($uaps != []) {
-            $this->logger->info('$uaps not empty');
-            // Check if the array contains a '0' value, which means "no UAPs at all"
-            if (in_array(0, $uaps)) {
-                $this->logger->info('Value 0 found - removing all UAPs from department');
-                // Remove all existing UAPs from the department
-                $depUaps = $department->getUaps();
-                foreach ($depUaps as $oldUap) {
-                    $this->logger->info('Removing all UAPs - removing uap ' . $oldUap->getName());
-                    $department->removeUap($oldUap);
-                }
-            } else {
-                // Normal case - add selected UAPs and remove unselected ones
-                foreach ($uaps as &$newUap) {
-                    $uap = $this->uapRepository->find($newUap);
-                    if ($uap) {
-                        $this->logger->info('try to add uap ' . $uap->getName());
-                        $department->addUap($uap);
-                    } else {
-                        $this->logger->warning('UAP with ID ' . $newUap . ' not found');
-                    }
-                }
-                // Process removals - any UAP not in the submitted list should be removed
-                $depUaps = $department->getUaps();
-                foreach ($depUaps as $oldUap) {
-                    $this->logger->info('try to remove uap ' . $oldUap->getName());
-                    if (!in_array($oldUap->getId(), $uaps)) {
-                        $this->logger->info('remove uap ' . $oldUap->getName());
-                        $department->removeUap($oldUap);
-                    }
-                }
-            }
+        if (empty($uaps)) {
+            return;
         }
 
+        $this->logger->info('$uaps not empty');
+
+        if (in_array(0, $uaps)) {
+            $this->removeAllUapsFromDepartment($department);
+            return;
+        }
+
+        $this->updateDepartmentUaps($department, $uaps);
+    }
+
+    /**
+     * Remove all UAPs from a department
+     */
+    private function removeAllUapsFromDepartment(Department $department): void
+    {
+        $this->logger->info('Value 0 found - removing all UAPs from department');
+        $depUaps = $department->getUaps();
+        foreach ($depUaps as $oldUap) {
+            $this->logger->info('Removing all UAPs - removing uap ' . $oldUap->getName());
+            $department->removeUap($oldUap);
+        }
+    }
+
+    /**
+     * Update department UAPs based on the provided list
+     */
+    private function updateDepartmentUaps(Department $department, array $uapIds): void
+    {
+        // Add new UAPs
+        $this->addSelectedUaps($department, $uapIds);
+
+        // Remove unselected UAPs
+        $this->removeUnselectedUaps($department, $uapIds);
+    }
+
+    /**
+     * Add selected UAPs to department
+     */
+    private function addSelectedUaps(Department $department, array $uapIds): void
+    {
+        foreach ($uapIds as $uapId) {
+            $uap = $this->uapRepository->find($uapId);
+            if ($uap) {
+                $this->logger->info('try to add uap ' . $uap->getName());
+                $department->addUap($uap);
+            } else {
+                $this->logger->warning('UAP with ID ' . $uapId . ' not found');
+            }
+        }
+    }
+
+    /**
+     * Remove UAPs that are not in the selected list
+     */
+    private function removeUnselectedUaps(Department $department, array $uapIds): void
+    {
+        $depUaps = $department->getUaps();
+        foreach ($depUaps as $oldUap) {
+            if (!in_array($oldUap->getId(), $uapIds)) {
+                $this->logger->info('remove uap ' . $oldUap->getName());
+                $department->removeUap($oldUap);
+            }
+        }
+    }
+
+    public function departmentZoneManagement(Department $department, Request $request)
+    {
         $zones = $request->request->all('department_zones');
-        if ($zones != []) {
-            if (in_array(0, $zones)) {
-                $this->logger->info('Value 0 found - removing all Zones from department');
-                // Remove all existing Zones from the department
-                $depZones = $department->getZones();
-                foreach ($depZones as $oldZone) {
-                    $this->logger->info('Removing all Zones - removing Zone ' . $oldZone->getName());
-                    $department->removeZone($oldZone);
-                }
-            } else {
-                // Normal case - add selected Zones and remove unselected ones
-                $this->logger->info('$zones not empty');
-                foreach ($zones as &$newZone) {
-                    $zone = $this->zoneRepository->find($newZone);
-                    $this->logger->info('try to add zone ' . $zone->getName());
-                    $department->addZone($zone);
-                }
-                // Process removals - any Zone not in the submitted list should be removed
-                $depZones = $department->getZones();
-                foreach ($depZones as $oldZone) {
-                    $this->logger->info('try to remove zone ' . $oldZone->getName());
-                    if (in_array($oldZone->getId(), $zones) === false) {
-                        $this->logger->info('remove zone ' . $oldZone->getName());
-                        $department->removeZone($oldZone);
-                    }
-                }
-            }
+        if (empty($zones)) {
+            return;
         }
 
+        if (in_array(0, $zones)) {
+            $this->removeAllZonesFromDepartment($department);
+            return;
+        }
+
+        $this->updateDepartmentZones($department, $zones);
+    }
+
+    /**
+     * Remove all zones from a department
+     */
+    private function removeAllZonesFromDepartment(Department $department): void
+    {
+        $this->logger->info('Value 0 found - removing all Zones from department');
+        $depZones = $department->getZones();
+        foreach ($depZones as $oldZone) {
+            $this->logger->info('Removing all Zones - removing Zone ' . $oldZone->getName());
+            $department->removeZone($oldZone);
+        }
+    }
+
+    /**
+     * Update department zones based on the provided list
+     */
+    private function updateDepartmentZones(Department $department, array $zoneIds): void
+    {
+        // Add new zones
+        $this->addSelectedZones($department, $zoneIds);
+
+        // Remove unselected zones
+        $this->removeUnselectedZones($department, $zoneIds);
+    }
+
+    /**
+     * Add selected zones to department
+     */
+    private function addSelectedZones(Department $department, array $zoneIds): void
+    {
+        $this->logger->info('$zones not empty');
+        foreach ($zoneIds as $zoneId) {
+            $zone = $this->zoneRepository->find($zoneId);
+            if ($zone) {
+                $this->logger->info('try to add zone ' . $zone->getName());
+                $department->addZone($zone);
+            } else {
+                $this->logger->warning('Zone with ID ' . $zoneId . ' not found');
+            }
+        }
+    }
+
+    /**
+     * Remove zones that are not in the selected list
+     */
+    private function removeUnselectedZones(Department $department, array $zoneIds): void
+    {
+        $depZones = $department->getZones();
+        foreach ($depZones as $oldZone) {
+            if (!in_array($oldZone->getId(), $zoneIds)) {
+                $this->logger->info('remove zone ' . $oldZone->getName());
+                $department->removeZone($oldZone);
+            }
+        }
+    }
+
+    public function validatingDepartment(Department $department)
+    {
         $errors = $this->validator->validate($department);
         $this->logger->info('count errors: ' . count($errors));
         if (count($errors) > 0) {
@@ -158,9 +246,5 @@ class DepartmentService extends AbstractController
             $errorsString = implode("\n", $errorMessages);
             throw new \Exception($errorsString);
         }
-
-        $this->em->persist($department);
-        $this->em->flush();
-        return $departmentName;
     }
 }
