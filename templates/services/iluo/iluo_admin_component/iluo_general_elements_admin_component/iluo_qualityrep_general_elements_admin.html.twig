@@ -94,22 +94,7 @@
 												UserMod
 											</span>
 										</a>
-										<a
-											href="{{path('app_iluo_delete_entity', {'entityType': 'qualityRep', 'entityId': qualityRep.id})}}" aria-label="Delete the qualityRep Entity, not the User"
-											class="btn btn-danger delete-qualityrep shadow tooltips-above">
-											<span
-												class="d-none d-md-inline">
-												Supprimer
-											</span>
-											<i
-												class="fas fa-trash d-inline d-md-none"
-												aria-hidden="true"
-												title="Supprimer"></i>
-											<span
-												class="visually-hidden">
-												Supprimer
-											</span>
-										</a>
+										{{ delete_form('qualityRep', qualityRep.id, 'app_iluo_qualityrep_general_elements_admin') }}
 									{% endif %}
 								</li>
 							{% endfor %}

@@ -8,6 +8,7 @@ use App\Entity\Department;
 use App\Entity\Products;
 use App\Entity\Uap;
 use App\Entity\Upload;
+use App\Entity\User;
 use App\Entity\Zone;
 
 use App\Repository\ProductsRepository;
@@ -58,7 +59,7 @@ class WorkstationType extends AbstractType
     private function getDefaultOptions(string $placeholder = '', ?array $optionalAttr = []): array
     {
         return [
-            'required' => false,
+            'required' => true,
             'placeholder' => $placeholder,
             'attr' => array_merge(
                 [
@@ -77,7 +78,7 @@ class WorkstationType extends AbstractType
         ];
     }
 
-    private function addUploadField($form, ?Zone $zone = null, ?Products $product = null): void
+    public function addUploadField($form, ?Zone $zone = null, ?Products $product = null): void
     {
 
         $this->logger->debug('Adding upload field ', ['zone' => $zone, 'product' => $product]);
@@ -91,6 +92,7 @@ class WorkstationType extends AbstractType
 
             // If a zone is selected, filter uploads related to that zone
             if ($zone !== null) {
+                $this->logger->debug('Adding zone filter ', ['zone' => $zone]);
                 $qb->leftJoin('u.button', 'b')
                     ->leftJoin('b.category', 'c')
                     ->leftJoin('c.productLine', 'pl')
@@ -100,9 +102,9 @@ class WorkstationType extends AbstractType
             }
 
             if ($product !== null) {
+                $this->logger->debug('Adding product filter ', ['product' => $product]);
                 // Extract just the product name without spaces for better matching
                 $productNameSimplified = str_replace(' ', '', $product->getName());
-
                 // Match paths that contain the product name (case insensitive)
                 $qb->andWhere('LOWER(u.path) LIKE LOWER(:productPattern)')
                     ->setParameter('productPattern', '%' . $productNameSimplified . '%');
@@ -129,43 +131,19 @@ class WorkstationType extends AbstractType
         );
     }
 
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        // Initialize default values
-        $userDepartment = null;
-        $userZone = null;
-        $userUap = null;
 
-        // Get the current user's information
-        $user = $this->security->getUser();
-
-        if ($user) {
-            // Get user's department
-            $userDepartment = $user->getDepartment();
-
-            // If user has a department, try to get a default zone and UAP
-            if ($userDepartment) {
-                // Get the first zone from the department's zones collection (if any)
-                $zones = $userDepartment->getZones();
-                if ($zones && !$zones->isEmpty()) {
-                    $userZone = $zones->first();
-                }
-
-                // Get the first UAP from the department's UAPs collection (if any)
-                $uaps = $userDepartment->getUaps();
-                if ($uaps && !$uaps->isEmpty()) {
-                    $userUap = $uaps->first();
-                }
-            }
-
-            // If no UAP found from department, try to get it from the user's operator
-            if (!$userUap) {
-                $userOperator = $user->getOperator();
-                if ($userOperator) {
-                    $userUap = $userOperator->getUaps();
-                }
-            }
+        if ($user = $this->security->getUser()) {
+            // If he exist get the current user's information
+            $existingData = $this->preExistingUserData($user);
         }
+
+        // Initialize default values
+        $userDepartment = $existingData[0];
+        $userZone = $existingData[1];
+        $userUap = $existingData[2];
 
         $builder
             ->add('name', TextType::class, [
@@ -255,60 +233,20 @@ class WorkstationType extends AbstractType
                     ])
                 )
             );
+
         if ($userZone) {
+            $this->logger->debug('Adding upload field with userZone: ' . $userZone);
             $this->addUploadField($builder, $userZone);
         } else {
+            $this->logger->debug('Adding upload field without userZone');
             // Add the upload field initially without zone filtering
             $this->addUploadField($builder);
         }
 
-
-
         // Add event listener to update the upload field when zone changes
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
-                $data = $event->getData();
-                $form = $event->getForm();
-
-                $this->logger->info('Pre-submit event triggered');
-
-                // Check if zone is selected
-                if (isset($data['zone']) && !empty($data['zone'])) {
-                    $this->logger->debug('Updating upload field with zone: ' . $data['zone']);
-                    // Get the Zone entity
-                    $zone = $this->getZoneById($data['zone']);
-
-                    // Update department and UAP based on zone
-                    if ($zone && $zone->getDepartment()) {
-                        $data['department'] = $zone->getDepartment()->getId();
-                        // Set first UAP from department if available
-                        if ($zone->getDepartment()->getUaps() && !$zone->getDepartment()->getUaps()->isEmpty()) {
-                            $data['uap'] = $zone->getDepartment()->getUaps()->first()->getId();
-                        }
-                    }
-                    // Update the event data with the modified values
-                    $event->setData($data);
-
-                    if (isset($data['products']) && !empty($data['products'])) {
-                        $this->logger->debug('Updating upload field with products: ' . $data['products']);
-                        // Get the Product entity
-                        $product = $this->getProductById($data['products']);
-                        // Update the upload field with zone filtering
-                        $this->addUploadField($form, $zone, $product);
-                    }
-                    // If no zone or product is selected, update the upload field without zone filtering
-                    $this->addUploadField($form, $zone);
-                } elseif (isset($data['products']) && !empty($data['products'])) {
-                    $this->logger->debug('Updating upload field with products: ' . $data['products']);
-                    // Get the Product entity
-                    $product = $this->getProductById($data['products']);
-                    // Update the upload field with zone filtering
-                    $this->addUploadField($form, null, $product);
-                } else {
-                    $this->addUploadField($form);
-                }
-            }
+            [$this, 'uploadFilterDetermination']
         );
 
         $builder->add('save', SubmitType::class, [
@@ -319,6 +257,92 @@ class WorkstationType extends AbstractType
                 'data-name-validation-target' => 'saveButton',
             ]
         ]);
+    }
+
+
+    public function preExistingUserData(User $user)
+    {
+        // Initialize default values
+        $userDepartment = null;
+        $userZone = null;
+        $userUap = null;
+
+        // Get user's department
+        $userDepartment = $user->getDepartment();
+
+        // If user has a department, try to get a default zone and UAP
+        if ($userDepartment) {
+            // Get the first zone from the department's zones collection (if any)
+            $zones = $userDepartment->getZones();
+            if ($zones && !$zones->isEmpty()) {
+                $userZone = $zones->first();
+            }
+
+            // Get the first UAP from the department's UAPs collection (if any)
+            $uaps = $userDepartment->getUaps();
+            if ($uaps && !$uaps->isEmpty()) {
+                $userUap = $uaps->first();
+            } else {
+                $userOperator = $user->getOperator();
+                if ($userOperator) {
+                    $userUap = $userOperator->getUaps();
+                }
+            }
+        }
+        return [$userDepartment, $userZone, $userUap];
+    }
+
+    
+    public function uploadFilterDetermination(FormEvent $event)
+    {
+        $data = $event->getData();
+        $form = $event->getForm();
+
+        $this->logger->info('Pre-submit event triggered');
+
+        // Update department and UAP if zone is selected
+        $this->updateDepartmentAndUapFromZone($data, $event);
+
+        // Update upload field based on selected zone and product
+        $this->updateUploadField($data, $form);
+    }
+
+    public function updateDepartmentAndUapFromZone(array &$data, FormEvent $event): void
+    {
+        if (isset($data['zone']) && !empty($data['zone'])) {
+            $zone = $this->getZoneById($data['zone']);
+
+            if ($zone && $zone->getDepartment()) {
+                $data['department'] = $zone->getDepartment()->getId();
+
+                if ($zone->getDepartment()->getUaps() && !$zone->getDepartment()->getUaps()->isEmpty()) {
+                    $data['uap'] = $zone->getDepartment()->getUaps()->first()->getId();
+                }
+            }
+
+            $event->setData($data);
+        }
+    }
+
+    public function updateUploadField(array $data, FormInterface $form): void
+    {
+        $zone = null;
+        $product = null;
+
+        if (isset($data['zone']) && !empty($data['zone'])) {
+            $zone = $this->getZoneById($data['zone']);
+        }
+
+        if (isset($data['products']) && !empty($data['products'])) {
+            $product = $this->getProductById($data['products']);
+        }
+
+        $this->logger->debug('Updating upload field', [
+            'zone' => $zone ? $zone->getId() : null,
+            'product' => $product ? $product->getId() : null
+        ]);
+
+        $this->addUploadField($form, $zone, $product);
     }
 
     /**

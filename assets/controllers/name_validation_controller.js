@@ -39,7 +39,7 @@ export default class NameValidationController extends Controller {
     }
 
     validateWorkstationName() {
-        const regex = /^[A-Za-z0-9\s\-\/\(\)\+\.]+$/;
+        const regex = /^[A-Za-z0-9\s\-/()+.]+$/;
         let isValid = true;
         let name = this.workstationNameTarget.value.toUpperCase();
         if (name != '') {

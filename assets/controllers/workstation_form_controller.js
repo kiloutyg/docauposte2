@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 
-export default class workstationFormController extends Controller {
+export default class WorkstationFormController extends Controller {
     static targets = ["uap", "department", "product", "zone", "upload"];
 
     connect() {
@@ -37,7 +37,7 @@ export default class workstationFormController extends Controller {
                     const uploadParent = this.uploadTarget.parentNode;
                     uploadParent.innerHTML = newUploadSelect.parentNode.innerHTML;
                 }
-                
+
                 const newUapSelect = doc.querySelector('select[name="workstation[uap]"]');
                 if (newUapSelect && this.hasUapTarget) {
                     const uapParent = this.uapTarget.parentNode;

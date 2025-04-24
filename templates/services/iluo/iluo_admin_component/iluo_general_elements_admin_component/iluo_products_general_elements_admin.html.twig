@@ -66,23 +66,9 @@
 										{{ product.name }}
 									</strong>
 
-									{% if is_granted('ROLE_SUPER_ADMIN') %}
-										<a
-											href="{{path('app_iluo_delete_entity', {'entityType': 'products', 'entityId': product.id})}}" class="btn btn-danger delete-products shadow">
-											<span
-												class="d-none d-md-inline">
-												Supprimer
-											</span>
-											<i
-												class="fas fa-trash d-inline d-md-none"
-												aria-hidden="true"
-												title="Supprimer"></i>
-											<span
-												class="visually-hidden">
-												Supprimer
-											</span>
-										</a>
-									{% endif %}
+
+										{{ delete_form('products', product.id, 'app_iluo_qualityrep_general_elements_admin') }}
+
 								</li>
 							{% endfor %}
 						</ul>

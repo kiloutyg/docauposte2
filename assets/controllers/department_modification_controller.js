@@ -32,10 +32,11 @@ export default class DepartmentModificationController extends Controller {
     }
     
     // If "None" option is selected, unselect all other options
-    if (noneOption && noneOption.selected) {
+    if (noneOption?.selected) {
       otherOptions.forEach(option => {
         option.selected = false;
       });
     }
+    
   }
 }
