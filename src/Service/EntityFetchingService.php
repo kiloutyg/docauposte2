@@ -122,7 +122,7 @@ class EntityFetchingService extends AbstractController
 
     public function getUsers()
     {
-        return $this->userRepository->findAll();
+        return $this->userRepository->findBy([], ['username' => 'ASC']);
     }
 
 

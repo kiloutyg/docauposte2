@@ -165,16 +165,17 @@ class WorkstationType extends AbstractType
                 ]
             ])
             ->add(
-                'products',
+                'zone',
                 EntityType::class,
                 array_merge(
                     [
-                        'label' => 'Produit :',
-                        'class' => Products::class,
-                        'choice_label' => 'name'
+                        'label' => 'Zone :',
+                        'class' => Zone::class,
+                        'choice_label' => 'name',
+                        'data' => $userZone,
                     ],
-                    $this->getDefaultOptions('Choisir un Produit :', [
-                        'data-workstation-form-target' => 'product',
+                    $this->getDefaultOptions('Choisir une Zone :', [
+                        'data-workstation-form-target' => 'zone',
                         'data-action' => 'change->workstation-form#fieldsChanged'
                     ])
                 )
@@ -191,22 +192,6 @@ class WorkstationType extends AbstractType
                     ],
                     $this->getDefaultOptions('Choisir un Service :', [
                         'data-workstation-form-target' => 'department',
-                        'data-action' => 'change->workstation-form#fieldsChanged'
-                    ])
-                )
-            )
-            ->add(
-                'zone',
-                EntityType::class,
-                array_merge(
-                    [
-                        'label' => 'Zone :',
-                        'class' => Zone::class,
-                        'choice_label' => 'name',
-                        'data' => $userZone,
-                    ],
-                    $this->getDefaultOptions('Choisir une Zone :', [
-                        'data-workstation-form-target' => 'zone',
                         'data-action' => 'change->workstation-form#fieldsChanged'
                     ])
                 )
@@ -229,6 +214,21 @@ class WorkstationType extends AbstractType
                     ],
                     $this->getDefaultOptions('Choisir une UAP :', [
                         'data-workstation-form-target' => 'uap',
+                        'data-action' => 'change->workstation-form#fieldsChanged'
+                    ])
+                )
+            )
+            ->add(
+                'products',
+                EntityType::class,
+                array_merge(
+                    [
+                        'label' => 'Produit :',
+                        'class' => Products::class,
+                        'choice_label' => 'name'
+                    ],
+                    $this->getDefaultOptions('Choisir un Produit :', [
+                        'data-workstation-form-target' => 'product',
                         'data-action' => 'change->workstation-form#fieldsChanged'
                     ])
                 )
@@ -292,7 +292,7 @@ class WorkstationType extends AbstractType
         return [$userDepartment, $userZone, $userUap];
     }
 
-    
+
     public function uploadFilterDetermination(FormEvent $event)
     {
         $data = $event->getData();
