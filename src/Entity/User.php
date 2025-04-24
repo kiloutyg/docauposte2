@@ -6,11 +6,13 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity(fields: 'username', message: 'Un Utilisateur avec ce nom existe déjà.')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -22,7 +24,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 180)]
     #[Assert\Regex(
-        pattern: '/^(it-[a-zA-Z]{3,}|[a-zA-Z]{3,}(?:-[a-zA-Z]{3,})?\.[a-zA-Z]{3,}(?:-[a-zA-Z]{3,})?)$/',
+        pattern: '/^(it-[a-z]+|[a-z]+(?:-[a-z]+)?\.[a-z]+(?:-[a-z]+)?)$/',
         message: 'Le nom d\'utilisateur doit être au format prénom.nom, prénom-nom.nom, ou it-polangres'
     )]
     private ?string $username = null;
@@ -39,7 +41,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne(inversedBy: 'users')]
     private ?Department $department = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: false, unique: true)]
+    #[Assert\Email(message: 'L\'adresse email n\'est pas valide.')]
     private ?string $emailAddress = null;
 
     #[ORM\OneToMany(mappedBy: 'uploader', targetEntity: Upload::class)]
@@ -69,6 +72,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'Creator', targetEntity: Button::class)]
     private Collection $buttons;
 
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: ShiftLeaders::class, cascade: ['remove'])]
+    private ?ShiftLeaders $shiftLeader = null;
+
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: QualityRep::class, cascade: ['remove'])]
+    private ?QualityRep $qualityRep = null;
+
+    #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Operator $operator = null;
 
     public function __construct()
     {
@@ -445,6 +456,43 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $button->setCreator(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getShiftLeader(): ?ShiftLeaders
+    {
+        return $this->shiftLeader;
+    }
+
+    public function setShiftLeader(?ShiftLeaders $shiftLeader): static
+    {
+        $this->shiftLeader = $shiftLeader;
+
+        return $this;
+    }
+
+    public function getQualityRep(): ?QualityRep
+    {
+        return $this->qualityRep;
+    }
+
+    public function setQualityRep(?QualityRep $qualityRep): static
+    {
+        $this->qualityRep = $qualityRep;
+
+        return $this;
+    }
+
+
+    public function getOperator(): ?Operator
+    {
+        return $this->operator;
+    }
+
+    public function setOperator(?Operator $operator): static
+    {
+        $this->operator = $operator;
 
         return $this;
     }

@@ -1,0 +1,109 @@
+<turbo-frame
+	id="shiftleadersManagement"
+	class="container row mx-auto px-0 px-md-2">
+	{{ form_start(shiftLeadersForm, { attr: {class: 'col-lg-6 col-md-12 col-sm-12 d-flex flex-column ', method: 'POST', action: path('app_iluo_shiftleaders_general_elements_admin')}}
+	) }}
+	<div
+		class="col-12">
+		{{ form_label(shiftLeadersForm.user) }}
+		{{ form_widget(shiftLeadersForm.user) }}
+		{{ form_widget(shiftLeadersForm.save) }}
+	</div>
+	<div
+		id="flash-messages">
+		{% for label, messages in app.flashes %}
+			<div
+				class="alert alert-{{ label }}">
+				{% for message in messages %}
+					<p>
+						{{ message }}
+					</p>
+				{% endfor %}
+			</div>
+		{% endfor %}
+	</div>
+	{{ form_end(shiftLeadersForm) }}
+	{% if shiftLeaders is not empty %}
+		<div
+			class="col-lg-6 col-md-12 col-sm-12 mt-auto mb-auto accordion"
+			id="accordionShiftLeaderList">
+			<div
+				class="accordion-item shadow-lg shadow-lg-inset border border-dark">
+				<h2
+					class="accordion-header"
+					id="headingShiftLeaderList">
+					<button
+						class="accordion-button bg-white text-dark collapsed"
+						type="button"
+						data-bs-toggle="collapse"
+						data-bs-target="#collapseShiftLeaderList"
+						aria-expanded="false"
+						aria-controls="collapseShiftLeaderList">
+						<strong>
+							Liste des Managers d'équipe
+						</strong>
+					</button>
+				</h2>
+				<div
+					id="collapseShiftLeaderList"
+					class="accordion-collapse collapse "
+					aria-labelledby="headingShiftLeaderList"
+					data-bs-parent="#headingShiftLeaderList">
+					<div
+						class="accordion-body bg-white text-dark">
+						<ul
+							class="list-group">
+							{% for shiftLeader in shiftLeaders %}
+								<li
+									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+									<div
+										class="flex-grow-1">
+										<strong
+											class="flex-grow-1">
+											{{shiftLeader.user.username|capitalize|split('.')|first }}
+											{{shiftLeader.user.username|upper|split('.')|last }}
+										</strong>
+									</div>
+									{% if shiftLeader.user.operator is defined and shiftLeader.user.operator is not empty %}
+										<div>
+											{{shiftLeader.user.operator.team.name }}
+											{% set uap = shiftLeader.user.operator.uaps|first %}
+											{{uap.name}}
+										</div>
+									{% elseif shiftLeader.user.department is defined and shiftLeader.user.department is not empty %}
+										<div>
+											{{shiftLeader.user.department.name}}
+										</div>
+									{% endif %}
+									{% if is_granted('ROLE_SUPER_ADMIN') %}
+										<a
+											id="modify_user_account"
+											href="{{path('app_account_modify_account', {userId: shiftLeader.user.id})}}" aria-label="Modify the User Entity"
+											data-turbo-frame="_top"
+											class="btn btn-info m-1 tooltips-above">
+											<span
+												class="d-none d-md-inline">
+												UserMod
+											</span>
+											<i
+												class="fas fa-pen-to-square d-inline d-md-none"
+												aria-hidden="true"
+												title="	Modifier"></i>
+											<span
+												class="visually-hidden">
+												UserMod
+											</span>
+										</a>
+
+										{{ delete_form('shiftLeaders', shiftLeader.id, 'app_iluo_shiftleaders_general_elements_admin') }}
+
+									{% endif %}
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+</turbo-frame>

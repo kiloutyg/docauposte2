@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
-export default class extends Controller {
-    static targets = ["teamUapName", "productName", "teamUapNameMessage", "productNameMessage", "saveButton"];
+export default class NameValidationController extends Controller {
+    static targets = ["teamUapName", "teamUapNameMessage", "productName", "productNameMessage", "workstationName", "workstationNameMessage", "saveButton"];
 
     validateTeamUapName() {
         const regex = /^(?!-)(?!.*--)[A-Z-]{3,}(?<!-)$/;
@@ -24,7 +24,7 @@ export default class extends Controller {
     validateProductName() {
         const regex = /^[A-Z]+\d+$/;
         let isValid = true;
-        let name = this.productNameTarget.value;
+        let name = this.productNameTarget.value.toUpperCase();
         if (name != '') {
             isValid = regex.test(name);
         }
@@ -38,5 +38,20 @@ export default class extends Controller {
         }
     }
 
-
+    validateWorkstationName() {
+        const regex = /^[A-Za-z0-9\s\-/()+.]+$/;
+        let isValid = true;
+        let name = this.workstationNameTarget.value.toUpperCase();
+        if (name != '') {
+            isValid = regex.test(name);
+        }
+        if (isValid) {
+            this.workstationNameMessageTarget.textContent = "";
+            this.saveButtonTarget.disabled = false;
+        } else {
+            this.workstationNameMessageTarget.textContent = "Format invalide. Veuillez saisir sous la forme: Assy-P674-Poinçonneuse Peau";
+            this.workstationNameMessageTarget.style.color = "DarkRed"; // Display the message in red color.
+            this.saveButtonTarget.disabled = true;
+        }
+    }
 }

@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 
-export default class extends Controller {
+export default class OperatorTrainingSelectController extends Controller {
     static targets = ["newOperatorSelectTeam", "newOperatorSelectUap", "newOperatorSelectMessage", "submit"];
 
     validateNewOperatorSelect() {

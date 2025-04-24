@@ -1,0 +1,66 @@
+{% if is_granted('ROLE_SUPER_ADMIN') or users is empty %}
+	{% if usersExist is null %}
+		{% set superAdminCreationButton = "" %}
+		{% set superAdminCreationAria = "true" %}
+		{% set superAdminCreationDiv = "show" %}
+	{% else %}
+		{% set superAdminCreationButton = "collapsed" %}
+		{% set superAdminCreationAria = "false" %}
+		{% set superAdminCreationDiv = "collapse" %}
+	{% endif %}
+	<div
+		class="accordion-item">
+		<h2
+			class="accordion-header"
+			id="headingAccount">
+			<button
+				class="accordion-button fs-3 {{superAdminCreationButton}}"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target="#collapseAccount"
+				aria-expanded="{{superAdminCreationAria}}" aria-controls="collapseAccount">
+				<strong>
+					Formulaire de creation de compte utilisateur :
+				</strong>
+			</button>
+		</h2>
+		<div
+			id="collapseAccount"
+			class="accordion-collapse {{superAdminCreationDiv}}"
+			aria-labelledby="headingAccount"
+			data-bs-parent="#accordionAdmin">
+			<div
+				class="accordion-body accordion-bg shadow shadow-inset">
+				<div
+					class="card border-0 shadow rounded-3 my-5 form-floating row mx-auto">
+					<div
+						class="accordion mx-auto justify-content-center"
+						id="accordionAccountView">
+						<div
+							class="col-12 border-0 shadow rounded-3 my-5 bg-secondary">
+							<div
+								class="card-body">
+								<div
+									class="align-items-center">
+									<div
+										class="col mx-auto">
+
+										{% include "services/account_services/account_tool_components/account_crea_mod.html.twig" %}
+										<hr
+											class="my-4">
+										<turbo-frame
+											loading="lazy"
+											class="px-0 px-md-2">
+											{{ render(controller('App\\Controller\\DepartmentController::departmentView'), options = []) }}
+										</turbo-frame>
+										{% include "services/account_services/account_tool_components/user_list.html.twig" %}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endif %}

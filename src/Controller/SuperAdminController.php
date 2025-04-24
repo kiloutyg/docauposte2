@@ -2,14 +2,6 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-
 use App\Entity\Zone;
 
 use App\Repository\ZoneRepository;
@@ -23,12 +15,24 @@ use App\Service\EntityDeletionService;
 use App\Service\UploadService;
 use App\Service\FolderService;
 
+use Doctrine\ORM\EntityManagerInterface;
+
+use Psr\Log\LoggerInterface;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+
 // This controller is responsible for rendering the super admin interface an managing the logic of the super admin interface
 class SuperAdminController extends AbstractController
 {
     private $projectDir;
     private $public_dir;
     private $em;
+    private $logger;
 
     private $zoneRepository;
     private $uploadRepository;
@@ -44,6 +48,7 @@ class SuperAdminController extends AbstractController
     public function __construct(
 
         EntityManagerInterface          $em,
+        LoggerInterface                 $logger,
         ParameterBagInterface           $params,
 
         ZoneRepository                  $zoneRepository,
@@ -59,6 +64,7 @@ class SuperAdminController extends AbstractController
 
     ) {
         $this->em                           = $em;
+        $this->logger                       = $logger;
         $this->projectDir                   = $params->get('kernel.project_dir');
         $this->public_dir                   = $this->projectDir . '/public';
 
@@ -98,9 +104,6 @@ class SuperAdminController extends AbstractController
             'zones'                     => $this->entityFetchingService->getZones(),
         ]);
     }
-
-
-
 
 
 

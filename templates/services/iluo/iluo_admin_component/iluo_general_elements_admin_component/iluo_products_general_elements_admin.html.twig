@@ -1,16 +1,37 @@
 <turbo-frame
 	id="productManagement"
-	class="">
+	class="container row mx-auto px-0 px-md-2">
 
-	{{ form_start(productForm, { attr: { method: 'POST', action: path('app_iluo_product_general_elements_admin')}}
+	{{ form_start(productForm, { attr: {class: 'col-lg-6 col-md-12 col-sm-12 d-flex flex-column', method: 'POST', action: path('app_iluo_products_general_elements_admin')}}
 	) }}
-	{{ form_end(productForm) }}
 	<div
-		data-name-validation-target="productNameMessage"
-		class="productName-message"></div>
+		class="col-12">
+		{{ form_label(productForm.name) }}
+		{{ form_widget(productForm.name) }}
+		{{ form_widget(productForm.save) }}
+	</div>
+	<div
+		class="productName-message"
+		data-name-validation-target="productNameMessage"></div>
+	<div
+		id="flash-messages">
+		{% for label, messages in app.flashes %}
+			<div
+				class="alert alert-{{ label }}">
+				{% for message in messages %}
+					<p>
+						{{ message }}
+					</p>
+				{% endfor %}
+			</div>
+		{% endfor %}
+	</div>
+	{{ form_end(productForm) }}
+
+
 	{% if products is not empty %}
 		<div
-			class=" mt-auto mb-auto accordion"
+			class="col-lg-6 col-md-12 col-sm-12  mt-auto mb-auto accordion"
 			id="accordionProductList">
 			<div
 				class="accordion-item shadow-lg shadow-lg-inset border border-dark">
@@ -40,18 +61,13 @@
 							class="list-group">
 							{% for product in products %}
 								<li
-									class="list-group-item bg-white text-dark row">
-									<strong
-										class="col-4 ">
+									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+									<strong>
 										{{ product.name }}
 									</strong>
 
-									{% if is_granted('ROLE_SUPER_ADMIN') %}
-										<a
-											href="{{path('app_iluo_delete_entity', {'entityType': 'products', 'entityId': product.id})}}" class="btn btn-danger delete-product col-4 shadow">
-											Supprimer
-										</a>
-									{% endif %}
+
+										{{ delete_form('products', product.id, 'app_iluo_qualityrep_general_elements_admin') }}
 
 								</li>
 							{% endfor %}
@@ -61,5 +77,6 @@
 			</div>
 		</div>
 	{% endif %}
+
 
 </turbo-frame>

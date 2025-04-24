@@ -77,7 +77,7 @@ class ValidationController extends AbstractController
     // Is not currently in use, but might get useful for the operator side validation. 
     #[Route('/validation/{uploadId}', name: 'app_validation')]
     public function validationViewBasePage(
-        int $uploadId = null,
+        int $uploadId,
         Request $request
     ): Response {
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
@@ -106,7 +106,6 @@ class ValidationController extends AbstractController
             return $this->redirectToRoute('app_base');
         }
         return $this->render('services/validation/approbation.html.twig', [
-
             'approbation' => $approbation,
             'user'        => $this->getUser(),
         ]);
@@ -158,70 +157,22 @@ class ValidationController extends AbstractController
         ?int $approbationId = null
     ): Response {
         $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
+        try {
+            $response = $this->validationService->validationApproval($approbation, $request);
+            if ($response) {
+                $this->addFlash('success', 'Le fichier a été validé.');
+            } else {
+                $this->addFlash('danger', 'Le fichier a été désapprouver.');
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de la validation : ' . $e->getMessage());
+            $this->logger->error('$this->validationService->validationApproval error', [$e->getMessage()]);
+        }
 
-        $this->validationService->validationApproval($approbation, $request);
-
-        $this->addFlash('success', 'Le fichier a été validé.');
         return $this->redirectToRoute('app_base');
     }
 
 
-
-    #[Route('/validation/disapproved/modify/{approbationId}', name: 'app_validation_disapproved_modify')]
-    public function disapprovedValidationModification(
-        Request $request,
-        ?int $approbationId = null
-    ): Response {
-        $approbation = $this->approbationRepository->find($approbationId);
-        $validation  = $approbation->getValidation();
-        $upload      = $validation->getUpload();
-
-        $approbations = [];
-        $approbations = $validation->getApprobations(['Approval' => false]);
-
-        $currentUser = $this->getUser();
-        $user        = $this->userRepository->find($currentUser);
-
-        // Retrieve the origin URL
-        $originUrl = $request->headers->get('Referer');
-
-        $form = $this->createForm(UploadType::class, $upload, [
-            'current_user_id'        => $user->getId(),
-            'current_upload_id'      => $upload->getId(),
-            'current_approbation_id' => $approbationId,
-        ]);
-
-        $form->remove('approbator');
-        $form->remove('modificationType');
-
-        if ($request->isMethod('POST')) {
-
-            $this->namingService->requestUploadFilenameChecks($request);
-
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                $this->uploadService->modifyDisapprovedFile($upload, $user, $request);
-                $this->addFlash('success', 'Le fichier a été modifié.');
-                return $this->redirectToRoute('app_base');
-            }
-        }
-        if ($validation->isStatus() === false) {
-            return $this->render('services/validation/disapprovedModification.html.twig', [
-                'approbation'  => $approbation,
-                'upload'       => $upload,
-                'user'         => $this->getUser(),
-                'form'         => $form->createView(),
-                'approbations' => $approbations
-            ]);
-        } else {
-            $this->addFlash('error', 'Le fichier a bien été modifié.');
-            return $this->redirect($originUrl);
-        }
-    }
-    // 
-    // 
-    // 
-    // 
     #[Route('/validation/disapproved/modifyByUpload/{uploadId}', name: 'app_validation_disapproved_modify_by_upload')]
     public function disapprovedValidationModificationByUpload(
         Request $request,
@@ -232,7 +183,7 @@ class ValidationController extends AbstractController
         $validation = $upload->getValidation();
 
         $approbations = [];
-        $approbations = $validation->getApprobations(['Approval' => false]);
+        $approbations = $validation->getApprobations();
 
         $currentUser = $this->getUser();
         $user        = $this->userRepository->find($currentUser);

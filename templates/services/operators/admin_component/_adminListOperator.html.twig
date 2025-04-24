@@ -3,7 +3,6 @@
 	<ul>
 		<div
 			id="flash-messages">
-
 			{% for label, messages in app.flashes %}
 				<div
 					class="alert alert-{{ label }}">
@@ -86,7 +85,8 @@
 
 
 			{{ form_end(operatorForm) }}
-
+			<hr
+				class="my-4">
 		{% endfor %}
 	{% else %}
 		<div

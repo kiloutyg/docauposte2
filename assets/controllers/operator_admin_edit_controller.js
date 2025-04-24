@@ -1,7 +1,7 @@
 import OperatorAdminCreationController from './operator_admin_creation_controller';
 import axios from 'axios';
 
-export default class operatorAdminEdit extends OperatorAdminCreationController {
+export default class OperatorAdminEditController extends OperatorAdminCreationController {
 
 
     static targets = [

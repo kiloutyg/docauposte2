@@ -15,7 +15,6 @@
 					Formulaire de création de Lignes :
 				</strong>
 			</button>
-
 		</h2>
 		<div
 			id="collapseProductLine"
@@ -91,13 +90,16 @@
 											{% for productLine in zoneProductLines %}
 												<li
 													class="form-control d-flex justify-content-between align-items-center mb-2">
-													<a
-														href="{{path('app_productLine_admin', {'productLineId': productLine.Id})}}" class="btn btn-dark">
-														{{ productLine.name|split('.')|first|upper}}
-													</a>
+													<div
+														class="flex-grow-1">
+														<a
+															href="{{path('app_productLine_admin', {'productLineId': productLine.Id})}}" class="btn btn-dark">
+															{{ productLine.name|split('.')|first|upper}}
+														</a>
+													</div>
 													{% if is_granted ('ROLE_LINE_ADMIN') or app.user is same as( productLine.creator) %}
 														<a
-															href="{{path('app_base_views_modification')}}" class="btn btn-info">
+															href="{{path('app_base_views_modification')}}" class="btn btn-info m-2">
 															Modifier
 														</a>
 														<a

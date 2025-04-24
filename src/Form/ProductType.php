@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Entity\products;
-use App\Form\TypeComponent\DisplayType;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -26,10 +25,11 @@ class ProductType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Nom du Produit',
                 'label_attr' => [
+                    'class' => 'form-label fs-4',
                     'style' => 'color: #ffffff;'
                 ],
                 'attr' => [
-                    'class' => 'form-control',
+                    'class' => 'form-control capitalize-all-letters',
                     'placeholder' => 'Nom du Produit',
                     'id' => 'name',
                     'required' => true,

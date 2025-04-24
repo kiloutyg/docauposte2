@@ -25,7 +25,7 @@ class ValidationRepository extends BaseRepository
     public function findNonValidatedValidations()
     {
         $nonValidatedValidations = $this->createQueryBuilder('v')
-            ->where('v.Status != true OR v.Status IS NULL')
+            ->where('v.status != true OR v.status IS NULL')
             ->getQuery()
             ->getResult();
 

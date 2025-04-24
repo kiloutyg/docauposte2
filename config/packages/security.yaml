@@ -69,7 +69,6 @@ security:
         - { path: ^/zone_admin, roles: ROLE_MANAGER }
         - { path: ^/productline_admin, roles: ROLE_MANAGER }
         - { path: ^/category_admin, roles: ROLE_MANAGER }
-        - { path: ^/tutorial, roles: ROLE_MANAGER }
         - { path: ^/operator/admin, roles: ROLE_MANAGER }
         - { path: ^/training-record/delete-weeks-old, roles: ROLE_MANAGER }
         - { path: ^/admin, roles: ROLE_MANAGER }
