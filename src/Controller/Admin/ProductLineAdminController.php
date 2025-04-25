@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
 

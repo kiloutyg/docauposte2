@@ -50,31 +50,31 @@ use App\Service\PdfGeneratorService;
 use App\Service\OperatorService;
 
 
-class OperatorController extends AbstractController
+class OperatorBaseController extends OperatorBaseController
 {
 
-    private $em;
-    private $request;
-    private $logger;
-    private $authChecker;
-    private $cache;
+    public $em;
+    public $request;
+    public $logger;
+    public $authChecker;
+    public $cache;
 
     // Repository methods
-    private $validationRepository;
-    private $uploadRepository;
-    private $uapRepository;
-    private $teamRepository;
-    private $operatorRepository;
-    private $trainingRecordRepository;
-    private $trainerRepository;
-    private $userRepository;
+    public $validationRepository;
+    public $uploadRepository;
+    public $uapRepository;
+    public $teamRepository;
+    public $operatorRepository;
+    public $trainingRecordRepository;
+    public $trainerRepository;
+    public $userRepository;
 
     // Services methods
-    private $entitydeletionService;
-    private $trainingRecordService;
-    private $pdfGeneratorService;
-    private $entityFetchingService;
-    private $operatorService;
+    public $entitydeletionService;
+    public $trainingRecordService;
+    public $pdfGeneratorService;
+    public $entityFetchingService;
+    public $operatorService;
 
 
 
@@ -130,7 +130,7 @@ class OperatorController extends AbstractController
         $this->operatorService              = $operatorService;
     }
 
-    private function operatorEntitySearch(Request $request): array
+    public function operatorEntitySearch(Request $request): array
     {
         $operators = [];
 
@@ -161,7 +161,7 @@ class OperatorController extends AbstractController
 
 
     #[Route('/operator/admin', name: 'app_operator')]
-    public function operatorBasePage(Request $request): Response
+    public function operatorAdminPage(Request $request): Response
     {
         // // $this->logger->info('search query with full request', $request->request->all());
 
@@ -228,7 +228,7 @@ class OperatorController extends AbstractController
 
 
 
-    private function processNewOperator(Operator $newOperator, $form, Request $request)
+    public function processNewOperator(Operator $newOperator, $form, Request $request)
     {
 
         $trainerBool = $form->get('isTrainer')->getData();
@@ -408,6 +408,10 @@ class OperatorController extends AbstractController
     }
 
 
+
+
+
+
     // Route to handle the newOperator form submission
     #[Route('/operator/traininglist/newOperator/{uploadId}/{teamId}/{uapId}', name: 'app_training_new_operator')]
     public function trainingListNewOperator(ValidatorInterface $validator, Request $request, int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
@@ -480,7 +484,6 @@ class OperatorController extends AbstractController
             // For example, you can separate them with new lines when displaying in text format:
             $errorsString = implode("\n", $errorMessages);
 
-
             // $this->logger->info('danger', [$errorsString]);
             return $this->redirectToRoute('app_render_training_records', [
                 'uploadId' => $uploadId,
@@ -499,6 +502,9 @@ class OperatorController extends AbstractController
             'uapId' => $uapId,
         ]);
     }
+
+
+
 
 
     #[Route('/operator/traininglist/listform/{uploadId}', name: 'app_training_list_select_record_form')]
@@ -522,6 +528,8 @@ class OperatorController extends AbstractController
             'uapId' => $uapId,
         ]);
     }
+
+
 
 
     #[Route('/operator/render-training-records/{uploadId}/{teamId}/{uapId}', name: 'app_render_training_records')]
@@ -605,276 +613,6 @@ class OperatorController extends AbstractController
 
 
 
-    #[Route('/operator/check-duplicate-by-name', name: 'app_operator_check_duplicate_by_name', methods: ['POST'])]
-    public function checkDuplicateOperatorByName(Request $request): JsonResponse
-    {
-        // $this->logger->info('Full requestbyname', [$request->request->all()]);
-
-        $parsedRequest = json_decode($request->getContent(), true);
-        // $this->logger->info('parsedRequest', [$parsedRequest]);
-
-        $operatorName = $parsedRequest['value'];
-        // $this->logger->info('operatorName', [$operatorName]);
-
-        $existingOperator = $this->operatorRepository->findOneBy(['name' => $operatorName]);
-        // $this->logger->info('existingOperator', [$existingOperator]);
-
-        if ($existingOperator !== null) {
-
-
-            // Found duplicate
-            return new JsonResponse([
-                'found' => true,
-                'field' => 'name',
-                'value' => $operatorName,
-                'message' => 'Un opérateur avec ce nom existe déjà',
-                'operator' => [
-                    'id' => $existingOperator->getId(),
-                    // Include additional details as necessary
-                ]
-            ]);
-        }
-
-        // No duplicate found
-        return new JsonResponse([
-            'found' => false,
-            'field' => 'name',
-            'value' => $operatorName,
-            'message' => 'Aucun opérateur avec ce nom n\'existe'
-        ]);
-    }
-
-
-
-
-
-    #[Route('/operator/check-duplicate-by-code', name: 'app_operator_check_duplicate_by_code', methods: ['POST'])]
-    public function checkDuplicateOperatorByCode(Request $request): JsonResponse
-    {
-        // $this->logger->info('Full request bycode', $request->request->all());
-
-        $parsedRequest = json_decode($request->getContent(), true);
-        // $this->logger->info('parsedRequest', [$parsedRequest]);
-
-        $operatorCode = $parsedRequest['value'];
-        // $this->logger->info('operatorCode', [$operatorCode]);
-
-        $existingOperator = $this->operatorRepository->findOneBy(['code' => $operatorCode]);
-        // $this->logger->info('existingOperator', [$existingOperator]);
-
-        if ($existingOperator !== null) {
-            // Found duplicate
-            return new JsonResponse([
-                'found' => true,
-                'field' => 'code',
-                'value' => $operatorCode,
-                'message' => 'Un opérateur avec ce codeOpé existe déjà',
-                'operator' => [
-                    'id' => $existingOperator->getId(),
-                    // Include additional details as necessary
-                ]
-            ]);
-        }
-
-        // No duplicate found
-        return new JsonResponse([
-            'found' => false,
-            'field' => 'code',
-            'value' => $operatorCode,
-            'message' => "Aucun opérateur avec ce codeOpé n'existe"
-        ]);
-    }
-
-
-
-
-    // Route to check the operator to validate the training form and make the trained button appear
-
-    #[Route('operator/check-entered-code-against-operator-code/{teamId}/{uapId}', name: 'app_check_entered_code_against_operator_code')]
-    public function checkEnteredCodeAgainstOperatorCode(Request $request, int $teamId, int $uapId): JsonResponse
-    {
-        $parsedRequest = json_decode($request->getContent(), true);
-
-        $this->logger->info('Full request', $parsedRequest);
-
-        $enteredCode = $parsedRequest['code'];
-        $this->logger->info('enteredCode', [$enteredCode]);
-
-        $operatorId = (int)$parsedRequest['operatorId'];
-        $this->logger->info('operatorId', [$operatorId]);
-
-        $controllerOperator = $this->operatorRepository->findByCodeAndTeamAndUap($enteredCode, $teamId, $uapId);
-        $this->logger->info('controllerOperator', [$controllerOperator]);
-
-        if ($controllerOperator != null) {
-            $controllerOperatorId = $controllerOperator->getId();
-            $this->logger->info('controllerOperatorId', [$controllerOperatorId]);
-
-            $controllerOperatorId === $operatorId ? $operator = $controllerOperator : $operator = null;
-            $this->logger->info('operator', [$operator]);
-
-            if ($operator !== null) {
-                // Found operator
-                return new JsonResponse([
-                    'found' => true,
-                    'operator' => [
-                        'id' => $operator->getId(),
-                        'name' => $operator->getName(),
-                        'code' => $operator->getCode(),
-                        'team' => $operator->getTeam()->getName(),
-                        'uap' => $operator->getUaps()->first()->getName(),
-                    ]
-                ]);
-            }
-        }
-        // No operator found
-        return new JsonResponse([
-            'found' => false,
-            'message' => 'Aucun opérateur avec ce code n\'existe dans cette équipe et cette UAP'
-        ]);
-    }
-
-
-
-
-
-    // Route to check if a code exist in the database and then return a boolean
-
-    #[Route('operator/check-if-code-exist', name: 'app_check_if_code_exist')]
-    public function checkIfCodeExist(Request $request): JsonResponse
-    {
-        $parsedRequest = json_decode($request->getContent(), true);
-
-        // $this->logger->info('Full request', $parsedRequest);
-
-        $enteredCode = $parsedRequest['code'];
-        // $this->logger->info('enteredCode', [$enteredCode]);
-
-        $existingOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode]);
-        if ($existingOperator !== null) {
-
-            return new JsonResponse([
-                'found' => true,
-            ]);
-        } else {
-            return new JsonResponse([
-                'found' => false,
-            ]);
-        }
-    }
-
-
-
-
-
-    // Route to check if a trainer exist by name and code
-    #[Route('operator/check-if-trainer-exist', name: 'app_check_if_trainer_exist')]
-    public function checkIfTrainerExist(Request $request): JsonResponse
-    {
-        $parsedRequest = json_decode($request->getContent(), true);
-
-        $this->logger->info('Full request', $parsedRequest);
-
-        if (key_exists('code', $parsedRequest)) {
-            $enteredCode = $parsedRequest['code'];
-            // $this->logger->info('enteredCode', [$enteredCode]);
-        } else {
-            $enteredCode = null;
-        };
-
-        if (key_exists('name', $parsedRequest)) {
-            $enteredName = $parsedRequest['name'];
-            // $this->logger->info('enteredName', [$enteredName]);
-        } else {
-            $enteredName = null;
-        };
-
-        if ($enteredCode != null) {
-            $existingOperator = $this->operatorRepository->findOneBy(['code' => $enteredCode, 'name' => $enteredName, 'IsTrainer' => true]);
-            if ($existingOperator !== null) {
-                return new JsonResponse([
-                    'found'         => true,
-                    'name'          => $existingOperator->getName(),
-                    'code'          => $existingOperator->getCode(),
-                    'trainerId'     => $existingOperator->getId(),
-
-                ]);
-            } else {
-                return new JsonResponse([
-                    'found' => false,
-                ]);
-            }
-        } else {
-            $existingOperator = $this->operatorRepository->findOneBy(['name' => $enteredName, 'IsTrainer' => true]);
-            if ($existingOperator !== null) {
-
-                return new JsonResponse([
-                    'found' => true,
-                    'name'  => $existingOperator->getName(),
-                    'code'  => $existingOperator->getCode(),
-                ]);
-            } else {
-                return new JsonResponse([
-                    'found' => false,
-                ]);
-            }
-        }
-    }
-
-
-
-
-
-    #[Route('operator/suggest-names', name: 'app_suggest_names')]
-    public function suggestNames(Request $request, SerializerInterface $serializer): JsonResponse
-    {
-        $parsedRequest = json_decode($request->getContent(), true);
-        // $this->logger->info('app_suggest_names parsedRequest', $parsedRequest);
-
-        $name = $parsedRequest['name'];
-
-        /////////////// serialized data ////////////////////////
-        $rawSuggestions = $this->operatorRepository->findByNameLikeForSuggestions($name);
-        // $this->logger->info('app_suggest_names Raw suggestions', $rawSuggestions);
-
-        $teams = $this->teamRepository->findAll();
-        $teamIndex = [];
-        foreach ($teams as $team) {
-            $teamIndex[$team->getId()] = $team->getName();
-        }
-
-        $uaps = $this->uapRepository->findAll();
-        $uapIndex = [];
-        foreach ($uaps as $uap) {
-            $uapIndex[$uap->getId()] = $uap->getName();
-        }
-
-
-        foreach ($rawSuggestions as $key => &$suggestion) {
-            // Check and assign team name if available
-            if (isset($suggestion['team_id']) && isset($teamIndex[$suggestion['team_id']])) {
-                $suggestion['team_name'] = $teamIndex[$suggestion['team_id']];
-            } else {
-                $suggestion['team_name'] = 'nope'; // Or handle it as appropriate
-            }
-
-            // Check and assign UAP name if available
-            if (isset($suggestion['uap_id']) && isset($uapIndex[$suggestion['uap_id']])) {
-                $suggestion['uap_name'] = $uapIndex[$suggestion['uap_id']];
-            } else {
-                $suggestion['uap_name'] = 'nope'; // Or handle it as appropriate
-            }
-        }
-
-        // Serialize the entire array of entities at once using groups
-        $serializedSuggestions = json_encode($rawSuggestions);
-
-        // Since $serializedSuggestions is a JSON string, return it directly with JsonResponse
-        return new JsonResponse($serializedSuggestions, 200, [], true);
-    }
-
-
-
     // Route to print the operator detail in a pdf
     #[Route('/operator/detail/{operatorId}', name: 'app_operator_detail')]
     public function printOpeDetail(int $operatorId)
@@ -890,122 +628,6 @@ class OperatorController extends AbstractController
 
 
 
-    #[Route('/operator/import', name: 'app_operator_import')]
-    public function importOpe(Request $request, ValidatorInterface $validator, ManagerRegistry $doctrine)
-    {
-        /** @var EntityManagerInterface $em */
-        $em = $doctrine->getManager();
-
-        $unknownTeam = $this->teamRepository->findOneBy(['name' => 'INDEFINI']);
-        $unknownUap = $this->uapRepository->findOneBy(['name' => 'INDEFINI']);
-        if ($unknownTeam == null) {
-            $unknownTeam = new Team();
-            $unknownTeam->setName('INDEFINI');
-            $em->persist($unknownTeam);
-            $em->flush();
-        }
-        if ($unknownUap == null) {
-            $unknownUap = new Uap();
-            $unknownUap->setName('INDEFINI');
-            $em->persist($unknownUap);
-            $em->flush();
-        }
-
-        // Get all existing teams and UAPs
-        $existingTeams = $this->teamRepository->findAll();
-        $existingUaps = $this->uapRepository->findAll();
-
-        // Handle the file upload
-        $file = $request->files->get('operator-import-file');
-        $ope_data = [];
-        if ($file instanceof UploadedFile) {
-            // Open the file
-            if (($handle = fopen($file->getPathname(), 'r')) !== false) {
-                // Process the CSV data
-                while (($data = fgetcsv($handle, 1000, ';', '"')) !== false) {
-                    // Store $data in an array
-                    $ope_data[] = $data;
-                }
-                // Close the file handle
-                fclose($handle);
-            } else {
-                return new Response('Failed to open the file.', Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
-        } else {
-            return new Response('No file uploaded or invalid file.', Response::HTTP_BAD_REQUEST);
-        }
-
-        // Begin a transaction
-        $em->beginTransaction();
-        try {
-            // Process the data
-            foreach ($ope_data as $data) {
-                $code = $data[1];
-                $firstname = $data[2];
-                $surname = $data[3];
-                $name = strtolower($firstname . '.' . $surname);
-
-                // Find or default to 'INDEFINI' for team
-                $team = $this->findEntityByName($existingTeams, $data[4], "INDEFINI");
-
-                // Find or default to 'INDEFINI' for UAP
-                $uap = $this->findEntityByName($existingUaps, $data[5], "INDEFINI");
-                if ($uap->getName() === 'INDEFINI') {
-                    $uap = $this->findEntityByName($existingUaps, $data[4], "INDEFINI");
-                }
-
-                $operator = new Operator();
-                $operator->setCode($code);
-                $operator->setName($name);
-                $operator->setTeam($team);
-                $operator->addUap($uap);
-
-                // Validate the operator
-                $errors = $validator->validate($operator);
-
-                // Handle validation errors
-                if (count($errors) > 0) {
-                    foreach ($errors as $error) {
-                        $this->addFlash('error', $error->getMessage());
-                    }
-                    continue; // Skip this operator if there are validation errors
-                }
-
-                $suffix = 1;
-                while (true) {
-                    try {
-                        $em->persist($operator);
-                        $em->flush();
-
-                        break; // Exit loop if successful
-                    } catch (UniqueConstraintViolationException $e) {
-                        // Modify the violating field and retry
-                        $operator->setName($name . '_' . $suffix);
-                        $suffix++;
-                    }
-                }
-            }
-
-            // Commit the transaction
-            $em->commit();
-        } catch (\Exception $e) {
-            // Rollback the transaction if something goes wrong
-            $em->rollback();
-
-            // Reset the EntityManager if it's closed
-            if (!$em->isOpen()) {
-                $em = $doctrine->resetManager();
-            }
-            $this->cache->delete('operators_list');
-
-            // Re-throw the exception for further handling
-            throw $e;
-        }
-
-        $this->addFlash('success', 'Les opérateurs ont bien été importés');
-        return $this->redirectToRoute('app_operator');
-    }
-
 
 
 
@@ -1018,7 +640,8 @@ class OperatorController extends AbstractController
      *
      * @return object
      */
-    private function findEntityByName(array $entities, string $name, string $defaultName)
+
+    public function findEntityByName(array $entities, string $name, string $defaultName)
     {
         foreach ($entities as $entity) {
             if ($entity->getName() === $name) {
@@ -1126,36 +749,5 @@ class OperatorController extends AbstractController
                 'uapForm'   => $uapForm->createView()
             ]);
         }
-    }
-
-
-
-    #[Route('/operator/user_login_check', name: 'app_operator_user_login_check')]
-    public function userLoginCheck(): JsonResponse
-    {
-        $currentUser = $this->getUser();
-        $this->logger->info('current user', [$currentUser]);
-        $this->logger->info('role granted', [$this->authChecker->isGranted('ROLE_MANAGER')]);
-
-        if (!empty($currentUser) && $this->authChecker->isGranted('ROLE_MANAGER')) {
-            $user               = $this->userRepository->find($currentUser);
-            $this->logger->info(' user', [$user]);
-
-            $operator           = $this->operatorRepository->findOneBy(['name' => $user->getUsername()]);
-            $this->logger->info('operator', [$operator]);
-
-            if ($operator != null && $operator->isIsTrainer()) {
-                return new JsonResponse([
-                    'found'         => true,
-                    'name'          => $operator->getName(),
-                    'code'          => $operator->getCode(),
-                    'trainerId'     => $operator->getId(),
-                    'uploadTrainer' => true,
-                ]);
-            }
-        }
-        return new JsonResponse([
-            'found'         => false
-        ]);
     }
 }
