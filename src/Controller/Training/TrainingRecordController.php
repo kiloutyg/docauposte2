@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Training;
 
 use Symfony\Component\Routing\Annotation\Route;
 

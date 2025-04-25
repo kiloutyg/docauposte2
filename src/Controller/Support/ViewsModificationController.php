@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Support;
 
 use App\Service\ViewsModificationService;
 use App\Service\EntityFetchingService;

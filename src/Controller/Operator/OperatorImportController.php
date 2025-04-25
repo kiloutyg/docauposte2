@@ -1,12 +1,23 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Operator;
 
-use \Psr\Log\LoggerInterface;
+use App\Controller\Operator\OperatorBaseController;
+
+use App\Entity\Operator;
+use App\Entity\Team;
+use App\Entity\Uap;
+
+use App\Repository\UapRepository;
+use App\Repository\TeamRepository;
 
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+
+use \Psr\Log\LoggerInterface;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,24 +27,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-use Symfony\Contracts\Cache\CacheInterface;
 
-use App\Entity\Operator;
-use App\Entity\Team;
-use App\Entity\Uap;
-
-
-use App\Repository\UapRepository;
-use App\Repository\TeamRepository;
-
-
-class OperatorImportController extends OperatorBaseController
+class OperatorImportController extends AbstractController
 {
 
     public $em;
     public $request;
     public $logger;
-    public $cache;
+
+    public $operatorBaseController;
 
     public $uapRepository;
     public $teamRepository;
@@ -45,7 +47,7 @@ class OperatorImportController extends OperatorBaseController
         EntityManagerInterface          $em,
         LoggerInterface                 $logger,
         RequestStack                    $requestStack,
-        CacheInterface                  $cache,
+        OperatorBaseController          $operatorBaseController,
 
         UapRepository                   $uapRepository,
         TeamRepository                  $teamRepository,
@@ -53,13 +55,14 @@ class OperatorImportController extends OperatorBaseController
 
     ) {
 
-        $this->em                           = $em;
-        $this->logger                       = $logger;
-        $this->request                      = $requestStack->getCurrentRequest();
-        $this->cache                        = $cache;
+        $this->em                               = $em;
+        $this->logger                           = $logger;
+        $this->request                          = $requestStack->getCurrentRequest();
 
-        $this->uapRepository                = $uapRepository;
-        $this->teamRepository               = $teamRepository;
+        $this->operatorBaseController           = $operatorBaseController;
+
+        $this->uapRepository                    = $uapRepository;
+        $this->teamRepository                   = $teamRepository;
     }
 
 
@@ -124,12 +127,12 @@ class OperatorImportController extends OperatorBaseController
                 $name = strtolower($firstname . '.' . $surname);
 
                 // Find or default to 'INDEFINI' for team
-                $team = $this->findEntityByName($existingTeams, $data[4], "INDEFINI");
+                $team = $this->operatorBaseController->findEntityByName($existingTeams, $data[4], "INDEFINI");
 
                 // Find or default to 'INDEFINI' for UAP
-                $uap = $this->findEntityByName($existingUaps, $data[5], "INDEFINI");
+                $uap = $this->operatorBaseController->findEntityByName($existingUaps, $data[5], "INDEFINI");
                 if ($uap->getName() === 'INDEFINI') {
-                    $uap = $this->findEntityByName($existingUaps, $data[4], "INDEFINI");
+                    $uap = $this->operatorBaseController->findEntityByName($existingUaps, $data[4], "INDEFINI");
                 }
 
                 $operator = new Operator();

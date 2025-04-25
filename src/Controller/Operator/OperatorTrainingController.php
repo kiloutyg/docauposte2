@@ -1,38 +1,8 @@
 <?php
 
-namespace App\Controller;
-
-use \Psr\Log\LoggerInterface;
-
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
-
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
-use Symfony\Contracts\Cache\CacheInterface;
-
-use App\Form\OperatorType;
-use App\Form\TeamType;
-use App\Form\UapType;
+namespace App\Controller\Operator;
 
 use App\Entity\Operator;
-use App\Entity\TrainingRecord;
-use App\Entity\Trainer;
-use App\Entity\Team;
-use App\Entity\Uap;
-
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
 
 use App\Repository\UploadRepository;
 use App\Repository\ValidationRepository;
@@ -49,8 +19,23 @@ use App\Service\TrainingRecordService;
 use App\Service\PdfGeneratorService;
 use App\Service\OperatorService;
 
+use Doctrine\ORM\EntityManagerInterface;
 
-class OperatorTrainingController extends OperatorBaseController
+use \Psr\Log\LoggerInterface;
+
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Cache\CacheInterface;
+
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+class OperatorTrainingController extends AbstractController
 {
 
     public $em;
@@ -58,6 +43,7 @@ class OperatorTrainingController extends OperatorBaseController
     public $logger;
     public $authChecker;
     public $cache;
+    public $operatorBaseController;
 
     // Repository methods
     public $validationRepository;
@@ -85,6 +71,7 @@ class OperatorTrainingController extends OperatorBaseController
         AuthorizationCheckerInterface   $authChecker,
         RequestStack                    $requestStack,
         CacheInterface                  $cache,
+        OperatorBaseController          $operatorBaseController,
 
         // Repository classes
         ValidationRepository            $validationRepository,
@@ -104,13 +91,12 @@ class OperatorTrainingController extends OperatorBaseController
         OperatorService                 $operatorService,
 
     ) {
-        // $this->cache                        = $cache;
-
         $this->em                           = $em;
         $this->logger                       = $logger;
         $this->authChecker                  = $authChecker;
         $this->request                      = $requestStack->getCurrentRequest();
         $this->cache                        = $cache;
+        $this->operatorBaseController           = $operatorBaseController;
 
         // Variables related to the repositories
         $this->validationRepository         = $validationRepository;
@@ -135,42 +121,6 @@ class OperatorTrainingController extends OperatorBaseController
 
 
 
-    //first test of actual page rendering with a validated document and a dynamic form and list of operators and stuff
-    #[Route('/operator/frontByVal/{validationId}', name: 'app_training_front_by_validation')]
-    public function documentAndOperatorByValidation(Request $request, int $validationId): Response
-    {
-        $referer = $request->headers->get('referer');
-        $validation = $this->validationRepository->find($validationId);
-        $upload = $validation->getUpload();
-
-        if ($request->getMethod() === 'GET') {
-            return $this->render('services/operators/docAndOperator.html.twig', [
-                'upload' => $upload,
-            ]);
-        } else {
-            return $this->redirect($referer);
-        }
-    }
-
-    //first test of actual page rendering with a validated document and a dynamic form and list of operators and stuff
-    #[Route('/operator/frontByUpl/{uploadId}', name: 'app_training_front_by_upload')]
-    public function documentAndOperatorByUpload(Request $request, int $uploadId): Response
-    {
-        $referer = $request->headers->get('referer');
-        $upload = $this->uploadRepository->find($uploadId);
-
-        if ($request->getMethod() === 'GET') {
-            return $this->render('services/operators/docAndOperator.html.twig', [
-                'upload' => $upload,
-            ]);
-        } else {
-            return $this->redirect($referer);
-        }
-    }
-
-
-
-
     // page with the training record and the operator list and the form to add a new operator, 
     // page that will be integrated as an iframe probably in the test document page
     #[Route('operator/traininglist/{uploadId}', name: 'app_training_list')]
@@ -190,8 +140,6 @@ class OperatorTrainingController extends OperatorBaseController
             'operators'         => $this->entityFetchingService->getOperators(),
         ]);
     }
-
-
 
 
 

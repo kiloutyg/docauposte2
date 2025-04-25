@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Operator;
 
 use \Psr\Log\LoggerInterface;
 
@@ -30,9 +30,9 @@ use App\Service\EntityFetchingService;
 use App\Service\TrainingRecordService;
 use App\Service\PdfGeneratorService;
 use App\Service\OperatorService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-
-class OperatorUserController extends OperatorBaseController
+class OperatorUserController extends AbstractController
 {
 
     public $em;

@@ -194,9 +194,9 @@
 			id="accordionAdmin">
 
 			{% if pageLevel is same as('super')  %}
-				{{ render(controller('App\\Controller\\SettingsController::settingsIndex'), options = []) }}
+				{{ render(controller('App\\Controller\\Support\\SettingsController::settingsIndex'), options = []) }}
 				{% include "admin_template/admin_template_components/zone_creation_form.html.twig" %}
-				{{ render(controller('App\\Controller\\AccountController::createAccountController'), options = []) }}
+				{{ render(controller('App\\Controller\\Security\\AccountController::createAccountController'), options = []) }}
 			{% elseif pageLevel is same as('zone') %}
 				{% include "admin_template/admin_template_components/line_creation_form.html.twig" %}
 			{% elseif pageLevel is same as('productLine') %}
@@ -207,7 +207,7 @@
 
 
 			{% if settings.IsTraining %}
-				{{ render(controller('App\\Controller\\OperatorController::operatorManagement'), options = []) }}
+				{{ render(controller('App\\Controller\\Operator\\OperatorAdminController::operatorTeamUapManagement'), options = []) }}
 			{% endif %}
 
 
@@ -215,7 +215,7 @@
 
 			{% if is_granted('ROLE_LINE_ADMIN') %}
 				{% if is_granted('ROLE_SUPER_ADMIN') %}
-					{{ render(controller('App\\Controller\\IncidentController::incidentManagementView'), options = []) }}
+					{{ render(controller('App\\Controller\\Document\\IncidentController::incidentManagementView'), options = []) }}
 				{% else %}
 					{% include "services/incident/incident.html.twig" %}
 				{% endif %}

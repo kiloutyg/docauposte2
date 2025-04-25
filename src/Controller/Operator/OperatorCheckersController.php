@@ -1,38 +1,8 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Operator;
 
-use \Psr\Log\LoggerInterface;
-
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
-
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
-use Symfony\Contracts\Cache\CacheInterface;
-
-use App\Form\OperatorType;
-use App\Form\TeamType;
-use App\Form\UapType;
-
-use App\Entity\Operator;
-use App\Entity\TrainingRecord;
-use App\Entity\Trainer;
-use App\Entity\Team;
-use App\Entity\Uap;
-
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
+use App\Controller\Operator\OperatorBaseController;
 
 use App\Repository\UploadRepository;
 use App\Repository\ValidationRepository;
@@ -49,8 +19,20 @@ use App\Service\TrainingRecordService;
 use App\Service\PdfGeneratorService;
 use App\Service\OperatorService;
 
+use \Psr\Log\LoggerInterface;
 
-class OperatorCheckersController extends OperatorBaseController
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
+use Symfony\Contracts\Cache\CacheInterface;
+
+class OperatorCheckersController extends AbstractController
 {
 
     public $em;
@@ -58,6 +40,7 @@ class OperatorCheckersController extends OperatorBaseController
     public $logger;
     public $authChecker;
     public $cache;
+    public $operatorBaseController;
 
     // Repository methods
     public $validationRepository;
@@ -85,6 +68,7 @@ class OperatorCheckersController extends OperatorBaseController
         AuthorizationCheckerInterface   $authChecker,
         RequestStack                    $requestStack,
         CacheInterface                  $cache,
+        OperatorBaseController          $operatorBaseController,
 
         // Repository classes
         ValidationRepository            $validationRepository,
@@ -110,6 +94,7 @@ class OperatorCheckersController extends OperatorBaseController
         $this->authChecker                  = $authChecker;
         $this->request                      = $requestStack->getCurrentRequest();
         $this->cache                        = $cache;
+        $this->operatorBaseController           = $operatorBaseController;
 
         // Variables related to the repositories
         $this->validationRepository         = $validationRepository;

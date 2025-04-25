@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Document;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -50,7 +50,6 @@ class UploadController extends AbstractController
 
     public function __construct(
         LoggerInterface                 $logger,
-
         Security                        $security,
         AuthorizationCheckerInterface   $authChecker,
 
