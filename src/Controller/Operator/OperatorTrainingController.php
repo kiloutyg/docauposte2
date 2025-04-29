@@ -2,116 +2,38 @@
 
 namespace App\Controller\Operator;
 
-use App\Entity\Operator;
-
-use App\Repository\UploadRepository;
-use App\Repository\ValidationRepository;
-use App\Repository\UapRepository;
-use App\Repository\TeamRepository;
-use App\Repository\OperatorRepository;
-use App\Repository\TrainingRecordRepository;
-use App\Repository\TrainerRepository;
-use App\Repository\UserRepository;
-
-use App\Service\EntityDeletionService;
 use App\Service\EntityFetchingService;
 use App\Service\TrainingRecordService;
-use App\Service\PdfGeneratorService;
 use App\Service\OperatorService;
-
-use Doctrine\ORM\EntityManagerInterface;
 
 use \Psr\Log\LoggerInterface;
 
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Contracts\Cache\CacheInterface;
-
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class OperatorTrainingController extends AbstractController
 {
-
-    public $em;
-    public $request;
     public $logger;
-    public $authChecker;
-    public $cache;
-    public $operatorBaseController;
-
-    // Repository methods
-    public $validationRepository;
-    public $uploadRepository;
-    public $uapRepository;
-    public $teamRepository;
-    public $operatorRepository;
-    public $trainingRecordRepository;
-    public $trainerRepository;
-    public $userRepository;
 
     // Services methods
-    public $entitydeletionService;
     public $trainingRecordService;
-    public $pdfGeneratorService;
     public $entityFetchingService;
     public $operatorService;
-
-
-
     public function __construct(
-
-        EntityManagerInterface          $em,
         LoggerInterface                 $logger,
-        AuthorizationCheckerInterface   $authChecker,
-        RequestStack                    $requestStack,
-        CacheInterface                  $cache,
-        OperatorBaseController          $operatorBaseController,
-
-        // Repository classes
-        ValidationRepository            $validationRepository,
-        UploadRepository                $uploadRepository,
-        UapRepository                   $uapRepository,
-        TeamRepository                  $teamRepository,
-        OperatorRepository              $operatorRepository,
-        TrainingRecordRepository        $trainingRecordRepository,
-        TrainerRepository               $trainerRepository,
-        UserRepository                  $userRepository,
-
         // Services classes
-        EntityDeletionService           $entitydeletionService,
         TrainingRecordService           $trainingRecordService,
-        PdfGeneratorService             $pdfGeneratorService,
         EntityFetchingService           $entityFetchingService,
         OperatorService                 $operatorService,
-
     ) {
-        $this->em                           = $em;
         $this->logger                       = $logger;
-        $this->authChecker                  = $authChecker;
-        $this->request                      = $requestStack->getCurrentRequest();
-        $this->cache                        = $cache;
-        $this->operatorBaseController           = $operatorBaseController;
-
-        // Variables related to the repositories
-        $this->validationRepository         = $validationRepository;
-        $this->uploadRepository             = $uploadRepository;
-        $this->uapRepository                = $uapRepository;
-        $this->teamRepository               = $teamRepository;
-        $this->operatorRepository           = $operatorRepository;
-        $this->trainingRecordRepository     = $trainingRecordRepository;
-        $this->trainerRepository            = $trainerRepository;
-        $this->userRepository               = $userRepository;
 
         // Variables related to the services
-        $this->entitydeletionService        = $entitydeletionService;
         $this->trainingRecordService        = $trainingRecordService;
-        $this->pdfGeneratorService          = $pdfGeneratorService;
         $this->entityFetchingService        = $entityFetchingService;
         $this->operatorService              = $operatorService;
     }
@@ -126,10 +48,7 @@ class OperatorTrainingController extends AbstractController
     #[Route('operator/traininglist/{uploadId}', name: 'app_training_list')]
     public function trainingList(int $uploadId): Response
     {
-
-        // Handle the GET request
-        $upload = $this->uploadRepository->find($uploadId);
-
+        $upload = $this->entityFetchingService->find('upload', $uploadId);
         $trainingRecords = $this->trainingRecordService->getOrderedTrainingRecordsByUpload($upload);
 
         return $this->render('services/operators/operatorTraining.html.twig', [
@@ -146,77 +65,10 @@ class OperatorTrainingController extends AbstractController
 
     // Route to handle the newOperator form submission
     #[Route('/operator/traininglist/newOperator/{uploadId}/{teamId}/{uapId}', name: 'app_training_new_operator')]
-    public function trainingListNewOperator(ValidatorInterface $validator, Request $request, int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
+    public function trainingListNewOperator(Request $request, int $uploadId, int $teamId, int $uapId): Response
     {
-
-        $team = $this->teamRepository->find($teamId);
-        $uap = $this->uapRepository->find($uapId);
-        $operatorCode = $request->request->get('newOperatorCode');
-
-        $surname = $request->request->get('newOperatorSurname');
-        $firstname = $request->request->get('newOperatorFirstname');
-        $concatenedOperatorNameNotLower = $firstname . '.' . $surname;
-        $concatenedOperatorNameLower = strtolower($concatenedOperatorNameNotLower);
-
-        $operatorName = $request->request->get('newOperatorName');
-
-        if ($operatorName !== $concatenedOperatorNameLower) {
-            $this->addFlash('danger', 'Il y a eu un probleme, contactez votre administrateur');
-            return $this->redirectToRoute('app_training_list', [
-                'uploadId' => $uploadId,
-                'teamId' => $teamId,
-                'uapId' => $uapId,
-            ]);
-        }
-
-        $existingOperator = $this->operatorRepository->findOneBy(['name' => $operatorName]);
-        if ($existingOperator == null) {
-            $existingOperator = $this->operatorRepository->findOneBy(['code' => $operatorCode]);
-        }
-
-        if ($existingOperator != null) {
-            // $this->logger->info('existingOperator', [$existingOperator->getName()]);
-            if ($existingOperator->getTeam() == $team && $existingOperator->getUaps()->contains($uap)) {
-                $this->addFlash('danger', 'Cet opérateur existe déjà dans cette equipe et uap');
-                return $this->redirectToRoute('app_training_list', [
-                    'uploadId' => $uploadId,
-                    'teamId' => $teamId,
-                    'uapId' => $uapId,
-                ]);
-            } else {
-                $existingOperator->setTeam($team);
-                $existingOperator->addUap($uap);
-                $this->em->persist($existingOperator);
-                $this->em->flush();
-                $this->addFlash('success', 'L\'opérateur a bien été ajouté et son equipe et son UAP ont été modifiées');
-                return $this->redirectToRoute('app_render_training_records', [
-                    'uploadId' => $uploadId,
-                    'teamId' => $teamId,
-                    'uapId' => $uapId,
-                ]);
-            }
-        }
-
-        $operator = new Operator();
-        $operator->setName($operatorName);
-        $operator->setTeam($team);
-        $operator->addUap($uap);
-        $operator->setCode($operatorCode);
-
-        $errors = $validator->validate($operator);
-        if (count($errors) > 0) {
-            $errorMessages = [];
-            foreach ($errors as $violation) {
-                // You can use ->getPropertyPath() if you need to show the field name
-                // $errorMessages[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
-                $errorMessages[] = $violation->getMessage();
-            }
-
-            // Now you have an array of user-friendly messages you can display
-            // For example, you can separate them with new lines when displaying in text format:
-            $errorsString = implode("\n", $errorMessages);
-
-            // $this->logger->info('danger', [$errorsString]);
+        if (!$this->operatorService->autoOperatorNameCheckerFromRequest($request)) {
+            $this->addFlash('danger', 'Il y a eu un probleme avec le nom, contactez votre administrateur');
             return $this->redirectToRoute('app_render_training_records', [
                 'uploadId' => $uploadId,
                 'teamId' => $teamId,
@@ -224,10 +76,11 @@ class OperatorTrainingController extends AbstractController
             ]);
         }
 
-        $this->em->persist($operator);
-        $this->em->flush();
-        $this->cache->delete('operators_list');
-        $this->addFlash('success', 'L\'opérateur a bien été ajouté');
+        $operatorCode = (int)$request->request->get('newOperatorCode');
+        $operatorName = $request->request->get('newOperatorName');
+
+        $this->operatorService->processOperatorFromRequest($operatorName, $operatorCode, $teamId, $uapId);
+
         return $this->redirectToRoute('app_render_training_records', [
             'uploadId' => $uploadId,
             'teamId' => $teamId,
@@ -240,12 +93,8 @@ class OperatorTrainingController extends AbstractController
 
 
     #[Route('/operator/traininglist/listform/{uploadId}', name: 'app_training_list_select_record_form')]
-    public function trainingListFormHandling(Request $request, int $uploadId): Response
+    public function trainingListSelectFormHandling(Request $request, int $uploadId): Response
     {
-        // Log the full request for debugging
-        // $this->logger->info('Full request', $request->request->all());
-
-        // Process the POST request
         $teamId = $request->request->get('team-trainingRecord-select');
         $uapId = $request->request->get('uap-trainingRecord-select');
         if ($teamId == null || $uapId == null) {
@@ -253,7 +102,6 @@ class OperatorTrainingController extends AbstractController
             return $this->redirectToRoute('app_training_list', ['uploadId' => $uploadId]);
         }
 
-        // Redirect to the route that renders the partial
         return $this->redirectToRoute('app_render_training_records', [
             'uploadId' => $uploadId,
             'teamId' => $teamId,
@@ -267,16 +115,7 @@ class OperatorTrainingController extends AbstractController
     #[Route('/operator/render-training-records/{uploadId}/{teamId}/{uapId}', name: 'app_render_training_records')]
     public function renderTrainingRecords(int $uploadId, ?int $teamId = null, ?int $uapId = null): Response
     {
-        $upload = $this->uploadRepository->find($uploadId);
-
-        $selectedOperators = $this->operatorRepository->findByTeamAndUap($teamId, $uapId);
-
-        usort($selectedOperators, function ($a, $b) {
-            list($firstNameA, $surnameA) = explode('.', $a->getName());
-            list($firstNameB, $surnameB) = explode('.', $b->getName());
-
-            return $surnameA === $surnameB ? strcmp($firstNameA, $firstNameB) : strcmp($surnameA, $surnameB);
-        });
+        $selectedOperators = $this->entityFetchingService->findOperatorsByTeamAndUapId($teamId, $uapId);
 
         $trainingRecords = []; // Array of training records
         $unorderedTrainingRecords = []; // Array of unordered training records
@@ -285,12 +124,11 @@ class OperatorTrainingController extends AbstractController
         $inTrainingOperatorsByTrainer = []; // Array of operators in training grouped by trainer
 
         foreach ($selectedOperators as $operator) {
-            $records = $this->trainingRecordRepository->findBy(['operator' => $operator, 'upload' => $uploadId]);
+            $records = $this->entityFetchingService->findBy('trainingRecord', ['operator' => $operator, 'upload' => $uploadId]);
             $unorderedTrainingRecords = array_merge($trainingRecords, $records);
 
             $record = $records[0] ?? null;
             if ($record) {
-                // $this->logger->info('unorderedTrainingRecords', [$unorderedTrainingRecords]);
                 $trainerName = $record->getTrainer() ? $record->getTrainer()->getOperator()->getName() : 'inconnu.nom';
                 if ($record->isTrained()) {
                     $operatorsByTrainer[$trainerName][] = $operator;
@@ -306,13 +144,10 @@ class OperatorTrainingController extends AbstractController
             $trainingRecords = $this->trainingRecordService->getOrderedTrainingRecordsByTrainingRecordsArray($unorderedTrainingRecords);
         }
 
-        // $this->logger->info('trainingRecords', [$trainingRecords]);
-
-        // Render the partial view
         return $this->render('services/operators/training_component/_listOperatorContainer.html.twig', [
-            'team' => $this->teamRepository->find($teamId),
-            'uap' => $this->uapRepository->find($uapId),
-            'upload' => $upload,
+            'team' => $this->entityFetchingService->find('team', $teamId),
+            'uap' => $this->entityFetchingService->find('uap', $uapId),
+            'upload' => $this->entityFetchingService->find('upload', $uploadId),
             'selectedOperators' => $selectedOperators,
             'trainingRecords'   => $trainingRecords,
             'untrainedOperators' => $untrainedOperators,
@@ -327,7 +162,6 @@ class OperatorTrainingController extends AbstractController
     #[Route('/operator/trainingRecord/form/{uploadId}/{teamId}/{uapId}', name: 'app_training_record_form')]
     public function trainingRecordFormManagement(int $uploadId, Request $request, ?int $teamId = null, ?int $uapId = null): Response
     {
-
         try {
             $this->trainingRecordService->trainingRecordTreatment($request);
         } catch (\Exception $e) {

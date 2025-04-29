@@ -25,7 +25,8 @@ class TrainingRecordController extends AbstractController
         $this->trainingRecordService = $trainingRecordService;
     }
 
-    // Methods to delete a weeks old training record maximum
+
+
     #[Route('/training-record/delete-weeks-old/{uploadId}/{teamId}/{uapId}/{trainingRecordId}', name: 'app_training_record_delete_weeks_old')]
     public function deleteWeeksOldTrainingRecords(int $trainingRecordId, int $uploadId, int $teamId, int $uapId): Response
     {
