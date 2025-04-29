@@ -38,6 +38,12 @@ class Settings
     #[ORM\Column(type: Types::DATEINTERVAL, nullable: true, options: ['default' => 'P00Y03M00DT00H00M00S'])]
     private ?\DateInterval $OperatorAutoDeleteDelay = null;
 
+    #[ORM\Column]
+    private ?bool $OperatorCodeMethod = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $OperatorCodeRegex = null;
+
     public function __construct()
     {
         $this->id = 1;
@@ -149,6 +155,30 @@ class Settings
     public function setOperatorAutoDeleteDelay(?\DateInterval $OperatorAutoDeleteDelay): static
     {
         $this->OperatorAutoDeleteDelay = $OperatorAutoDeleteDelay;
+
+        return $this;
+    }
+
+    public function isOperatorCodeMethod(): ?bool
+    {
+        return $this->OperatorCodeMethod;
+    }
+
+    public function setOperatorCodeMethod(bool $OperatorCodeMethod): static
+    {
+        $this->OperatorCodeMethod = $OperatorCodeMethod;
+
+        return $this;
+    }
+
+    public function getOperatorCodeRegex(): ?string
+    {
+        return $this->OperatorCodeRegex;
+    }
+
+    public function setOperatorCodeRegex(?string $OperatorCodeRegex): static
+    {
+        $this->OperatorCodeRegex = $OperatorCodeRegex;
 
         return $this;
     }
