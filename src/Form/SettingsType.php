@@ -9,15 +9,15 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class SettingsType extends AbstractType
 {
-
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -60,8 +60,27 @@ class SettingsType extends AbstractType
                     'attr' => ['class' => 'pretty-toggle'],
                 ]
             )
-
-        ;
+            ->add(
+                'OperatorCodeMethod',
+                CheckboxType::class,
+                [
+                    'required' => false,
+                    'label' => false,
+                    'attr' => ['class' => 'pretty-toggle'],
+                ]
+            )
+            ->add(
+                'OperatorCodeRegex',
+                TextType::class,
+                [
+                    'required' => false,
+                    'label' => false,
+                    'attr' => [
+                        'class' => 'form-control mx-auto mt-2',
+                        'placeholder' => 'Format par défaut: /^[0-9]{5}$/',
+                    ]
+                ]
+            );
 
         $builder
             ->add(
@@ -151,6 +170,7 @@ class SettingsType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Settings::class,
+
         ]);
     }
 }

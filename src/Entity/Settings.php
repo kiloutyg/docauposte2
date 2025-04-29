@@ -38,10 +38,10 @@ class Settings
     #[ORM\Column(type: Types::DATEINTERVAL, nullable: true, options: ['default' => 'P00Y03M00DT00H00M00S'])]
     private ?\DateInterval $OperatorAutoDeleteDelay = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: false, options: ['default' => true])]
     private ?bool $OperatorCodeMethod = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true, options: ['default' => '\/^[0-9]{5}$\/'])]
     private ?string $OperatorCodeRegex = null;
 
     public function __construct()
@@ -55,6 +55,8 @@ class Settings
         $this->OperatorRetrainingDelay = new \DateInterval('P00Y06M00DT00H00M00S');
         $this->OperatorInactivityDelay = new \DateInterval('P00Y03M00DT00H00M00S');
         $this->OperatorAutoDeleteDelay = new \DateInterval('P00Y03M00DT00H00M00S');
+        $this->OperatorCodeMethod = true;
+        $this->OperatorCodeRegex = '/^[0-9]{5}$/';
     }
 
     public function getId(): ?int
