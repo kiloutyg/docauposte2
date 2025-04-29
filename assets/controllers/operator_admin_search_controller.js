@@ -101,6 +101,6 @@ export default class OperatorAdminSearchController extends Controller {
             this.operatorAdminSearchCodeInputTarget.value = '';
             this.operatorAdminSearchNameInputTarget.value = '';
             this.operatorAdminSearchIsTrainerInputTarget.value = '';
-        }, 10000);
+        }, 15000);
     }
 }

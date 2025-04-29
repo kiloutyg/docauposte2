@@ -25,15 +25,18 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
                     // Provide positive feedback to the user if necessary
                 } else if (!isValidSum) {
                     this.showCodeFormatError('Bad Format.');
+                    console.log('Bad Format.');
                     const newCode = await this.proposeCompliantNewCode();
                     this.operatorFormCodeTarget.value = newCode;
                 } else if (isExistingCode) {
                     this.showCodeExistenceError('Existe déjà.');
+                    console.log('Existe déjà.');
                     const newCode = await this.proposeCompliantNewCode();
                     this.operatorFormCodeTarget.value = newCode;
                 }
             } else {
                 this.showCodeFormatError('Format invalide.');
+                console.log('Format invalide.');
                 const newCode = await this.proposeCompliantNewCode();
                 this.operatorFormCodeTarget.value = newCode;
             }
@@ -45,6 +48,7 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
     // Helper method to check if the code format is valid
     isCodeValidFormat(code) {
         const regex = /^[0-9]{5}$/;
+        console.log('Checking code format:', code);
         return regex.test(code);
     }
 
@@ -82,7 +86,7 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
     }
 
 
-
+    // TODO: Find how to allow method change dynamically
     editedCodeFormatChecker(code) {
         const sumOfFirstThreeDigits = code
             .substring(0, 3)

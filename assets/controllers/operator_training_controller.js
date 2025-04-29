@@ -40,12 +40,10 @@ export default class OperatorTrainingController extends Controller {
     }
 
     validateNewOperatorFirstname() {
-
         document.getElementById('newOperatorFirstname').addEventListener('input', function (e) {
             var value = e.target.value;
             e.target.value = value.charAt(0).toUpperCase() + value.slice(1);
         });
-
 
         clearTimeout(this.firstnameTypingTimeout);
         this.firstnameTypingTimeout = setTimeout(() => {
@@ -65,9 +63,12 @@ export default class OperatorTrainingController extends Controller {
         }, 1400);
     }
 
+
+
     capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
+
 
 
     validateNewOperatorName() {
@@ -104,7 +105,6 @@ export default class OperatorTrainingController extends Controller {
     validateNewOperatorCode() {
         clearTimeout(this.codeTypingTimeout);
         this.codeTypingTimeout = setTimeout(() => {
-
 
             const regex = /^[0-9]{5}$/;
             let isValid;
