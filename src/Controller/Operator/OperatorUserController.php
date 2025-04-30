@@ -4,69 +4,36 @@ namespace App\Controller\Operator;
 
 use \Psr\Log\LoggerInterface;
 
-use Doctrine\ORM\EntityManagerInterface;
-
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-use Symfony\Contracts\Cache\CacheInterface;
-
-use App\Repository\UploadRepository;
-use App\Repository\ValidationRepository;
-use App\Repository\UapRepository;
-use App\Repository\TeamRepository;
 use App\Repository\OperatorRepository;
-use App\Repository\TrainingRecordRepository;
-use App\Repository\TrainerRepository;
 use App\Repository\UserRepository;
 
-use App\Service\EntityDeletionService;
-use App\Service\EntityFetchingService;
-use App\Service\TrainingRecordService;
-use App\Service\PdfGeneratorService;
-use App\Service\OperatorService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class OperatorUserController extends AbstractController
 {
-
-    public $em;
-    public $request;
     public $logger;
     public $authChecker;
-    public $uapRepository;
-    public $teamRepository;
     public $operatorRepository;
     public $userRepository;
 
 
 
     public function __construct(
-
-        EntityManagerInterface          $em,
         LoggerInterface                 $logger,
         AuthorizationCheckerInterface   $authChecker,
-        RequestStack                    $requestStack,
 
-        UapRepository                   $uapRepository,
-        TeamRepository                  $teamRepository,
         OperatorRepository              $operatorRepository,
         UserRepository                  $userRepository,
 
     ) {
-
-        $this->em                           = $em;
         $this->logger                       = $logger;
         $this->authChecker                  = $authChecker;
-        $this->request                      = $requestStack->getCurrentRequest();
 
-        $this->uapRepository                = $uapRepository;
-        $this->teamRepository               = $teamRepository;
         $this->operatorRepository           = $operatorRepository;
         $this->userRepository               = $userRepository;
     }
@@ -75,7 +42,7 @@ class OperatorUserController extends AbstractController
 
 
 
-    #[Route('/operator/user_login_check', name: 'app_operator_user_login_check')]
+    #[Route('/operator/user-login-check', name: 'app_operator_user_login_check')]
     public function userLoginCheck(): JsonResponse
     {
         $currentUser = $this->getUser();

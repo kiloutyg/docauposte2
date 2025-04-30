@@ -1,11 +1,8 @@
-
 import { Controller } from '@hotwired/stimulus';
-
+import { operatorCodeService } from './services/operator_code_service';
 import axios from 'axios';
 
 export default class OperatorAdminCreationController extends Controller {
-
-
 
     static targets = [
         "newOperatorLastname",
@@ -22,9 +19,7 @@ export default class OperatorAdminCreationController extends Controller {
     ];
 
 
-
     suggestionsResults = [];
-
 
 
     validateNewOperatorLastname() {
@@ -37,11 +32,10 @@ export default class OperatorAdminCreationController extends Controller {
             if (isValid) {
                 if (this.newOperatorFirstnameTarget.value.trim() === "") {
                     this.newOperatorFirstnameTarget.disabled = false;
-                    // this.newOperatorFirstnameTarget.focus();
                 }
                 this.validateNewOperatorFirstname();
             }
-        }, 800);
+        }, 1000);
     }
 
 
@@ -61,7 +55,7 @@ export default class OperatorAdminCreationController extends Controller {
                 this.newOperatorInvertedNameTarget = invertedCombined.toLowerCase();
                 this.validateNewOperatorName();
             }
-        }, 800);
+        }, 1000);
     }
 
 
@@ -83,12 +77,9 @@ export default class OperatorAdminCreationController extends Controller {
 
     validateNewOperatorName() {
         clearTimeout(this.nameTypingTimeout);  // clear any existing timeout to reset the timer
-
         this.nameTypingTimeout = setTimeout(() => {
-
             const regex = /^[a-zA-Z]+\.(?!-)(?!.*--)[a-zA-Z-]+(?<!-)$/;
             let isValid;
-
             if (this.duplicateCheckResults.name) {
                 if (this.newOperatorNameTarget.trim() === this.duplicateCheckResults.name.data.value) {
                     return;
@@ -99,7 +90,6 @@ export default class OperatorAdminCreationController extends Controller {
             } else {
                 isValid = regex.test(this.newOperatorNameTarget.trim());
             }
-
             this.updateMessage(this.newOperatorNameMessageTarget, isValid, "Veuillez saisir sous la forme prenom.nom.");
             this.newOperatorCodeTarget.disabled = true;
 
@@ -109,40 +99,70 @@ export default class OperatorAdminCreationController extends Controller {
                     this.validateNewOperatorCode();
                 }
             }
-        }, 800); // delay in milliseconds
+        }, 1000); // delay in milliseconds
     }
+
+
+
+    // validateNewOperatorCode() {
+    //     clearTimeout(this.codeTypingTimeout);
+    //     this.codeTypingTimeout = setTimeout(() => {
+    //         console.log('OperatorAdminCreationController: Validating operator code:', this.newOperatorCodeTarget.value);
+    //         const regex = /^[0-9]{5}$/;
+    //         let isValid;
+    //         if (this.duplicateCheckResults.code) {
+    //             if (this.newOperatorCodeTarget.value.trim() === this.duplicateCheckResults.code.data.value) {
+    //                 return;
+    //             } else {
+    //                 this.duplicateCheckResults.code = null;
+    //                 const code = this.newOperatorCodeTarget.value
+    //                 const sumOfFirstThreeDigit = code.toString.split('').slice(0, 3).reduce((sum, digit) => sum + Number(digit), 0);
+    //                 const valueOfLastTwoDigit = code.toString.split('').slice(3).join('');
+    //                 if (sumOfFirstThreeDigit === valueOfLastTwoDigit) {
+    //                     isValid = regex.test(this.newOperatorCodeTarget.value.trim());
+    //                 }
+    //             }
+    //         } else {
+    //             isValid = regex.test(this.newOperatorCodeTarget.value.trim());
+    //         }
+    //         this.updateMessage(this.newOperatorCodeMessageTarget, isValid, "Veuillez saisir un code correct.");
+    //         if (isValid) {
+    //             this.duplicateCheckResults.code = null;
+    //             this.checkForExistingEntityByCode();
+    //         }
+    //     }, 1000);
+    // }
+
 
 
 
     validateNewOperatorCode() {
         clearTimeout(this.codeTypingTimeout);
-        this.codeTypingTimeout = setTimeout(() => {
-            const regex = /^[0-9]{5}$/;
+        this.codeTypingTimeout = setTimeout(async () => {
+            console.log('OperatorAdminCreationController: Validating operator code:', this.newOperatorCodeTarget.value);
             let isValid;
-
             if (this.duplicateCheckResults.code) {
                 if (this.newOperatorCodeTarget.value.trim() === this.duplicateCheckResults.code.data.value) {
+                    console.log('OperatorAdminCreationController: Code already validated');
                     return;
                 } else {
+                    console.log('OperatorAdminCreationController: Resetting duplicate check results for code');
                     this.duplicateCheckResults.code = null;
-                    const code = this.newOperatorCodeTarget.value
-                    const sumOfFirstThreeDigit = code.toString.split('').slice(0, 3).reduce((sum, digit) => sum + Number(digit), 0);
-                    const valueOfLastTwoDigit = code.toString.split('').slice(3).join('');
-                    if (sumOfFirstThreeDigit === valueOfLastTwoDigit) {
-                        isValid = regex.test(this.newOperatorCodeTarget.value.trim());
-                    }
+                    isValid = await operatorCodeService.validateCode(this.newOperatorCodeTarget.value.trim());
                 }
             } else {
-                isValid = regex.test(this.newOperatorCodeTarget.value.trim());
+                isValid = await operatorCodeService.validateCode(this.newOperatorCodeTarget.value.trim());
             }
+            console.log('OperatorAdminCreationController: Code validation result:', isValid);
             this.updateMessage(this.newOperatorCodeMessageTarget, isValid, "Veuillez saisir un code correct.");
-
             if (isValid) {
+                console.log('OperatorAdminCreationController: Code is valid, checking for duplicates');
                 this.duplicateCheckResults.code = null;
                 this.checkForExistingEntityByCode();
             }
-        }, 800);
+        }, 1000);
     }
+
 
 
 
@@ -166,6 +186,7 @@ export default class OperatorAdminCreationController extends Controller {
 
 
 
+
     async checkForExistingEntityByCode() {
         try {
             const response = await this.checkForDuplicate('/docauposte/operator/check-duplicate-by-code', this.newOperatorCodeTarget.value);
@@ -176,6 +197,7 @@ export default class OperatorAdminCreationController extends Controller {
             this.newOperatorCodeMessageTarget.textContent = "Erreur lors de la vérification du code opérateur.";
         }
     }
+
 
 
 
@@ -192,18 +214,18 @@ export default class OperatorAdminCreationController extends Controller {
 
 
 
+
     duplicateCheckResults = { name: null, code: null };
 
 
 
-    handleDuplicateResponse(response, messageTarget, fieldName) {
+
+    async handleDuplicateResponse(response, messageTarget, fieldName) {
         messageTarget.textContent = response.data.found
             ? response.data.message
             : `Aucun doublon trouvé dans les ${fieldName}.`;
-
         messageTarget.style.fontWeight = "bold";
         messageTarget.style.color = response.data.found ? "red" : "green";
-
         if (response.data.found) {
             if (response.data.field === "name") {
                 this.duplicateCheckResults.name = response;
@@ -211,9 +233,9 @@ export default class OperatorAdminCreationController extends Controller {
                 this.duplicateCheckResults.code = response;
             }
             this.checkForCorrespondingEntity();
-
         } else {
-            if (response.data.field === "name") {
+            const settings = await operatorCodeService.getSettings();
+            if (response.data.field === "name" && settings.methodEnabled) {
                 this.codeGeneratorInitiator();
             }
             this.newOperatorCodeTarget.disabled = false;
@@ -221,6 +243,8 @@ export default class OperatorAdminCreationController extends Controller {
             this.manageNewOperatorSubmitButton(true);
         }
     }
+
+
 
 
     manageNewOperatorSubmitButton(enableButton = false) {
@@ -245,7 +269,7 @@ export default class OperatorAdminCreationController extends Controller {
             this.newOperatorIsTrainerTarget.checked = null;
             this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions 
             this.suggestionsResults = [];
-        }, 15000);
+        }, 110000);
 
     }
 
@@ -282,45 +306,85 @@ export default class OperatorAdminCreationController extends Controller {
 
 
 
+
     executeEntityNonMatchingLogic(unMatchedFound) {
         this.manageNewOperatorSubmitButton(unMatchedFound);
     }
 
 
-    codeGenerator() {
-        // Generate a random integer between 1 and 999
-        const code = Math.floor(1 + Math.random() * 999);
 
-        // Sum the digits of the 'code' integer
-        let sumOfDigits = code
-            .toString()
-            .split('')
-            .reduce((sum, digit) => sum + Number(digit), 0);
-        const sumOfDigitsString = sumOfDigits.toString();
-        if (sumOfDigitsString.length < 2) {
-            sumOfDigits = '0' + sumOfDigits;
-        }
-        // Combine the original code and the sum of its digits
-        let newCode = code.toString() + sumOfDigits.toString();
-        // Ensure 'newCode' has exactly 5 digits
-        if (newCode.length < 5) {
-            // Pad with leading zeros if less than 5 digits
-            newCode = newCode.padStart(5, '0');
-        } else if (newCode.length > 5) {
-            // If more than 5 digits, use the last 5 digits
-            newCode = newCode.slice(-5);
-        }
-        return newCode;
+    // codeGenerator() {
+    //     // Generate a random integer between 1 and 999
+    //     const code = Math.floor(1 + Math.random() * 999);
+    //     // Sum the digits of the 'code' integer
+    //     let sumOfDigits = code
+    //         .toString()
+    //         .split('')
+    //         .reduce((sum, digit) => sum + Number(digit), 0);
+    //     const sumOfDigitsString = sumOfDigits.toString();
+    //     if (sumOfDigitsString.length < 2) {
+    //         sumOfDigits = '0' + sumOfDigits;
+    //     }
+    //     // Combine the original code and the sum of its digits
+    //     let newCode = code.toString() + sumOfDigits.toString();
+    //     // Ensure 'newCode' has exactly 5 digits
+    //     if (newCode.length < 5) {
+    //         // Pad with leading zeros if less than 5 digits
+    //         newCode = newCode.padStart(5, '0');
+    //     } else if (newCode.length > 5) {
+    //         // If more than 5 digits, use the last 5 digits
+    //         newCode = newCode.slice(-5);
+    //     }
+    //     return newCode;
+    // }
+
+
+
+    async codeGenerator() {
+        console.log('OperatorAdminCreationController: Calling codeGenerator');
+        const code = await operatorCodeService.generateUniqueCode();
+        console.log('OperatorAdminCreationController: Generated code:', code);
+        return code;
     }
 
+
+    // async codeGeneratorInitiator() {
+    //     const newCode = this.codeGenerator();
+    //     // Check if the generated code already exists
+    //     try {
+    //         const response = await this.generatedCodeChecker(newCode);
+    //         if (response.data.found) {
+    //             await this.codeGeneratorInitiator(); // Recursively generate a new code
+    //         } else {
+    //             // Set the new code to the input field and proceed
+    //             this.newOperatorCodeTarget.value = newCode;
+    //             this.newOperatorCodeTarget.disabled = true;
+    //             this.newOperatorCodeTarget.focus();
+    //             this.validateNewOperatorCode();
+    //         }
+    //     } catch (error) {
+    //         console.error('Error checking for duplicate operator code.', error);
+    //         // Handle error accordingly
+    //     }
+    // }
+
+
+
+
     async codeGeneratorInitiator() {
-        const newCode = this.codeGenerator();
+        console.log('OperatorAdminCreationController: Initiating code generation');
+        const newCode = await this.codeGenerator();
+        console.log('OperatorAdminCreationController: Generated code:', newCode);
         // Check if the generated code already exists
         try {
             const response = await this.generatedCodeChecker(newCode);
+            console.log('OperatorAdminCreationController: Code existence check response:', response);
+
             if (response.data.found) {
+                console.log('OperatorAdminCreationController: Code already exists, generating a new one');
                 await this.codeGeneratorInitiator(); // Recursively generate a new code
             } else {
+                console.log('OperatorAdminCreationController: Code is unique, setting it to the input field');
                 // Set the new code to the input field and proceed
                 this.newOperatorCodeTarget.value = newCode;
                 this.newOperatorCodeTarget.disabled = true;
@@ -328,16 +392,36 @@ export default class OperatorAdminCreationController extends Controller {
                 this.validateNewOperatorCode();
             }
         } catch (error) {
-            console.error('Error checking for duplicate operator code.', error);
+            console.error('OperatorAdminCreationController: Error checking for duplicate operator code:', error);
             // Handle error accordingly
         }
     }
 
 
 
-    generatedCodeChecker(code) {
-        return axios.post(`/docauposte/operator/check-if-code-exist`, { code: code });
+
+    // generatedCodeChecker(code) {
+    //     return axios.post(`/docauposte/operator/check-if-code-exist`, { code: code });
+    // }
+
+
+
+
+
+    async generatedCodeChecker(code) {
+        console.log('OperatorAdminCreationController: Checking if code exists:', code);
+        try {
+            const exists = await operatorCodeService.checkIfCodeExists(code);
+            console.log('OperatorAdminCreationController: Code exists check result:', exists);
+            // Format the response to match what the controller expects
+            return { data: { found: exists } };
+        } catch (error) {
+            console.error('OperatorAdminCreationController: Error checking if code exists:', error);
+            throw error;
+        }
     }
+
+
 
 
 
@@ -362,6 +446,9 @@ export default class OperatorAdminCreationController extends Controller {
 
 
 
+
+
+
     suggestFirstname(event) {
         const input = event.target.value;
         if (input.length > 0) { // Only start suggesting after at least 2 characters have been entered
@@ -383,9 +470,12 @@ export default class OperatorAdminCreationController extends Controller {
 
 
 
+
+
+
+
     async fetchNameSuggestions(name, inputField) {
         let response;
-
         if (inputField === 'lastname' && this.newOperatorFirstnameTarget.value.trim() != "") {
             const firstNameResponse = await axios.post(`suggest-names`, { name: this.newOperatorFirstnameTarget.value.trim() });
             this.suggestionsResults = firstNameResponse.data;
@@ -396,6 +486,9 @@ export default class OperatorAdminCreationController extends Controller {
         response = await axios.post(`suggest-names`, { name: name });
         return this.checkIfSuggestionsResultsEmpty(response.data);
     }
+
+
+
 
 
 
@@ -412,12 +505,19 @@ export default class OperatorAdminCreationController extends Controller {
 
 
 
+
+
+
     async checkForDuplicatesuggestionsResults(responses) {
         const duplicateSuggestions = responses.filter(response => {
             return this.suggestionsResults.some(suggestion => suggestion.id === response.id);
         });
         return duplicateSuggestions;
     }
+
+
+
+
 
 
 
@@ -437,7 +537,6 @@ export default class OperatorAdminCreationController extends Controller {
             ${lastName} ${firstName} - ${teamName} - ${uapName} (${code})
         </div>`;
         }).join('');
-
         this.nameSuggestionsTarget.querySelectorAll('.suggestion-item').forEach(item => {
             item.addEventListener('click', (event) => {
                 const firstname = event.currentTarget.getAttribute('data-firstname');
@@ -452,7 +551,7 @@ export default class OperatorAdminCreationController extends Controller {
                 this.newOperatorCodeTarget.value = code;
                 this.newOperatorTeamTarget.value = team;
                 this.newOperatorUapsTarget.value = uap;
-                
+
                 if (isTrainer === '1') {
                     this.newOperatorIsTrainerTarget.checked = true;
                 } else {

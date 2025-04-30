@@ -126,7 +126,10 @@ class OperatorCheckersController extends AbstractController
     #[Route('operator/check-if-code-exist', name: 'app_check_if_code_exist')]
     public function checkIfCodeExist(Request $request): JsonResponse
     {
+        $this->logger->info('Checking if code exist, full request: ', [$request->request->all()]);
+        
         $parsedRequest = json_decode($request->getContent(), true);
+
         $enteredCode = $parsedRequest['code'];
         $existingOperator = $this->entityFetchingService->findOneBy('operator', ['code' => $enteredCode]);
 

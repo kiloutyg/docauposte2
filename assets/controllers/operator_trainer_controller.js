@@ -1,4 +1,4 @@
-
+import { operatorCodeService } from './services/operator_code_service';
 import { Controller } from '@hotwired/stimulus';
 import axios from 'axios';
 
@@ -15,6 +15,31 @@ export default class OperatorTrainerController extends Controller {
         "trainerOperatorLogon",
     ];
 
+    currentRegexPattern = '[0-9]{5}';
+
+    connect() {
+        // Fetch the current regex pattern when the controller connects
+        this.fetchRegexPattern();
+    }
+
+    async fetchRegexPattern() {
+        try {
+            const settings = await operatorCodeService.getSettings();
+            console.log('Fetched global regex pattern:', settings.regex);
+            if (settings) {
+                // Remove any forward slashes that might be in the stored pattern
+                this.currentRegexPattern = settings.regex.toString().replace(/^\/|\/$/g, '');
+                console.log('Fetched regex pattern:', this.currentRegexPattern);
+            }
+        } catch (error) {
+            console.error('Error fetching regex pattern:', error);
+            // Keep the default pattern if there's an error
+        }
+    }
+
+
+
+
     trainerOperatorLogonTargetConnected() {
         this.trainerOperatorLoginCheck();
     }
@@ -22,7 +47,7 @@ export default class OperatorTrainerController extends Controller {
 
     async trainerOperatorLoginCheck() {
         try {
-            const response = await axios.post('/docauposte/operator/user_login_check');
+            const response = await axios.post('/docauposte/operator/user-login-check');
             if (response.data.found) {
                 this.trainerAuthenticated(response);
             } else {
@@ -219,8 +244,7 @@ export default class OperatorTrainerController extends Controller {
                         >
                         <input
                             type="text"
-                            pattern="[0-9]{5}"
-                            maxlength="5"
+                            pattern="${this.currentRegexPattern}"
                             class="form-control"
                             data-operator-training-target="newOperatorCode"
                             data-action="keyup->operator-training#validateNewOperatorCode"

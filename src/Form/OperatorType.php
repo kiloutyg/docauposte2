@@ -9,6 +9,8 @@ use App\Entity\Uap;
 use App\Form\DataTransformer\FirstNameTransformer;
 use App\Form\DataTransformer\LastNameTransformer;
 
+use App\Service\SettingsService;
+
 use Doctrine\ORM\EntityRepository;
 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -26,12 +28,21 @@ class OperatorType extends AbstractType
     private $firstNameTransformer;
     private $lastNameTransformer;
 
-    public function __construct(FirstNameTransformer $firstNameTransformer, LastNameTransformer $lastNameTransformer)
-    {
+    private $settingsService;
+
+    public function __construct(
+        FirstNameTransformer $firstNameTransformer,
+        LastNameTransformer $lastNameTransformer,
+        SettingsService $settingsService,
+    ) {
         $this->firstNameTransformer = $firstNameTransformer;
         $this->lastNameTransformer = $lastNameTransformer;
+        $this->settingsService = $settingsService;
     }
-
+    private function getCurrentRegexPattern(): string
+    {
+        return $this->settingsService->getCurrentCodeOpeRegexPattern();
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -90,8 +101,7 @@ class OperatorType extends AbstractType
                     'class' => 'form-control mx-auto mt-2',
                     'placeholder' => 'Code de l\'opérateur',
                     'required' => true,
-                    'maxlength' => '5',
-                    'pattern' => '[0-9]{5}',
+                    'pattern' => $this->getCurrentRegexPattern(),
                 ],
                 'row_attr' => [
                     'class' => 'col'

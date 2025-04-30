@@ -104,4 +104,9 @@ class SettingsService extends AbstractController
         }
         return $this->incidentAutoDisplayTimerInSeconds;
     }
+
+
+    public function getCurrentCodeOpeRegexPattern(): string{
+        return $this->settingsRepository->getSettings()->getOperatorCodeRegex();
+    }
 }

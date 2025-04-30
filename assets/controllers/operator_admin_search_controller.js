@@ -1,4 +1,4 @@
-
+import { operatorCodeService } from './services/operator_code_service';
 
 import { Controller } from '@hotwired/stimulus';
 
@@ -31,7 +31,8 @@ export default class OperatorAdminSearchController extends Controller {
 
 
     async validateSearchByCode(code) {
-        const regex = /^[0-9]$/;
+        const settings = await operatorCodeService.getSettings();
+        const regex = settings.regex;
         const isValid = regex.test(code.trim());
         return isValid;
     }
