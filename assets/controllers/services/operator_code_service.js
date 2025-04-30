@@ -2,8 +2,9 @@ import { getSettingsData } from '../../js/server-variable';
 import axios from 'axios';
 
 // Default values
-let codeOpeRegex = /^[0-9]{5}$/;
+let codeOpeRegex = /^\d{5}$/;
 let codeOpeMethodBool = false;
+
 
 /**
  * Operator Code Service - Provides methods for code generation, validation, and checking
@@ -15,8 +16,27 @@ class OperatorCodeService {
         this.initPromise = this.initialize();
     }
 
+
+
+
+    /**
+      * Start the initialization process
+      * This should be called right after creating the service instance
+      */
+    init() {
+        if (!this.initPromise) {
+            console.log('OperatorCodeService: Starting initialization');
+            this.initPromise = this.initialize();
+        }
+        return this.initPromise;
+    }
+
+
+
+
     /**
      * Initialize the service with settings from the server
+     * @private
      */
     async initialize() {
         try {
@@ -38,8 +58,12 @@ class OperatorCodeService {
             console.error('OperatorCodeService: Error initializing service:', error);
             console.log('OperatorCodeService: Falling back to default values');
             // Fall back to defaults
+            this.initialized = true; // Mark as initialized even with defaults
         }
     }
+
+
+
 
     /**
      * Ensure the service is initialized before using it
@@ -47,10 +71,17 @@ class OperatorCodeService {
     async ensureInitialized() {
         if (!this.initialized) {
             console.log('OperatorCodeService: Service not initialized, waiting for initialization');
+            if (!this.initPromise) {
+                console.log('OperatorCodeService: No initialization in progress, starting now');
+                this.initPromise = this.initialize();
+            }
             await this.initPromise;
             console.log('OperatorCodeService: Service now initialized');
         }
     }
+
+
+
 
     /**
      * Generate a compliant operator code
@@ -60,41 +91,47 @@ class OperatorCodeService {
         console.log('OperatorCodeService: Generating new code');
         await this.ensureInitialized();
 
-        // Generate a random integer between 1 and 999
-        const code = Math.floor(1 + Math.random() * 999);
-        console.log('OperatorCodeService: Generated random base code:', code);
+        try {
+            // Generate a random integer between 1 and 999
+            const code = Math.floor(1 + Math.random() * 999);
+            console.log('OperatorCodeService: Generated random base code:', code);
 
-        // Sum the digits of the 'code' integer
-        let sumOfDigits = code
-            .toString()
-            .split('')
-            .reduce((sum, digit) => sum + Number(digit), 0);
-        console.log('OperatorCodeService: Sum of digits in base code:', sumOfDigits);
+            // Sum the digits of the 'code' integer
+            let sumOfDigits = code
+                .toString()
+                .split('')
+                .reduce((sum, digit) => sum + Number(digit), 0);
+            console.log('OperatorCodeService: Sum of digits in base code:', sumOfDigits);
 
-        const sumOfDigitsString = sumOfDigits.toString();
+            const sumOfDigitsString = sumOfDigits.toString();
 
-        if (sumOfDigitsString.length < 2) {
-            sumOfDigits = '0' + sumOfDigits;
-            console.log('OperatorCodeService: Padded sum to two digits:', sumOfDigits);
+            if (sumOfDigitsString.length < 2) {
+                sumOfDigits = '0' + sumOfDigits;
+                console.log('OperatorCodeService: Padded sum to two digits:', sumOfDigits);
+            }
+
+            // Combine the original code and the sum of its digits
+            let newCode = code.toString() + sumOfDigits.toString();
+            console.log('OperatorCodeService: Combined code before formatting:', newCode);
+
+            // Ensure 'newCode' has exactly 5 digits
+            if (newCode.length < 5) {
+                // Pad with leading zeros if less than 5 digits
+                newCode = newCode.padStart(5, '0');
+                console.log('OperatorCodeService: Padded code to 5 digits:', newCode);
+            } else if (newCode.length > 5) {
+                // If more than 5 digits, use the last 5 digits
+                newCode = newCode.slice(-5);
+                console.log('OperatorCodeService: Trimmed code to 5 digits:', newCode);
+            }
+
+            console.log('OperatorCodeService: Final generated code:', newCode);
+            return Promise.resolve(newCode);
+
+        } catch (error) {
+            console.error('OperatorCodeService: Error generating code:', error);
+            return Promise.resolve(false);
         }
-
-        // Combine the original code and the sum of its digits
-        let newCode = code.toString() + sumOfDigits.toString();
-        console.log('OperatorCodeService: Combined code before formatting:', newCode);
-
-        // Ensure 'newCode' has exactly 5 digits
-        if (newCode.length < 5) {
-            // Pad with leading zeros if less than 5 digits
-            newCode = newCode.padStart(5, '0');
-            console.log('OperatorCodeService: Padded code to 5 digits:', newCode);
-        } else if (newCode.length > 5) {
-            // If more than 5 digits, use the last 5 digits
-            newCode = newCode.slice(-5);
-            console.log('OperatorCodeService: Trimmed code to 5 digits:', newCode);
-        }
-
-        console.log('OperatorCodeService: Final generated code:', newCode);
-        return newCode;
     }
 
 
@@ -264,13 +301,16 @@ class OperatorCodeService {
         };
 
         console.log('OperatorCodeService: Current settings:', settings);
-        return settings;
+        return Promise.resolve(settings);
     }
 }
 
 // Create a singleton instance
 const operatorCodeService = new OperatorCodeService();
 console.log('OperatorCodeService: Singleton instance created');
-
+// Initialize the service immediately
+operatorCodeService.init().catch(error => {
+    console.error('OperatorCodeService: Failed to initialize service:', error);
+});
 // Export the singleton service for use in other controllers
 export { operatorCodeService };

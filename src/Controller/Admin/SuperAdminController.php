@@ -4,12 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Zone;
 
-use App\Repository\ZoneRepository;
-use App\Repository\UploadRepository;
-use App\Repository\IncidentRepository;
-
 use App\Service\EntityFetchingService;
-use App\Service\TrainingRecordService;
 use App\Service\IncidentService;
 use App\Service\EntityDeletionService;
 use App\Service\UploadService;
@@ -17,10 +12,7 @@ use App\Service\FolderService;
 
 use Doctrine\ORM\EntityManagerInterface;
 
-use Psr\Log\LoggerInterface;
-
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -29,17 +21,9 @@ use Symfony\Component\Routing\Annotation\Route;
 // This controller is responsible for rendering the super admin interface an managing the logic of the super admin interface
 class SuperAdminController extends AbstractController
 {
-    private $projectDir;
-    private $public_dir;
     private $em;
-    private $logger;
-
-    private $zoneRepository;
-    private $uploadRepository;
     private $incidentRepository;
-
     private $entityFetchingService;
-    private $trainingRecordService;
     private $folderService;
     private $entitydeletionService;
     private $incidentService;
@@ -48,15 +32,8 @@ class SuperAdminController extends AbstractController
     public function __construct(
 
         EntityManagerInterface          $em,
-        LoggerInterface                 $logger,
-        ParameterBagInterface           $params,
-
-        ZoneRepository                  $zoneRepository,
-        UploadRepository                $uploadRepository,
-        IncidentRepository              $incidentRepository,
 
         EntityFetchingService           $entityFetchingService,
-        TrainingRecordService           $trainingRecordService,
         UploadService                   $uploadService,
         EntityDeletionService           $entitydeletionService,
         FolderService                   $folderService,
@@ -64,21 +41,15 @@ class SuperAdminController extends AbstractController
 
     ) {
         $this->em                           = $em;
-        $this->logger                       = $logger;
-        $this->projectDir                   = $params->get('kernel.project_dir');
-        $this->public_dir                   = $this->projectDir . '/public';
-
-        $this->zoneRepository               = $zoneRepository;
-        $this->uploadRepository             = $uploadRepository;
-        $this->incidentRepository           = $incidentRepository;
 
         $this->uploadService                = $uploadService;
         $this->folderService                = $folderService;
         $this->incidentService              = $incidentService;
         $this->entitydeletionService        = $entitydeletionService;
-        $this->trainingRecordService        = $trainingRecordService;
         $this->entityFetchingService        = $entityFetchingService;
     }
+
+
 
     // This function is responsible for rendering the super admin interface
     #[Route('/super_admin', name: 'app_super_admin')]
@@ -93,7 +64,6 @@ class SuperAdminController extends AbstractController
         $uploadsArray = $this->uploadService->groupAllUploads($uploads);
         $groupedUploads = $uploadsArray[0];
         $groupedValidatedUploads = $uploadsArray[1];
-
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
 
         return $this->render('admin_template/admin_index.html.twig', [
@@ -117,21 +87,17 @@ class SuperAdminController extends AbstractController
         // Create a zone
         if ($request->getMethod() == 'POST') {
             $zonename = trim($request->request->get('zonename'));
-            $zone = $this->zoneRepository->findOneBy(['name' => $zonename]);
+            $zone = $this->entityFetchingService->findOneBy('zone', ['name' => $zonename]);
             if (empty($zonename)) {
                 $this->addFlash('danger', 'Le nom de la Zone ne peut être vide');
                 return $this->redirectToRoute('app_super_admin');
-            }
-
-            if (!file_exists($this->public_dir . '/doc/')) {
-                mkdir($this->public_dir . '/doc/', 0777, true);
             }
 
             if ($zone) {
                 $this->addFlash('danger', 'La zone existe déjà');
                 return $this->redirectToRoute('app_super_admin');
             } else {
-                $count = $this->zoneRepository->count([]);
+                $count = $this->entityFetchingService->count('zone', []);
                 $sortOrder = $count + 1;
                 $zone = new Zone();
                 $zone->setName($zonename);
@@ -152,15 +118,9 @@ class SuperAdminController extends AbstractController
     {
         $entityType = 'zone';
 
-        $entity = $this->zoneRepository->findOneBy(['id' => $zoneId]);
+        $response = $this->entitydeletionService->deleteEntity($entityType, $zoneId);
 
-        if (empty($entity)) {
-            return $this->redirectToRoute('app_super_admin');
-        };
-
-        $response = $this->entitydeletionService->deleteEntity($entityType, $entity->getId());
-
-        if ($response == true) {
+        if ($response) {
             $this->addFlash('success', $entityType . ' has been deleted');
             return $this->redirectToRoute('app_super_admin');
         } else {
@@ -170,19 +130,7 @@ class SuperAdminController extends AbstractController
     }
 
 
-    // A route that use a method to revalid automatically every training records of a certain date
-    #[Route('super_admin/cheattrain/{year}/{month}/{day}', name: 'app_super_admin_cheat_train')]
-    public function cheatTrain(string $year, string $month, string $day)
-    {
-        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
-            $date = $year . '-' . $month . '-' . $day;
-            $this->trainingRecordService->cheatTrain($date);
-            return $this->redirectToRoute('app_super_admin');
-        } else {
-            $this->addFlash('danger', 'Vous n\'êtes pas autorisé à accéder à cette page');
-            return $this->redirectToRoute('app_login');
-        }
-    }
+
 
 
 
@@ -191,23 +139,6 @@ class SuperAdminController extends AbstractController
     #[Route('/super_admin/update', name: 'super_admin_update')]
     public function updateDB()
     {
-
-
-        // $uploads = $this->entityFetchingService->getUploads();
-        // foreach ($uploads as $upload) {
-        //     $similarNamedUploads = $this->uploadRepository->findBy(['filename' => $upload->getFilename()]);
-        //     foreach ($similarNamedUploads as $similarNamedUpload) {
-        //         if ($upload->getId() != $similarNamedUpload->getId()) {
-        //             $originalName = pathinfo($similarNamedUpload->getFilename(), PATHINFO_FILENAME);
-        //             $fileExtension = pathinfo($similarNamedUpload->getFilename(), PATHINFO_EXTENSION);
-        //             $similarNamedUpload->setFilename($originalName . '_' . uniqid('', true) . '.' . $fileExtension);
-        //             $this->em->persist($similarNamedUpload);
-        //         }
-        //     }
-        // }
-
-
-
         $incidents = $this->entityFetchingService->getIncidents();
         foreach ($incidents as $incident) {
             $similarNamedincidents = $this->incidentRepository->findBy(['name' => $incident->getName()]);
@@ -221,17 +152,7 @@ class SuperAdminController extends AbstractController
             }
         }
 
-
-        // $operators = $this->entityFetchingService->getOperators();
-        // foreach ($operators as $operator) {
-        //     $currentUap = $operator->getUap();
-        //     $operator->addUap($currentUap);
-        //     $this->em->persist($operator);
-        // }
-
-
         $this->em->flush();
-
         return $this->redirectToRoute('app_base');
     }
 }

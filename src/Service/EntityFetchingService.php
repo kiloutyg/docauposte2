@@ -339,28 +339,29 @@ class EntityFetchingService extends AbstractController
 
     public function findBy(string $entityType, array $criteria): mixed
     {
-        $entityTypeName = $this->checkEntityType($entityType);
-        $repositoryName = $this->getRepositoryName($entityTypeName);
-        $repositoryName = lcfirst($repositoryName);
-        return $this->{$repositoryName}->findBy($criteria);
+        return $this->{$this->fromNameToRepo($entityType)}->findBy($criteria);
     }
-
 
     public function findOneBy(string $entityType, array $criteria): mixed
     {
-        $entityTypeName = $this->checkEntityType($entityType);
-        $repositoryName = $this->getRepositoryName($entityTypeName);
-        $repositoryName = lcfirst($repositoryName);
-        return $this->{$repositoryName}->findOneBy($criteria);
+        return $this->{$this->fromNameToRepo($entityType)}->findOneBy($criteria);
     }
 
+    public function count(string $entityType, array $criteria): mixed
+    {
+        return $this->{$this->fromNameToRepo($entityType)}->count($criteria);
+    }
 
     public function find(string $entityType, int $entityId): mixed
     {
+        return $this->{$this->fromNameToRepo($entityType)}->find($entityId);
+    }
+
+    private function fromNameToRepo(string $entityType): string
+    {
         $entityTypeName = $this->checkEntityType($entityType);
         $repositoryName = $this->getRepositoryName($entityTypeName);
-        $repositoryName = lcfirst($repositoryName);
-        return $this->{$repositoryName}->find($entityId);
+        return lcfirst($repositoryName);
     }
 
 
