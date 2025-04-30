@@ -32,6 +32,7 @@ export default class OperatorAdminCreationController extends Controller {
             if (isValid) {
                 if (this.newOperatorFirstnameTarget.value.trim() === "") {
                     this.newOperatorFirstnameTarget.disabled = false;
+                    this.newOperatorFirstnameTarget.focus();
                 }
                 this.validateNewOperatorFirstname();
             }
@@ -104,43 +105,13 @@ export default class OperatorAdminCreationController extends Controller {
 
 
 
-    // validateNewOperatorCode() {
-    //     clearTimeout(this.codeTypingTimeout);
-    //     this.codeTypingTimeout = setTimeout(() => {
-    //         console.log('OperatorAdminCreationController: Validating operator code:', this.newOperatorCodeTarget.value);
-    //         const regex = /^[0-9]{5}$/;
-    //         let isValid;
-    //         if (this.duplicateCheckResults.code) {
-    //             if (this.newOperatorCodeTarget.value.trim() === this.duplicateCheckResults.code.data.value) {
-    //                 return;
-    //             } else {
-    //                 this.duplicateCheckResults.code = null;
-    //                 const code = this.newOperatorCodeTarget.value
-    //                 const sumOfFirstThreeDigit = code.toString.split('').slice(0, 3).reduce((sum, digit) => sum + Number(digit), 0);
-    //                 const valueOfLastTwoDigit = code.toString.split('').slice(3).join('');
-    //                 if (sumOfFirstThreeDigit === valueOfLastTwoDigit) {
-    //                     isValid = regex.test(this.newOperatorCodeTarget.value.trim());
-    //                 }
-    //             }
-    //         } else {
-    //             isValid = regex.test(this.newOperatorCodeTarget.value.trim());
-    //         }
-    //         this.updateMessage(this.newOperatorCodeMessageTarget, isValid, "Veuillez saisir un code correct.");
-    //         if (isValid) {
-    //             this.duplicateCheckResults.code = null;
-    //             this.checkForExistingEntityByCode();
-    //         }
-    //     }, 1000);
-    // }
-
-
-
 
     validateNewOperatorCode() {
         clearTimeout(this.codeTypingTimeout);
         this.codeTypingTimeout = setTimeout(async () => {
             console.log('OperatorAdminCreationController: Validating operator code:', this.newOperatorCodeTarget.value);
-            let isValid;
+            let isValidPromise;
+            
             if (this.duplicateCheckResults.code) {
                 if (this.newOperatorCodeTarget.value.trim() === this.duplicateCheckResults.code.data.value) {
                     console.log('OperatorAdminCreationController: Code already validated');
@@ -148,17 +119,27 @@ export default class OperatorAdminCreationController extends Controller {
                 } else {
                     console.log('OperatorAdminCreationController: Resetting duplicate check results for code');
                     this.duplicateCheckResults.code = null;
-                    isValid = await operatorCodeService.validateCode(this.newOperatorCodeTarget.value.trim());
+                    isValidPromise = operatorCodeService.validateCode(this.newOperatorCodeTarget.value.trim());
+                    console.log('OperatorAdminCreationController: Code validation promise created if no duplicate');
                 }
             } else {
-                isValid = await operatorCodeService.validateCode(this.newOperatorCodeTarget.value.trim());
+                isValidPromise = operatorCodeService.validateCode(this.newOperatorCodeTarget.value.trim());
+                console.log('OperatorAdminCreationController: Code validation promise created if duplicate');
             }
-            console.log('OperatorAdminCreationController: Code validation result:', isValid);
-            this.updateMessage(this.newOperatorCodeMessageTarget, isValid, "Veuillez saisir un code correct.");
-            if (isValid) {
-                console.log('OperatorAdminCreationController: Code is valid, checking for duplicates');
-                this.duplicateCheckResults.code = null;
-                this.checkForExistingEntityByCode();
+            
+            try {
+                const isValid = await isValidPromise;
+                console.log('OperatorAdminCreationController: Code validation general result:', isValid);
+                this.updateMessage(this.newOperatorCodeMessageTarget, isValid, "Veuillez saisir un code correct.");
+                
+                if (isValid) {
+                    console.log('OperatorAdminCreationController: Code is valid, checking for duplicates');
+                    this.duplicateCheckResults.code = null;
+                    this.checkForExistingEntityByCode();
+                }
+            } catch (error) {
+                console.error('OperatorAdminCreationController: Error validating code:', error);
+                this.updateMessage(this.newOperatorCodeMessageTarget, false, "Erreur lors de la validation du code.");
             }
         }, 1000);
     }
@@ -313,33 +294,6 @@ export default class OperatorAdminCreationController extends Controller {
 
 
 
-    // codeGenerator() {
-    //     // Generate a random integer between 1 and 999
-    //     const code = Math.floor(1 + Math.random() * 999);
-    //     // Sum the digits of the 'code' integer
-    //     let sumOfDigits = code
-    //         .toString()
-    //         .split('')
-    //         .reduce((sum, digit) => sum + Number(digit), 0);
-    //     const sumOfDigitsString = sumOfDigits.toString();
-    //     if (sumOfDigitsString.length < 2) {
-    //         sumOfDigits = '0' + sumOfDigits;
-    //     }
-    //     // Combine the original code and the sum of its digits
-    //     let newCode = code.toString() + sumOfDigits.toString();
-    //     // Ensure 'newCode' has exactly 5 digits
-    //     if (newCode.length < 5) {
-    //         // Pad with leading zeros if less than 5 digits
-    //         newCode = newCode.padStart(5, '0');
-    //     } else if (newCode.length > 5) {
-    //         // If more than 5 digits, use the last 5 digits
-    //         newCode = newCode.slice(-5);
-    //     }
-    //     return newCode;
-    // }
-
-
-
     async codeGenerator() {
         console.log('OperatorAdminCreationController: Calling codeGenerator');
         const code = await operatorCodeService.generateUniqueCode();
@@ -348,25 +302,6 @@ export default class OperatorAdminCreationController extends Controller {
     }
 
 
-    // async codeGeneratorInitiator() {
-    //     const newCode = this.codeGenerator();
-    //     // Check if the generated code already exists
-    //     try {
-    //         const response = await this.generatedCodeChecker(newCode);
-    //         if (response.data.found) {
-    //             await this.codeGeneratorInitiator(); // Recursively generate a new code
-    //         } else {
-    //             // Set the new code to the input field and proceed
-    //             this.newOperatorCodeTarget.value = newCode;
-    //             this.newOperatorCodeTarget.disabled = true;
-    //             this.newOperatorCodeTarget.focus();
-    //             this.validateNewOperatorCode();
-    //         }
-    //     } catch (error) {
-    //         console.error('Error checking for duplicate operator code.', error);
-    //         // Handle error accordingly
-    //     }
-    // }
 
 
 
@@ -397,12 +332,6 @@ export default class OperatorAdminCreationController extends Controller {
         }
     }
 
-
-
-
-    // generatedCodeChecker(code) {
-    //     return axios.post(`/docauposte/operator/check-if-code-exist`, { code: code });
-    // }
 
 
 

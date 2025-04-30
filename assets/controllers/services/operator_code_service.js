@@ -41,8 +41,6 @@ class OperatorCodeService {
         }
     }
 
-
-
     /**
      * Ensure the service is initialized before using it
      */
@@ -53,9 +51,6 @@ class OperatorCodeService {
             console.log('OperatorCodeService: Service now initialized');
         }
     }
-
-
-
 
     /**
      * Generate a compliant operator code
@@ -102,66 +97,83 @@ class OperatorCodeService {
         return newCode;
     }
 
+
+
     /**
      * Validate a code against the current regex pattern
      * @param {string} code - The code to validate
-     * @returns {boolean} Whether the code is valid
+     * @returns {Promise<boolean>} Whether the code is valid
      */
     async validateCode(code) {
         console.log('OperatorCodeService: Validating code:', code);
         await this.ensureInitialized();
 
-        if (codeOpeMethodBool) {
-            console.log('OperatorCodeService: Using arithmetic validation method');
-            const result = await this.validateCodeArithmetic(code);
-            console.log('OperatorCodeService: Arithmetic validation result:', result);
-            return result;
+        if (!code || typeof code !== 'string') {
+            console.log('OperatorCodeService: Invalid input, code must be a non-empty string');
+            return Promise.resolve(false);
         }
 
-        const result = codeOpeRegex.test(code);
-        console.log('OperatorCodeService: Regex validation result:', result);
-        return result;
+        if (codeOpeMethodBool) {
+            console.log('OperatorCodeService: Using arithmetic validation method');
+            return this.validateCodeArithmetic(code);
+        }
+
+        try {
+            const result = codeOpeRegex.test(code);
+            console.log('OperatorCodeService: Regex validation result:', result);
+            return Promise.resolve(result);
+        } catch (error) {
+            console.error('OperatorCodeService: Error during regex validation:', error);
+            return Promise.resolve(false);
+        }
     }
+
 
 
 
     /**
      * Validate code against the arithmetic method where sum of first 3 digits equals last 2 digits
      * @param {string} code - The code to validate
-     * @returns {boolean} Whether the code is valid
+     * @returns {Promise<boolean>} Whether the code is valid
      */
     async validateCodeArithmetic(code) {
         console.log('OperatorCodeService: Performing arithmetic validation on code:', code);
 
-        if (!codeOpeRegex.test(code)) {
-            console.log('OperatorCodeService: Code failed basic format validation');
-            return false;
+        try {
+            if (!codeOpeRegex.test(code)) {
+                console.log('OperatorCodeService: Code failed basic format validation');
+                return Promise.resolve(false);
+            }
+
+            // Extract first 3 digits and calculate their sum
+            const sumOfFirstThreeDigits = code
+                .toString()
+                .split('')
+                .slice(0, 3)
+                .reduce((sum, digit) => sum + Number(digit), 0);
+            console.log('OperatorCodeService: Sum of first 3 digits:', sumOfFirstThreeDigits);
+
+            // Extract last 2 digits as a single number
+            const valueOfLastTwoDigits = Number(code.toString().slice(3));
+            console.log('OperatorCodeService: Value of last 2 digits:', valueOfLastTwoDigits);
+
+            // Check if the sum equals the last 2 digits
+            const result = sumOfFirstThreeDigits === valueOfLastTwoDigits;
+            console.log('OperatorCodeService: Arithmetic validation result:', result);
+            return Promise.resolve(result);
+        } catch (error) {
+            console.error('OperatorCodeService: Error during arithmetic validation:', error);
+            return Promise.resolve(false);
         }
-
-        // Extract first 3 digits and calculate their sum
-        const sumOfFirstThreeDigits = code
-            .toString()
-            .split('')
-            .slice(0, 3)
-            .reduce((sum, digit) => sum + Number(digit), 0);
-        console.log('OperatorCodeService: Sum of first 3 digits:', sumOfFirstThreeDigits);
-
-        // Extract last 2 digits as a single number
-        const valueOfLastTwoDigits = Number(code.toString().slice(3));
-        console.log('OperatorCodeService: Value of last 2 digits:', valueOfLastTwoDigits);
-
-        // Check if the sum equals the last 2 digits
-        const result = sumOfFirstThreeDigits === valueOfLastTwoDigits;
-        console.log('OperatorCodeService: Arithmetic validation result:', result);
-        return result;
     }
+
 
 
 
     /**
      * Check if a code already exists in the database
      * @param {string} code - The code to check
-     * @returns {Promise&lt;boolean&gt;} Whether the code exists
+     * @returns {Promise<boolean>} Whether the code exists
      */
     async checkIfCodeExists(code) {
         console.log('OperatorCodeService: Checking if code exists in database:', code);
@@ -175,9 +187,11 @@ class OperatorCodeService {
         }
     }
 
+
+
     /**
      * Generate a unique code that doesn't exist in the database
-     * @returns {Promise&lt;string&gt;} A unique operator code
+     * @returns {Promise<string>} A unique operator code
      */
     async generateUniqueCode() {
         console.log('OperatorCodeService: Generating unique code');
@@ -214,7 +228,7 @@ class OperatorCodeService {
     /**
      * Validate a code and check if it exists
      * @param {string} code - The code to validate
-     * @returns {Promise&lt;Object&gt;} Validation result with isValid and exists properties
+     * @returns {Promise<Object>} Validation result with isValid and exists properties
      */
     async validateAndCheckCode(code) {
         console.log('OperatorCodeService: Validating and checking code:', code);
