@@ -74,7 +74,7 @@ class ValidationController extends AbstractController
 
 
 
-    // Is not currently in use, but might get useful for the operator side validation. 
+    // Is not currently in use, but might get useful for the operator side validation.
     #[Route('/validation/{uploadId}', name: 'app_validation')]
     public function validationViewBasePage(
         int $uploadId,

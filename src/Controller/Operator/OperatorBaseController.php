@@ -63,12 +63,10 @@ class OperatorBaseController extends AbstractController
     public function suggestNames(Request $request): JsonResponse
     {
         $parsedRequest = json_decode($request->getContent(), true);
-        // $this->logger->info('app_suggest_names parsedRequest', $parsedRequest);
 
         $name = $parsedRequest['name'];
 
         $rawSuggestions = $this->entityFetchingService->findOperatorByNameLikeForSuggestions($name);
-        // $this->logger->info('app_suggest_names Raw suggestions', $rawSuggestions);
 
         $teams = $this->entityFetchingService->getTeams();
         $teamIndex = [];

@@ -23,7 +23,7 @@ class SettingsType extends AbstractType
     {
         $builder
             ->add(
-                'UploadValidation',
+                'uploadValidation',
                 CheckboxType::class,
                 [
                     'required' => false,
@@ -32,7 +32,7 @@ class SettingsType extends AbstractType
                 ]
             )
             ->add(
-                'ValidatorNumber',
+                'validatorNumber',
                 ChoiceType::class,
                 [
                     'required' => true,
@@ -43,7 +43,7 @@ class SettingsType extends AbstractType
                 ]
             )
             ->add(
-                'IncidentAutoDisplay',
+                'incidentAutoDisplay',
                 CheckboxType::class,
                 [
                     'required' => false,
@@ -52,7 +52,7 @@ class SettingsType extends AbstractType
                 ]
             )
             ->add(
-                'Training',
+                'training',
                 CheckboxType::class,
                 [
                     'required' => false,
@@ -61,7 +61,7 @@ class SettingsType extends AbstractType
                 ]
             )
             ->add(
-                'OperatorCodeMethod',
+                'operatorCodeMethod',
                 CheckboxType::class,
                 [
                     'required' => false,
@@ -70,7 +70,7 @@ class SettingsType extends AbstractType
                 ]
             )
             ->add(
-                'OperatorCodeRegex',
+                'operatorCodeRegex',
                 TextType::class,
                 [
                     'required' => false,
@@ -123,7 +123,7 @@ class SettingsType extends AbstractType
         $builder
             ->get('settingsDateInterval')
             ->add(
-                'OperatorRetrainingDelay',
+                'operatorRetrainingDelay',
                 DateIntervalType::class,
                 array_merge(
                     $intervalArray,
@@ -131,7 +131,7 @@ class SettingsType extends AbstractType
                 )
             )
             ->add(
-                'OperatorInactivityDelay',
+                'operatorInactivityDelay',
                 DateIntervalType::class,
                 array_merge(
                     $intervalArray,
@@ -139,7 +139,7 @@ class SettingsType extends AbstractType
                 )
             )
             ->add(
-                'OperatorAutoDeleteDelay',
+                'operatorAutoDeleteDelay',
                 DateIntervalType::class,
                 array_merge(
                     $intervalArray,
@@ -147,7 +147,7 @@ class SettingsType extends AbstractType
                 )
             )
             ->add(
-                'IncidentAutoDisplayTimer',
+                'incidentAutoDisplayTimer',
                 DateIntervalType::class,
                 array_merge(
                     $intervalArray,

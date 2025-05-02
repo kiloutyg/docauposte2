@@ -89,4 +89,39 @@ class EntityManagerFacade
     {
         return $this->entityFetchingService->getIncidents();
     }
+
+    public function findDeactivatedOperators()
+    {
+        return $this->entityFetchingService->findDeactivatedOperators();
+    }
+
+    public function findOperatorWithNoRecentTraining()
+    {
+        return $this->entityFetchingService->findOperatorWithNoRecentTraining();
+    }
+
+    public function findInActiveOperators()
+    {
+        return $this->entityFetchingService->findInActiveOperators();
+    }
+
+    public function findOperatorToBeDeleted()
+    {
+        return $this->entityFetchingService->findOperatorToBeDeleted();
+    }
+
+    public function findBySearchQuery(string $name, string $code, string $team, string $uap, string $trainer)
+    {
+        return $this->entityFetchingService->findBySearchQuery($name, $code, $team, $uap, $trainer);
+    }
+
+    public function getTeams()
+    {
+        return $this->entityFetchingService->getTeams();
+    }
+
+    public function getUaps()
+    {
+        return $this->entityFetchingService->getUaps();
+    }
 }

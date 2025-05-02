@@ -43,7 +43,7 @@ class OperatorTrainingController extends AbstractController
 
 
 
-    // page with the training record and the operator list and the form to add a new operator, 
+    // page with the training record and the operator list and the form to add a new operator,
     // page that will be integrated as an iframe probably in the test document page
     #[Route('operator/traininglist/{uploadId}', name: 'app_training_list')]
     public function trainingList(int $uploadId): Response

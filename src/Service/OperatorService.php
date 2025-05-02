@@ -5,13 +5,8 @@ namespace App\Service;
 use App\Entity\Operator;
 use App\Entity\Trainer;
 
-use App\Service\EntityDeletionService;
-use App\Service\EntityFetchingService;
-use App\Service\TeamService;
-use App\Service\TrainerService;
-use App\Service\UapService;
-
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\Facade\TrainingManagerFacade;
+use App\Service\Facade\EntityManagerFacade;
 
 use Psr\Log\LoggerInterface;
 
@@ -27,38 +22,24 @@ class OperatorService extends AbstractController
 {
     private     $logger;
     private     $projectDir;
-    private     $em;
+
     private     $validator;
-
-    private     $entityDeletionService;
-    private     $entityFetchingService;
-    private     $teamService;
-    private     $trainerService;
-    private     $uapService;
-
+    private    $entityManagerFacade;
+    private    $trainingManagerFacade;
 
     public function __construct(
         LoggerInterface                 $logger,
         ParameterBagInterface           $params,
-        EntityManagerInterface          $em,
         ValidatorInterface              $validator,
-
-        EntityDeletionService           $entityDeletionService,
-        EntityFetchingService           $entityFetchingService,
-        TeamService                     $teamService,
-        TrainerService                  $trainerService,
-        UapService                      $uapService
+        EntityManagerFacade             $entityManagerFacade,
+        TrainingManagerFacade           $trainingManagerFacade
     ) {
         $this->logger                   = $logger;
         $this->projectDir               = $params->get('kernel.project_dir');
-        $this->em                       = $em;
         $this->validator                = $validator;
 
-        $this->entityDeletionService    = $entityDeletionService;
-        $this->entityFetchingService    = $entityFetchingService;
-        $this->teamService              = $teamService;
-        $this->trainerService           = $trainerService;
-        $this->uapService               = $uapService;
+        $this->entityManagerFacade      = $entityManagerFacade;
+        $this->trainingManagerFacade    = $trainingManagerFacade;
     }
 
 
@@ -78,7 +59,7 @@ class OperatorService extends AbstractController
             $toBeDeletedOperatorsIds = $this->deleteToBeDeletedOperator($filePath, $today);
 
             return [
-                'findDeactivatedOperators' => count($this->entityFetchingService->findDeactivatedOperators()),
+                'findDeactivatedOperators' => count($this->entityManagerFacade->findDeactivatedOperators()),
                 'toBeDeletedOperators' => count($toBeDeletedOperatorsIds)
             ];
         }
@@ -87,13 +68,13 @@ class OperatorService extends AbstractController
 
     private function setOperatorToInactive(string $filePath, \DateTime $today)
     {
-        $inActiveOperators = $this->entityFetchingService->findOperatorWithNoRecentTraining();
+        $inActiveOperators = $this->entityManagerFacade->findOperatorWithNoRecentTraining();
         if (count($inActiveOperators) > 0) {
             foreach ($inActiveOperators as $operator) {
                 $operator->setInactiveSince($today);
-                $this->em->persist($operator);
+                $this->entityManagerFacade->getEntityManager()->persist($operator);
             }
-            $this->em->flush();
+            $this->entityManagerFacade->getEntityManager()->flush();
             file_put_contents($filePath, $today->format('Y-m-d'));
         }
     }
@@ -101,13 +82,13 @@ class OperatorService extends AbstractController
 
     private function setOperatorToBeDeleted(string $filePath, \DateTime $today)
     {
-        $operatorSetToBeDeleted = $this->entityFetchingService->findInActiveOperators();
+        $operatorSetToBeDeleted = $this->entityManagerFacade->findInActiveOperators();
         if (count($operatorSetToBeDeleted) > 0) {
             foreach ($operatorSetToBeDeleted as $operator) {
                 $operator->setTobedeleted($today);
-                $this->em->persist($operator);
+                $this->entityManagerFacade->getEntityManager()->persist($operator);
             }
-            $this->em->flush();
+            $this->entityManagerFacade->getEntityManager()->flush();
             file_put_contents($filePath, $today->format('Y-m-d'));
         }
     }
@@ -115,12 +96,12 @@ class OperatorService extends AbstractController
 
     private function deleteToBeDeletedOperator(string $filePath, \DateTime $today)
     {
-        $toBeDeletedOperatorsIds = $this->entityFetchingService->findOperatorToBeDeleted();
+        $toBeDeletedOperatorsIds = $this->entityManagerFacade->findOperatorToBeDeleted();
         if (count($toBeDeletedOperatorsIds) > 0) {
             foreach ($toBeDeletedOperatorsIds as $operatorId) {
-                $this->entityDeletionService->deleteEntity('operator', $operatorId);
+                $this->entityManagerFacade->deleteEntity('operator', $operatorId);
             }
-            $this->em->flush();
+            $this->entityManagerFacade->getEntityManager()->flush();
             file_put_contents($filePath, $today->format('Y-m-d'));
         }
         return $toBeDeletedOperatorsIds;
@@ -130,11 +111,11 @@ class OperatorService extends AbstractController
 
     public function editOperatorService(Form $form, Operator $operator)
     {
-        $this->trainerService->handleTrainerStatus($form->get('isTrainer')->getData(), $operator);
+        $this->trainingManagerFacade->handleTrainerStatus($form->get('isTrainer')->getData(), $operator);
         $this->reactivateOperatorIfNeeded($operator);
-        $this->uapService->updateOperatorUaps($form->get('uaps')->getData()->toArray(), $operator);
+        $this->trainingManagerFacade->updateOperatorUaps($form->get('uaps')->getData()->toArray(), $operator);
 
-        $this->em->flush();
+        $this->entityManagerFacade->getEntityManager()->flush();
 
         return true;
     }
@@ -175,12 +156,13 @@ class OperatorService extends AbstractController
     public function processOperatorFromRequest(string $operatorName, int $operatorCode, int $teamId, int $uapId)
     {
 
-        $team = $this->entityFetchingService->find('team', $teamId);
-        $uap = $this->entityFetchingService->find('uap', $uapId);
+        $team = $this->entityManagerFacade->find('team', $teamId);
+        $uap = $this->entityManagerFacade->find('uap', $uapId);
+        $em = $this->entityManagerFacade->getEntityManager();
 
-        $existingOperator = $this->entityFetchingService->findOneBy('operator', ['name' => $operatorName]);
+        $existingOperator = $this->entityManagerFacade->findOneBy('operator', ['name' => $operatorName]);
         if ($existingOperator == null) {
-            $existingOperator = $this->entityFetchingService->findOneBy('operator', ['code' => $operatorCode]);
+            $existingOperator = $this->entityManagerFacade->findOneBy('operator', ['code' => $operatorCode]);
         }
 
         if ($existingOperator != null) {
@@ -191,8 +173,8 @@ class OperatorService extends AbstractController
             } else {
                 $existingOperator->setTeam($team);
                 $existingOperator->addUap($uap);
-                $this->em->persist($existingOperator);
-                $this->em->flush();
+                $em->persist($existingOperator);
+                $em->flush();
                 $this->addFlash('success', 'L\'opérateur a bien été ajouté et son equipe et son UAP ont été modifiées');
                 return;
             }
@@ -219,8 +201,8 @@ class OperatorService extends AbstractController
             return;
         }
 
-        $this->em->persist($operator);
-        $this->em->flush();
+        $em->persist($operator);
+        $em->flush();
 
         $this->addFlash('success', 'L\'opérateur a bien été ajouté');
     }
@@ -230,27 +212,28 @@ class OperatorService extends AbstractController
     public function processNewOperatorFromFormType(Operator $newOperator, Form $form)
     {
         $trainerBool = $form->get('isTrainer')->getData();
-        if ($trainerBool == true) {
+        $em = $this->entityManagerFacade->getEntityManager();
+        if ($trainerBool) {
             $trainer = new Trainer();
             $trainer->setOperator($newOperator);
             $trainer->setDemoted(false);
-            $this->em->persist($trainer);
+            $em->persist($trainer);
             $newOperator->setTrainer($trainer);
-        } elseif ($trainerBool != true) {
+        } elseif (!$trainerBool) {
             $trainer = $newOperator->getTrainer();
             $newOperator->setTrainer(null);
             if ($trainer != null) {
-                $this->em->remove($trainer);
+                $em->remove($trainer);
             }
         }
         $operator = $form->getData();
         $uaps = $operator->getUaps();
         foreach ($uaps as $uap) {
             $uap->addOperator($operator);
-            $this->em->persist($uap);
+            $em->persist($uap);
         }
-        $this->em->persist($operator);
-        $this->em->flush();
+        $em->persist($operator);
+        $em->flush();
 
         return $operator->getId();
     }
@@ -278,7 +261,7 @@ class OperatorService extends AbstractController
                 return $entity;
             }
         }
-        throw new \Exception('Default entity not found');
+        throw new \InvalidArgumentException('Default entity not found');
     }
 
 
@@ -301,7 +284,7 @@ class OperatorService extends AbstractController
             $uap        = $request->request->get('search_uap');
             $trainer    = $request->request->get('search_trainer');
         }
-        return $this->entityFetchingService->findBySearchQuery($name, $code, $team, $uap, $trainer);
+        return $this->entityManagerFacade->findBySearchQuery($name, $code, $team, $uap, $trainer);
     }
 
 
@@ -309,13 +292,14 @@ class OperatorService extends AbstractController
 
     public function operatorTeamUapFormManagement(Form $uapForm, Form $teamForm, Request $request): void
     {
+        $em = $this->entityManagerFacade->getEntityManager();
         $teamForm->handleRequest($request);
         $uapForm->handleRequest($request);
         if ($teamForm->isSubmitted()) {
             if ($teamForm->isValid()) {
                 $team = $teamForm->getData();
-                $this->em->persist($team);
-                $this->em->flush();
+                $em->persist($team);
+                $em->flush();
                 $this->addFlash('success', 'team has been created');
             } else {
                 // Validation failed, get the error message and display it
@@ -327,8 +311,8 @@ class OperatorService extends AbstractController
         if ($uapForm->isSubmitted()) {
             if ($uapForm->isValid()) {
                 $uap = $uapForm->getData();
-                $this->em->persist($uap);
-                $this->em->flush();
+                $em->persist($uap);
+                $em->flush();
                 $this->addFlash('success', 'Uap has been created');
             } else {
                 // Validation failed, get the error message and display it
@@ -343,11 +327,11 @@ class OperatorService extends AbstractController
 
     public function teamUapInitialization(): void
     {
-        if (count($this->entityFetchingService->getTeams()) == 0 || $this->entityFetchingService->findOneBy('team', ['name' => 'INDEFINI']) == null) {
-            $this->teamService->teamInitialization();
+        if (count($this->entityManagerFacade->getTeams()) == 0 || $this->entityManagerFacade->findOneBy('team', ['name' => 'INDEFINI']) == null) {
+            $this->trainingManagerFacade->teamInitialization();
         }
-        if (count($this->entityFetchingService->getUaps()) == 0 || $this->entityFetchingService->findOneBy('uap', ['name' => 'INDEFINI']) == null) {
-            $this->uapService->uapInitialization();
+        if (count($this->entityManagerFacade->getUaps()) == 0 || $this->entityManagerFacade->findOneBy('uap', ['name' => 'INDEFINI']) == null) {
+            $this->trainingManagerFacade->uapInitialization();
         }
     }
 
@@ -356,7 +340,7 @@ class OperatorService extends AbstractController
 
     public function deleteActionOperatorService(string $entityType, int $entityId, ?Request $request = null): Response
     {
-        $result = $this->entityDeletionService->deleteEntity($entityType, $entityId);
+        $result = $this->entityManagerFacade->deleteEntity($entityType, $entityId);
         $originUrl = $request->headers->get('referer') ?? 'app_base';
 
         if (!$result) {

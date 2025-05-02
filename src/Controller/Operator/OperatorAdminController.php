@@ -118,7 +118,7 @@ class OperatorAdminController extends AbstractController
             ])->createView();
         }
 
-        if (count($operatorForms) === 0) {
+        if (empty($operatorForms)) {
             $inActiveOperators = $this->operatorRepository->findDeactivatedOperators();
             foreach ($inActiveOperators as $operator) {
                 $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
