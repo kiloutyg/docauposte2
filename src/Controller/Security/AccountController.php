@@ -28,7 +28,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * AccountController
- * 
+ *
  * This controller manages user account operations including creation, modification,
  * deletion, blocking/unblocking, and department management. It provides functionality
  * for administrators to manage user accounts and departments within the system.
