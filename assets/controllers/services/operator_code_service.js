@@ -13,7 +13,7 @@ class OperatorCodeService {
     constructor() {
         console.log('OperatorCodeService: Initializing service');
         this.initialized = false;
-        this.initPromise = this.initialize();
+        this.initPromise = null;
     }
 
 
@@ -87,7 +87,7 @@ class OperatorCodeService {
      * Generate a compliant operator code
      * @returns {string} A 5-digit code
      */
-    async generateCode() {
+    async #generateCode() {
         console.log('OperatorCodeService: Generating new code');
         await this.ensureInitialized();
 
@@ -175,7 +175,6 @@ class OperatorCodeService {
      */
     async validateCodeArithmetic(code) {
         console.log('OperatorCodeService: Performing arithmetic validation on code:', code);
-
         try {
             if (!codeOpeRegex.test(code)) {
                 console.log('OperatorCodeService: Code failed basic format validation');
@@ -231,6 +230,7 @@ class OperatorCodeService {
      * @returns {Promise<string>} A unique operator code
      */
     async generateUniqueCode() {
+        await this.ensureInitialized();
         console.log('OperatorCodeService: Generating unique code');
         let code = await this.generateCode();
         console.log('OperatorCodeService: Generated initial code:', code);
@@ -286,9 +286,11 @@ class OperatorCodeService {
         return result;
     }
 
+
+
     /**
      * Get the current settings
-     * @returns {Object} Current settings
+     * @returns {Promise<Object>} Current settings
      */
     async getSettings() {
         await this.ensureInitialized();
@@ -301,7 +303,7 @@ class OperatorCodeService {
         };
 
         console.log('OperatorCodeService: Current settings:', settings);
-        return Promise.resolve(settings);
+        return settings;
     }
 }
 
