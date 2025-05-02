@@ -2,24 +2,31 @@
 
 namespace App\Service\Facade;
 
+use Symfony\Component\HttpFoundation\Request;
+
 use App\Service\IncidentService;
 use App\Service\UploadService;
 use App\Service\FolderService;
+use App\Service\NamingService;
 
 class ContentManagerFacade
 {
     private $incidentService;
     private $uploadService;
     private $folderService;
+    private $namingService;
 
     public function __construct(
-        IncidentService $incidentService,
-        UploadService $uploadService,
-        FolderService $folderService
+        IncidentService                     $incidentService,
+        UploadService                       $uploadService,
+        FolderService                       $folderService,
+        NamingService                       $namingService
+
     ) {
-        $this->incidentService = $incidentService;
-        $this->uploadService = $uploadService;
-        $this->folderService = $folderService;
+        $this->incidentService              = $incidentService;
+        $this->uploadService                = $uploadService;
+        $this->folderService                = $folderService;
+        $this->namingService                = $namingService;
     }
 
     public function groupIncidents($incidents)
@@ -35,5 +42,10 @@ class ContentManagerFacade
     public function folderStructure($name)
     {
         return $this->folderService->folderStructure($name);
+    }
+
+    public function requestIncidentFilenameChecks(Request $request)
+    {
+        return $this->namingService->requestIncidentFilenameChecks($request);
     }
 }
