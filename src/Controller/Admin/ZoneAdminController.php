@@ -3,8 +3,6 @@
 
 namespace App\Controller\Admin;
 
-use Doctrine\ORM\EntityManagerInterface;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,59 +14,30 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\ProductLine;
 use App\Entity\Zone;
 
-use App\Service\EntityDeletionService;
-use App\Service\UploadService;
-use App\Service\FolderService;
-use App\Service\IncidentService;
-use App\Service\EntityHeritanceService;
-use App\Service\SettingsService;
-use App\Service\EntityFetchingService;
+use App\Service\Facade\EntityManagerFacade;
+use App\Service\Facade\ContentManagerFacade;
 use App\Service\ErrorService;
 
 #[Route('/zone_admin', name: 'app_zone_')]
 // This controller is responsible for rendering the zone admin interface an managing the logic of the zone admin interface
 class ZoneAdminController extends AbstractController
 {
-
-    private $em;
+    private $entityManagerFacade;
+    private $contentManagerFacade;
     private $authChecker;
-    // Services methods
-    private $incidentService;
-    private $folderService;
-    private $entityHeritanceService;
-    private $entitydeletionService;
-    private $uploadService;
-    private $entityFetchingService;
     private $errorService;
 
-
     public function __construct(
-
-        EntityManagerInterface          $em,
-        AuthorizationCheckerInterface   $authChecker,
-        // Services methods
-        IncidentService                 $incidentService,
-        EntityHeritanceService          $entityHeritanceService,
-        FolderService                   $folderService,
-        EntityDeletionService           $entitydeletionService,
-        UploadService                   $uploadService,
-        EntityFetchingService           $entityFetchingService,
-        ErrorService                    $errorService,
-
+        EntityManagerFacade $entityManagerFacade,
+        ContentManagerFacade $contentManagerFacade,
+        AuthorizationCheckerInterface $authChecker,
+        ErrorService $errorService
     ) {
-        $this->em                           = $em;
-        $this->authChecker                  = $authChecker;
-
-        // Variables related to the services
-        $this->incidentService              = $incidentService;
-        $this->entityHeritanceService       = $entityHeritanceService;
-        $this->folderService                = $folderService;
-        $this->uploadService                = $uploadService;
-        $this->entitydeletionService        = $entitydeletionService;
-        $this->entityFetchingService        = $entityFetchingService;
-        $this->errorService                 = $errorService;
+        $this->entityManagerFacade = $entityManagerFacade;
+        $this->contentManagerFacade = $contentManagerFacade;
+        $this->authChecker = $authChecker;
+        $this->errorService = $errorService;
     }
-
 
     // This function is responsible for rendering the zone admin interface
     #[Route('/{zoneId}', name: 'admin')]
@@ -76,7 +45,7 @@ class ZoneAdminController extends AbstractController
     {
         $pageLevel = 'zone';
         if ($zone === null && $zoneId != null) {
-            $zone = $this->entityFetchingService->find('zone', $zoneId);
+            $zone = $this->entityManagerFacade->find('zone', $zoneId);
         }
         if (!$zone) {
             return $this->errorService->errorRedirectByOrgaEntityType($pageLevel);
@@ -84,14 +53,14 @@ class ZoneAdminController extends AbstractController
 
         $productLines = $zone->getProductLines();
 
-        $uploads = $this->entityHeritanceService->uploadsByParentEntity('zone', $zone);
-        $incidents = $this->entityHeritanceService->incidentsByParentEntity('zone', $zone);
+        $uploads = $this->entityManagerFacade->uploadsByParentEntity('zone', $zone);
+        $incidents = $this->entityManagerFacade->incidentsByParentEntity('zone', $zone);
 
         // Group the uploads and incidents by parent entity
-        $uploadsArray = $this->uploadService->groupAllUploads($uploads);
+        $uploadsArray = $this->contentManagerFacade->groupAllUploads($uploads);
         $groupedUploads = $uploadsArray[0];
         $groupedValidatedUploads = $uploadsArray[1];
-        $groupIncidents = $this->incidentService->groupIncidents($incidents);
+        $groupIncidents = $this->contentManagerFacade->groupIncidents($incidents);
 
 
         return $this->render('admin_template/admin_index.html.twig', [
@@ -99,8 +68,8 @@ class ZoneAdminController extends AbstractController
             'groupedUploads'            => $groupedUploads,
             'groupedValidatedUploads'   => $groupedValidatedUploads,
             'groupincidents'            => $groupIncidents,
-            'zones'                     => $this->entityFetchingService->getZones(),
-            'incidentCategories'        => $this->entityFetchingService->getIncidentCategories(),
+            'zones'                     => $this->entityManagerFacade->getZones(),
+            'incidentCategories'        => $this->entityManagerFacade->getIncidentCategories(),
             'zone'                      => $zone,
             'zoneProductLines'          => $productLines,
         ]);
@@ -119,16 +88,16 @@ class ZoneAdminController extends AbstractController
             return $this->redirectToRoute('app_zone_admin', ['zoneId' => $zoneId]);
         } else {
 
-            $zone = $this->entityFetchingService->find('zone', $zoneId);
+            $zone = $this->entityManagerFacade->find('zone', $zoneId);
             // Check if the productLine already exists by comparing the productLine name and the zone
             $productLineName = $request->request->get('productLineName') . '.' . $zone->getName();
-            $productLine = $this->entityFetchingService->findOneBy('productLine', ['name' => $productLineName]);
+            $productLine = $this->entityManagerFacade->findOneBy('productLine', ['name' => $productLineName]);
 
             if ($productLine) {
                 $this->addFlash('danger', 'La ligne de produit existe déjà');
                 return $this->redirectToRoute('app_zone_admin', ['zoneId' => $zoneId]);
             } else {
-                $count = $this->entityFetchingService->count('productLine', ['zone' => $zoneId]);
+                $count = $this->entityManagerFacade->count('productLine', ['zone' => $zoneId]);
                 $sortOrder = $count + 1;
 
                 $productLine = new ProductLine();
@@ -136,10 +105,12 @@ class ZoneAdminController extends AbstractController
                 $productLine->setZone($zone);
                 $productLine->setSortOrder($sortOrder);
                 $productLine->setCreator($this->getUser());
-                $this->em->persist($productLine);
-                $this->em->flush();
 
-                $this->folderService->folderStructure($productLineName);
+                $em = $this->entityManagerFacade->getEntityManager();
+                $em->persist($productLine);
+                $em->flush();
+
+                $this->contentManagerFacade->folderStructure($productLineName);
 
                 $this->addFlash('success', 'The Product Line has been created');
                 return $this->redirectToRoute('app_zone_admin', ['zoneId' => $zoneId]);
@@ -153,7 +124,7 @@ class ZoneAdminController extends AbstractController
     public function deleteEntityProductLine(int $productLineId): Response
     {
         $entityType = 'productLine';
-        $productLine = $this->entityFetchingService->find('productLine', $productLineId);
+        $productLine = $this->entityManagerFacade->find('productLine', $productLineId);
 
         $zoneId = $productLine->getZone()->getId();
 
@@ -161,7 +132,7 @@ class ZoneAdminController extends AbstractController
         if ($this->authChecker->isGranted("ROLE_LINE_ADMIN")) {
             // This function is used to delete a category and all the infants entity attached to it, it depends on the EntityDeletionService class.
             // The folder is deleted by the FolderService class through the EntityDeletionService class.
-            $response = $this->entitydeletionService->deleteEntity($entityType, $productLine->getId());
+            $response = $this->entityManagerFacade->deleteEntity($entityType, $productLine->getId());
         } else {
             $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer cette ligne.');
             return $this->redirectToRoute('app_zone_admin', ['zoneId' => $zoneId]);

@@ -169,7 +169,7 @@ class EntityFetchingService extends AbstractController
     }
 
 
-    public function getAllWithAssociations()
+    public function getAllUploadsWithAssociations()
     {
         $query = $this->uploadRepository->findAllWithAssociations();
         $this->logger->info('query', $query);
