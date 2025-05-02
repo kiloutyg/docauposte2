@@ -232,7 +232,7 @@ class OperatorCodeService {
     async generateUniqueCode() {
         await this.ensureInitialized();
         console.log('OperatorCodeService: Generating unique code');
-        let code = await this.generateCode();
+        let code = await this.#generateCode();
         console.log('OperatorCodeService: Generated initial code:', code);
 
         let exists = await this.checkIfCodeExists(code);
@@ -244,7 +244,7 @@ class OperatorCodeService {
 
         while (exists && attempts < maxAttempts) {
             console.log(`OperatorCodeService: Attempt ${attempts + 1} - Code already exists, generating new code`);
-            code = await this.generateCode();
+            code = await this.#generateCode();
             console.log('OperatorCodeService: Generated new code:', code);
 
             exists = await this.checkIfCodeExists(code);
