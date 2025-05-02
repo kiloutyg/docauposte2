@@ -36,6 +36,10 @@ class EntityManagerFacade
         return $this->entityFetchingService->find($entityType, $id);
     }
 
+    public function findBy(string $entityType, array $criteria)
+    {
+        return $this->entityFetchingService->findBy($entityType, $criteria);
+    }
     public function findOneBy(string $entityType, array $criteria)
     {
         return $this->entityFetchingService->findOneBy($entityType, $criteria);
