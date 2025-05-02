@@ -85,7 +85,7 @@ class OperatorCodeService {
 
     /**
      * Generate a compliant operator code
-     * @returns {string} A 5-digit code
+     * @returns {Promise<string>} A 5-digit code
      */
     async #generateCode() {
         console.log('OperatorCodeService: Generating new code');
