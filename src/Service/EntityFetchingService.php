@@ -16,9 +16,9 @@ use App\Repository\DepartmentRepository;
 use App\Repository\ValidationRepository;
 use App\Repository\ApprobationRepository;
 use App\Repository\OldUploadRepository;
+use App\Repository\OperatorRepository;
 use App\Repository\UapRepository;
 use App\Repository\TeamRepository;
-use App\Repository\OperatorRepository;
 use App\Repository\TrainingRecordRepository;
 use App\Repository\TrainerRepository;
 use App\Repository\IncidentRepository;
@@ -169,7 +169,7 @@ class EntityFetchingService extends AbstractController
     }
 
 
-    public function getAllWithAssociations()
+    public function getAllUploadsWithAssociations()
     {
         $query = $this->uploadRepository->findAllWithAssociations();
         $this->logger->info('query', $query);
@@ -214,11 +214,69 @@ class EntityFetchingService extends AbstractController
     }
 
 
+
+
     public function getOperators()
     {
-
         return $this->operatorRepository->findAllOrdered();
     }
+
+    public function findBySearchQuery(string $name, string $code, string $team, string $uap, string $trainer): array
+    {
+        return $this->operatorRepository->findBySearchQuery($name, $code, $team, $uap, $trainer);
+    }
+
+
+    public function findOperatorWithNoRecentTraining()
+    {
+        return $this->operatorRepository->findOperatorWithNoRecentTraining();
+    }
+
+
+    public function findInActiveOperators()
+    {
+        return $this->operatorRepository->findInActiveOperators();
+    }
+
+
+
+    public function findDeactivatedOperators()
+    {
+        return $this->operatorRepository->findDeactivatedOperators();
+    }
+
+
+    public function findOperatorToBeDeleted()
+    {
+        return $this->operatorRepository->findOperatorToBeDeleted();
+    }
+
+
+    public function findOperatorByNameLikeForSuggestions(string $name)
+    {
+        return $this->operatorRepository->findByNameLikeForSuggestions($name);
+    }
+
+
+
+    public function findOperatorByCodeAndTeamAndUap(int $code, int $team, int $uap)
+    {
+        return $this->operatorRepository->findByCodeAndTeamAndUap($code, $team, $uap);
+    }
+
+
+
+    public function findOperatorsByTeamAndUapId(int $teamId, int $uapId): array
+    {
+        $selectedOperators = $this->operatorRepository->findByTeamAndUap($teamId, $uapId);
+        usort($selectedOperators, function ($a, $b) {
+            list($firstNameA, $surnameA) = explode('.', $a->getName());
+            list($firstNameB, $surnameB) = explode('.', $b->getName());
+            return $surnameA === $surnameB ? strcmp($firstNameA, $firstNameB) : strcmp($surnameA, $surnameB);
+        });
+        return $selectedOperators;
+    }
+
 
 
     public function getTrainingRecords()
@@ -276,5 +334,64 @@ class EntityFetchingService extends AbstractController
         }
 
         return $groupedValidatedUploads;
+    }
+
+
+    public function findBy(string $entityType, array $criteria): mixed
+    {
+        return $this->{$this->fromNameToRepo($entityType)}->findBy($criteria);
+    }
+
+    public function findOneBy(string $entityType, array $criteria): mixed
+    {
+        return $this->{$this->fromNameToRepo($entityType)}->findOneBy($criteria);
+    }
+
+    public function count(string $entityType, array $criteria): mixed
+    {
+        return $this->{$this->fromNameToRepo($entityType)}->count($criteria);
+    }
+
+    public function find(string $entityType, int $entityId): mixed
+    {
+        return $this->{$this->fromNameToRepo($entityType)}->find($entityId);
+    }
+
+    private function fromNameToRepo(string $entityType): string
+    {
+        $entityTypeName = $this->checkEntityType($entityType);
+        $repositoryName = $this->getRepositoryName($entityTypeName);
+        return lcfirst($repositoryName);
+    }
+
+
+    private function getRepositoryName(string $entityType): string
+    {
+        $repositoryName = ucfirst($entityType) . 'Repository';
+
+        // Create the fully qualified class name
+        $repositoryClass = 'App\\Repository\\' . $repositoryName;
+
+        if (!class_exists($repositoryClass)) {
+            throw new \InvalidArgumentException(sprintf('Repository for entity type "%s" does not exist.', $entityType));
+        }
+        return $repositoryName;
+    }
+
+
+    private function checkEntityType(string $entityType): string
+    {
+        // Convert to proper case (e.g., "operator" to "Operator")
+        $entityName = ucfirst($entityType);
+
+        // Create the fully qualified class name
+        $entityClass = 'App\\Entity\\' . $entityName;
+
+
+        if (!class_exists($entityClass)) {
+            throw new \InvalidArgumentException(sprintf('Entity type "%s" does not exist.', $entityName));
+        }
+
+        return $entityName;
     }
 }

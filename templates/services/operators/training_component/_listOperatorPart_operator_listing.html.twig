@@ -16,9 +16,9 @@
 		<li
 			style="flex:0.3; text-align: center;"
 			class="mx-auto">
-			{{ operator.team.name }}
+			{{ operator.team.name != null ? operator.team.name : 'NONE' }}
 			&nbsp;
-			{{ operator.uaps.first.name }}
+			{{ operator.uaps.first != "" ? operator.uaps.first.name : 'NONE' }}
 		</li>
 		<li
 			style="flex:0.01; text-align: center;"

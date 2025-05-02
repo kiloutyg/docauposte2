@@ -15,40 +15,48 @@ class Settings
     private ?int $id = 1;
 
     #[ORM\Column(nullable: true, options: ['default' => true])]
-    private ?bool $UploadValidation = null;
+    private ?bool $uploadValidation = null;
 
     #[ORM\Column(nullable: true, options: ['default' => 4])]
-    private ?int $ValidatorNumber = null;
+    private ?int $validatorNumber = null;
 
     #[ORM\Column(nullable: true, options: ['default' => true])]
-    private ?bool $IncidentAutoDisplay = null;
+    private ?bool $incidentAutoDisplay = null;
 
     #[ORM\Column(type: Types::DATEINTERVAL, nullable: true, options: ['default' => 'P00Y00M00DT00H10M00S'])]
-    private ?\DateInterval $IncidentAutoDisplayTimer = null;
+    private ?\DateInterval $incidentAutoDisplayTimer = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $Training = true;
+    private ?bool $training = true;
 
     #[ORM\Column(type: Types::DATEINTERVAL, nullable: true, options: ['default' => 'P00Y06M00DT00H00M00S'])]
-    private ?\DateInterval $OperatorRetrainingDelay = null;
+    private ?\DateInterval $operatorRetrainingDelay = null;
 
     #[ORM\Column(type: Types::DATEINTERVAL, nullable: true, options: ['default' => 'P00Y03M00DT00H00M00S'])]
-    private ?\DateInterval $OperatorInactivityDelay = null;
+    private ?\DateInterval $operatorInactivityDelay = null;
 
     #[ORM\Column(type: Types::DATEINTERVAL, nullable: true, options: ['default' => 'P00Y03M00DT00H00M00S'])]
-    private ?\DateInterval $OperatorAutoDeleteDelay = null;
+    private ?\DateInterval $operatorAutoDeleteDelay = null;
+
+    #[ORM\Column(nullable: false, options: ['default' => true])]
+    private ?bool $operatorCodeMethod = null;
+
+    #[ORM\Column(length: 255, nullable: true, options: ['default' => '\/^[0-9]{5}$\/'])]
+    private ?string $operatorCodeRegex = null;
 
     public function __construct()
     {
         $this->id = 1;
-        $this->UploadValidation = true;
-        $this->ValidatorNumber = 4;
-        $this->IncidentAutoDisplay = true;
-        $this->IncidentAutoDisplayTimer = new \DateInterval('P00Y00M00DT00H10M00S');
-        $this->Training = true;
-        $this->OperatorRetrainingDelay = new \DateInterval('P00Y06M00DT00H00M00S');
-        $this->OperatorInactivityDelay = new \DateInterval('P00Y03M00DT00H00M00S');
-        $this->OperatorAutoDeleteDelay = new \DateInterval('P00Y03M00DT00H00M00S');
+        $this->uploadValidation = true;
+        $this->validatorNumber = 4;
+        $this->incidentAutoDisplay = true;
+        $this->incidentAutoDisplayTimer = new \DateInterval('P00Y00M00DT00H10M00S');
+        $this->training = true;
+        $this->operatorRetrainingDelay = new \DateInterval('P00Y06M00DT00H00M00S');
+        $this->operatorInactivityDelay = new \DateInterval('P00Y03M00DT00H00M00S');
+        $this->operatorAutoDeleteDelay = new \DateInterval('P00Y03M00DT00H00M00S');
+        $this->operatorCodeMethod = true;
+        $this->operatorCodeRegex = '/^[0-9]{5}$/';
     }
 
     public function getId(): ?int
@@ -58,24 +66,24 @@ class Settings
 
     public function isUploadValidation(): ?bool
     {
-        return $this->UploadValidation;
+        return $this->uploadValidation;
     }
 
-    public function setUploadValidation(?bool $UploadValidation): static
+    public function setUploadValidation(?bool $uploadValidation): static
     {
-        $this->UploadValidation = $UploadValidation;
+        $this->uploadValidation = $uploadValidation;
 
         return $this;
     }
 
     public function getValidatorNumber(): ?int
     {
-        return $this->ValidatorNumber;
+        return $this->validatorNumber;
     }
 
-    public function setValidatorNumber(?int $ValidatorNumber): static
+    public function setValidatorNumber(?int $validatorNumber): static
     {
-        $this->ValidatorNumber = $ValidatorNumber;
+        $this->validatorNumber = $validatorNumber;
 
         return $this;
     }
@@ -83,72 +91,96 @@ class Settings
 
     public function isIncidentAutoDisplay(): ?bool
     {
-        return $this->IncidentAutoDisplay;
+        return $this->incidentAutoDisplay;
     }
 
-    public function setIncidentAutoDisplay(?bool $IncidentAutoDisplay): static
+    public function setIncidentAutoDisplay(?bool $incidentAutoDisplay): static
     {
-        $this->IncidentAutoDisplay = $IncidentAutoDisplay;
+        $this->incidentAutoDisplay = $incidentAutoDisplay;
 
         return $this;
     }
 
     public function getIncidentAutoDisplayTimer(): ?\DateInterval
     {
-        return $this->IncidentAutoDisplayTimer;
+        return $this->incidentAutoDisplayTimer;
     }
 
-    public function setIncidentAutoDisplayTimer(?\DateInterval $IncidentAutoDisplayTimer): static
+    public function setIncidentAutoDisplayTimer(?\DateInterval $incidentAutoDisplayTimer): static
     {
-        $this->IncidentAutoDisplayTimer = $IncidentAutoDisplayTimer;
+        $this->incidentAutoDisplayTimer = $incidentAutoDisplayTimer;
 
         return $this;
     }
 
     public function isTraining(): ?bool
     {
-        return $this->Training;
+        return $this->training;
     }
 
-    public function setTraining(?bool $Training): static
+    public function setTraining(?bool $training): static
     {
-        $this->Training = $Training;
+        $this->training = $training;
 
         return $this;
     }
 
     public function getOperatorRetrainingDelay(): ?\DateInterval
     {
-        return $this->OperatorRetrainingDelay;
+        return $this->operatorRetrainingDelay;
     }
 
-    public function setOperatorRetrainingDelay(?\DateInterval $OperatorRetrainingDelay): static
+    public function setOperatorRetrainingDelay(?\DateInterval $operatorRetrainingDelay): static
     {
-        $this->OperatorRetrainingDelay = $OperatorRetrainingDelay;
+        $this->operatorRetrainingDelay = $operatorRetrainingDelay;
 
         return $this;
     }
 
     public function getOperatorInactivityDelay(): ?\DateInterval
     {
-        return $this->OperatorInactivityDelay;
+        return $this->operatorInactivityDelay;
     }
 
-    public function setOperatorInactivityDelay(?\DateInterval $OperatorInactivityDelay): static
+    public function setOperatorInactivityDelay(?\DateInterval $operatorInactivityDelay): static
     {
-        $this->OperatorInactivityDelay = $OperatorInactivityDelay;
+        $this->operatorInactivityDelay = $operatorInactivityDelay;
 
         return $this;
     }
 
     public function getOperatorAutoDeleteDelay(): ?\DateInterval
     {
-        return $this->OperatorAutoDeleteDelay;
+        return $this->operatorAutoDeleteDelay;
     }
 
-    public function setOperatorAutoDeleteDelay(?\DateInterval $OperatorAutoDeleteDelay): static
+    public function setOperatorAutoDeleteDelay(?\DateInterval $operatorAutoDeleteDelay): static
     {
-        $this->OperatorAutoDeleteDelay = $OperatorAutoDeleteDelay;
+        $this->operatorAutoDeleteDelay = $operatorAutoDeleteDelay;
+
+        return $this;
+    }
+
+    public function isOperatorCodeMethod(): ?bool
+    {
+        return $this->operatorCodeMethod;
+    }
+
+    public function setOperatorCodeMethod(bool $operatorCodeMethod): static
+    {
+        $this->operatorCodeMethod = $operatorCodeMethod;
+
+        return $this;
+    }
+
+    public function getOperatorCodeRegex(): ?string
+    {
+        return $this->operatorCodeRegex;
+    }
+
+    public function setOperatorCodeRegex(?string $operatorCodeRegex): static
+    {
+        $this->operatorCodeRegex = $operatorCodeRegex;
 
         return $this;
     }

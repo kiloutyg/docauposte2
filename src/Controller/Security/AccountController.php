@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Security;
 
 use App\Entity\User;
 use App\Entity\Department;
@@ -24,53 +24,93 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Symfony\Component\Routing\Annotation\Route;
 
-use Symfony\Component\Security\Core\User\UserInterface;
 
 
+/**
+ * AccountController
+ *
+ * This controller manages user account operations including creation, modification,
+ * deletion, blocking/unblocking, and department management. It provides functionality
+ * for administrators to manage user accounts and departments within the system.
+ */
 #[Route('/account', name: 'app_account_')]
 class AccountController extends AbstractController
 {
+    /**
+     * @var LoggerInterface Logger for recording account-related operations
+     */
     private $logger;
 
+    /**
+     * @var EntityManagerInterface Doctrine entity manager for database operations
+     */
     private $em;
 
+    /**
+     * @var UserRepository Repository for User entity operations
+     */
     private $userRepository;
+
+    /**
+     * @var DepartmentRepository Repository for Department entity operations
+     */
     private $departmentRepository;
 
+    /**
+     * @var AccountService Service for account management operations
+     */
     private $accountService;
+
+    /**
+     * @var EntityFetchingService Service for fetching entities
+     */
     private $entityFetchingService;
+
+    /**
+     * @var EntityDeletionService Service for entity deletion operations
+     */
     private $entityDeletionService;
 
+    /**
+     * Constructor for AccountController
+     *
+     * Initializes all required services and repositories for account management.
+     *
+     * @param LoggerInterface $logger Logger for recording operations
+     * @param EntityManagerInterface $em Entity manager for database operations
+     * @param UserRepository $userRepository Repository for User entity operations
+     * @param DepartmentRepository $departmentRepository Repository for Department entity operations
+     * @param AccountService $accountService Service for account management
+     * @param EntityFetchingService $entityFetchingService Service for fetching entities
+     * @param EntityDeletionService $entityDeletionService Service for entity deletion
+     */
     public function __construct(
-
         LoggerInterface $logger,
-
         EntityManagerInterface $em,
-
         UserRepository $userRepository,
         DepartmentRepository $departmentRepository,
-
         AccountService $accountService,
         EntityFetchingService $entityFetchingService,
         EntityDeletionService $entityDeletionService,
-
     ) {
         $this->logger = $logger;
-
         $this->em = $em;
-
         $this->userRepository = $userRepository;
         $this->departmentRepository = $departmentRepository;
-
         $this->accountService = $accountService;
         $this->entityFetchingService = $entityFetchingService;
         $this->entityDeletionService = $entityDeletionService;
     }
 
-
-
-
-    // Creation of new user account destined to the super admin
+    /**
+     * Creates a new user account
+     *
+     * This method handles both the display of the account creation form (GET)
+     * and the processing of submitted form data (POST). Only accessible to super admins.
+     *
+     * @param Request $request The HTTP request
+     * @return Response The rendered form or a redirect after account creation
+     */
     #[Route(path: '/create', name: 'create')]
     public function createAccountController(Request $request): Response
     {
@@ -93,13 +133,15 @@ class AccountController extends AbstractController
         );
     }
 
-
-
-
-
-
     /**
-     * This function is responsible for rendering the account modification interface destined to the super admin.//+
+     * Renders and processes the account modification interface
+     *
+     * This method handles the display of the account modification form (GET)
+     * and delegates to modifyAccountPost for processing form submissions (POST).
+     *
+     * @param int $userId The ID of the user account to modify
+     * @param Request $request The HTTP request
+     * @return Response The rendered form or a redirect after modification
      */
     #[Route(path: '/modify_account/{userId}', name: 'modify_account')]
     public function modifyAccountGet(int $userId, Request $request): Response
@@ -110,14 +152,23 @@ class AccountController extends AbstractController
         }
         if ($request->isMethod('GET')) {
             return $this->render('services/accountservices/modify_account_view.html.twig', [
-                'user'          => $user
+                'user' => $user
             ]);
         } else {
             return $this->modifyAccountPost($user, $request);
         }
     }
 
-
+    /**
+     * Processes account modification form submissions
+     *
+     * This method handles the business logic for modifying user accounts,
+     * with special protection for super admin accounts.
+     *
+     * @param User $user The user entity to modify
+     * @param Request $request The HTTP request containing form data
+     * @return Response A redirect response after processing
+     */
     public function modifyAccountPost(User $user, Request $request)
     {
         if (in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
@@ -134,10 +185,15 @@ class AccountController extends AbstractController
         }
     }
 
-
-
-
-    // This function is responsible for managing the logic of the account deletion
+    /**
+     * Blocks a user account
+     *
+     * This method blocks a user account when it cannot be deleted due to
+     * existing relationships with other entities in the system.
+     *
+     * @param Request $request The HTTP request containing the user ID
+     * @return Response A redirect to the originating page with status message
+     */
     #[Route(path: '/delete_account/block', name: 'block_account')]
     public function blockAccount(Request $request): Response
     {
@@ -145,18 +201,22 @@ class AccountController extends AbstractController
         $originUrl = $request->headers->get('Referer');
         try {
             $this->accountService->blockUser($userId);
-            $this->addFlash('danger',  'Le compte a été bloqué, il ne peut pas être supprimé car il est lié à des incidents, des uploads, des validations ou des approbations.');
+            $this->addFlash('danger', 'Le compte a été bloqué, il ne peut pas être supprimé car il est lié à des incidents, des uploads, des validations ou des approbations.');
         } catch (\Exception $e) {
-            $this->addFlash('danger',  'Le compte ne peut pas être bloqué : ' . $e->getMessage());
+            $this->addFlash('danger', 'Le compte ne peut pas être bloqué : ' . $e->getMessage());
         }
         return $this->redirect($originUrl);
     }
 
-
-
-
-
-    // This function is responsible for managing the unblocking of an account
+    /**
+     * Unblocks a previously blocked user account
+     *
+     * This method reactivates a blocked user account, requiring
+     * password and role reassignment afterward.
+     *
+     * @param Request $request The HTTP request containing the user ID
+     * @return Response A redirect to the originating page with status message
+     */
     #[Route(path: '/delete_account/unblock_account', name: 'unblock_account')]
     public function unblockAccount(Request $request): Response
     {
@@ -164,18 +224,22 @@ class AccountController extends AbstractController
         $originUrl = $request->headers->get('Referer');
         try {
             $this->accountService->unblockUser($userId);
-            $this->addFlash('success',  'Le compte a été débloqué, vous devez réaffecter un Mot de passe et un Role à l\'utilisateur.');
+            $this->addFlash('success', 'Le compte a été débloqué, vous devez réaffecter un Mot de passe et un Role à l\'utilisateur.');
         } catch (\Exception $e) {
-            $this->addFlash('danger',  'Le compte ne peut pas être débloqué : ' . $e->getMessage());
+            $this->addFlash('danger', 'Le compte ne peut pas être débloqué : ' . $e->getMessage());
         }
         return $this->redirect($originUrl);
     }
 
-
-
-
-
-    // This function is responsible for managing the logic of the account deletion
+    /**
+     * Deletes a user account
+     *
+     * This method permanently removes a user account from the system,
+     * with appropriate error handling for cases where deletion is not possible.
+     *
+     * @param Request $request The HTTP request containing the user ID
+     * @return Response A redirect to the originating page with status message
+     */
     #[Route(path: '/delete_account', name: 'delete_account')]
     public function deleteAccount(Request $request): Response
     {
@@ -184,25 +248,29 @@ class AccountController extends AbstractController
         $username = $this->userRepository->find($userId)->getUsername();
         try {
             $this->accountService->deleteUser($userId);
-            $this->addFlash('success',  'Le compte de ' . $username . ' a été supprimé');
+            $this->addFlash('success', 'Le compte de ' . $username . ' a été supprimé');
         } catch (\Exception $e) {
-            $this->addFlash('danger',  'Le compte ne peut pas être supprimé : ' . $e->getMessage());
+            $this->addFlash('danger', 'Le compte ne peut pas être supprimé : ' . $e->getMessage());
         }
         return $this->redirect($originUrl);
     }
 
-
-
-
-
-    // Logic to create a new department and display a message
+    /**
+     * Creates a new department
+     *
+     * This method handles AJAX requests to create a new department,
+     * with validation to prevent duplicates and empty names.
+     *
+     * @param Request $request The HTTP request containing department data
+     * @return JsonResponse JSON response indicating success or failure with a message
+     */
     #[Route('/department/department_creation', name: 'department_creation')]
     public function departmentCreation(Request $request): JsonResponse
     {
         // Get the data from the request
         $data = json_decode($request->getContent(), true);
 
-        // Get the name of the department 
+        // Get the name of the department
         $departmentName = $data['department_name'] ?? null;
 
         // Get the existing department name
@@ -216,16 +284,25 @@ class AccountController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Ce service existe déjà']);
             // If the department does not exist, we create it
         } else {
-            $Department = new Department();
-            $Department->setName($departmentName);
-            $this->em->persist($Department);
+            $department = new Department();
+            $department->setName($departmentName);
+            $this->em->persist($department);
             $this->em->flush();
 
             return new JsonResponse(['success' => true, 'message' => 'Le service a été créé']);
         }
     }
-
-    // Create a route for department deletion. It depends on the entitydeletionService.
+    /**
+     * Deletes a department
+     *
+     * This method removes a department from the system using the entity deletion service.
+     * It provides appropriate feedback messages for both successful deletion and cases
+     * where the department doesn't exist or cannot be deleted.
+     *
+     * @param int $departmentId The ID of the department to delete
+     * @param Request $request The HTTP request
+     * @return Response A redirect to the originating page with status message
+     */
     #[Route('/department/department_deletion/{departmentId}', name: 'department_deletion')]
     public function departmentDeletion(int $departmentId, Request $request): Response
     {
@@ -233,8 +310,7 @@ class AccountController extends AbstractController
         $response = $this->entityDeletionService->deleteEntity($entityType, $departmentId);
         $originUrl = $request->headers->get('referer');
 
-        if ($response == true) {
-
+        if ($response) {
             $this->addFlash('success', $entityType . ' has been deleted');
             return $this->redirect($originUrl);
         } else {
@@ -243,7 +319,18 @@ class AccountController extends AbstractController
         }
     }
 
-    // Create a route to allow transmission of work to another user before deleting the account with the delete_account method
+    /**
+     * Transfers a user's work to another user
+     *
+     * This method facilitates the transfer of responsibilities, uploads, validations,
+     * and other work items from one user to another before account deletion.
+     * It's an important step to maintain data integrity when removing user accounts
+     * that have associated work items in the system.
+     *
+     * @param Request $request The HTTP request containing transfer details
+     * @param int $userId The ID of the user whose work is being transferred
+     * @return Response A redirect with status message after the transfer operation
+     */
     #[Route('/delete_account/transfer_work/{userId}', name: 'transfer_work')]
     public function transferWork(Request $request, int $userId): Response
     {

@@ -64,16 +64,13 @@ class TrainingRecordService extends AbstractController
     {
         $trainingRecords = $upload->getTrainingRecords();
         $trained = false;
-        if ($trainingRecords->isEmpty()) {
-            return;
-        } else {
+        if (!$trainingRecords->isEmpty()) {
             foreach ($trainingRecords as $trainingRecord) {
                 $trainingRecord->setTrained($trained);
                 $this->em->persist($trainingRecord);
                 $this->em->flush();
             }
         }
-        return;
     }
 
     public function getOrderedTrainingRecordsByUpload($upload)
@@ -84,10 +81,13 @@ class TrainingRecordService extends AbstractController
     }
 
 
+
     public function getOrderedTrainingRecordsByTrainingRecordsArray($trainingRecords)
     {
         return $this->orderedTrainingRecordsLoop($trainingRecords);
     }
+
+
 
     private function orderedTrainingRecordsLoop(array $trainingRecords)
     {
@@ -112,6 +112,8 @@ class TrainingRecordService extends AbstractController
     {
         $trainingRecord = $this->trainingRecordRepository->find($trainingRecordId);
         $today = new \DateTime();
+        $response = false;
+
         if ($trainingRecord->getDate() < $today->modify('-1 week')) {
             return false;
         } else {

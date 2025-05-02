@@ -1,5 +1,5 @@
 import OperatorAdminCreationController from './operator_admin_creation_controller';
-import axios from 'axios';
+import { operatorCodeService } from './services/operator_code_service';
 
 export default class operatorAdminEdit extends OperatorAdminCreationController {
 
@@ -9,8 +9,15 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
     ];
 
 
-
-
+    /**
+     * Validates the operator code entered by the user after a short delay.
+     * This method implements debouncing to prevent excessive validation calls during typing.
+     * If the code format is invalid or the code already exists, it displays an error message
+     * and automatically proposes a new compliant code.
+     * 
+     * @async
+     * @returns {Promise<void>}
+     */
     async editedCodeChecker() {
         // Clear any existing timeouts to debounce user input
         clearTimeout(this.codeTypingTimeout);
@@ -19,21 +26,16 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
             const code = this.operatorFormCodeTarget.value.trim();
             const isValidFormat = this.isCodeValidFormat(code);
             if (isValidFormat) {
-                const isValidSum = this.editedCodeFormatChecker(code);
-                const isExistingCode = await this.existingCodeChecker(code);
-                if (isValidSum && !isExistingCode) {
-                    // Provide positive feedback to the user if necessary
-                } else if (!isValidSum) {
-                    this.showCodeFormatError('Bad Format.');
-                    const newCode = await this.proposeCompliantNewCode();
-                    this.operatorFormCodeTarget.value = newCode;
-                } else if (isExistingCode) {
+                const isExistingCode = await operatorCodeService.checkIfCodeExists(code);
+                if (isExistingCode) {
                     this.showCodeExistenceError('Existe déjà.');
+                    console.log('operatorAdminEditController::editedCodeChecker: Existe déjà.');
                     const newCode = await this.proposeCompliantNewCode();
                     this.operatorFormCodeTarget.value = newCode;
                 }
             } else {
                 this.showCodeFormatError('Format invalide.');
+                console.log('operatorAdminEditController::editedCodeChecker: Bad Format.');
                 const newCode = await this.proposeCompliantNewCode();
                 this.operatorFormCodeTarget.value = newCode;
             }
@@ -41,24 +43,37 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
     }
 
 
-
-    // Helper method to check if the code format is valid
+    /**
+     * Checks if the provided operator code has a valid format.
+     * 
+     * @param {string} code - The operator code to validate
+     * @returns {boolean} True if the code format is valid, false otherwise
+     */
     isCodeValidFormat(code) {
-        const regex = /^[0-9]{5}$/;
-        return regex.test(code);
+        return operatorCodeService.validateCode(code);
     }
 
 
-
-    // Method to display format errors
+    /**
+     * Displays an error message when the code format is invalid.
+     * Clears the input field and sets the placeholder to the error message.
+     * 
+     * @param {string} message - The error message to display
+     * @returns {void}
+     */
     showCodeFormatError(message) {
         this.operatorFormCodeTarget.value = '';
         this.operatorFormCodeTarget.placeholder = message;
     }
 
 
-
-    // Method to display existence errors
+    /**
+     * Displays an error message when the code already exists.
+     * Clears the input field and sets the placeholder to the error message.
+     * 
+     * @param {string} message - The error message to display
+     * @returns {void}
+     */
     showCodeExistenceError(message) {
         // You can implement visual feedback to the user here
         this.operatorFormCodeTarget.value = '';
@@ -66,44 +81,13 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
     }
 
 
-
-    async existingCodeChecker(code) {
-        // Since axios.post is asynchronous, we need to handle it with async/await or promises
-        return axios.post('/docauposte/operator/check-if-code-exist', { code })
-            .then(response => {
-                const found = response.data.found;
-                return found;
-            })
-            .catch(error => {
-                console.error('Error checking for duplicate operator code.', error);
-                // Handle error appropriately
-                return false;
-            });
-    }
-
-
-
-    editedCodeFormatChecker(code) {
-        const sumOfFirstThreeDigits = code
-            .substring(0, 3)
-            .split('')
-            .reduce((sum, digit) => sum + Number(digit), 0);
-        const lastTwoDigitsValue = Number(code.substring(3));
-        return sumOfFirstThreeDigits === lastTwoDigitsValue;
-    }
-
-
-
+    /**
+     * Generates a new unique operator code that complies with format requirements.
+     * 
+     * @async
+     * @returns {Promise<string>} A new unique operator code
+     */
     async proposeCompliantNewCode() {
-        const newCode = this.codeGenerator();
-        const response = await this.existingCodeChecker(newCode);
-        if (response) {
-            return this.proposeCompliantNewCode();
-        } else {
-            return newCode;
-        }
-
+        return await operatorCodeService.generateUniqueCode();
     }
 }
-
-

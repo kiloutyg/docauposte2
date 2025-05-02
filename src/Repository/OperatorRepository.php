@@ -107,7 +107,7 @@ class OperatorRepository extends ServiceEntityRepository
     }
 
 
-    public function findBySearchQuery($name, $code, $team, $uap, $trainer)
+    public function findBySearchQuery(string $name, string $code, string $team, string $uap, string $trainer)
     {
         $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.team', 't')

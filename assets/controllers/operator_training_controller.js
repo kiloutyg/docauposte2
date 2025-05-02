@@ -1,5 +1,4 @@
-
-
+import { operatorCodeService } from './services/operator_code_service';
 import { Controller } from '@hotwired/stimulus';
 import axios from 'axios';
 
@@ -36,16 +35,14 @@ export default class OperatorTrainingController extends Controller {
                 this.validateNewOperatorFirstname();
             }
 
-        }, 1400);
+        }, 1500);
     }
 
     validateNewOperatorFirstname() {
-
         document.getElementById('newOperatorFirstname').addEventListener('input', function (e) {
             var value = e.target.value;
             e.target.value = value.charAt(0).toUpperCase() + value.slice(1);
         });
-
 
         clearTimeout(this.firstnameTypingTimeout);
         this.firstnameTypingTimeout = setTimeout(() => {
@@ -62,12 +59,15 @@ export default class OperatorTrainingController extends Controller {
                 this.newOperatorInvertedNameTarget = invertedCombined.toLowerCase();
                 this.validateNewOperatorName();
             }
-        }, 1400);
+        }, 1500);
     }
+
+
 
     capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
+
 
 
     validateNewOperatorName() {
@@ -96,17 +96,15 @@ export default class OperatorTrainingController extends Controller {
             if (isValid) {
                 this.checkForExistingEntityByName();
             }
-        }, 1400); // delay in milliseconds
+        }, 1500); // delay in milliseconds
     }
 
 
 
     validateNewOperatorCode() {
         clearTimeout(this.codeTypingTimeout);
-        this.codeTypingTimeout = setTimeout(() => {
+        this.codeTypingTimeout = setTimeout(async () => {
 
-
-            const regex = /^[0-9]{5}$/;
             let isValid;
 
             if (this.duplicateCheckResults.code) {
@@ -114,10 +112,10 @@ export default class OperatorTrainingController extends Controller {
                     return;
                 } else {
                     this.duplicateCheckResults.code = null;
-                    isValid = regex.test(this.newOperatorCodeTarget.value.trim());
+                    isValid = await operatorCodeService.validateCode(this.newOperatorCodeTarget.value.trim());
                 }
             } else {
-                isValid = regex.test(this.newOperatorCodeTarget.value.trim());
+                isValid = await operatorCodeService.validateCode(this.newOperatorCodeTarget.value.trim());
             }
             this.newOperatorTransferMessageTarget.textContent = "";
             this.updateMessage(this.newOperatorCodeMessageTarget, isValid, "Veuillez saisir un code correct.");
@@ -125,9 +123,8 @@ export default class OperatorTrainingController extends Controller {
             if (isValid) {
                 this.duplicateCheckResults.code = null;
                 this.checkForExistingEntityByCode();
-
             }
-        }, 1400);
+        }, 1500);
     }
 
 
@@ -181,14 +178,14 @@ export default class OperatorTrainingController extends Controller {
                 targetElement.style.color = "red";
                 this.manageNewOperatorSubmitButton();
             }
-        }, 800);
+        }, 1000);
     }
 
 
 
     duplicateCheckResults = { name: null, code: null };
 
-    handleDuplicateResponse(response, messageTarget, fieldName) {
+    async handleDuplicateResponse(response, messageTarget, fieldName) {
 
         messageTarget.textContent = response.data.found
             ? response.data.message
@@ -207,7 +204,8 @@ export default class OperatorTrainingController extends Controller {
             this.newOperatorCodeTarget.disabled = false;
             this.newOperatorCodeTarget.focus();
         } else {
-            if (response.data.field === "name") {
+            const settings = await operatorCodeService.getSettings()
+            if (response.data.field === "name" && settings.methodEnabled) {
                 this.proposeCompliantNewCode();
             }
             this.newOperatorCodeTarget.disabled = false;
@@ -242,7 +240,7 @@ export default class OperatorTrainingController extends Controller {
             this.newOperatorTransferMessageTarget.textContent = "";
             this.nameSuggestionsTarget.innerHTML = ''; // Clear suggestions
             this.suggestionsResults = [];
-        }, 12000);
+        }, 15000);
 
     }
 
@@ -259,7 +257,6 @@ export default class OperatorTrainingController extends Controller {
 
             const bothFound = Object.values(this.duplicateCheckResults).every(result => result.data.found);
             const bothNotFound = Object.values(this.duplicateCheckResults).every(result => !result.data.found);
-
 
             if (bothFound) {
                 this.executeEntityMatchingLogic(bothFound);
@@ -314,12 +311,10 @@ export default class OperatorTrainingController extends Controller {
 
 
 
-    validateCodeEntryForTraining() {
+    async validateCodeEntryForTraining() {
         clearTimeout(this.trainingCodeTypingTimeout);
-        this.trainingCodeTypingTimeout = setTimeout(() => {
-            const regex = /^[0-9]{5}$/;
-            const isValid = regex.test(this.trainingOperatorCodeTarget.value.trim());
-
+        this.trainingCodeTypingTimeout = setTimeout(async () => {
+            const isValid = await operatorCodeService.validateTrainingCode(this.trainingOperatorCodeTarget.value);
             if (isValid) {
                 this.checkOperatorIdentityByCode();
             } else {
@@ -343,7 +338,7 @@ export default class OperatorTrainingController extends Controller {
                 this.inputSwitch(response.data);
             } else {
                 this.trainingOperatorCodeTarget.value = "";
-                this.trainingOperatorCodeTarget.placeholder = "Invalide";
+                this.trainingOperatorCodeTarget.placeholder = "Erroné";
             }
         } catch (error) {
             console.error("Error checking for operator identity by code.", error);
@@ -412,18 +407,12 @@ export default class OperatorTrainingController extends Controller {
 
 
     async proposeCompliantNewCode() {
-
         const code = this.codeGenerator();
-        const response = await this.generatedTrainingCodeChecker(code);
+        this.newOperatorCodeTarget.value = code;
+        this.newOperatorCodeTarget.disabled = true;
+        this.newOperatorCodeTarget.focus();
+        this.validateNewOperatorCode();
 
-        if (response) {
-            this.proposeCompliantNewCode();
-        } else {
-            this.newOperatorCodeTarget.value = code;
-            this.newOperatorCodeTarget.disabled = true;
-            this.newOperatorCodeTarget.focus();
-            this.validateNewOperatorCode();
-        }
     }
 
 
@@ -565,37 +554,10 @@ export default class OperatorTrainingController extends Controller {
 
 
 
-    codeGenerator() {
-
-        // Generate a random integer between 1 and 999
-        const code = Math.floor(1 + Math.random() * 999);
-
-        // Sum the digits of the 'code' integer
-        let sumOfDigits = code
-            .toString()
-            .split('')
-            .reduce((sum, digit) => sum + Number(digit), 0);
-
-
-        const sumOfDigitsString = sumOfDigits.toString();
-
-
-        if (sumOfDigitsString.length < 2) {
-            sumOfDigits = '0' + sumOfDigits;
-        }
-
-        // Combine the original code and the sum of its digits
-        let newCode = code.toString() + sumOfDigits.toString();
-
-        // Ensure 'newCode' has exactly 5 digits
-        if (newCode.length < 5) {
-            // Pad with leading zeros if less than 5 digits
-            newCode = newCode.padStart(5, '0');
-        } else if (newCode.length > 5) {
-            // If more than 5 digits, use the last 5 digits
-            newCode = newCode.slice(-5);
-        }
-
-        return newCode;
+    async codeGenerator() {
+        console.log('OperatorAdminCreationController: Calling codeGenerator');
+        const code = await operatorCodeService.generateUniqueCode();
+        console.log('OperatorAdminCreationController: Generated code:', code);
+        return code;
     }
 }

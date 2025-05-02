@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Document;
 
 use \Psr\Log\LoggerInterface;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -21,65 +20,42 @@ use App\Entity\IncidentCategory;
 
 use App\Form\IncidentType;
 
-use App\Repository\IncidentRepository;
-use App\Repository\IncidentCategoryRepository;
-
-use App\Service\EntityDeletionService;
 use App\Service\IncidentService;
-use App\Service\EntityFetchingService;
-use App\Service\NamingService;
+use App\Service\Facade\EntityManagerFacade;
+use App\Service\Facade\ContentManagerFacade;
 
 // This controller manage the logics of the incidents interface, it is responsible for rendering the incidents interface.
 // It is also responsible for creating, modifying, deleting incidents and incident categories.
 #[Route('/', name: 'app_')]
 class IncidentController extends AbstractController
 {
-
-    private $em;
-    private $authChecker;
     private $logger;
+    private $authChecker;
 
     // Repository methods
-    private $incidentRepository;
-    private $incidentCategoryRepository;
-    private $namingService;
 
     // Services methods
     private $incidentService;
-    private $entitydeletionService;
-    private $entityFetchingService;
+    private $entityManagerFacade;
+    private $contentManagerFacade;
 
     public function __construct(
-        EntityManagerInterface          $em,
         LoggerInterface                 $logger,
         AuthorizationCheckerInterface   $authChecker,
 
-        // Repository methods
-        IncidentCategoryRepository      $incidentCategoryRepository,
-        IncidentRepository              $incidentRepository,
-
         // Services methods
         IncidentService                 $incidentService,
-        EntityDeletionService           $entitydeletionService,
-        EntityFetchingService           $entityFetchingService,
-        NamingService                   $namingService
+        EntityManagerFacade             $entityManagerFacade,
+        ContentManagerFacade            $contentManagerFacade,
 
     ) {
-        // $this->cache                        = $cache;
-
-        $this->em                           = $em;
         $this->authChecker                  = $authChecker;
         $this->logger                       = $logger;
 
-        // Variables related to the repositories
-        $this->incidentCategoryRepository   = $incidentCategoryRepository;
-        $this->incidentRepository           = $incidentRepository;
-
         // Variables related to the services
         $this->incidentService              = $incidentService;
-        $this->entitydeletionService        = $entitydeletionService;
-        $this->entityFetchingService        = $entityFetchingService;
-        $this->namingService                = $namingService;
+        $this->contentManagerFacade         = $contentManagerFacade;
+        $this->entityManagerFacade          = $entityManagerFacade;
     }
 
 
@@ -90,10 +66,10 @@ class IncidentController extends AbstractController
     public function incidentManagementView(): Response
     {
 
-        $incidents = $this->entityFetchingService->getIncidents();
+        $incidents = $this->entityManagerFacade->getIncidents();
 
         $groupIncidents = $this->incidentService->groupIncidents($incidents);
-        $incidentCategories = $this->entityFetchingService->getIncidentCategories();
+        $incidentCategories = $this->entityManagerFacade->getIncidentCategories();
 
         return $this->render(
             'services/incident/incident.html.twig',
@@ -111,7 +87,6 @@ class IncidentController extends AbstractController
     #[Route('/productLine/{productLineId}/incident/{incidentId}', name: 'mandatory_incident')]
     public function mandatoryIncident(?int $productLineId = null, ?int $incidentId = null): Response
     {
-        $this->logger->info('mandatory incident is being called', ['productLineId' => $productLineId, 'incidentId' => $incidentId]);
 
         $response = $this->incidentService->displayIncident($productLineId, $incidentId);
         $incident       = $response[0];
@@ -130,7 +105,6 @@ class IncidentController extends AbstractController
                     'nextIncidentId'    => $nextIncident ? $nextIncident->getId() : null
                 ]
             );
-            // If there is no incident we render the productLine page
         } else {
             return $this->render(
                 'productLine.html.twig',
@@ -139,8 +113,6 @@ class IncidentController extends AbstractController
                     'categories' => $productLine->getCategories(),
                 ]
             );
-
-            // return $this
         }
     }
 
@@ -158,7 +130,7 @@ class IncidentController extends AbstractController
         $incidentCategoryName = $data['incident_incidentCategory_name'] ?? null;
 
         // Get the existing incident category name
-        $existingIncidentCategory = $this->incidentCategoryRepository->findOneBy(['name' => $incidentCategoryName]);
+        $existingIncidentCategory = $this->entityManagerFacade->findOneBy('category', ['name' => $incidentCategoryName]);
 
         // Check if the incident category name is empty or if the incident category already exists
         if (empty($incidentCategoryName)) {
@@ -170,8 +142,10 @@ class IncidentController extends AbstractController
         } else {
             $incidentCategory = new IncidentCategory();
             $incidentCategory->setName($incidentCategoryName);
-            $this->em->persist($incidentCategory);
-            $this->em->flush();
+
+            $em = $this->entityManagerFacade->getEntityManager();
+            $em->persist($incidentCategory);
+            $em->flush();
 
             return new JsonResponse(['success' => true, 'message' => 'Le type d\'incident a été créé']);
         }
@@ -185,13 +159,13 @@ class IncidentController extends AbstractController
     public function incidentCategoryDeletion(int $incidentCategoryId, Request $request): Response
     {
         $entityType = "incidentCategory";
-        $entity = $this->entitydeletionService->deleteEntity($entityType, $incidentCategoryId);
+        $entity = $this->entityManagerFacade->deleteEntity($entityType, $incidentCategoryId);
 
-        if ($entity == true) {
-
+        if ($entity) {
             $this->addFlash('success', $entityType . ' has been deleted');
             return $this->redirectToOriginUrl($request);
         } else {
+            $this->logger->error('Erreur lors de la suppression du ' . $entityType);
             $this->addFlash('danger',  $entityType . '  does not exist');
             return $this->redirectToOriginUrl($request);
         }
@@ -205,7 +179,7 @@ class IncidentController extends AbstractController
     public function genericUploadOfIncidentFiles(Request $request): Response
     {
 
-        // Check if the form is submitted 
+        // Check if the form is submitted
         if ($request->isMethod('POST')) {
             // Use the IncidentService to handle the upload of the Incidents files
             $name = $this->incidentService->uploadIncidentFiles($request);
@@ -213,6 +187,7 @@ class IncidentController extends AbstractController
             return $this->redirectToOriginUrl($request);
         } else {
             // Show an error message if the form is not submitted
+            $this->logger->info('Le fichier n\'a pas été poster correctement.');
             $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
             return $this->redirectToOriginUrl($request);
         }
@@ -225,7 +200,7 @@ class IncidentController extends AbstractController
     #[Route('/download_incident/{incidentId}', name: 'incident_download_file')]
     public function download_file(?int $incidentId = null): Response
     {
-        $file       = $this->incidentRepository->find($incidentId);
+        $file       = $this->entityManagerFacade->find('incident', $incidentId);
         $path       = $file->getPath();
         $file       = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);
@@ -236,24 +211,13 @@ class IncidentController extends AbstractController
 
 
     // Create a route to delete a file
-    #[Route('/incident/delete/{incidentId}', name: 'incident_delete_file')]
+    #[Route('/delete/incident/{incidentId}', name: 'incident_delete_file')]
     public function delete_file(int $incidentId, Request $request): Response
     {
-        $incidentEntity = $this->incidentRepository->find($incidentId);
-
-        // Check if the user is the creator of the upload or if he is a super admin
-        if ($this->authChecker->isGranted('ROLE_ADMIN')) {
-            // Use the incidentService to handle file deletion
-            $name = $this->incidentService->deleteIncidentFile($incidentEntity);
-        } elseif ($this->getUser() === $incidentEntity->getUploader()) {
-            // Use the incidentService to handle file deletion
-            $name = $this->incidentService->deleteIncidentFile($incidentEntity);
-        } else {
-            $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer ce document.');
-            return $this->redirectToOriginUrl($request);
-        }
+        $incidentEntity = $this->entityManagerFacade->find('incident', $incidentId);
+        $this->logger->debug('Deleting file: ' . $incidentEntity->getPath());
+        $name = $this->incidentService->deleteIncidentFile($incidentEntity);
         $this->addFlash('success', 'File ' . $name . ' deleted');
-
         return $this->redirectToOriginUrl($request);
     }
 
@@ -265,11 +229,11 @@ class IncidentController extends AbstractController
     public function modify_incident_file(Request $request, int $incidentId): Response
     {
         // Retrieve the current incident entity based on the incidentId
-        $incident = $this->incidentRepository->find($incidentId);
+        $incident = $this->entityManagerFacade->find('incident', $incidentId);
 
         if ($request->isMethod('POST')) {
             // Check name compliency and adjust if necessary
-            $this->namingService->requestIncidentFilenameChecks($request);
+            $this->contentManagerFacade->requestIncidentFilenameChecks($request);
 
             // Create a form to modify the Upload entity
             $form = $this->createForm(IncidentType::class, $incident);
