@@ -55,6 +55,11 @@ class EntityManagerFacade
         return $this->entityDeletionService->deleteEntity($entityType, $id);
     }
 
+    public function deleteFile(int $id)
+    {
+        return $this->entityDeletionService->deleteFile($id);
+    }
+
     public function uploadsByParentEntity(string $entityType, $entity)
     {
         return $this->entityHeritanceService->uploadsByParentEntity($entityType, $entity);

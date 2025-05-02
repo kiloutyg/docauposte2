@@ -48,4 +48,14 @@ class ContentManagerFacade
     {
         return $this->namingService->requestIncidentFilenameChecks($request);
     }
+
+    public function filenameChecks(Request $request, ?string $newFilename = null): string
+    {
+        return $this->namingService->filenameChecks($request, $newFilename);
+    }
+
+    public function requestUploadFilenameChecks(Request $request)
+    {
+        return $this->namingService->requestUploadFilenameChecks($request);
+    }
 }

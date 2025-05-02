@@ -29,7 +29,7 @@ use App\Service\Facade\ContentManagerFacade;
 #[Route('/', name: 'app_')]
 class IncidentController extends AbstractController
 {
-
+    private $logger;
     private $authChecker;
 
     // Repository methods
@@ -105,7 +105,6 @@ class IncidentController extends AbstractController
                     'nextIncidentId'    => $nextIncident ? $nextIncident->getId() : null
                 ]
             );
-            // If there is no incident we render the productLine page
         } else {
             return $this->render(
                 'productLine.html.twig',
@@ -114,7 +113,6 @@ class IncidentController extends AbstractController
                     'categories' => $productLine->getCategories(),
                 ]
             );
-
         }
     }
 
@@ -167,6 +165,7 @@ class IncidentController extends AbstractController
             $this->addFlash('success', $entityType . ' has been deleted');
             return $this->redirectToOriginUrl($request);
         } else {
+            $this->logger->error('Erreur lors de la suppression du ' . $entityType);
             $this->addFlash('danger',  $entityType . '  does not exist');
             return $this->redirectToOriginUrl($request);
         }
@@ -188,6 +187,7 @@ class IncidentController extends AbstractController
             return $this->redirectToOriginUrl($request);
         } else {
             // Show an error message if the form is not submitted
+            $this->logger->info('Le fichier n\'a pas été poster correctement.');
             $this->addFlash('error', 'Le fichier n\'a pas été poster correctement.');
             return $this->redirectToOriginUrl($request);
         }
@@ -211,24 +211,13 @@ class IncidentController extends AbstractController
 
 
     // Create a route to delete a file
-    #[Route('/incident/delete/{incidentId}', name: 'incident_delete_file')]
+    #[Route('/delete/incident/{incidentId}', name: 'incident_delete_file')]
     public function delete_file(int $incidentId, Request $request): Response
     {
         $incidentEntity = $this->entityManagerFacade->find('incident', $incidentId);
-
-        // Check if the user is the creator of the upload or if he is a super admin
-        if ($this->authChecker->isGranted('ROLE_ADMIN')) {
-            // Use the incidentService to handle file deletion
-            $name = $this->incidentService->deleteIncidentFile($incidentEntity);
-        } elseif ($this->getUser() === $incidentEntity->getUploader()) {
-            // Use the incidentService to handle file deletion
-            $name = $this->incidentService->deleteIncidentFile($incidentEntity);
-        } else {
-            $this->addFlash('error', 'Vous n\'avez pas les droits pour supprimer ce document.');
-            return $this->redirectToOriginUrl($request);
-        }
+        $this->logger->debug('Deleting file: ' . $incidentEntity->getPath());
+        $name = $this->incidentService->deleteIncidentFile($incidentEntity);
         $this->addFlash('success', 'File ' . $name . ' deleted');
-
         return $this->redirectToOriginUrl($request);
     }
 
