@@ -24,8 +24,7 @@ class OperatorCodeService {
       * This should be called right after creating the service instance
       */
     init() {
-        const isItInitialized = this.initPromise
-        if (!isItInitialized) {
+        if (this.initPromise === null || this.initPromise === undefined) {
             console.log('OperatorCodeService: Starting initialization');
             this.initPromise = this.initialize();
         }
@@ -72,8 +71,7 @@ class OperatorCodeService {
     async ensureInitialized() {
         if (!this.initialized) {
             console.log('OperatorCodeService: Service not initialized, waiting for initialization');
-            const isItInitialized = this.initPromise
-            if (!isItInitialized) {
+            if (this.initPromise === null || this.initPromise === undefined) {
                 console.log('OperatorCodeService: No initialization in progress, starting now');
                 this.initPromise = this.initialize();
             }
