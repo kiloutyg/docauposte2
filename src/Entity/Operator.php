@@ -54,7 +54,7 @@ class Operator
 
     #[ORM\Column(nullable: true)]
     #[Groups(['operator_details'])]
-    private ?bool $IsTrainer = null;
+    private ?bool $isTrainer = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $lasttraining = null;
@@ -204,12 +204,12 @@ class Operator
 
     public function isIsTrainer(): ?bool
     {
-        return $this->IsTrainer;
+        return $this->isTrainer;
     }
 
-    public function setIsTrainer(?bool $IsTrainer): static
+    public function setIsTrainer(?bool $isTrainer): static
     {
-        $this->IsTrainer = $IsTrainer;
+        $this->isTrainer = $isTrainer;
 
         return $this;
     }

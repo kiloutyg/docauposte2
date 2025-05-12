@@ -127,7 +127,7 @@ class OperatorCheckersController extends AbstractController
     public function checkIfCodeExist(Request $request): JsonResponse
     {
         $this->logger->info('Checking if code exist, full request: ', [$request->request->all()]);
-        
+
         $parsedRequest = json_decode($request->getContent(), true);
 
         $enteredCode = $parsedRequest['code'];
@@ -163,7 +163,7 @@ class OperatorCheckersController extends AbstractController
         key_exists('name', $parsedRequest) ? $enteredName = $parsedRequest['name'] : $enteredName = null;
 
         if ($enteredCode != null) {
-            $existingOperator = $this->entityFetchingService->findOneBy('operator', ['code' => $enteredCode, 'name' => $enteredName, 'IsTrainer' => true]);
+            $existingOperator = $this->entityFetchingService->findOneBy('operator', ['code' => $enteredCode, 'name' => $enteredName, 'isTrainer' => true]);
             if ($existingOperator !== null) {
                 $found = true;
                 $name = $existingOperator->getName();
@@ -171,7 +171,7 @@ class OperatorCheckersController extends AbstractController
                 $trainerId = $existingOperator->getId();
             }
         } else {
-            $existingOperator = $this->entityFetchingService->findOneBy('operator', ['name' => $enteredName, 'IsTrainer' => true]);
+            $existingOperator = $this->entityFetchingService->findOneBy('operator', ['name' => $enteredName, 'isTrainer' => true]);
             if ($existingOperator !== null) {
                 $found = true;
                 $name = $existingOperator->getName();
