@@ -60,6 +60,7 @@ class SettingsService extends AbstractController
             $settingsEntity = new Settings();
             $this->em->persist($settingsEntity);
             $this->em->flush();
+            $this->settings = $settingsEntity;
         }
 
         return $this->settings;
@@ -106,7 +107,8 @@ class SettingsService extends AbstractController
     }
 
 
-    public function getCurrentCodeOpeRegexPattern(): string{
-        return $this->settingsRepository->getSettings()->getOperatorCodeRegex();
+    public function getCurrentCodeOpeRegexPattern(): string
+    {
+        return $this->getSettings()->getOperatorCodeRegex();
     }
 }
