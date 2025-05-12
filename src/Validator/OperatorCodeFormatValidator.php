@@ -31,7 +31,7 @@ class OperatorCodeFormatValidator extends ConstraintValidator
      * @param Constraint $constraint The constraint for the validation
      *
      * @throws UnexpectedTypeException If the constraint is not an instance of OperatorCodeFormat
-     * 
+     *
      * @return void
      */
     public function validate($value, Constraint $constraint): void
