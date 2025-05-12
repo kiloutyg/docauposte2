@@ -145,12 +145,12 @@ class OperatorRepository extends ServiceEntityRepository
 
         if ($trainer === true) {
             $qb->setParameter('trainerStatus', true)
-                ->andWhere('o.IsTrainer = :trainerStatus');
+                ->andWhere('o.isTrainer = :trainerStatus');
         } elseif ($trainer === false) {
             $qb->setParameter('trainerStatus', false)
-                ->andWhere('o.IsTrainer = :trainerStatus OR o.IsTrainer IS NULL');
+                ->andWhere('o.isTrainer = :trainerStatus OR o.isTrainer IS NULL');
         } elseif ($trainer === null) {
-            // If $trainer is null, and you want to select all without any filter on IsTrainer, do not add any where clause related to IsTrainer.
+            // If $trainer is null, and you want to select all without any filter on isTrainer, do not add any where clause related to isTrainer.
             // No further action needed if you want all records regardless of trainer status.
         }
         return $this->operatorComparison($qb->getQuery()->getResult());

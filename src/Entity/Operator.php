@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\OperatorRepository;
+use App\Validator\OperatorCodeFormat;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,6 +20,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[UniqueEntity(fields: 'name', message: 'Un opérateur avec ce nom existe déjà.')]
 class Operator
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -43,8 +45,7 @@ class Operator
 
     #[ORM\Column(length: 255, unique: true)]
     #[Assert\NotBlank]
-    #[Assert\Length(5)]
-    #[Assert\Regex(pattern: '/[0-9]{5}$/', message: 'Le code Opérateur doit être composé de 5 chiffres.')]
+    #[OperatorCodeFormat]
     #[Groups(['operator_details'])]
     private ?string $code = null;
 
@@ -53,7 +54,7 @@ class Operator
 
     #[ORM\Column(nullable: true)]
     #[Groups(['operator_details'])]
-    private ?bool $IsTrainer = null;
+    private ?bool $isTrainer = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $lasttraining = null;
@@ -203,12 +204,12 @@ class Operator
 
     public function isIsTrainer(): ?bool
     {
-        return $this->IsTrainer;
+        return $this->isTrainer;
     }
 
-    public function setIsTrainer(?bool $IsTrainer): static
+    public function setIsTrainer(?bool $isTrainer): static
     {
-        $this->IsTrainer = $IsTrainer;
+        $this->isTrainer = $isTrainer;
 
         return $this;
     }
