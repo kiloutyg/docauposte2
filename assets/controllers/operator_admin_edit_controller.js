@@ -78,6 +78,7 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
         this.operatorFormCodeTarget.placeholder = message;
     }
 
+    
     /**
      * Retrieves operator code generation settings and proposes a new compliant code if enabled.
      * This method is called when an invalid or existing code is detected, to automatically
@@ -93,6 +94,7 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
             this.operatorFormCodeTarget.value = newCode;
         }
     }
+
 
     /**
      * Generates a new unique operator code that complies with format requirements.
