@@ -30,14 +30,12 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
                 if (isExistingCode) {
                     this.showCodeExistenceError('Existe déjà.');
                     console.log('operatorAdminEditController::editedCodeChecker: Existe déjà.');
-                    const newCode = await this.proposeCompliantNewCode();
-                    this.operatorFormCodeTarget.value = newCode;
+                    this.settingOperatorCodeBeforProposingCompliantCode();
                 }
             } else {
                 this.showCodeFormatError('Format invalide.');
                 console.log('operatorAdminEditController::editedCodeChecker: Bad Format.');
-                const newCode = await this.proposeCompliantNewCode();
-                this.operatorFormCodeTarget.value = newCode;
+                this.settingOperatorCodeBeforProposingCompliantCode();
             }
         }, 800);
     }
@@ -80,6 +78,21 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
         this.operatorFormCodeTarget.placeholder = message;
     }
 
+    /**
+     * Retrieves operator code generation settings and proposes a new compliant code if enabled.
+     * This method is called when an invalid or existing code is detected, to automatically
+     * provide a valid alternative to the user.
+     * 
+     * @async
+     * @returns {Promise<void>} A promise that resolves when the operation is complete
+     */
+    async settingOperatorCodeBeforProposingCompliantCode() {
+        const settings = await operatorCodeService.getSettings();
+        if (settings.methodEnabled) {
+            const newCode = await this.proposeCompliantNewCode();
+            this.operatorFormCodeTarget.value = newCode;
+        }
+    }
 
     /**
      * Generates a new unique operator code that complies with format requirements.
