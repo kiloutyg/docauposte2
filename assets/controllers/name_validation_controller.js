@@ -83,7 +83,7 @@ export default class extends Controller {
         if (isValid) {
             this.messageTarget.textContent = "";
         } else {
-            this.messageTarget.textContent = "Format invalide. Veuillez saisir sous la forme UAP ou TEAM";
+            this.messageTarget.textContent = "Format invalide. Veuillez saisir au moins 3 lettres majuscules, sans accent, ni caractères spéciaux, sauf un tiret. Le nom ne doit pas commencer ou finir par un point ou un tiret.";
             this.messageTarget.style.color = "DarkRed"; // Display the message in red color.
         }
     }
