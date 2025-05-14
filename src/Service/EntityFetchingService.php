@@ -259,7 +259,7 @@ class EntityFetchingService extends AbstractController
 
 
 
-    public function findOperatorByCodeAndTeamAndUap(int $code, int $team, int $uap)
+    public function findOperatorByCodeAndTeamAndUap(string $code, int $team, int $uap)
     {
         return $this->operatorRepository->findByCodeAndTeamAndUap($code, $team, $uap);
     }

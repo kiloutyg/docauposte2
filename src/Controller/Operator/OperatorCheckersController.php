@@ -89,7 +89,7 @@ class OperatorCheckersController extends AbstractController
     public function checkEnteredCodeAgainstOperatorCode(Request $request, int $teamId, int $uapId): JsonResponse
     {
         $parsedRequest = json_decode($request->getContent(), true);
-        $enteredCode = $parsedRequest['code'];
+        $enteredCode = (string)$parsedRequest['code'];
         $operatorId = (int)$parsedRequest['operatorId'];
         $controllerOperator = $this->entityFetchingService->findOperatorByCodeAndTeamAndUap($enteredCode, $teamId, $uapId);
 

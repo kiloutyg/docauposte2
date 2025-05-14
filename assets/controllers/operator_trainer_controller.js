@@ -80,11 +80,11 @@ export default class OperatorTrainerController extends Controller {
         this.trainerOperatorCodeTarget.focus();
 
         clearTimeout(this.typingTimeout);  // clear any existing timeout to reset the timer
-        this.typingTimeout = setTimeout(() => {
-            const regex = /^[0-9]{5}$/;
+        this.typingTimeout = setTimeout(async () => {
             const value = this.trainerOperatorCodeTarget.value.trim();
-            const isValid = regex.test(value);
-            if (value.length > 0) { // only check if the field is not empty
+            if (value.length > 0) // only check if the field is not empty
+            {
+                const isValid = await operatorCodeService.validateCode(value);
                 if (isValid) {
                     this.checkTrainerExistence('code', value);
                 } else {

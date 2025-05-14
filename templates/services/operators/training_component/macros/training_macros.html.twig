@@ -7,8 +7,8 @@
 				{{'Formé le ' ~ trainingRecord.date|date('d/m/Y')}}
 				{% if date(trainingRecord.date) > date('now - 1 week') and is_granted('ROLE_MANAGER') %}
 					<a
-						href="{{path('app_training_record_delete_weeks_old', {'trainingRecordId': trainingRecord.id, 'uploadId': trainingRecord.Upload.id, 'teamId': teamId, 'uapId': uapId})}}" class="btn btn-danger" disabled
-						>
+						href="{{path('app_training_record_delete_weeks_old', {'trainingRecordId': trainingRecord.id, 'uploadId': trainingRecord.Upload.id, 'teamId': teamId, 'uapId': uapId})}}" class="btn btn-danger"
+						disabled>
 						Supprimer
 					</a>
 				{% endif %}
@@ -26,7 +26,7 @@
 				name="trainingCheckbox{{ operatorId }}"
 				id="trainingCheckbox{{ operatorId }}">
 				<input
-					type="text"
+					type="password"
 					class="form-control form-control-sm operator-input mx-auto"
 					data-operator-training-target="trainingOperatorCode"
 					data-action="keyup->operator-training#validateCodeEntryForTraining"
@@ -50,7 +50,7 @@
 			name="trainingCheckbox{{ operatorId }}"
 			id="trainingCheckbox{{ operatorId }}">
 			<input
-				type="text"
+				type="password"
 				class=" form-control form-control-sm operator-input mx-auto"
 				data-operator-training-target="trainingOperatorCode"
 				data-action="keyup->operator-training#validateCodeEntryForTraining"
