@@ -8,6 +8,22 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
         "operatorFormCode"
     ];
 
+    // Instance property to store the original code
+    originalCode = '';
+
+    // This method runs when the controller connects to the DOM
+    connect() {
+        // Call parent's connect method if it exists
+        if (super.connect) {
+            super.connect();
+        }
+
+        // Store the original code when the controller initializes
+        if (this.hasOperatorFormCodeTarget) {
+            this.originalCode = this.operatorFormCodeTarget.value;
+        }
+    }
+
 
     /**
      * Validates the operator code entered by the user after a short delay.
@@ -21,25 +37,23 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
     async editedCodeChecker() {
         // Clear any existing timeouts to debounce user input
         clearTimeout(this.codeTypingTimeout);
-
         this.codeTypingTimeout = setTimeout(async () => {
             const code = this.operatorFormCodeTarget.value.trim();
-            const isValidFormat = this.isCodeValidFormat(code);
+            const isValidFormat = await this.isCodeValidFormat(code);
+            console.log('operatorAdminEditController::editedCodeChecker: isValidFormat:', isValidFormat);
             if (isValidFormat) {
                 const isExistingCode = await operatorCodeService.checkIfCodeExists(code);
                 if (isExistingCode) {
-                    this.showCodeExistenceError('Existe déjà.');
+                    this.showCodeFormatExistenceError('Existe déjà.');
                     console.log('operatorAdminEditController::editedCodeChecker: Existe déjà.');
-                    const newCode = await this.proposeCompliantNewCode();
-                    this.operatorFormCodeTarget.value = newCode;
+                    this.settingOperatorCodeBeforProposingCompliantCode();
                 }
             } else {
-                this.showCodeFormatError('Format invalide.');
+                this.showCodeFormatExistenceError('Format invalide.');
                 console.log('operatorAdminEditController::editedCodeChecker: Bad Format.');
-                const newCode = await this.proposeCompliantNewCode();
-                this.operatorFormCodeTarget.value = newCode;
+                this.settingOperatorCodeBeforProposingCompliantCode();
             }
-        }, 800);
+        }, 1000);
     }
 
 
@@ -47,37 +61,54 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
      * Checks if the provided operator code has a valid format.
      * 
      * @param {string} code - The operator code to validate
-     * @returns {boolean} True if the code format is valid, false otherwise
+     * @returns {Promise<boolean>} True if the code format is valid, false otherwise
      */
-    isCodeValidFormat(code) {
+    async isCodeValidFormat(code) {
         return operatorCodeService.validateCode(code);
     }
 
 
     /**
      * Displays an error message when the code format is invalid.
-     * Clears the input field and sets the placeholder to the error message.
+     * Temporarily shows the error message by clearing the input field and setting a placeholder.
+     * After a brief delay, restores the original code value.
      * 
      * @param {string} message - The error message to display
      * @returns {void}
      */
-    showCodeFormatError(message) {
+    showCodeFormatExistenceError(message) {
+        // Clear the input to make the placeholder visible
         this.operatorFormCodeTarget.value = '';
         this.operatorFormCodeTarget.placeholder = message;
+
+        // Highlight the input field to indicate an error
+        this.operatorFormCodeTarget.classList.add('is-invalid');
+
+        // After a short delay, restore the original code and remove the error styling
+        clearTimeout(this.codeTypingMessageTimeout);
+        this.codeTypingMessageTimeout = setTimeout(() => {
+            this.operatorFormCodeTarget.value = this.originalCode;
+            this.operatorFormCodeTarget.placeholder = '';
+            this.operatorFormCodeTarget.classList.remove('is-invalid');
+        }, 2000); // Shorter delay (2 seconds) for better user experience
     }
 
 
+
     /**
-     * Displays an error message when the code already exists.
-     * Clears the input field and sets the placeholder to the error message.
+     * Retrieves operator code generation settings and proposes a new compliant code if enabled.
+     * This method is called when an invalid or existing code is detected, to automatically
+     * provide a valid alternative to the user.
      * 
-     * @param {string} message - The error message to display
-     * @returns {void}
+     * @async
+     * @returns {Promise<void>} A promise that resolves when the operation is complete
      */
-    showCodeExistenceError(message) {
-        // You can implement visual feedback to the user here
-        this.operatorFormCodeTarget.value = '';
-        this.operatorFormCodeTarget.placeholder = message;
+    async settingOperatorCodeBeforProposingCompliantCode() {
+        const settings = await operatorCodeService.getSettings();
+        if (settings.methodEnabled) {
+            const newCode = await this.proposeCompliantNewCode();
+            this.operatorFormCodeTarget.value = newCode;
+        }
     }
 
 

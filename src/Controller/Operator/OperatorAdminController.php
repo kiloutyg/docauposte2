@@ -90,6 +90,7 @@ class OperatorAdminController extends AbstractController
                 $printUrl = $this->generateUrl('app_operator_detail', ['operatorId' => $newOperatorId]);
 
                 // Store the print URL in the session
+
                 $request->getSession()->set('print_operator_url', $printUrl);
 
                 // Redirect to app_operator with a special parameter
@@ -138,13 +139,27 @@ class OperatorAdminController extends AbstractController
 
 
 
-    // Individual operator modification controller, used in dev purpose
-    #[Route('/operator/edit/{id}', name: 'app_operator_edit')]
-    public function editOperatorAction(Request $request, Operator $operator): Response
+    /**
+     * Handles the editing of an operator entity.
+     *
+     * This function processes both search requests and form submissions for operator editing.
+     * If a search request is detected, it retrieves matching operators and creates forms for each.
+     * For form submissions, it attempts to update the operator and provides appropriate feedback.
+     *
+     * @param Request $request The HTTP request object containing form data or search parameters
+     * @param Operator $operator The operator entity to be edited (auto-wired by Symfony)
+     * @param int|null $id Optional operator ID to fetch the operator if not provided via auto-wiring
+     *
+     * @return Response A rendered view containing the operator edit form or search results
+     */
+    #[Route('/operator/edit/{operator}', name: 'app_operator_edit')]
+    public function editOperatorAction(Request $request, ?Operator $operator = null): Response
     {
+
+        $operatorForms = [];
+        $form = null;
         if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
             $operators = $this->operatorService->operatorEntitySearch($request);
-            $operatorForms = [];
 
             // Create and handle forms
             foreach ($operators as $operator) {
@@ -154,37 +169,35 @@ class OperatorAdminController extends AbstractController
             }
         }
 
-        $form = $this->createForm(OperatorType::class, $operator, [
-            'operator_id' => $operator->getId(),
-        ]);
+        if ($operator) {
+            $form = $this->createForm(OperatorType::class, $operator, [
+                'operator_id' => $operator->getId(),
+            ]);
 
-        $error = false;
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->operatorService->editOperatorService($form, $operator);
-                $this->addFlash('success', 'L\'opérateur a bien été modifié');
-            } catch (\Exception $e) {
-                $this->addFlash('danger', 'L\'opérateur n\'a pas pu être modifié. Erreur: ' . $e->getMessage());
-                $this->logger->error('Error while editing operator in try catch', [$e->getMessage()]);
+            $error = false;
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                try {
+                    $this->operatorService->editOperatorService($form, $operator);
+                    $this->addFlash('success', 'L\'opérateur a bien été modifié');
+                } catch (\Exception $e) {
+                    $this->addFlash('danger', 'L\'opérateur n\'a pas pu être modifié. Erreur: ' . $e->getMessage());
+                    $this->logger->error('Error while editing operator in try catch', [$e->getMessage()]);
+                    $error = true;
+                }
+            } else {
+                $this->logger->error('Error in submitting form while editing operator');
                 $error = true;
             }
-        } else {
-            $this->logger->error('Error in submitting form while editing operator');
-            $error = true;
+
+            if ($error) {
+                $this->logger->error('error true');
+                $operatorForms = [$operator->getId() => $form->createView()];
+            }
         }
 
-        if ($error) {
-            $this->logger->error('error true');
-            $operatorForms = [$operator->getId() => $form->createView()];
-        } elseif (isset($operatorForms)) {
-            $this->logger->debug('operatorsForms isset');
-        } else {
-            $this->logger->debug('there is only one operator', [[$operator], [$operator->getUaps()->getValues()]]);
-            $operatorForms = [];
-        }
         return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
-            'form' => $form->createView() ?? null,
+            'form' => $form?->createView(),
             'operator' => $operator ?? null,
             'operatorForms' => $operatorForms,
         ]);
@@ -205,8 +218,18 @@ class OperatorAdminController extends AbstractController
 
 
     // Route to print the operator detail in a pdf
+    /**
+     * Generates and outputs a PDF document containing detailed information about a specific operator.
+     *
+     * This function retrieves an operator entity by its ID and uses the PDF generator service
+     * to create a detailed PDF document for that operator. The PDF is automatically sent to the browser.
+     *
+     * @param int $operatorId The unique identifier of the operator for whom to generate the PDF
+     *
+     * @return bool Returns true when the PDF has been successfully generated and output
+     */
     #[Route('/operator/detail/{operatorId}', name: 'app_operator_detail')]
-    public function printOpeDetail(int $operatorId)
+    public function printOpeDetail(int $operatorId): bool
     {
         $operator = $this->operatorRepository->find($operatorId);
         $this->pdfGeneratorService->generateOperatorPdf($operator);

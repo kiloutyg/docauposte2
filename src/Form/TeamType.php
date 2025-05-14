@@ -23,12 +23,12 @@ class TeamType extends AbstractType
                     'style' => 'color: #ffffff;'
                 ],
                 'attr' => [
-                    'class' => 'form-control',
+                    'class' => 'form-control capitalize-all-letters',
                     'placeholder' => 'Nom de l\'équipe',
                     'id' => 'name',
                     'required' => true,
-                    'data-name-validation-target' => 'teamUapName',
-                    'data-action' => 'keyup->name-validation#validateTeamUapName',
+                    'data-name-validation-target' => 'teamName',
+                    'data-action' => 'input->name-validation#teamNameChanged',
                 ],
             ])
             ->add('save', SubmitType::class, [

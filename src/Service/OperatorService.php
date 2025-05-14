@@ -18,6 +18,14 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
+/**
+ * Service class for managing Operator entities and related business logic.
+ *
+ * Handles operator lifecycle (creation, update, inactivation, deletion),
+ * form processing, search, and initialization of teams and UAPs.
+ *
+ * @package App\Service
+ */
 class OperatorService extends AbstractController
 {
     private     $logger;
@@ -43,7 +51,12 @@ class OperatorService extends AbstractController
     }
 
 
-
+    /**
+     * Checks for operators to set as inactive, mark for deletion, or delete, based on training activity.
+     * Ensures the process runs only once per day.
+     *
+     * @return array|null Returns an array with counts of deactivated and deleted operators, or null if already checked today.
+     */
     public function operatorCheckForAutoDelete()
     {
         $today = new \DateTime();
@@ -66,6 +79,18 @@ class OperatorService extends AbstractController
     }
 
 
+    /**
+     * Sets operators with no recent training activity to inactive status.
+     *
+     * Identifies operators who haven't had training recently and marks them as inactive
+     * by setting their inactive date to the current date. Updates the check file
+     * to record that this process was run today.
+     *
+     * @param string    $filePath   Path to the file that tracks when this check was last performed
+     * @param \DateTime $today      Current date used to mark operators as inactive
+     *
+     * @return void
+     */
     private function setOperatorToInactive(string $filePath, \DateTime $today)
     {
         $inActiveOperators = $this->entityManagerFacade->findOperatorWithNoRecentTraining();
@@ -80,6 +105,18 @@ class OperatorService extends AbstractController
     }
 
 
+    /**
+     * Marks inactive operators for deletion.
+     *
+     * Identifies operators who are already inactive and marks them for deletion
+     * by setting their tobedeleted date to the current date. Updates the check file
+     * to record that this process was run today.
+     *
+     * @param string    $filePath   Path to the file that tracks when this check was last performed
+     * @param \DateTime $today      Current date used to mark operators for deletion
+     *
+     * @return void
+     */
     private function setOperatorToBeDeleted(string $filePath, \DateTime $today)
     {
         $operatorSetToBeDeleted = $this->entityManagerFacade->findInActiveOperators();
@@ -94,6 +131,18 @@ class OperatorService extends AbstractController
     }
 
 
+    /**
+     * Permanently deletes operators that were previously marked for deletion.
+     *
+     * Retrieves all operators marked for deletion, removes them from the database,
+     * and updates the check file to record that this process was run today.
+     *
+     * @param string    $filePath   Path to the file that tracks when this check was last performed
+     * @param \DateTime $today      Current date used for updating the check file
+
+     *
+     * @return array    Array of IDs of the operators that were deleted
+     */
     private function deleteToBeDeletedOperator(string $filePath, \DateTime $today)
     {
         $toBeDeletedOperatorsIds = $this->entityManagerFacade->findOperatorToBeDeleted();
@@ -108,7 +157,14 @@ class OperatorService extends AbstractController
     }
 
 
-
+    /**
+     * Handles updates to an operator from a form submission, including trainer status and UAP assignments.
+     * Reactivates the operator if needed.
+     *
+     * @param Form     $form     The submitted form.
+     * @param Operator $operator The operator entity to update.
+     * @return bool Always returns true if successful.
+     */
     public function editOperatorService(Form $form, Operator $operator)
     {
         $this->trainingManagerFacade->handleTrainerStatus($form->get('isTrainer')->getData(), $operator);
@@ -124,7 +180,10 @@ class OperatorService extends AbstractController
 
 
     /**
-     * Reactivate an operator if they were marked for deletion
+     * Checks if the operator name in the request matches the expected format (firstname.surname, lowercased).
+     *
+     * @param Request $request The HTTP request containing operator data.
+     * @return bool True if the name matches, false otherwise.
      */
     private function reactivateOperatorIfNeeded(Operator $operator): void
     {
@@ -139,6 +198,18 @@ class OperatorService extends AbstractController
 
 
 
+    /**
+     * Validates if the operator name in the request follows the expected format.
+     *
+     * Checks if the operator name provided in the request matches the expected format
+     * of "firstname.surname" in lowercase, by comparing it with the separately provided
+     * firstname and surname fields.
+     *
+     * @param Request $request The HTTP request containing operator data fields:
+     *                         'newOperatorFirstname', 'newOperatorSurname', and 'newOperatorName'
+     * @return bool True if the name format is valid (matches firstname.surname in lowercase),
+     *              false otherwise
+     */
     public function autoOperatorNameCheckerFromRequest(Request $request): bool
     {
 
@@ -153,6 +224,16 @@ class OperatorService extends AbstractController
 
 
 
+    /**
+     * Processes the creation or update of an operator based on request data.
+     * Handles duplicate detection, team/UAP assignment, and validation.
+     *
+     * @param string $operatorName The operator's name.
+     * @param int    $operatorCode The operator's code.
+     * @param int    $teamId       The team ID.
+     * @param int    $uapId        The UAP ID.
+     * @return void
+     */
     public function processOperatorFromRequest(string $operatorName, int $operatorCode, int $teamId, int $uapId)
     {
 
@@ -208,7 +289,13 @@ class OperatorService extends AbstractController
     }
 
 
-
+    /**
+     * Handles the creation of a new operator from a form, including trainer assignment and UAP relationships.
+     *
+     * @param Operator $newOperator The new operator entity.
+     * @param Form     $form        The submitted form.
+     * @return int The ID of the created operator.
+     */
     public function processNewOperatorFromFormType(Operator $newOperator, Form $form)
     {
         $trainerBool = $form->get('isTrainer')->getData();
@@ -241,13 +328,13 @@ class OperatorService extends AbstractController
 
 
     /**
-     * Helper function to find an entity by name or return a default.
+     * Finds an entity by name or returns a default if not found.
      *
-     * @param array  $entities
-     * @param string $name
-     * @param string $defaultName
-     *
-     * @return object
+     * @param array  $entities    Array of entities to search.
+     * @param string $name        The name to search for.
+     * @param string $defaultName The default name to return if not found.
+     * @return object The found entity.
+     * @throws \InvalidArgumentException If the default entity is not found.
      */
     public function findEntityByName(array $entities, string $name, string $defaultName)
     {
@@ -267,7 +354,12 @@ class OperatorService extends AbstractController
 
 
 
-
+    /**
+     * Performs a search for operators based on request parameters (supports both JSON and form data).
+     *
+     * @param Request $request The HTTP request containing search parameters.
+     * @return array Search results.
+     */
     public function operatorEntitySearch(Request $request): array
     {
         if ($request->getContentTypeFormat() == 'json') {
@@ -289,7 +381,14 @@ class OperatorService extends AbstractController
 
 
 
-
+    /**
+     * Handles the creation of teams and UAPs from form submissions, including validation and error handling.
+     *
+     * @param Form    $uapForm  The UAP form.
+     * @param Form    $teamForm The team form.
+     * @param Request $request  The HTTP request.
+     * @return void
+     */
     public function operatorTeamUapFormManagement(Form $uapForm, Form $teamForm, Request $request): void
     {
         $em = $this->entityManagerFacade->getEntityManager();
@@ -325,6 +424,11 @@ class OperatorService extends AbstractController
 
 
 
+    /**
+     * Ensures that at least one team and one UAP exist in the system, initializing them if necessary.
+     *
+     * @return void
+     */
     public function teamUapInitialization(): void
     {
         if (count($this->entityManagerFacade->getTeams()) == 0 || $this->entityManagerFacade->findOneBy('team', ['name' => 'INDEFINI']) == null) {
@@ -337,18 +441,35 @@ class OperatorService extends AbstractController
 
 
 
-
+    /**
+     * Deletes an entity (typically an operator) and redirects to the referring page,
+     * displaying a success or error message.
+     *
+     * @param string       $entityType The type of entity to delete.
+     * @param int          $entityId   The ID of the entity to delete.
+     * @param Request|null $request    The HTTP request (optional, for redirect).
+     * @return Response The HTTP response (redirect).
+     */
     public function deleteActionOperatorService(string $entityType, int $entityId, ?Request $request = null): Response
+
     {
         $result = $this->entityManagerFacade->deleteEntity($entityType, $entityId);
-        $originUrl = $request->headers->get('referer') ?? 'app_base';
 
         if (!$result) {
             $this->addFlash('danger',  $entityType . ' n\'a pas pu être supprimé');
-            return $this->redirectToRoute($originUrl);
         } else {
             $this->addFlash('success', $entityType . ' a bien été supprimé');
-            return $this->redirectToRoute($originUrl);
+        }
+
+        // Check if this is a Turbo frame request
+        if ($request && $request->headers->get('Turbo-Frame')) {
+            // For Turbo frame requests, redirect to the edit route with a dummy operator ID
+            // This will trigger the editOperatorAction which renders the correct template
+            return $this->redirectToRoute('app_operator_edit', ['operator' => $entityId]);
+        } else {
+            // For regular requests, redirect to the referring page
+            $originUrl = $request->headers->get('referer') ?? 'app_base';
+            return $this->redirect($originUrl);
         }
     }
 }

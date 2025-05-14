@@ -314,7 +314,7 @@ export default class OperatorTrainingController extends Controller {
     async validateCodeEntryForTraining() {
         clearTimeout(this.trainingCodeTypingTimeout);
         this.trainingCodeTypingTimeout = setTimeout(async () => {
-            const isValid = await operatorCodeService.validateTrainingCode(this.trainingOperatorCodeTarget.value);
+            const isValid = await operatorCodeService.validateAndCheckCode(this.trainingOperatorCodeTarget.value);
             if (isValid) {
                 this.checkOperatorIdentityByCode();
             } else {

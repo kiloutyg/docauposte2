@@ -17,17 +17,12 @@
 				</h6>
 				<div
 					class="d-flex flex-fill">
-					<input
-						data-operator-trainer-target="trainerOperatorLogon"
-						id="trainerOperatorLogon"
-						name="trainerOperatorLogon"
-						disable
-						hidden>
+	
 					<input
 						type="text"
 						class="form-control "
 						data-operator-trainer-target="trainerOperatorName"
-						data-action="keyup->operator-trainer#validateTrainerOperatorName"
+						data-action="input->operator-trainer#validateTrainerOperatorName"
 						data-upload-id="{{upload.id}}" placeholder="prenom.nom"
 						id="trainerOperatorName"
 						name="trainerOperatorName"
@@ -37,7 +32,7 @@
 						type="password"
 						class="form-control"
 						data-operator-trainer-target="trainerOperatorCode"
-						data-action="keyup->operator-trainer#validateTrainerOperatorCode "
+						data-action="input->operator-trainer#validateTrainerOperatorCode "
 						placeholder="Code Opérateur"
 						id="trainerOperatorCode"
 						name="trainerOperatorCode"

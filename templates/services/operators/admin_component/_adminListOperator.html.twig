@@ -38,9 +38,9 @@
 			{% for operatorId, operatorForm in operatorForms %}
 			{% form_theme operatorForm 'bootstrap_5_layout.html.twig' %}
 				{% if operatorForm.vars.data.tobedeleted is not empty %}
-					{{ form_start(operatorForm, {'attr': {'class': 'row bg-dark', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
+					{{ form_start(operatorForm, {'attr': {'class': 'row bg-dark', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'operator': operatorId})}) }}
 				{% else %}
-					{{ form_start(operatorForm, {'attr': {'class': 'row', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
+					{{ form_start(operatorForm, {'attr': {'class': 'row', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'operator': operatorId})}) }}
 				{% endif %}
 
 				{% for field in fields %}
@@ -83,8 +83,6 @@
 						</a>
 					</div>
 				{% endif %}
-
-
 			{{ form_end(operatorForm) }}
 
 		{% endfor %}

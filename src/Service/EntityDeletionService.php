@@ -252,15 +252,13 @@ class EntityDeletionService
             }
         } elseif ($entityType === 'team') {
             $unDefinedTeam = $this->teamRepository->findOneBy(['name' => 'INDEFINI']);
-            // $this->logger->info('UnDefined Team: ', [$unDefinedTeam]);
             foreach ($entity->getOperator() as $operator) {
                 $operator->setTeam($unDefinedTeam);
                 $this->em->persist($operator);
             }
         } elseif ($entityType === 'uap') {
             $unDefinedUap = $this->uapRepository->findOneBy(['name' => 'INDEFINI']);
-            // $this->logger->info('UnDefined UAP: ', [$unDefinedUap]);
-            foreach ($entity->getOperator() as $operator) {
+            foreach ($entity->getOperators() as $operator) {
                 $operator->addUap($unDefinedUap);
                 $this->em->persist($operator);
             }
