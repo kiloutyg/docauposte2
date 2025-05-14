@@ -61,7 +61,7 @@ export default class operatorAdminEdit extends OperatorAdminCreationController {
      * Checks if the provided operator code has a valid format.
      * 
      * @param {string} code - The operator code to validate
-     * @returns {boolean} True if the code format is valid, false otherwise
+     * @returns {Promise<boolean>} True if the code format is valid, false otherwise
      */
     async isCodeValidFormat(code) {
         return operatorCodeService.validateCode(code);
