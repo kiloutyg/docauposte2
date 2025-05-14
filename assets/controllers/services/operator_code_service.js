@@ -156,8 +156,9 @@ class OperatorCodeService {
         }
 
         try {
+            console.log('OperatorCodeService::validateCode: regex used:', codeOpeRegex);
             const result = codeOpeRegex.test(code);
-            console.log('OperatorCodeService: Regex validation result:', result);
+            console.log('OperatorCodeService::validateCode: Regex validation result:', result);
             return Promise.resolve(result);
         } catch (error) {
             console.error('OperatorCodeService: Error during regex validation:', error);
