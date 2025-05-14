@@ -155,6 +155,7 @@ class OperatorAdminController extends AbstractController
     #[Route('/operator/edit/{operator}', name: 'app_operator_edit')]
     public function editOperatorAction(Request $request, ?Operator $operator = null): Response
     {
+
         $operatorForms = [];
         $form = null;
         if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
@@ -217,8 +218,18 @@ class OperatorAdminController extends AbstractController
 
 
     // Route to print the operator detail in a pdf
+    /**
+     * Generates and outputs a PDF document containing detailed information about a specific operator.
+     * 
+     * This function retrieves an operator entity by its ID and uses the PDF generator service
+     * to create a detailed PDF document for that operator. The PDF is automatically sent to the browser.
+     *
+     * @param int $operatorId The unique identifier of the operator for whom to generate the PDF
+     * 
+     * @return bool Returns true when the PDF has been successfully generated and output
+     */
     #[Route('/operator/detail/{operatorId}', name: 'app_operator_detail')]
-    public function printOpeDetail(int $operatorId)
+    public function printOpeDetail(int $operatorId): bool
     {
         $operator = $this->operatorRepository->find($operatorId);
         $this->pdfGeneratorService->generateOperatorPdf($operator);
