@@ -17,11 +17,24 @@ export default class OperatorTrainerController extends Controller {
 
     currentRegexPattern = '[0-9]{5}';
 
+    /**
+     * Checks authentication status when the controller reconnects after page load/reload
+     * This should be called when the controller connects to handle post-submission state
+     */
     connect() {
         // Fetch the current regex pattern when the controller connects
         this.fetchRegexPattern();
     }
 
+    /**
+     * Fetches the current regex pattern for operator code validation from the server.
+     * This method retrieves the validation pattern settings from the operator code service
+     * and updates the controller's currentRegexPattern property accordingly.
+     * If the fetch fails, the default pattern will be maintained.
+     * 
+     * @async
+     * @returns {Promise<void>} No return value, but updates the currentRegexPattern property
+     */
     async fetchRegexPattern() {
         try {
             const settings = await operatorCodeService.getSettings();
@@ -37,19 +50,27 @@ export default class OperatorTrainerController extends Controller {
         }
     }
 
-
-
-
     trainerOperatorLogonTargetConnected() {
+        console.log('TrainerOperatorLogonTarget connected');
         this.trainerOperatorLoginCheck();
     }
 
-
+    /**
+     * Checks if the current user is authenticated as a trainer.
+     * Makes an API call to verify the user's login status and trainer role.
+     * If authenticated, it triggers the trainer authentication process.
+     * 
+     * @async
+     * @returns {Promise<boolean|undefined>} Returns true if the user is authenticated as a trainer,
+     *                                      undefined otherwise (in case of error or not found)
+     */
     async trainerOperatorLoginCheck() {
+        console.log('OperatorTrainerController: trainerOperatorLoginCheck');
         try {
             const response = await axios.post('/docauposte/operator/user-login-check');
             if (response.data.found) {
                 this.trainerAuthenticated(response);
+                return true;
             } else {
                 console.error('No user connected or User not found as a trainer');
             }
@@ -243,7 +264,7 @@ export default class OperatorTrainerController extends Controller {
                         class="col-2 mx-1"
                         >
                         <input
-                            type="text"
+                            type="password"
                             pattern="${this.currentRegexPattern}"
                             class="form-control"
                             data-operator-training-target="newOperatorCode"
@@ -305,10 +326,7 @@ export default class OperatorTrainerController extends Controller {
         listUpdateSubmitContainer.innerHTML = '';
     }
 
-
-
     resetFollowingSubmit() {
         this.validateTrainerOperatorName();
     }
-
 }
