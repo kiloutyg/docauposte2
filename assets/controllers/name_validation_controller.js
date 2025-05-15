@@ -51,11 +51,6 @@ export default class NameValidationController extends Controller {
         let isValid = true;
         let name = '';
 
-        // Convert inputs to uppercase
-        if (this.hasTeamNameTarget && this.teamNameTarget.value) {
-            this.teamNameTarget.value = this.teamNameTarget.value;
-        }
-
         if (this.hasUapNameTarget && this.uapNameTarget.value) {
             this.uapNameTarget.value = this.uapNameTarget.value.toUpperCase();
         }
