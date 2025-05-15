@@ -23,7 +23,7 @@ class TeamType extends AbstractType
                     'style' => 'color: #ffffff;'
                 ],
                 'attr' => [
-                    'class' => 'form-control capitalize-all-letters',
+                    'class' => 'form-control',
                     'placeholder' => 'Nom de l\'équipe',
                     'id' => 'name',
                     'required' => true,
