@@ -161,6 +161,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+        // You can also add this line to help with profiler security
+        $this->password = '[REDACTED]';
     }
 
     public function getDepartment(): ?Department

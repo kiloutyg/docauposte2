@@ -13,29 +13,24 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/super_admin', name: 'app_super_')]
 
 // This controller is responsible for rendering the super admin interface an managing the logic of the super admin interface
 class SuperAdminController extends AbstractController
 {
     private $entityManagerFacade;
     private $contentManagerFacade;
-    private $errorService;
 
     public function __construct(
         EntityManagerFacade $entityManagerFacade,
         ContentManagerFacade $contentManagerFacade,
-        ErrorService $errorService
     ) {
         $this->entityManagerFacade = $entityManagerFacade;
         $this->contentManagerFacade = $contentManagerFacade;
-        $this->errorService = $errorService;
     }
 
 
 
-    // This function is responsible for rendering the super admin interface
-    #[Route('/', name: 'admin')]
+    #[Route('/super_admin', name: 'app_super_admin')]
     public function superAdmin(): Response
     {
         $pageLevel = 'super';
@@ -64,10 +59,9 @@ class SuperAdminController extends AbstractController
 
 
     // Zone creation logic destined to the super admin, it also creates the folder structure for the zone
-    #[Route('/create_zone', name: 'admin_create_zone')]
+    #[Route('/super_admin/create_zone', name: 'app_super_admin_create_zone')]
     public function createZone(Request $request)
     {
-        // Create a zone
         if ($request->getMethod() == 'POST') {
             $zonename = trim($request->request->get('zonename'));
             $zone = $this->entityManagerFacade->findOneBy('zone', ['name' => $zonename]);
@@ -87,7 +81,6 @@ class SuperAdminController extends AbstractController
                 $zone->setSortOrder($sortOrder);
                 $zone->setCreator($this->getUser());
 
-
                 $em = $this->entityManagerFacade->getEntityManager();
                 $em->persist($zone);
                 $em->flush();
@@ -99,8 +92,11 @@ class SuperAdminController extends AbstractController
         }
     }
 
+
+
+
     // Zone deletion logic destined to the super admin, it also deletes the folder structure for the zone
-    #[Route('/delete_zone/{zoneId}', name: 'admin_delete_zone')]
+    #[Route('/super_admin/delete_zone/{zoneId}', name: 'app_super_admin_delete_zone')]
     public function deleteEntityZone(int $zoneId): Response
     {
         $entityType = 'zone';
@@ -123,7 +119,7 @@ class SuperAdminController extends AbstractController
 
 
     // Update method for any stuff necessary during dev
-    #[Route('/update', name: 'update')]
+    #[Route('/super_admin/update', name: 'app_super_update')]
     public function updateDB()
     {
         $em = $this->entityManagerFacade->getEntityManager();
