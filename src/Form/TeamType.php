@@ -27,8 +27,8 @@ class TeamType extends AbstractType
                     'placeholder' => 'Nom de l\'équipe',
                     'id' => 'name',
                     'required' => true,
-                    'data-name-validation-target' => 'teamUapName',
-                    'data-action' => 'keyup->name-validation#validateTeamUapName',
+                    'data-name-validation-target' => 'teamName',
+                    'data-action' => 'input->name-validation#teamNameChanged',
                 ],
             ])
             ->add('save', SubmitType::class, [

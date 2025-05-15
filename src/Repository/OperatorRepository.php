@@ -107,7 +107,7 @@ class OperatorRepository extends ServiceEntityRepository
     }
 
 
-    public function findBySearchQuery($name, $code, $team, $uap, $trainer)
+    public function findBySearchQuery(string $name, string $code, string $team, string $uap, string $trainer)
     {
         $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.team', 't')
@@ -150,7 +150,7 @@ class OperatorRepository extends ServiceEntityRepository
             $qb->setParameter('trainerStatus', false)
                 ->andWhere('o.isTrainer = :trainerStatus OR o.isTrainer IS NULL');
         } elseif ($trainer === null) {
-            // If $trainer is null, and you want to select all without any filter on IsTrainer, do not add any where clause related to IsTrainer.
+            // If $trainer is null, and you want to select all without any filter on isTrainer, do not add any where clause related to isTrainer.
             // No further action needed if you want all records regardless of trainer status.
         }
         return $this->operatorComparison($qb->getQuery()->getResult());

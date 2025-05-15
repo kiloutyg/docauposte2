@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Support;
 
 use  \Psr\Log\LoggerInterface;
 
@@ -31,7 +31,6 @@ class SettingsController extends AbstractController
     #[Route('/settings', name: 'app_settings')]
     public function settingsIndex(): Response
     {
-
         $settingsForm = $this->settingsService->getSettingsForm();
 
         return $this->render('services/settings/settings.html.twig', [
@@ -39,15 +38,11 @@ class SettingsController extends AbstractController
         ]);
     }
 
+    
     // This function is responsible to pass the settings to the settingsService interface
     #[Route('/settings/update', name: 'app_settings_update')]
     public function settingsUpdate(Request $request): Response
     {
-
-        // $this->logger->info('Full request', [
-        //     'request' => $request->request->all()
-        // ]);
-
         $referer = $request->headers->get('referer');
 
         if ($request->isMethod('POST')) {
@@ -63,7 +58,6 @@ class SettingsController extends AbstractController
                 $this->addFlash('error', 'Erreur lors de la mise à jour des paramètres' . $e->getMessage());
             }
         }
-
         return $this->redirect($referer);
     }
 }

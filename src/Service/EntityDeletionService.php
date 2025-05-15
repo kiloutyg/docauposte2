@@ -225,6 +225,7 @@ class EntityDeletionService
             }
         } elseif ($entityType === 'uap') {
             $unDefinedUap = $this->uapRepository->findOneBy(['name' => 'INDEFINI']);
+            foreach ($entity->getOperators() as $operator) {
             foreach ($entity->getOperator() as $operator) {
                 $operator->addUap($unDefinedUap);
                 $this->em->persist($operator);
