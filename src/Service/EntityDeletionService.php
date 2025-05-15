@@ -226,19 +226,20 @@ class EntityDeletionService
         } elseif ($entityType === 'uap') {
             $unDefinedUap = $this->uapRepository->findOneBy(['name' => 'INDEFINI']);
             foreach ($entity->getOperators() as $operator) {
-            foreach ($entity->getOperator() as $operator) {
-                $operator->addUap($unDefinedUap);
-                $this->em->persist($operator);
+                foreach ($entity->getOperator() as $operator) {
+                    $operator->addUap($unDefinedUap);
+                    $this->em->persist($operator);
+                }
             }
-        }
-        $this->logger->debug('deleted entity details: ', [$entity]);
-        try {
-            $this->em->remove($entity);
-            $this->em->flush();
-            return true;
-        } catch (\Exception $e) {
-            $this->logger->error('Error deleting entity: ', [$e->getMessage()]);
-            throw $e;
+            $this->logger->debug('deleted entity details: ', [$entity]);
+            try {
+                $this->em->remove($entity);
+                $this->em->flush();
+                return true;
+            } catch (\Exception $e) {
+                $this->logger->error('Error deleting entity: ', [$e->getMessage()]);
+                throw $e;
+            }
         }
     }
 
