@@ -9,21 +9,21 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class SettingsType extends AbstractType
 {
-
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add(
-                'UploadValidation',
+                'uploadValidation',
                 CheckboxType::class,
                 [
                     'required' => false,
@@ -32,7 +32,7 @@ class SettingsType extends AbstractType
                 ]
             )
             ->add(
-                'ValidatorNumber',
+                'validatorNumber',
                 ChoiceType::class,
                 [
                     'required' => true,
@@ -43,7 +43,7 @@ class SettingsType extends AbstractType
                 ]
             )
             ->add(
-                'IncidentAutoDisplay',
+                'incidentAutoDisplay',
                 CheckboxType::class,
                 [
                     'required' => false,
@@ -52,7 +52,7 @@ class SettingsType extends AbstractType
                 ]
             )
             ->add(
-                'Training',
+                'training',
                 CheckboxType::class,
                 [
                     'required' => false,
@@ -60,8 +60,27 @@ class SettingsType extends AbstractType
                     'attr' => ['class' => 'pretty-toggle'],
                 ]
             )
-
-        ;
+            ->add(
+                'operatorCodeMethod',
+                CheckboxType::class,
+                [
+                    'required' => false,
+                    'label' => false,
+                    'attr' => ['class' => 'pretty-toggle'],
+                ]
+            )
+            ->add(
+                'operatorCodeRegex',
+                TextType::class,
+                [
+                    'required' => false,
+                    'label' => false,
+                    'attr' => [
+                        'class' => 'form-control mx-auto mt-2',
+                        'placeholder' => 'Format par défaut: /^[0-9]{5}$/',
+                    ]
+                ]
+            );
 
         $builder
             ->add(
@@ -104,7 +123,7 @@ class SettingsType extends AbstractType
         $builder
             ->get('settingsDateInterval')
             ->add(
-                'OperatorRetrainingDelay',
+                'operatorRetrainingDelay',
                 DateIntervalType::class,
                 array_merge(
                     $intervalArray,
@@ -112,7 +131,7 @@ class SettingsType extends AbstractType
                 )
             )
             ->add(
-                'OperatorInactivityDelay',
+                'operatorInactivityDelay',
                 DateIntervalType::class,
                 array_merge(
                     $intervalArray,
@@ -120,7 +139,7 @@ class SettingsType extends AbstractType
                 )
             )
             ->add(
-                'OperatorAutoDeleteDelay',
+                'operatorAutoDeleteDelay',
                 DateIntervalType::class,
                 array_merge(
                     $intervalArray,
@@ -128,7 +147,7 @@ class SettingsType extends AbstractType
                 )
             )
             ->add(
-                'IncidentAutoDisplayTimer',
+                'incidentAutoDisplayTimer',
                 DateIntervalType::class,
                 array_merge(
                     $intervalArray,
@@ -151,6 +170,7 @@ class SettingsType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Settings::class,
+
         ]);
     }
 }

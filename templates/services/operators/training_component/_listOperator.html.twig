@@ -3,6 +3,12 @@
 	{% if selectedOperators is defined and selectedOperators is not empty %}
 
 
+		<input
+			data-operator-trainer-target="trainerOperatorLogon"
+			id="trainerOperatorLogon"
+			name="trainerOperatorLogon"
+			disable
+			hidden>
 		<form
 			class="d-flex flex-column justify-content-evenl mt-2"
 			id="trainingRecords-form"
@@ -47,11 +53,8 @@
 						</p>
 						{% for operator in operators %}
 							{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-
 							{% include 'services/operators/training_component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
-
 						{% endfor %}
-
 
 					{% endfor %}
 				{% endif %}
@@ -88,10 +91,8 @@
 			</p>
 			{% for record in trainingRecords %}
 				{% if record.trained is same as(true) %}
-
 					{% include 'services/operators/training_component/_listOperatorPart_operator_listing.html.twig' with {'operator': record.operator, 'trainingRecord': record} %}
 				{% endif %}
-
 			{% endfor %}
 			<p
 				style="flex:1;"

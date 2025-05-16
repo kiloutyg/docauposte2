@@ -7,9 +7,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\Form\FormInterface;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
@@ -24,11 +21,8 @@ class SettingsService extends AbstractController
 {
     protected $logger;
     protected $em;
-
     protected $settingsRepository;
-
     private $settings;
-
     private $incidentAutoDisplayTimerInSeconds;
 
     public function __construct(
@@ -36,22 +30,24 @@ class SettingsService extends AbstractController
         EntityManagerInterface      $em,
         SettingsRepository          $settingsRepository
     ) {
-
-        $this->logger = $logger;
-        $this->em = $em;
-        $this->settingsRepository = $settingsRepository;
+        $this->logger               = $logger;
+        $this->em                   = $em;
+        $this->settingsRepository   = $settingsRepository;
     }
+
+
+
+
 
     // This function is responsible for getting the settings from the database and creating a form
     public function getSettingsForm(): FormInterface
     {
-
         $settingsEntity = $this->getSettings();
 
-        $settingsForm = $this->createForm(SettingsType::class, $settingsEntity);
-
-        return $settingsForm;
+        return $this->createForm(SettingsType::class, $settingsEntity);
     }
+
+
 
     // This function is responsible for getting all the settings from the database
     public function getSettings(): Settings
@@ -64,15 +60,17 @@ class SettingsService extends AbstractController
             $settingsEntity = new Settings();
             $this->em->persist($settingsEntity);
             $this->em->flush();
+            $this->settings = $settingsEntity;
         }
 
         return $this->settings;
     }
 
+
+
     // This function is responsible for updating the settings in the database
     public function updateSettings(Request $request): Response
     {
-
         $settingsEntity = $this->getSettings();
 
         $settingsForm = $this->createForm(SettingsType::class, $settingsEntity);
@@ -82,7 +80,6 @@ class SettingsService extends AbstractController
         if ($settingsForm->isSubmitted() && $settingsForm->isValid()) {
             $settingsEntity = $settingsForm->getData();
         }
-
 
         $response = '';
 
@@ -99,11 +96,19 @@ class SettingsService extends AbstractController
         return new Response($response);
     }
 
+
+
     public function getIncidentAutoDisplayTimerInSeconds()
     {
         if ($this->incidentAutoDisplayTimerInSeconds === null) {
             $this->incidentAutoDisplayTimerInSeconds = $this->settingsRepository->getIncidentAutoDisplayTimerInSeconds();
         }
         return $this->incidentAutoDisplayTimerInSeconds;
+    }
+
+
+    public function getCurrentCodeOpeRegexPattern(): string
+    {
+        return $this->getSettings()->getOperatorCodeRegex();
     }
 }

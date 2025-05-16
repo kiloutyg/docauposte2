@@ -23,12 +23,12 @@ class UapType extends AbstractType
                     'style' => 'color: #ffffff;'
                 ],
                 'attr' => [
-                    'class' => 'form-control',
+                    'class' => 'form-control capitalize-all-letters',
                     'placeholder' => 'Nom de l\'Uap',
                     'id' => 'name',
                     'required' => true,
-                    'data-name-validation-target' => 'teamUapName',
-                    'data-action' => 'keyup->name-validation#validateTeamUapName',
+                    'data-name-validation-target' => 'uapName',
+                    'data-action' => 'input->name-validation#uapNameChanged',
                 ]
             ])
             ->add('save', SubmitType::class, [

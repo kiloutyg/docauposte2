@@ -24,7 +24,6 @@ class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
     private $urlGenerator;
-    private $controller;
     private $security;
     private $userRepository;
 
@@ -41,10 +40,14 @@ class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
     public function authenticate(Request $request): Passport
     {
         $name = $request->request->get('name', '');
+        $password = $request->request->get('password', '');
+        // Immediately create credentials and clear from request
+        $credentials = new PasswordCredentials($password);
+        $request->request->set('password', '[REDACTED]');
 
         return new Passport(
             new UserBadge($name),
-            new PasswordCredentials($request->request->get('password', '')),
+            $credentials,
             [
                 new CsrfTokenBadge('authenticate', $request->request->get('_csrf_token')),
             ]

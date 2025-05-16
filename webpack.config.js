@@ -32,7 +32,6 @@ Encore
   .addEntry("inactivity-timer", "./assets/js/inactivity-timer.js")
   .addEntry("incident-cycler", "./assets/js/incident-cycler.js")
   .addEntry("views-modification-value-tracker", "./assets/js/views-modification-value-tracker.js")
-  .addEntry("workstation-creation", "./assets/js/workstation-creation.js")
 
 
   // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
@@ -40,9 +39,6 @@ Encore
 
   // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
   .enableStimulusBridge('./assets/controllers.json')
-
-  // // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
-  // .enableStimulusBridge('./assets/controllers.json')
 
   // will require an extra script tag for runtime.js
   // but, you probably want this, unless you're building a single-page app

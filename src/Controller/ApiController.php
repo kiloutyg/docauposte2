@@ -144,10 +144,18 @@ class ApiController extends AbstractController
 
         $incidentAutoDisplayTimer = ($this->settingsRepository->getIncidentAutoDisplayTimerInSeconds() * 100);
 
+        $operatorCodeMethod = $settings->isOperatorCodeMethod();
+        $this->logger->info('operatorCodeMethod bool ', [$operatorCodeMethod]);
+        $operatorCodeMethod ? $operatorCodeRegex = '/^[0-9]{5}$/' : $operatorCodeRegex = $settings->getOperatorCodeRegex();
+        $this->logger->info('operatorCodeRegex ', [$operatorCodeRegex]);
+
+
         $responseData = [
-            'uploadValidation' => $uploadValidation,
-            'validatorNumber' => $validatorNumber,
-            'incidentAutoDisplayTimer' => $incidentAutoDisplayTimer
+            'uploadValidation'          => $uploadValidation,
+            'validatorNumber'           => $validatorNumber,
+            'incidentAutoDisplayTimer'  => $incidentAutoDisplayTimer,
+            'operatorCodeMethod'        => $operatorCodeMethod,
+            'operatorCodeRegex'         => $operatorCodeRegex,
         ];
 
         return new JsonResponse($responseData);

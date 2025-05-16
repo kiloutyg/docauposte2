@@ -16,7 +16,7 @@
 		</div>
 		<div
 			class="row">
-			{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAP de l\'operateur', 'Est-il un formateur?'] %}
+			{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAPs de l\'operateur', 'Est-il un formateur?'] %}
 
 			{% for fieldName in fieldsName %}
 				<div
@@ -37,9 +37,9 @@
 			{% for operatorId, operatorForm in operatorForms %}
 			{% form_theme operatorForm 'bootstrap_5_layout.html.twig' %}
 				{% if operatorForm.vars.data.tobedeleted is not empty %}
-					{{ form_start(operatorForm, {'attr': {'class': 'row bg-dark', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
+					{{ form_start(operatorForm, {'attr': {'class': 'row bg-dark', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'operator': operatorId})}) }}
 				{% else %}
-					{{ form_start(operatorForm, {'attr': {'class': 'row', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'id': operatorId})}) }}
+					{{ form_start(operatorForm, {'attr': {'class': 'row', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'operator': operatorId})}) }}
 				{% endif %}
 
 				{% for field in fields %}
@@ -82,8 +82,6 @@
 						</a>
 					</div>
 				{% endif %}
-
-
 			{{ form_end(operatorForm) }}
 			<hr
 				class="my-4">

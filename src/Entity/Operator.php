@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Model\EmploymentType;
 use App\Repository\OperatorRepository;
+use App\Validator\OperatorCodeFormat;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -20,6 +21,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[UniqueEntity(fields: 'name', message: 'Un opérateur avec ce nom existe déjà.')]
 class Operator
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -44,8 +46,7 @@ class Operator
 
     #[ORM\Column(length: 255, unique: true)]
     #[Assert\NotBlank]
-    #[Assert\Length(5)]
-    #[Assert\Regex(pattern: '/[0-9]{5}$/', message: 'Le code Opérateur doit être composé de 5 chiffres.')]
+    #[OperatorCodeFormat]
     #[Groups(['operator_details'])]
     private ?string $code = null;
 

@@ -4,7 +4,7 @@
 {% endblock %}
 {% block body %}
 	<script>
-		{% set fieldsName = ['Nom de l\'opérateur', 'Prenom de l\'opérateur', 'Code de l\'opérateur', 'Equipe de l\'opérateur', 'UAP de l\'opérateur', 'Est-il un formateur?'] %}
+		{% set fieldsName = ['Nom de l\'opérateur', 'Prenom de l\'opérateur', 'Code de l\'opérateur', 'Equipe de l\'opérateur', 'UAPs de l\'opérateur', 'Est-il un formateur?'] %}
 {% set fields = ['lastname', 'firstname', 'code', 'team', 'uaps', 'isTrainer'] %}
 	</script>
 
@@ -39,15 +39,15 @@
 						class="col-3">
 						<label
 							for="operator-import-file"
-							class="form-label tooltips-above"
-							aria-label="Importer un CSV avec une liste d'opé formaté ID;CodeOPE;PRENOM;NOM;EQUIPE;UAP"
+							class="form-label tooltips"
+							aria-label="Importer une liste formaté: ID;CodeOPE;PRENOM;NOM;EQUIPE;UAP et 1000 caractére par ligne max"
 							style="color:white;">
 							<input
 								type="file"
 								class="form-control "
 								id="operator-import-file"
 								name="operator-import-file"
-								aria-label="Importer un CSV avec une liste d'opé formaté ID;CodeOPE;PRENOM;NOM;EQUIPE;UAP"
+								aria-label="Importer une liste formaté: ID;CodeOPE;PRENOM;NOM;EQUIPE;UAP et 1000 caractére par ligne max"
 								accept=".csv"
 								placeholder="Importer un fichier CSV">
 						</div>
@@ -84,7 +84,7 @@
 		{% if app.request.query.get('open_print') and app.session.get('print_operator_url') %}
 			<script>
 				window.open('{{ app.session.get('print_operator_url') }}', '_blank');
-				{% do app.session.remove('print_operator_url') %}
+{% do app.session.remove('print_operator_url') %}
 			</script>
 		{% endif %}
 	{% endblock %}
