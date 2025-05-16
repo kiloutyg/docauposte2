@@ -34,6 +34,17 @@ class IluoController extends AbstractController
     private $authChecker;
     private $entityFetchingService;
     private $iluoService;
+    /**
+     * Constructor for the IluoController class.
+     *
+     * Initializes the controller with necessary services for logging, authorization,
+     * entity fetching, and ILUO-specific operations.
+     *
+     * @param LoggerInterface $logger An instance of LoggerInterface for logging purposes.
+     * @param AuthorizationCheckerInterface $authChecker An instance of AuthorizationCheckerInterface for checking user permissions.
+     * @param EntityFetchingService $entityFetchingService A service for fetching various entities.
+     * @param IluoService $iluoService A service specific to ILUO operations.
+     */
     public function __construct(
         LoggerInterface                     $logger,
         AuthorizationCheckerInterface       $authChecker,
@@ -50,6 +61,18 @@ class IluoController extends AbstractController
 
 
 
+    /**
+     * Handles the GET request for the base admin page.
+     *
+     * This function checks if the incoming request is a GET method and if the user has the ROLE_LINE_ADMIN role.
+     * If both conditions are met, it renders the admin template. Otherwise, it adds a warning flash message
+     * and redirects to the base application route.
+     *
+     * @param Request $request The incoming HTTP request object
+     *
+     * @return Response Returns either a rendered template response for authorized GET requests
+     *                  or a redirect response with a warning flash message for unauthorized or non-GET requests
+     */
     #[Route('admin', name: 'admin')]
     public function baseAdminPageGet(Request $request): Response
     {
@@ -60,8 +83,21 @@ class IluoController extends AbstractController
         return $this->redirectToRoute('app_base');
     }
 
-    // Checklist
 
+
+
+
+    /**
+     * Handles the GET request for the checklist admin page.
+     *
+     * This function checks if the incoming request is a GET method and, if so,
+     * renders the checklist admin template. Otherwise, it redirects to the base application route.
+     *
+     * @param Request $request The incoming HTTP request object
+     *
+     * @return Response Returns either a rendered template response for GET requests
+     *                  or a redirect response for non-GET requests
+     */
     #[Route('admin/checklist', name: 'checklist_admin')]
     public function checklistAdminPageGet(Request $request): Response
     {
@@ -72,9 +108,20 @@ class IluoController extends AbstractController
     }
 
 
-    // General elements
 
 
+
+    /**
+     * Handles the GET request for the general elements admin page.
+     *
+     * This function checks if the incoming request is a GET method and, if so,
+     * renders the general elements admin template. Otherwise, it redirects to the base application route.
+     *
+     * @param Request $request The incoming HTTP request object
+     *
+     * @return Response Returns either a rendered template response for GET requests
+     *                  or a redirect response for non-GET requests
+     */
     #[Route('admin/general_elements', name: 'general_elements_admin')]
     public function generalElementsAdminPageGet(Request $request): Response
     {
@@ -84,6 +131,19 @@ class IluoController extends AbstractController
         return $this->redirectToRoute('app_base');
     }
 
+
+
+    /**
+     * Handles the GET and POST requests for the Products general elements admin page.
+     *
+     * This function retrieves all products, creates a form for a new product,
+     * processes form submissions, and renders the products admin template.
+     *
+     * @param Request $request The current HTTP request object containing all request data.
+     *
+     * @return Response A Symfony Response object containing either the rendered template
+     *                  or a redirect response after form processing.
+     */
     #[Route('admin/products_general_elements', name: 'products_general_elements_admin')]
     public function productsGeneralElementsAdminPageGet(Request $request): Response
     {
@@ -101,6 +161,20 @@ class IluoController extends AbstractController
     }
 
 
+
+
+
+    /**
+     * Handles the GET and POST requests for the Shift Leaders general elements admin page.
+     *
+     * This function retrieves all shift leaders, creates a form for a new shift leader,
+     * processes form submissions, and renders the shift leaders admin template.
+     *
+     * @param Request $request The current HTTP request object containing all request data.
+     *
+     * @return Response A Symfony Response object containing either the rendered template
+     *                  or a redirect response after form processing.
+     */
     #[Route('admin/shiftleaders_general_elements', name: 'shiftleaders_general_elements_admin')]
     public function shiftLeadersGeneralElementsAdminPageGet(Request $request): Response
     {
@@ -118,6 +192,17 @@ class IluoController extends AbstractController
     }
 
 
+    /**
+     * Handles the GET and POST requests for the Quality Representative general elements admin page.
+     *
+     * This function retrieves all quality representatives, creates a form for a new quality representative,
+     * processes form submissions, and renders the quality representative admin template.
+     *
+     * @param Request $request The current HTTP request object containing all request data.
+     *
+     * @return Response A Symfony Response object containing either the rendered template
+     *                  or a redirect response after form processing.
+     */
     #[Route('admin/qualityrep_general_elements', name: 'qualityrep_general_elements_admin')]
     public function qualityRepGeneralElementsAdminPageGet(Request $request): Response
     {
@@ -136,8 +221,18 @@ class IluoController extends AbstractController
 
 
 
-    // Workstation
 
+    /**
+     * Handles the GET request for the workstation admin page.
+     *
+     * This function checks if the incoming request is a GET method and, if so,
+     * renders the workstation admin template. Otherwise, it redirects to the base application route.
+     *
+     * @param Request $request The incoming HTTP request object
+     *
+     * @return Response Returns either a rendered template response for GET requests
+     *                  or a redirect response for non-GET requests
+     */
     #[Route('admin/workstation', name: 'workstation_admin')]
     public function workstationAdminPageGet(Request $request): Response
     {
@@ -148,6 +243,20 @@ class IluoController extends AbstractController
     }
 
 
+
+
+    /**
+     * Handles the creation and management of workstations in the admin interface.
+     *
+     * This function processes both GET and POST requests for the workstation creation page.
+     * It creates a new workstation form, handles form submissions (including AJAX requests
+     * for zone changes), and renders the workstation creation template.
+     *
+     * @param Request $request The current HTTP request object containing all request data.
+     *
+     * @return Response A Symfony Response object containing the rendered template or
+     *                  a redirect response after form processing.
+     */
     #[Route('admin/creation_workstation', name: 'creation_workstation_admin')]
     public function creationWorkstationAdminPageGet(Request $request): Response
     {

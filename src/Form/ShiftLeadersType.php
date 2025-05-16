@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\Operator;
 use App\Entity\User;
 use App\Entity\ShiftLeaders;
 
@@ -41,9 +42,32 @@ class ShiftLeadersType extends AbstractType
                     'class' => 'form-label fs-4',
                     'style' => 'color: #ffffff;'
                 ],
-                'placeholder' => 'Ajouter un Shift-Leader :',
+                'placeholder' => 'Ajouter depuis un Utilisateur :',
                 'attr' => [
                     'class' => 'form-control mx-auto mt-2',
+                    'data-shift-leaders-form-target' => 'userShiftLeaders',
+                    'data-action' => 'change->shift-leaders-form#userShiftLeadersChange',
+                ],
+            ])
+            ->add('operator', EntityType::class, [
+                'label' => 'Désignation Manager',
+                'class' => Operator::class,
+                'choice_label' => 'name',
+                'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('o')
+                    ->where('o.isTrainer = :true')
+                    ->leftJoin('o.shiftLeaders', 'sl')
+                    ->andWhere('sl.id IS NULL')
+                    ->setParameter('true', 'true')
+                    ->orderBy('o.name', 'ASC'),
+                'label_attr' => [
+                    'class' => 'form-label fs-4',
+                    'style' => 'color: #ffffff;'
+                ],
+                'placeholder' => 'Ajouter depuis un Operateur Formateur :',
+                'attr' => [
+                    'class' => 'form-control mx-auto mt-2',
+                    'data-shift-leaders-form-target' => 'operatorShiftLeaders',
+                    'data-action' => 'change->shift-leaders-form#operatorShiftLeadersChange',
                 ],
             ])
             ->add('save', SubmitType::class, [
