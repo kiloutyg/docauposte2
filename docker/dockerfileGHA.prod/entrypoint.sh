@@ -44,7 +44,7 @@ composer clear-cache
 # echo "✅ All applicable migrations processed."
 
 php bin/console doctrine:migrations:diff --no-interaction;
-for version in $(php bin/console doctrine:migrations:status --no-interaction | grep "Next" | awk '{print $5}'); do
+for version in $(php bin/console doctrine:migrations:status --no-interaction | grep "Latest" | awk '{print $5}'); do
   php bin/console doctrine:migrations:execute --up "$version" --no-interaction;
 done
 # Clear and warm up Symfony cache
