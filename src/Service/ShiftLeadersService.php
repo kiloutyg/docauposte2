@@ -37,7 +37,13 @@ class ShiftLeadersService extends AbstractController
             $this->em->persist($shiftLeaderData);
             $this->em->flush();
         } finally {
-            return $shiftLeaderData->getUser()->getUsername();
+            $shiftLeaderName = '';
+            if ($shiftLeaderData->getUser()) {
+                $shiftLeaderName = $shiftLeaderData->getUser()->getUsername();
+            } elseif ($shiftLeaderData->getOperator()) {
+                $shiftLeaderName = $shiftLeaderData->getOperator()->getName();
+            }
+            return $shiftLeaderName;
         }
     }
 }
