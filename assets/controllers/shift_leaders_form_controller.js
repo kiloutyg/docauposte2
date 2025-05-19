@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 
-export default class shiftLeadersFormController extends Controller {
+export default class ShiftLeadersFormController extends Controller {
 
     static targets = [
         'operatorShiftLeaders',

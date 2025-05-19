@@ -40,7 +40,6 @@ class StepsType extends AbstractType
                 'attr' => [
                     'class' => 'btn btn-primary btn-login text-uppercase fw-bold mt-2 mb-3 submit-entity-creation',
                     'type' => 'submit',
-                    'data-name-validation-target' => 'saveButton',
                 ]
             ]);
     }
