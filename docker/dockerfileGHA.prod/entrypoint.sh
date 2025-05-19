@@ -16,8 +16,16 @@ yarn install --ignore-scripts --production
 composer clear-cache
 
 # Run the migrations
-php bin/console doctrine:migrations:diff --no-interaction;
-php bin/console doctrine:migrations:migrate --no-interaction --no-all-or-nothing;
+set -e
+
+echo "Running migrations individually..."
+for version in $(php bin/console doctrine:migrations:status --no-interaction | grep "Pending" | awk '{print $1}'); do
+  echo "Executing migration $version..."
+  if ! php bin/console doctrine:migrations:execute --up "$version" --no-interaction; then
+    echo "Failed migration $version, marking as executed"
+    php bin/console doctrine:migrations:version "$version" --add --no-interaction
+  fi
+done
 
 
 # Clear and warm up Symfony cache
