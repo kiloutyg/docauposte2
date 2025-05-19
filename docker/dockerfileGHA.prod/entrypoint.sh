@@ -17,6 +17,8 @@ composer clear-cache
 
 # Run the migrations
 set -e
+echo "Generating diff doctrine migration script..."
+php bin/console doctrine:migrations:diff --no-interaction;
 
 echo "Running migrations individually..."
 for version in $(php bin/console doctrine:migrations:status --no-interaction | grep "Pending" | awk '{print $1}'); do
