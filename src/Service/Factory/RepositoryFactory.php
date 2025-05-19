@@ -30,8 +30,10 @@ class RepositoryFactory
      * @param ContainerInterface $container The service container
      * @param EntityManagerInterface $em The entity manager
      */
-    public function __construct(ContainerInterface $container, EntityManagerInterface $em)
-    {
+    public function __construct(
+        ContainerInterface $container,
+        EntityManagerInterface $em
+    ) {
         $this->container = $container;
         $this->em = $em;
     }
