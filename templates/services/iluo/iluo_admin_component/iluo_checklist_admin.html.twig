@@ -32,7 +32,13 @@
 							class="row">
 
 							<div
-								class="card border-0 shadow rounded-3 my-2 bg-secondary"></div>
+								class="card border-0 shadow rounded-3 my-2 bg-secondary">
+								<turbo-frame
+									loading="lazy"
+									class="px-0 px-md-2">
+									{{ render(controller('App\\Controller\\Iluo\\IluoChecklistController::trainingMaterialTypeAdminPageGet'), options = []) }}
+								</turbo-frame>
+							</div>
 						</div>
 					</div>
 				</div>

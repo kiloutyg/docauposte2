@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Products;
+use App\Entity\Steps;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -12,7 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ProductType extends AbstractType
+class StepsType extends AbstractType
 {
     public function __construct()
     {
@@ -22,19 +22,17 @@ class ProductType extends AbstractType
     {
 
         $builder
-            ->add('name', TextType::class, [
-                'label' => 'Nom du Produit',
+            ->add('question', TextType::class, [
+                'label' => 'Question d\'Etape',
                 'label_attr' => [
                     'class' => 'form-label fs-4',
                     'style' => 'color: #ffffff;'
                 ],
                 'attr' => [
-                    'class' => 'form-control capitalize-all-letters',
-                    'placeholder' => 'Nom du Produit',
-                    'id' => 'name',
+                    'class' => 'form-control',
+                    'placeholder' => 'Question d\'Etape',
+                    'id' => 'question',
                     'required' => true,
-                    'data-name-validation-target' => 'productName',
-                    'data-action' => 'keyup->name-validation#validateProductName',
                 ]
             ])
             ->add('save', SubmitType::class, [
@@ -51,7 +49,7 @@ class ProductType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Products::class,
+            'data_class' => Steps::class,
         ]);
     }
 }

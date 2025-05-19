@@ -15,9 +15,9 @@
 		<div
 			class="accordion w-100"
 			id="accordionIluo">
-			{{ render(controller('App\\Controller\\IluoController::generalElementsAdminPageGet'), options = []) }}
-			{{ render(controller('App\\Controller\\IluoController::checklistAdminPageGet'), options = []) }}
-			{{ render(controller('App\\Controller\\IluoController::workstationAdminPageGet'), options = []) }}
+			{{ render(controller('App\\Controller\\Iluo\\IluoGeneralElementsController::generalElementsAdminPageGet'), options = []) }}
+			{{ render(controller('App\\Controller\\Iluo\\IluoChecklistController::checklistAdminPageGet'), options = []) }}
+			{{ render(controller('App\\Controller\\Iluo\\IluoWorkstationController::workstationAdminPageGet'), options = []) }}
 		</div>
 	</div>
 {% endblock %}

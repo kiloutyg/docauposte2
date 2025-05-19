@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Products;
+use App\Entity\TrainingMaterialType;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -12,7 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ProductType extends AbstractType
+class TrainingMaterialTypeType extends AbstractType
 {
     public function __construct()
     {
@@ -23,18 +23,16 @@ class ProductType extends AbstractType
 
         $builder
             ->add('name', TextType::class, [
-                'label' => 'Nom du Produit',
+                'label' => 'Type de Support de Formation',
                 'label_attr' => [
                     'class' => 'form-label fs-4',
                     'style' => 'color: #ffffff;'
                 ],
                 'attr' => [
-                    'class' => 'form-control capitalize-all-letters',
-                    'placeholder' => 'Nom du Produit',
+                    'class' => 'form-control',
+                    'placeholder' => 'Nom du Type de Support de Formation',
                     'id' => 'name',
                     'required' => true,
-                    'data-name-validation-target' => 'productName',
-                    'data-action' => 'keyup->name-validation#validateProductName',
                 ]
             ])
             ->add('save', SubmitType::class, [
@@ -51,7 +49,7 @@ class ProductType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Products::class,
+            'data_class' => TrainingMaterialType::class,
         ]);
     }
 }

@@ -19,9 +19,6 @@ class Steps
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $question = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $trainingMaterialType = null;
-
     /**
      * @var Collection<int, Upload>
      */
@@ -43,10 +40,17 @@ class Steps
     #[ORM\ManyToMany(targetEntity: IluoChecklist::class, mappedBy: 'step')]
     private Collection $iluoChecklists;
 
+    /**
+     * @var Collection<int, TrainingMaterialType>
+     */
+    #[ORM\ManyToMany(targetEntity: TrainingMaterialType::class, inversedBy: 'steps')]
+    private Collection $trainingMaterialType;
+
     public function __construct()
     {
         $this->uploads = new ArrayCollection();
         $this->iluoChecklists = new ArrayCollection();
+        $this->trainingMaterialType = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -65,19 +69,7 @@ class Steps
 
         return $this;
     }
-
-    public function getTrainingMaterialType(): ?string
-    {
-        return $this->trainingMaterialType;
-    }
-
-    public function setTrainingMaterialType(?string $trainingMaterialType): static
-    {
-        $this->trainingMaterialType = $trainingMaterialType;
-
-        return $this;
-    }
-
+    
     /**
      * @return Collection<int, Upload>
      */
@@ -161,6 +153,30 @@ class Steps
         if ($this->iluoChecklists->removeElement($iluoChecklist)) {
             $iluoChecklist->removeStep($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TrainingMaterialType>
+     */
+    public function getTrainingMaterialType(): Collection
+    {
+        return $this->trainingMaterialType;
+    }
+
+    public function addTrainingMaterialType(TrainingMaterialType $trainingMaterialType): static
+    {
+        if (!$this->trainingMaterialType->contains($trainingMaterialType)) {
+            $this->trainingMaterialType->add($trainingMaterialType);
+        }
+
+        return $this;
+    }
+
+    public function removeTrainingMaterialType(TrainingMaterialType $trainingMaterialType): static
+    {
+        $this->trainingMaterialType->removeElement($trainingMaterialType);
 
         return $this;
     }

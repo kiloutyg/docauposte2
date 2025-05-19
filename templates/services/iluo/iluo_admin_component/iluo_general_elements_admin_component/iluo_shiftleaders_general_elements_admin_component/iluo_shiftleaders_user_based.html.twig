@@ -16,7 +16,7 @@
 		</div>
 	{% elseif shiftLeader.user.department is defined and shiftLeader.user.department is not empty %}
 		<div>
-			{{shiftLeader.user.department.name}}
+			{{shiftLeader.user.department.name|capitalize}}
 		</div>
 	{% endif %}
 	{% if is_granted('ROLE_SUPER_ADMIN') %}
