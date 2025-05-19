@@ -20,14 +20,27 @@ set -e
 echo "Generating diff doctrine migration script..."
 php bin/console doctrine:migrations:diff --no-interaction;
 
-echo "Running migrations individually..."
-for version in $(php bin/console doctrine:migrations:status --no-interaction | grep "Pending" | awk '{print $1}'); do
-  echo "Executing migration $version..."
-  if ! php bin/console doctrine:migrations:execute --up "$version" --no-interaction; then
-    echo "Failed migration $version, marking as executed"
-    php bin/console doctrine:migrations:version "$version" --add --no-interaction
+echo "🔎 Listing available migration files..."
+available_versions=$(ls migrations/Version*.php | sed -E 's/.*Version([0-9]+)\.php/\1/')
+
+echo "🔍 Getting executed versions from DB..."
+executed_versions=$(php bin/console doctrine:query:sql "SELECT version FROM doctrine_migration_versions" 2>/dev/null | grep -Eo '[0-9]{14}')
+
+echo "🚀 Starting per-version execution..."
+for version in $available_versions; do
+  if ! echo "$executed_versions" | grep -q "$version"; then
+    echo "➡️  Running migration $version"
+    if php bin/console doctrine:migrations:execute --up DoctrineMigrations\\Version"$version" --no-interaction; then
+      echo "✅ Successfully executed $version"
+    else
+      echo "⚠️  Failed to execute $version, marking as executed"
+      php bin/console doctrine:migrations:version DoctrineMigrations\\Version"$version" --add --no-interaction
+    fi
   fi
 done
+
+echo "✅ All applicable migrations processed."
+
 
 
 # Clear and warm up Symfony cache
