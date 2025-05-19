@@ -43,6 +43,10 @@ composer clear-cache
 # 
 # echo "✅ All applicable migrations processed."
 
+php bin/console doctrine:migrations:diff --no-interaction;
+php bin/console doctrine:migrations:status --no-interaction | grep "Next" | awk '{print $5}'
+php bin/console doctrine:migrations:execute --up DoctrineMigrations\\Version"$version" --no-interaction;
+
 # Clear and warm up Symfony cache
 php ./bin/console cache:clear --no-warmup --env=prod
 php ./bin/console cache:warmup --env=prod
