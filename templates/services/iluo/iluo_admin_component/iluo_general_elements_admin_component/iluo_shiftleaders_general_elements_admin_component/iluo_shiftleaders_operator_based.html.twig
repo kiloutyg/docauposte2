@@ -1,19 +1,16 @@
-<li
-	class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
-	<div
+<div
+	class="flex-grow-1">
+	<strong
 		class="flex-grow-1">
-		<strong
-			class="flex-grow-1">
-			{{shiftLeader.operator.name|capitalize|split('.')|first }}
-			{{shiftLeader.operator.name|upper|split('.')|last }}
-		</strong>
-	</div>
-	<div
-		class="m-1">
-		{{shiftLeader.operator.team.name }}
-		{% set uap = shiftLeader.operator.uaps|first %}
-		{{uap.name}}
-	</div>
+		{{shiftLeader.operator.name|capitalize|split('.')|first }}
+		{{shiftLeader.operator.name|upper|split('.')|last }}
+	</strong>
+</div>
+<div
+	class="m-1">
+	{{shiftLeader.operator.team.name }}
+	{% set uap = shiftLeader.operator.uaps|first %}
+	{{uap.name}}
+</div>
 
-	{{ delete_form('shiftLeaders', shiftLeader.id, 'app_iluo_shiftleaders_general_elements_admin') }}
-</li>
+{{ delete_form('shiftLeaders', shiftLeader.id, 'app_iluo_shiftleaders_general_elements_admin') }}

@@ -56,11 +56,14 @@
 						<ul
 							class="list-group">
 							{% for shiftLeader in shiftLeaders %}
-								{% if shiftLeader.user is defined and shiftLeader.user is not empty %}
-									{% include 'services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_shiftleaders_general_elements_admin_component/iluo_shiftleaders_user_based.html.twig' %}
-								{% elseif shiftLeader.operator is defined and shiftLeader.operator is not empty %}
-									{% include 'services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_shiftleaders_general_elements_admin_component/iluo_shiftleaders_operator_based.html.twig' %}
-								{% endif %}
+								<li
+									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+									{% if shiftLeader.user is defined and shiftLeader.user is not empty %}
+										{% include 'services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_shiftleaders_general_elements_admin_component/iluo_shiftleaders_user_based.html.twig' %}
+									{% elseif shiftLeader.operator is defined and shiftLeader.operator is not empty %}
+										{% include 'services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_shiftleaders_general_elements_admin_component/iluo_shiftleaders_operator_based.html.twig' %}
+									{% endif %}
+								</li>
 							{% endfor %}
 						</ul>
 					</div>
