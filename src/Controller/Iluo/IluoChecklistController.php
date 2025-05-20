@@ -2,7 +2,7 @@
 
 namespace App\Controller\Iluo;
 
-use \Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -19,7 +19,7 @@ use App\Service\EntityFetchingService;
 use App\Service\IluoService;
 
 
-#[Route('/iluo/admin/checklist', name: 'app_iluo_')]
+#[Route('/iluo/', name: 'app_iluo_')]
 class IluoChecklistController extends AbstractController
 {
     private $logger;
@@ -60,7 +60,7 @@ class IluoChecklistController extends AbstractController
      * @return Response Returns either a rendered template response for GET requests
      *                  or a redirect response for non-GET requests
      */
-    #[Route('/', name: 'checklist_admin')]
+    #[Route('admin/checklist', name: 'checklist_admin')]
     public function checklistAdminPageGet(Request $request): Response
     {
         if ($request->isMethod('GET')) {
@@ -70,7 +70,7 @@ class IluoChecklistController extends AbstractController
     }
 
 
-    #[Route('/training_material_type', name: 'training_material_type_checklist_admin')]
+    #[Route('admin/checklist/training_material_type', name: 'training_material_type_checklist_admin')]
     public function trainingMaterialTypeAdminPageGet(Request $request): Response
     {
         $trainingMaterialTypes = $this->entityFetchingService->findAll('TrainingMaterialType');
@@ -80,9 +80,9 @@ class IluoChecklistController extends AbstractController
             $this->logger->debug('TrainingMaterialType form submitted', [$request->request->all()]);
             return $this->iluoService->iluoComponentFormManagement('TrainingMaterialType', $trainingMaterialTypeForm, $request);
         }
-        return $this->render('/services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_TrainingMaterialType_general_elements_admin.html.twig', [
-            'TrainingMaterialTypeForm' => $trainingMaterialTypeForm->createView(),
-            'TrainingMaterialTypes'    => $trainingMaterialTypes,
+        return $this->render('/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_training_material_type_checklist_admin_component.html.twig', [
+            'trainingMaterialTypeForm' => $trainingMaterialTypeForm->createView(),
+            'trainingMaterialTypes'    => $trainingMaterialTypes,
         ]);
     }
 }

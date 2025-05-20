@@ -108,7 +108,7 @@ class EntityFetchingService extends AbstractController
 
     public function getAllUploadsWithAssociations()
     {
-        return $this->{$this->fromNameToRepo('upload')}->findAllWithAssociations();
+        return $this->fromNameToRepo('upload')->findAllWithAssociations();
     }
 
 
@@ -120,7 +120,7 @@ class EntityFetchingService extends AbstractController
 
     public function getAllValidatedUploadsWithAssociations()
     {
-        return $this->groupUploads($this->{$this->fromNameToRepo('upload')}->findAllValidatedUploadsWithAssociations());
+        return $this->groupUploads($this->fromNameToRepo('upload')->findAllValidatedUploadsWithAssociations());
     }
 
 
@@ -150,57 +150,57 @@ class EntityFetchingService extends AbstractController
 
     public function getOperators()
     {
-        return $this->{$this->fromNameToRepo('operator')}->findAllOrdered();
+        return $this->fromNameToRepo('operator')->findAllOrdered();
     }
 
     public function findBySearchQuery(string $name, string $code, string $team, string $uap, string $trainer): array
     {
-        return $this->{$this->fromNameToRepo('operator')}->findBySearchQuery($name, $code, $team, $uap, $trainer);
+        return $this->fromNameToRepo('operator')->findBySearchQuery($name, $code, $team, $uap, $trainer);
     }
 
 
     public function findOperatorWithNoRecentTraining()
     {
-        return $this->{$this->fromNameToRepo('operator')}->findOperatorWithNoRecentTraining();
+        return $this->fromNameToRepo('operator')->findOperatorWithNoRecentTraining();
     }
 
 
     public function findInActiveOperators()
     {
-        return $this->{$this->fromNameToRepo('operator')}->findInActiveOperators();
+        return $this->fromNameToRepo('operator')->findInActiveOperators();
     }
 
 
 
     public function findDeactivatedOperators()
     {
-        return $this->{$this->fromNameToRepo('operator')}->findDeactivatedOperators();
+        return $this->fromNameToRepo('operator')->findDeactivatedOperators();
     }
 
 
     public function findOperatorToBeDeleted()
     {
-        return $this->{$this->fromNameToRepo('operator')}->findOperatorToBeDeleted();
+        return $this->fromNameToRepo('operator')->findOperatorToBeDeleted();
     }
 
 
     public function findOperatorByNameLikeForSuggestions(string $name)
     {
-        return $this->{$this->fromNameToRepo('operator')}->findByNameLikeForSuggestions($name);
+        return $this->fromNameToRepo('operator')->findByNameLikeForSuggestions($name);
     }
 
 
 
     public function findOperatorByCodeAndTeamAndUap(string $code, int $team, int $uap)
     {
-        return $this->{$this->fromNameToRepo('operator')}->findByCodeAndTeamAndUap($code, $team, $uap);
+        return $this->fromNameToRepo('operator')->findByCodeAndTeamAndUap($code, $team, $uap);
     }
 
 
 
     public function findOperatorsByTeamAndUapId(int $teamId, int $uapId): array
     {
-        $selectedOperators = $this->{$this->fromNameToRepo('operator')}->findByTeamAndUap($teamId, $uapId);
+        $selectedOperators = $this->fromNameToRepo('operator')->findByTeamAndUap($teamId, $uapId);
         usort($selectedOperators, function ($a, $b) {
             list($firstNameA, $surnameA) = explode('.', $a->getName());
             list($firstNameB, $surnameB) = explode('.', $b->getName());
@@ -292,11 +292,11 @@ class EntityFetchingService extends AbstractController
         $lastname  = $explodedUsername[1] ?? null;
 
         if ($firstname) {
-            $firstnameSuggestions = $this->{$this->fromNameToRepo('operator')}->findByNameLikeForSuggestions($firstname);
+            $firstnameSuggestions = $this->fromNameToRepo('operator')->findByNameLikeForSuggestions($firstname);
         }
 
         if ($lastname) {
-            $lastnameSuggestions = $this->{$this->fromNameToRepo('operator')}->findByNameLikeForSuggestions($lastname);
+            $lastnameSuggestions = $this->fromNameToRepo('operator')->findByNameLikeForSuggestions($lastname);
         }
 
         $rawSuggestions = array_merge($firstnameSuggestions, $lastnameSuggestions);

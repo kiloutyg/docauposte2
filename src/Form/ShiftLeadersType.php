@@ -16,7 +16,7 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ShiftLeadersType extends AbstractType
+class ShiftLeadersType extends AbstractBaseFormType
 {
     public function __construct()
     {
@@ -24,31 +24,55 @@ class ShiftLeadersType extends AbstractType
     }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-
-        $builder
-            ->add('user', EntityType::class, [
-                'label' => 'Désignation Manager(Shift-Leader)',
-                'class' => User::class,
-                'choice_label' => 'username',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.roles = :manager')
-                        ->leftJoin('u.shiftLeader', 'sl')
-                        ->andWhere('sl.id IS NULL')
-                        ->setParameter('manager', '["ROLE_MANAGER"]')
-                        ->orderBy('u.username', 'ASC');
-                },
-                'label_attr' => [
-                    'class' => 'form-label fs-4',
-                    'style' => 'color: #ffffff;'
-                ],
-                'placeholder' => 'Ajouter depuis un Utilisateur :',
+        $this->addEntityField(
+            $builder,
+            'user',
+            'Désignation Manager(Shift-Leader)',
+            User::class,
+            'username',
+            fn(EntityRepository $er) => $er->createQueryBuilder('u')
+                ->where('u.roles = :manager')
+                ->leftJoin('u.shiftLeader', 'sl')
+                ->andWhere('sl.id IS NULL')
+                ->setParameter('manager', '["ROLE_MANAGER"]')
+                ->orderBy('u.username', 'ASC'),
+            'Ajouter depuis un Utilisateur :',
+            true,
+            [
                 'attr' => [
-                    'class' => 'form-control mx-auto mt-2',
                     'data-shift-leaders-form-target' => 'userShiftLeaders',
                     'data-action' => 'change->shift-leaders-form#userShiftLeadersChange',
-                ],
-            ])
+                ]
+            ]
+
+        );
+
+        $builder
+        //     ->add('user', EntityType::class, [
+        //         'label' => 'Désignation Manager(Shift-Leader)',
+        //         'class' => User::class,
+        //         'choice_label' => 'username',
+        //         'query_builder' => fn(EntityRepository $er) => $er->createQueryBuilder('u')
+        //             ->where('u.roles = :manager')
+        //             ->leftJoin('u.shiftLeader', 'sl')
+        //             ->andWhere('sl.id IS NULL')
+        //             ->setParameter('manager', '["ROLE_MANAGER"]')
+        //             ->orderBy('u.username', 'ASC'),
+        //         'label_attr' => [
+        //             'class' => 'form-label fs-4',
+        //             'style' => 'color: #ffffff;'
+        //         ],
+        //         'placeholder' => 'Ajouter depuis un Utilisateur :',
+        //         'attr' => [
+        //             'class' => 'form-control mx-auto mt-2',
+        //             'data-shift-leaders-form-target' => 'userShiftLeaders',
+        //             'data-action' => 'change->shift-leaders-form#userShiftLeadersChange',
+        //         ],
+        //     ])
+
+
+
+
             ->add('operator', EntityType::class, [
                 'label' => 'Désignation Manager',
                 'class' => Operator::class,
