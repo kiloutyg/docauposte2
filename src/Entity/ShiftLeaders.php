@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Validator\Constraints as AppAssert;
+use App\Validator as AppAssert;
 
 #[ORM\Entity(repositoryClass: ShiftLeadersRepository::class)]
 #[AppAssert\ExclusiveShiftLeadersRelation(fields: ['user', 'operator'], message: 'A ShiftLeader must be associated with either a User or an Operator, but not both or neither.')]

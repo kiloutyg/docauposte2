@@ -11,11 +11,11 @@ class StepsType extends AbstractBaseFormType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->addTextField(
-            $builder,
-            'question',
-            'Question d\'Etape',
-            'Question d\'Etape',
-            true
+            builder: $builder,
+            fieldName: 'question',
+            label: 'Question d\'Etape',
+            placeholder: 'Question d\'Etape',
+            required: true
         );
         
         $this->addSubmitButton($builder);

@@ -11,11 +11,11 @@ class TrainingMaterialTypeType extends AbstractBaseFormType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->addTextField(
-            $builder,
-            'name',
-            'Type de Support de Formation',
-            'Nom du Type de Support de Formation',
-            true
+            builder: $builder,
+            fieldName: 'name',
+            label: 'Type de Support de Formation',
+            placeholder: 'Nom du Type de Support de Formation',
+            required: true
         );
 
         $this->addSubmitButton($builder);

@@ -82,29 +82,4 @@ class IluoController extends AbstractController
         $this->addFlash('warning', 'Accés non authorisé');
         return $this->redirectToRoute('app_base');
     }
-
-
-
-
-
-    /**
-     * Handles the GET request for the checklist admin page.
-     *
-     * This function checks if the incoming request is a GET method and, if so,
-     * renders the checklist admin template. Otherwise, it redirects to the base application route.
-     *
-     * @param Request $request The incoming HTTP request object
-     *
-     * @return Response Returns either a rendered template response for GET requests
-     *                  or a redirect response for non-GET requests
-     */
-    #[Route('admin/checklist', name: 'checklist_admin')]
-    public function checklistAdminPageGet(Request $request): Response
-    {
-        if ($request->isMethod('GET')) {
-            return $this->render('/services/iluo/iluo_admin_component/iluo_checklist_admin.html.twig');
-        }
-        return $this->redirectToRoute('app_base');
-    }
-
 }

@@ -161,6 +161,4 @@ class IluoGeneralElementsController extends AbstractController
             'qualityRep'    => $qualityRep,
         ]);
     }
-
-
 }

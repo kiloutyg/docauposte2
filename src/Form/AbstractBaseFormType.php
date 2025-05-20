@@ -11,15 +11,34 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 abstract class AbstractBaseFormType extends AbstractType
 {
+    /**
+     * Adds an entity selection field to the form.
+     *
+     * This method creates a dropdown or selection field for choosing entities from the database.
+     * It configures the field with standard styling and allows customization of the query used
+     * to fetch entities, as well as how they are displayed.
+     *
+     * @param FormBuilderInterface $builder          The form builder instance
+     * @param string               $fieldName        The name of the field in the form
+     * @param string               $label            The label text to display for the field
+     * @param string               $entityClass      The fully qualified class name of the entity
+     * @param string               $choiceLabel      The property of the entity to use as the displayed text
+     * @param callable|null        $queryBuilder     Optional callback to customize the query that fetches entities
+     * @param string|null          $placeholder      Optional placeholder text (defaults to label if null)
+     * @param bool                 $required         Whether the field is required (default: true)
+     * @param array                $additionalOptions Additional options to override or extend default configuration
+     *
+     * @return void
+     */
     protected function addEntityField(
         FormBuilderInterface $builder,
         string $fieldName,
         string $label,
         string $entityClass,
         string $choiceLabel,
-        callable $queryBuilder,
+        ?callable $queryBuilder = null,
         ?string $placeholder = null,
-        bool $required = true,
+        ?bool $required = true,
         array $additionalOptions = []
     ): void {
         $options = [
@@ -31,9 +50,9 @@ abstract class AbstractBaseFormType extends AbstractType
                 'class' => 'form-label fs-4',
                 'style' => 'color: #ffffff;'
             ],
+            'placeholder' => $placeholder ?? $label,
             'attr' => [
                 'class' => 'form-control',
-                'placeholder' => $placeholder ?? $label,
                 'id' => $fieldName,
                 'required' => $required,
             ]
@@ -47,6 +66,22 @@ abstract class AbstractBaseFormType extends AbstractType
 
 
 
+    /**
+     * Adds a text field to the form.
+     *
+     * This method creates a text input field with predefined styling and configuration.
+     * It handles label formatting, placeholder text, and allows for additional customization
+     * through optional parameters.
+     *
+     * @param FormBuilderInterface $builder          The form builder instance
+     * @param string               $fieldName        The name of the field in the form
+     * @param string               $label            The label text to display for the field
+     * @param string|null          $placeholder      Optional placeholder text (defaults to label if null)
+     * @param bool                 $required         Whether the field is required (default: true)
+     * @param array                $additionalOptions Additional options to override or extend default configuration
+     *
+     * @return void
+     */
     protected function addTextField(
         FormBuilderInterface $builder,
         string $fieldName,
@@ -75,9 +110,21 @@ abstract class AbstractBaseFormType extends AbstractType
         $builder->add($fieldName, TextType::class, $options);
     }
 
+    /**
+     * Adds a submit button to the form.
+     *
+     * This method creates a submit button with predefined styling and allows for customization
+     * through additional options.
+     *
+     * @param FormBuilderInterface $builder          The form builder instance
+     * @param string               $label            The button label text, defaults to 'Ajouter'
+     * @param array                $additionalOptions Additional options to override or extend default configuration
+     *
+     * @return void
+     */
     protected function addSubmitButton(
         FormBuilderInterface $builder,
-        string $label = 'Ajouter',
+        ?string $label = 'Ajouter',
         array $additionalOptions = []
     ): void {
         $options = [

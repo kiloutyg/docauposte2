@@ -70,17 +70,31 @@ class IluoChecklistController extends AbstractController
     }
 
 
-    #[Route('admin/checklist/training_material_type', name: 'training_material_type_checklist_admin')]
+    /**
+     * Handles the GET request for the training material type admin page.
+     *
+     * This function checks if the incoming request is a GET method and, if so,
+     * renders the training material type admin template with a form for managing
+     * training material types and a list of existing training material types.
+     * If the request is a POST method, it logs the submitted form data and
+     * delegates the form management to the IluoService.
+     *
+     * @param Request $request The incoming HTTP request object
+     *
+     * @return Response Returns either a rendered template response for GET requests
+     *                  or a redirect response for non-GET requests
+     */
+    #[Route(path: 'admin/training_material_type_checklist', name: 'training_material_type_checklist_admin')]
     public function trainingMaterialTypeAdminPageGet(Request $request): Response
     {
-        $trainingMaterialTypes = $this->entityFetchingService->findAll('TrainingMaterialType');
+        $trainingMaterialTypes = $this->entityFetchingService->findAll(entityType: 'TrainingMaterialType');
         $newTrainingMaterialType = new TrainingMaterialType;
-        $trainingMaterialTypeForm = $this->createForm(TrainingMaterialTypeType::class, $newTrainingMaterialType);
-        if ($request->isMethod('POST')) {
-            $this->logger->debug('TrainingMaterialType form submitted', [$request->request->all()]);
-            return $this->iluoService->iluoComponentFormManagement('TrainingMaterialType', $trainingMaterialTypeForm, $request);
+        $trainingMaterialTypeForm = $this->createForm(type: TrainingMaterialTypeType::class, data: $newTrainingMaterialType);
+        if ($request->isMethod(method: 'POST')) {
+            $this->logger->debug(message: 'TrainingMaterialType form submitted', context: [$request->request->all()]);
+            return $this->iluoService->iluoComponentFormManagement(entityType: 'TrainingMaterialType', form: $trainingMaterialTypeForm, request: $request);
         }
-        return $this->render('/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_training_material_type_checklist_admin_component.html.twig', [
+        return $this->render(view: '/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_training_material_type_checklist_admin_component.html.twig', parameters: [
             'trainingMaterialTypeForm' => $trainingMaterialTypeForm->createView(),
             'trainingMaterialTypes'    => $trainingMaterialTypes,
         ]);
