@@ -52,7 +52,7 @@ abstract class AbstractBaseFormType extends AbstractType
             ],
             'placeholder' => $placeholder ?? $label,
             'attr' => [
-                'class' => 'form-control',
+                'class' => 'form-control mx-auto mt-2',
                 'id' => $fieldName,
                 'required' => $required,
             ]
@@ -97,7 +97,7 @@ abstract class AbstractBaseFormType extends AbstractType
                 'style' => 'color: #ffffff;'
             ],
             'attr' => [
-                'class' => 'form-control',
+                'class' => 'form-control mx-auto mt-2',
                 'placeholder' => $placeholder ?? $label,
                 'id' => $fieldName,
                 'required' => $required,

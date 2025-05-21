@@ -1,0 +1,203 @@
+{% macro skeleton_loader(type, title, icon_class, color = 'primary', items = 2) %}
+	<div
+		class="accordion-item">
+		<h2
+			class="accordion-header">
+			<button
+				class="accordion-button fs-3 collapsed"
+				type="button"
+				disabled>
+				<strong>
+					{{ title }}
+				</strong>
+			</button>
+		</h2>
+		<div
+			class="p-4">
+			<div
+				class="text-center mb-3">
+				<i
+					class="fas {{ icon_class }} fa-2x text-{{ color }} mb-2 loading-icon"></i>
+				<p
+					class="text-muted">
+					Chargement en cours...
+				</p>
+			</div>
+			<div
+				class="progress"
+				style="height: 10px;">
+				<div
+					class="progress-bar progress-bar-striped progress-bar-animated bg-{{ color }}"
+					role="progressbar"
+					style="width: 100%"
+					aria-valuenow="100"
+					aria-valuemin="0"
+					aria-valuemax="100">
+					<output
+						class="visually-hidden">
+						Chargement en cours
+					</output>
+				</div>
+			</div>
+
+			{% if type == 'form' %}
+				<div
+					class="mt-4">
+					{% for i in 1..items %}
+						<div
+							class="skeleton-form-group mb-3">
+							<div
+								class="skeleton-label"></div>
+							<div
+								class="skeleton-input"></div>
+						</div>
+					{% endfor %}
+				</div>
+			{% elseif type == 'checklist' %}
+				<div
+					class="mt-4">
+					{% for i in 1..items %}
+						<div
+							class="d-flex align-items-center mb-2">
+							<div
+								class="skeleton-checkbox me-2"></div>
+							<div
+								class="skeleton-text flex-grow-1"></div>
+						</div>
+					{% endfor %}
+				</div>
+			{% elseif type == 'cards' %}
+				<div
+					class="mt-4">
+					<div
+						class="row">
+						{% for i in 1..items %}
+							<div
+								class="col-md-{{ 12 / items }}">
+								<div
+									class="skeleton-card p-3 mb-3">
+									<div
+										class="skeleton-card-header mb-2"></div>
+									<div
+										class="skeleton-text mb-2"></div>
+									<div
+										class="skeleton-text mb-2"></div>
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+			{% elseif type == 'table' %}
+				<div
+					class="mt-4">
+					<div
+						class="skeleton-card p-2">
+						<div
+							class="d-flex mb-3 skeleton-text"
+							style="height: 24px;"></div>
+						{% for i in 1..items %}
+							<div
+								class="d-flex mb-2">
+								{% for j in 1..3 %}
+									<div
+										class="skeleton-text flex-grow-1 mx-1"></div>
+								{% endfor %}
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+{% endmacro %}
+
+{% macro turbo_frame_loader(id, src, type = 'form', title = 'Chargement...', icon_class = 'fa-cogs', color = 'primary', items = 2) %}
+	<div
+		class="accordion-item"
+		data-controller="accordion-frame-manager">
+		<h2
+			class="accordion-header"
+			id="heading-{{ id }}">
+			<button
+				class="accordion-button fs-3 collapsed"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target="#collapse-{{ id }}"
+				aria-expanded="false"
+				aria-controls="collapse-{{ id }}"
+				data-action="click->accordion-frame-manager#handleAccordionClick">
+				<strong>
+					{{ title }}
+				</strong>
+			</button>
+		</h2>
+		<div
+			id="collapse-{{ id }}"
+			class="accordion-collapse collapse"
+			aria-labelledby="heading-{{ id }}"
+			data-bs-parent="#accordionIluo"
+			data-accordion-frame-manager-target="accordionContent">
+			<div
+				class="accordion-body accordion-bg shadow shadow-inset p-2 p-md-3">
+				<div
+					class="card border-0 shadow rounded-3 my-2">
+					<div
+						class="card-body">
+						<div
+							class="row card border-0 shadow rounded-3 my-2 bg-secondary p-2 p-md-3">
+							<div
+								class="card-body m-0 px-0 px-md-2 row">
+								<turbo-frame
+									id="{{ id }}-content" data-original-src="{{ src }}" data-accordion-frame-manager-target="turboFrame"
+									loading="lazy"
+									class="px-0 px-md-2">
+									{{ _self.skeleton_loader(type, title, icon_class, color, items) }}
+
+								</turbo-frame>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endmacro %}
+
+{% macro simple_loader(message = 'Chargement en cours...', color = 'primary') %}
+	<div
+		class="d-flex flex-column align-items-center my-4">
+		<div
+			class="spinner-border text-{{ color }} mb-2"
+			role="status">
+			<output
+				class="visually-hidden">
+				{{ message }}
+			</output>
+		</div>
+		<p
+			class="text-muted">
+			{{ message }}
+		</p>
+	</div>
+{% endmacro %}
+
+{% macro content_placeholder(type = 'text', lines = 3, width = '100%') %}
+	<div
+		class="content-placeholder">
+		{% if type == 'text' %}
+			{% for i in 1..lines %}
+				<div
+					class="skeleton-text mb-2"
+					style="width: {% if i == lines %}70%{% else %}{{ width }}{% endif %};"></div>
+			{% endfor %}
+		{% elseif type == 'image' %}
+			<div
+				class="skeleton-image"
+				style="width: {{ width }}; height: 200px;"></div>
+		{% elseif type == 'button' %}
+			<div
+				class="skeleton-button"
+				style="width: {{ width }};"></div>
+		{% endif %}
+	</div>
+{% endmacro %}

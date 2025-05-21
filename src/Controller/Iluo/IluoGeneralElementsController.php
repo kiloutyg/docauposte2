@@ -29,6 +29,7 @@ class IluoGeneralElementsController extends AbstractController
     private $logger;
     private $entityFetchingService;
     private $iluoService;
+
     /**
      * Constructor for the IluoController class.
      *
@@ -55,23 +56,38 @@ class IluoGeneralElementsController extends AbstractController
 
 
     /**
-     * Handles the GET request for the general elements admin page.
+     * Provides a Turbo Frame for the general elements admin section.
+     * 
+     * This function renders a Turbo Frame template that serves as a container
+     * for the general elements administration interface. The frame allows for
+     * partial page updates without full page reloads when interacting with
+     * the general elements admin section.
      *
-     * This function checks if the incoming request is a GET method and, if so,
-     * renders the general elements admin template. Otherwise, it redirects to the base application route.
-     *
-     * @param Request $request The incoming HTTP request object
-     *
-     * @return Response Returns either a rendered template response for GET requests
-     *                  or a redirect response for non-GET requests
+     * @return Response A Symfony Response object containing the rendered Turbo Frame template
+     *                  for the general elements admin section.
      */
     #[Route('admin/general_elements', name: 'general_elements_admin')]
-    public function generalElementsAdminPageGet(Request $request): Response
+    public function generalElementsAdminFrameGet(): Response
     {
-        if ($request->isMethod('GET')) {
-            return $this->render('/services/iluo/iluo_admin_component/iluo_general_elements_admin.html.twig');
-        }
-        return $this->redirectToRoute('app_base');
+        return $this->render('services/iluo/iluo_admin_component/iluo_general_elements_admin.html.twig', []);
+    }
+
+
+
+    /**
+     * Provides the content for the general elements administration section.
+     * 
+     * This function renders a template that contains the main content for the general elements
+     * administration interface. It serves as the primary content area for managing general elements
+     * such as products, shift leaders, and quality representatives.
+     *
+     * @return Response A Symfony Response object containing the rendered template
+     *                  for the general elements administration content.
+     */
+    #[Route('admin/general_elements/content', name: 'general_elements_admin_content')]
+    public function generalElementsContentGet(): Response
+    {
+        return $this->render('services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_general_elements_admin_content.html.twig', []);
     }
 
 
@@ -133,6 +149,7 @@ class IluoGeneralElementsController extends AbstractController
             'shiftLeaders'    => $shiftLeaders,
         ]);
     }
+
 
 
     /**

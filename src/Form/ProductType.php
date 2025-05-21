@@ -11,12 +11,12 @@ class ProductType extends AbstractBaseFormType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->addTextField(
-            $builder,
-            'name',
-            'Nom du Produit',
-            'Nom du Produit',
-            true,
-            [
+            builder: $builder,
+            fieldName: 'name',
+            label: 'Nom du Produit',
+            placeholder: 'Nom du Produit',
+            required: true,
+            additionalOptions: [
                 'attr' => [
                     'class' => 'form-control capitalize-all-letters',
                     'data-name-validation-target' => 'productName',
@@ -26,9 +26,9 @@ class ProductType extends AbstractBaseFormType
         );
 
         $this->addSubmitButton(
-            $builder,
-            'Ajouter',
-            [
+            builder: $builder,
+            label: 'Ajouter',
+            additionalOptions: [
                 'attr' => [
                     'data-name-validation-target' => 'saveButton',
                 ]

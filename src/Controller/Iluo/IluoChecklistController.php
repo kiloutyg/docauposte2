@@ -50,25 +50,33 @@ class IluoChecklistController extends AbstractController
 
 
     /**
-     * Handles the GET request for the checklist admin page.
+     * Provides a Turbo Frame for the checklist admin section.
      *
-     * This function checks if the incoming request is a GET method and, if so,
-     * renders the checklist admin template. Otherwise, it redirects to the base application route.
+     * This function renders a Turbo Frame template that contains the checklist admin interface.
+     * It is used to load the admin section asynchronously within a Turbo Frame context.
      *
-     * @param Request $request The incoming HTTP request object
-     *
-     * @return Response Returns either a rendered template response for GET requests
-     *                  or a redirect response for non-GET requests
+     * @return Response A Response object containing the rendered Turbo Frame template
      */
     #[Route('admin/checklist', name: 'checklist_admin')]
-    public function checklistAdminPageGet(Request $request): Response
+    public function checklistAdminFrameGet(): Response
     {
-        if ($request->isMethod('GET')) {
-            return $this->render('/services/iluo/iluo_admin_component/iluo_checklist_admin.html.twig');
-        }
-        return $this->redirectToRoute('app_base');
+        return $this->render('services/iluo/iluo_admin_component/iluo_checklist_admin.html.twig', []);
     }
 
+
+    /**
+     * Provides a Turbo Frame for the checklist admin content section.
+     *
+     * This function renders a Turbo Frame template that contains the checklist admin content.
+     * It is used to load the content section asynchronously within a Turbo Frame context.
+     *
+     * @return Response A Response object containing the rendered Turbo Frame template for the checklist admin content
+     */
+    #[Route('admin/checklist/content', name: 'checklist_admin_content')]
+    public function checklistAdminContentGet(): Response
+    {
+        return $this->render('services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_checklist_admin_content.html.twig', []);
+    }
 
     /**
      * Handles the GET request for the training material type admin page.
@@ -84,15 +92,15 @@ class IluoChecklistController extends AbstractController
      * @return Response Returns either a rendered template response for GET requests
      *                  or a redirect response for non-GET requests
      */
-    #[Route(path: 'admin/training_material_type_checklist', name: 'training_material_type_checklist_admin')]
+    #[Route(path: 'admin/training_material_type_checklist', name: 'trainingMaterialType_checklist_admin')]
     public function trainingMaterialTypeAdminPageGet(Request $request): Response
     {
-        $trainingMaterialTypes = $this->entityFetchingService->findAll(entityType: 'TrainingMaterialType');
+        $trainingMaterialTypes = $this->entityFetchingService->findAll(entityType: 'trainingMaterialType');
         $newTrainingMaterialType = new TrainingMaterialType;
         $trainingMaterialTypeForm = $this->createForm(type: TrainingMaterialTypeType::class, data: $newTrainingMaterialType);
         if ($request->isMethod(method: 'POST')) {
             $this->logger->debug(message: 'TrainingMaterialType form submitted', context: [$request->request->all()]);
-            return $this->iluoService->iluoComponentFormManagement(entityType: 'TrainingMaterialType', form: $trainingMaterialTypeForm, request: $request);
+            return $this->iluoService->iluoComponentFormManagement(entityType: 'trainingMaterialType', form: $trainingMaterialTypeForm, request: $request);
         }
         return $this->render(view: '/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_training_material_type_checklist_admin_component.html.twig', parameters: [
             'trainingMaterialTypeForm' => $trainingMaterialTypeForm->createView(),

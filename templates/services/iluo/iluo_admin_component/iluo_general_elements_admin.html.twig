@@ -1,61 +1,34 @@
-{% if is_granted('ROLE_MANAGER') %}
+<turbo-frame
+	id="iluo-general-elementes"
+	class="accordion-item">
 	<div
-		class="accordion-item">
-		<h2
-			class="accordion-header"
-			id="headingIluoGeneralElementsMannagement">
-			<button
-				class="accordion-button fs-3 collapsed"
-				type="button"
-				data-bs-toggle="collapse"
-				data-bs-target="#collapseIluoGeneralElementsMannagement"
-				aria-expanded="false"
-				aria-controls="collapseIluoGeneralElementsMannagement">
-				<strong>
-					Formulaire de gestions des Elements Généraux ILUO :
-				</strong>
-			</button>
-		</h2>
+		id="collapse-iluo-general-elements"
+		class="accordion-collapse collapse"
+		aria-labelledby="heading-iluo-general-elements"
+		data-bs-parent="#accordionIluo"
+		data-accordion-frame-manager-target="accordionContent">
 		<div
-			id="collapseIluoGeneralElementsMannagement"
-			class="accordion-collapse collapse"
-			aria-labelledby="headingIluoGeneralElementsMannagement"
-			data-bs-parent="#accordionIluo">
+			class="accordion-body accordion-bg shadow shadow-inset p-2 p-md-3">
 			<div
-				class="accordion-body accordion-bg shadow shadow-inset p-2 p-md-3">
+				class="card border-0 shadow rounded-3 my-2">
 				<div
-					class="card border-0 shadow rounded-3 my-2">
+					class="card-body">
 					<div
-						class="card-body">
+						class="row card border-0 shadow rounded-3 my-2 bg-secondary p-2 p-md-3">
 						<div
-							class="row card border-0 shadow rounded-3 my-2 bg-secondary p-2 p-md-3">
-							<div
-								class="card-body m-0 px-0 px-md-2"
-								data-controller="name-validation">
-								<turbo-frame
-									loading="lazy"
-									class="px-0 px-md-2">
-									{{ render(controller('App\\Controller\\Iluo\\IluoGeneralElementsController::productsGeneralElementsAdminPageGet'), options = []) }}
-								</turbo-frame>
-								<hr
-									class="my-4">
-								<turbo-frame
-									loading="lazy"
-									class="px-0 px-md-2">
-									{{ render(controller('App\\Controller\\Iluo\\IluoGeneralElementsController::shiftleadersGeneralElementsAdminPageGet'), options = []) }}
-								</turbo-frame>
-								<hr
-									class="my-4">
-								<turbo-frame
-									loading="lazy"
-									class="px-0 px-md-2">
-									{{ render(controller('App\\Controller\\Iluo\\IluoGeneralElementsController::qualityRepGeneralElementsAdminPageGet'), options = []) }}
-								</turbo-frame>
-							</div>
+							class="card-body m-0 px-0 px-md-2 row">
+							<turbo-frame
+								id="iluo-general-elements-content"
+								src="{{path('app_iluo_general_elements_admin_content')}}" loading="lazy"
+								class="px-0 px-md-2"
+								data-accordion-frame-manager-target="turboFrame">
+								{% import 'macros/accordion_loading_animations.html.twig' as loading %}
+								{{ loading.content_placeholder('text', 3, '100%') }}
+							</turbo-frame>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-{% endif %}
+</turbo-frame>

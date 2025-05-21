@@ -48,27 +48,38 @@ class IluoWorkstationController extends AbstractController
     }
 
 
-
     /**
-     * Handles the GET request for the workstation admin page.
+     * Provides a Turbo Frame for the workstation admin section.
      *
-     * This function checks if the incoming request is a GET method and, if so,
-     * renders the workstation admin template. Otherwise, it redirects to the base application route.
+     * This function renders a template that contains a Turbo Frame
+     * specifically for the workstation administration interface.
+     * The frame allows for dynamic content loading within the page.
      *
-     * @param Request $request The incoming HTTP request object
-     *
-     * @return Response Returns either a rendered template response for GET requests
-     *                  or a redirect response for non-GET requests
+     * @return Response A Symfony Response object containing the rendered Turbo Frame
+     *                  template for the workstation admin section.
      */
     #[Route('admin/workstation', name: 'workstation_admin')]
-    public function workstationAdminPageGet(Request $request): Response
+    public function workstationAdminFrameGet(): Response
     {
-        if ($request->isMethod('GET')) {
-            return $this->render('/services/iluo/iluo_admin_component/iluo_workstation_admin.html.twig');
-        }
-        return $this->redirectToRoute('app_base');
+        return $this->render('services/iluo/iluo_admin_component/iluo_workstation_admin.html.twig', []);
     }
 
+
+
+    /**
+     * Retrieves the content for the workstation admin section.
+     *
+     * This function renders the template that contains the main content
+     * for the workstation administration interface.
+     *
+     * @return Response A Symfony Response object containing the rendered template
+     *                  for the workstation admin content.
+     */
+    #[Route(path: 'admin/workstation/content', name: 'workstation_admin_content')]
+    public function workstationChecklistContentGet(): Response
+    {
+        return $this->render('/services/iluo/iluo_admin_component/iluo_workstation_admin_component/iluo_workstation_admin_content.html.twig', []);
+    }
 
 
 
@@ -84,8 +95,8 @@ class IluoWorkstationController extends AbstractController
      * @return Response A Symfony Response object containing the rendered template or
      *                  a redirect response after form processing.
      */
-    #[Route('admin/creation_workstation', name: 'creation_workstation_admin')]
-    public function creationWorkstationAdminPageGet(Request $request): Response
+    #[Route('admin/workstation/creation', name: 'creation_workstation_admin')]
+    public function workstationCreationAdminPageGet(Request $request): Response
     {
         $this->logger->info('GET request on creation_workstation_admin full request : ', [$request->request->all()]);
         $newWorkstation = new Workstation();

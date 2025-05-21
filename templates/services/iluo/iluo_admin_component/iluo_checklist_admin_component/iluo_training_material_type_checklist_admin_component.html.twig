@@ -1,7 +1,7 @@
 <turbo-frame
-	id="trainingMaterialTypeManagement"
+	id="training-material-type-section"
 	class="container row mx-auto px-0 px-md-2">
-	{{ form_start(trainingMaterialTypeForm, { attr: {class: 'col-lg-6 col-md-12 col-sm-12 d-flex flex-column', method: 'POST', action: path('app_iluo_training_material_type_checklist_admin')}}
+	{{ form_start(trainingMaterialTypeForm, { attr: {class: 'col-lg-6 col-md-12 col-sm-12 d-flex flex-column', method: 'POST', action: path('app_iluo_trainingMaterialType_checklist_admin')}}
 	) }}
 	<div
 		class="col-12">
@@ -60,7 +60,7 @@
 										{{ trainingMaterialType.name }}
 									</strong>
 
-									{{ delete_form('trainingMaterialTypes', trainingMaterialType.id, 'app_iluo_training_material_type_checklist_admin') }}
+									{{ delete_form('trainingMaterialTypes', trainingMaterialType.id, 'app_iluo_trainingMaterialType_checklist_admin') }}
 
 								</li>
 							{% endfor %}

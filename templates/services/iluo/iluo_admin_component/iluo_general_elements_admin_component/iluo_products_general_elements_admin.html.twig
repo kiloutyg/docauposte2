@@ -1,6 +1,7 @@
 <turbo-frame
-	id="productManagement"
-	class="container row mx-auto px-0 px-md-2">
+	id="products-section"
+	class="container row mx-auto px-0 px-md-2"
+	data-controller="name-validation">
 	{{ form_start(productForm, { attr: {class: 'col-lg-6 col-md-12 col-sm-12 d-flex flex-column', method: 'POST', action: path('app_iluo_products_general_elements_admin')}}
 	) }}
 	<div
@@ -62,10 +63,7 @@
 									<strong>
 										{{ product.name }}
 									</strong>
-
-
-										{{ delete_form('products', product.id, 'app_iluo_qualityrep_general_elements_admin') }}
-
+									{{ delete_form('products', product.id, 'app_iluo_products_general_elements_admin') }}
 								</li>
 							{% endfor %}
 						</ul>
