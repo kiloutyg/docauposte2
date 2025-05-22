@@ -26,10 +26,10 @@ class EntityFetchingService extends AbstractController
 
     /**
      * Constructor for the EntityFetchingService.
-     * 
+     *
      * Initializes the service with required dependencies for logging, caching,
      * and repository access.
-     * 
+     *
      * @param LoggerInterface $logger The logger service for recording application events
      * @param CacheInterface $cache The cache service for storing and retrieving cached data
      * @param RepositoryFactory $repositoryFactory Factory service to create and access entity repositories
@@ -163,6 +163,19 @@ class EntityFetchingService extends AbstractController
         return $this->fromNameToRepo('operator')->findAllOrdered();
     }
 
+    /**
+     * Searches for operators based on multiple criteria.
+     *
+     * This method allows filtering operators by name, code, team, UAP, and trainer,
+     * delegating the actual search to the operator repository.
+     *
+     * @param string $name The operator name to search for
+     * @param string $code The operator code to filter by
+     * @param string $team The team identifier to filter operators by
+     * @param string $uap The UAP (Unit Assembly Production) identifier to filter operators by
+     * @param string $trainer The trainer name to filter operators by
+     * @return array An array of Operator entities matching the search criteria
+     */
     public function findBySearchQuery(string $name, string $code, string $team, string $uap, string $trainer): array
     {
         return $this->fromNameToRepo('operator')->findBySearchQuery($name, $code, $team, $uap, $trainer);
@@ -208,6 +221,17 @@ class EntityFetchingService extends AbstractController
 
 
 
+    /**
+     * Retrieves operators filtered by team and UAP ID and sorts them by surname then firstname.
+     *
+     * This method fetches operators belonging to a specific team and UAP combination,
+     * then sorts them alphabetically by surname first, and by firstname when surnames match.
+     * The sorting assumes operator names are in the format "firstname.surname".
+     *
+     * @param int $teamId The ID of the team to filter operators by
+     * @param int $uapId The ID of the UAP (Unit Assembly Production) to filter operators by
+     * @return array An array of sorted Operator entities matching the team and UAP criteria
+     */
     public function findOperatorsByTeamAndUapId(int $teamId, int $uapId): array
     {
         $selectedOperators = $this->fromNameToRepo('operator')->findByTeamAndUap($teamId, $uapId);
@@ -232,6 +256,16 @@ class EntityFetchingService extends AbstractController
         return $this->findAll('trainer');
     }
 
+    /**
+     * Groups uploads into a hierarchical structure based on their associations.
+     *
+     * This method organizes uploads into a nested array structure following the hierarchy:
+     * Zone -> ProductLine -> Category -> Button -> Upload
+     * Uploads without complete association chain are skipped.
+     *
+     * @param array $uploads An array of Upload entities to be grouped
+     * @return array A multi-dimensional array organizing uploads by their hierarchical associations
+     */
     private function groupUploads($uploads)
     {
 
@@ -294,6 +328,16 @@ class EntityFetchingService extends AbstractController
         return $this->findAll('qualityRep');
     }
 
+    /**
+     * Retrieves operator suggestions based on a username pattern.
+     *
+     * This method parses a username (typically in format "firstname.lastname"),
+     * searches for operators matching either the firstname or lastname component,
+     * and returns a unique list of matching operator entities.
+     *
+     * @param string $username The username to search for, expected in "firstname.lastname" format
+     * @return array An array of Operator entities matching the search criteria
+     */
     public function getOperatorSuggestionByUsername(string $username)
     {
 
@@ -335,6 +379,20 @@ class EntityFetchingService extends AbstractController
         return $this->fromNameToRepo($entityType)->findAll();
     }
 
+    /**
+     * Finds entities of the specified type that match given criteria with optional sorting and pagination.
+     *
+     * This method provides a flexible way to query entities by type with various filtering options.
+     * It acts as a wrapper around Doctrine's repository findBy method.
+     *
+     * @param string $entityType The type of entity to search for (e.g., 'user', 'category')
+     * @param array $params An array containing search parameters in the following order:
+     *                      - [0]: criteria - Array of field conditions to filter by (default: empty array)
+     *                      - [1]: orderBy - Array of field sorting instructions (default: null)
+     *                      - [2]: limit - Maximum number of results to return (default: null)
+     *                      - [3]: offset - Number of results to skip (default: null)
+     * @return mixed An array of matching entity objects or an empty array if no matches found
+     */
     public function findBy(string $entityType, array $params): mixed
     {
         $criteria = $params[0] ?? [];
@@ -367,6 +425,16 @@ class EntityFetchingService extends AbstractController
     }
 
 
+    /**
+     * Validates and normalizes an entity type string.
+     *
+     * This method converts the provided entity type to proper case format
+     * and verifies that the corresponding entity class exists in the application.
+     *
+     * @param string $entityType The raw entity type name (e.g., "operator", "category")
+     * @return string The normalized entity name with proper capitalization (e.g., "Operator")
+     * @throws \InvalidArgumentException If the entity class does not exist
+     */
     private function checkEntityType(string $entityType): string
     {
         // Convert to proper case (e.g., "operator" to "Operator")
