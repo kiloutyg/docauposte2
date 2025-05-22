@@ -6,6 +6,7 @@ use App\Service\ProductsService;
 use App\Service\QualityRepService;
 use App\Service\ShiftLeadersService;
 use App\Service\WorkstationService;
+use App\Service\TrainingMaterialTypeService;
 
 use Psr\Log\LoggerInterface;
 
@@ -26,6 +27,8 @@ class IluoService extends AbstractController
     private $qualityRepService;
     private $shiftLeadersService;
     private $workstationService;
+    private $trainingMaterialTypeService;
+
     /**
      * Constructor for the IluoService class.
      *
@@ -37,6 +40,7 @@ class IluoService extends AbstractController
      * @param ProductsService $productsService Service for managing product-related operations
      * @param QualityRepService $qualityRepService Service for managing quality representative operations
      * @param ShiftLeadersService $shiftLeadersService Service for managing shift leader operations
+     * @param TrainingMaterialTypeService $trainingMaterialTypeService Service for managing training material type operations
      * @param WorkstationService $workstationService Service for managing workstation operations
      */
     public function __construct(
@@ -45,19 +49,18 @@ class IluoService extends AbstractController
         ProductsService                     $productsService,
         QualityRepService                   $qualityRepService,
         ShiftLeadersService                 $shiftLeadersService,
-        WorkstationService                  $workstationService
+        TrainingMaterialTypeService         $trainingMaterialTypeService,
+        WorkstationService                  $workstationService,
     ) {
         $this->logger                       = $logger;
 
         $this->productsService              = $productsService;
         $this->qualityRepService            = $qualityRepService;
         $this->shiftLeadersService          = $shiftLeadersService;
+        $this->trainingMaterialTypeService  = $trainingMaterialTypeService;
         $this->workstationService           = $workstationService;
     }
 
-
-    
-    // Transversal elements
 
 
 
@@ -78,7 +81,7 @@ class IluoService extends AbstractController
      */
     public function iluoComponentFormManagement(string $entityType, Form $form, Request $request): Response
     {
-        $this->logger->info('iluoComponentFormManagement', [$entityType, $form, $request]);
+        $this->logger->info(message: 'iluoComponentFormManagement', context: [$entityType, $form, $request]);
         $form->handleRequest(request: $request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
@@ -97,11 +100,11 @@ class IluoService extends AbstractController
                 $entityName = $service->$methodName($form);
                 $this->addFlash(type: 'success', message: "L'entité $entityName a bien été ajoutée.");
             } catch (\Exception $e) {
-                $this->logger->error('Issue in form submission', [$e->getMessage()]);
+                $this->logger->error(message: 'Issue in form submission', context: [$e->getMessage()]);
                 $this->addFlash(type: 'error', message: 'Issue in form submission ' . $e->getMessage());
             }
         } elseif ($form->isSubmitted()) {
-            $this->logger->error('Invalid form', [$form->getErrors()]);
+            $this->logger->error(message: 'Invalid form', context: [$form->getErrors()]);
             $this->addFlash(type: 'error', message: 'Invalid form ' . $form->getErrors());
         }
         return $this->redirectToRoute(route: $this->routeNameDetermination(entityType: $entityType));
@@ -128,15 +131,15 @@ class IluoService extends AbstractController
     {
         if (in_array(needle: $entityType, haystack: ['products', 'shiftLeaders', 'qualityRep'])) {
             $route = 'app_iluo_' . strtolower(string: $entityType) . '_general_elements_admin';
-        } elseif ($entityType === 'workstation') {
+        } elseif (in_array(needle: $entityType, haystack: ['workstation'])) {
             $route = 'app_iluo_creation_workstation_admin';
-        } elseif ($entityType === 'trainingMaterialType') {
-            $route = 'app_iluo_trainingMaterialType_checklist_admin';
+        } elseif (in_array(needle: $entityType, haystack: ['trainingMaterialType'])) {
+            $route = 'app_iluo_' . strtolower(string: $entityType) . '_checklist_admin';
         } else {
-            $this->logger->error('Invalid entity type', [$entityType]);
+            $this->logger->error(message: 'Invalid entity type', context: [$entityType]);
             throw new \InvalidArgumentException(message: "Invalid entity type: $entityType");
         }
-        $this->logger->info('Redirecting to route', [$route]);
+        $this->logger->info(message: 'Redirecting to route', context: [$route]);
         return $route;
     }
 }

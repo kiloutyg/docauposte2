@@ -1,3 +1,4 @@
+{% import "macros/accordion_loading_animations.html.twig" as loading %}
 {% extends 'base.html.twig' %}
 {% block title %}
 	Admin Opérateurs
@@ -77,8 +78,10 @@
 
 			{% include '/services/operators/admin_component/_adminListOperatorSearchForm.html.twig' %}
 			<turbo-frame
-				id="adminListOperator">
+				id="adminListOperator"
+				 loading="lazy">
 				{% include '/services/operators/admin_component/_adminListOperator.html.twig' %}
+				{# {{ loading.skeleton_loader('table', 'Liste Opérateur','fa-cogs', 'success',4) }} #}
 			</turbo-frame>
 		</div>
 		{% if app.request.query.get('open_print') and app.session.get('print_operator_url') %}

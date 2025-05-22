@@ -76,7 +76,7 @@ class IluoChecklistController extends AbstractController
      * @return Response Returns either a rendered template response for GET requests
      *                  or a redirect response for non-GET requests
      */
-    #[Route(path: 'admin/training_material_type_checklist', name: 'trainingMaterialType_checklist_admin')]
+    #[Route(path: 'admin/training_material_type_checklist', name: 'trainingmaterialtype_checklist_admin')]
     public function trainingMaterialTypeAdminPageGet(Request $request): Response
     {
         $trainingMaterialTypes = $this->entityFetchingService->findAll(entityType: 'trainingMaterialType');

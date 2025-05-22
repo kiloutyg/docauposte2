@@ -18,6 +18,16 @@ class ShiftLeadersService extends AbstractController
     private $logger;
 
     private $shiftLeadersRepository;
+    /**
+     * Constructor for the ShiftLeadersService class.
+     *
+     * Initializes the service with required dependencies for database operations,
+     * logging, and shift leader data access.
+     *
+     * @param EntityManagerInterface $em The entity manager for database operations
+     * @param LoggerInterface $logger The logger service for logging events and errors
+     * @param ShiftLeadersRepository $shiftLeadersRepository Repository for shift leader data access
+     */
     public function __construct(
         EntityManagerInterface $em,
         LoggerInterface $logger,
@@ -30,6 +40,15 @@ class ShiftLeadersService extends AbstractController
         $this->shiftLeadersRepository = $shiftLeadersRepository;
     }
 
+    /**
+     * Processes the shift leader creation form by persisting the data to the database.
+     *
+     * This method extracts data from the submitted form, persists it to the database,
+     * and returns the name of the created shift leader.
+     *
+     * @param Form $shiftLeaderForm The submitted form containing shift leader data
+     * @return string The name of the created shift leader (username or operator name)
+     */
     public function shiftLeadersCreationFormProcessing(Form $shiftLeaderForm): string
     {
         try {

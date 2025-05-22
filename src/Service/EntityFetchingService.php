@@ -24,6 +24,16 @@ class EntityFetchingService extends AbstractController
 
     private $repositoryFactory;
 
+    /**
+     * Constructor for the EntityFetchingService.
+     * 
+     * Initializes the service with required dependencies for logging, caching,
+     * and repository access.
+     * 
+     * @param LoggerInterface $logger The logger service for recording application events
+     * @param CacheInterface $cache The cache service for storing and retrieving cached data
+     * @param RepositoryFactory $repositoryFactory Factory service to create and access entity repositories
+     */
     public function __construct(
         LoggerInterface                 $logger,
 
@@ -289,7 +299,10 @@ class EntityFetchingService extends AbstractController
 
         $explodedUsername = explode('.', $username);
         $firstname = $explodedUsername[0] ?? null;
+        $firstnameSuggestions = [];
         $lastname  = $explodedUsername[1] ?? null;
+        $lastnameSuggestions = [];
+
 
         if ($firstname) {
             $firstnameSuggestions = $this->fromNameToRepo('operator')->findByNameLikeForSuggestions($firstname);
