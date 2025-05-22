@@ -1,0 +1,74 @@
+<turbo-frame
+	id="shiftleaders-section"
+	class="container row mx-auto px-0 px-md-2"
+	data-controller="shift-leaders-form">
+	{{ form_start(shiftLeadersForm, { attr: {class: 'col-lg-6 col-md-12 col-sm-12 d-flex flex-column ', method: 'POST', action: path('app_iluo_shiftleaders_general_elements_admin')}}
+	) }}
+	<div
+		class="col-12">
+		{{ form_label(shiftLeadersForm.user) }}
+		{{ form_widget(shiftLeadersForm.user) }}
+		{{ form_widget(shiftLeadersForm.operator) }}
+		{{ form_widget(shiftLeadersForm.save) }}
+	</div>
+	<div
+		id="flash-messages">
+		{% for label, messages in app.flashes %}
+			<div
+				class="alert alert-{{ label }}">
+				{% for message in messages %}
+					<p>
+						{{ message }}
+					</p>
+				{% endfor %}
+			</div>
+		{% endfor %}
+	</div>
+	{{ form_end(shiftLeadersForm) }}
+	{% if shiftLeaders is not empty %}
+		<div
+			class="col-lg-6 col-md-12 col-sm-12 mt-auto mb-auto accordion"
+			id="accordionShiftLeaderList">
+			<div
+				class="accordion-item shadow-lg shadow-lg-inset border border-dark">
+				<h2
+					class="accordion-header"
+					id="headingShiftLeaderList">
+					<button
+						class="accordion-button bg-white text-dark collapsed"
+						type="button"
+						data-bs-toggle="collapse"
+						data-bs-target="#collapseShiftLeaderList"
+						aria-expanded="false"
+						aria-controls="collapseShiftLeaderList">
+						<strong>
+							Liste des Managers d'équipe
+						</strong>
+					</button>
+				</h2>
+				<div
+					id="collapseShiftLeaderList"
+					class="accordion-collapse collapse "
+					aria-labelledby="headingShiftLeaderList"
+					data-bs-parent="#headingShiftLeaderList">
+					<div
+						class="accordion-body bg-white text-dark">
+						<ul
+							class="list-group">
+							{% for shiftLeader in shiftLeaders %}
+								<li
+									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+									{% if shiftLeader.user is defined and shiftLeader.user is not empty %}
+										{% include 'services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_shiftleaders_general_elements_admin_component/iluo_shiftleaders_user_based.html.twig' %}
+									{% elseif shiftLeader.operator is defined and shiftLeader.operator is not empty %}
+										{% include 'services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_shiftleaders_general_elements_admin_component/iluo_shiftleaders_operator_based.html.twig' %}
+									{% endif %}
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+</turbo-frame>

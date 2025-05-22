@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/accordion_loading_animations.html.twig' as loading %}
+
+{% block title %}
+	ILUO Admin	|
+	{{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+	<div
+		class="container-fluid d-flex align-items-center flex-grow-1">
+		<div
+			class="accordion w-100"
+			id="accordionIluo">
+			{{ loading.turbo_frame_loader(
+                'iluo-general-elements', 
+                path('app_iluo_general_elements_admin_content'),
+                'form',
+                'Formulaire de gestions des Elements Généraux ILUO',
+                'fa-cogs',
+                'primary',
+                3
+            ) }}
+
+			{{ loading.turbo_frame_loader(
+                'iluo-checklist', 
+                path('app_iluo_checklist_admin_content'),
+                'checklist',
+                'Formulaire de gestions de la Checklist ILUO',
+                'fa-tasks',
+                'success',
+                4
+            ) }}
+
+			{{ loading.turbo_frame_loader(
+                'iluo-workstation', 
+                path('app_iluo_workstation_admin_content'),
+                'cards',
+                'Formulaire de gestions des Postes ILUO',
+                'fa-desktop',
+                'info',
+                2
+            ) }}
+		</div>
+	</div>
+{% endblock %}

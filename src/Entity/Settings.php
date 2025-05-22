@@ -41,7 +41,7 @@ class Settings
     #[ORM\Column(nullable: false, options: ['default' => true])]
     private ?bool $operatorCodeMethod = null;
 
-    #[ORM\Column(length: 255, nullable: true, options: ['default' => '\/^[0-9]{5}$\/'])]
+    #[ORM\Column(length: 255, nullable: true, options: ['default' => '[0-9]{5}'])]
     private ?string $operatorCodeRegex = null;
 
     public function __construct()
@@ -56,7 +56,7 @@ class Settings
         $this->operatorInactivityDelay = new \DateInterval('P00Y03M00DT00H00M00S');
         $this->operatorAutoDeleteDelay = new \DateInterval('P00Y03M00DT00H00M00S');
         $this->operatorCodeMethod = true;
-        $this->operatorCodeRegex = '/^[0-9]{5}$/';
+        $this->operatorCodeRegex = '[0-9]{5}';
     }
 
     public function getId(): ?int

@@ -1,0 +1,225 @@
+{% if user is defined %}
+	<h3
+		class="card-title text-center mb-2"
+		style="color:white">
+		<strong>
+			Modification de compte de
+			{{user.username|capitalize|split('.')|first }}
+			{{user.username|upper|split('.')|last }}
+		</strong>
+	</h3>
+	<form
+		class="form col-sm-11 col-md-10 col-lg-9 mx-auto"
+		method="POST"
+		action="{{path('app_account_modify_account', {userId: user.id})}}">
+
+	{% else %}
+		<h3
+			class="card-title text-center mb-5"
+			style="color:white">
+			<strong>
+				Création de compte
+			</strong>
+		</h3>
+		<form
+			class="form col-sm-11 col-md-10 col-lg-9 mx-auto"
+			method="POST"
+			action="{{ path('app_account_create') }}">
+		{% endif %}
+
+		<div
+			class="form-control mb-3">
+			<label
+				for="username">
+				Nom d'utilisateur
+			</label>
+			<div
+				data-controller="username-validation">
+				<input
+					type="text"
+					class="form-control"
+					data-username-validation-target="username"
+					data-action="keyup->username-validation#validateUsername"
+					id="username"
+					name="username"
+					{% if user is defined %} placeholder="{{user.username}}" {% else %} placeholder="prenom.nom"
+					required
+					{% endif %}>
+
+				<div
+					data-username-validation-target="message"
+					class="username-message"></div>
+			</div>
+		</div>
+		<div
+			class="form-control mb-3">
+			<label
+				for="floatingPassword">
+				Mot de passe
+			</label>
+			<input
+				type="password"
+				id="floatingPassword"
+				name="password"
+				{% if user is defined %} placeholder="Mot de passe"
+				{% else %} placeholder="Mot de passe"
+				required
+				{% endif %} class="form-control">
+
+		</div>
+		<div
+			class="form-control mb-3">
+			<label
+				for="emailAddress">
+				Adresse Mail
+			</label>
+			<input
+				type="email"
+				id="emailAddress"
+				name="emailAddress"
+				{% if user is defined %} placeholder="{{user.emailAddress}}" {% else %} placeholder="prenom.nom@opmobility.com"
+				required
+				{% endif %} class="form-control">
+		</div>
+		<div
+			class="form-control mb-3">
+			{% include 'services/account_services/account_tool_components/role_affectation.html.twig' %}
+		</div>
+
+		{% if operatorSuggestions is defined and operatorSuggestions is not empty %}
+			{% if user.operator is defined and user.operator is not empty %}
+				{% set correspondingOperatorId = user.operator.id %}
+			{% endif %}
+			<div
+				class="form-control mb-3">
+				<label
+					class="form-label"
+					for="operator-user-relation">
+					Select the corresponding Operator entity:
+				</label>
+				<div
+					class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2">
+					{% for operatorSuggestion in operatorSuggestions %}
+						<div
+							class="col">
+							<div
+								class="form-check border rounded">
+								<input
+									type="checkbox"
+									class="form-check-input"
+									name="operator"
+									id="operator-{{ operatorSuggestion.id }}"
+									value="{{operatorSuggestion.id }}" {% if correspondingOperatorId is defined and operatorSuggestion.id is same as correspondingOperatorId %} checked="true"
+									{% endif %}>
+								<label
+									class="form-check-label small"
+									for="operator-{{ operatorSuggestion.id }}">
+									{{operatorSuggestion.name}}
+								</label>
+
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		{% endif %}
+		<div
+			class="form-control mb-3">
+			<div>
+				<label
+					for="department"
+					style="color:black">
+					Service :
+				</label>
+			</div>
+			<div>
+				<select
+					name="department"
+					id="department"
+					class="form-select">
+					<option
+						value=""
+						selected
+						disabled
+						hidden>
+						Choisir un Service
+					</option>
+				</select>
+			</div>
+		</div>
+		{% if user is defined %}
+			<div
+				class="d-grid">
+				<button
+					class="btn btn-primary btn-login text-uppercase fw-bold modify-user mb-2"
+					type="submit">
+					Modification du compte
+				</button>
+			</div>
+		</form>
+
+		<div
+			class="row">
+			{% if user.blocked ? true %}
+				{% if user.uploads is not empty or user.incidents is not empty %}
+					<form
+						class="form col-sm-10 col-md-9 col-lg-8 mx-auto d-flex"
+						method="post"
+						action="{{path('app_account_transfer_work', {userId: user.id})}}">
+
+						<select
+							name="work-transfer-recipient"
+							id="work-transfer-recipient"
+							class="form-select mx-3">
+							<option
+								value=""
+								selected
+								disabled>
+								Choisir un destinataire
+							</option>
+							{% for recipient in users %}
+								{% if recipient is same as(user) or 'ROLE_SUPER_ADMIN' in recipient.roles %}
+									{% else %}
+										<option
+											value="{{recipient.id}}">
+											{{recipient.username|capitalize|split('.')|first }}
+											{{recipient.username|upper|split('.')|last }}
+										</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+						<button
+							class="col-4 mx-auto btn btn-danger transfer-work"
+							type="submit">
+							Transferer le tavail de l'utilisateur
+						</button>
+					</form>
+				{% else %}
+					<a
+						href="{{path('app_account_delete_account', {userId: user.id})}}" class="col-4 mx-auto btn btn-danger definitively-delete-user">
+						Supprimer definitivement
+					</a>
+					<a
+						href="{{path('app_account_unblock_account', {userId: user.id})}}" class="col-4 mx-auto btn btn-success unblock-user">
+						Debloquer le compte
+					</a>
+				{% endif %}
+			{% else %}
+				<a
+					href="{{path('app_account_block_account', {userId: user.id})}}" class="col-4 mx-auto btn btn-danger delete-user">
+					Supprimer (Bloquer le compte)
+				</a>
+			{% endif %}
+		</div>
+	{% else %}
+		<div
+			class="d-grid col-6 mx-auto">
+			<button
+				class="btn btn-primary btn-login text-uppercase fw-bold create-user"
+				type="submit">
+				Création du compte
+			</button>
+		</div>
+	</form>
+
+{% endif %}

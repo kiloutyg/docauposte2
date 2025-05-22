@@ -1,5 +1,4 @@
 {% if is_granted('ROLE_ADMIN') %}
-
 	<div
 		class="accordion-item">
 		<h2
@@ -23,115 +22,119 @@
 			aria-labelledby="headingZone"
 			data-bs-parent="#accordionAdmin">
 			<div
-				class="accordion-body accordion-bg shadow shadow-inset">
-
+				class="accordion-body accordion-bg shadow shadow-inset p-2 p-md-3">
 				<div
-					class="card border-0 shadow rounded-3 my-5">
+					class="card border-0 shadow rounded-3 m-0">
 					<div
 						class="card-body">
 						<div
-							class="row ">
-							<form
-								method="POST"
-								action="{{ path('app_super_admin_create_zone') }}">
-
+							class="card border-0 shadow rounded-3 my-2 bg-secondary p-2 p-md-3">
+							<div
+								class="row align-items-center">
 								<div
-									class="card border-0 shadow rounded-3 my-5 bg-secondary">
-									<div
-										class="card-body">
-										<div
-											class="row d-flex align-items-center gy-lg-0 gy-5">
+									class="col-lg-6 col-md-6 col-sm-12 ">
+									<form
+										class="w-100"
+										method="POST"
+										action="{{ path('app_super_admin_create_zone') }}">
+										<div>
+											<h3
+												class="card-title text-center m-2 fw-light fs-4">
+												<strong>
+													Création de Zones
+												</strong>
+											</h3>
 											<div
-												class="col-md-6">
-
-												<h3
-													class="card-title text-center mb-5 fw-light fs-5">
-													<strong>
-														Création de Zones
-													</strong>
-												</h3>
-
-												<form
-													class="form-floating"
-													method="post">
-
-													<div
-														class="form-control mb-3">
-														<label
-															for="zonename">
-															Nom de la zone
-														</label>
-														<input
-															type="text"
-															name="zonename"
-															placeholder="Nom de la zone"
-															required
-															class="form-control"
-															id="zonename">
-													</div>
-
-													<div
-														class="d-grid">
-														<button
-															class="btn btn-primary btn-login text-first|uppercase fw-bold"
-															type="submit">
-															Valider
-														</button>
-													</div>
-
-												</form>
-												<hr
-													class="my-4">
-
+												class="form-control mb-3">
+												<label
+													for="zonename">
+													Nom de la zone
+												</label>
+												<input
+													type="text"
+													name="zonename"
+													placeholder="Nom de la zone"
+													required
+													class="form-control"
+													id="zonename">
 											</div>
 											<div
-												class="col-md-6">
-												<h5
-													class="card-title text-center mb-5 fw-light fs-5">
-													<strong>
-														Liste des zones :
-													</strong>
-												</h5>
-												<ul
-													class="list-unstyled">
-													{% for zone in zones %}
-														<li
-															class="form-control d-flex justify-content-between align-items-center mb-2">
-															<div
-																class="flex-grow-1">
-																<a
-																	href="{{path('app_zone_admin', {zoneId: zone.id})}}" class="btn btn-dark">
-																	{{ zone.name|split('.')|first|upper }}
-																</a>
-															</div>
-															<a
-																href="{{path('app_base_views_modification')}}" class="btn btn-info m-2">
-																Modifier
-															</a>
-															<a
-																href="{{path('app_super_admin_delete_zone', {zoneId: zone.id})}}" class="btn btn-danger delete-zone">
-																Supprimer
-															</a>
-														</li>
-													{% else %}
-														<li
-															class="alert alert-danger d-flex justify-content-center">
-															<button
-																class="btn btn-lg btn-outline-dark"
-																onclick="event.preventDefault(); window.history.back();">
-																Il n'y a pas de zone dans l'application.
-															</button>
-															<a
-																href="javascript:void(0)"
-																onclick="event.preventDefault(); window.history.back();"></a>
-														</li>
-													{% endfor %}
-												</ul>
+												class="d-grid">
+												<button
+													class="btn btn-primary btn-login text-first|uppercase fw-bold"
+													type="submit">
+													Valider
+												</button>
 											</div>
 										</div>
-									</div>
+										<hr
+											class="my-4">
+									</form>
 								</div>
-							</form>
+								<div
+									class="col-lg-6 col-md-6 col-sm-12">
+									<h5
+										class="card-title text-center m-2 fw-light fs-4">
+										<strong>
+											Liste des zones :
+										</strong>
+									</h5>
+									<ul
+										class="list-unstyled">
+										{% for zone in zones %}
+											<li
+												class="form-control d-flex justify-content-between align-items-center my-1">
+												<div
+													class="flex-grow-1">
+													<a
+														href="{{path('app_zone_admin', {zoneId: zone.id})}}" class="btn btn-dark">
+														{{ zone.name|split('.')|first|upper }}
+													</a>
+												</div>
+												<a
+													href="{{path('app_base_views_modification')}}" class="btn btn-info m-1">
+													<span
+														class="d-none d-md-inline">
+														Modifier
+													</span>
+													<i
+														class="fas fa-pen-to-square d-inline d-md-none"
+														aria-hidden="true"
+														title="	Modifier"></i>
+													<span
+														class="visually-hidden">
+														Modifier
+													</span>
+												</a>
+												<a
+													href="{{path('app_super_admin_delete_zone', {zoneId: zone.id})}}" class="btn btn-danger delete-zone">
+													<span
+														class="d-none d-lg-inline">
+														Supprimer
+													</span>
+													<i
+														class="fas fa-trash d-inline d-lg-none"
+														aria-hidden="true"
+														title="Supprimer"></i>
+													<span
+														class="visually-hidden">
+														Supprimer
+													</span>
+												</a>
+											</li>
+										{% else %}
+											<li
+												class="alert alert-danger d-flex justify-content-center">
+												<button
+													class="btn btn-lg btn-outline-dark"
+													onclick="event.preventDefault(); window.history.back();">
+													Il n'y a pas de zone dans l'application.
+												</button>
+											</li>
+										{% endfor %}
+									</ul>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>

@@ -21,7 +21,7 @@ class Validation
     private ?Upload $Upload = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $Status = null;
+    private ?bool $status = null;
 
     #[ORM\OneToMany(mappedBy: 'Validation', targetEntity: Approbation::class, orphanRemoval: true)]
     private Collection $approbations;
@@ -56,12 +56,12 @@ class Validation
 
     public function isStatus(): ?bool
     {
-        return $this->Status;
+        return $this->status;
     }
 
-    public function setStatus(?bool $Status): static
+    public function setStatus(?bool $status): static
     {
-        $this->Status = $Status;
+        $this->status = $status;
 
         return $this;
     }

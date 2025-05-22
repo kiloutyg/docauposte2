@@ -22,38 +22,19 @@ class ValidationRepository extends BaseRepository
     }
 
 
+    /**
+     * Retrieves all validation records that have not been validated.
+     *
+     * This method finds all validation entities where the status is either
+     * explicitly set to false or is null (not set).
+     *
+     * @return Validation[] An array of non-validated Validation entities
+     */
     public function findNonValidatedValidations()
     {
-        $nonValidatedValidations = $this->createQueryBuilder('v')
-            ->where('v.Status != true OR v.Status IS NULL')
+        return $this->createQueryBuilder('v')
+            ->where('v.status != true OR v.status IS NULL')
             ->getQuery()
             ->getResult();
-
-        return $nonValidatedValidations;
     }
-
-    //    /**
-    //     * @return Validation[] Returns an array of Validation objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('v')
-    //            ->andWhere('v.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('v.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Validation
-    //    {
-    //        return $this->createQueryBuilder('v')
-    //            ->andWhere('v.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

@@ -6,23 +6,8 @@ use App\Entity\Zone;
 use App\Entity\ProductLine;
 use App\Entity\Category;
 
-use App\Repository\ZoneRepository;
-use App\Repository\ProductLineRepository;
-use App\Repository\UserRepository;
-use App\Repository\UploadRepository;
-use App\Repository\CategoryRepository;
-use App\Repository\ButtonRepository;
-use App\Repository\DepartmentRepository;
-use App\Repository\ValidationRepository;
-use App\Repository\ApprobationRepository;
-use App\Repository\OldUploadRepository;
-use App\Repository\OperatorRepository;
-use App\Repository\UapRepository;
-use App\Repository\TeamRepository;
-use App\Repository\TrainingRecordRepository;
-use App\Repository\TrainerRepository;
-use App\Repository\IncidentRepository;
-use App\Repository\IncidentCategoryRepository;
+
+use App\Service\Factory\RepositoryFactory;
 
 use Psr\Log\LoggerInterface;
 
@@ -37,238 +22,219 @@ class EntityFetchingService extends AbstractController
 
     private $cache;
 
-    private $departmentRepository;
-    private $approbationRepository;
-    private $validationRepository;
-    private $incidentRepository;
-    private $incidentCategoryRepository;
-    private $categoryRepository;
-    private $buttonRepository;
-    private $uploadRepository;
-    private $zoneRepository;
-    private $productLineRepository;
-    private $userRepository;
-    private $oldUploadRepository;
-    private $uapRepository;
-    private $teamRepository;
-    private $operatorRepository;
-    private $trainingRecordRepository;
-    private $trainerRepository;
+    private $repositoryFactory;
 
+    /**
+     * Constructor for the EntityFetchingService.
+     *
+     * Initializes the service with required dependencies for logging, caching,
+     * and repository access.
+     *
+     * @param LoggerInterface $logger The logger service for recording application events
+     * @param CacheInterface $cache The cache service for storing and retrieving cached data
+     * @param RepositoryFactory $repositoryFactory Factory service to create and access entity repositories
+     */
     public function __construct(
         LoggerInterface                 $logger,
 
-        CacheInterface $cache,
+        CacheInterface                  $cache,
 
-        ApprobationRepository           $approbationRepository,
-        ValidationRepository            $validationRepository,
-        DepartmentRepository            $departmentRepository,
-        IncidentCategoryRepository      $incidentCategoryRepository,
-        CategoryRepository              $categoryRepository,
-        ButtonRepository                $buttonRepository,
-        UploadRepository                $uploadRepository,
-        ZoneRepository                  $zoneRepository,
-        ProductLineRepository           $productLineRepository,
-        UserRepository                  $userRepository,
-        OldUploadRepository             $oldUploadRepository,
-        UapRepository                   $uapRepository,
-        TeamRepository                  $teamRepository,
-        OperatorRepository              $operatorRepository,
-        TrainingRecordRepository        $trainingRecordRepository,
-        TrainerRepository               $trainerRepository,
-        IncidentRepository              $incidentRepository,
+        RepositoryFactory               $repositoryFactory,
     ) {
         $this->logger                       = $logger;
 
-        $this->cache = $cache;
+        $this->cache                        = $cache;
 
-        $this->departmentRepository         = $departmentRepository;
-        $this->approbationRepository        = $approbationRepository;
-        $this->validationRepository         = $validationRepository;
-        $this->incidentCategoryRepository   = $incidentCategoryRepository;
-        $this->incidentRepository           = $incidentRepository;
-        $this->uploadRepository             = $uploadRepository;
-        $this->zoneRepository               = $zoneRepository;
-        $this->productLineRepository        = $productLineRepository;
-        $this->userRepository               = $userRepository;
-        $this->categoryRepository           = $categoryRepository;
-        $this->buttonRepository             = $buttonRepository;
-        $this->oldUploadRepository          = $oldUploadRepository;
-        $this->uapRepository                = $uapRepository;
-        $this->teamRepository               = $teamRepository;
-        $this->operatorRepository           = $operatorRepository;
-        $this->trainingRecordRepository     = $trainingRecordRepository;
-        $this->trainerRepository            = $trainerRepository;
+        $this->repositoryFactory            = $repositoryFactory;
     }
 
 
     public function getUsers()
     {
-        return $this->userRepository->findAll();;
+        return $this->findBy('user', [[], ['username' => 'ASC']]);
     }
 
 
     public function getDepartments()
     {
-        return $this->departmentRepository->findAll();
+        return $this->findAll('department');
     }
 
 
     public function getZones()
     {
-        return $this->zoneRepository->findBy([], ['SortOrder' => 'ASC']);
+        return $this->findBy('zone', [[], ['SortOrder' => 'ASC']]);
     }
 
 
     public function getProductLines()
     {
-        return $this->productLineRepository->findBy([], ['SortOrder' => 'ASC']);
+        return $this->findBy('productLine', [[], ['SortOrder' => 'ASC']]);
     }
 
     public function getProductLinesByZone(Zone $zone)
     {
-        return $this->productLineRepository->findBy(['zone' => $zone->getId()], ['SortOrder' => 'ASC']);
+        return $this->findBy('productLine', [['zone' => $zone->getId()], ['SortOrder' => 'ASC']]);
     }
 
 
     public function getIncidents()
     {
-        return $this->incidentRepository->findAll();
+        return $this->findAll('incident');
     }
 
 
     public function getIncidentCategories()
     {
-        return $this->incidentCategoryRepository->findAll();
+        return $this->findAll('incidentCategory');
     }
 
 
     public function getCategories()
     {
-        return $this->categoryRepository->findBy([], ['SortOrder' => 'ASC']);
+        return $this->findBy('category', [[], ['SortOrder' => 'ASC']]);
     }
 
     public function getCategoriesByProductLine(ProductLine $productLine)
     {
-        return $this->categoryRepository->findBy(['productLine' => $productLine->getId()], ['SortOrder' => 'ASC']);
+        return $this->findBy('category', [['productLine' => $productLine->getId()], ['SortOrder' => 'ASC']]);
     }
 
     public function getButtons()
     {
-        return $this->buttonRepository->findBy([], ['SortOrder' => 'ASC']);
+        return $this->findBy('button', [[], ['SortOrder' => 'ASC']]);
     }
 
     public function getButtonsByCategory(Category $category)
     {
-        return $this->buttonRepository->findBy(['category' => $category->getId()], ['SortOrder' => 'ASC']);
+        return $this->findBy('button', [['category' => $category->getId()], ['SortOrder' => 'ASC']]);
     }
 
     public function getUploads()
     {
-        return $this->uploadRepository->findAll();
+        return $this->findAll('upload');
     }
 
 
     public function getAllUploadsWithAssociations()
     {
-        $query = $this->uploadRepository->findAllWithAssociations();
-        $this->logger->info('query', $query);
-        return $query;
+        return $this->fromNameToRepo('upload')->findAllWithAssociations();
     }
 
 
     public function getValidations()
     {
-        return $this->validationRepository->findAll();
+        return $this->findAll('validation');
     }
-
 
 
     public function getAllValidatedUploadsWithAssociations()
     {
-        return $this->groupUploads($this->uploadRepository->findAllValidatedUploadsWithAssociations());
+        return $this->groupUploads($this->fromNameToRepo('upload')->findAllValidatedUploadsWithAssociations());
     }
 
 
     public function getApprobations()
     {
-        return $this->approbationRepository->findAll();
+        return $this->findAll('approbation');
     }
 
 
     public function getOldUploads()
     {
-        return $this->oldUploadRepository->findAll();
+        return $this->findAll('oldUpload');
     }
 
 
     public function getTeams()
     {
-        return $this->teamRepository->findAll();
+        return $this->findAll('team');
     }
 
 
     public function getUaps()
     {
-        return $this->uapRepository->findAll();
+        return $this->findAll('uap');
     }
-
-
 
 
     public function getOperators()
     {
-        return $this->operatorRepository->findAllOrdered();
+        return $this->fromNameToRepo('operator')->findAllOrdered();
     }
 
+    /**
+     * Searches for operators based on multiple criteria.
+     *
+     * This method allows filtering operators by name, code, team, UAP, and trainer,
+     * delegating the actual search to the operator repository.
+     *
+     * @param string $name The operator name to search for
+     * @param string $code The operator code to filter by
+     * @param string $team The team identifier to filter operators by
+     * @param string $uap The UAP (Unit Assembly Production) identifier to filter operators by
+     * @param string $trainer The trainer name to filter operators by
+     * @return array An array of Operator entities matching the search criteria
+     */
     public function findBySearchQuery(string $name, string $code, string $team, string $uap, string $trainer): array
     {
-        return $this->operatorRepository->findBySearchQuery($name, $code, $team, $uap, $trainer);
+        return $this->fromNameToRepo('operator')->findBySearchQuery($name, $code, $team, $uap, $trainer);
     }
 
 
     public function findOperatorWithNoRecentTraining()
     {
-        return $this->operatorRepository->findOperatorWithNoRecentTraining();
+        return $this->fromNameToRepo('operator')->findOperatorWithNoRecentTraining();
     }
 
 
     public function findInActiveOperators()
     {
-        return $this->operatorRepository->findInActiveOperators();
+        return $this->fromNameToRepo('operator')->findInActiveOperators();
     }
 
 
 
     public function findDeactivatedOperators()
     {
-        return $this->operatorRepository->findDeactivatedOperators();
+        return $this->fromNameToRepo('operator')->findDeactivatedOperators();
     }
 
 
     public function findOperatorToBeDeleted()
     {
-        return $this->operatorRepository->findOperatorToBeDeleted();
+        return $this->fromNameToRepo('operator')->findOperatorToBeDeleted();
     }
 
 
     public function findOperatorByNameLikeForSuggestions(string $name)
     {
-        return $this->operatorRepository->findByNameLikeForSuggestions($name);
+        return $this->fromNameToRepo('operator')->findByNameLikeForSuggestions($name);
     }
 
 
 
     public function findOperatorByCodeAndTeamAndUap(string $code, int $team, int $uap)
     {
-        return $this->operatorRepository->findByCodeAndTeamAndUap($code, $team, $uap);
+        return $this->fromNameToRepo('operator')->findByCodeAndTeamAndUap($code, $team, $uap);
     }
 
 
 
+    /**
+     * Retrieves operators filtered by team and UAP ID and sorts them by surname then firstname.
+     *
+     * This method fetches operators belonging to a specific team and UAP combination,
+     * then sorts them alphabetically by surname first, and by firstname when surnames match.
+     * The sorting assumes operator names are in the format "firstname.surname".
+     *
+     * @param int $teamId The ID of the team to filter operators by
+     * @param int $uapId The ID of the UAP (Unit Assembly Production) to filter operators by
+     * @return array An array of sorted Operator entities matching the team and UAP criteria
+     */
     public function findOperatorsByTeamAndUapId(int $teamId, int $uapId): array
     {
-        $selectedOperators = $this->operatorRepository->findByTeamAndUap($teamId, $uapId);
+        $selectedOperators = $this->fromNameToRepo('operator')->findByTeamAndUap($teamId, $uapId);
         usort($selectedOperators, function ($a, $b) {
             list($firstNameA, $surnameA) = explode('.', $a->getName());
             list($firstNameB, $surnameB) = explode('.', $b->getName());
@@ -281,15 +247,25 @@ class EntityFetchingService extends AbstractController
 
     public function getTrainingRecords()
     {
-        return $this->trainingRecordRepository->findAll();
+        return $this->findAll('trainingRecord');
     }
 
 
     public function getTrainers()
     {
-        return $this->trainerRepository->findAll();
+        return $this->findAll('trainer');
     }
 
+    /**
+     * Groups uploads into a hierarchical structure based on their associations.
+     *
+     * This method organizes uploads into a nested array structure following the hierarchy:
+     * Zone -> ProductLine -> Category -> Button -> Upload
+     * Uploads without complete association chain are skipped.
+     *
+     * @param array $uploads An array of Upload entities to be grouped
+     * @return array A multi-dimensional array organizing uploads by their hierarchical associations
+     */
     private function groupUploads($uploads)
     {
 
@@ -337,48 +313,128 @@ class EntityFetchingService extends AbstractController
     }
 
 
-    public function findBy(string $entityType, array $criteria): mixed
+    public function getProducts()
     {
-        return $this->{$this->fromNameToRepo($entityType)}->findBy($criteria);
+        return $this->findAll('products');
+    }
+
+    public function getShiftLeaders()
+    {
+        return $this->findAll('shiftLeaders');
+    }
+
+    public function getQualityRep()
+    {
+        return $this->findAll('qualityRep');
+    }
+
+    /**
+     * Retrieves operator suggestions based on a username pattern.
+     *
+     * This method parses a username (typically in format "firstname.lastname"),
+     * searches for operators matching either the firstname or lastname component,
+     * and returns a unique list of matching operator entities.
+     *
+     * @param string $username The username to search for, expected in "firstname.lastname" format
+     * @return array An array of Operator entities matching the search criteria
+     */
+    public function getOperatorSuggestionByUsername(string $username)
+    {
+
+        $explodedUsername = explode('.', $username);
+        $firstname = $explodedUsername[0] ?? null;
+        $firstnameSuggestions = [];
+        $lastname  = $explodedUsername[1] ?? null;
+        $lastnameSuggestions = [];
+
+
+        if ($firstname) {
+            $firstnameSuggestions = $this->fromNameToRepo('operator')->findByNameLikeForSuggestions($firstname);
+        }
+
+        if ($lastname) {
+            $lastnameSuggestions = $this->fromNameToRepo('operator')->findByNameLikeForSuggestions($lastname);
+        }
+
+        $rawSuggestions = array_merge($firstnameSuggestions, $lastnameSuggestions);
+        $suggestions = array_unique($rawSuggestions, SORT_REGULAR);
+        $response = [];
+        foreach ($suggestions as &$suggestionKey) {
+            if (isset($suggestionKey['id'])) {
+                $response[] = $this->find('operator', $suggestionKey['id']);
+            }
+        }
+
+        return $response;
+    }
+
+
+    public function getWorkstations()
+    {
+        return $this->findAll('workstation');
+    }
+
+    public function findAll(string $entityType): array
+    {
+        return $this->fromNameToRepo($entityType)->findAll();
+    }
+
+    /**
+     * Finds entities of the specified type that match given criteria with optional sorting and pagination.
+     *
+     * This method provides a flexible way to query entities by type with various filtering options.
+     * It acts as a wrapper around Doctrine's repository findBy method.
+     *
+     * @param string $entityType The type of entity to search for (e.g., 'user', 'category')
+     * @param array $params An array containing search parameters in the following order:
+     *                      - [0]: criteria - Array of field conditions to filter by (default: empty array)
+     *                      - [1]: orderBy - Array of field sorting instructions (default: null)
+     *                      - [2]: limit - Maximum number of results to return (default: null)
+     *                      - [3]: offset - Number of results to skip (default: null)
+     * @return mixed An array of matching entity objects or an empty array if no matches found
+     */
+    public function findBy(string $entityType, array $params): mixed
+    {
+        $criteria = $params[0] ?? [];
+        $orderBy = $params[1] ?? null;
+        $limit = $params[2] ?? null;
+        $offset = $params[3] ?? null;
+
+        return $this->fromNameToRepo($entityType)->findBy($criteria, $orderBy, $limit, $offset);
     }
 
     public function findOneBy(string $entityType, array $criteria): mixed
     {
-        return $this->{$this->fromNameToRepo($entityType)}->findOneBy($criteria);
+        return $this->fromNameToRepo($entityType)->findOneBy($criteria);
     }
 
     public function count(string $entityType, array $criteria): mixed
     {
-        return $this->{$this->fromNameToRepo($entityType)}->count($criteria);
+        return $this->fromNameToRepo($entityType)->count($criteria);
     }
 
     public function find(string $entityType, int $entityId): mixed
     {
-        return $this->{$this->fromNameToRepo($entityType)}->find($entityId);
+        return $this->fromNameToRepo($entityType)->find($entityId);
     }
 
-    private function fromNameToRepo(string $entityType): string
+    private function fromNameToRepo(string $entityType): object
     {
         $entityTypeName = $this->checkEntityType($entityType);
-        $repositoryName = $this->getRepositoryName($entityTypeName);
-        return lcfirst($repositoryName);
+        return $this->repositoryFactory->getRepository($entityTypeName);
     }
 
 
-    private function getRepositoryName(string $entityType): string
-    {
-        $repositoryName = ucfirst($entityType) . 'Repository';
-
-        // Create the fully qualified class name
-        $repositoryClass = 'App\\Repository\\' . $repositoryName;
-
-        if (!class_exists($repositoryClass)) {
-            throw new \InvalidArgumentException(sprintf('Repository for entity type "%s" does not exist.', $entityType));
-        }
-        return $repositoryName;
-    }
-
-
+    /**
+     * Validates and normalizes an entity type string.
+     *
+     * This method converts the provided entity type to proper case format
+     * and verifies that the corresponding entity class exists in the application.
+     *
+     * @param string $entityType The raw entity type name (e.g., "operator", "category")
+     * @return string The normalized entity name with proper capitalization (e.g., "Operator")
+     * @throws \InvalidArgumentException If the entity class does not exist
+     */
     private function checkEntityType(string $entityType): string
     {
         // Convert to proper case (e.g., "operator" to "Operator")

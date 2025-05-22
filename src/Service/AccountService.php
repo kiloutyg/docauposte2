@@ -4,16 +4,15 @@ namespace App\Service;
 
 use App\Entity\User;
 
-use App\Repository\UserRepository;
 use App\Repository\DepartmentRepository;
-
-use App\Service\EntityDeletionService;
+use App\Repository\OperatorRepository;
 
 use Doctrine\ORM\EntityManagerInterface;
 
 use Psr\Log\LoggerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -22,44 +21,36 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 // This class is responsible for managing the user accounts logic
 class AccountService extends AbstractController
 {
-
-    private $userRepository;
     private $departmentRepository;
-
-    private $entityDeletionService;
+    private $operatorRepository;
 
     private $passwordHasher;
 
-    private $manager;
+    private $em;
 
     private $validator;
 
     private $logger;
 
     public function __construct(
-
-        UserRepository $userRepository,
         DepartmentRepository $departmentRepository,
-
-        EntityDeletionService $entityDeletionService,
+        OperatorRepository $operatorRepository,
 
         UserPasswordHasherInterface $passwordHasher,
 
-        EntityManagerInterface $manager,
+        EntityManagerInterface $em,
 
         ValidatorInterface $validator,
 
         LoggerInterface $logger
 
     ) {
-        $this->userRepository = $userRepository;
         $this->departmentRepository = $departmentRepository;
-
-        $this->entityDeletionService = $entityDeletionService;
+        $this->operatorRepository = $operatorRepository;
 
         $this->passwordHasher = $passwordHasher;
 
-        $this->manager = $manager;
+        $this->em = $em;
 
         $this->validator = $validator;
 
@@ -73,45 +64,30 @@ class AccountService extends AbstractController
     // This function is responsible for creating a new user account and persisting it to the database
     public function createAccount(Request $request)
     {
-        $name = $request->request->get('username');
+        // create the user
+        $user = new User();
         $password = $request->request->get('password');
-        $role = $request->request->get('role');
-        $departmentId = $request->request->get('department');
-        $department = $this->departmentRepository->findOneBy(['id' => $departmentId]);
-        $emailAddress = $request->request->get('emailAddress');
+        $password = $this->passwordHasher->hashPassword($user, $password);
+        $user->setUsername($request->request->get('username'));
+        $user->setPassword($password);
+        $user->setRoles([$request->request->get('role')]);
+        $user->setDepartment($this->departmentRepository->find($request->request->get('department')));
+        $user->setEmailAddress($request->request->get('emailAddress'));
 
-        // check if the username is already in use
-        $user = $this->userRepository->findOneBy(['username' => $name]);
-        if ($user) {
-            throw new \Exception('Ce nom d\'utilisateur est déja utilisé.');
-        } else {
-            // create the user
-            $user = new User();
-
-            $password = $this->passwordHasher->hashPassword($user, $password);
-            $user->setUsername($name);
-            $user->setPassword($password);
-            $user->setRoles([$role]);
-            $user->setDepartment($department);
-            $user->setEmailAddress($emailAddress);
-
-            $errors = $this->validator->validate($user);
-            if (count($errors) > 0) {
-                $errorMessages = [];
-                foreach ($errors as $violation) {
-                    $errorMessages[] = $violation->getMessage();
-                }
-
-                $errorsString = implode("\n", $errorMessages);
-
-                throw new \Exception($errorsString);
+        $errors = $this->validator->validate($user);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $violation) {
+                $errorMessages[] = $violation->getMessage();
             }
-
-            $this->manager->persist($user);
-            $this->manager->flush();
-
-            return  $user;
+            $errorsString = implode("\n", $errorMessages);
+            throw new \Exception($errorsString);
         }
+
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return  $user;
     }
 
 
@@ -125,27 +101,39 @@ class AccountService extends AbstractController
         $modified = '';
         try {
             if ($request->request->get('username') != '') {
+                $this->logger->debug('$request->request->get(\'username\')', [$request->request->get('username')]);
                 $user->setUsername($request->request->get('username'));
                 $modified .= 'Nom d\'utilisateur, ';
-            };
+            }
             if ($request->request->get('password') != '') {
                 $password = $this->passwordHasher->hashPassword($user, $request->request->get('password'));
                 $user->setPassword($password);
                 $modified .= 'Mot de passe, ';
-            };
+            }
             if ($request->request->get('role') != '') {
+                $this->logger->debug('$request->request->get(\'role\')', [$request->request->get('role')]);
                 $user->setRoles([$request->request->get('role')]);
                 $modified .= 'Rôle, ';
-            };
+            }
             if ($request->request->get('department') != '') {
-                $department = $this->departmentRepository->findOneBy(['id' => $request->request->get('department')]);
+                $department = $this->departmentRepository->find((int)$request->request->get('department'));
+                $this->logger->debug('department $request->request->get', [$department]);
                 $user->setDepartment($department);
                 $modified .= 'Service, ';
-            };
+            }
             if ($request->request->get('emailAddress') != '') {
+                $this->logger->debug('$request->request->get(\'emailAddress\')', [$request->request->get('emailAddress')]);
                 $user->setEmailAddress($request->request->get('emailAddress'));
                 $modified .= 'Adresse email, ';
-            };
+            }
+            if ($request->request->get('operator') != '') {
+                $this->logger->debug('$request->request->get(\'operator\')', [$request->request->get('operator')]);
+                $operator = $this->operatorRepository->find($request->request->get('operator'));
+                $this->logger->debug('operator', [$operator]);
+                $user->setOperator($operator);
+                $modified .= 'Identité d\'opérateur liée, ';
+            }
+
             $errorsString = '';
             $errors = $this->validator->validate($user);
             if (count($errors) > 0) {
@@ -154,18 +142,19 @@ class AccountService extends AbstractController
                     $errorMessages[] = $violation->getMessage();
                 }
                 $errorsString = implode("\n", $errorMessages);
+                $this->logger->error('Validation errors while modifying account', [$errorsString]);
                 throw new \Exception($errorsString);
             }
             if ($modified === '' || $modified === null || $errorsString !== '') {
                 $modified = 'rien';
             }
             $modified = rtrim($modified, ', ');
-            $this->manager->persist($user);
-            $this->manager->flush();
+            $this->em->persist($user);
+            $this->em->flush();
 
             return $modified;
         } catch (\Exception $e) {
-            $this->logger->error('account modification error', [
+            $this->logger->error('Account modification error', [
                 ' modified account' => $user,
                 'modifier' => $this->getUser(),
                 'error' => $e->getMessage()
@@ -181,34 +170,21 @@ class AccountService extends AbstractController
 
 
 
-    // This function is responsible for deleting a user account from the database
-    public function deleteUser($id)
+    public function blockUser(User $user)
     {
-        $user = $this->userRepository->find($id);
-        $this->entityDeletionService->deleteEntity('user', $id);
-
-        $this->manager->remove($user);
-        $this->manager->flush();
-    }
-
-    // This function is responsible for blocking a user account
-
-    public function blockUser($id)
-    {
-        $user = $this->userRepository->find($id);
         $user->setBlocked(true);
         $user->setPassword('');
         $user->setRoles(['ROLE_USER']);
-        $this->manager->persist($user);
-        $this->manager->flush();
+        $this->em->persist($user);
+        $this->em->flush();
     }
 
-    public function unblockUser($id)
+
+    public function unblockUser(User $user)
     {
-        $user = $this->userRepository->find($id);
         $user->setBlocked(null);
-        $this->manager->persist($user);
-        $this->manager->flush();
+        $this->em->persist($user);
+        $this->em->flush();
     }
 
 
@@ -217,79 +193,48 @@ class AccountService extends AbstractController
         $username = $user->getUsername();
         $emailAddress = $username . '@' . 'plasticomnium.com';
         $user->setEmailAddress($emailAddress);
-        $this->manager->persist($user);
-        $this->manager->flush();
-        return;
+        $this->em->persist($user);
+        $this->em->flush();
     }
 
-    public function transferWork(Request $request, int $userId)
+
+    public function transferWork(User $originalUser, User $recipient)
     {
-        $user = $this->userRepository->find($userId);
-        $recipient = $this->userRepository->find($request->request->get('work-transfer-recipient'));
+        $this->transferEntities($originalUser, $recipient, 'getIncidents', 'setUploader');
+        $this->transferEntities($originalUser, $recipient, 'getOldUploads', 'setOldUploader');
+        $this->transferEntities($originalUser, $recipient, 'getUploads', 'setUploader');
+        $this->transferEntities($originalUser, $recipient, 'getZones', 'setCreator');
+        $this->transferEntities($originalUser, $recipient, 'getProductLines', 'setCreator');
+        $this->transferEntities($originalUser, $recipient, 'getCategories', 'setCreator');
+        $this->transferEntities($originalUser, $recipient, 'getButtons', 'setCreator');
+        $this->checkApprobations($originalUser);
 
-        if ($user->getIncidents()) {
-            foreach ($user->getIncidents() as $incident) {
-                $incident->setUploader($recipient);
-                $this->manager->persist($incident);
+        $this->em->flush();
+    }
+
+    private function transferEntities(User $originalUser, User $recipient, string $getterMethod, string $setterMethod): void
+    {
+        $entities = $originalUser->$getterMethod();
+        if ($entities !== null && is_iterable($entities)) {
+            foreach ($entities as $entity) {
+                $entity->$setterMethod($recipient);
+                $this->em->persist($entity);
             }
         }
+    }
 
-        if ($user->getOldUploads()) {
-            foreach ($user->getOldUploads() as $oldUpload) {
-                $oldUpload->setOldUploader($recipient);
-                $this->manager->persist($oldUpload);
-            }
-        }
-
-
-        if ($user->getUploads()) {
-            foreach ($user->getUploads() as $upload) {
-                $upload->setUploader($recipient);
-                $this->manager->persist($upload);
-            }
-        }
-
-        if ($user->getZones()) {
-            foreach ($user->getZones() as $zone) {
-                $zone->setCreator($recipient);
-                $this->manager->persist($zone);
-            }
-        }
-
-        if ($user->getProductLines()) {
-            foreach ($user->getProductLines() as $productLine) {
-                $productLine->setCreator($recipient);
-                $this->manager->persist($productLine);
-            }
-        }
-
-        if ($user->getCategories()) {
-            foreach ($user->getCategories() as $category) {
-                $category->setCreator($recipient);
-                $this->manager->persist($category);
-            }
-        }
-
-        if ($user->getButtons()) {
-            foreach ($user->getButtons() as $button) {
-                $button->setCreator($recipient);
-                $this->manager->persist($button);
-            }
-        }
-
-        if ($user->getApprobations()) {
+    private function checkApprobations(User $originalUser): void
+    {
+        $approbations = $originalUser->getApprobations();
+        if ($approbations !== null && is_iterable($approbations)) {
             $uploadsNames = [];
-            foreach ($user->getApprobations() as $approbation) {
+            foreach ($approbations as $approbation) {
                 $uploadsNames[] = $approbation->getValidation()->getUpload()->getButton()->getName();
             }
             if (!empty($uploadsNames)) {
-                $namesString = implode(', ', $uploadsNames); // Convert the names array to a comma-separated string
+                $namesString = implode(', ', $uploadsNames);
                 throw new \Exception('Les approbations ne peuvent pas être transférées; veuillez revalider les documents suivants: ' . $namesString);
             }
         }
-
-        $this->manager->flush();
-
-        return;
     }
 }

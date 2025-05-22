@@ -1,0 +1,183 @@
+<turbo-frame
+	id="departmentManagement">
+	<div
+		class="accordion-item">
+		<div
+			id="flash-messages">
+			{% for label, messages in app.flashes %}
+				<div
+					class="alert alert-{{ label }}">
+					{% for message in messages %}
+						<p>
+							{{ message }}
+						</p>
+					{% endfor %}
+				</div>
+			{% endfor %}
+		</div>
+		<h3
+			class="accordion-header"
+			id="headingDepartment">
+			<button
+				class="accordion-button"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target="#collapseDepartment"
+				aria-expanded="false"
+				aria-controls="collapseDepartment">
+				<strong>
+					Gestion des Services
+				</strong>
+			</button>
+		</h3>
+		<div
+			id="collapseDepartment"
+			class="accordion-collapse collapse"
+			aria-labelledby="headingDepartment"
+			data-bs-parent="#accordionAccountView">
+			<div
+				class="accordion-body bg-secondary shadow shadow-inset">
+				<div
+					class="accordion">
+					<form
+						class="row mb-3 justify-content-center align-items-center"
+						id="newDepartmentForm"
+						method="post"
+						action="{{path('app_department_creation')}}">
+						<div
+							class=" col-auto">
+							<label
+								for="department_name"
+								class="form-label"
+								style="color:white">
+								Nouveau Service :
+							</label>
+							<input
+								type="text"
+								class="form-control"
+								id="department_name"
+								name="department_name"
+								placeholder="Nom du nouveau Service"
+								required>
+						</div>
+						<div
+							class="col-auto">
+							<button
+								class="btn btn-secondary shadow border border-dark-subtle m-0"
+								action="submit">
+								Ajouter un nouveau service
+							</button>
+						</div>
+					</form>
+					{% for department in departments %}
+						<form
+							data-controller="department-modification"
+							class="col-12 mx-auto mb-3"
+							method="post"
+							action="{{path('app_department_modification')}}">
+							<div
+								class="form-control shadow d-flex justify-content-end align-items-center gap-1">
+								<div
+									class="flex-grow-1 d-flex align-items-center gap-1">
+									<strong>
+										{{department.name|upper}}
+									</strong>
+								</div>
+								<input
+									type="text"
+									class="m-0"
+									id="department_name_mod_{{ department.id }}"
+									name="department_name_mod"
+									placeholder="{{department.name|upper}}">
+								<input
+									type="hidden"
+									name="department_id"
+									value="{{ department.id }}">
+								<select
+									id="department_uaps_{{ department.id }}"
+									name="department_uaps[]"
+									multiple="multiple"
+									size="2"
+									data-department-modification-target="select">
+									<option
+										value="0"
+										{% if department.uaps is empty %} selected
+										{% endif %}>
+										Aucune/Toutes
+									</option>
+									{% for uap in uaps %}
+										{% if uap.name is same as 'INDEFINI' %}
+											{% else %}
+												<option
+													value="{{uap.id}}" {% if uap.id in department.uaps|map(u => u.id) %} selected
+													{% endif %}>
+													{{uap.name|upper}}
+												</option>
+										{% endif %}
+									{% endfor %}
+								</select>
+								<select
+									id="department_zones_{{ department.id }}"
+									name="department_zones[]"
+									multiple="multiple"
+									size="2"
+									data-department-modification-target="select">
+									>
+									<option
+										value="0"
+										{% if department.zones is empty %} selected
+										{% endif %}>
+										Aucune/Toutes
+									</option>
+									{% for zone in zones %}
+										<option
+											value="{{zone.id}}" {% if zone.id in department.zones|map(z => z.id) %} selected
+											{% endif %}>
+											{{zone.name|upper}}
+										</option>
+									{% endfor %}
+								</select>
+								<button
+									id="modify_department_{{ department.id }}"
+									type="submit"
+									aria-label="Modify the department Entity"
+									class="btn btn-info tooltips-above">
+									<span
+										class="d-none d-md-inline">
+										Modifier
+									</span>
+									<i
+										class="fas fa-pen-to-square d-inline d-md-none"
+										aria-hidden="true"
+										title="Modifier"></i>
+									<span
+										class="visually-hidden">
+										Modifier
+									</span>
+								</button>
+								<a
+									id="delete_department"
+									href="{{ path('app_department_deletion', {departmentId : department.id}) }}" type="button"
+									aria-label="Delete the department Entity"
+									class="btn btn-danger shadow border border-dark-subtle delete-department">
+									<span
+										class="d-none d-md-inline tooltips-above">
+										Supprimer
+									</span>
+									<i
+										class="fas fa-trash d-inline d-md-none"
+										aria-hidden="true"
+										title="Supprimer"></i>
+									<span
+										class="visually-hidden">
+										Supprimer
+									</span>
+								</a>
+							</div>
+						</form>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+</turbo-frame>

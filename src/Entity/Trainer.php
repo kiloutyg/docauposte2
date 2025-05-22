@@ -24,9 +24,23 @@ class Trainer
     #[ORM\Column(options: ['default' => false])]
     private ?bool $demoted;
 
+    /**
+     * @var Collection<int, Iluo>
+     */
+    #[ORM\OneToMany(targetEntity: Iluo::class, mappedBy: 'trainer')]
+    private Collection $iluos;
+
+    /**
+     * @var Collection<int, IluoChecklist>
+     */
+    #[ORM\OneToMany(targetEntity: IluoChecklist::class, mappedBy: 'trainer')]
+    private Collection $iluoChecklists;
+
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
+        $this->iluos = new ArrayCollection();
+        $this->iluoChecklists = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -84,6 +98,66 @@ class Trainer
     public function setDemoted(?bool $demoted): static
     {
         $this->demoted = $demoted;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Iluo>
+     */
+    public function getIluos(): Collection
+    {
+        return $this->iluos;
+    }
+
+    public function addIluo(Iluo $iluo): static
+    {
+        if (!$this->iluos->contains($iluo)) {
+            $this->iluos->add($iluo);
+            $iluo->setTrainer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIluo(Iluo $iluo): static
+    {
+        if ($this->iluos->removeElement($iluo)) {
+            // set the owning side to null (unless already changed)
+            if ($iluo->getTrainer() === $this) {
+                $iluo->setTrainer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, IluoChecklist>
+     */
+    public function getIluoChecklists(): Collection
+    {
+        return $this->iluoChecklists;
+    }
+
+    public function addIluoChecklist(IluoChecklist $iluoChecklist): static
+    {
+        if (!$this->iluoChecklists->contains($iluoChecklist)) {
+            $this->iluoChecklists->add($iluoChecklist);
+            $iluoChecklist->setTrainer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIluoChecklist(IluoChecklist $iluoChecklist): static
+    {
+        if ($this->iluoChecklists->removeElement($iluoChecklist)) {
+            // set the owning side to null (unless already changed)
+            if ($iluoChecklist->getTrainer() === $this) {
+                $iluoChecklist->setTrainer(null);
+            }
+        }
 
         return $this;
     }

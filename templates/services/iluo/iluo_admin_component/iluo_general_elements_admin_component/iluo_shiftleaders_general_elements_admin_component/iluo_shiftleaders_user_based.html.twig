@@ -1,0 +1,40 @@
+<div
+	class="flex-grow-1">
+	<strong
+		class="flex-grow-1">
+		{{shiftLeader.user.username|capitalize|split('.')|first }}
+		{{shiftLeader.user.username|upper|split('.')|last }}
+	</strong>
+</div>
+{% if shiftLeader.user.operator is defined and shiftLeader.user.operator is not empty %}
+	<div>
+		{{shiftLeader.user.operator.team.name }}
+		{% set uap = shiftLeader.user.operator.uaps|first %}
+		{{uap.name}}
+	</div>
+{% elseif shiftLeader.user.department is defined and shiftLeader.user.department is not empty %}
+	<div>
+		{{shiftLeader.user.department.name|capitalize}}
+	</div>
+{% endif %}
+{% if is_granted('ROLE_SUPER_ADMIN') %}
+	<a
+		id="modify_user_account"
+		href="{{path('app_account_modify_account', {userId: shiftLeader.user.id})}}" aria-label="Modify the User Entity"
+		data-turbo-frame="_top"
+		class="btn btn-info m-1 tooltips-above">
+		<span
+			class="d-none d-md-inline">
+			UserMod
+		</span>
+		<i
+			class="fas fa-pen-to-square d-inline d-md-none"
+			aria-hidden="true"
+			title="	Modifier"></i>
+		<span
+			class="visually-hidden">
+			UserMod
+		</span>
+	</a>
+{% endif %}
+{{ delete_form('shiftLeaders', shiftLeader.id, 'app_iluo_shiftleaders_general_elements_admin') }}

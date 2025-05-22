@@ -131,6 +131,7 @@ class OperatorService extends AbstractController
     }
 
 
+
     /**
      * Permanently deletes operators that were previously marked for deletion.
      *

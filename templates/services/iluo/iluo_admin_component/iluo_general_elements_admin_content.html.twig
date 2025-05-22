@@ -1,0 +1,31 @@
+<turbo-frame
+	id="iluo-general-elements-content">
+	{% import 'macros/accordion_loading_animations.html.twig' as loading %}
+
+	<turbo-frame
+		id="products-section"
+		src="{{ path('app_iluo_products_general_elements_admin') }}" loading="lazy"
+		class="row">
+		{{ loading.content_placeholder('text', 2, '90%') }}
+	</turbo-frame>
+
+	<hr
+		class="my-4">
+
+	<turbo-frame
+		id="shiftleaders-section"
+		src="{{ path('app_iluo_shiftleaders_general_elements_admin') }}" loading="lazy"
+		class="row">
+		{{ loading.content_placeholder('text', 2, '90%') }}
+	</turbo-frame>
+
+	<hr
+		class="my-4">
+
+	<turbo-frame
+		id="qualityrep-section"
+		src="{{ path('app_iluo_qualityrep_general_elements_admin') }}" loading="lazy"
+		class="row">
+		{{ loading.content_placeholder('text', 2, '90%') }}
+	</turbo-frame>
+</turbo-frame>

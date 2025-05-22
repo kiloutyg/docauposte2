@@ -54,3 +54,6 @@ services:
     App\EventSubscriber\ActivitySubscriber:
         tags:
             - { name: kernel.event_subscriber }
+    App\Service\Factory\RepositoryFactory:
+        arguments:
+            $container: "@service_container"

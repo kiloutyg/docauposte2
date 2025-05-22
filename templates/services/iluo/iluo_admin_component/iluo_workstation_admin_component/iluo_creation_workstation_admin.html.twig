@@ -1,0 +1,94 @@
+<turbo-frame
+	id="workstation-section"
+	class="container row mx-auto px-0 px-md-2">
+	{{ form_start(workstationForm, { attr: { 'data-controller': 'workstation-form', class: 'col-lg-12 col-md-12 col-sm-12 row', method: 'POST', action: path('app_iluo_creation_workstation_admin'), id: 'workstation-form'}}
+	) }}
+	<div
+		class="workstationName-message"
+		data-name-validation-target="workstationNameMessage"></div>
+	<div
+		id="flash-messages">
+		{% for label, messages in app.flashes %}
+			<div
+				class="alert alert-{{ label }}">
+				{% for message in messages %}
+					<p>
+						{{ message }}
+					</p>
+				{% endfor %}
+			</div>
+		{% endfor %}
+	</div>
+	{{ form_end(workstationForm) }}
+	{% if workstations is not empty %}
+		<div
+			class="col-lg-12 col-md-12 col-sm-12 mt-auto mb-auto accordion"
+			id="accordionWorkstationList">
+			<div
+				class="accordion-item shadow-lg shadow-lg-inset border border-dark">
+				<h2
+					class="accordion-header"
+					id="headingWorkstationList">
+					<button
+						class="accordion-button bg-white text-dark collapsed"
+						type="button"
+						data-bs-toggle="collapse"
+						data-bs-target="#collapseWorkstationList"
+						aria-expanded="false"
+						aria-controls="collapseWorkstationList">
+						<strong>
+							Liste des workstations
+						</strong>
+					</button>
+				</h2>
+				<div
+					id="collapseWorkstationList"
+					class="accordion-collapse collapse "
+					aria-labelledby="headingWorkstationList"
+					data-bs-parent="#accordionWorkstationList">
+					<div
+						class="accordion-body bg-white text-dark">
+						<ul
+							class="list-group">
+							{% for workstation in workstations %}
+								<li
+									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+									<div
+										class="flex-grow-1">
+										<strong
+											class="flex-grow-1">
+											{{workstation.name}}
+										</strong>
+										<strong
+											class="flex-grow-1">
+											{{workstation.upload.filename}}
+										</strong>
+										<strong
+											class="flex-grow-1">
+											{{workstation.products.name}}
+										</strong>
+										<strong
+											class="flex-grow-1">
+											{{workstation.department.name}}
+										</strong>
+										<strong
+											class="flex-grow-1">
+											{{workstation.zone.name}}
+										</strong>
+										<strong
+											class="flex-grow-1">
+											{{workstation.uap.name}}
+										</strong>
+									</div>
+									{% if is_granted('ROLE_LINE_ADMIN') %}
+										{{ delete_form('workstation', workstation.id, 'app_iluo_creation_workstation_admin') }}
+									{% endif %}
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+</turbo-frame>

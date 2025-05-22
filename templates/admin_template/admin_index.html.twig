@@ -1,21 +1,15 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}
 	AdminPage
 {% endblock %}
-
 {% block javascripts %}
 	{{ parent() }}
-
 	{{ encore_entry_script_tags('incident-cascading-dropdowns') }}
 	{{ encore_entry_script_tags('cascading-dropdowns') }}
 	{{ encore_entry_script_tags('document-validator') }}
 	{{ encore_entry_script_tags('department-creation') }}
 {% endblock %}
-
 {% block body %}
-
-
 	<div
 		class="row align-items-center">
 		{% if pageLevel is same as('super') %}
@@ -25,13 +19,12 @@
 					Page de Super-Administration
 				</strong>
 			</h1>
-
 		{% elseif pageLevel is same as('zone') %}
-
 			{% if  is_granted('ROLE_SUPER_ADMIN') %}
 				<div
 					class='my-3'>
 					<aside
+						aria-label="Super admin page access"
 						class="end-0">
 						<a
 							href="{{ path('app_super_admin') }}" class="btn shadow bg-dark "
@@ -52,7 +45,6 @@
 				class="my-3">
 				<strong>
 					Page d'administration des Lignes de la Zone
-
 					<button
 						class="dropdown-toggle"
 						data-bs-toggle="dropdown"
@@ -61,7 +53,6 @@
 						id="zoneDropdown">
 						{{zone.name|split('.')|first|upper}}
 					</button>
-
 					<ul
 						class="dropdown-menu shadow shadow-inset"
 						aria-labelledby="zoneDropdown">
@@ -78,13 +69,12 @@
 					</ul>
 				</strong>
 			</h1>
-
 		{% elseif pageLevel is same as('productLine') %}
-
-			{% if  is_granted('ROLE_ADMIN') %}
+			{% if is_granted('ROLE_ADMIN') %}
 				<div
 					class='my-3'>
 					<aside
+						aria-label="zone admin page access"
 						class="end-0">
 						<a
 							href="{{ path('app_zone_admin', {zoneId: zone.id}) }}" class="btn shadow bg-dark "
@@ -105,7 +95,6 @@
 				class="my-3">
 				<strong>
 					Page d'administration de la ligne
-
 					<button
 						class="dropdown-toggle"
 						data-bs-toggle="dropdown"
@@ -132,13 +121,12 @@
 					{{productLine.zone.name|split('.')|first|upper}}
 				</strong>
 			</h1>
-
 		{% elseif pageLevel is same as('category') %}
-
 			{% if  is_granted('ROLE_LINE_ADMIN') %}
 				<div
 					class='my-3'>
 					<aside
+						aria-label="Line admin page access"
 						class="end-0">
 						<a
 							href="{{ path('app_productLine_admin', {productLineId: productLine.id}) }}" class="btn shadow  bg-dark "
@@ -185,12 +173,10 @@
 					{{productLine.name|split('.')|first|upper}}
 				</strong>
 			</h1>
-
 		{% endif %}
 
-
 		<div
-			class="accordion my-3"
+			class="accordion"
 			id="accordionAdmin">
 
 			{% if pageLevel is same as('super')  %}
@@ -205,11 +191,9 @@
 				{% include "admin_template/admin_template_components/button_creation_form.html.twig" %}
 			{% endif %}
 
-
 			{% if settings.IsTraining %}
 				{{ render(controller('App\\Controller\\Operator\\OperatorAdminController::operatorTeamUapManagement'), options = []) }}
 			{% endif %}
-
 
 			{% include "services/uploads/upload.html.twig" %}
 
@@ -221,7 +205,6 @@
 				{% endif %}
 			{% endif %}
 
-
 			{% include "services/uploads/uploaded_list.html.twig" %}
 
 			{% if settings.IsUploadValidation %}
@@ -230,5 +213,4 @@
 
 		</div>
 	</div>
-
 {% endblock %}

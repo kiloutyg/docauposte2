@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Model\EmploymentType;
 use App\Repository\OperatorRepository;
 use App\Validator\OperatorCodeFormat;
 
@@ -65,6 +66,7 @@ class Operator
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $inactiveSince = null;
 
+
     /**
      * @var Collection<int, Uap>
      */
@@ -73,11 +75,27 @@ class Operator
     #[Assert\Count(min: 1, minMessage: "Un opérateur doit être assigné à au moins une UAP")]
     private Collection $uaps;
 
+    /**
+     * @var Collection<int, Iluo>
+     */
+    #[ORM\OneToMany(targetEntity: Iluo::class, mappedBy: 'operator')]
+    private Collection $iluos;
+
+    #[ORM\Column(nullable: true, enumType: EmploymentType::class)]
+    private ?EmploymentType $employmentType = null;
+
+    #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist'])]
+    private ?User $user = null;
+
+    #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist', 'remove'])]
+    private ?ShiftLeaders $shiftLeaders = null;
+
 
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
         $this->uaps = new ArrayCollection();
+        $this->iluos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -273,6 +291,91 @@ class Operator
         if ($this->uaps->removeElement($uap)) {
             $uap->removeOperator($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Iluo>
+     */
+    public function getIluos(): Collection
+    {
+        return $this->iluos;
+    }
+
+    public function addIluo(Iluo $iluo): static
+    {
+        if (!$this->iluos->contains($iluo)) {
+            $this->iluos->add($iluo);
+            $iluo->setOperator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIluo(Iluo $iluo): static
+    {
+        if ($this->iluos->removeElement($iluo)) {
+            if ($iluo->getOperator() === $this) {
+                $iluo->setOperator(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getEmploymentType(): ?EmploymentType
+    {
+        return $this->employmentType;
+    }
+
+    public function setEmploymentType(?EmploymentType $employmentType): static
+    {
+        $this->employmentType = $employmentType;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($user === null && $this->user !== null) {
+            $this->user->setOperator(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($user !== null && $user->getOperator() !== $this) {
+            $user->setOperator($this);
+        }
+
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getShiftLeaders(): ?ShiftLeaders
+    {
+        return $this->shiftLeaders;
+    }
+
+    public function setShiftLeaders(?ShiftLeaders $shiftLeaders): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($shiftLeaders === null && $this->shiftLeaders !== null) {
+            $this->shiftLeaders->setOperator(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($shiftLeaders !== null && $shiftLeaders->getOperator() !== $this) {
+            $shiftLeaders->setOperator($this);
+        }
+
+        $this->shiftLeaders = $shiftLeaders;
 
         return $this;
     }

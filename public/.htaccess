@@ -17,6 +17,16 @@ DirectoryIndex index.php
     Options -MultiViews
 </IfModule>
 
+# PHP settings to prevent segmentation faults
+<IfModule mod_php.c>
+    php_value memory_limit 512M
+    php_value max_execution_time 300
+    php_value post_max_size 64M
+    php_value upload_max_filesize 64M
+    php_flag display_errors on
+    php_flag log_errors on
+</IfModule>
+
 <IfModule mod_rewrite.c>
     # This Option needs to be enabled for RewriteRule, otherwise it will show an error like
     # 'Options FollowSymLinks or SymLinksIfOwnerMatch is off which implies that RewriteRule directive is forbidden'

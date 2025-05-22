@@ -24,7 +24,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 180)]
     #[Assert\Regex(
-        pattern: '/^(it-[a-z]{3,}|[a-z]{3,}(?:-[a-z]{3,})?\.[a-z]{3,}(?:-[a-z]{3,})?)$/',
+        pattern: '/^(it-[a-z]+|[a-z]+(?:-[a-z]+)?\.[a-z]+(?:-[a-z]+)?)$/',
         message: 'Le nom d\'utilisateur doit être au format prénom.nom, prénom-nom.nom, ou it-polangres'
     )]
     private ?string $username = null;
@@ -72,6 +72,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'Creator', targetEntity: Button::class)]
     private Collection $buttons;
 
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: ShiftLeaders::class, cascade: ['remove'])]
+    private ?ShiftLeaders $shiftLeader = null;
+
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: QualityRep::class, cascade: ['remove'])]
+    private ?QualityRep $qualityRep = null;
+
+    #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Operator $operator = null;
 
     public function __construct()
     {
@@ -153,6 +161,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+        // You can also add this line to help with profiler security
+        $this->password = '[REDACTED]';
     }
 
     public function getDepartment(): ?Department
@@ -448,6 +458,43 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $button->setCreator(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getShiftLeader(): ?ShiftLeaders
+    {
+        return $this->shiftLeader;
+    }
+
+    public function setShiftLeader(?ShiftLeaders $shiftLeader): static
+    {
+        $this->shiftLeader = $shiftLeader;
+
+        return $this;
+    }
+
+    public function getQualityRep(): ?QualityRep
+    {
+        return $this->qualityRep;
+    }
+
+    public function setQualityRep(?QualityRep $qualityRep): static
+    {
+        $this->qualityRep = $qualityRep;
+
+        return $this;
+    }
+
+
+    public function getOperator(): ?Operator
+    {
+        return $this->operator;
+    }
+
+    public function setOperator(?Operator $operator): static
+    {
+        $this->operator = $operator;
 
         return $this;
     }
