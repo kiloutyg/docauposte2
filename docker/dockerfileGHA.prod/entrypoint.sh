@@ -47,8 +47,6 @@ php bin/console doctrine:migrations:diff --no-interaction;
 for version in $(php bin/console doctrine:migrations:status --no-interaction | grep "Latest" | awk '{print $5}'); do
   php bin/console doctrine:migrations:execute --up "$version" --no-interaction;
 done
-
-
 # Clear and warm up Symfony cache
 php ./bin/console cache:clear --no-warmup --env=prod
 php ./bin/console cache:warmup --env=prod
