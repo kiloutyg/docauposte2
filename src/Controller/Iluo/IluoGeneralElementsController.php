@@ -56,27 +56,8 @@ class IluoGeneralElementsController extends AbstractController
 
 
     /**
-     * Provides a Turbo Frame for the general elements admin section.
-     * 
-     * This function renders a Turbo Frame template that serves as a container
-     * for the general elements administration interface. The frame allows for
-     * partial page updates without full page reloads when interacting with
-     * the general elements admin section.
-     *
-     * @return Response A Symfony Response object containing the rendered Turbo Frame template
-     *                  for the general elements admin section.
-     */
-    #[Route('admin/general_elements', name: 'general_elements_admin')]
-    public function generalElementsAdminFrameGet(): Response
-    {
-        return $this->render('services/iluo/iluo_admin_component/iluo_general_elements_admin.html.twig', []);
-    }
-
-
-
-    /**
      * Provides the content for the general elements administration section.
-     * 
+     *
      * This function renders a template that contains the main content for the general elements
      * administration interface. It serves as the primary content area for managing general elements
      * such as products, shift leaders, and quality representatives.
@@ -87,7 +68,7 @@ class IluoGeneralElementsController extends AbstractController
     #[Route('admin/general_elements/content', name: 'general_elements_admin_content')]
     public function generalElementsContentGet(): Response
     {
-        return $this->render('services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_general_elements_admin_content.html.twig', []);
+        return $this->render('services/iluo/iluo_admin_component/iluo_general_elements_admin_content.html.twig', []);
     }
 
 

@@ -48,23 +48,6 @@ class IluoWorkstationController extends AbstractController
     }
 
 
-    /**
-     * Provides a Turbo Frame for the workstation admin section.
-     *
-     * This function renders a template that contains a Turbo Frame
-     * specifically for the workstation administration interface.
-     * The frame allows for dynamic content loading within the page.
-     *
-     * @return Response A Symfony Response object containing the rendered Turbo Frame
-     *                  template for the workstation admin section.
-     */
-    #[Route('admin/workstation', name: 'workstation_admin')]
-    public function workstationAdminFrameGet(): Response
-    {
-        return $this->render('services/iluo/iluo_admin_component/iluo_workstation_admin.html.twig', []);
-    }
-
-
 
     /**
      * Retrieves the content for the workstation admin section.
@@ -78,7 +61,7 @@ class IluoWorkstationController extends AbstractController
     #[Route(path: 'admin/workstation/content', name: 'workstation_admin_content')]
     public function workstationChecklistContentGet(): Response
     {
-        return $this->render('/services/iluo/iluo_admin_component/iluo_workstation_admin_component/iluo_workstation_admin_content.html.twig', []);
+        return $this->render('/services/iluo/iluo_admin_component/iluo_workstation_admin_content.html.twig', []);
     }
 
 

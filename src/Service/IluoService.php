@@ -26,6 +26,19 @@ class IluoService extends AbstractController
     private $qualityRepService;
     private $shiftLeadersService;
     private $workstationService;
+    /**
+     * Constructor for the IluoService class.
+     *
+     * Initializes the service with required dependencies for logging and
+     * managing various ILUO components (products, quality representatives,
+     * shift leaders, and workstations).
+     *
+     * @param LoggerInterface $logger The logger service for recording application events
+     * @param ProductsService $productsService Service for managing product-related operations
+     * @param QualityRepService $qualityRepService Service for managing quality representative operations
+     * @param ShiftLeadersService $shiftLeadersService Service for managing shift leader operations
+     * @param WorkstationService $workstationService Service for managing workstation operations
+     */
     public function __construct(
         LoggerInterface                     $logger,
 
@@ -50,7 +63,7 @@ class IluoService extends AbstractController
 
     /**
      * Manages form submission and processing for ILUO component entities.
-     * 
+     *
      * This method handles the form submission process for various entity types,
      * validates the form, processes it through the appropriate service, and
      * redirects to the relevant route with appropriate flash messages.
@@ -58,40 +71,40 @@ class IluoService extends AbstractController
      * @param string $entityType The type of entity being processed (e.g., 'products', 'shiftLeaders')
      * @param Form $form The form instance containing the submitted data
      * @param Request $request The current HTTP request
-     * 
+     *
      * @return Response A redirect response to the appropriate route after processing
-     * 
+     *
      * @throws \InvalidArgumentException When the service or method for the entity type is not found
      */
     public function iluoComponentFormManagement(string $entityType, Form $form, Request $request): Response
     {
         $this->logger->info('iluoComponentFormManagement', [$entityType, $form, $request]);
-        $form->handleRequest($request);
+        $form->handleRequest(request: $request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 // Convert entityType to service property name (e.g., 'shiftLeaders' -> 'shiftLeadersService')
-                $serviceProperty = lcfirst($entityType) . 'Service';
+                $serviceProperty = lcfirst(string: $entityType) . 'Service';
                 // Check if service property exists in the current class
-                if (!property_exists($this, $serviceProperty)) {
-                    throw new \InvalidArgumentException("Service not found for entity type: $entityType");
+                if (!property_exists(object_or_class: $this, property: $serviceProperty)) {
+                    throw new \InvalidArgumentException(message: "Service not found for entity type: $entityType");
                 }
                 $service = $this->$serviceProperty;
                 // Call the appropriate method
-                $methodName = lcfirst($entityType) . 'CreationFormProcessing';
-                if (!method_exists($service, $methodName)) {
-                    throw new \InvalidArgumentException("Method $methodName not found in service");
+                $methodName = lcfirst(string: $entityType) . 'CreationFormProcessing';
+                if (!method_exists(object_or_class: $service, method: $methodName)) {
+                    throw new \InvalidArgumentException(message: "Method $methodName not found in service");
                 }
                 $entityName = $service->$methodName($form);
-                $this->addFlash('success', "L'entité $entityName a bien été ajoutée.");
+                $this->addFlash(type: 'success', message: "L'entité $entityName a bien été ajoutée.");
             } catch (\Exception $e) {
                 $this->logger->error('Issue in form submission', [$e->getMessage()]);
-                $this->addFlash('error', 'Issue in form submission ' . $e->getMessage());
+                $this->addFlash(type: 'error', message: 'Issue in form submission ' . $e->getMessage());
             }
         } elseif ($form->isSubmitted()) {
             $this->logger->error('Invalid form', [$form->getErrors()]);
-            $this->addFlash('error', 'Invalid form ' . $form->getErrors());
+            $this->addFlash(type: 'error', message: 'Invalid form ' . $form->getErrors());
         }
-        return $this->redirectToRoute($this->routeNameDetermination($entityType));
+        return $this->redirectToRoute(route: $this->routeNameDetermination(entityType: $entityType));
     }
 
 
@@ -99,29 +112,29 @@ class IluoService extends AbstractController
 
     /**
      * Determines the appropriate route name based on the entity type.
-     * 
+     *
      * This method maps different entity types to their corresponding route names
      * in the application's routing system. It handles various ILUO component entities
      * and returns the appropriate route for redirecting after form processing.
      *
      * @param string $entityType The type of entity for which to determine the route
      *                          (e.g., 'products', 'shiftLeaders', 'qualityRep', 'workstation', 'trainingMaterialType')
-     * 
+     *
      * @return string The determined route name for the given entity type
-     * 
+     *
      * @throws \InvalidArgumentException When an unsupported entity type is provided
      */
     public function routeNameDetermination(string $entityType): string
     {
-        if (in_array($entityType, ['products', 'shiftLeaders', 'qualityRep'])) {
-            $route = 'app_iluo_' . strtolower($entityType) . '_general_elements_admin';
+        if (in_array(needle: $entityType, haystack: ['products', 'shiftLeaders', 'qualityRep'])) {
+            $route = 'app_iluo_' . strtolower(string: $entityType) . '_general_elements_admin';
         } elseif ($entityType === 'workstation') {
             $route = 'app_iluo_creation_workstation_admin';
         } elseif ($entityType === 'trainingMaterialType') {
             $route = 'app_iluo_trainingMaterialType_checklist_admin';
         } else {
             $this->logger->error('Invalid entity type', [$entityType]);
-            throw new \InvalidArgumentException("Invalid entity type: $entityType");
+            throw new \InvalidArgumentException(message: "Invalid entity type: $entityType");
         }
         $this->logger->info('Redirecting to route', [$route]);
         return $route;

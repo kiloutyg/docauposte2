@@ -144,7 +144,7 @@ abstract class AbstractBaseFormType extends AbstractType
 
     /**
      * Merges options with proper handling of nested arrays
-     * 
+     *
      * @param array $baseOptions The base options array (will be modified)
      * @param array $additionalOptions The additional options to merge
      */

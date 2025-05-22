@@ -1,13 +1,11 @@
 <turbo-frame
-	id="iluo-checklist-content">
+	id="iluo-workstation-content">
 	{% import 'macros/accordion_loading_animations.html.twig' as loading %}
-
 	<turbo-frame
-		id="training-material-type-section"
-		src="{{ path('app_iluo_trainingMaterialType_checklist_admin') }}" loading="lazy"
-		class="px-0 px-md-2">
+		id="workstation-section"
+		src="{{path('app_iluo_creation_workstation_admin')}}" loading="lazy"
+		class="row">
 		{{ loading.content_placeholder('text', 2, '90%') }}
-
 	</turbo-frame>
 	<hr
 		class="my-4">

@@ -39,10 +39,10 @@ class ExclusiveShiftLeadersRelation extends Constraint
     }
     /**
      * Defines the targets this constraint can be applied to.
-     * 
+     *
      * This method specifies that this constraint should be applied at the class level
      * rather than to individual properties.
-     * 
+     *
      * @return string The target type (CLASS_CONSTRAINT)
      */
     public function getTargets(): string

@@ -12,6 +12,15 @@ export default class AccordionFrameManagerController extends Controller {
     parentId: String
   }
   
+  /**
+   * Initializes the AccordionFrameManagerController.
+   * This function is called when the controller is connected to the DOM.
+   * It performs initial setup, such as finding the parent accordion ID,
+   * checking if the accordion is initially open, and listening for
+   * bootstrap collapse events on other accordions.
+   *
+   * @returns {void}
+   */
   connect() {
     console.log("AccordionFrameManager connected", {
       hasAccordionContent: this.hasAccordionContentTarget,
@@ -37,12 +46,31 @@ export default class AccordionFrameManagerController extends Controller {
     document.addEventListener('show.bs.collapse', this.handleOtherAccordionOpen.bind(this));
   }
   
+  /**
+   * Disconnects the controller and cleans up event listeners.
+   * This function is called automatically by Stimulus when the controller
+   * is disconnected from the DOM. It removes the event listener for
+   * bootstrap collapse events to prevent memory leaks.
+   *
+   * @returns {void}
+   */
   disconnect() {
     // Clean up event listener
     document.removeEventListener('show.bs.collapse', this.handleOtherAccordionOpen.bind(this));
   }
   
   // Handle when other accordions are opened
+  /**
+   * Handles the event when another accordion is opened.
+   * This function is triggered by the 'show.bs.collapse' Bootstrap event.
+   * It checks if the opened accordion belongs to the same parent group,
+   * and if so, unloads the current frame if this accordion is open.
+   * This ensures that only one accordion's content is loaded at a time
+   * within the same accordion group.
+   *
+   * @param {Event} event - The Bootstrap collapse event object containing information about the opened accordion
+   * @returns {void}
+   */
   handleOtherAccordionOpen(event) {
     // Only proceed if we have a parent ID and this is not our own accordion
     if (this.parentIdValue && event.target !== this.accordionContentTarget) {
@@ -61,6 +89,16 @@ export default class AccordionFrameManagerController extends Controller {
   }
 
   // Called when the accordion button is clicked
+  /**
+   * Handles click events on accordion buttons.
+   * This function determines whether the accordion is being opened or closed
+   * and triggers the appropriate frame loading or unloading action.
+   * It checks the aria-expanded attribute of the clicked button to determine
+   * the accordion's current state.
+   *
+   * @param {Event} event - The click event object from the accordion button
+   * @returns {void}
+   */
   handleAccordionClick(event) {
     console.log("Accordion button clicked");
 
@@ -79,6 +117,15 @@ export default class AccordionFrameManagerController extends Controller {
   }
 
   // Load the frame content
+  /**
+   * Loads the content of a Turbo Frame.
+   * This function checks if a Turbo Frame target exists and has a data-original-src attribute.
+   * If so, it sets the src attribute to the value of data-original-src, which triggers
+   * the frame to load its content. This is typically called when an accordion is opened
+   * to load the content dynamically.
+   * 
+   * @returns {void} This function does not return a value
+   */
   loadFrame() {
     console.log("Loading frame");
 
@@ -106,6 +153,14 @@ export default class AccordionFrameManagerController extends Controller {
   }
 
   // Unload the frame content
+  /**
+   * Unloads the content of a Turbo Frame.
+   * This function checks if a Turbo Frame target exists and removes its src attribute
+   * if present. It also clears the frame's content. This is typically called when an
+   * accordion is closed to prevent unnecessary content loading and to free up resources.
+   * 
+   * @returns {void} This function does not return a value
+   */
   unloadFrame() {
     console.log("Unloading frame");
 

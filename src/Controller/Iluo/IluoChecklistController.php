@@ -48,22 +48,6 @@ class IluoChecklistController extends AbstractController
     }
 
 
-
-    /**
-     * Provides a Turbo Frame for the checklist admin section.
-     *
-     * This function renders a Turbo Frame template that contains the checklist admin interface.
-     * It is used to load the admin section asynchronously within a Turbo Frame context.
-     *
-     * @return Response A Response object containing the rendered Turbo Frame template
-     */
-    #[Route('admin/checklist', name: 'checklist_admin')]
-    public function checklistAdminFrameGet(): Response
-    {
-        return $this->render('services/iluo/iluo_admin_component/iluo_checklist_admin.html.twig', []);
-    }
-
-
     /**
      * Provides a Turbo Frame for the checklist admin content section.
      *
@@ -75,7 +59,7 @@ class IluoChecklistController extends AbstractController
     #[Route('admin/checklist/content', name: 'checklist_admin_content')]
     public function checklistAdminContentGet(): Response
     {
-        return $this->render('services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_checklist_admin_content.html.twig', []);
+        return $this->render('services/iluo/iluo_admin_component/iluo_checklist_admin_content.html.twig', []);
     }
 
     /**

@@ -26,9 +26,8 @@
 			<div
 				class="progress"
 				style="height: 10px;">
-				<div
+				<progress
 					class="progress-bar progress-bar-striped progress-bar-animated bg-{{ color }}"
-					role="progressbar"
 					style="width: 100%"
 					aria-valuenow="100"
 					aria-valuemin="0"
@@ -37,7 +36,7 @@
 						class="visually-hidden">
 						Chargement en cours
 					</output>
-				</div>
+				</progress>
 			</div>
 
 			{% if type == 'form' %}
@@ -145,16 +144,13 @@
 						class="card-body">
 						<div
 							class="row card border-0 shadow rounded-3 my-2 bg-secondary p-2 p-md-3">
-							<div
-								class="card-body m-0 px-0 px-md-2 row">
-								<turbo-frame
-									id="{{ id }}-content" data-original-src="{{ src }}" data-accordion-frame-manager-target="turboFrame"
-									loading="lazy"
-									class="px-0 px-md-2">
-									{{ _self.skeleton_loader(type, title, icon_class, color, items) }}
 
-								</turbo-frame>
-							</div>
+							<turbo-frame
+								id="{{ id }}-content" data-original-src="{{ src }}" data-accordion-frame-manager-target="turboFrame"
+								loading="lazy"
+								>
+								{{ _self.skeleton_loader(type, title, icon_class, color, items) }}
+							</turbo-frame>
 						</div>
 					</div>
 				</div>
@@ -166,13 +162,9 @@
 {% macro simple_loader(message = 'Chargement en cours...', color = 'primary') %}
 	<div
 		class="d-flex flex-column align-items-center my-4">
-		<div
-			class="spinner-border text-{{ color }} mb-2"
-			role="status">
-			<output
-				class="visually-hidden">
-				{{ message }}
-			</output>
+		<output
+			class="spinner-border text-{{ color }} mb-2">
+			{{ message }}
 		</div>
 		<p
 			class="text-muted">

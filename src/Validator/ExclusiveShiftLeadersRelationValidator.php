@@ -17,9 +17,9 @@ class ExclusiveShiftLeadersRelationValidator extends ConstraintValidator
      *
      * @param mixed $value The value to validate, typically an object with getter methods
      * @param Constraint $constraint The constraint to validate against, must be an instance of ExclusiveShiftLeadersRelation
-     * 
+     *
      * @throws UnexpectedTypeException If the constraint is not an instance of ExclusiveShiftLeadersRelation
-     * 
+     *
      * @return void
      */
     public function validate($value, Constraint $constraint)
