@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Upload;
-use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,11 +16,30 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class UploadRepository extends BaseRepository
 {
+    /**
+     * Constructor for the UploadRepository.
+     *
+     * Initializes the repository with the entity manager and sets Upload as the entity class.
+     *
+     * @param ManagerRegistry $registry The Doctrine registry service that provides access to entity managers
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Upload::class);
     }
 
+
+    /**
+     * Saves an Upload entity to the database.
+     *
+     * This method persists the given Upload entity to the database. If the flush parameter
+     * is set to true, changes will be immediately written to the database. Otherwise,
+     * the entity will only be scheduled for insertion/update on the next flush operation.
+     *
+     * @param Upload $entity The Upload entity to be saved
+     * @param bool $flush Whether to flush changes immediately to the database (default: false)
+     * @return void
+     */
     public function save(Upload $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
@@ -31,6 +49,18 @@ class UploadRepository extends BaseRepository
         }
     }
 
+
+    /**
+     * Removes an Upload entity from the database.
+     *
+     * This method marks the given Upload entity for removal from the database. If the flush parameter
+     * is set to true, changes will be immediately written to the database. Otherwise,
+     * the entity will only be scheduled for deletion on the next flush operation.
+     *
+     * @param Upload $entity The Upload entity to be removed
+     * @param bool $flush Whether to flush changes immediately to the database (default: false)
+     * @return void
+     */
     public function remove(Upload $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
@@ -40,12 +70,20 @@ class UploadRepository extends BaseRepository
         }
     }
 
+
+
     /**
-     * Get uploads with optional associations and filters.
+     * Retrieves uploads with specified associations and optional validation filtering.
      *
-     * @param array $associations
-     * @param bool  $validatedOnly
-     * @return Upload[]
+     * This method builds a query to fetch Upload entities with their related associations
+     * (button, validation, category, productLine, zone) based on the provided parameters.
+     * It automatically resolves dependencies between associations to ensure proper joins.
+     *
+     * @param array $associations An array of association names to include in the query results
+     *                           (e.g., ['zone', 'category', 'productLine'])
+     * @param bool $validatedOnly When true, returns only uploads that have been validated with status=1
+     *
+     * @return Upload[] An array of Upload entities with the requested associations loaded
      */
     private function getUploads(array $associations = [], bool $validatedOnly = false)
     {
@@ -86,11 +124,17 @@ class UploadRepository extends BaseRepository
 
         return $qb->getQuery()->getResult();
     }
+
+
     /**
-     * Resolve associations to include dependencies.
+     * Resolves associations to include their required dependencies.
      *
-     * @param array $associations
-     * @return array
+     * This method ensures that when requesting specific associations (like 'zone'),
+     * all required parent associations in the hierarchy (like 'productLine', 'category')
+     * are also included in the result.
+     *
+     * @param array $associations An array of association names to be resolved (e.g., ['zone', 'category'])
+     * @return array An array of unique association names including all dependencies
      */
     private function resolveAssociations(array $associations): array
     {
@@ -101,30 +145,39 @@ class UploadRepository extends BaseRepository
             'category' => ['button'],
             'button' => [],
         ];
-
+    
         $resolved = [];
-
+    
         foreach ($associations as $association) {
             // Add the association itself
             $resolved[] = $association;
-
+    
             // Recursively add dependencies
             if (isset($dependencies[$association])) {
                 $resolved = array_merge($resolved, $dependencies[$association]);
             }
         }
-
+    
         // Always include 'button' as it's a direct association
         if (!in_array('button', $resolved)) {
             $resolved[] = 'button';
         }
-
+    
         // Remove duplicates
         $resolved = array_unique($resolved);
-
+    
         return $resolved;
     }
 
+
+    /**
+     * Retrieves all validated uploads with their complete association hierarchy.
+     *
+     * This method returns all Upload entities that have been validated (status=1),
+     * including their full association chain: button, validation, category, productLine, and zone.
+     *
+     * @return Upload[] An array of validated Upload entities with all associations loaded
+     */
     public function findAllValidatedUploadsWithAssociations()
     {
         return $this->getUploads(
@@ -133,6 +186,15 @@ class UploadRepository extends BaseRepository
         );
     }
 
+    
+    /**
+     * Retrieves all uploads with their complete association hierarchy.
+     *
+     * This method returns all Upload entities including their full association chain:
+     * button, validation, category, productLine, and zone.
+     *
+     * @return Upload[] An array of Upload entities with all associations loaded
+     */
     public function findAllWithAssociations()
     {
         return $this->getUploads(
@@ -140,6 +202,15 @@ class UploadRepository extends BaseRepository
         );
     }
 
+
+    /**
+     * Retrieves all uploads with associations up to the product line level.
+     *
+     * This method returns all Upload entities with their associations loaded
+     * including button, validation, category, and productLine, but not zone.
+     *
+     * @return Upload[] An array of Upload entities with product line associations loaded
+     */
     public function findAllWithAssociationsProductLine()
     {
         return $this->getUploads(
@@ -147,6 +218,15 @@ class UploadRepository extends BaseRepository
         );
     }
 
+
+    /**
+     * Retrieves all uploads with associations up to the category level.
+     *
+     * This method returns all Upload entities with their associations loaded
+     * including button, validation, and category, but not productLine or zone.
+     *
+     * @return Upload[] An array of Upload entities with category associations loaded
+     */
     public function findAllWithAssociationsCategory()
     {
         return $this->getUploads(
@@ -154,34 +234,17 @@ class UploadRepository extends BaseRepository
         );
     }
 
+
+    /**
+     * Retrieves all uploads with associations up to the button level.
+     *
+     * This method returns all Upload entities with their basic associations loaded
+     * including button and validation, but not category, productLine, or zone.
+     *
+     * @return Upload[] An array of Upload entities with button associations loaded
+     */
     public function findAllWithAssociationsButton()
     {
         return $this->getUploads();
     }
-
-
-    //    /**
-    //     * @return Upload[] Returns an array of Upload objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('u.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Upload
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

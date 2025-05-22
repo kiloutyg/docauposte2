@@ -17,19 +17,44 @@ use App\Entity\Operator;
  */
 class TrainingRecordRepository extends ServiceEntityRepository
 {
+
+    /**
+     * Constructor for the TrainingRecordRepository.
+     *
+     * Initializes the repository with the TrainingRecord entity class.
+     *
+     * @param ManagerRegistry $registry The Doctrine registry service used to access entity managers
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, TrainingRecord::class);
     }
 
+    /**
+     * Compares two operators for sorting purposes based on team, UAP, and name.
+     *
+     * The comparison follows this hierarchy:
+     * 1. First by team name
+     * 2. If teams are equal, then by UAP name
+     * 3. If UAPs are equal, then by surname
+     * 4. If surnames are equal, then by firstname
+     *
+     * @param Operator $a The first operator to compare
+     * @param Operator $b The second operator to compare
+     *
+     * @return int Returns negative if $a should come before $b,
+     *             positive if $a should come after $b,
+     *             or zero if they are considered equal
+     */
     public function compareOperator(Operator $a, Operator $b): int
     {
+        $response = null;
         if ($a->getTeam()->getName() != $b->getTeam()->getName()) {
-            return strcmp($a->getTeam()->getName(), $b->getTeam()->getName());
+            $response = strcmp($a->getTeam()->getName(), $b->getTeam()->getName());
         }
         // If 'team' is the same, move on to compare by 'uap'
         if ($a->getUaps()->first()->getName() != $b->getUaps()->first()->getName()) {
-            return strcmp($a->getUaps()->first()->getName(), $b->getUaps()->first()->getName());
+            $response = strcmp($a->getUaps()->first()->getName(), $b->getUaps()->first()->getName());
         }
 
         // If 'uap' is also the same, finally compare by 'surname.firstname'
@@ -38,34 +63,9 @@ class TrainingRecordRepository extends ServiceEntityRepository
 
         $surnameComparison = strcmp($surnameA, $surnameB);
         if ($surnameComparison !== 0) {
-            return $surnameComparison;
+            $response = $surnameComparison;
         }
 
-        return strcmp($firstnameA, $firstnameB);
+        return $response ?? strcmp($firstnameA, $firstnameB);
     }
-
-    //    /**
-    //     * @return TrainingRecord[] Returns an array of TrainingRecord objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?TrainingRecord
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

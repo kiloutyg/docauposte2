@@ -30,15 +30,18 @@ class AccountController extends AbstractController
     private $entityFetchingService;
     private $entityDeletionService;
 
+
     /**
      * Constructor for AccountController
      *
-     * @param LoggerInterface $logger
-     * @param EntityManagerInterface $em
-     * @param UserRepository $userRepository
-     * @param AccountService $accountService
-     * @param EntityFetchingService $entityFetchingService
-     * @param EntityDeletionService $entityDeletionService
+     * Initializes the controller with required dependencies for account management operations.
+     *
+     * @param LoggerInterface $logger For logging system events and errors
+     * @param EntityManagerInterface $em Doctrine entity manager for database operations
+     * @param UserRepository $userRepository Repository for user entity operations
+     * @param AccountService $accountService Service handling account-related business logic
+     * @param EntityFetchingService $entityFetchingService Service for retrieving entities from the database
+     * @param EntityDeletionService $entityDeletionService Service for safely deleting entities
      */
     public function __construct(
         LoggerInterface $logger,
@@ -59,8 +62,15 @@ class AccountController extends AbstractController
     /**
      * Creates a new user account (accessible to super admin)
      *
-     * @param Request $request
-     * @return Response
+     * This function handles both GET and POST requests for account creation.
+     * For GET requests, it renders the account creation form with a list of existing users.
+     * For POST requests, it processes the submitted form data to create a new user account.
+     * If the account creation is successful, a success message is displayed.
+     * If an error occurs during account creation, an error message with details is shown.
+     *
+     * @param Request $request The HTTP request object containing either form data (POST) or just the request (GET)
+     * @return Response A response object containing either the rendered form (GET) or a redirect to the super admin dashboard (POST)
+     * @throws \Exception If the account creation fails (caught internally)
      */
     #[Route(path: '/create', name: 'create')]
     public function createAccountController(Request $request): Response
@@ -85,9 +95,14 @@ class AccountController extends AbstractController
     /**
      * Renders the account modification interface for super admin
      *
-     * @param int $userId
-     * @param Request $request
-     * @return Response
+     * This function handles both GET and POST requests for account modification.
+     * For GET requests, it renders the account modification form with the user's current data.
+     * For POST requests, it delegates to the modifyAccountPost method to process the form submission.
+     * If the requested user doesn't exist, it redirects to the super admin dashboard with a warning.
+     *
+     * @param int $userId The ID of the user account to be modified
+     * @param Request $request The HTTP request object containing either form data (POST) or just the request (GET)
+     * @return Response A response object containing either the rendered form (GET) or a redirect (POST/error)
      */
     #[Route(path: '/modify_account/{userId}', name: 'modify_account')]
     public function modifyAccountGet(int $userId, Request $request): Response
@@ -109,9 +124,15 @@ class AccountController extends AbstractController
     /**
      * Processes the account modification request
      *
-     * @param User $user
-     * @param Request $request
-     * @return Response
+     * This function handles the processing of user account modification requests.
+     * It prevents modification of super admin accounts for security reasons.
+     * The function uses the accountService to perform the actual modification
+     * and provides appropriate feedback via flash messages.
+     *
+     * @param User $user The user entity whose account is being modified
+     * @param Request $request The HTTP request containing the modification data
+     * @return Response A redirect response to the account modification page with appropriate flash messages
+     * @throws \Exception If the account modification fails (caught internally)
      */
     public function modifyAccountPost(User $user, Request $request)
     {
@@ -132,8 +153,14 @@ class AccountController extends AbstractController
     /**
      * Blocks a user account
      *
-     * @param Request $request
-     * @return Response
+     * This function handles the blocking of a user account in the system.
+     * Blocking is used when an account cannot be deleted due to existing relationships
+     * with incidents, uploads, validations, or approvals. The blocked account
+     * remains in the system but cannot be used for authentication.
+     *
+     * @param Request $request The HTTP request object containing the userId in the query parameters
+     * @return Response A redirect response to the super admin dashboard with appropriate flash messages
+     * @throws \Exception If the account cannot be blocked (caught internally)
      */
     #[Route(path: '/delete_account/block', name: 'block_account')]
     public function blockAccount(Request $request): Response
@@ -150,8 +177,15 @@ class AccountController extends AbstractController
     /**
      * Unblocks a user account
      *
-     * @param Request $request
-     * @return Response
+     * This function reactivates a previously blocked user account in the system.
+     * After unblocking, the account will need to have a new password and role assigned.
+     * The function uses the accountService to perform the actual unblocking operation.
+     * If successful, a success message is displayed. If the unblocking fails,
+     * an error message with the exception details is shown.
+     *
+     * @param Request $request The HTTP request object containing the userId in the query parameters
+     * @return Response A redirect response to the super admin dashboard with appropriate flash messages
+     * @throws \Exception If the account cannot be unblocked (caught internally)
      */
     #[Route(path: '/delete_account/unblock_account', name: 'unblock_account')]
     public function unblockAccount(Request $request): Response
@@ -168,8 +202,13 @@ class AccountController extends AbstractController
     /**
      * Deletes a user account
      *
-     * @param Request $request
-     * @return Response
+     * This function handles the deletion of a user account from the system.
+     * It uses the entityDeletionService to perform the actual deletion operation.
+     * If successful, a success message is displayed. If the deletion fails,
+     * an error message with the exception details is shown.
+     *
+     * @param Request $request The HTTP request object containing the userId in the query parameters
+     * @return Response A redirect response to the super admin dashboard with appropriate flash messages
      */
     #[Route(path: '/delete_account', name: 'delete_account')]
     public function deleteAccount(Request $request): Response
@@ -186,9 +225,14 @@ class AccountController extends AbstractController
     /**
      * Transfers work from one user to another before account deletion
      *
-     * @param Request $request
-     * @param int $userId
-     * @return Response
+     * This function handles the transfer of all work items (incidents, uploads, validations, etc.)
+     * from one user to another. It's typically used before deleting a user account to ensure
+     * continuity of work and prevent data loss.
+     *
+     * @param Request $request The HTTP request object containing the recipient user ID in the 'work-transfer-recipient' field
+     * @param int $userId The ID of the user whose work is being transferred (source user)
+     * @return Response A redirect response to the super admin dashboard with appropriate flash messages
+     * @throws \Exception If the work transfer fails for any reason (caught internally)
      */
     #[Route('/delete_account/transfer_work/{userId}', name: 'transfer_work')]
     public function transferWork(Request $request, int $userId): Response
