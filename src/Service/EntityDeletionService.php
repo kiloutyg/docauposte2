@@ -4,7 +4,6 @@
 
 namespace App\Service;
 
-use App\Entity\ShiftLeaders;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Psr\Log\LoggerInterface;
@@ -13,32 +12,15 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 use App\Service\FolderService;
 use App\Service\IncidentService;
-
-use App\Repository\ButtonRepository;
-use App\Repository\CategoryRepository;
-use App\Repository\DepartmentRepository;
-use App\Repository\IncidentCategoryRepository;
-use App\Repository\IncidentRepository;
-use App\Repository\OldUploadRepository;
-use App\Repository\OperatorRepository;
-use App\Repository\ProductLineRepository;
-use App\Repository\ProductsRepository;
-use App\Repository\QualityRepRepository;
-use App\Repository\ShiftLeadersRepository;
-use App\Repository\TeamRepository;
-use App\Repository\TrainerRepository;
-use App\Repository\TrainingRecordRepository;
-use App\Repository\UapRepository;
-use App\Repository\UploadRepository;
-use App\Repository\UserRepository;
-use App\Repository\ValidationRepository;
-use App\Repository\WorkstationRepository;
-use App\Repository\ZoneRepository;
+use App\Service\Factory\RepositoryFactory;
 
 
-
-// This class is responsible for managing the deletion of entities, their related entities from the database
-// It also refer to the logic for deleting the folder and files from the server filesystem
+/**
+ * EntityDeletionService
+ *
+ * This class is responsible for managing the deletion of entities and their related entities from the database.
+ * It also handles the logic for deleting associated folders and files from the server filesystem.
+ */
 class EntityDeletionService
 {
     private $em;
@@ -48,28 +30,19 @@ class EntityDeletionService
     private $folderService;
     private $incidentService;
 
-    private $buttonRepository;
-    private $categoryRepository;
-    private $departmentRepository;
-    private $incidentCategoryRepository;
-    private $incidentRepository;
-    private $oldUploadRepository;
-    private $operatorRepository;
-    private $productLineRepository;
-    private $productsRepository;
-    private $qualityRepRepository;
-    private $shiftLeadersRepository;
-    private $teamRepository;
-    private $trainerRepository;
-    private $trainingRecordRepository;
-    private $uapRepository;
-    private $uploadRepository;
-    private $userRepository;
-    private $validationRepository;
-    private $workstationRepository;
-    private $zoneRepository;
+    private $repositoryFactory;
 
 
+    /**
+     * Constructor
+     *
+     * @param EntityManagerInterface $em
+     * @param LoggerInterface $logger
+     * @param ParameterBagInterface $params
+     * @param FolderService $folderService
+     * @param IncidentService $incidentService
+     * @param RepositoryFactory $repositoryFactor
+     */
     public function __construct(
         EntityManagerInterface              $em,
         LoggerInterface                     $logger,
@@ -79,26 +52,8 @@ class EntityDeletionService
         FolderService                       $folderService,
         IncidentService                     $incidentService,
 
-        ButtonRepository                    $buttonRepository,
-        CategoryRepository                  $categoryRepository,
-        DepartmentRepository                $departmentRepository,
-        IncidentCategoryRepository          $incidentCategoryRepository,
-        IncidentRepository                  $incidentRepository,
-        OldUploadRepository                 $oldUploadRepository,
-        OperatorRepository                  $operatorRepository,
-        ProductLineRepository               $productLineRepository,
-        ProductsRepository                  $productsRepository,
-        QualityRepRepository                $qualityRepRepository,
-        ShiftLeadersRepository              $shiftLeadersRepository,
-        TeamRepository                      $teamRepository,
-        TrainerRepository                   $trainerRepository,
-        TrainingRecordRepository            $trainingRecordRepository,
-        UapRepository                       $uapRepository,
-        UploadRepository                    $uploadRepository,
-        UserRepository                      $userRepository,
-        ValidationRepository                $validationRepository,
-        WorkstationRepository               $workstationRepository,
-        ZoneRepository                      $zoneRepository
+        RepositoryFactory                   $repositoryFactory
+
     ) {
         $this->em                           = $em;
         $this->logger                       = $logger;
@@ -108,148 +63,262 @@ class EntityDeletionService
         $this->folderService                = $folderService;
         $this->incidentService              = $incidentService;
 
-        $this->buttonRepository             = $buttonRepository;
-        $this->categoryRepository           = $categoryRepository;
-        $this->departmentRepository         = $departmentRepository;
-        $this->incidentCategoryRepository   = $incidentCategoryRepository;
-        $this->incidentRepository           = $incidentRepository;
-        $this->oldUploadRepository          = $oldUploadRepository;
-        $this->operatorRepository           = $operatorRepository;
-        $this->productLineRepository        = $productLineRepository;
-        $this->productsRepository           = $productsRepository;
-        $this->qualityRepRepository         = $qualityRepRepository;
-        $this->shiftLeadersRepository       = $shiftLeadersRepository;
-        $this->teamRepository               = $teamRepository;
-        $this->trainerRepository            = $trainerRepository;
-        $this->trainingRecordRepository     = $trainingRecordRepository;
-        $this->uapRepository                = $uapRepository;
-        $this->uploadRepository             = $uploadRepository;
-        $this->userRepository               = $userRepository;
-        $this->validationRepository         = $validationRepository;
-        $this->workstationRepository        = $workstationRepository;
-        $this->zoneRepository               = $zoneRepository;
+        $this->repositoryFactory = $repositoryFactory;
     }
 
-    // This function is responsible for deleting an entity and its related entities from the database and the server filesystem
-    public function deleteEntity(string $entityType, int $id): bool
+
+
+    /**
+     * Deletes an entity and its related entities from the database and the server filesystem.
+     *
+     * @param string $entityType The type of the entity to be deleted.
+     * @param int $id The unique identifier of the entity to be deleted.
+     *
+     * @return bool|string Returns true if the entity is successfully deleted, or an error message if an exception occurs.
+     *
+     * @throws \InvalidArgumentException If the entity type or the entity with the given ID is not found.
+     * @throws \Exception If an error occurs while deleting the entity.
+     */
+    public function deleteEntity(string $entityType, int $id): bool|string
     {
         $this->logger->debug('deleteEntity: entityType: ' . $entityType . 'id: ' . $id);
 
         $entity = $this->entityObjectRetrieving($entityType, $id);
 
-        if (!$entity) {
-            $this->logger->error('Entity not found in the database');
-            throw new \InvalidArgumentException('Entity not found in the database');
-        }
-
         $this->logger->debug('to be deleted entity details: ', [$entity]);
 
         // Deletion logic for related entities, folder and files
         if ($entityType === 'zone') {
-            foreach ($entity->getProductLines() as $productLine) {
-                $this->deleteEntity('productLine', $productLine->getId());
-            }
-            $this->folderService->deleteFolderStructure($entity->getName());
+            $this->deleteEntityZone($entity);
         } elseif ($entityType === 'productLine') {
-            foreach ($entity->getCategories() as $category) {
-                $this->deleteEntity('category', $category->getId());
-            }
-            foreach ($entity->getIncidents() as $incident) {
-                $this->deleteEntity('incident', $incident->getId());
-            }
-            $this->folderService->deleteFolderStructure($entity->getName());
+            $this->deleteEntityProductLine($entity);
         } elseif ($entityType === 'category') {
-            foreach ($entity->getButtons() as $button) {
-                $this->deleteEntity('button', $button->getId());
-            }
-            $this->folderService->deleteFolderStructure($entity->getName());
+            $this->deleteEntityCategory($entity);
         } elseif ($entityType === 'button') {
-            foreach ($entity->getUploads() as $upload) {
-                $this->deleteEntity('upload', $upload->getId());
-            }
-            $this->folderService->deleteFolderStructure($entity->getName());
+            $this->deleteEntityButton($entity);
         } elseif ($entityType === 'user') {
-            foreach ($entity->getUploads() as $upload) {
-                $this->deleteEntity('upload', $upload->getId());
-            }
-            foreach ($entity->getIncidents() as $incident) {
-                $this->deleteEntity('incident', $incident->getId());
-            }
+            $this->deleteEntityUser($entity);
         } elseif ($entityType === 'incidentCategory') {
-            foreach ($entity->getIncidents() as $incident) {
-                $this->deleteEntity('incident', $incident->getId());
-            }
+            $this->deleteEntityIncidentCategory($entity);
         } elseif ($entityType === 'upload') {
             $this->deleteFile($entity->getId());
         } elseif ($entityType === 'incident') {
             $this->incidentService->deleteIncidentFile($entity);
         } elseif ($entityType === 'department') {
-            foreach ($entity->getUsers() as $user) {
-                $entity->removeUser($user);
-            }
+            $this->deleteEntityDepartment($entity);
         } elseif ($entityType === 'operator') {
-            foreach ($entity->getTrainingRecords() as $trainingRecord) {
-                $this->deleteEntity('trainingRecord', $trainingRecord->getId());
-            }
-            if ($entity->isIsTrainer()) {
-                $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $entity]);
-                $this->logger->debug('trainerEntity details: ', [$trainerEntity]);
-                $this->logger->debug('trainerEntity trainingRecords: ', [$trainerEntity->getTrainingRecords()]);
-                if (!$trainerEntity->getTrainingRecords()->isEmpty()) {
-                    $entity->setToBeDeleted(new \DateTime('now'));
-                    try {
-                        $this->em->persist($entity);
-                        $this->em->flush();
-                    } catch (\Exception $e) {
-                        $this->logger->error('Error deleting department: ', [$e->getMessage()]);
-                        throw $e;
-                    }
-                } else {
-                    $this->deleteEntity('trainer', $trainerEntity->getId());
-                }
-            }
+            $this->deleteEntityOperator($entity);
         } elseif ($entityType === 'trainingRecord') {
             $trainer = $entity->getTrainer();
             $trainer->removeTrainingRecord($entity);
         } elseif ($entityType === 'trainer') {
-            if (!$entity->getTrainingRecords()->isEmpty()) {
-                throw new \InvalidArgumentException('Trainer has training records');
-            } else {
-                $entity->getOperator()->setIsTrainer(false);
-            }
+            $this->deleteEntityTrainer($entity);
         } elseif ($entityType === 'team') {
-            $unDefinedTeam = $this->teamRepository->findOneBy(['name' => 'INDEFINI']);
-            foreach ($entity->getOperator() as $operator) {
-                $operator->setTeam($unDefinedTeam);
-                $this->em->persist($operator);
-            }
+            $this->deleteEntityTeam($entity);
         } elseif ($entityType === 'uap') {
-            $unDefinedUap = $this->uapRepository->findOneBy(['name' => 'INDEFINI']);
-            foreach ($entity->getOperators() as $operator) {
-                foreach ($entity->getOperator() as $operator) {
-                    $operator->addUap($unDefinedUap);
-                    $this->em->persist($operator);
-                }
+            $this->deleteEntityUap($entity);
+        }
+        $this->logger->debug('deleted entity details: ', [$entity]);
+        try {
+            $this->em->remove($entity);
+            $this->em->flush();
+            return true;
+        } catch (\Exception $e) {
+            $this->logger->error('Error deleting entity: ', [$e->getMessage()]);
+            throw $e;
+        }
+    }
+
+
+    /**
+     * Deletes a Zone entity and its related entities.
+     *
+     * @param object $entity The Zone entity to be deleted.
+     */
+    private function deleteEntityZone(Object $entity): void
+    {
+        foreach ($entity->getProductLines() as $productLine) {
+            $this->deleteEntity('productLine', $productLine->getId());
+        }
+        $this->folderService->deleteFolderStructure($entity->getName());
+    }
+
+    /**
+     * Deletes a ProductLine entity and its related entities.
+     *
+     * @param object $entity The ProductLine entity to be deleted.
+     */
+    private function deleteEntityProductLine(Object $entity): void
+    {
+        foreach ($entity->getCategories() as $category) {
+            $this->deleteEntity('category', $category->getId());
+        }
+        foreach ($entity->getIncidents() as $incident) {
+            $this->deleteEntity('incident', $incident->getId());
+        }
+        $this->folderService->deleteFolderStructure($entity->getName());
+    }
+
+
+    /**
+     * Deletes a Category entity and its related entities.
+     *
+     * @param object $entity The Category entity to be deleted.
+     */
+    private function deleteEntityCategory(Object $entity): void
+    {
+        foreach ($entity->getButtons() as $button) {
+            $this->deleteEntity('button', $button->getId());
+        }
+        $this->folderService->deleteFolderStructure($entity->getName());
+    }
+
+
+    /**
+     * Deletes a Button entity and its related entities.
+     *
+     * @param object $entity The Button entity to be deleted.
+     */
+    private function deleteEntityButton(Object $entity): void
+    {
+        foreach ($entity->getUploads() as $upload) {
+            $this->deleteEntity('upload', $upload->getId());
+        }
+        $this->folderService->deleteFolderStructure($entity->getName());
+    }
+
+
+    /**
+     * Deletes a User entity and its related entities.
+     *
+     * @param object $entity The User entity to be deleted.
+     */
+    private function deleteEntityUser(Object $entity): void
+    {
+        foreach ($entity->getUploads() as $upload) {
+            $this->deleteEntity('upload', $upload->getId());
+        }
+        foreach ($entity->getIncidents() as $incident) {
+            $this->deleteEntity('incident', $incident->getId());
+        }
+    }
+
+
+    /**
+     * Deletes an IncidentCategory entity and its related entities.
+     *
+     * @param object $entity The IncidentCategory entity to be deleted.
+     */
+    private function deleteEntityIncidentCategory(Object $entity): void
+    {
+        foreach ($entity->getIncidents() as $incident) {
+            $this->deleteEntity('incident', $incident->getId());
+        }
+    }
+
+
+    /**
+     * Deletes a Department entity and its related entities.
+     *
+     * @param object $entity The Department entity to be deleted.
+     */
+    private function deleteEntityDepartment(Object $entity): void
+    {
+        foreach ($entity->getUsers() as $user) {
+            $entity->removeUser($user);
+        }
+    }
+
+
+    /**
+     * Deletes an Operator entity and its related entities.
+     *
+     * @param object $entity The Operator entity to be deleted.
+     */
+    private function deleteEntityOperator(Object $entity): void
+    {
+        foreach ($entity->getTrainingRecords() as $trainingRecord) {
+            $this->deleteEntity('trainingRecord', $trainingRecord->getId());
+        }
+        if ($entity->isIsTrainer()) {
+            $repository = $this->repositoryFactory->getRepository('trainer');
+            $trainerEntity = $repository->findOneBy(['operator' => $entity]);
+            $this->logger->debug('trainerEntity details: ', [$trainerEntity]);
+            $this->logger->debug('trainerEntity trainingRecords: ', [$trainerEntity->getTrainingRecords()]);
+            if (!$trainerEntity->getTrainingRecords()->isEmpty()) {
+                $entity->setToBeDeleted(new \DateTime('now'));
+            } else {
+                $this->deleteEntity('trainer', $trainerEntity->getId());
             }
-            $this->logger->debug('deleted entity details: ', [$entity]);
-            try {
-                $this->em->remove($entity);
-                $this->em->flush();
-                return true;
-            } catch (\Exception $e) {
-                $this->logger->error('Error deleting entity: ', [$e->getMessage()]);
-                throw $e;
+        }
+    }
+
+
+    /**
+     * Deletes a Trainer entity and its related entities.
+     *
+     * @param object $entity The Trainer entity to be deleted.
+     * @throws \InvalidArgumentException If the trainer has training records.
+     */
+    private function deleteEntityTrainer(Object $entity): void
+    {
+        if (!$entity->getTrainingRecords()->isEmpty()) {
+            throw new \InvalidArgumentException('Trainer has training records');
+        } else {
+            $entity->getOperator()->setIsTrainer(false);
+        }
+    }
+
+
+    /**
+     * Deletes a Team entity and reassigns its operators to an undefined team.
+     *
+     * @param object $entity The Team entity to be deleted.
+     */
+    private function deleteEntityTeam(Object $entity): void
+    {
+        $repository = $this->repositoryFactory->getRepository('team');
+        $unDefinedTeam = $repository->findOneBy(['name' => 'INDEFINI']);
+        foreach ($entity->getOperator() as $operator) {
+            $operator->setTeam($unDefinedTeam);
+            $this->em->persist($operator);
+        }
+    }
+
+
+    /**
+     * Deletes a UAP entity and reassigns its operators to an undefined UAP.
+     *
+     * @param object $entity The UAP entity to be deleted.
+     */
+    private function deleteEntityUap(Object $entity): void
+    {
+        $repository = $this->repositoryFactory->getRepository('uap');
+
+        $unDefinedUap = $repository->findOneBy(['name' => 'INDEFINI']);
+        foreach ($entity->getOperators() as $operator) {
+            foreach ($entity->getOperator() as $operator) {
+                $operator->addUap($unDefinedUap);
+                $this->em->persist($operator);
             }
         }
     }
 
 
 
-    // This function is responsible for the logic of deleting the uploads files
+
+    /**
+     * Deletes an upload file and its associated database record.
+     *
+     * @param int $uploadId The ID of the upload to be deleted.
+     * @return string The name of the deleted file.
+     */
     public function deleteFile(
         int $uploadId
     ) {
-        $upload     = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $repository = $this->repositoryFactory->getRepository('upload');
+
+        $upload     = $repository->findOneBy(['id' => $uploadId]);
         if ($upload->getOldUpload() != null) {
             $oldUploadId = $upload->getOldUpload()->getId();
             $this->deleteOldFile($oldUploadId);
@@ -279,12 +348,16 @@ class EntityDeletionService
     }
 
 
-    // This function is responsible for the logic of deleting the OldUploads files
+    /**
+     * Deletes an old upload file and its associated database record.
+     *
+     * @param int $oldUploadId The ID of the old upload to be deleted.
+     */
     public function deleteOldFile(
         int $oldUploadId
     ) {
-
-        $oldUpload = $this->oldUploadRepository->findOneBy(['id' => $oldUploadId]);
+        $repository     = $this->repositoryFactory->getRepository('oldUpload');
+        $oldUpload      = $repository->findOneBy(['id' => $oldUploadId]);
 
         $path = $oldUpload->getPath();
         if (file_exists($path)) {
@@ -295,6 +368,14 @@ class EntityDeletionService
     }
 
 
+    /**
+     * Retrieves an entity object based on its type and ID.
+     *
+     * @param string $entityType The type of the entity to retrieve.
+     * @param int $id The ID of the entity to retrieve.
+     * @return object|bool The retrieved entity object or false if not found.
+     * @throws \InvalidArgumentException If the repository for the entity type is not found or the entity is not found in the database.
+     */
     public function entityObjectRetrieving(
         string $entityType,
         int $id
@@ -303,13 +384,13 @@ class EntityDeletionService
         // Get the repository for the entity type
         $repository = null;
 
-        $repositoryProperty = lcfirst($entityType) . 'Repository';
-        if (!property_exists($this, $repositoryProperty)) {
-            throw new \InvalidArgumentException("Repository not found for entity type: $repositoryProperty");
+        $repository = $this->repositoryFactory->getRepository($entityType);
+        $entity = $repository->find($id);
+        if (!$entity) {
+            $this->logger->error('Entity not found in the database');
+            throw new \InvalidArgumentException('Entity not found in the database');
         }
-        $repository = $this->$repositoryProperty;
 
-
-        return $repository->find($id);
+        return $entity;
     }
 }

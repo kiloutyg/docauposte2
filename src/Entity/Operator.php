@@ -87,6 +87,9 @@ class Operator
     #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist'])]
     private ?User $user = null;
 
+    #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist', 'remove'])]
+    private ?ShiftLeaders $shiftLeaders = null;
+
 
     public function __construct()
     {
@@ -351,6 +354,28 @@ class Operator
         }
 
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getShiftLeaders(): ?ShiftLeaders
+    {
+        return $this->shiftLeaders;
+    }
+
+    public function setShiftLeaders(?ShiftLeaders $shiftLeaders): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($shiftLeaders === null && $this->shiftLeaders !== null) {
+            $this->shiftLeaders->setOperator(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($shiftLeaders !== null && $shiftLeaders->getOperator() !== $this) {
+            $shiftLeaders->setOperator($this);
+        }
+
+        $this->shiftLeaders = $shiftLeaders;
 
         return $this;
     }

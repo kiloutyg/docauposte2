@@ -6,8 +6,11 @@ use App\Repository\ShiftLeadersRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator as AppAssert;
 
 #[ORM\Entity(repositoryClass: ShiftLeadersRepository::class)]
+#[AppAssert\ExclusiveShiftLeadersRelation(fields: ['user', 'operator'], message: 'A ShiftLeader must be associated with either a User or an Operator, but not both or neither.')]
 class ShiftLeaders
 {
     #[ORM\Id]
@@ -17,6 +20,9 @@ class ShiftLeaders
 
     #[ORM\OneToOne(inversedBy: 'shiftLeader', cascade: ['persist'])]
     private ?User $user = null;
+
+    #[ORM\OneToOne(inversedBy: 'shiftLeaders', cascade: ['persist'])]
+    private ?Operator $operator = null;
 
     /**
      * @var Collection<int, Iluo>
@@ -29,6 +35,7 @@ class ShiftLeaders
      */
     #[ORM\OneToMany(targetEntity: IluoChecklist::class, mappedBy: 'shiftLeader')]
     private Collection $iluoChecklists;
+
 
     public function __construct()
     {
@@ -48,10 +55,29 @@ class ShiftLeaders
 
     public function setUser(?User $user): static
     {
+        if ($user !== null && $this->operator !== null) {
+            $this->operator = null;
+        }
         $this->user = $user;
 
         return $this;
     }
+
+    public function getOperator(): ?Operator
+    {
+        return $this->operator;
+    }
+
+    public function setOperator(?Operator $operator): static
+    {
+        if ($operator !== null && $this->user !== null) {
+            $this->user = null;
+        }
+        $this->operator = $operator;
+
+        return $this;
+    }
+
 
     /**
      * @return Collection<int, Iluo>

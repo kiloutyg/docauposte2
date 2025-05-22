@@ -16,6 +16,7 @@ use App\Repository\ZoneRepository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query\Expr\Join;
 
 use Psr\Log\LoggerInterface;
 
@@ -85,18 +86,19 @@ class WorkstationType extends AbstractType
 
         $queryBuilder = function (EntityRepository $er) use ($zone, $product): QueryBuilder {
             $qb = $er->createQueryBuilder('u')
-                ->leftJoin('u.validation', 'v')
+                ->select('u')
+                ->leftJoin('App\Entity\Validation', 'v', Join::WITH, 'v.Upload = u')
                 ->where('v.id IS NOT NULL')
-                ->andWhere('v.status = :validated')
-                ->setParameter('validated', 1);
+                ->andWhere('v.status = :isValidated')
+                ->setParameter('isValidated', true);
 
             // If a zone is selected, filter uploads related to that zone
             if ($zone !== null) {
                 $this->logger->debug('Adding zone filter ', ['zone' => $zone]);
-                $qb->leftJoin('u.button', 'b')
-                    ->leftJoin('b.category', 'c')
-                    ->leftJoin('c.productLine', 'pl')
-                    ->leftJoin('pl.zone', 'z')
+                $qb->leftJoin('App\Entity\Button', 'b', Join::WITH, 'b.id = u.button')
+                    ->leftJoin('App\Entity\Category', 'c', Join::WITH, 'c.id = b.category')
+                    ->leftJoin('App\Entity\ProductLine', 'pl', Join::WITH, 'pl.id = c.productLine')
+                    ->leftJoin('App\Entity\Zone', 'z', Join::WITH, 'z.id = pl.zone')
                     ->andWhere('z.id = :zoneId')
                     ->setParameter('zoneId', $zone->getId());
             }

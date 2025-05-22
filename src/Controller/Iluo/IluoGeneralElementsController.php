@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Iluo;
 
 use \Psr\Log\LoggerInterface;
 
@@ -11,38 +11,42 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\Routing\Annotation\Route;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use App\Entity\Products;
 use App\Entity\ShiftLeaders;
 use App\Entity\QualityRep;
-use App\Entity\Workstation;
 
 use App\Form\ProductType;
 use App\Form\ShiftLeadersType;
 use App\Form\QualityRepType;
-use App\Form\WorkstationType;
 
 use App\Service\EntityFetchingService;
 use App\Service\IluoService;
 
 
 #[Route('/iluo/', name: 'app_iluo_')]
-class IluoController extends AbstractController
+class IluoGeneralElementsController extends AbstractController
 {
     private $logger;
-    private $authChecker;
     private $entityFetchingService;
     private $iluoService;
+
+    /**
+     * Constructor for the IluoController class.
+     *
+     * Initializes the controller with necessary services for logging, authorization,
+     * entity fetching, and ILUO-specific operations.
+     *
+     * @param LoggerInterface $logger An instance of LoggerInterface for logging purposes.
+     * @param EntityFetchingService $entityFetchingService A service for fetching various entities.
+     * @param IluoService $iluoService A service specific to ILUO operations.
+     */
     public function __construct(
         LoggerInterface                     $logger,
-        AuthorizationCheckerInterface       $authChecker,
 
         EntityFetchingService               $entityFetchingService,
         IluoService                         $iluoService
     ) {
         $this->logger                       = $logger;
-        $this->authChecker                  = $authChecker;
 
         $this->entityFetchingService        = $entityFetchingService;
         $this->iluoService                  = $iluoService;
@@ -50,40 +54,36 @@ class IluoController extends AbstractController
 
 
 
-    #[Route('admin', name: 'admin')]
-    public function baseAdminPageGet(Request $request): Response
-    {
-        if ($request->isMethod('GET') && $this->authChecker->isGranted('ROLE_LINE_ADMIN')) {
-            return $this->render('/services/iluo/iluo_admin.html.twig');
-        }
-        $this->addFlash('warning', 'Accés non authorisé');
-        return $this->redirectToRoute('app_base');
-    }
 
-    // Checklist
-
-    #[Route('admin/checklist', name: 'checklist_admin')]
-    public function checklistAdminPageGet(Request $request): Response
+    /**
+     * Provides the content for the general elements administration section.
+     *
+     * This function renders a template that contains the main content for the general elements
+     * administration interface. It serves as the primary content area for managing general elements
+     * such as products, shift leaders, and quality representatives.
+     *
+     * @return Response A Symfony Response object containing the rendered template
+     *                  for the general elements administration content.
+     */
+    #[Route('admin/general_elements/content', name: 'general_elements_admin_content')]
+    public function generalElementsContentGet(): Response
     {
-        if ($request->isMethod('GET')) {
-            return $this->render('/services/iluo/iluo_admin_component/iluo_checklist_admin.html.twig');
-        }
-        return $this->redirectToRoute('app_base');
+        return $this->render('services/iluo/iluo_admin_component/iluo_general_elements_admin_content.html.twig', []);
     }
 
 
-    // General elements
 
-
-    #[Route('admin/general_elements', name: 'general_elements_admin')]
-    public function generalElementsAdminPageGet(Request $request): Response
-    {
-        if ($request->isMethod('GET')) {
-            return $this->render('/services/iluo/iluo_admin_component/iluo_general_elements_admin.html.twig');
-        }
-        return $this->redirectToRoute('app_base');
-    }
-
+    /**
+     * Handles the GET and POST requests for the Products general elements admin page.
+     *
+     * This function retrieves all products, creates a form for a new product,
+     * processes form submissions, and renders the products admin template.
+     *
+     * @param Request $request The current HTTP request object containing all request data.
+     *
+     * @return Response A Symfony Response object containing either the rendered template
+     *                  or a redirect response after form processing.
+     */
     #[Route('admin/products_general_elements', name: 'products_general_elements_admin')]
     public function productsGeneralElementsAdminPageGet(Request $request): Response
     {
@@ -101,6 +101,20 @@ class IluoController extends AbstractController
     }
 
 
+
+
+
+    /**
+     * Handles the GET and POST requests for the Shift Leaders general elements admin page.
+     *
+     * This function retrieves all shift leaders, creates a form for a new shift leader,
+     * processes form submissions, and renders the shift leaders admin template.
+     *
+     * @param Request $request The current HTTP request object containing all request data.
+     *
+     * @return Response A Symfony Response object containing either the rendered template
+     *                  or a redirect response after form processing.
+     */
     #[Route('admin/shiftleaders_general_elements', name: 'shiftleaders_general_elements_admin')]
     public function shiftLeadersGeneralElementsAdminPageGet(Request $request): Response
     {
@@ -118,6 +132,18 @@ class IluoController extends AbstractController
     }
 
 
+
+    /**
+     * Handles the GET and POST requests for the Quality Representative general elements admin page.
+     *
+     * This function retrieves all quality representatives, creates a form for a new quality representative,
+     * processes form submissions, and renders the quality representative admin template.
+     *
+     * @param Request $request The current HTTP request object containing all request data.
+     *
+     * @return Response A Symfony Response object containing either the rendered template
+     *                  or a redirect response after form processing.
+     */
     #[Route('admin/qualityrep_general_elements', name: 'qualityrep_general_elements_admin')]
     public function qualityRepGeneralElementsAdminPageGet(Request $request): Response
     {
@@ -131,48 +157,6 @@ class IluoController extends AbstractController
         return $this->render('/services/iluo/iluo_admin_component/iluo_general_elements_admin_component/iluo_qualityrep_general_elements_admin.html.twig', [
             'qualityRepForm' => $qualityRepForm->createView(),
             'qualityRep'    => $qualityRep,
-        ]);
-    }
-
-
-
-    // Workstation
-
-    #[Route('admin/workstation', name: 'workstation_admin')]
-    public function workstationAdminPageGet(Request $request): Response
-    {
-        if ($request->isMethod('GET')) {
-            return $this->render('/services/iluo/iluo_admin_component/iluo_workstation_admin.html.twig');
-        }
-        return $this->redirectToRoute('app_base');
-    }
-
-
-    #[Route('admin/creation_workstation', name: 'creation_workstation_admin')]
-    public function creationWorkstationAdminPageGet(Request $request): Response
-    {
-        $this->logger->info('GET request on creation_workstation_admin full request : ', [$request->request->all()]);
-        $newWorkstation = new Workstation();
-        $workstationForm = $this->createForm(WorkstationType::class, $newWorkstation);
-        if ($request->isMethod('POST')) {
-            $this->logger->info('workstation form submitted method POST ', [$request->request->all()]);
-            // Check if this is an AJAX request for zone change
-            if ($request->request->has('ajax_change')) {
-
-                $this->logger->info('workstation form submitted with AJAX zone change', [$request->request->all()]);
-
-                // Get the form data from the request
-                $formData = $request->request->has('workstation') ? $request->request->all('workstation') : [];
-                // Handle the form data
-                $workstationForm->submit($formData, false);
-            } else {
-                $this->logger->info('workstation form submitted', [$request->request->all()]);
-                return $this->iluoService->iluoComponentFormManagement('workstation', $workstationForm, $request);
-            }
-        }
-        return $this->render('/services/iluo/iluo_admin_component/iluo_workstation_admin_component/iluo_creation_workstation_admin.html.twig', [
-            'workstationForm' => $workstationForm->createView(),
-            'workstations' => $this->entityFetchingService->getWorkstations(),
         ]);
     }
 }

@@ -2,20 +2,19 @@
 
 namespace App\Form;
 
+use App\Entity\Operator;
 use App\Entity\User;
 use App\Entity\ShiftLeaders;
 
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ShiftLeadersType extends AbstractType
+class ShiftLeadersType extends AbstractBaseFormType
 {
     public function __construct()
     {
@@ -23,37 +22,62 @@ class ShiftLeadersType extends AbstractType
     }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-
-        $builder
-            ->add('user', EntityType::class, [
-                'label' => 'Désignation Manager',
-                'class' => User::class,
-                'choice_label' => 'username',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
-                        ->where('u.roles = :manager')
-                        ->leftJoin('u.shiftLeader', 'sl')
-                        ->andWhere('sl.id IS NULL')
-                        ->setParameter('manager', '["ROLE_MANAGER"]')
-                        ->orderBy('u.username', 'ASC');
-                },
-                'label_attr' => [
-                    'class' => 'form-label fs-4',
-                    'style' => 'color: #ffffff;'
-                ],
-                'placeholder' => 'Ajouter un Shift-Leader :',
+        $this->addEntityField(
+            builder: $builder,
+            fieldName: 'user',
+            label: 'Désignation Manager(Shift-Leader)',
+            entityClass: User::class,
+            choiceLabel: 'username',
+            queryBuilder: function (EntityRepository $er) {
+                return $er->createQueryBuilder('u')
+                    ->select('u')
+                    ->where('u.roles LIKE :role')
+                    ->leftJoin(ShiftLeaders::class, 'sl', Join::WITH, 'sl.user = u')
+                    ->andWhere('sl.id IS NULL')
+                    ->setParameter('role', '%"ROLE_MANAGER"%')
+                    ->orderBy('u.username', 'ASC');
+            },
+            placeholder: 'Ajouter depuis un Utilisateur :',
+            required: true,
+            additionalOptions: [
                 'attr' => [
-                    'class' => 'form-control mx-auto mt-2',
-                ],
-            ])
-            ->add('save', SubmitType::class, [
-                'label' => 'Ajouter',
-                'attr' => [
-                    'class' => 'btn btn-primary btn-login text-uppercase fw-bold mt-2 mb-3 submit-entity-creation',
-                    'type' => 'submit',
-                    'data-name-validation-target' => 'saveButton',
+                    'data-shift-leaders-form-target' => 'userShiftLeaders',
+                    'data-action' => 'change->shift-leaders-form#userShiftLeadersChange',
                 ]
-            ]);
+            ]
+        );
+
+        $this->addEntityField(
+            builder: $builder,
+            fieldName: 'operator',
+            label: 'Désignation Manager',
+            entityClass: Operator::class,
+            choiceLabel: 'name',
+            queryBuilder: function (EntityRepository $er) {
+                return $er->createQueryBuilder('o')
+                    ->select('o')
+                    ->where('o.isTrainer = :isTrainer')
+                    ->leftJoin(ShiftLeaders::class, 'sl', Join::WITH, 'sl.operator = o')
+                    ->andWhere('sl.id IS NULL')
+                    ->setParameter('isTrainer', true)
+                    ->orderBy('o.name', 'ASC');
+            },
+            placeholder: 'Ajouter depuis un Operateur Formateur :',
+            required: true,
+            additionalOptions: [
+                'attr' => [
+                    'data-shift-leaders-form-target' => 'operatorShiftLeaders',
+                    'data-action' => 'change->shift-leaders-form#operatorShiftLeadersChange',
+                ]
+            ]
+        );
+
+        $this->addSubmitButton(
+            builder: $builder,
+            additionalOptions: [
+                'attr' => ['data-name-validation-target' => 'saveButton'],
+            ]
+        );
     }
 
 
