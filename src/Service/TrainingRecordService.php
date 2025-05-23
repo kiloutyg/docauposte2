@@ -37,6 +37,19 @@ class TrainingRecordService extends AbstractController
     private $entityDeletionService;
 
 
+    /**
+     * Constructor for the TrainingRecordService class.
+     *
+     * Initializes the service with necessary dependencies for managing training records.
+     *
+     * @param LoggerInterface $logger Logger for recording service operations
+     * @param EntityManagerInterface $em Doctrine entity manager for database operations
+     * @param TrainingRecordRepository $trainingRecordRepository Repository for training record entities
+     * @param OperatorRepository $operatorRepository Repository for operator entities
+     * @param UploadRepository $uploadRepository Repository for upload entities
+     * @param TrainerRepository $trainerRepository Repository for trainer entities
+     * @param EntityDeletionService $entityDeletionService Service for handling entity deletion operations
+     */
     public function __construct(
         LoggerInterface                 $logger,
         EntityManagerInterface          $em,
@@ -60,6 +73,15 @@ class TrainingRecordService extends AbstractController
         $this->entityDeletionService        = $entityDeletionService;
     }
 
+    /**
+     * Updates the training status of all training records associated with a specific upload.
+     *
+     * This method sets the 'trained' status to false for all training records linked to the provided upload.
+     * Each record is persisted and the changes are flushed to the database.
+     *
+     * @param Upload $upload The upload entity whose associated training records need to be updated
+     * @return void
+     */
     public function updateTrainingRecord(Upload $upload)
     {
         $trainingRecords = $upload->getTrainingRecords();
@@ -73,6 +95,15 @@ class TrainingRecordService extends AbstractController
         }
     }
 
+    /**
+     * Retrieves training records associated with a specific upload and orders them.
+     *
+     * This method fetches all training records linked to the provided upload entity,
+     * converts them to an array, and then passes them to the ordering function.
+     *
+     * @param Upload $upload The upload entity whose training records need to be ordered
+     * @return array An ordered array of training records based on operator comparison
+     */
     public function getOrderedTrainingRecordsByUpload($upload)
     {
         $this->logger->info('Ordering training records by upload');
@@ -84,6 +115,15 @@ class TrainingRecordService extends AbstractController
 
 
 
+    /**
+     * Orders training records from a provided array.
+     *
+     * This method takes an array of training records and passes it to the ordering function
+     * to sort them based on operator comparison.
+     *
+     * @param array $trainingRecords An array of TrainingRecord entities to be ordered
+     * @return array An ordered array of training records based on operator comparison
+     */
     public function getOrderedTrainingRecordsByTrainingRecordsArray($trainingRecords)
     {
         return $this->orderedTrainingRecordsLoop($trainingRecords);
@@ -91,6 +131,16 @@ class TrainingRecordService extends AbstractController
 
 
 
+    /**
+     * Orders training records based on their associated operators.
+     *
+     * This method extracts operators from training records, sorts them using the repository's
+     * compareOperator method, and then reorders the training records to match the operator order.
+     * It ensures that training records are presented in a consistent order based on operator attributes.
+     *
+     * @param array $trainingRecords An array of TrainingRecord entities to be ordered
+     * @return array An ordered array of training records based on operator comparison
+     */
     private function orderedTrainingRecordsLoop(array $trainingRecords)
     {
         $this->logger->info(message: 'Ordering training records in TrainingRecordService::orderedTrainingRecordsLoop');
@@ -114,25 +164,44 @@ class TrainingRecordService extends AbstractController
         return $orderedTrainingRecords;
     }
 
+    /**
+     * Deletes training records that are older than one week.
+     *
+     * This method checks if a training record is older than one week from the current date.
+     * If it is not older than a week, it proceeds with deletion. Otherwise, it returns false
+     * indicating that the record is too old to be deleted.
+     *
+     * @param int $trainingRecordId The ID of the training record to check and potentially delete
+     * @return bool Returns true if the record was successfully deleted, false if the record is older than one week
+     */
     public function deleteWeeksOldTrainingRecords(int $trainingRecordId)
     {
         $trainingRecord = $this->trainingRecordRepository->find($trainingRecordId);
         $today = new \DateTime();
-        $response = false;
-
         if ($trainingRecord->getDate() < $today->modify('-1 week')) {
             return false;
         } else {
-            $response = $this->entityDeletionService->deleteEntity('trainingRecord', $trainingRecord->getId());
+            return $this->entityDeletionService->deleteEntity('trainingRecord', $trainingRecord->getId());
         }
-        if ($response != '' || $response != null) {
-            return true;
-        } else {
-            return false;
-        }
+          
     }
 
 
+    /**
+     * Processes training records based on request data.
+     *
+     * This method handles the creation or update of training records for operators based on
+     * the submitted form data. It identifies trained operators, creates or updates their
+     * training records, updates operator status information, and ensures the trainer is
+     * also recorded as trained.
+     *
+     * @param Request $request The HTTP request containing training data:
+     *                         - 'operators': Array of operator data with 'id' and 'trained' status
+     *                         - 'trainerId': ID of the trainer conducting the training
+     *                         - 'uploadId' (attribute): ID of the upload associated with the training
+     *
+     * @return void
+     */
     public function trainingRecordTreatment(Request $request)
     {
         $operators = [];
@@ -140,16 +209,16 @@ class TrainingRecordService extends AbstractController
         $upload = $this->uploadRepository->find($request->attributes->get('uploadId'));
         $trainerOperator = $this->operatorRepository->find($request->request->get('trainerId'));
         $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $trainerOperator]);
-
+    
         foreach ($operators as $operator) {
             if (array_key_exists("trained", $operator)) {
-
+    
                 if ($operator['trained'] === 'true') {
                     $trained = true;
                 } else {
                     continue;
                 }
-
+    
                 $operatorEntity = $this->operatorRepository->find($operator['id']);
                 // Get all training records as a collection
                 $operatorTrainingRecords = $operatorEntity->getTrainingRecords();
@@ -157,7 +226,7 @@ class TrainingRecordService extends AbstractController
                 $filteredRecords = $operatorTrainingRecords->filter(function ($trainingRecord) use ($upload) {
                     return $trainingRecord->getUpload() === $upload;
                 });
-
+    
                 // If the collection is empty, create a new TrainingRecord
                 if ($filteredRecords->isEmpty()) {
                     $trainingRecord = new TrainingRecord();
@@ -176,19 +245,31 @@ class TrainingRecordService extends AbstractController
                 $this->em->persist($operatorEntity);
             }
         }
-
+    
         try {
             $this->trainerOperatorTrainingRecordCheck($trainerOperator, $trainerEntity, $upload);
         } catch (\Exception $e) {
             $this->logger->error('error during trainerOperatorTrainingRecordCheck', [$e]);
         } finally {
             $this->em->flush();
-            return;
         }
     }
 
 
 
+    /**
+     * Ensures that a trainer is also recorded as trained for the upload they are training others on.
+     *
+     * This method checks if a training record exists for the trainer as an operator for the given upload.
+     * If no record exists, it creates one. It then updates the training record with the current date
+     * and marks the trainer as trained. Additionally, it updates the trainer's operator record
+     * with the latest training date and clears any deletion or inactivity flags.
+     *
+     * @param Operator $trainerOperator The operator entity representing the trainer
+     * @param Trainer $trainerEntity The trainer entity associated with the operator
+     * @param Upload $upload The upload entity for which the training is being conducted
+     * @return void
+     */
     public function trainerOperatorTrainingRecordCheck(Operator $trainerOperator, Trainer $trainerEntity, Upload $upload)
     {
         $existingTrainingRecord = $this->trainingRecordRepository->findOneBy(['upload' => $upload, 'operator' => $trainerOperator]);
@@ -207,7 +288,5 @@ class TrainingRecordService extends AbstractController
         $trainerOperator->setTobedeleted(null);
         $trainerOperator->setInactiveSince(null);
         $this->em->persist($trainerOperator);
-
-        return;
     }
 }
