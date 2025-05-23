@@ -106,10 +106,7 @@ class FrontController extends AbstractController
         if ($users == null) {
 
             $error = null;
-            $result = $this->accountService->createAccount(
-                $request,
-                $error
-            );
+            $result = $this->accountService->createAccount(request: $request);
             if ($result) {
                 $this->addFlash('success', 'Le compte de Super-Administrateur a bien été créé.');
             }
