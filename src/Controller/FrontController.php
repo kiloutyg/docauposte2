@@ -121,14 +121,14 @@ class FrontController extends AbstractController
     // This function is responsible for creating the super-admin account at the first connection of the application.
     /**
      * Creates a super-admin account at the first connection of the application.
-     * 
+     *
      * This function checks if any users exist in the system. If no users exist,
      * it attempts to create a super-admin account using the provided request data.
      * If users already exist, it displays an alert message indicating that the
      * super-admin account already exists.
-     * 
+     *
      * @param Request $request The HTTP request containing form data for account creation
-     * 
+     *
      * @return Response A redirect response to the application base route
      */
     #[Route('/createSuperAdmin', name: 'create_super_admin')]
