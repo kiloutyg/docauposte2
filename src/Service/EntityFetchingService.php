@@ -51,7 +51,7 @@ class EntityFetchingService extends AbstractController
 
     public function getUsers()
     {
-        return $this->findBy('user', [[], ['username' => 'ASC']]);
+        return $this->findBy(entityType: 'user', criteria: [], orderBy: ['username' => 'ASC']);
     }
 
 
@@ -63,18 +63,18 @@ class EntityFetchingService extends AbstractController
 
     public function getZones()
     {
-        return $this->findBy('zone', [[], ['SortOrder' => 'ASC']]);
+        return $this->findBy(entityType: 'zone', criteria: [], orderBy: ['SortOrder' => 'ASC']);
     }
 
 
     public function getProductLines()
     {
-        return $this->findBy('productLine', [[], ['SortOrder' => 'ASC']]);
+        return $this->findBy(entityType: 'productLine', criteria: [], orderBy: ['SortOrder' => 'ASC']);
     }
 
     public function getProductLinesByZone(Zone $zone)
     {
-        return $this->findBy('productLine', [['zone' => $zone->getId()], ['SortOrder' => 'ASC']]);
+        return $this->findBy(entityType: 'productLine', criteria: ['zone' => $zone->getId()], orderBy: ['SortOrder' => 'ASC']);
     }
 
 
@@ -92,22 +92,22 @@ class EntityFetchingService extends AbstractController
 
     public function getCategories()
     {
-        return $this->findBy('category', [[], ['SortOrder' => 'ASC']]);
+        return $this->findBy(entityType: 'category', criteria: [], orderBy: ['SortOrder' => 'ASC']);
     }
 
     public function getCategoriesByProductLine(ProductLine $productLine)
     {
-        return $this->findBy('category', [['productLine' => $productLine->getId()], ['SortOrder' => 'ASC']]);
+        return $this->findBy(entityType: 'category', criteria: ['productLine' => $productLine->getId()], orderBy: ['SortOrder' => 'ASC']);
     }
 
     public function getButtons()
     {
-        return $this->findBy('button', [[], ['SortOrder' => 'ASC']]);
+        return $this->findBy(entityType: 'button', criteria: [], orderBy: ['SortOrder' => 'ASC']);
     }
 
     public function getButtonsByCategory(Category $category)
     {
-        return $this->findBy('button', [['category' => $category->getId()], ['SortOrder' => 'ASC']]);
+        return $this->findBy(entityType: 'button', criteria: ['category' => $category->getId()], orderBy: ['SortOrder' => 'ASC']);
     }
 
     public function getUploads()
@@ -395,19 +395,9 @@ class EntityFetchingService extends AbstractController
      *                      - [3]: offset - Number of results to skip (default: null)
      * @return mixed An array of matching entity objects or an empty array if no matches found
      */
-    public function findBy(string $entityType, array $params): mixed
+    public function findBy(string $entityType, array $criteria, ?array $orderBy = null, ?int $limit = null, ?int $offset = null): mixed
     {
-        $this->logger->debug('findBy', [$entityType, $params]);
-        $criteria = $params[0] ?? [];
-        $this->logger->debug('criteria', [$criteria]);
-        $orderBy = $params[1] ?? null;
-        $this->logger->debug('orderBy', [$orderBy]);
-        $limit = $params[2] ?? null;
-        $this->logger->debug('limit', [$limit]);
-        $offset = $params[3] ?? null;
-        $this->logger->debug('', [$offset]);
-
-        return $this->fromNameToRepo($entityType)->findBy($criteria, $orderBy, $limit, $offset);
+        return $this->fromNameToRepo(entityType: $entityType)->findBy(criteria: $criteria, orderBy: $orderBy, limit: $limit, offset: $offset);
     }
 
     public function findOneBy(string $entityType, array $criteria): mixed

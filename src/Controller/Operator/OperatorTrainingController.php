@@ -174,7 +174,7 @@ class OperatorTrainingController extends AbstractController
         $inTrainingOperatorsByTrainer = []; // Array of operators in training grouped by trainer
 
         foreach ($selectedOperators as $operator) {
-            $records = $this->entityFetchingService->findBy('trainingRecord', [['operator' => $operator, 'upload' => $uploadId]]);
+            $records = $this->entityFetchingService->findBy('trainingRecord', ['operator' => $operator, 'upload' => $uploadId]);
             $this->logger->debug('records: ', [$records]);
             $unorderedTrainingRecords = array_merge($trainingRecords, $records);
 
