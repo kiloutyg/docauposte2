@@ -19,10 +19,10 @@ DirectoryIndex index.php
 
 # PHP settings to prevent segmentation faults
 <IfModule mod_php.c>
-    php_value memory_limit 512M
-    php_value max_execution_time 300
-    php_value post_max_size 64M
-    php_value upload_max_filesize 64M
+    php_value memory_limit 2048M
+    php_value max_execution_time 1000
+    php_value post_max_size 128M
+    php_value upload_max_filesize 128M
     php_flag display_errors on
     php_flag log_errors on
 </IfModule>

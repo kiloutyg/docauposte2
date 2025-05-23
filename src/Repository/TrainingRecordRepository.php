@@ -48,24 +48,27 @@ class TrainingRecordRepository extends ServiceEntityRepository
      */
     public function compareOperator(Operator $a, Operator $b): int
     {
-        $response = null;
+        $result = 0;
+
+        // Compare by team name
         if ($a->getTeam()->getName() != $b->getTeam()->getName()) {
-            $response = strcmp($a->getTeam()->getName(), $b->getTeam()->getName());
+            $result = strcmp(string1: $a->getTeam()->getName(), string2: $b->getTeam()->getName());
         }
-        // If 'team' is the same, move on to compare by 'uap'
-        if ($a->getUaps()->first()->getName() != $b->getUaps()->first()->getName()) {
-            $response = strcmp($a->getUaps()->first()->getName(), $b->getUaps()->first()->getName());
+        // If teams are equal, compare by UAP name
+        elseif ($a->getUaps()->first()->getName() != $b->getUaps()->first()->getName()) {
+            $result = strcmp(string1: $a->getUaps()->first()->getName(), string2: $b->getUaps()->first()->getName());
+        }
+        // If UAPs are equal, compare by name (firstname.surname)
+        else {
+            // Split names to separate first name and last name
+            list($firstnameA, $surnameA) = explode(separator: '.', string: $a->getName(), limit: 2);
+            list($firstnameB, $surnameB) = explode(separator: '.', string: $b->getName(), limit: 2);
+
+            // Compare surnames
+            $surnameComparison = strcmp(string1: $surnameA, string2: $surnameB);
+            $result = ($surnameComparison !== 0) ? $surnameComparison : strcmp(string1: $firstnameA, string2: $firstnameB);
         }
 
-        // If 'uap' is also the same, finally compare by 'surname.firstname'
-        list($firstnameA, $surnameA) = explode('.', $a->getName(), 2);
-        list($firstnameB, $surnameB) = explode('.', $b->getName(), 2);
-
-        $surnameComparison = strcmp($surnameA, $surnameB);
-        if ($surnameComparison !== 0) {
-            $response = $surnameComparison;
-        }
-
-        return $response ?? strcmp($firstnameA, $firstnameB);
+        return $result;
     }
 }

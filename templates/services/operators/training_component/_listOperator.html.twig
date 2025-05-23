@@ -2,7 +2,6 @@
 	id="training-records-form">
 	{% if selectedOperators is defined and selectedOperators is not empty %}
 
-
 		<input
 			data-operator-trainer-target="trainerOperatorLogon"
 			id="trainerOperatorLogon"
@@ -26,7 +25,6 @@
 			<strong>
 				{% if operatorsByTrainer is defined and operatorsByTrainer is not empty %}
 					{% for trainerName, operators in operatorsByTrainer %}
-
 						<p
 							class="mx-2 card text-center"
 							style="flex:1;">
@@ -41,7 +39,6 @@
 						{% endfor %}
 					{% endfor %}
 				{% endif %}
-
 				{% if inTrainingOperatorsByTrainer is defined and inTrainingOperatorsByTrainer is not empty %}
 					{% for trainerName, operators in inTrainingOperatorsByTrainer %}
 
@@ -73,6 +70,8 @@
 				{% endif %}
 
 			</strong>
+
+			
 			<div
 				id="trainingValidationSubmitContainer"
 				name="trainingValidationSubmitContainer"></div>

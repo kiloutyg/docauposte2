@@ -235,6 +235,7 @@ class EntityFetchingService extends AbstractController
     public function findOperatorsByTeamAndUapId(int $teamId, int $uapId): array
     {
         $selectedOperators = $this->fromNameToRepo('operator')->findByTeamAndUap($teamId, $uapId);
+        $this->logger->info('selectedOperators', [$selectedOperators]);
         usort($selectedOperators, function ($a, $b) {
             list($firstNameA, $surnameA) = explode('.', $a->getName());
             list($firstNameB, $surnameB) = explode('.', $b->getName());
@@ -255,6 +256,7 @@ class EntityFetchingService extends AbstractController
     {
         return $this->findAll('trainer');
     }
+
 
     /**
      * Groups uploads into a hierarchical structure based on their associations.
@@ -395,10 +397,15 @@ class EntityFetchingService extends AbstractController
      */
     public function findBy(string $entityType, array $params): mixed
     {
+        $this->logger->debug('findBy', [$entityType, $params]);
         $criteria = $params[0] ?? [];
+        $this->logger->debug('criteria', [$criteria]);
         $orderBy = $params[1] ?? null;
+        $this->logger->debug('orderBy', [$orderBy]);
         $limit = $params[2] ?? null;
+        $this->logger->debug('limit', [$limit]);
         $offset = $params[3] ?? null;
+        $this->logger->debug('', [$offset]);
 
         return $this->fromNameToRepo($entityType)->findBy($criteria, $orderBy, $limit, $offset);
     }
