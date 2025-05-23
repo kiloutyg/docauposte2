@@ -125,7 +125,7 @@ class SuperAdminController extends AbstractController
         $em = $this->entityManagerFacade->getEntityManager();
         $incidents = $this->entityManagerFacade->getIncidents();
         foreach ($incidents as $incident) {
-            $similarNamedincidents = $this->entityManagerFacade->findBy('incident', ['name' => $incident->getName()]);
+            $similarNamedincidents = $this->entityManagerFacade->findBy(entityType: 'incident', criteria: ['name' => $incident->getName()]);
             foreach ($similarNamedincidents as $similarNamedincident) {
                 if ($incident->getId() != $similarNamedincident->getId()) {
                     $originalName = pathinfo($similarNamedincident->getName(), PATHINFO_FILENAME);

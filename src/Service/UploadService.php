@@ -247,6 +247,8 @@ class UploadService extends AbstractController
         }
     }
 
+
+    
     /**
      * Handle the case when validation is required for the upload
      */
@@ -269,6 +271,8 @@ class UploadService extends AbstractController
         }
     }
 
+
+
     /**
      * Handle the case when no validation is required for the upload
      */
@@ -279,6 +283,8 @@ class UploadService extends AbstractController
             $this->updateExistingValidationComment($upload, $request, $comment);
         }
     }
+
+
 
     /**
      * Determine if the upload needs validation based on request parameters
@@ -292,6 +298,9 @@ class UploadService extends AbstractController
         }
         return true; // No validation needed
     }
+
+
+
 
     /**
      * Update or create validation records based on existing validation and modification type
@@ -309,6 +318,8 @@ class UploadService extends AbstractController
         }
     }
 
+
+
     /**
      * Update the comment on an existing validation
      */
@@ -325,6 +336,7 @@ class UploadService extends AbstractController
         $this->em->persist($preExistingValidationEntity);
         $this->em->flush();
     }
+
 
 
     // This function is responsible for the logic of modifying the uploads files

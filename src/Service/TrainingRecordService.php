@@ -75,6 +75,8 @@ class TrainingRecordService extends AbstractController
 
     public function getOrderedTrainingRecordsByUpload($upload)
     {
+        $this->logger->info('Ordering training records by upload');
+
         $trainingRecords = $upload->getTrainingRecords()->toArray();
 
         return $this->orderedTrainingRecordsLoop($trainingRecords);
@@ -91,10 +93,12 @@ class TrainingRecordService extends AbstractController
 
     private function orderedTrainingRecordsLoop(array $trainingRecords)
     {
-        $operators = array_map(function ($trainingRecord) {
+        $this->logger->info(message: 'Ordering training records in TrainingRecordService::orderedTrainingRecordsLoop');
+        $operators = array_map(callback: function ($trainingRecord): mixed {
             return $trainingRecord->getOperator();
-        }, $trainingRecords);
-        usort($operators, [$this->trainingRecordRepository, 'compareOperator']);
+        }, array: $trainingRecords);
+
+        usort(array: $operators, callback: [$this->trainingRecordRepository, 'compareOperator']);
 
         $orderedTrainingRecords = [];
         foreach ($operators as $operator) {
@@ -105,6 +109,8 @@ class TrainingRecordService extends AbstractController
                 }
             }
         }
+
+
         return $orderedTrainingRecords;
     }
 
