@@ -29,6 +29,7 @@ const initConfirmations = () => {
     { selector: ".delete-incident", message: "Êtes vous sûr de vouloir supprimer cet Incident?" },
     { selector: ".delete-incidentCategory", message: "Êtes vous sûr de vouloir supprimer ce Type d'Incident?" },
     { selector: ".delete-operator", message: "Êtes vous sûr de vouloir supprimer cet Opérateur?" },
+    { selector: ".delete-all-inactive-operator", message: "Êtes vous sûr de vouloir supprimer ces Opérateurs définitivement?" },
     { selector: ".delete-productLine", message: "Êtes vous sûr de vouloir supprimer cette Ligne?" },
     { selector: ".delete-products", message: "Êtes vous sûr de vouloir supprimer ce Produit?" },
     { selector: ".delete-shiftLeaders", message: "Êtes vous sûr de vouloir enlever cet utilisateur de la liste des ShiftLeaders?" },
@@ -52,8 +53,8 @@ const initConfirmations = () => {
     { selector: ".submit-operator-modification", message: "Êtes vous sûr de vouloir soumettre ces modifications?" },
     { selector: ".submit-upload-modification", message: "Êtes vous sûr de vouloir soumettre ces modifications?" },
     { selector: ".submit-views-modification", message: "Êtes vous sûr de vouloir soumettre ces modifications?" },
-    
-    { selector: ".transfer-work", message:"Êtes vous sûr de vouloir transferer le travail de cet utilisateur à un autre utilisateur?" },
+
+    { selector: ".transfer-work", message: "Êtes vous sûr de vouloir transferer le travail de cet utilisateur à un autre utilisateur?" },
 
   ];
 

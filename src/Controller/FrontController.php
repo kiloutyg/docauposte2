@@ -9,20 +9,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-use Doctrine\ORM\EntityManagerInterface;
-
-use \Psr\Log\LoggerInterface;
-
 use App\Entity\ProductLine;
 use App\Entity\Category;
 use App\Entity\Button;
-use App\Entity\Department;
-
-use App\Repository\ZoneRepository;
-use App\Repository\ProductLineRepository;
-use App\Repository\IncidentRepository;
-use App\Repository\CategoryRepository;
-use App\Repository\ButtonRepository;
 
 use App\Service\EntityFetchingService;
 use App\Service\AccountService;
@@ -37,21 +26,13 @@ use App\Service\OperatorService;
 class FrontController extends AbstractController
 {
 
-    private $em;
     private $authChecker;
-    private $logger;
 
-    private $categoryRepository;
-    private $buttonRepository;
-    private $incidentRepository;
-    private $zoneRepository;
-    private $productLineRepository;
-
-    private $settingsService;
-    private $validationService;
+    private $accountService;
     private $operatorService;
     private $entityFetchingService;
-    private $accountService;
+    private $settingsService;
+    private $validationService;
 
 
 
@@ -62,13 +43,6 @@ class FrontController extends AbstractController
      * the front interface of the application.
      *
      * @param AuthorizationCheckerInterface $authChecker           Service for checking user authorization
-     * @param EntityManagerInterface $em                           Doctrine entity manager for database operations
-     * @param LoggerInterface $logger                              Service for logging application events
-     * @param CategoryRepository $categoryRepository               Repository for Category entity operations
-     * @param ButtonRepository $buttonRepository                   Repository for Button entity operations
-     * @param ZoneRepository $zoneRepository                       Repository for Zone entity operations
-     * @param ProductLineRepository $productLineRepository         Repository for ProductLine entity operations
-     * @param IncidentRepository $incidentRepository               Repository for Incident entity operations
      * @param SettingsService $settingsService                     Service for managing application settings
      * @param OperatorService $operatorService                     Service for operator-related operations
      * @param ValidationService $validationService                 Service for validation-related operations
@@ -79,35 +53,15 @@ class FrontController extends AbstractController
      */
     public function __construct(
 
-        AuthorizationCheckerInterface   $authChecker,
-        EntityManagerInterface          $em,
-        LoggerInterface                 $logger,
+        AuthorizationCheckerInterface       $authChecker,
 
-
-        CategoryRepository              $categoryRepository,
-        ButtonRepository                $buttonRepository,
-        ZoneRepository                  $zoneRepository,
-        ProductLineRepository           $productLineRepository,
-        IncidentRepository              $incidentRepository,
-
-
-        SettingsService                 $settingsService,
-        OperatorService                 $operatorService,
-        ValidationService               $validationService,
-        EntityFetchingService           $entityFetchingService,
-        AccountService                  $accountService,
-
+        SettingsService                     $settingsService,
+        OperatorService                     $operatorService,
+        ValidationService                   $validationService,
+        EntityFetchingService               $entityFetchingService,
+        AccountService                      $accountService,
     ) {
         $this->authChecker                  = $authChecker;
-        $this->em                           = $em;
-        $this->logger                       = $logger;
-
-        $this->categoryRepository           = $categoryRepository;
-        $this->buttonRepository             = $buttonRepository;
-        $this->incidentRepository           = $incidentRepository;
-        $this->zoneRepository               = $zoneRepository;
-        $this->productLineRepository        = $productLineRepository;
-
 
         $this->operatorService              = $operatorService;
         $this->settingsService              = $settingsService;
@@ -170,21 +124,10 @@ class FrontController extends AbstractController
     #[Route('/', name: 'base')]
     public function base(): Response
     {
-
         $users = $this->entityFetchingService->getUsers();
         $settings = $this->settingsService->getSettings();
         if ($settings->isUploadValidation() && $this->entityFetchingService->getValidations() != null) {
             $this->validationService->remindCheck($users);
-        }
-
-        if ($this->entityFetchingService->getDepartments() == null) {
-            $department = new Department();
-            $department->setName('I.T.');
-            $this->em->persist($department);
-            $department = new Department();
-            $department->setName('QUALITY');
-            $this->em->persist($department);
-            $this->em->flush();
         }
 
         if ($settings->isTraining() && $this->authChecker->isGranted('ROLE_MANAGER')) {
@@ -225,7 +168,7 @@ class FrontController extends AbstractController
         ?int $zoneId = null,
     ): Response {
 
-        $zone = $this->zoneRepository->find($zoneId);
+        $zone = $this->entityFetchingService->find(entityType: 'zone',  entityId: $zoneId);
 
         $productLinesInZone = [];
         $productLinesInZone = $this->entityFetchingService->getProductLinesByZone($zone);
@@ -264,15 +207,16 @@ class FrontController extends AbstractController
     {
 
         if (!$productLine) {
-            $productLine = $this->productLineRepository->find($productLineId);
+            $productLine = $this->entityFetchingService->find(entityType: 'productLine', entityId: $productLineId);
         }
 
         $categoriesInLine = $this->entityFetchingService->getCategoriesByProductLine($productLine);
 
         $incidentsInProductLine = [];
-        $incidentsInProductLine = $this->incidentRepository->findBy(
-            ['productLine' => $productLineId],
-            ['id' => 'ASC'] // order by id ascending
+        $incidentsInProductLine = $this->entityFetchingService->findBy(
+            entityType: 'incident',
+            criteria: ['productLine' => $productLineId],
+            orderBy: ['id' => 'ASC'] // order by id ascending
         );
 
 
@@ -320,7 +264,7 @@ class FrontController extends AbstractController
 
         $buttons = [];
         if (!$category) {
-            $category = $this->categoryRepository->find($categoryId);
+            $category = $this->entityFetchingService->find(entityType: 'category', entityId: $categoryId);
         }
 
         $buttons = $this->entityFetchingService->getButtonsByCategory($category);
@@ -361,7 +305,7 @@ class FrontController extends AbstractController
     public function buttonDisplay(?int $buttonId = null, ?Button $button = null): Response
     {
         if (!$button) {
-            $button = $this->buttonRepository->find($buttonId);
+            $button = $this->entityFetchingService->find(entityType: 'button', entityId: $buttonId);
         }
 
         $buttonUploads = $button->getUploads();

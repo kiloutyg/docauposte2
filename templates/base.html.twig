@@ -147,9 +147,9 @@
 				<div
 					class="ms-auto d-flex align-items-center">
 					{% if usersExist is defined %}
-						{% if usersExist is empty %}
+						{% if usersExist is not empty %}
 
-							{% else %}
+							
 								{% if app.user is null %}
 									<p>
 										<a

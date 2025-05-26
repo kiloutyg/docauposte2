@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
 
+use App\Entity\Department;
 use App\Entity\Settings;
 
 use App\Repository\SettingsRepository;
@@ -57,6 +58,13 @@ class SettingsService extends AbstractController
             $this->settings = $this->settingsRepository->getSettings();
         }
         if (!$this->settings) {
+            $department = new Department();
+            $department->setName('I.T.');
+            $this->em->persist($department);
+            $department = new Department();
+            $department->setName('QUALITY');
+            $this->em->persist($department);
+
             $settingsEntity = new Settings();
             $this->em->persist($settingsEntity);
             $this->em->flush();

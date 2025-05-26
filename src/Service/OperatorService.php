@@ -96,6 +96,10 @@ class OperatorService extends AbstractController
         $inActiveOperators = $this->entityManagerFacade->findOperatorWithNoRecentTraining();
         if (count($inActiveOperators) > 0) {
             foreach ($inActiveOperators as $operator) {
+                if ($operator->isTrainer() && $this->trainingManagerFacade->trainerInactivityCheck($operator)) {
+                    // Skip trainer if they have recently had training, if both conditions are true,
+                    continue;
+                }
                 $operator->setInactiveSince($today);
                 $this->entityManagerFacade->getEntityManager()->persist($operator);
             }
@@ -122,6 +126,10 @@ class OperatorService extends AbstractController
         $operatorSetToBeDeleted = $this->entityManagerFacade->findInActiveOperators();
         if (count($operatorSetToBeDeleted) > 0) {
             foreach ($operatorSetToBeDeleted as $operator) {
+                if ($operator->isTrainer() && $this->trainingManagerFacade->trainerInactivityCheck($operator)) {
+                    // Skip trainer if they have recently had training, if both conditions are true,
+                    continue;
+                }
                 $operator->setTobedeleted($today);
                 $this->entityManagerFacade->getEntityManager()->persist($operator);
             }
@@ -155,6 +163,37 @@ class OperatorService extends AbstractController
             file_put_contents($filePath, $today->format('Y-m-d'));
         }
         return $toBeDeletedOperatorsIds;
+    }
+
+
+    /**
+     * Forcefully deletes all operators that are marked for deletion, bypassing any delay restrictions.
+     *
+     * Retrieves all operators marked for deletion without considering any time constraints,
+     * and permanently removes them from the database. Skips trainers who have recent training activity.
+     *
+     * @return int The number of operators that were deleted
+     */
+    public function forceDeleteToBeDeletedOperator(): int
+    {
+        $toBeDeletedOperators = $this->entityManagerFacade->findOperatorToBeDeletedWithNoDelayRestriction();
+        $numberOfToBeDeleted = count($toBeDeletedOperators);
+        $this->logger->info('forceDeleteToBeDeletedOperator ' . $numberOfToBeDeleted . ' operators marked for deletion');
+
+        $numberOfNonToBeDeleted = 0;
+        if ($numberOfToBeDeleted > 0) {
+            foreach ($toBeDeletedOperators as $operator) {
+                if ($operator->isIsTrainer() && $this->trainingManagerFacade->trainerInactivityCheck($operator)) {
+                    $numberOfNonToBeDeleted++;
+                    continue;
+                }
+                $this->entityManagerFacade->deleteEntity('operator', $operator->getID());
+            }
+            $this->entityManagerFacade->getEntityManager()->flush();
+        }
+        $this->logger->info('forceDeleteToBeDeletedOperator ' . $numberOfNonToBeDeleted . ' operators unmarked for deletion');
+
+        return $numberOfToBeDeleted - $numberOfNonToBeDeleted;
     }
 
 

@@ -57,15 +57,15 @@
 									<div
 										class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
 										{{ form_label(settingsForm.uploadValidation, 'Validation des fichiers chargés:', {
-                                                'label_attr': {'class': 'text-white m-0'}
-                                            }) }}
+													'label_attr': {'class': 'text-white m-0'}
+												}) }}
 										{{ form_widget(settingsForm.uploadValidation) }}
 									</div>
 									<div
 										class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
 										{{ form_label(settingsForm.validatorNumber, 'Nombre de validateurs:', {
-                                                'label_attr': {'class': 'text-white m-0'}
-                                            }) }}
+													'label_attr': {'class': 'text-white m-0'}
+												}) }}
 										{{ form_widget(settingsForm.validatorNumber) }}
 									</div>
 								</div>
@@ -83,16 +83,16 @@
 									<div
 										class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
 										{{ form_label(settingsForm.incidentAutoDisplay, 'Affichage automatique des incidents:', {
-                                                'label_attr': {'class': 'text-white m-0'}
-                                            }) }}
+													'label_attr': {'class': 'text-white m-0'}
+												}) }}
 										{{ form_widget(settingsForm.incidentAutoDisplay) }}
 									</div>
 									<div
 										class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
 										{{ form_label(settingsForm.settingsDateInterval.incidentAutoDisplayTimer, 'Délai d\'affichage automatique des incidents (en minutes):', {
-                                                'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary text-white m-0'}
-                                            }) }}
-                                            {{ form_widget(settingsForm.settingsDateInterval.incidentAutoDisplayTimer) }}										
+												'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary text-white m-0'}
+											}) }}
+											{{ form_widget(settingsForm.settingsDateInterval.incidentAutoDisplayTimer) }}										
 										</div>
 									</div>
 
@@ -104,45 +104,51 @@
 									<div
 										class=" d-flex justify-content-around flex-wrap">
 										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
-                                       		{{ form_label(settingsForm.training, 'Activation des signatures Opérateur:', {
-                                                'label_attr': {'class': 'text-white m-0'}
-                                            }) }}
-                                            {{ form_widget(settingsForm.training) }}										
+											{{ form_label(settingsForm.training, 'Activation des signatures Opérateur:', {
+												'label_attr': {'class': 'text-white m-0'}
+											}) }}
+											{{ form_widget(settingsForm.training) }}										
 										</div>
 										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
-                                            {{ form_label(settingsForm.settingsDateInterval.operatorRetrainingDelay, 'Délai de déqualification des opérateurs (en mois):', {
-                                                'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary  text-white m-0'}
-                                            }) }}
-                                            {{ form_widget(settingsForm.settingsDateInterval.operatorRetrainingDelay) }}										
+											{{ form_label(settingsForm.settingsDateInterval.operatorRetrainingDelay, 'Délai de déqualification des opérateurs (en mois):', {
+												'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary  text-white m-0'}
+											}) }}
+											{{ form_widget(settingsForm.settingsDateInterval.operatorRetrainingDelay) }}										
 										</div>
 										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
-                                            {{ form_label(settingsForm.settingsDateInterval.operatorInactivityDelay, 'Délai de mise en inactivité des opérateurs (en mois):', {
-                                                'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary  text-white m-0'}
-                                            }) }}
-                                            {{ form_widget(settingsForm.settingsDateInterval.operatorInactivityDelay) }}										
+											{{ form_label(settingsForm.settingsDateInterval.operatorInactivityDelay, 'Délai de mise en inactivité des opérateurs (en mois):', {
+												'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary  text-white m-0'}
+											}) }}
+											{{ form_widget(settingsForm.settingsDateInterval.operatorInactivityDelay) }}										
 										</div>
 										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
-                                            {{ form_label(settingsForm.settingsDateInterval.operatorAutoDeleteDelay, 'Délai de suppression automatique des opérateurs après inactivité (en mois):', {
-                                                'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary text-white m-0'}
-                                            }) }}
-                                            {{ form_widget(settingsForm.settingsDateInterval.operatorAutoDeleteDelay) }}										
+											{{ form_label(settingsForm.settingsDateInterval.operatorAutoDeleteDelay, 'Délai de suppression automatique des opérateurs après inactivité (en mois):', {
+												'label_attr': {'class': ' mx-auto d-flex align-items-center justify-content-center bg-secondary text-white m-0'}
+											}) }}
+											{{ form_widget(settingsForm.settingsDateInterval.operatorAutoDeleteDelay) }}										
 										</div>
 										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
-                                       		{{ form_label(settingsForm.operatorCodeMethod, 'Utilisation de la methode J-F-Decorse pour les CodeOpé(Avec générateur de code):', {
-                                                'label_attr': {'class': 'text-white m-0'}
-                                            }) }}
-                                            {{ form_widget(settingsForm.operatorCodeMethod) }}										
+											{{ form_label(settingsForm.operatorCodeMethod, 'Utilisation de la methode J-F-Decorse pour les CodeOpé(Avec générateur de code):', {
+												'label_attr': {'class': 'text-white m-0'}
+											}) }}
+											{{ form_widget(settingsForm.operatorCodeMethod) }}										
 										</div>
 										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
-                                       		{{ form_label(settingsForm.operatorCodeRegex, 'Si autre methode que J-F-Decorse, entrer la RegEx (ECMAScript->Javascript) à appliquer:', {
-                                                'label_attr': {'class': 'text-white m-0'}
-                                            }) }}
-                                            {{ form_widget(settingsForm.operatorCodeRegex) }}										
+											{{ form_label(settingsForm.operatorCodeRegex, 'Si autre methode que J-F-Decorse, entrer la RegEx (ECMAScript->Javascript) à appliquer:', {
+												'label_attr': {'class': 'text-white m-0'}
+											}) }}
+											{{ form_widget(settingsForm.operatorCodeRegex) }}										
+										</div>
+										<div class="col-6 mx-auto d-flex align-items-center justify-content-center card bg-secondary border-5 shadow">
+											<a href="{{path('app_tabularasa')}}" 
+											class="btn btn-danger text-white m-2 delete-all-inactive-operator">
+												Supprimer définitivement tous les opérateurs inactifs programmés à la suppression automatique.
+											</a>
 										</div>
 									</div>
 									<hr
 										class="my-4">
-									{{ form_widget(settingsForm.submit, {'attr': {'class': 'btn btn-primary mx-auto submit-settings-modification'}}) }}
+										{{ form_widget(settingsForm.submit, {'attr': {'class': 'btn btn-primary mx-auto submit-settings-modification'}}) }}
 								{{ form_end(settingsForm) }}
 							</div>
 						</div>

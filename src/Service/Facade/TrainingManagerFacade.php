@@ -31,7 +31,8 @@ class TrainingManagerFacade
         $this->trainerService->handleTrainerStatus($isTrainer, $operator);
     }
 
-    public function teamInitialization() {
+    public function teamInitialization()
+    {
         $this->teamService->teamInitialization();
     }
 
@@ -40,7 +41,13 @@ class TrainingManagerFacade
         $this->uapService->updateOperatorUaps($newUapsArray, $operator);
     }
 
-    public function uapInitialization() {
+    public function uapInitialization()
+    {
         $this->uapService->uapInitialization();
+    }
+
+    public function trainerInactivityCheck(Operator $operator): bool
+    {
+        return $this->trainerService->trainerInactivityCheck(operator: $operator);
     }
 }
