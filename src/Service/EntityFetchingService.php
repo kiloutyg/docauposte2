@@ -207,6 +207,12 @@ class EntityFetchingService extends AbstractController
     }
 
 
+    public function findOperatorToBeDeletedWithNoDelayRestriction()
+    {
+        return $this->fromNameToRepo('operator')->findOperatorToBeDeletedWithNoDelayRestriction();
+    }
+
+
     public function findOperatorByNameLikeForSuggestions(string $name)
     {
         return $this->fromNameToRepo('operator')->findByNameLikeForSuggestions($name);

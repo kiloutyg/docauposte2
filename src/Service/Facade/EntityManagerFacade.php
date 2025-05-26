@@ -110,6 +110,11 @@ class EntityManagerFacade
         return $this->entityFetchingService->findOperatorToBeDeleted();
     }
 
+    public function findOperatorToBeDeletedWithNoDelayRestriction()
+    {
+        return $this->entityFetchingService->findOperatorToBeDeletedWithNoDelayRestriction();
+    }
+
     public function findBySearchQuery(string $name, string $code, string $team, string $uap, string $trainer)
     {
         return $this->entityFetchingService->findBySearchQuery($name, $code, $team, $uap, $trainer);

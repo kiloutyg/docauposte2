@@ -59,14 +59,14 @@ class OperatorRepository extends ServiceEntityRepository
             $operators,
             function ($a, $b) {
                 $result = 0; // Default comparison result (equal)
-    
+
                 // Team comparison
                 $teamA = $a->getTeam();
                 $teamB = $b->getTeam();
                 if ($teamA && $teamB && $teamA->getId() != $teamB->getId()) {
                     $result = strcmp($teamA->getName(), $teamB->getName());
                 }
-    
+
                 // UAP comparison (only if previous comparison resulted in equality)
                 if ($result == 0) {
                     $uapsA = $a->getUaps()->first();
@@ -75,21 +75,21 @@ class OperatorRepository extends ServiceEntityRepository
                         $result = strcmp($uapsA->getName(), $uapsB->getName());
                     }
                 }
-    
+
                 // Name comparison (only if previous comparisons resulted in equality)
                 if ($result == 0) {
                     // Lower cases
                     $fullNameA = strtolower($a->getName());
                     $fullNameB = strtolower($b->getName());
-    
+
                     try {
                         // Split names to separate first name and last name
                         list($firstNameA, $lastNameA) = explode('.', $fullNameA);
                         list($firstNameB, $lastNameB) = explode('.', $fullNameB);
-    
+
                         // Compare last names
                         $result = strcmp($lastNameA, $lastNameB);
-    
+
                         // If last names are equal, then compare first names
                         if ($result == 0) {
                             $result = strcmp($firstNameA, $firstNameB);
@@ -99,11 +99,11 @@ class OperatorRepository extends ServiceEntityRepository
                         $result = strcmp($fullNameA, $fullNameB);
                     }
                 }
-    
+
                 return $result;
             }
         );
-    
+
         return $operators;
     }
 
@@ -127,8 +127,8 @@ class OperatorRepository extends ServiceEntityRepository
             ->select('o, t, u')
             ->getQuery()
             ->getResult();
-    
-    
+
+
         return $this->operatorComparison($operators);
     }
 
@@ -154,7 +154,7 @@ class OperatorRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.team', 't')
             ->leftJoin('o.uaps', 'u');
-    
+
         if (!empty($name)) {
             $qb->andWhere('LOWER(o.name) LIKE :name')
                 ->setParameter('name', '%' . strtolower($name) . '%');
@@ -171,7 +171,7 @@ class OperatorRepository extends ServiceEntityRepository
             $qb->andWhere('LOWER(u.name) LIKE :uap')
                 ->setParameter('uap', '%' . strtolower($uap) . '%');
         }
-    
+
         // Handling trainer value based on true, false, or null
         switch ($trainer) {
             case "true":
@@ -184,7 +184,7 @@ class OperatorRepository extends ServiceEntityRepository
                 $trainer = null;
                 break;
         }
-    
+
         if ($trainer === true) {
             $qb->setParameter('trainerStatus', true)
                 ->andWhere('o.isTrainer = :trainerStatus');
@@ -216,10 +216,10 @@ class OperatorRepository extends ServiceEntityRepository
         if (!preg_match('/^[a-z]+(-[a-z]+)*(\.[a-z]+(-[a-z]+)*)?$/i', $name)) {
             throw new \InvalidArgumentException("Invalid name format.");
         }
-    
+
         $name = strtolower($name); // Normalize input to lower case
         $searchPattern = '%' . $name . '%'; // Create a search pattern for LIKE
-    
+
         // Adjusted query for newer DBAL versions
         $sql = "SELECT o.id, o.name, o.code, t.id as team_id, t.name as team_name, u.id as uap_id, u.name as uap_name
         FROM operator o
@@ -227,7 +227,7 @@ class OperatorRepository extends ServiceEntityRepository
         LEFT JOIN uap_operator ou ON o.id = ou.operator_id
         LEFT JOIN uap u ON ou.uap_id = u.id
         WHERE LOWER(o.name) LIKE :pattern OR SOUNDEX(o.name) = SOUNDEX(:name)";
-    
+
         return $this->getEntityManager()
             ->getConnection()
             ->executeQuery($sql, [
@@ -257,7 +257,7 @@ class OperatorRepository extends ServiceEntityRepository
         $operatorRetrainingDateInterval = $this->settingsService->getSettings()->getOperatorRetrainingDelay();
         $retrainingDelay = new \DateTime('now');
         $retrainingDelay->sub($operatorRetrainingDateInterval);
-    
+
         return $this->createQueryBuilder('o')
             ->where('o.lasttraining < :retrainingDelay')
             ->orWhere('o.lasttraining IS NULL')
@@ -338,19 +338,42 @@ class OperatorRepository extends ServiceEntityRepository
         $operatorAutoDeleteDateInterval = $this->settingsService->getSettings()->getOperatorAutoDeleteDelay();
         $autoDeleteDelay = new \DateTime();
         $autoDeleteDelay->sub($operatorAutoDeleteDateInterval);
-    
+
         $operatorIds = $this->createQueryBuilder('o')
-            ->select('o.id')
+            ->select(select: 'o.id')
             ->where('o.tobedeleted < :autoDeleteDelay')
             ->setParameter('autoDeleteDelay', $autoDeleteDelay)
             ->getQuery()
             ->getScalarResult();
-    
+
         // Extract IDs from the result
         return array_column($operatorIds, 'id');
     }
 
 
+
+
+    /**
+     * Finds all operators that are marked for deletion regardless of the deletion delay.
+     *
+     * This method retrieves all operators that have been marked for deletion (tobedeleted field
+     * is not null), without considering the auto-delete delay period. This allows for retrieving
+     * all operators in the deletion queue regardless of when they were marked.
+     *
+     * @return array An array of Operator entities that are marked for deletion
+     */
+    public function findOperatorToBeDeletedWithNoDelayRestriction()
+    {
+        return $this->createQueryBuilder('o')
+            ->select( 'o')
+            ->where('o.tobedeleted IS NOT NULL')
+            ->getQuery()
+            ->getResult();
+    }
+
+
+
+    
     /**
      * Finds all operators belonging to a specific team and UAP.
      *
