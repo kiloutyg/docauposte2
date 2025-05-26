@@ -230,7 +230,7 @@ class AccountService extends AbstractController
 
     /**
      * Updates a user's email address based on their username.
-     * 
+     *
      * This method generates an email address by appending the domain 'plasticomnium.com'
      * to the user's username and updates the user's email address field.
      *
@@ -251,7 +251,7 @@ class AccountService extends AbstractController
     /**
      * Transfers all work items from one user to another.
      *
-     * This method transfers ownership of various entities (incidents, uploads, zones, 
+     * This method transfers ownership of various entities (incidents, uploads, zones,
      * product lines, categories, and buttons) from the original user to the recipient user.
      * It also checks if there are any approbations that cannot be transferred.
      *
