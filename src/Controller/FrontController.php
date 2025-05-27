@@ -133,8 +133,23 @@ class FrontController extends AbstractController
         if ($settings->isTraining() && $this->authChecker->isGranted('ROLE_MANAGER')) {
             $countArray = $this->operatorService->operatorCheckForAutoDelete();
             if ($countArray != null) {
-                $this->addFlash('info', ($countArray['findDeactivatedOperators'] === 1 ? $countArray['findDeactivatedOperators'] . ' opérateur inactif est à supprimer. ' : $countArray['findDeactivatedOperators'] . ' opérateurs inactifs sont à supprimer. ') .
-                    ($countArray['toBeDeletedOperators'] === 1 ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. ' : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. '));
+                // Generate the URL for the operator admin page
+                $operatorAdminUrl = $this->generateUrl('app_operator'); // Adjust route name as needed
+
+                // Create the message content first
+                $messageContent =
+                    ($countArray['findDeactivatedOperators'] === 1
+                        ? $countArray['findDeactivatedOperators'] . ' opérateur inactif est à supprimer. '
+                        : $countArray['findDeactivatedOperators'] . ' opérateurs inactifs sont à supprimer. ') .
+                    ($countArray['toBeDeletedOperators'] === 1
+                        ? $countArray['toBeDeletedOperators'] . ' opérateur inactif n\'a été supprimé. '
+                        : $countArray['toBeDeletedOperators'] . ' opérateurs inactifs ont été supprimés. ');
+
+                // Then wrap the entire message in an anchor tag
+                $this->addFlash(
+                    'info',
+                    '<a href="' . $operatorAdminUrl . '">' . $messageContent . '</a>'
+                );
             }
         }
 
