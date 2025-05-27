@@ -30,7 +30,10 @@ class Team
     #[ORM\Column(length: 255, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 180)]
-    #[Assert\Regex(pattern: '/^(?!-)(?!.*--)[A-Z-]{3,}(?<!-)$/', message: 'Format invalide. Veuillez saisir sous la forme EQUIPE')]
+    #[Assert\Regex(
+        pattern: '/^(?!-)(?!.*--)[A-Za-zÉÈÊËÀÂÄÔÖÙÛÜÇéèêëàâäôöùûüç][A-Za-zÉÈÊËÀÂÄÔÖÙÛÜÇéèêëàâäôöùûüç -]{2,}(?<!-)(?<! )$/',
+        message: 'Format invalide. Veuillez saisir un nom d\'équipe d\'au moins 3 caractères, sans tirets consécutifs, sans tiret ou espace au début ou à la fin.'
+    )]
     #[Groups(['operator_details'])]
     private ?string $name = null;
 

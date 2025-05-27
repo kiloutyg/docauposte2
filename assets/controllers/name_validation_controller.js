@@ -47,7 +47,7 @@ export default class NameValidationController extends Controller {
      * No return value as it updates the DOM directly.
      */
     validateTeamUapName() {
-        const regex = /^([A-ZÉÈÊËÀÂÄÔÖÙÛÜÇ][A-ZÉÈÊËÀÂÄÔÖÙÛÜÇa-zéèêëàâäôöùûüç]+ [A-Z]+|[A-ZÉÈÊËÀÂÄÔÖÙÛÜÇ][A-ZÉÈÊËÀÂÄÔÖÙÛÜÇa-zéèêëàâäôöùûüç]+)$/;
+        const regex = /^(?!-)(?!.*--)[A-Za-zÉÈÊËÀÂÄÔÖÙÛÜÇéèêëàâäôöùûüç][A-Za-zÉÈÊËÀÂÄÔÖÙÛÜÇéèêëàâäôöùûüç -]{2,}(?<!-)(?<! )$/;
         let isValid = true;
         let name = '';
 
