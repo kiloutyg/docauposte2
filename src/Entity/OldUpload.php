@@ -28,7 +28,7 @@ class OldUpload
     private ?string $path = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $olduploaded_at = null;
+    private ?\DateTimeInterface $olduploadedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'olduploads')]
     #[ORM\JoinColumn(nullable: false)]
@@ -43,11 +43,11 @@ class OldUpload
     #[ORM\Column(nullable: true)]
     private ?int $revision = null;
 
-    #[ORM\OneToOne(mappedBy: 'OldUpload', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'oldUpload', cascade: ['persist', 'remove'])]
     private ?Upload $upload = null;
 
 
-    #[ORM\OneToOne(inversedBy: 'oldupload', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'oldUpload', cascade: ['persist', 'remove'])]
 
 
     public function setFile(?File $file = null): void
@@ -55,7 +55,7 @@ class OldUpload
         $this->file = $file;
 
         if (null !== $file) {
-            $this->olduploaded_at = new \DateTime();
+            $this->olduploadedAt = new \DateTime();
         }
     }
 
@@ -95,12 +95,12 @@ class OldUpload
 
     public function getOldUploadedAt(): ?\DateTimeInterface
     {
-        return $this->olduploaded_at;
+        return $this->olduploadedAt;
     }
 
-    public function setOldUploadedAt(\DateTimeInterface $olduploaded_at): self
+    public function setOldUploadedAt(\DateTimeInterface $olduploadedAt): self
     {
-        $this->olduploaded_at = $olduploaded_at;
+        $this->olduploadedAt = $olduploadedAt;
 
         return $this;
     }

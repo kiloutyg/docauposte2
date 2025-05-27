@@ -33,7 +33,7 @@ class Incident
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $uploaded_at = null;
+    private ?\DateTimeInterface $uploadedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'incidents')]
     #[ORM\JoinColumn(nullable: false)]
@@ -62,7 +62,7 @@ class Incident
         $this->file = $file;
 
         if (null !== $file) {
-            $this->uploaded_at = new \DateTime();
+            $this->uploadedAt = new \DateTime();
         }
     }
 
@@ -102,12 +102,12 @@ class Incident
 
     public function getUploadedAt(): ?\DateTimeInterface
     {
-        return $this->uploaded_at;
+        return $this->uploadedAt;
     }
 
-    public function setUploadedAt(\DateTimeInterface $uploaded_at): self
+    public function setUploadedAt(\DateTimeInterface $uploadedAt): self
     {
-        $this->uploaded_at = $uploaded_at;
+        $this->uploadedAt = $uploadedAt;
 
         return $this;
     }

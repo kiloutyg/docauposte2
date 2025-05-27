@@ -6,6 +6,7 @@ use App\Entity\TrainingRecord;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Operator;
+use App\Entity\Upload;
 
 /**
  * @extends ServiceEntityRepository<TrainingRecord>
@@ -71,4 +72,6 @@ class TrainingRecordRepository extends ServiceEntityRepository
 
         return $result;
     }
+
+
 }
