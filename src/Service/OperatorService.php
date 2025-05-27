@@ -96,7 +96,7 @@ class OperatorService extends AbstractController
         $inActiveOperators = $this->entityManagerFacade->findOperatorWithNoRecentTraining();
         if (count($inActiveOperators) > 0) {
             foreach ($inActiveOperators as $operator) {
-                if ($operator->isTrainer() && $this->trainingManagerFacade->trainerInactivityCheck($operator)) {
+                if ($operator->isIsTrainer() && $this->trainingManagerFacade->trainerInactivityCheck($operator)) {
                     // Skip trainer if they have recently had training, if both conditions are true,
                     continue;
                 }
@@ -126,7 +126,7 @@ class OperatorService extends AbstractController
         $operatorSetToBeDeleted = $this->entityManagerFacade->findInActiveOperators();
         if (count($operatorSetToBeDeleted) > 0) {
             foreach ($operatorSetToBeDeleted as $operator) {
-                if ($operator->isTrainer() && $this->trainingManagerFacade->trainerInactivityCheck($operator)) {
+                if ($operator->isIsTrainer() && $this->trainingManagerFacade->trainerInactivityCheck($operator)) {
                     // Skip trainer if they have recently had training, if both conditions are true,
                     continue;
                 }
