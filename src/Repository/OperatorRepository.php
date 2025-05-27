@@ -340,7 +340,7 @@ class OperatorRepository extends ServiceEntityRepository
         $autoDeleteDelay->sub($operatorAutoDeleteDateInterval);
 
         $operatorIds = $this->createQueryBuilder('o')
-            ->select(select: 'o.id')
+            ->select( 'o.id')
             ->where('o.tobedeleted < :autoDeleteDelay')
             ->setParameter('autoDeleteDelay', $autoDeleteDelay)
             ->getQuery()
