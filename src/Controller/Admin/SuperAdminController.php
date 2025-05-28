@@ -30,14 +30,13 @@ class SuperAdminController extends AbstractController
 
 
 
-    #[Route('/super_admin', name: 'app_super_admin')]
+    #[Route('/superadmin', name: 'app_super_admin')]
     public function superAdmin(): Response
     {
         $pageLevel = 'super';
 
-        $incidents = $this->entityManagerFacade->getIncidents();
-
         $uploads = $this->entityManagerFacade->getAllUploadsWithAssociations();
+        $incidents = $this->entityManagerFacade->getIncidents();
 
         $uploadsArray = $this->contentManagerFacade->groupAllUploads($uploads);
         $groupedUploads = $uploadsArray[0];
@@ -48,7 +47,7 @@ class SuperAdminController extends AbstractController
             'pageLevel'                 => $pageLevel,
             'groupedUploads'            => $groupedUploads,
             'groupedValidatedUploads'   => $groupedValidatedUploads,
-            'groupincidents'            => $groupIncidents,
+            'groupincidents' => $groupIncidents,
             'zones'                     => $this->entityManagerFacade->getZones(),
         ]);
     }
@@ -59,7 +58,7 @@ class SuperAdminController extends AbstractController
 
 
     // Zone creation logic destined to the super admin, it also creates the folder structure for the zone
-    #[Route('/super_admin/create_zone', name: 'app_super_admin_create_zone')]
+    #[Route('/superadmin/create_zone', name: 'app_super_admin_create_zone')]
     public function createZone(Request $request)
     {
         if ($request->getMethod() == 'POST') {
@@ -96,7 +95,7 @@ class SuperAdminController extends AbstractController
 
 
     // Zone deletion logic destined to the super admin, it also deletes the folder structure for the zone
-    #[Route('/super_admin/delete_zone/{zoneId}', name: 'app_super_admin_delete_zone')]
+    #[Route('/superadmin/delete_zone/{zoneId}', name: 'app_super_admin_delete_zone')]
     public function deleteEntityZone(int $zoneId): Response
     {
         $entityType = 'zone';
@@ -119,7 +118,7 @@ class SuperAdminController extends AbstractController
 
 
     // Update method for any stuff necessary during dev
-    #[Route('/super_admin/update', name: 'app_super_update')]
+    #[Route('/superadmin/update', name: 'app_super_update')]
     public function updateDB()
     {
         $em = $this->entityManagerFacade->getEntityManager();

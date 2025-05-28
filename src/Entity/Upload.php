@@ -40,7 +40,7 @@ class Upload
     private ?string $path = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $uploaded_at = null;
+    private ?\DateTimeInterface $uploadedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'uploads')]
     #[ORM\JoinColumn(nullable: false)]
@@ -59,7 +59,7 @@ class Upload
     private ?int $revision = null;
 
     #[ORM\OneToOne(inversedBy: 'upload', cascade: ['persist', 'remove'])]
-    private ?OldUpload $OldUpload = null;
+    private ?OldUpload $oldUpload = null;
 
     #[ORM\OneToMany(mappedBy: 'upload', cascade: ['persist', 'remove'], targetEntity: TrainingRecord::class)]
     private Collection $trainingRecords;
@@ -98,7 +98,7 @@ class Upload
         $this->file = $file;
 
         if (null !== $file) {
-            $this->uploaded_at = new \DateTime();
+            $this->uploadedAt = new \DateTime();
         }
     }
 
@@ -138,12 +138,12 @@ class Upload
 
     public function getUploadedAt(): ?\DateTimeInterface
     {
-        return $this->uploaded_at;
+        return $this->uploadedAt;
     }
 
-    public function setUploadedAt(\DateTimeInterface $uploaded_at): self
+    public function setUploadedAt(\DateTimeInterface $uploadedAt): self
     {
-        $this->uploaded_at = $uploaded_at;
+        $this->uploadedAt = $uploadedAt;
 
         return $this;
     }
@@ -215,12 +215,12 @@ class Upload
 
     public function getOldUpload(): ?OldUpload
     {
-        return $this->OldUpload;
+        return $this->oldUpload;
     }
 
-    public function setOldUpload(?OldUpload $OldUpload): static
+    public function setOldUpload(?OldUpload $oldUpload): static
     {
-        $this->OldUpload = $OldUpload;
+        $this->oldUpload = $oldUpload;
 
         return $this;
     }

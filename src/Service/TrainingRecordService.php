@@ -107,8 +107,13 @@ class TrainingRecordService extends AbstractController
     public function getOrderedTrainingRecordsByUpload($upload)
     {
         $this->logger->info('Ordering training records by upload');
+        $uploadTR = $upload->getTrainingRecords();
 
-        $trainingRecords = $upload->getTrainingRecords()->toArray();
+        $this->logger->info('getOrderedTrainingRecordsByUpload: uploadTR: ', [$uploadTR]);
+
+        $trainingRecords = $uploadTR->toArray();
+
+        $this->logger->info('getOrderedTrainingRecordsByUpload: trainingRecords: ', [$trainingRecords]);
 
         return $this->orderedTrainingRecordsLoop($trainingRecords);
     }
@@ -148,7 +153,11 @@ class TrainingRecordService extends AbstractController
             return $trainingRecord->getOperator();
         }, array: $trainingRecords);
 
+        $this->logger->info('orderedTrainingRecordsLoop: operators: ', [$operators]);
+
         usort(array: $operators, callback: [$this->trainingRecordRepository, 'compareOperator']);
+
+        $this->logger->info('orderedTrainingRecordsLoop after usort : operators: ', [$operators]);
 
         $orderedTrainingRecords = [];
         foreach ($operators as $operator) {
@@ -183,7 +192,6 @@ class TrainingRecordService extends AbstractController
         } else {
             return $this->entityDeletionService->deleteEntity('trainingRecord', $trainingRecord->getId());
         }
-          
     }
 
 
@@ -204,86 +212,133 @@ class TrainingRecordService extends AbstractController
      */
     public function trainingRecordTreatment(Request $request)
     {
-        $operators = [];
-        $operators = $request->request->all('operators');
-        $upload = $this->uploadRepository->find($request->attributes->get('uploadId'));
-        $trainerOperator = $this->operatorRepository->find($request->request->get('trainerId'));
-        $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $trainerOperator]);
-    
-        foreach ($operators as $operator) {
-            if (array_key_exists("trained", $operator)) {
-    
-                if ($operator['trained'] === 'true') {
-                    $trained = true;
-                } else {
-                    continue;
-                }
-    
-                $operatorEntity = $this->operatorRepository->find($operator['id']);
-                // Get all training records as a collection
-                $operatorTrainingRecords = $operatorEntity->getTrainingRecords();
-                // Filter the collection to find the record with the matching $upload
-                $filteredRecords = $operatorTrainingRecords->filter(function ($trainingRecord) use ($upload) {
-                    return $trainingRecord->getUpload() === $upload;
-                });
-    
-                // If the collection is empty, create a new TrainingRecord
-                if ($filteredRecords->isEmpty()) {
-                    $trainingRecord = new TrainingRecord();
-                    $trainingRecord->setOperator($operatorEntity);
-                    $trainingRecord->setUpload($upload);
-                } else {
-                    $trainingRecord = $filteredRecords->first();
-                }
-                $trainingRecord->setTrained($trained);
-                $trainingRecord->setTrainer($trainerEntity);
-                $trainingRecord->setDate(new \DateTime());
-                $this->em->persist($trainingRecord);
-                $operatorEntity->setLasttraining(new \DateTime());
-                $operatorEntity->setTobedeleted(null);
-                $operatorEntity->setInactiveSince(null);
-                $this->em->persist($operatorEntity);
-            }
-        }
-    
         try {
-            $this->trainerOperatorTrainingRecordCheck($trainerOperator, $trainerEntity, $upload);
-        } catch (\Exception $e) {
-            $this->logger->error('error during trainerOperatorTrainingRecordCheck', [$e]);
-        } finally {
+            // Start transaction
+            $this->em->beginTransaction();
+
+            $operators = $request->request->all('operators');
+            $upload = $this->uploadRepository->find($request->attributes->get('uploadId'));
+            $trainerOperator = $this->operatorRepository->find($request->request->get('trainerId'));
+            $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $trainerOperator]);
+
+            // Process regular operators
+            $this->processOperatorTrainingRecords($operators, $upload, $trainerEntity, $trainerOperator);
+
+            // Process the trainer's own record
+            $this->processTrainerTrainingRecord($trainerOperator, $trainerEntity, $upload);
+
+            // Commit all changes at once
             $this->em->flush();
+            $this->em->commit();
+
+            $this->logger->info('Successfully processed training records for upload ID: ' . $upload->getId());
+        } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+            $this->em->rollback();
+            $this->logger->warning('Attempted to create duplicate training record', [
+                'error' => $e->getMessage(),
+                'uploadId' => $request->attributes->get('uploadId')
+            ]);
+        } catch (\Exception $e) {
+            $this->em->rollback();
+            $this->logger->error('Error during trainingRecordTreatment', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
         }
     }
 
-
-
     /**
-     * Ensures that a trainer is also recorded as trained for the upload they are training others on.
+     * Process training records for regular operators.
      *
-     * This method checks if a training record exists for the trainer as an operator for the given upload.
-     * If no record exists, it creates one. It then updates the training record with the current date
-     * and marks the trainer as trained. Additionally, it updates the trainer's operator record
-     * with the latest training date and clears any deletion or inactivity flags.
-     *
-     * @param Operator $trainerOperator The operator entity representing the trainer
-     * @param Trainer $trainerEntity The trainer entity associated with the operator
-     * @param Upload $upload The upload entity for which the training is being conducted
+     * @param array $operators Array of operator data
+     * @param Upload $upload The upload entity
+     * @param Trainer $trainerEntity The trainer entity
      * @return void
      */
-    public function trainerOperatorTrainingRecordCheck(Operator $trainerOperator, Trainer $trainerEntity, Upload $upload)
+    private function processOperatorTrainingRecords(array $operators, Upload $upload, Trainer $trainerEntity, Operator $trainerOperator): void
     {
-        $existingTrainingRecord = $this->trainingRecordRepository->findOneBy(['upload' => $upload, 'operator' => $trainerOperator]);
-        if (!$existingTrainingRecord) {
-            $existingTrainingRecord = new TrainingRecord();
-            $existingTrainingRecord->setOperator($trainerOperator);
-            $existingTrainingRecord->setTrainer($trainerEntity);
-            $existingTrainingRecord->setUpload($upload);
+        foreach ($operators as $operator) {
+
+            if (!array_key_exists("trained", $operator) || $operator['trained'] !== 'true') {
+                continue;
+            }
+
+            $operatorEntity = $this->operatorRepository->find($operator['id']);
+
+            if (!$operatorEntity) {
+                $this->logger->warning('Operator not found', ['id' => $operator['id']]);
+                continue;
+            }
+
+            if ($operatorEntity === $trainerOperator) {
+                $this->logger->info('Trainer is trying to train himself', ['operatorId' => $operatorEntity->getId()]);
+                continue;
+            }
+
+            // Get all training records as a collection
+            $operatorTrainingRecords = $operatorEntity->getTrainingRecords();
+            $this->logger->info('processOperatorTrainingRecords :: Operator name ', [$operatorEntity->getName()]);
+            // Filter the collection to find the record with the matching $upload
+            $filteredRecords = $operatorTrainingRecords->filter(function ($trainingRecord) use ($upload) {
+                return $trainingRecord->getUpload()->getId() === $upload->getId();
+            });
+            $this->logger->info('processOperatorTrainingRecords :: filteredRecords: ', [$filteredRecords]);
+            // If the collection is empty, create a new TrainingRecord
+            if ($filteredRecords->isEmpty()) {
+                $trainingRecord = new TrainingRecord();
+                $trainingRecord->setOperator($operatorEntity);
+                $trainingRecord->setUpload($upload);
+            } else {
+                $trainingRecord = $filteredRecords->first();
+            }
+
+            $trainingRecord->setTrained(true);
+            $trainingRecord->setTrainer($trainerEntity);
+            $trainingRecord->setDate(new \DateTime());
+            $this->em->persist($trainingRecord);
+
+            // Update operator status
+            $operatorEntity->setLasttraining(new \DateTime());
+            $operatorEntity->setTobedeleted(null);
+            $operatorEntity->setInactiveSince(null);
+            $this->em->persist($operatorEntity);
+        }
+    }
+
+    /**
+     * Process training record for the trainer.
+     *
+     * @param Operator $trainerOperator The operator entity representing the trainer
+     * @param Trainer $trainerEntity The trainer entity
+     * @param Upload $upload The upload entity
+     * @return void
+     */
+    private function processTrainerTrainingRecord(Operator $trainerOperator, Trainer $trainerEntity, Upload $upload): void
+    {
+        $this->logger->info('processTrainerTrainingRecord :: trainer name ', [$trainerOperator->getName()]);
+
+        // Check if the trainer already has a training record for this upload
+        $operatorTrainingRecords = $trainerOperator->getTrainingRecords();
+        $filteredRecords = $operatorTrainingRecords->filter(function ($trainingRecord) use ($upload) {
+            return $trainingRecord->getUpload()->getId() === $upload->getId();
+        });
+
+        $this->logger->info('processTrainerTrainingRecord :: filteredRecords: ', [$filteredRecords]);
+
+        if ($filteredRecords->isEmpty()) {
+            $trainingRecord = new TrainingRecord();
+            $trainingRecord->setOperator($trainerOperator);
+            $trainingRecord->setUpload($upload);
+            $trainingRecord->setTrainer($trainerEntity);
+        } else {
+            $trainingRecord = $filteredRecords->first();
         }
 
-        $existingTrainingRecord->setDate(new \DateTime());
-        $existingTrainingRecord->setTrained(true);
-        $this->em->persist($existingTrainingRecord);
+        $trainingRecord->setDate(new \DateTime());
+        $trainingRecord->setTrained(true);
+        $this->em->persist($trainingRecord);
 
+        // Update trainer operator status
         $trainerOperator->setLasttraining(new \DateTime());
         $trainerOperator->setTobedeleted(null);
         $trainerOperator->setInactiveSince(null);

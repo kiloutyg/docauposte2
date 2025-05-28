@@ -110,7 +110,7 @@
 	</div>
 {% endmacro %}
 
-{% macro turbo_frame_loader(id, src, type = 'form', title = 'Chargement...', icon_class = 'fa-cogs', color = 'primary', items = 2) %}
+{% macro turbo_frame_loader(id, src, type = 'form', title = 'Chargement...', icon_class = 'fa-cogs', color = 'primary', items = 2, parent) %}
 	<div
 		class="accordion-item"
 		data-controller="accordion-frame-manager">
@@ -134,7 +134,7 @@
 			id="collapse-{{ id }}"
 			class="accordion-collapse collapse"
 			aria-labelledby="heading-{{ id }}"
-			data-bs-parent="#accordionIluo"
+			data-bs-parent="#{{ parent }}"
 			data-accordion-frame-manager-target="accordionContent">
 			<div
 				class="accordion-body accordion-bg shadow shadow-inset p-2 p-md-3">

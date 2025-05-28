@@ -1,65 +1,57 @@
 doctrine:
-    dbal:
-        url: "%env(resolve:DATABASE_URL)%"
-        default_table_options:
-            charset: utf8mb4
-            collate: utf8mb4_unicode_ci
-        driver: "pdo_mysql"
-        options:
-            # SSL private key
-            !php/const PDO::MYSQL_ATTR_SSL_KEY: "%env(MYSQL_SSL_KEY)%"
-            # SSL certificate
-            !php/const PDO::MYSQL_ATTR_SSL_CERT: "%env(MYSQL_SSL_CERT)%"
-            # SSL CA authority
-            !php/const PDO::MYSQL_ATTR_SSL_CA: "%env(MYSQL_SSL_CA)%"
-            # SSL does not check for valid CA
-            !php/const PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT: false
+  dbal:
+    url: "%env(resolve:DATABASE_URL)%"
+    default_table_options:
+      charset: utf8mb4
+      collate: utf8mb4_unicode_ci
+    driver: "pdo_mysql"
+    options:
+      # # SSL private key
+      # !php/const PDO::MYSQL_ATTR_SSL_KEY: "%env(MYSQL_SSL_KEY)%"
+      # # SSL certificate
+      # !php/const PDO::MYSQL_ATTR_SSL_CERT: "%env(MYSQL_SSL_CERT)%"
+      # # SSL CA authority
+      # !php/const PDO::MYSQL_ATTR_SSL_CA: "%env(MYSQL_SSL_CA)%"
+      # # SSL does not check for valid CA
+      # !php/const PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT: false
 
-            # # SSL private key
-            # PDO::MYSQL_ATTR_SSL_KEY: '%env(MYSQL_SSL_KEY)%'
-            # # SSL certificate
-            # PDO::MYSQL_ATTR_SSL_CERT: '%env(MYSQL_SSL_CERT)%'
-            # # SSL CA authority
-            # PDO::MYSQL_ATTR_SSL_CA: '%env(MYSQL_SSL_CA)%'
-            # # Disable server certificate verification (as a boolean!)
-            # PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT: false
-        # IMPORTANT: You MUST configure your server version,
-        # either here or in the DATABASE_URL env var (see .env file)
-        #server_version: '15'
-    orm:
-        auto_generate_proxy_classes: true
-        enable_lazy_ghost_objects: true
-        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
-        auto_mapping: true
-        mappings:
-            App:
-                is_bundle: false
-                dir: "%kernel.project_dir%/src/Entity"
-                prefix: 'App\Entity'
-                alias: App
+    # IMPORTANT: You MUST configure your server version,
+    # either here or in the DATABASE_URL env var (see .env file)
+    #server_version: '15'
+  orm:
+    auto_generate_proxy_classes: true
+    enable_lazy_ghost_objects: true
+    naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+    auto_mapping: true
+    mappings:
+      App:
+        is_bundle: false
+        dir: "%kernel.project_dir%/src/Entity"
+        prefix: 'App\Entity'
+        alias: App
 
 when@test:
-    doctrine:
-        dbal:
-            # "TEST_TOKEN" is typically set by ParaTest
-            dbname_suffix: "_test%env(default::TEST_TOKEN)%"
+  doctrine:
+    dbal:
+      # "TEST_TOKEN" is typically set by ParaTest
+      dbname_suffix: "_test%env(default::TEST_TOKEN)%"
 
 when@prod:
-    doctrine:
-        orm:
-            auto_generate_proxy_classes: false
-            proxy_dir: "%kernel.build_dir%/doctrine/orm/Proxies"
-            query_cache_driver:
-                type: pool
-                pool: doctrine.system_cache_pool
-            result_cache_driver:
-                type: pool
-                pool: doctrine.result_cache_pool
+  doctrine:
+    orm:
+      auto_generate_proxy_classes: false
+      proxy_dir: "%kernel.build_dir%/doctrine/orm/Proxies"
+      query_cache_driver:
+        type: pool
+        pool: doctrine.system_cache_pool
+      result_cache_driver:
+        type: pool
+        pool: doctrine.result_cache_pool
 
-    framework:
-        cache:
-            pools:
-                doctrine.result_cache_pool:
-                    adapter: cache.app
-                doctrine.system_cache_pool:
-                    adapter: cache.system
+  framework:
+    cache:
+      pools:
+        doctrine.result_cache_pool:
+          adapter: cache.app
+        doctrine.system_cache_pool:
+          adapter: cache.system

@@ -110,7 +110,7 @@ class UploadController extends AbstractController
      * @return Response The rendered uploaded files template
      */
     #[Route('/uploaded', name: 'app_uploaded_files')]
-    public function uploaded_files(): Response
+    public function uploadedFiles(): Response
     {
         return $this->render(
             'services/uploads/uploaded.html.twig'
@@ -128,7 +128,7 @@ class UploadController extends AbstractController
      * @return Response A redirect response to the originating page with status messages
      */
     #[Route('/uploading', name: 'app_generic_upload_files')]
-    public function generic_upload_files(Request $request): Response
+    public function genericUploadFiles(Request $request): Response
     {
         // Get the URL of the page from which the request originated
         $originUrl = $request->headers->get('referer');

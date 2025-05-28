@@ -110,16 +110,18 @@ class FrontController extends AbstractController
 
 
 
-    // Render the base page
+    
     /**
      * Renders the base page of the application.
      *
-     * This function handles several initialization tasks:
-     * - Checks for upload validations and sends reminders if needed
-     * - Creates default departments if none exist
-     * - Checks for inactive operators that need to be deleted if training mode is enabled
+     * This function serves as the entry point for the application, displaying the main interface.
+     * It performs several checks:
+     * - Checks for upload validations that need attention
+     * - For managers in training mode, checks for inactive operators that need to be deleted
+     * - Displays appropriate flash messages for system notifications
+     * - Renders the base template with all available zones
      *
-     * @return Response The rendered base template with zones data
+     * @return Response A response object containing the rendered base template with zones data
      */
     #[Route('/', name: 'base')]
     public function base(): Response

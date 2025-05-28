@@ -20,7 +20,6 @@ use Symfony\Component\Routing\Annotation\Route;
  * This controller manages user account operations including creation, modification,
  * deletion, blocking/unblocking, and work transfer.
  */
-#[Route('/account', name: 'app_account_')]
 class AccountController extends AbstractController
 {
     private $logger;
@@ -59,6 +58,8 @@ class AccountController extends AbstractController
         $this->entityDeletionService = $entityDeletionService;
     }
 
+
+
     /**
      * Creates a new user account (accessible to super admin)
      *
@@ -72,9 +73,10 @@ class AccountController extends AbstractController
      * @return Response A response object containing either the rendered form (GET) or a redirect to the super admin dashboard (POST)
      * @throws \Exception If the account creation fails (caught internally)
      */
-    #[Route(path: '/create', name: 'create')]
+    #[Route(path: '/account/create', name: 'app_account_create')]
     public function createAccountController(Request $request): Response
     {
+        
         if ($request->isMethod('POST')) {
             try {
                 $this->accountService->createAccount($request);
@@ -84,13 +86,18 @@ class AccountController extends AbstractController
             }
             return $this->redirectToRoute('app_super_admin');
         }
+
+
         return $this->render(
             '/services/account_services/create_account.html.twig',
             [
-                'users' => $this->entityFetchingService->getUsers(),
+                'users' => $this->userRepository->getAllUsersOrderedByLastname(),
             ]
         );
     }
+
+
+
 
     /**
      * Renders the account modification interface for super admin
@@ -104,7 +111,7 @@ class AccountController extends AbstractController
      * @param Request $request The HTTP request object containing either form data (POST) or just the request (GET)
      * @return Response A response object containing either the rendered form (GET) or a redirect (POST/error)
      */
-    #[Route(path: '/modify_account/{userId}', name: 'modify_account')]
+    #[Route(path: '/account/modify_account/{userId}', name: 'app_account_modify_account')]
     public function modifyAccountGet(int $userId, Request $request): Response
     {
         if (!($user = $this->userRepository->find($userId))) {
@@ -162,7 +169,7 @@ class AccountController extends AbstractController
      * @return Response A redirect response to the super admin dashboard with appropriate flash messages
      * @throws \Exception If the account cannot be blocked (caught internally)
      */
-    #[Route(path: '/delete_account/block', name: 'block_account')]
+    #[Route(path: '/account/delete_account/block', name: 'app_account_block_account')]
     public function blockAccount(Request $request): Response
     {
         try {
@@ -187,7 +194,7 @@ class AccountController extends AbstractController
      * @return Response A redirect response to the super admin dashboard with appropriate flash messages
      * @throws \Exception If the account cannot be unblocked (caught internally)
      */
-    #[Route(path: '/delete_account/unblock_account', name: 'unblock_account')]
+    #[Route(path: '/account/delete_account/unblock_account', name: 'app_account_unblock_account')]
     public function unblockAccount(Request $request): Response
     {
         try {
@@ -210,7 +217,7 @@ class AccountController extends AbstractController
      * @param Request $request The HTTP request object containing the userId in the query parameters
      * @return Response A redirect response to the super admin dashboard with appropriate flash messages
      */
-    #[Route(path: '/delete_account', name: 'delete_account')]
+    #[Route(path: '/account/delete_account', name: 'app_account_delete_account')]
     public function deleteAccount(Request $request): Response
     {
         try {
@@ -234,7 +241,7 @@ class AccountController extends AbstractController
      * @return Response A redirect response to the super admin dashboard with appropriate flash messages
      * @throws \Exception If the work transfer fails for any reason (caught internally)
      */
-    #[Route('/delete_account/transfer_work/{userId}', name: 'transfer_work')]
+    #[Route('/account/delete_account/transfer_work/{userId}', name: 'app_account_transfer_work')]
     public function transferWork(Request $request, int $userId): Response
     {
         $originalUser = $this->userRepository->find($userId);
