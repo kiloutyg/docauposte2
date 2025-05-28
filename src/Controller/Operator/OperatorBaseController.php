@@ -2,11 +2,15 @@
 
 namespace App\Controller\Operator;
 
+use App\Entity\OldUpload;
+
 use App\Repository\UploadRepository;
 use App\Repository\ValidationRepository;
 
 use App\Service\EntityFetchingService;
 use App\Service\OperatorService;
+
+use App\Service\Factory\RepositoryFactory;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -31,6 +35,7 @@ class OperatorBaseController extends AbstractController
 
     private $entityFetchingService;
     private $operatorService;
+    private $repositoryFactory;
 
 
     public function __construct(
@@ -44,6 +49,7 @@ class OperatorBaseController extends AbstractController
         // Services classes
         EntityFetchingService           $entityFetchingService,
         OperatorService                 $operatorService,
+        RepositoryFactory $repositoryFactory
 
     ) {
         $this->logger                       = $logger;
@@ -55,6 +61,7 @@ class OperatorBaseController extends AbstractController
         // Variables related to the services
         $this->entityFetchingService        = $entityFetchingService;
         $this->operatorService              = $operatorService;
+        $this->repositoryFactory           = $repositoryFactory;
     }
 
 
@@ -183,5 +190,23 @@ class OperatorBaseController extends AbstractController
         } else {
             return $this->redirect($referer);
         }
+    }
+
+
+
+
+    #[Route('/operator/frontByOldUpl/{oldUploadId}', name: 'app_training_front_by_old_upload')]
+    public function documentAndOperatorByOldUpload(int $oldUploadId): Response
+    {
+
+        $oldUpload = $this->repositoryFactory->getRepository('oldUpload')->find($oldUploadId);
+
+        $this->logger->info('documentAndOperatorByOldUpload :: oldUpload ', [$oldUpload]);
+
+        $uploadEntity = $oldUpload->getUpload();
+
+        return $this->render('services/operators/docAndOperator.html.twig', [
+            'upload' => $uploadEntity,
+        ]);
     }
 }
