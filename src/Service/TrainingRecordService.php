@@ -222,7 +222,7 @@ class TrainingRecordService extends AbstractController
             $trainerEntity = $this->trainerRepository->findOneBy(['operator' => $trainerOperator]);
 
             // Process regular operators
-            $this->processOperatorTrainingRecords($operators, $upload, $trainerEntity);
+            $this->processOperatorTrainingRecords($operators, $upload, $trainerEntity, $trainerOperator);
 
             // Process the trainer's own record
             $this->processTrainerTrainingRecord($trainerOperator, $trainerEntity, $upload);
@@ -255,27 +255,34 @@ class TrainingRecordService extends AbstractController
      * @param Trainer $trainerEntity The trainer entity
      * @return void
      */
-    private function processOperatorTrainingRecords(array $operators, Upload $upload, Trainer $trainerEntity): void
+    private function processOperatorTrainingRecords(array $operators, Upload $upload, Trainer $trainerEntity, Operator $trainerOperator): void
     {
         foreach ($operators as $operator) {
+
             if (!array_key_exists("trained", $operator) || $operator['trained'] !== 'true') {
                 continue;
             }
 
             $operatorEntity = $this->operatorRepository->find($operator['id']);
+
             if (!$operatorEntity) {
                 $this->logger->warning('Operator not found', ['id' => $operator['id']]);
                 continue;
             }
 
+            if ($operatorEntity === $trainerOperator) {
+                $this->logger->info('Trainer is trying to train himself', ['operatorId' => $operatorEntity->getId()]);
+                continue;
+            }
+
             // Get all training records as a collection
             $operatorTrainingRecords = $operatorEntity->getTrainingRecords();
-
+            $this->logger->info('processOperatorTrainingRecords :: Operator name ', [$operatorEntity->getName()]);
             // Filter the collection to find the record with the matching $upload
             $filteredRecords = $operatorTrainingRecords->filter(function ($trainingRecord) use ($upload) {
-                return $trainingRecord->getUpload() === $upload;
+                return $trainingRecord->getUpload()->getId() === $upload->getId();
             });
-
+            $this->logger->info('processOperatorTrainingRecords :: filteredRecords: ', [$filteredRecords]);
             // If the collection is empty, create a new TrainingRecord
             if ($filteredRecords->isEmpty()) {
                 $trainingRecord = new TrainingRecord();
@@ -308,11 +315,15 @@ class TrainingRecordService extends AbstractController
      */
     private function processTrainerTrainingRecord(Operator $trainerOperator, Trainer $trainerEntity, Upload $upload): void
     {
+        $this->logger->info('processTrainerTrainingRecord :: trainer name ', [$trainerOperator->getName()]);
+
         // Check if the trainer already has a training record for this upload
         $operatorTrainingRecords = $trainerOperator->getTrainingRecords();
         $filteredRecords = $operatorTrainingRecords->filter(function ($trainingRecord) use ($upload) {
-            return $trainingRecord->getUpload() === $upload;
+            return $trainingRecord->getUpload()->getId() === $upload->getId();
         });
+
+        $this->logger->info('processTrainerTrainingRecord :: filteredRecords: ', [$filteredRecords]);
 
         if ($filteredRecords->isEmpty()) {
             $trainingRecord = new TrainingRecord();
