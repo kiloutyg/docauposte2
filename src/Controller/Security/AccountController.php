@@ -76,6 +76,7 @@ class AccountController extends AbstractController
     #[Route(path: '/account/create', name: 'app_account_create')]
     public function createAccountController(Request $request): Response
     {
+        
         if ($request->isMethod('POST')) {
             try {
                 $this->accountService->createAccount($request);
@@ -85,6 +86,8 @@ class AccountController extends AbstractController
             }
             return $this->redirectToRoute('app_super_admin');
         }
+
+
         return $this->render(
             '/services/account_services/create_account.html.twig',
             [

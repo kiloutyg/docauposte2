@@ -36,15 +36,18 @@ class SuperAdminController extends AbstractController
         $pageLevel = 'super';
 
         $uploads = $this->entityManagerFacade->getAllUploadsWithAssociations();
+        $incidents = $this->entityManagerFacade->getIncidents();
 
         $uploadsArray = $this->contentManagerFacade->groupAllUploads($uploads);
         $groupedUploads = $uploadsArray[0];
         $groupedValidatedUploads = $uploadsArray[1];
+        $groupIncidents = $this->contentManagerFacade->groupIncidents($incidents);
 
         return $this->render('admin_template/admin_index.html.twig', [
             'pageLevel'                 => $pageLevel,
             'groupedUploads'            => $groupedUploads,
             'groupedValidatedUploads'   => $groupedValidatedUploads,
+            'groupincidents' => $groupIncidents,
             'zones'                     => $this->entityManagerFacade->getZones(),
         ]);
     }

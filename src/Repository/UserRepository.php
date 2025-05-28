@@ -98,10 +98,10 @@ class UserRepository extends BaseRepository implements PasswordUpgraderInterface
      *
      * @return User[] The sorted array of User objects
      */
-    public function getAllUsersOrderedByLastname()
+    public function getAllUsersOrderedByLastname(): array
     {
 
-        $users = $this->findAll();
+        $users = $this->findBy([], ['username' => 'ASC']);
 
         usort(
             $users,
@@ -131,7 +131,7 @@ class UserRepository extends BaseRepository implements PasswordUpgraderInterface
                 return $result;
             }
         );
-        
+
         return $users;
     }
 }

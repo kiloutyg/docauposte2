@@ -10,6 +10,8 @@
 	{{ encore_entry_script_tags('department-creation') }}
 {% endblock %}
 {% block body %}
+	{% import 'macros/accordion_loading_animations.html.twig' as loading %}
+
 	<div
 		class="row align-items-center">
 		{% if pageLevel is same as('super') %}
@@ -182,7 +184,15 @@
 			{% if pageLevel is same as('super')  %}
 				{{ render_esi(controller('App\\Controller\\Support\\SettingsController::settingsIndex'), options = []) }}
 				{% include "admin_template/admin_template_components/zone_creation_form.html.twig" %}
-				{{ render_esi(controller('App\\Controller\\Security\\AccountController::createAccountController'), options = []) }}
+				{# {{ render_esi(controller('App\\Controller\\Security\\AccountController::createAccountController')) }} #}
+
+				<turbo-frame
+					id="create-account"
+					src="{{ path('app_account_create') }}" data-accordion-frame-manager-target="turboFrame"
+					loading="lazy">
+					{{ loading.content_placeholder('text', 2, '90%') }}
+				</turbo-frame>
+
 			{% elseif pageLevel is same as('zone') %}
 				{% include "admin_template/admin_template_components/line_creation_form.html.twig" %}
 			{% elseif pageLevel is same as('productLine') %}
@@ -198,7 +208,11 @@
 			{% include "services/uploads/upload.html.twig" %}
 
 			{% if is_granted('ROLE_LINE_ADMIN') %}
-				{{ render_esi(controller('App\\Controller\\Document\\IncidentController::incidentManagementView'), options = []) }}
+				{% if is_granted('ROLE_SUPER_ADMIN') %}
+					{{ render(controller('App\\Controller\\Document\\IncidentController::incidentManagementView'), options = []) }}
+				{% else %}
+					{% include "services/incident/incident.html.twig" %}
+				{% endif %}
 			{% endif %}
 
 			{% include "services/uploads/uploaded_list.html.twig" %}
