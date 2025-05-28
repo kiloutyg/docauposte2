@@ -49,6 +49,14 @@ class EntityFetchingService extends AbstractController
     }
 
 
+    /**
+     * Retrieves all users from the database ordered by username and then by lastname.
+     *
+     * This method first fetches all users sorted alphabetically by username,
+     * then applies additional sorting by lastname through the repository.
+     *
+     * @return array An array of User entities ordered by lastname
+     */
     public function getUsers()
     {
         return $this->findBy(entityType: 'user', criteria: [], orderBy: ['username' => 'ASC']);

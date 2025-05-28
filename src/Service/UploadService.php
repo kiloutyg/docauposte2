@@ -40,7 +40,7 @@ class UploadService extends AbstractController
 
     public function __construct(
         EntityManagerInterface  $em,
-        LoggerInterface $logger,
+        LoggerInterface         $logger,
         UploadRepository        $uploadRepository,
 
         ValidationService       $validationService,
@@ -50,7 +50,7 @@ class UploadService extends AbstractController
         FileTypeService         $fileTypeService,
     ) {
         $this->em                    = $em;
-        $this->logger               = $logger;
+        $this->logger                = $logger;
 
         $this->uploadRepository      = $uploadRepository;
 
@@ -491,106 +491,141 @@ class UploadService extends AbstractController
     }
 
 
-    // create a route to redirect to the correct views of a file
+
+
+
     public function filterDownloadFile(int $uploadId, Request $request): Response
     {
         $upload = $this->uploadRepository->find($uploadId);
-        $this->logger->info('filterDownloadFile :: upload ', [$upload]);
-        $path = $upload->getPath();
-        $settings = $this->settingsService->getSettings();
-        if (!($settings->isUploadValidation() || $settings->IsTraining())) {
-            return $this->downloadFileFromMethods($path);
+        $this->logger->debug('filterDownloadFile :: upload ', [$upload]);
+        if (!$upload) {
+            $this->addFlash('warning', 'Aucun document trouvé avec l\'ID ' . $uploadId);
         }
 
+        $settings = $this->settingsService->getSettings();
+
+        if (!($settings->isUploadValidation() || $settings->IsTraining())) {
+            return $this->downloadFileFromMethods($upload->getPath());
+        }
+
+        return $this->filterDownloadFileResponse($upload, $request);
+    }
+
+
+
+
+    public function filterDownloadFileResponse(Upload $upload, Request $request): Response
+    {
+        $this->logger->debug('filterDownloadFileResponse');
         $isValidated = $upload->isValidated();
-        $this->logger->info('filterDownloadFile :: isValidated', [$isValidated]);
+        $this->logger->debug('filterDownloadFile :: isValidated', [$isValidated]);
         $isForcedDisplay = $upload->isForcedDisplay();
-        $this->logger->info('filterDownloadFile :: isForcedDisplay', [$isForcedDisplay]);
+        $this->logger->debug('filterDownloadFile :: isForcedDisplay', [$isForcedDisplay]);
         $isTraining = $upload->isTraining();
-        $this->logger->info('filterDownloadFile :: isTraining', [$isTraining]);
+        $this->logger->debug('filterDownloadFile :: isTraining', [$isTraining]);
         $hasOldUpload = $upload->getOldUpload() !== null;
-        $this->logger->info('filterDownloadFile :: hasOldUpload', [$hasOldUpload]);
+        $this->logger->debug('filterDownloadFile :: hasOldUpload', [$hasOldUpload]);
         $originUrl = $request->headers->get('Referer');
 
-
-        if ($isValidated === false && $isForcedDisplay === false) {
-            $this->logger->info('filterDownloadFile :: $isValidated === false && $isForcedDisplay === false');
-            if ($settings->IsTraining() && $isTraining) {
-                $this->logger->info('filterDownloadFile :: $settings->IsTraining() && $isTraining true');
-                return $this->redirectToRoute('app_training_front_by_validation', [
-                    'validationId' => $upload->getValidation()->getId()
-                ]);
-            } elseif ($hasOldUpload) {
-                $this->logger->info('filterDownloadFile :: hasOldUpload true');
-                return $this->downloadFileFromPath($uploadId);
-            } else {
-                $this->logger->info('filterDownloadFile :: $settings->IsTraining() && $isTraining and $hasOldUpload false');
-                $this->addFlash(
-                    'Danger',
-                    'Le fichier a été refusé par les validateurs et son affichage n\'est pas forcé. Contacter votre responsable pour plus d\'informations.'
-                );
-                return $this->redirect($originUrl, 307);
-            }
+        if ($isValidated === true) {
+            return $this->filterDownloadFileIsValidated(isTraining: $isTraining, upload: $upload);
+        } elseif ($isValidated === false) {
+            return $this->filterDownloadFileIsRefused(isTraining: $isTraining, hasOldUpload: $hasOldUpload, upload: $upload, originUrl: $originUrl);
+        } else {
+            return $this->filterDownloadFileIsBeingValidated(isTraining: $isTraining, hasOldUpload: $hasOldUpload, upload: $upload, isForcedDisplay: $isForcedDisplay);
         }
+    }
 
-        if ($isValidated === null && $isForcedDisplay === false) {
-            $this->logger->info('filterDownloadFile :: $isValidated === null && $isForcedDisplay === false');
+
+
+    public function filterDownloadFileIsValidated(bool $isTraining, Upload $upload): Response
+    {
+        $this->logger->debug('filterDownloadFileIsValidated :: $isValidated === true');
+
+        if ($isTraining) {
+            $this->logger->debug('filterDownloadFile :: $settings->IsTraining() && $isTraining true');
+
+            $response = $this->redirectToRoute('app_training_front_by_upload', [
+                'uploadId' => $upload->getId()
+            ]);
+        } else {
+            $this->logger->debug('filterDownloadFile :: $settings->IsTraining() && $isTraining false');
+
+            $response = $this->downloadFileFromMethods($upload->getPath());
+        }
+        return $response;
+    }
+
+
+    public function filterDownloadFileIsRefused(bool $isTraining, bool $hasOldUpload, Upload $upload, string $originUrl): Response
+    {
+        $this->logger->debug('filterDownloadFileIsRefused :: $isValidated === false');
+
+        if ($isTraining) {
+            $this->logger->debug('filterDownloadFile :: Training true');
+
+            $response = $this->redirectToRoute('app_training_front_by_validation', [
+                'validationId' => $upload->getValidation()->getId()
+            ]);
+        } elseif ($hasOldUpload) {
+            $this->logger->debug('filterDownloadFile :: hasOldUpload true');
+
+            $response = $this->manageOldUploadDisplay($upload);
+        } else {
+            $this->logger->debug('filterDownloadFile :: $settings->IsTraining() && $isTraining and $hasOldUpload false');
+            $response = $this->redirect($originUrl, 307);
+            $this->addFlash(
+                'Danger',
+                'Le fichier a été refusé par les validateurs et son affichage n\'est pas forcé. Contacter votre responsable pour plus d\'informations.'
+            );
+        }
+        return $response;
+    }
+
+
+    public function filterDownloadFileIsBeingValidated(bool $isTraining, bool $hasOldUpload, Upload $upload, bool $isForcedDisplay): Response
+    {
+        $this->logger->debug('filterDownloadFileIsBeingValidated :: $isValidated === null');
+
+        if ($isForcedDisplay) {
+
             if ($hasOldUpload) {
-                $this->logger->info('filterDownloadFile :: hasOldUpload true');
+                $this->logger->debug('filterDownloadFile :: hasOldUpload true');
 
-                return $this->manageOldUploadDisplay($upload);
-
-                // return $this->downloadFileFromPath($uploadId);
+                $response =  $this->manageOldUploadDisplay($upload);
             } else {
-                $this->logger->info('filterDownloadFile :: hasOldUpload false');
+                $this->logger->debug('filterDownloadFile :: hasOldUpload false');
 
                 $this->addFlash(
                     'Danger',
                     'Le fichier est en cours de validation et son affichage n\'est pas forcé. Contacter votre responsable pour plus d\'informations.'
                 );
-                return $this->redirect($originUrl, 307);
             }
-        }
 
-        if ($isValidated === true) {
-            $this->logger->info('filterDownloadFile :: $isValidated === true');
+        } else {
 
-            if ($settings->IsTraining() && $isTraining) {
-                $this->logger->info('filterDownloadFile :: $settings->IsTraining() && $isTraining true');
+            if ($isTraining) {
+                $this->logger->debug('filterDownloadFile :: $settings->IsTraining() && $isTraining true');
 
-                return $this->redirectToRoute('app_training_front_by_upload', [
-                    'uploadId' => $uploadId
-                ]);
-            } else {
-                $this->logger->info('filterDownloadFile :: $settings->IsTraining() && $isTraining false');
-
-                return $this->downloadFileFromMethods($path);
-            }
-        }
-
-        if ($isValidated === null) {
-            $this->logger->info('filterDownloadFile :: $isValidated === null');
-
-            if ($settings->IsTraining() && $isTraining) {
-                $this->logger->info('filterDownloadFile :: $settings->IsTraining() && $isTraining true');
-
-                return $this->redirectToRoute('app_training_front_by_validation', [
+                $response = $this->redirectToRoute('app_training_front_by_validation', [
                     'validationId' => $upload->getValidation()->getId()
                 ]);
             } else {
-                $this->logger->info('filterDownloadFile :: $settings->IsTraining() && $isTraining false');
+                $this->logger->debug('filterDownloadFile :: $settings->IsTraining() && $isTraining false');
 
-                return $this->downloadFileFromPath($uploadId);
+                $response = $this->downloadFileFromPath($upload->getId());
             }
         }
-        return $this->downloadFileFromMethods($path);
+
+        return $response;
     }
+
 
 
 
     public function manageOldUploadDisplay(Upload $upload)
     {
-        $this->logger->info(message: 'manageOldUploadDisplay');
+        $this->logger->debug(message: 'manageOldUploadDisplay');
 
         $oldUpload = $upload->getOldUpload();
         if ($oldUpload === null) {
@@ -600,7 +635,7 @@ class UploadService extends AbstractController
         }
 
         $oldUploadValidated = $oldUpload->isValidated();
-        $this->logger->info(message: 'manageOldUploadDisplay: oldUploadValidated: ', context: [$oldUploadValidated]);
+        $this->logger->debug(message: 'manageOldUploadDisplay: oldUploadValidated: ', context: [$oldUploadValidated]);
 
         if ($oldUploadValidated) {
             return $this->redirectToRoute(

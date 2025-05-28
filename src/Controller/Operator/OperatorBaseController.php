@@ -37,6 +37,8 @@ class OperatorBaseController extends AbstractController
     private $operatorService;
     private $repositoryFactory;
 
+    private $docAndOpeTemplatePath;
+
 
     public function __construct(
 
@@ -61,7 +63,8 @@ class OperatorBaseController extends AbstractController
         // Variables related to the services
         $this->entityFetchingService        = $entityFetchingService;
         $this->operatorService              = $operatorService;
-        $this->repositoryFactory           = $repositoryFactory;
+        $this->repositoryFactory            = $repositoryFactory;
+        $this->docAndOpeTemplatePath        = 'services/operators/docAndOperator.html.twig';
     }
 
 
@@ -155,7 +158,7 @@ class OperatorBaseController extends AbstractController
         $upload = $validation->getUpload();
 
         if ($request->getMethod() === 'GET') {
-            return $this->render('services/operators/docAndOperator.html.twig', [
+            return $this->render($this->docAndOpeTemplatePath, [
                 'upload' => $upload,
             ]);
         } else {
@@ -184,7 +187,7 @@ class OperatorBaseController extends AbstractController
         $upload = $this->uploadRepository->find($uploadId);
 
         if ($request->getMethod() === 'GET') {
-            return $this->render('services/operators/docAndOperator.html.twig', [
+            return $this->render($this->docAndOpeTemplatePath, [
                 'upload' => $upload,
             ]);
         } else {
@@ -195,18 +198,23 @@ class OperatorBaseController extends AbstractController
 
 
 
+    /**
+     * Renders a page displaying a document and operator information based on an old upload ID.
+     *
+     * This function retrieves an old upload by its ID, gets the associated current upload entity,
+     * and renders a template with the upload data.
+     *
+     * @param int $oldUploadId  The ID of the old upload to retrieve and process
+     *
+     * @return Response         A rendered template with upload data
+     */
     #[Route('/operator/frontByOldUpl/{oldUploadId}', name: 'app_training_front_by_old_upload')]
     public function documentAndOperatorByOldUpload(int $oldUploadId): Response
     {
-
         $oldUpload = $this->repositoryFactory->getRepository('oldUpload')->find($oldUploadId);
-
-        $this->logger->info('documentAndOperatorByOldUpload :: oldUpload ', [$oldUpload]);
-
-        $uploadEntity = $oldUpload->getUpload();
-
-        return $this->render('services/operators/docAndOperator.html.twig', [
-            'upload' => $uploadEntity,
+        $this->logger->debug('documentAndOperatorByOldUpload :: oldUpload ', [$oldUpload]);
+        return $this->render($this->docAndOpeTemplatePath, [
+            'upload' => $oldUpload->getUpload(),
         ]);
     }
 }

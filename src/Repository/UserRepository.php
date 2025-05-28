@@ -83,4 +83,55 @@ class UserRepository extends BaseRepository implements PasswordUpgraderInterface
 
         $this->save($user, true);
     }
+
+
+
+
+    /**
+     * Sorts an array of User objects by their last name, then by first name.
+     * 
+     * This function assumes usernames are in the format "firstname.lastname" and
+     * sorts them alphabetically by lastname first, then by firstname if lastnames are identical.
+     * If the username format is unexpected, it falls back to comparing the full usernames.
+     *
+     * @param User[] $users An array of User objects to be sorted
+     *
+     * @return User[] The sorted array of User objects
+     */
+    public function getAllUsersOrderedByLastname()
+    {
+
+        $users = $this->findAll();
+
+        usort(
+            $users,
+            function ($a, $b) {
+                $result = 0;
+                // Lower cases
+                $fullNameA = strtolower($a->getUsername());
+                $fullNameB = strtolower($b->getUsername());
+
+                try {
+                    // Split names to separate first name and last name
+                    list($firstNameA, $lastNameA) = explode('.', $fullNameA);
+                    list($firstNameB, $lastNameB) = explode('.', $fullNameB);
+
+                    // Compare last names
+                    $result = strcmp($lastNameA, $lastNameB);
+
+                    // If last names are equal, then compare first names
+                    if ($result == 0) {
+                        $result = strcmp($firstNameA, $firstNameB);
+                    }
+                } catch (\Exception $e) {
+                    // Fallback if name format is unexpected
+                    $result = strcmp($fullNameA, $fullNameB);
+                }
+
+                return $result;
+            }
+        );
+        
+        return $users;
+    }
 }
