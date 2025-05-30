@@ -4,23 +4,23 @@ namespace App\Service;
 
 use App\Entity\OldUpload;
 use App\Entity\Upload;
-use App\Entity\Button;
 
 use App\Repository\OldUploadRepository;
 use App\Repository\UploadRepository;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+
 use Psr\Log\LoggerInterface;
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 
 class OldUploadService extends AbstractController
 {
-    protected $manager;
+    protected $em;
     protected $oldUploadRepository;
     protected $uploadRepository;
     protected $projectDir;
@@ -28,13 +28,13 @@ class OldUploadService extends AbstractController
     protected $logger;
 
     public function __construct(
-        EntityManagerInterface $manager,
+        EntityManagerInterface $em,
         OldUploadRepository $oldUploadRepository,
         ParameterBagInterface $params,
         UploadRepository $uploadRepository,
         LoggerInterface $logger
     ) {
-        $this->manager                  = $manager;
+        $this->em                       = $em;
         $this->oldUploadRepository      = $oldUploadRepository;
         $this->uploadRepository         = $uploadRepository;
         $this->projectDir               = $params->get('kernel.project_dir');
@@ -44,32 +44,41 @@ class OldUploadService extends AbstractController
 
 
     // public function retireOldUpload(Upload $upload)
-    public function retireOldUpload(string $OldFilePath, string $OldFileName)
-
+    /**
+     * Retires the old upload by creating a new OldUpload entity and copying the file with a new name.
+     *
+     * @param string $oldFilePath The path of the old file to be retired.
+     * @param string $oldFileName The name of the old file to be retired.
+     *
+     * @throws \Exception If the file could not be copied.
+     *
+     * @return void
+     */
+    public function retireOldUpload(string $oldFilePath, string $oldFileName)
     {
-        $upload = $this->uploadRepository->findOneBy(['path' => $OldFilePath]);
-
-        // $this->logger->info('OldUploadService: retireOldUpload: upload: ' . $upload->getId());
-        // $this->logger->info('OldUploadService: retireOldUpload: upload to be retired name: ' . $upload->getFilename());
-
+        $upload = $this->uploadRepository->findOneBy(['path' => $oldFilePath]);
+    
+        $this->logger->debug('OldUploadService: retireOldUpload: upload: ' . $upload->getId());
+        $this->logger->debug('OldUploadService: retireOldUpload: upload to be retired name: ' . $upload->getFilename());
+    
         $currentOldUpload = $upload->getOldUpload();
         if ($currentOldUpload !== null) {
-            // $this->logger->info('OldUploadService: retireOldUpload: currentOldUpload: ' . $currentOldUpload->getId());
+            $this->logger->debug('OldUploadService: retireOldUpload: currentOldUpload: ' . $currentOldUpload->getId());
             $currendOldUploadEntity = $this->oldUploadRepository->find($currentOldUpload);
         }
-
-        if ($currentOldUpload !== null && (file_get_contents($currendOldUploadEntity->getPath()) === file_get_contents($OldFilePath)) === true) {
-            // $this->logger->info('OldUploadService: retireOldUpload: File exist and is the same as the current old file');
+    
+        if ($currentOldUpload !== null && (file_get_contents($currendOldUploadEntity->getPath()) === file_get_contents($oldFilePath)) === true) {
+            $this->logger->debug('OldUploadService: retireOldUpload: File exist and is the same as the current old file');
         } else {
-            // $this->logger->info('OldUploadService: retireOldUpload: File is different from the current old file');
-
+            $this->logger->debug('OldUploadService: retireOldUpload: File is different from the current old file');
+    
             $button             = $upload->getButton();
             $uploader           = $upload->getUploader();
-            $filename           = $OldFileName;
+            $filename           = $oldFileName;
             $oldFilename        = 'Old_' . $filename;
-
-            $path = $OldFilePath;
-
+    
+            $path = $oldFilePath;
+    
             // New file path
             $buttonname = $button->getName();
             $parts      = explode('.', $buttonname);
@@ -80,7 +89,7 @@ class OldUploadService extends AbstractController
                 $folderPath .= '/' . $part;
             }
             $oldPath = $folderPath . '/' . $oldFilename;
-
+    
             // Copy the file with the new name
             if (copy($path, $oldPath)) {
                 // The file has been copied to $oldPath
@@ -88,11 +97,11 @@ class OldUploadService extends AbstractController
                 // The file could not be copied
                 throw new \Exception("File could not be copied.");
             }
-
+    
             $uploadedAt         = $upload->getUploadedAt();
             $validated          = $upload->isValidated();
             $revision           = $upload->getRevision();
-
+    
             $oldUpload = new OldUpload();
             $oldUpload->setFile(new File($oldPath));
             $oldUpload->setButton($button);
@@ -103,8 +112,50 @@ class OldUploadService extends AbstractController
             $oldUpload->setOldUploadedAt($uploadedAt);
             $oldUpload->setRevision($revision);
             $upload->setOldUpload($oldUpload);
-            $this->manager->persist($oldUpload);
-            $this->manager->flush();
+            $this->em->persist($oldUpload);
+            $this->em->flush();
         }
     }
+
+
+
+
+    
+    /**
+     * Manages the display of an old upload.
+     *
+     * This function checks if the given upload has an associated old upload.
+     * If the old upload is not found, it logs an error message, adds a flash message,
+     * and redirects to the 'app_base' route.
+     * If the old upload is found, it checks if it is validated.
+     * If the old upload is validated, it redirects to the 'app_training_front_by_old_upload' route
+     * with the old upload ID as a parameter.
+     *
+     * @param Upload $upload The upload to be managed.
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
+     *     Returns a redirect response if the old upload is validated, or null if the old upload is not found.
+     */
+    public function manageOldUploadDisplay(Upload $upload)
+    {
+        $this->logger->debug(message: 'manageOldUploadDisplay');
+    
+        $oldUpload = $upload->getOldUpload();
+        if ($oldUpload === null) {
+            $this->logger->error(message: 'manageOldUploadDisplay: oldUpload is null');
+            $this->addFlash(type: 'danger', message: 'Le fichier n\existe pas.');
+            return $this->redirectToRoute(route: 'app_base');
+        }
+    
+        $oldUploadValidated = $oldUpload->isValidated();
+        $this->logger->debug(message: 'manageOldUploadDisplay: oldUploadValidated: ', context: [$oldUploadValidated]);
+    
+        if ($oldUploadValidated) {
+            return $this->redirectToRoute(
+                route: 'app_training_front_by_old_upload',
+                parameters: ['oldUploadId' => $oldUpload->getId()]
+            );
+        }
+    }
+
 }

@@ -20,7 +20,7 @@ use App\Repository\ApprobationRepository;
 
 use App\Form\UploadType;
 
-use App\Service\UploadService;
+use App\Service\UploadModificationService;
 use App\Service\ValidationService;
 use App\Service\NamingService;
 
@@ -38,7 +38,7 @@ class ValidationController extends AbstractController
 
     // Services methods
     private $validationService;
-    private $uploadService;
+    private $uploadModificationService;
     private $namingService;
 
 
@@ -55,7 +55,7 @@ class ValidationController extends AbstractController
 
         // Services methods
         ValidationService               $validationService,
-        UploadService                   $uploadService,
+        UploadModificationService       $uploadModificationService,
         NamingService                   $namingService,
 
     ) {
@@ -68,7 +68,7 @@ class ValidationController extends AbstractController
 
         // Variables related to the services
         $this->validationService            = $validationService;
-        $this->uploadService                = $uploadService;
+        $this->uploadModificationService                = $uploadModificationService;
         $this->namingService                = $namingService;
     }
 
@@ -205,7 +205,7 @@ class ValidationController extends AbstractController
 
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
-                $this->uploadService->modifyDisapprovedFile($upload, $user, $request);
+                $this->uploadModificationService->modifyDisapprovedFile($upload, $user, $request);
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirectToRoute('app_base');
             }
