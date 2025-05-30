@@ -2,8 +2,6 @@
 
 namespace App\Service;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -24,23 +22,75 @@ use App\Service\SettingsService;
 use App\Service\FolderService;
 use App\Service\FileTypeService;
 
-// This class is used to manage the uploads files and logic
+
+/**
+ * UploadService - Core service for managing document uploads and file operations
+ *
+ * This service handles all aspects of file uploads in the document management system including:
+ * - Processing new file uploads
+ * - Managing file downloads based on validation status
+ * - Organizing uploads by organizational structure
+ * - Handling file validation workflows
+ * - Managing file access permissions based on validation status
+ *
+ * The service implements business rules for file access, ensuring that files
+ * are only accessible according to their validation status, training requirements,
+ * and forced display settings.
+ */
 class UploadService extends AbstractController
 {
+    /**
+     * @var EntityManagerInterface Doctrine entity manager for database operations
+     */
     private $em;
-    private $logger;
+
+    /**
+     * @var UploadRepository Repository for Upload entity operations
+     */
     private $uploadRepository;
 
+    /**
+     * @var ValidationService Service for handling document validation processes
+     */
     private $validationService;
+
+    /**
+     * @var OldUploadService Service for managing previous versions of uploads
+     */
     private $oldUploadService;
+
+    /**
+     * @var SettingsService Service for accessing application settings
+     */
     private $settingsService;
+
+    /**
+     * @var FolderService Service for managing folder structures and paths
+     */
     private $folderService;
+
+    /**
+     * @var FileTypeService Service for validating and handling file types
+     */
     private $fileTypeService;
 
 
+    /**
+     * Constructor for the UploadService class.
+     *
+     * Initializes the service with necessary dependencies for managing file uploads,
+     * validation, storage, and related operations.
+     *
+     * @param EntityManagerInterface $em                The entity manager for database operations
+     * @param UploadRepository       $uploadRepository  Repository for Upload entity operations
+     * @param ValidationService      $validationService Service for handling file validation processes
+     * @param OldUploadService       $oldUploadService  Service for managing previous versions of uploads
+     * @param SettingsService        $settingsService   Service for accessing application settings
+     * @param FolderService          $folderService     Service for managing folder structures and paths
+     * @param FileTypeService        $fileTypeService   Service for validating and handling file types
+     */
     public function __construct(
         EntityManagerInterface  $em,
-        LoggerInterface         $logger,
         UploadRepository        $uploadRepository,
 
         ValidationService       $validationService,
@@ -50,7 +100,6 @@ class UploadService extends AbstractController
         FileTypeService         $fileTypeService,
     ) {
         $this->em                    = $em;
-        $this->logger                = $logger;
 
         $this->uploadRepository      = $uploadRepository;
 
@@ -61,7 +110,20 @@ class UploadService extends AbstractController
         $this->fileTypeService       = $fileTypeService;
     }
 
+
+
+
     // This function is responsible for the logic of uploading the uploads files
+    /**
+     * This function is responsible for uploading files and managing their related data.
+     *
+     * @param Request $request The request object containing the uploaded files.
+     * @param mixed   $button  The button related to the uploaded files.
+     * @param User    $user    The user who uploaded the files.
+     * @param string  $filename The name of the uploaded file.
+     *
+     * @return string The name of the last uploaded file.
+     */
     public function uploadFiles(Request $request, $button, User $user, $filename)
     {
         // Get all the files from the request
@@ -110,6 +172,14 @@ class UploadService extends AbstractController
 
 
 
+    /**
+     * This function checks and sets the training, display, and validation properties of an Upload entity based on the request parameters.
+     *
+     * @param Request $request The request object containing the parameters.
+     * @param Upload  $upload  The Upload entity to be updated.
+     *
+     * @return void
+     */
     public function uploadTrainingValidationChecker(Request $request, Upload $upload): void
     {
         // Check if the file need to be validated or not, by checking if there is a validator_department or a validator_user string in the request
@@ -148,272 +218,31 @@ class UploadService extends AbstractController
     }
 
 
-    // This function is responsible for the logic of modifying the uploads files
-    public function modifyFile(Upload $upload, Request $request)
-    {
-
-        // Get the new file directly from the Upload object
-        $newFile = $upload->getFile();
-
-        $user = $this->getUser();
-
-        $oldFilePath = $upload->getPath();
-        $oldFileName = $upload->getFilename();
-
-        // New file path
-        $path = $this->folderService->uploadPath($upload);
-
-        $modificationOutlined = $request->request->get('modification-outlined');
-
-        $preExistingValidation = !empty($upload->getValidation());
-
-        // Retire the old file if a new one has been uploaded.
-        if (!empty($newfile)) {
-            try {
-                $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
-            } catch (\Exception $e) {
-                throw $e;
-            }
-        }
-        $this->modifyUploadTrainingValidationChecker($request, $upload, $user);
-
-        $upload->setTraining(filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN));
-
-        $upload->setForcedDisplay(filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN));
-
-
-        // If new file exists, process it and delete the old one
-        if ($newFile) {
-
-            try { // Retire the old file
-                $this->oldUploadService->retireOldUpload($oldFilePath, $oldFileName);
-            } catch (\exception $e) {
-                throw $e;
-            }
-
-            $this->fileTypeService->checkFileType($newFile);
-
-            // Remove old file if it exists
-            if (file_exists($oldFilePath)) {
-                unlink($oldFilePath);
-            }
-            // Move the new file to the directory
-            try {
-                $newFile->move($this->folderService->pathFindingDoc($upload->getButton()->getName()) . '/', $upload->getFilename());
-            } catch (\Exception $e) {
-                throw $e;
-            }
-            // Update the file path in the upload object
-            $upload->setPath($path);
-            // Update the uploader in the upload object
-            $upload->setUploader($user);
-
-            // If the modification is heavy, increment the revision number
-            $upload->setRevision($upload->getRevision() + 1);
-            if ($modificationOutlined == '') {
-                // If the modification is heavy, reset the approbation and set the $globalModification flag to true
-                $globalModification = true;
-                // Reset the validation and approbation property
-                $request->request->set('modification-outlined', 'heavy-modification');
-            }
-
-            if ($preExistingValidation  && ($modificationOutlined == null || $modificationOutlined == '' || $modificationOutlined == 'heavy-modification')) {
-                $this->validationService->resetApprobation($upload, $request, $globalModification);
-            }
-        } else {
-            // If no new file is uploaded, just rename the old one if necessary
-            if ($oldFilePath != $path) {
-                rename($oldFilePath, $path);
-                $upload->setPath($path);
-                // Update the uploader in the upload object
-                $upload->setUploader($user);
-            }
-        }
-        // Persist changes and flush to the database
-        $upload->setUploadedAt(new \DateTime());
-        $this->em->persist($upload);
-        $this->em->flush();
-    }
-
-
-    public function modifyUploadTrainingValidationChecker(Request $request, Upload $upload, User $user): void
-    {
-        $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
-        $preExistingValidation = !empty($upload->getValidation());
-
-        if ($newValidation) {
-            $this->handleRequiredValidation($request, $upload, $user, $preExistingValidation);
-        } else {
-            $this->handleNoValidationRequired($request, $upload, $preExistingValidation);
-        }
-    }
-
-
-
-    /**
-     * Handle the case when validation is required for the upload
-     */
-    private function handleRequiredValidation(Request $request, Upload $upload, User $user, bool $preExistingValidation): void
-    {
-        $validated = $this->determineValidationStatus($request);
-        $modificationOutlined = $request->request->get('modification-outlined');
-
-        // Set the validated boolean property
-        $upload->setValidated($validated);
-
-        // Update the uploader in the upload object
-        $upload->setUploader($user);
-
-        // Set the revision
-        $upload->setRevision(1);
-
-        if ($validated === null) {
-            $this->updateOrCreateValidation($upload, $request, $preExistingValidation, $modificationOutlined);
-        }
-    }
-
-
-
-    /**
-     * Handle the case when no validation is required for the upload
-     */
-    private function handleNoValidationRequired(Request $request, Upload $upload, bool $preExistingValidation): void
-    {
-        $comment = $request->request->get('modificationComment');
-        if ($preExistingValidation && $comment != null) {
-            $this->updateExistingValidationComment($upload, $request, $comment);
-        }
-    }
-
-
-
-    /**
-     * Determine if the upload needs validation based on request parameters
-     */
-    private function determineValidationStatus(Request $request): ?bool
-    {
-        foreach ($request->request->keys() as $key) {
-            if (strpos($key, 'validator_user') !== false) {
-                return null; // Needs validation
-            }
-        }
-        return true; // No validation needed
-    }
-
-
-
-
-    /**
-     * Update or create validation records based on existing validation and modification type
-     */
-    private function updateOrCreateValidation(Upload $upload, Request $request, bool $preExistingValidation, ?string $modificationOutlined): void
-    {
-        $isHeavyModification = $modificationOutlined == null ||
-            $modificationOutlined == '' ||
-            $modificationOutlined == 'heavy-modification';
-
-        if ($preExistingValidation && $isHeavyModification) {
-            $this->validationService->updateValidation($upload, $request);
-        } else {
-            $this->validationService->createValidation($upload, $request);
-        }
-    }
-
-
-
-    /**
-     * Update the comment on an existing validation
-     */
-    private function updateExistingValidationComment(Upload $upload, Request $request, string $comment): void
-    {
-        $modificationOutlined = $request->request->get('modification-outlined');
-
-        if ($modificationOutlined == 'minor-modification') {
-            $comment = $comment . ' (modification mineure)';
-        }
-
-        $preExistingValidationEntity = $upload->getValidation();
-        $preExistingValidationEntity->setComment($comment);
-        $this->em->persist($preExistingValidationEntity);
-        $this->em->flush();
-    }
-
-
-
-    // This function is responsible for the logic of modifying the uploads files
-    public function modifyDisapprovedFile(Upload $upload, User $user, Request $request, ?string $newFilename = null)
-    {
-        $trainingNeeded = filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN);
-
-        // Get the new file directly from the Upload object
-        $newFile = $upload->getFile();
-
-        // Old file path
-        $oldFilePath = $upload->getPath();
-
-        $path = $this->folderService->uploadPath($upload);
-        // If new file exists, process it and delete the old one
-        if ($newFile) {
-
-            $this->fileTypeService->checkFileType($newFile);
-
-            // Remove old file if it exists
-            if (file_exists($oldFilePath)) {
-                unlink($oldFilePath);
-            }
-            // Move the new file to the directory
-            try {
-                $newFile->move($this->folderService->pathFindingDoc($upload->getButton()->getName()) . '/', $upload->getFilename());
-            } catch (\Exception $e) {
-                throw $e;
-            }
-            // Update the file path in the upload object
-            $upload->setPath($path);
-            // Update the uploader in the upload object
-            $upload->setUploader($user);
-        } else {
-            // If no new file is uploaded, just rename the old one if necessary
-            if ($oldFilePath != $path) {
-                rename($oldFilePath, $path);
-                $upload->setPath($path);
-                // Update the uploader in the upload object
-                $upload->setUploader($user);
-            }
-        }
-
-        if ($upload->isTraining() != $trainingNeeded) {
-            $upload->setTraining($trainingNeeded);
-        }
-        $upload->setValidated(null);
-        $upload->setUploadedAt(new \DateTime());
-
-
-        // Persist changes and flush to the database
-        $this->em->persist($upload);
-        $this->em->flush();
-
-        $this->validationService->resetApprobation($upload, $request);
-    }
-
 
 
 
 
     // This function is responsible for the logic of grouping the uploads files by parent entities
+    /**
+     * Groups all the uploads by their respective zone, product line, category, and button.
+     *
+     * @param array $uploads An array of Upload entities to be grouped.
+     *
+     * @return array An array containing two elements:
+     *               - The first element is a multi-dimensional array representing the grouped uploads.
+     *               - The second element is a multi-dimensional array representing the grouped validated uploads.
+     */
     public function groupAllUploads($uploads)
     {
         $groupedUploads = [];
-
         $groupedValidatedUploads = [];
+
         // Group uploads by zone, productLine, category, and button
         foreach ($uploads as $upload) {
-
-
             $zoneName        = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
             $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
             $categoryName    = $upload->getButton()->getCategory()->getName();
-            $buttonName      = $upload->getButton()->getname();
-
+            $buttonName      = $upload->getButton()->getName();
 
             if (!isset($groupedUploads[$zoneName])) {
                 $groupedUploads[$zoneName] = [];
@@ -445,6 +274,7 @@ class UploadService extends AbstractController
                 $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
             }
         }
+
         return [$groupedUploads, $groupedValidatedUploads];
     }
 
@@ -452,80 +282,48 @@ class UploadService extends AbstractController
 
 
 
-    public function prepareUploadData(array $uploads): array
-    {
-        $processedUploads = [];
-
-        foreach ($uploads as $upload) {
-            $processedUpload = [
-                'id' => $upload->getId(),
-                'filename' => strtoupper($upload->getFilename()),
-                'revision' => $upload->getRevision(),
-                'uploader' => $upload->getUploader() ? [
-                    'firstName' => explode('.', $upload->getUploader()->getUsername()[0]),
-                    'lastName' => explode('.', $upload->getUploader()->getUsername()[1]),
-                ] : 'inconnu',
-                'uploadedAt' => $upload->getUploadedAt()->format('d/m/Y'),
-                'validated' => $upload->isValidated(),
-                'validations' => [],
-            ];
-
-            // Process validations
-            if ($upload->getValidation()) {
-                foreach ($upload->getValidation()->getApprobations() as $approbation) {
-                    $processedApprobation = [
-                        'approver' => [
-                            'firstName' => ucfirst(explode('.', $approbation->getUserapprobator()->getUsername())[0]),
-                            'lastName' => strtoupper(explode('.', $approbation->getUserapprobator()->getUsername())[1]),
-                        ],
-                        'approval' => $approbation->isApproval(),
-                        'comment' => $approbation->getComment(),
-                        'approvedAt' => $approbation->getApprovedAt() ? $approbation->getApprovedAt()->format('d/m/Y H\hi') : null,
-                    ];
-                    $processedUpload['validations'][] = $processedApprobation;
-                }
-            }
-            $processedUploads[] = $processedUpload;
-        }
-        return $processedUploads;
-    }
-
-
-
-
-
+    /**
+     * Filters and processes the download request for a specific upload file based on its validation status and settings.
+     *
+     * @param int         $uploadId The ID of the upload file to be downloaded.
+     * @param Request     $request  The request object containing the origin URL.
+     *
+     * @return Response The response object representing the download file or a redirect to a validation page.
+     *
+     */
     public function filterDownloadFile(int $uploadId, Request $request): Response
     {
         $upload = $this->uploadRepository->find($uploadId);
-        $this->logger->debug('filterDownloadFile :: upload ', [$upload]);
         if (!$upload) {
             $this->addFlash('warning', 'Aucun document trouvé avec l\'ID ' . $uploadId);
+            return $this->redirect($request->headers->get('referer'));
         }
-
         $settings = $this->settingsService->getSettings();
-
         if (!($settings->isUploadValidation() || $settings->IsTraining())) {
             return $this->downloadFileFromMethods($upload->getPath());
         }
-
         return $this->filterDownloadFileResponse($upload, $request);
     }
 
 
 
 
+    /**
+     * Filters and processes the download request for a specific upload file based on its validation status and settings.
+     *
+     * @param Upload $upload The upload file to be downloaded.
+     * @param Request $request The request object containing the origin URL.
+     *
+     * @return Response The response object representing the download file or a redirect to a validation page.
+     *
+     */
     public function filterDownloadFileResponse(Upload $upload, Request $request): Response
     {
-        $this->logger->debug('filterDownloadFileResponse');
-        $isValidated = $upload->isValidated();
-        $this->logger->debug('filterDownloadFile :: isValidated', [$isValidated]);
-        $isForcedDisplay = $upload->isForcedDisplay();
-        $this->logger->debug('filterDownloadFile :: isForcedDisplay', [$isForcedDisplay]);
-        $isTraining = $upload->isTraining();
-        $this->logger->debug('filterDownloadFile :: isTraining', [$isTraining]);
-        $hasOldUpload = $upload->getOldUpload() !== null;
-        $this->logger->debug('filterDownloadFile :: hasOldUpload', [$hasOldUpload]);
-        $originUrl = $request->headers->get('Referer');
+        $isValidated        = $upload->isValidated();
+        $isForcedDisplay    = $upload->isForcedDisplay();
+        $isTraining         = $upload->isTraining();
+        $hasOldUpload       = $upload->getOldUpload() !== null;
+        $originUrl          = $request->headers->get('Referer');
 
         if ($isValidated === true) {
             return $this->filterDownloadFileIsValidated(isTraining: $isTraining, upload: $upload);
@@ -538,41 +336,48 @@ class UploadService extends AbstractController
 
 
 
+    /**
+     * Filters and processes the download request for a validated upload file based on its training status.
+     *
+     * @param bool     $isTraining Indicates whether the upload file is related to training.
+     * @param Upload   $upload     The validated upload file to be downloaded.
+     *
+     * @return Response The response object representing the download file or a redirect to a training page.
+     */
     public function filterDownloadFileIsValidated(bool $isTraining, Upload $upload): Response
     {
-        $this->logger->debug('filterDownloadFileIsValidated :: $isValidated === true');
-
         if ($isTraining) {
-            $this->logger->debug('filterDownloadFile :: $settings->IsTraining() && $isTraining true');
-
             $response = $this->redirectToRoute('app_training_front_by_upload', [
                 'uploadId' => $upload->getId()
             ]);
         } else {
-            $this->logger->debug('filterDownloadFile :: $settings->IsTraining() && $isTraining false');
-
             $response = $this->downloadFileFromMethods($upload->getPath());
         }
         return $response;
     }
 
 
+
+
+    /**
+     * Filters and processes the download request for a refused upload file based on its training status and old upload existence.
+     *
+     * @param bool     $isTraining     Indicates whether the upload file is related to training.
+     * @param bool     $hasOldUpload   Indicates whether the upload file has an old upload.
+     * @param Upload   $upload         The refused upload file to be downloaded.
+     * @param string   $originUrl      The origin URL of the download request.
+     *
+     * @return Response The response object representing the download file or a redirect to a validation or training page.
+     */
     public function filterDownloadFileIsRefused(bool $isTraining, bool $hasOldUpload, Upload $upload, string $originUrl): Response
     {
-        $this->logger->debug('filterDownloadFileIsRefused :: $isValidated === false');
-
         if ($isTraining) {
-            $this->logger->debug('filterDownloadFile :: Training true');
-
             $response = $this->redirectToRoute('app_training_front_by_validation', [
                 'validationId' => $upload->getValidation()->getId()
             ]);
         } elseif ($hasOldUpload) {
-            $this->logger->debug('filterDownloadFile :: hasOldUpload true');
-
-            $response = $this->manageOldUploadDisplay($upload);
+            $response = $this->oldUploadService->manageOldUploadDisplay($upload);
         } else {
-            $this->logger->debug('filterDownloadFile :: $settings->IsTraining() && $isTraining and $hasOldUpload false');
             $response = $this->redirect($originUrl, 307);
             $this->addFlash(
                 'Danger',
@@ -583,73 +388,55 @@ class UploadService extends AbstractController
     }
 
 
+
+
+    /**
+     * Filters and processes the download request for a file in validation status based on its training status, old upload existence, and forced display.
+     *
+     * @param bool     $isTraining     Indicates whether the upload file is related to training.
+     * @param bool     $hasOldUpload   Indicates whether the upload file has an old upload.
+     * @param Upload   $upload         The file in validation to be downloaded.
+     * @param bool     $isForcedDisplay Indicates whether the upload file's display is forced.
+     *
+     * @return Response The response object representing the download file or a redirect to a training or validation page.
+     */
     public function filterDownloadFileIsBeingValidated(bool $isTraining, bool $hasOldUpload, Upload $upload, bool $isForcedDisplay): Response
     {
-        $this->logger->debug('filterDownloadFileIsBeingValidated :: $isValidated === null');
-
         if ($isForcedDisplay) {
-
             if ($hasOldUpload) {
-                $this->logger->debug('filterDownloadFile :: hasOldUpload true');
-
-                $response =  $this->manageOldUploadDisplay($upload);
+                $response =  $this->oldUploadService->manageOldUploadDisplay($upload);
             } else {
-                $this->logger->debug('filterDownloadFile :: hasOldUpload false');
-
                 $this->addFlash(
                     'Danger',
                     'Le fichier est en cours de validation et son affichage n\'est pas forcé. Contacter votre responsable pour plus d\'informations.'
                 );
             }
-
         } else {
-
             if ($isTraining) {
-                $this->logger->debug('filterDownloadFile :: $settings->IsTraining() && $isTraining true');
-
                 $response = $this->redirectToRoute('app_training_front_by_validation', [
                     'validationId' => $upload->getValidation()->getId()
                 ]);
             } else {
-                $this->logger->debug('filterDownloadFile :: $settings->IsTraining() && $isTraining false');
-
                 $response = $this->downloadFileFromPath($upload->getId());
             }
         }
-
         return $response;
     }
 
 
 
 
-    public function manageOldUploadDisplay(Upload $upload)
-    {
-        $this->logger->debug(message: 'manageOldUploadDisplay');
 
-        $oldUpload = $upload->getOldUpload();
-        if ($oldUpload === null) {
-            $this->logger->error(message: 'manageOldUploadDisplay: oldUpload is null');
-            $this->addFlash(type: 'danger', message: 'Le fichier n\existe pas.');
-            return $this->redirectToRoute(route: 'app_base');
-        }
-
-        $oldUploadValidated = $oldUpload->isValidated();
-        $this->logger->debug(message: 'manageOldUploadDisplay: oldUploadValidated: ', context: [$oldUploadValidated]);
-
-        if ($oldUploadValidated) {
-            return $this->redirectToRoute(
-                route: 'app_training_front_by_old_upload',
-                parameters: ['oldUploadId' => $oldUpload->getId()]
-            );
-        }
-    }
-
-
-
-
-
-
+    /**
+     * Downloads a file from the specified path and returns a Response object.
+     *
+     * This function creates a File object from the given path, then uses the Symfony HttpFoundation's file() function
+     * to create a Response object with the file content. The file is set to be displayed inline in the browser.
+     *
+     * @param string $path The path to the file to be downloaded.
+     *
+     * @return Response The Response object containing the file content.
+     */
     public function downloadFileFromMethods(string $path): Response
     {
         $file = new File($path);
@@ -657,6 +444,19 @@ class UploadService extends AbstractController
     }
 
 
+
+
+    /**
+     * Downloads a file from the specified upload ID and returns a Response object.
+     *
+     * This function retrieves the file associated with the given upload ID from the database,
+     * determines the file path using the determineFilePath() method, and then calls the
+     * downloadFileFromMethods() method to create a Response object with the file content.
+     *
+     * @param int $uploadId The ID of the upload for which the file needs to be downloaded.
+     *
+     * @return Response The Response object containing the file content.
+     */
     public function downloadFileFromPath(int $uploadId)
     {
         $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
@@ -670,6 +470,15 @@ class UploadService extends AbstractController
 
 
     // Private method to determine the file path
+    /**
+     * Determines the file path based on the validation status and forced display settings of the upload.
+     *
+     * @param mixed $file The upload object for which the file path needs to be determined.
+     *
+     * @return string The determined file path.
+     *
+     * @throws Exception If the file object is not valid and does not have an old upload.
+     */
     private function determineFilePath($file): string
     {
         if (!$file->isValidated()) {
@@ -688,10 +497,24 @@ class UploadService extends AbstractController
 
 
     // create a route to download a file in more simple terms to display the file
+    /**
+     * This function is responsible for downloading a file related to a validation process.
+     *
+     * @param int|null $uploadId The ID of the upload file to be downloaded. If null, the function will use the last uploaded file.
+     *
+     * @return \Symfony\Component\HttpFoundation\Response The response object containing the file content.
+     *
+     * @throws \Exception If the upload ID is not provided and no file is found in the database.
+     */
     public function downloadInValidationFile(?int $uploadId = null)
     {
         // Retrieve the origin URL
         $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+
+        if (!$file) {
+            throw $this->createNotFoundException('No file found with the provided upload ID.');
+        }
+
         $path = $file->getPath();
         $file = new File($path);
         return $this->file($file, null, ResponseHeaderBag::DISPOSITION_INLINE);

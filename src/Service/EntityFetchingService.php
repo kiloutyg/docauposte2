@@ -138,7 +138,7 @@ class EntityFetchingService extends AbstractController
 
     public function getAllValidatedUploadsWithAssociations()
     {
-        return $this->groupUploads($this->fromNameToRepo('upload')->findAllValidatedUploadsWithAssociations());
+        return $this->groupValidatedUploads($this->fromNameToRepo('upload')->findAllValidatedUploadsWithAssociations());
     }
 
 
@@ -282,7 +282,7 @@ class EntityFetchingService extends AbstractController
      * @param array $uploads An array of Upload entities to be grouped
      * @return array A multi-dimensional array organizing uploads by their hierarchical associations
      */
-    private function groupUploads($uploads)
+    private function groupValidatedUploads($uploads)
     {
 
         $groupedValidatedUploads = [];
