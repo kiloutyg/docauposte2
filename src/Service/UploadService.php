@@ -424,7 +424,7 @@ class UploadService extends AbstractController
      */
     public function filterDownloadFileIsBeingValidated(bool $isTraining, bool $hasOldUpload, Upload $upload, bool $isForcedDisplay, string $originUrl): Response
     {
-        if ($isForcedDisplay) {
+        if (!$isForcedDisplay) {
             if ($hasOldUpload) {
                 $this->logger->debug('OldUploadService: filterDownloadFileIsBeingValidated: Old upload display');
                 $response =  $this->oldUploadService->manageOldUploadDisplay($upload);
@@ -432,7 +432,7 @@ class UploadService extends AbstractController
                 $response = $this->redirect($originUrl);
                 $this->addFlash(
                     'Danger',
-                    'Le fichier est en cours de validation et son affichage n\'est pas forcé. Contacter votre responsable pour plus d\'informations.'
+                    'Le fichier est en cours de validation, son affichage n\'est pas forcé et il ne dispose pas d\' une ancienne version. Contacter votre responsable pour plus d\'informations.'
                 );
             }
         } else {
