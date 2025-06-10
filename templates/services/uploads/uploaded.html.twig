@@ -8,7 +8,7 @@
 					{% for upload in button.uploads %}
 						{% if settings.isUploadValidation %}
 							{% set validated = '' %}
-							{% if upload.oldUpload != null and  upload.validation != null and upload.validation.status is same as(null)%}
+							{% if upload.oldUpload != null and  upload.validation != null and upload.validation.status is same as(null) and upload.isForcedDisplay != true %}
 								{% set validated = 'download-non-validated-but-old' %}
 							{% elseif upload.oldUpload != null and  upload.validation != null and upload.validation.status is same as(false) %}
 								{% set validated = 'download-refused-but-old' %}
@@ -46,8 +46,8 @@
 				{% else %}
 
 					<button
-					class="btn-warning btn btn-lg"
-					style="color:red"
+						class="btn-warning btn btn-lg"
+						style="color:red"
 						onclick="event.preventDefault(); window.history.back();">
 						Retour
 					</button>

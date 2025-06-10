@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use Psr\Log\LoggerInterface;
+
 use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -39,6 +41,9 @@ use App\Service\FileTypeService;
  */
 class UploadService extends AbstractController
 {
+
+    private $logger;
+
     /**
      * @var EntityManagerInterface Doctrine entity manager for database operations
      */
@@ -90,6 +95,7 @@ class UploadService extends AbstractController
      * @param FileTypeService        $fileTypeService   Service for validating and handling file types
      */
     public function __construct(
+        LoggerInterface         $logger,
         EntityManagerInterface  $em,
         UploadRepository        $uploadRepository,
 
@@ -99,6 +105,7 @@ class UploadService extends AbstractController
         FolderService           $folderService,
         FileTypeService         $fileTypeService,
     ) {
+        $this->logger                = $logger;
         $this->em                    = $em;
 
         $this->uploadRepository      = $uploadRepository;
@@ -417,14 +424,15 @@ class UploadService extends AbstractController
      */
     public function filterDownloadFileIsBeingValidated(bool $isTraining, bool $hasOldUpload, Upload $upload, bool $isForcedDisplay, string $originUrl): Response
     {
-        if ($isForcedDisplay) {
+        if (!$isForcedDisplay) {
             if ($hasOldUpload) {
+                $this->logger->debug('OldUploadService: filterDownloadFileIsBeingValidated: Old upload display');
                 $response =  $this->oldUploadService->manageOldUploadDisplay($upload);
             } else {
-                $response = $this->redirect(url: $originUrl, status: 307);
+                $response = $this->redirect($originUrl);
                 $this->addFlash(
                     'Danger',
-                    'Le fichier est en cours de validation et son affichage n\'est pas forcé. Contacter votre responsable pour plus d\'informations.'
+                    'Le fichier est en cours de validation, son affichage n\'est pas forcé et il ne dispose pas d\' une ancienne version. Contacter votre responsable pour plus d\'informations.'
                 );
             }
         } else {
