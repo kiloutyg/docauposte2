@@ -107,7 +107,7 @@ class EntityDeletionController extends AbstractController
 
 
     
-    #[Route(path: 'delete/trduplicate', name: 'app_delete_tr_duplicate')]
+    #[Route(path: '/superadmin/delete/trduplicate', name: 'app_delete_tr_duplicate')]
     public function deleteTRDuplicate(): Response
     {
         $this->logger->info('Delete TR duplicate');
