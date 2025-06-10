@@ -112,30 +112,4 @@ class SuperAdminController extends AbstractController
     }
 
 
-
-
-
-
-
-    // Update method for any stuff necessary during dev
-    #[Route('/superadmin/update', name: 'app_super_update')]
-    public function updateDB()
-    {
-        $em = $this->entityManagerFacade->getEntityManager();
-        $incidents = $this->entityManagerFacade->getIncidents();
-        foreach ($incidents as $incident) {
-            $similarNamedincidents = $this->entityManagerFacade->findBy(entityType: 'incident', criteria: ['name' => $incident->getName()]);
-            foreach ($similarNamedincidents as $similarNamedincident) {
-                if ($incident->getId() != $similarNamedincident->getId()) {
-                    $originalName = pathinfo($similarNamedincident->getName(), PATHINFO_FILENAME);
-                    $fileExtension = pathinfo($similarNamedincident->getName(), PATHINFO_EXTENSION);
-                    $similarNamedincident->setName($originalName . '_' . uniqid('', true) . '.' . $fileExtension);
-                    $em->persist($similarNamedincident);
-                }
-            }
-        }
-
-        $em->flush();
-        return $this->redirectToRoute('app_base');
-    }
 }
