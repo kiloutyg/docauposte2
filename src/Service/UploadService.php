@@ -320,8 +320,8 @@ class UploadService extends AbstractController
     public function filterDownloadFileResponse(Upload $upload, Request $request): Response
     {
         $isValidated        = $upload->isValidated();
-        $isForcedDisplay    = $upload->isForcedDisplay();
-        $isTraining         = $upload->isTraining();
+        $isForcedDisplay    = (bool)$upload->isForcedDisplay();
+        $isTraining         = (bool)$upload->isTraining();
         $hasOldUpload       = $upload->getOldUpload() !== null;
         $originUrl          = $request->headers->get('Referer');
 
