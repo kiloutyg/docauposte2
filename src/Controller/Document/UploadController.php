@@ -227,6 +227,30 @@ class UploadController extends AbstractController
         }
     }
 
+
+    /**
+     * Downloads an oldUpload file using its path
+     *
+     * Alternative download method that uses the file path instead of streaming.
+     * Useful for certain file types or when specific download behavior is needed.
+     *
+     * @param int $oldUploadId The ID of the file to download
+     * @param Request $request The HTTP request
+     * @return Response The file download response or a redirect with error message
+     */
+    #[Route('/downloadOldUploadByPath/{oldUploadId}', name: 'app_download_old_upload_file_from_path')]
+    public function downloadOldUploadFileFromPath(int $oldUploadId, Request $request): Response
+    {
+        if ($oldUploadId) {
+            $oldUploadEntity = $this->entityManagerFacade->find('oldUpload', $oldUploadId); // Assuming OldUpload is an entity class
+            return $this->uploadService->downloadFileFromMethods($oldUploadEntity->getPath());
+        } else {
+            $this->addFlash('warning', $this->absentFileId);
+            $originUrl = $request->headers->get('referer');
+            return $this->redirect($originUrl);
+        }
+    }
+
     /**
      * Downloads a file that is in validation process
      *

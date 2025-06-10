@@ -211,10 +211,13 @@ class OperatorBaseController extends AbstractController
     #[Route('/operator/frontByOldUpl/{oldUploadId}', name: 'app_training_front_by_old_upload')]
     public function documentAndOperatorByOldUpload(int $oldUploadId): Response
     {
+
+        // Issue, originally was only passing the upload docAndOpeTemplatePath, this template
         $oldUpload = $this->repositoryFactory->getRepository('oldUpload')->find($oldUploadId);
         $this->logger->debug('documentAndOperatorByOldUpload :: oldUpload ', [$oldUpload]);
-        return $this->render($this->docAndOpeTemplatePath, [
+        return $this->render('services/operators/docAndOperatorOldUpload.html.twig', [
             'upload' => $oldUpload->getUpload(),
+            'oldUpload' => $oldUpload,
         ]);
     }
 }

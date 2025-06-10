@@ -1,0 +1,31 @@
+{% extends 'blank.html.twig' %}
+{% block title %}
+	TrainingRecord
+
+{% endblock %}
+{% block javascripts %}
+	{{ parent()}}
+	{{encore_entry_script_tags('inactivity-timer')}}
+
+{% endblock %}
+{% block body %}
+
+
+	<div
+		class="d-flex ">
+
+		<iframe
+			title="iframe document"
+			src="{{ path('app_download_old_upload_file_from_path', { oldUploadId: oldUpload.id }) }}" class=" vh-100"
+			width="70%"
+			target="_blank"></iframe>
+		<iframe
+			title="trainingRecordList"
+			class="rounded-3 card vh-100  border-2 bg-light "
+			name="trainingRecord"
+			width="30%"
+			src="{{ path('app_training_list', { uploadId: upload.id})}}"></iframe>
+
+	</div>
+
+{% endblock %}
