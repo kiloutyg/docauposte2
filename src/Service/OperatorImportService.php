@@ -42,19 +42,18 @@ class OperatorImportService extends AbstractController
      * @param EntityFetchingService $entityFetchingService Service for fetching related entities
      * @param OperatorService $operatorService Service for operator-specific operations
      */
-
     public function __construct(
         LoggerInterface                 $logger,
         EntityManagerInterface          $em,
         ValidatorInterface              $validator,
-    
+
         EntityFetchingService           $entityFetchingService,
         OperatorService                 $operatorService
     ) {
         $this->logger                   = $logger;
         $this->em                       = $em;
         $this->validator                = $validator;
-    
+
         $this->entityFetchingService    = $entityFetchingService;
         $this->operatorService          = $operatorService;
     }
@@ -124,32 +123,35 @@ class OperatorImportService extends AbstractController
     {
         $existingTeams = $this->entityFetchingService->getTeams();
         $existingUaps = $this->entityFetchingService->getUaps();
-    
+
         // Process the data
         foreach ($ope_data as $data) {
             $code = $data[1];
+            $code = trim($code);
             $firstname = $data[2];
+            $firstname = trim($firstname);
             $surname = $data[3];
+            $surname = trim($surname);
             $name = strtolower($firstname . '.' . $surname);
-    
+
             // Find or default to 'INDEFINI' for team
             $team = $this->operatorService->findEntityByName($existingTeams, $data[4], "INDEFINI");
-    
+
             // Find or default to 'INDEFINI' for UAP
             $uap = $this->operatorService->findEntityByName($existingUaps, $data[5], "INDEFINI");
             if ($uap->getName() === 'INDEFINI') {
                 $uap = $this->operatorService->findEntityByName($existingUaps, $data[4], "INDEFINI");
             }
-    
+
             $operator = new Operator();
             $operator->setCode($code);
             $operator->setName($name);
             $operator->setTeam($team);
             $operator->addUap($uap);
-    
+
             // Validate the operator
             $errors = $this->validator->validate($operator);
-    
+
             // Handle validation errors
             if (count($errors) > 0) {
                 foreach ($errors as $error) {
@@ -162,7 +164,7 @@ class OperatorImportService extends AbstractController
                 try {
                     $this->em->persist($operator);
                     $this->em->flush();
-    
+
                     break; // Exit loop if successful
                 } catch (UniqueConstraintViolationException $e) {
                     $operator->setName($name . '_' . $suffix);

@@ -68,6 +68,8 @@ class ValidationService extends AbstractController
 
     public function createValidation(Upload $upload, Request $request)
     {
+
+        $this->logger->debug('ValidationService::createValidation : request: ', [$request->request->all()]);
         // Create empty arrays to store values for validator_department and validator_user
         $validator_user_values = [];
 
