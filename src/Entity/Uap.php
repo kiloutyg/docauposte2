@@ -34,7 +34,7 @@ class Uap
     /**
      * @var Collection<int, Operator>
      */
-    #[ORM\ManyToMany(targetEntity: Operator::class, inversedBy: 'uaps')]
+    #[ORM\ManyToMany(targetEntity: Operator::class, inversedBy: 'uaps', cascade: ['persist'])]
     private Collection $operators;
 
     #[ORM\ManyToOne(inversedBy: 'uaps')]
