@@ -8,15 +8,15 @@
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
-
+	{{ parent() }}
+	{{ encore_entry_script_tags('document-validator') }}
 	{{ encore_entry_script_tags('cascading-dropdowns') }}
 	{{ encore_entry_script_tags('inactivity-timer') }}
 {% endblock %}
 
 {% block body %}
 	<div
-		class="container">
+		class="inner-container flex-grow-1 d-flex flex-column">
 
 		{% if uploads|length > 1 %}
 			<div>
@@ -28,9 +28,10 @@
 							{{button.name|split('.')|first|upper}}
 						</strong>
 					</h2>
-					{% include 'services/uploads/uploaded.html.twig' %}
 				</div>
 			</div>
+			{% include 'services/uploads/uploaded.html.twig' %}
+
 		{% elseif uploads|length < 1 %}
 			<div
 				class="justify-content-between align-items-center ">
@@ -40,8 +41,9 @@
 						{{button.name|split('.')|first|upper}}
 					</strong>
 				</h2>
-				{% include 'services/uploads/uploaded.html.twig' %}
 			</div>
+			{% include 'services/uploads/uploaded.html.twig' %}
+
 		{% endif %}
 
 	</div>

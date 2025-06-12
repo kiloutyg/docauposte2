@@ -25,10 +25,16 @@ class FolderService
     // This function creates the folder structure for a given entity
     public function folderStructure(string $folderName)
     {
+        $this->logger->debug('Creating folder: $folderName: ' . $folderName);
+
         $folderPath = '';
         // Then the function creates the folder using the dedicated function
         foreach ($this->pathParts($folderName) as $part) {
+            $this->logger->debug('Creating folder: $part: ' . $part);
+
             $folderPath .= '/' . $part;
+            $this->logger->debug('Creating folder: $folderPath: ' . $folderPath);
+
             $this->createFolder($folderPath);
         }
     }
@@ -42,9 +48,9 @@ class FolderService
     // This function creates a folder and chmod it to 0755
     public function createFolder($folderPath)
     {
-        if (!file_exists($folderPath)) {
+        if (!file_exists($this->docDir . $folderPath)) {
             try {
-                mkdir($folderPath, 0755, true);
+                mkdir(directory: $this->docDir . $folderPath, permissions: 0755, recursive: false);
             } catch (\Exception $e) {
                 $this->logger->error('Failed to create folder: ' . $folderPath, [
                     'exception' => $e->getMessage(),
@@ -54,6 +60,7 @@ class FolderService
             }
         }
     }
+
 
     // This function deletes a folder
     public function deleteFolder($folderPath)

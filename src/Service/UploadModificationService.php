@@ -121,6 +121,7 @@ class UploadModificationService extends AbstractController
      */
     public function modifyFile(Upload $upload, Request $request)
     {
+        $this->logger->debug('UploadModificationService::modifyFile : upload: ' , [$upload->getId()]);
         $user = $this->getUser();
 
         $oldFilePath = $upload->getPath();
@@ -199,6 +200,7 @@ class UploadModificationService extends AbstractController
 
     public function modifyUploadTrainingValidationChecker(Request $request, Upload $upload, User $user): void
     {
+        $this->logger->debug('UploadModificationService::modifyUploadTrainingValidationChecker in validationService: request: ' , [$request->request->all()]);
         $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
         $preExistingValidation = !empty($upload->getValidation());
 
@@ -228,6 +230,7 @@ class UploadModificationService extends AbstractController
      */
     private function handleRequiredValidation(Request $request, Upload $upload, User $user, bool $preExistingValidation): void
     {
+
         $validated = $this->determineValidationStatus($request);
         $modificationOutlined = $request->request->get('modification-outlined');
 
@@ -308,13 +311,16 @@ class UploadModificationService extends AbstractController
      */
     private function updateOrCreateValidation(Upload $upload, Request $request, bool $preExistingValidation, ?string $modificationOutlined): void
     {
+        $this->logger->debug('UploadModification::updateOrCreateValidation()');
         $isHeavyModification = $modificationOutlined == null ||
             $modificationOutlined == '' ||
             $modificationOutlined == 'heavy-modification';
 
         if ($preExistingValidation && $isHeavyModification) {
+            $this->logger->debug('UploadModification::updateOrCreateValidation(): Updating existing validation and isHeavyModification');
             $this->validationService->updateValidation($upload, $request);
         } else {
+            $this->logger->debug('UploadModification::updateOrCreateValidation(): Creating new validation and not isHeavyModification');
             $this->validationService->createValidation($upload, $request);
         }
     }
@@ -337,6 +343,7 @@ class UploadModificationService extends AbstractController
      */
     private function updateExistingValidationComment(Upload $upload, Request $request, string $comment): void
     {
+        $this->logger->debug('UploadModification::updateExistingValidationComment()');
         $modificationOutlined = $request->request->get('modification-outlined');
 
         if ($modificationOutlined == 'minor-modification') {
