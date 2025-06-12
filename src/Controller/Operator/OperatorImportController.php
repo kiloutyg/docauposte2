@@ -40,8 +40,8 @@ class OperatorImportController extends AbstractController
     {
         $this->operatorService->teamUapInitialization();
         try {
-            $this->operatorImportService->importOpeService($request);
-            $this->addFlash('success', 'Les opérateurs ont bien été importés');
+            $response = $this->operatorImportService->importOpeService($request);
+            $this->addFlash('success', $response);
         } catch (\Exception $e) {
             $this->logger->error('Error importing operators', [
                 'error' => $e->getMessage()
