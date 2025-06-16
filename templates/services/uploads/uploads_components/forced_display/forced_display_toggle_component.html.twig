@@ -20,12 +20,16 @@
 </div>
 <div
 	class="col-md-9 col-sm-9 {{inputColValue}}">
-	<input
-		id="display-needed"
-		name="display-needed"
-		type="checkbox"
-		class="training-toggle-input col-8"
-		data-document-display-target="displayNeededToggle"
-		value="true"
-		{{checkStatus is defined ? (checkStatus ? "checked" : "") : ""}}>
+	<div
+		class="toggle-container tooltips-above"
+		aria-label="Si l'affichage d'un document non validé est nécéssaire">
+		<input
+			id="display-needed"
+			name="display-needed"
+			type="checkbox"
+			class="training-toggle-input col-8"
+			data-document-display-target="displayNeededToggle"
+			value="true"
+			{{checkStatus is defined ? (checkStatus ? "checked" : "") : ""}}>
+	</div>
 </div>

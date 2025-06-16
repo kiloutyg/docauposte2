@@ -23,14 +23,18 @@ class Validation
     #[ORM\Column(nullable: true)]
     private ?bool $status = null;
 
+
     #[ORM\OneToMany(mappedBy: 'Validation', targetEntity: Approbation::class, orphanRemoval: true)]
     private Collection $approbations;
+
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $validated_at = null;
 
+
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $Comment = null;
+
 
     public function __construct()
     {
@@ -66,6 +70,7 @@ class Validation
         return $this;
     }
 
+
     /**
      * @return Collection<int, Approbation>
      */
@@ -74,15 +79,16 @@ class Validation
         return $this->approbations;
     }
 
+
     public function addApprobation(Approbation $approbation): static
     {
         if (!$this->approbations->contains($approbation)) {
             $this->approbations->add($approbation);
             $approbation->setValidation($this);
         }
-
         return $this;
     }
+
 
     public function removeApprobation(Approbation $approbation): static
     {
@@ -92,10 +98,10 @@ class Validation
                 $approbation->setValidation(null);
             }
         }
-
         return $this;
     }
 
+    
     public function getValidatedAt(): ?\DateTimeInterface
     {
         return $this->validated_at;

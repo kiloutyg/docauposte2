@@ -20,6 +20,7 @@ use App\Entity\Approbation;
 
 use App\Service\MailerService;
 use App\Service\TrainingRecordService;
+use Doctrine\Common\Collections\Collection;
 
 class ValidationService extends AbstractController
 {
@@ -66,10 +67,22 @@ class ValidationService extends AbstractController
 
 
 
+    /**
+     * Creates a new validation process for an uploaded document.
+     *
+     * This method creates a validation record for an upload, processes any comments
+     * provided in the request, and creates approbation processes for each selected
+     * validator. It also sends notification emails to the validators.
+     *
+     * @param Upload $upload The upload entity for which to create a validation
+     * @param Request $request The HTTP request containing validation data (validator selections and comments)
+     *
+     * @return Validation The newly created and persisted Validation entity
+     */
     public function createValidation(Upload $upload, Request $request)
     {
 
-        $this->logger->debug('ValidationService::createValidation : request: ', [$request->request->all()]);
+        $this->logger->info('ValidationService::createValidation : request: ', [$request->request->all()]);
         // Create empty arrays to store values for validator_department and validator_user
         $validator_user_values = [];
 
@@ -99,7 +112,7 @@ class ValidationService extends AbstractController
         if ($request->request->get('modificationComment') !== null) {
             // Store the comment in a variable
             $comment = $request->request->get('modificationComment');
-            // If the user added a comment persist the comment 
+            // If the user added a comment persist the comment
             $validation->setComment($comment);
         }
         // Persist the Validation instance to the database
@@ -138,9 +151,22 @@ class ValidationService extends AbstractController
 
 
 
+    /**
+     * Updates an existing validation for an upload with new validators and comments.
+     *
+     * This method updates a validation record associated with an upload. It processes
+     * the modification comment, removes existing approbations, creates new approbation
+     * processes for selected validators, sends notification emails to the new validators,
+     * and updates training records if needed.
+     *
+     * @param Upload $upload The upload entity whose validation needs to be updated
+     * @param Request $request The HTTP request containing validation data (comments, validator selections)
+     *
+     * @return void This method doesn't return any value
+     */
     public function updateValidation(Upload $upload, Request $request)
     {
-        // // $this->logger->info('updateValidation in validationService: upload: ' . $upload->getId() . ' request: ' . $request->request->all())
+        $this->logger->info('ValidationService::updateValidation : request: ', [$request->request->all()]);
 
         // Get the Validation instance associated with the Upload instance
         $validation = $upload->getValidation();
@@ -148,7 +174,12 @@ class ValidationService extends AbstractController
         // Store the comment in a variable
         $comment = $request->request->get('modificationComment');
 
-        // If the user added a comment persist the comment 
+        $minorModification = $request->request->get('modification-outlined') === 'minor-modification';
+
+        if ($minorModification) {
+            $comment = $comment . ' (modification mineure)';
+        }
+        // If the user added a comment persist the comment
         if ($comment != null) {
             $validation->setComment($comment);
         }
@@ -159,22 +190,126 @@ class ValidationService extends AbstractController
         // Flush changes to the database
         $this->em->flush();
 
+        $this->logger->info('ValidationService::updateValidation : Before approbationChangeDetermination');
+        $this->approbationChangeDetermination(validation: $validation, request: $request);
+        $this->logger->info('ValidationService::updateValidation : After approbationChangeDetermination');
+
+        // Send a notification email to the validator
+        $this->mailerService->approbationEmail($validation);
+        // $this->logger->info('forcedDisplay: ' . $upload->isForcedDisplay() . ' training-needed: ' . $request->request->get('training-needed') . ' display-needed: ' . $request->request->get('display-needed'));
+        if (!$minorModification && $request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
+            $this->trainingRecordService->updateTrainingRecord($upload);
+        }
+    }
+
+
+
+    /**
+     * Determines and processes changes to approbations based on modification type.
+     *
+     * This method handles the logic for updating approbations when a validation is modified.
+     * For minor modifications, it identifies added and removed approbators and updates only
+     * those that changed. For major modifications, it removes all existing approbations and
+     * creates new ones based on the selected validators in the request.
+     *
+     * @param Validation $validation The validation entity whose approbations need to be updated
+     * @param Request $request The HTTP request containing validator selections and modification type
+     *
+     * @return void This method doesn't return any value
+     */
+    private function approbationChangeDetermination(Validation $validation, Request $request)
+    {
+
+        $this->logger->info('ValidationService::approbationChangeDetermination : request: ', [$request->request->all()]);
         // Get the approbators associated with the Validation instance
         $approbations = [];
-
         $approbations = $validation->getApprobations();
-
-        foreach ($approbations as $approbation) {
-            // Remove the Approbation instance from the database
-            $this->em->remove($approbation);
-        }
+        $minorModification = $request->request->get('modification-outlined') == 'minor-modification';
 
         // Iterate through the keys in the request to get the id for  validator_user
         foreach ($request->request->keys() as $key) {
             // If the key contains 'validator_user', add its value to the validator_user_values array
-            if (strpos($key, 'validator_user') !== false && $request->request->get($key) !== null && $request->request->get($key) !== '') {
+            if (
+                strpos($key, 'validator_user') !== false &&
+                $request->request->get($key) !== null &&
+                $request->request->get($key) !== ''
+            ) {
                 $validator_user_values[] = $request->request->get($key);
             }
+        }
+
+        if ($minorModification) {
+            $this->approbationChangeMinorModification($validation, $request, $approbations);
+        } else {
+            $this->approbationChangeMajorModification($validation, $approbations, $validator_user_values);
+        }
+    }
+
+
+
+
+    /**
+     * Processes approbation changes for minor modifications to a validation.
+     *
+     * This method handles the selective updating of approbations when a document undergoes
+     * minor modifications. It identifies which approbators were removed and which were added,
+     * then removes approbations for removed approbators and creates new approbations for
+     * newly added approbators, preserving existing approbations that weren't changed.
+     *
+     * @param Validation $validation The validation entity whose approbations need to be updated
+     * @param Request $request The HTTP request containing the updated validator selections
+     * @param Collection $approbations The collection of existing approbations associated with the validation
+     *
+     * @return void This method doesn't return any value
+     */
+    private function approbationChangeMinorModification(Validation $validation, Request $request, Collection $approbations)
+    {
+        $this->logger->info('ValidationService::approbationChangeDetermination: minor modification');
+        $diffInApprobators = $this->checkApprobatorChange($request, $validation->getUpload());
+        $this->logger->info('ValidationService::approbationChangeDetermination: diffInApprobators: ', $diffInApprobators);
+        if (!empty($diffInApprobators)) {
+            foreach ($approbations as $approbation) {
+                $this->logger->info('ValidationService::approbationChangeDetermination: removing approbators before checks', [$approbation]);
+                if (in_array(($approbation->getUserApprobator()->getId()), $diffInApprobators['removedApprobators'])) {
+                    $this->logger->info('ValidationService::approbationChangeDetermination: removing approbation after checks', [$approbation]);
+                    $this->em->remove($approbation);
+                }
+            }
+            foreach ($diffInApprobators['newApprobators'] as $newApprobatorId) {
+                $newApprobatorEntity = $this->userRepository->find($newApprobatorId);
+                $this->logger->info('ValidationService::approbationChangeDetermination: creating new approbation', [$newApprobatorEntity]);
+                $this->createApprobationProcess(
+                    $validation,
+                    $newApprobatorEntity
+                );
+            }
+        }
+    }
+
+
+
+
+    /**
+     * Processes approbation changes for major modifications to a validation.
+     *
+     * This method handles the complete replacement of approbations when a document undergoes
+     * major modifications. It removes all existing approbations associated with the validation
+     * and creates new approbation processes for each validator specified in the validator_user_values array.
+     *
+     * @param Validation $validation The validation entity whose approbations need to be replaced
+     * @param Collection $approbations The collection of existing approbations to be removed
+     * @param array $validator_user_values Array of user IDs to be set as new validators/approbators
+     *
+     * @return void This method doesn't return any value
+     */
+    private function approbationChangeMajorModification(Validation $validation, Collection $approbations, array $validator_user_values)
+    {
+
+        $this->logger->info('ValidationService::approbationChangeDetermination: non minor modification');
+
+        foreach ($approbations as $approbation) {
+            // Remove the Approbation instance from the database
+            $this->em->remove($approbation);
         }
 
         // Loop through each validator_user value
@@ -191,26 +326,27 @@ class ValidationService extends AbstractController
             );
             $validator_user = null;
         }
-
-        // Send a notification email to the validator
-        $this->mailerService->approbationEmail($validation);
-        // $this->logger->info('forcedDisplay: ' . $upload->isForcedDisplay() . ' training-needed: ' . $request->request->get('training-needed') . ' display-needed: ' . $request->request->get('display-needed'));
-        if ($request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
-            $this->trainingRecordService->updateTrainingRecord($upload);
-        }
-
-        // Return early
-        return;
     }
 
 
 
-
-
+    /**
+     * Creates an approbation process for a user validator.
+     *
+     * This method creates a new Approbation instance associated with a validation
+     * and assigns a user as the approbator. The approbation is then persisted
+     * to the database.
+     *
+     * @param mixed $validation The Validation entity to associate with the approbation
+     * @param User|null $validator_user The User entity to set as the approbator,
+     *                                 or null if no user is specified
+     *
+     * @return void This method doesn't return any value
+     */
     public function createApprobationProcess(
         $validation,
         ?User $validator_user = null
-    ) {
+    ): void {
         // Create a new Approbation instance
         $approbation = new Approbation();
         // Set the Validation object on the Approbation instance
@@ -225,15 +361,82 @@ class ValidationService extends AbstractController
 
         // Flush changes to the database
         $this->em->flush();
-
-        // Return the Approbation instance
-        return;
     }
 
 
 
+    /**
+     * Identifies changes in approbators between the current request and existing approbations.
+     *
+     * This method compares the validators selected in the current request with those
+     * already associated with an upload's validation. It identifies both newly added
+     * validators and removed validators, allowing for precise tracking of approbator changes.
+     *
+     * @param Request $request The HTTP request containing the form data with validator selections
+     * @param Upload $upload The upload entity whose approbators need to be compared
+     *
+     * @return array An associative array containing two keys:
+     *               - 'newApprobators': Array of user IDs that are newly selected as validators
+     *               - 'removedApprobators': Array of user IDs that were removed as validators
+     */
+    public function checkApprobatorChange(Request $request, Upload $upload): array
+    {
+        $validatorUserValues = [];
+        $approbatorUserId = [];
+
+        foreach ($request->request->keys() as $key) {
+            // If the key contains 'validator_user', add its value to the validator_user_values array
+            if (
+                strpos($key, 'validator_user') !== false &&
+                $request->request->get($key) !== null &&
+                $request->request->get($key) !== ''
+            ) {
+                $validatorUserValues[] = $request->request->get($key);
+            }
+        }
+
+        $approbations = $upload->getValidation()->getApprobations();
+        foreach ($approbations as $approbation) {
+            $approbatorUserId[] = $approbation->getUserApprobator()->getId();
+        }
+
+        // Find values in $validatorUserValues that are not in $approbatorUserId
+        $newApprobators = array_diff($validatorUserValues, $approbatorUserId);
+
+        // Find values in $approbatorUserId that are not in $validatorUserValues
+        $removedApprobators = array_diff($approbatorUserId, $validatorUserValues);
+
+        $this->logger->info(
+            'ValidationService::checkApprobatorChange() - Changes in approbators',
+            [
+                'newApprobators' => $newApprobators,
+                'removedApprobators' => $removedApprobators
+            ]
+        );
+
+        // Return an array with both new and removed approbators for complete change tracking
+        return [
+            'newApprobators' => $newApprobators,
+            'removedApprobators' => $removedApprobators
+        ];
+    }
 
 
+
+    /**
+     * Unused method to create an approbation process for a department validator. Might be removed or used in the future.
+     * Creates an approbation process for a department validator.
+     *
+     * This method creates a new Approbation instance associated with a validation
+     * and assigns a department as the approbator. The approbation is then persisted
+     * to the database.
+     *
+     * @param mixed $validation The Validation entity to associate with the approbation
+     * @param Department|null $validator_department The Department entity to set as the approbator,
+     *                                             or null if no department is specified
+     *
+     * @return Approbation The newly created and persisted Approbation entity
+     */
     public function createDepartmentApprobationProcess(
         $validation,
         ?Department $validator_department = null
@@ -261,9 +464,21 @@ class ValidationService extends AbstractController
 
 
 
+    /**
+     * Processes an approbation decision for a document validation.
+     *
+     * This method handles the approval or rejection of a document by a validator.
+     * It updates the approbation record with the decision, timestamp, and any comments,
+     * then triggers appropriate follow-up actions based on the decision.
+     *
+     * @param Approbation $approbation The approbation entity to be updated with the approval decision
+     * @param Request $request The HTTP request containing approval data ('approvalRadio' and 'approbationComment')
+     *
+     * @return bool Returns true if the approbation was approved or processing completed successfully,
+     *              returns false if the approbation was explicitly rejected
+     */
     public function validationApproval(Approbation $approbation, Request $request): bool
     {
-
         // Set return bool value to true
         $return = true;
 
@@ -307,6 +522,18 @@ class ValidationService extends AbstractController
 
 
 
+    /**
+     * Checks the status of all approbations for a validation and updates the validation status accordingly.
+     *
+     * This method evaluates all approbations associated with a validation to determine the overall
+     * validation status. If any approbation is rejected (false), the validation status is set to false.
+     * If all approbations are approved (true), the validation status is set to true. If any approbation
+     * is still pending (null), the validation status remains null.
+     *
+     * @param Validation $validation The validation entity whose approbations need to be checked
+     *
+     * @return void This method doesn't return any value
+     */
     public function approbationCheck(Validation $validation)
     {
         // Get the ID of the Validation instance
@@ -337,9 +564,22 @@ class ValidationService extends AbstractController
 
 
     // This method will also activate the notification email to the uploader
+    /**
+     * Updates the status of a validation and its associated upload.
+     *
+     * This method updates the validation status, sets the validation date, and handles
+     * the associated upload. If the validation is approved, it also manages any old uploads
+     * (deleting files and removing references), sends approval emails, and updates training
+     * records if needed.
+     *
+     * @param Validation $validation The validation entity to update
+     * @param bool|null $status The new status to set for the validation (true for approved, false for rejected, null for pending)
+     *
+     * @return void This method doesn't return any value
+     */
     public function updateValidationAndUploadStatus(Validation $validation, ?bool $status)
     {
-        // // $this->logger->info('updateValidationAndUploadStatus: ' . $validation->getId() . ' status: ' . $status);
+        $this->logger->info('updateValidationAndUploadStatus: ' . $validation->getId() . ' status: ' . $status);
 
         if ($validation->isStatus() === false) {
             return;
@@ -372,7 +612,7 @@ class ValidationService extends AbstractController
             $this->em->remove($oldUpload);
             $this->em->flush($oldUpload);
         }
-        // $this->logger->info('validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay());
+        $this->logger->info('validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay());
         if ($validation->isStatus() === true && $upload->isForcedDisplay() === false) {
             $this->mailerService->sendApprovalEmail($validation);
             $this->trainingRecordService->updateTrainingRecord($upload);
@@ -386,6 +626,22 @@ class ValidationService extends AbstractController
 
 
 
+    /**
+     * Resets the approbation process for an upload.
+     *
+     * This method resets the validation status of an upload and handles the approbation instances
+     * associated with it. It can reset all approbations or only those that were not approved,
+     * depending on the modification type. It also handles sending notification emails and
+     * updating training records if needed.
+     *
+     * @param Upload $upload The upload entity whose approbation process needs to be reset
+     * @param Request $request The HTTP request containing modification details and comments
+     * @param bool|null $globalModification Whether this is part of a global modification process.
+     *                                     If true, sends a notification email to all approbators.
+     *                                     Defaults to false.
+     *
+     * @return void This method doesn't return any value
+     */
     public function resetApprobation(Upload $upload, Request $request, ?bool $globalModification = false)
     {
         if ($upload->getValidation() == null) {
@@ -400,7 +656,7 @@ class ValidationService extends AbstractController
 
         // Store the comment in a variable
         $comment = $request->request->get('modificationComment');
-        // If the user added a comment persist the comment 
+        // If the user added a comment persist the comment
         if ($comment != null) {
             $validation->setComment($comment);
         }
@@ -450,7 +706,7 @@ class ValidationService extends AbstractController
         // Flush changes to the database
         $this->em->flush();
 
-        // // $this->logger->info('display-needed: ' . $request->request->get('display-needed') . ' training-needed: ' . $request->request->get('training-needed'));
+        $this->logger->info('display-needed: ' . $request->request->get('display-needed') . ' training-needed: ' . $request->request->get('training-needed'));
 
         if ($request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
             $this->trainingRecordService->updateTrainingRecord($upload);
@@ -461,23 +717,18 @@ class ValidationService extends AbstractController
 
 
 
-
-
-    public function updateValidationRecycle(Upload $upload)
-    {
-        if ($upload->getValidation() == null) {
-            $upload->setValidated(true);
-            $this->em->persist($upload);
-            $this->em->flush();
-            return;
-        }
-    }
-
-
-
-
-
-
+    /**
+     * Checks for pending validations and sends reminder emails to validators and uploaders.
+     *
+     * This function runs on even-numbered days of the month in non-development environments.
+     * It identifies uploads waiting for validation for more than 14 days and approbations
+     * that have not been answered for more than 1 day. It then sends reminder emails to
+     * the appropriate validators and uploaders.
+     *
+     * @param array $users An array of User objects to check for validator roles
+     *
+     * @return void This function doesn't return any value
+     */
     public function remindCheck(array $users)
     {
         $today = new \DateTime();
@@ -487,7 +738,12 @@ class ValidationService extends AbstractController
 
         $uploaders = [];
 
-        if ($this->params->get('kernel.environment') !== 'dev' && ($today->format('d') % 2 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false))) {
+        if (
+            $this->params->get('kernel.environment') !== 'dev' &&
+            ($today->format('d') % 2 == 0 &&
+                (!file_exists($filePath) ||
+                    strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false))
+        ) {
 
             $nonValidatedValidations = $this->validationRepository->findNonValidatedValidations();
 
@@ -545,7 +801,6 @@ class ValidationService extends AbstractController
 
             if ($return) {
                 file_put_contents($filePath, $today->format('Y-m-d'));
-                // $this->logger->info('fileWriting: ' . $fileWriting);
             }
             foreach ($uploaders as $uploader) {
                 $this->mailerService->sendReminderEmailToUploader($uploader);
@@ -561,6 +816,18 @@ class ValidationService extends AbstractController
 
 
 
+    /**
+     * Performs a monthly quality check and sends a quality resume email.
+     *
+     * This function runs on even-numbered days of the month. It checks if a monthly
+     * quality resume has already been sent for the current month. If not, it sends
+     * a quality resume email and records the date of sending to prevent duplicate emails.
+     *
+     * The function uses a text file to track when the last email was sent, comparing
+     * the month in the file with the current month to determine if a new email should be sent.
+     *
+     * @return void This function doesn't return any value
+     */
     public function qualityCheckUp()
     {
         $today = new \DateTime();
@@ -568,7 +835,6 @@ class ValidationService extends AbstractController
         $filePath = $this->projectDir . '/public/doc/' . $fileName;
 
         if (
-            // $today->format('d') == $today->format('t') &&
             $today->format('d') % 2 == 0 &&
             (
                 !file_exists($filePath) ||
@@ -600,6 +866,19 @@ class ValidationService extends AbstractController
 
 
 
+    /**
+     * Checks if the number of selected validators meets the required minimum.
+     *
+     * This function counts the number of validators selected in the request by looking
+     * for form fields containing 'validator_user' in their names that have non-empty values.
+     * It then compares this count against the required minimum number of validators.
+     *
+     * @param Request $request The HTTP request containing the form data with validator selections
+     * @param int $neededValidator The minimum number of validators required
+     *
+     * @return bool Returns true if the number of selected validators is equal to or greater
+     *              than the required minimum, false otherwise
+     */
     public function checkNumberOfValidator(Request $request, Int $neededValidator): bool
     {
 
@@ -608,14 +887,14 @@ class ValidationService extends AbstractController
 
         foreach ($request->request->keys() as $key) {
             // If the key contains 'validator_user', add its value to the validator_user_values array
-            if (strpos($key, 'validator_user') !== false && $request->request->get($key) !== null && !empty($request->request->get($key))) {
+            if (
+                strpos($key, 'validator_user') !== false &&
+                $request->request->get($key) !== null &&
+                !empty($request->request->get($key))
+            ) {
                 $selectedValidatorsCount++;
             }
         }
-        // $this->logger->info('number of selected validator: ' . $selectedValidatorsCount);
-        // $this->logger->info('neededValidator: ' . $neededValidator);
-        // $this->logger->info('is enough validator correctly determined: ' . $selectedValidatorsCount >= $neededValidator);
-
         if ($selectedValidatorsCount >= $neededValidator) {
             $enoughValidator = true;
         }

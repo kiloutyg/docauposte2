@@ -20,12 +20,16 @@
 </div>
 <div
 	class="col-md-9 col-sm-9 {{inputColValue}}">
-	<input
-		id="training-needed"
-		name="training-needed"
-		type="checkbox"
-		class="training-toggle-input"
-		value="true"
-		data-document-training-target="trainingNeededToggle"
-		{{checkStatus is defined ? (checkStatus ? "checked" : "") : ""}}>
+	<div
+		class="toggle-container tooltips-above"
+		aria-label="Si la formation et la signature des opérateurs est nécéssaire">
+		<input
+			id="training-needed"
+			name="training-needed"
+			type="checkbox"
+			class="training-toggle-input"
+			value="true"
+			data-document-training-target="trainingNeededToggle"
+			{{checkStatus is defined ? (checkStatus ? "checked" : "") : ""}}>
+	</div>
 </div>

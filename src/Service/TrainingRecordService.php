@@ -344,4 +344,22 @@ class TrainingRecordService extends AbstractController
         $trainerOperator->setInactiveSince(null);
         $this->em->persist($trainerOperator);
     }
+
+
+    public function cheatTrain(int $upload)
+    {
+        $uploadEntity = $this->uploadRepository->find($upload);
+        $this->logger->info('TrainingRecordService: cheatTrain: uploadEntity: ', [$uploadEntity]);
+
+        $uploadEntity = $this->uploadRepository->find($upload);
+        $trainingRecords = $this->trainingRecordRepository->findBy(['upload' => $uploadEntity]);
+        $this->logger->info('TrainingRecordService: cheatTrain: trainingRecords: ', [count($trainingRecords)]);
+        foreach ($trainingRecords as $trainingRecord) {
+            if ($trainingRecord->isTrained() === false) {
+                $trainingRecord->setTrained(true);
+                $this->em->persist($trainingRecord);
+                $this->em->flush();
+            }
+        }
+    }
 }

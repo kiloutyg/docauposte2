@@ -16,11 +16,11 @@ php bin/console cache:warmup --env=dev;
 
 # # Set the ownership
 chown -R www-data:www-data /var/www/var/;
-# chown -R www-data:www-data /var/www/public/;
+chown -R www-data:www-data /var/www/public/;
 chown -R www-data:www-data /var/www/migrations/;
 
 # Set the permissions
-chmod 777 . -R;
+chmod 755 . -R;
 
 
 # Enable core dumps for debugging segmentation faults
