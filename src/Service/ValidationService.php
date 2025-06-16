@@ -246,7 +246,7 @@ class ValidationService extends AbstractController
     }
 
 
-    
+
 
     /**
      * Processes approbation changes for minor modifications to a validation.
@@ -304,14 +304,14 @@ class ValidationService extends AbstractController
      */
     private function approbationChangeMajorModification(Validation $validation, Collection $approbations, array $validator_user_values)
     {
-    
+
         $this->logger->info('ValidationService::approbationChangeDetermination: non minor modification');
-    
+
         foreach ($approbations as $approbation) {
             // Remove the Approbation instance from the database
             $this->em->remove($approbation);
         }
-    
+
         // Loop through each validator_user value
         foreach ($validator_user_values as $validator_user_value) {
             // If the validator_user value is not null
@@ -706,7 +706,7 @@ class ValidationService extends AbstractController
         // Flush changes to the database
         $this->em->flush();
 
-        // // $this->logger->info('display-needed: ' . $request->request->get('display-needed') . ' training-needed: ' . $request->request->get('training-needed'));
+        $this->logger->info('display-needed: ' . $request->request->get('display-needed') . ' training-needed: ' . $request->request->get('training-needed'));
 
         if ($request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
             $this->trainingRecordService->updateTrainingRecord($upload);
@@ -721,8 +721,8 @@ class ValidationService extends AbstractController
      * Checks for pending validations and sends reminder emails to validators and uploaders.
      *
      * This function runs on even-numbered days of the month in non-development environments.
-     * It identifies uploads waiting for validation for more than 14 days and approbations 
-     * that have not been answered for more than 1 day. It then sends reminder emails to 
+     * It identifies uploads waiting for validation for more than 14 days and approbations
+     * that have not been answered for more than 1 day. It then sends reminder emails to
      * the appropriate validators and uploaders.
      *
      * @param array $users An array of User objects to check for validator roles
@@ -738,7 +738,12 @@ class ValidationService extends AbstractController
 
         $uploaders = [];
 
-        if ($this->params->get('kernel.environment') !== 'dev' && ($today->format('d') % 2 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false))) {
+        if (
+            $this->params->get('kernel.environment') !== 'dev' &&
+            ($today->format('d') % 2 == 0 &&
+                (!file_exists($filePath) ||
+                    strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false))
+        ) {
 
             $nonValidatedValidations = $this->validationRepository->findNonValidatedValidations();
 
@@ -796,7 +801,6 @@ class ValidationService extends AbstractController
 
             if ($return) {
                 file_put_contents($filePath, $today->format('Y-m-d'));
-                // $this->logger->info('fileWriting: ' . $fileWriting);
             }
             foreach ($uploaders as $uploader) {
                 $this->mailerService->sendReminderEmailToUploader($uploader);
@@ -883,7 +887,11 @@ class ValidationService extends AbstractController
 
         foreach ($request->request->keys() as $key) {
             // If the key contains 'validator_user', add its value to the validator_user_values array
-            if (strpos($key, 'validator_user') !== false && $request->request->get($key) !== null && !empty($request->request->get($key))) {
+            if (
+                strpos($key, 'validator_user') !== false &&
+                $request->request->get($key) !== null &&
+                !empty($request->request->get($key))
+            ) {
                 $selectedValidatorsCount++;
             }
         }
