@@ -121,7 +121,7 @@ class UploadModificationService extends AbstractController
      */
     public function modifyFile(Upload $upload, Request $request)
     {
-        $this->logger->debug('UploadModificationService::modifyFile : upload: ' , [$upload->getId()]);
+        $this->logger->info('UploadModificationService::modifyFile : upload: ', [$upload->getId()]);
         $user = $this->getUser();
 
         $oldFilePath = $upload->getPath();
@@ -136,10 +136,14 @@ class UploadModificationService extends AbstractController
 
         $newFile = $upload->getFile();
 
-        $this->modifyUploadTrainingValidationChecker($request, $upload, $user);
+        $this->modifiedUploadValidationChecker($request, $upload, $user);
 
-        $upload->setTraining(filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN));
-        $upload->setForcedDisplay(filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN));
+        $upload->setTraining(
+            filter_var($request->request->get('training-needed'), FILTER_VALIDATE_BOOLEAN)
+        );
+        $upload->setForcedDisplay(
+            filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN)
+        );
 
         // If new file exists, process it and delete the old one
         if ($newFile) {
@@ -156,7 +160,12 @@ class UploadModificationService extends AbstractController
                 }
 
                 // Move the new file to the directory
-                $newFile->move($this->folderService->pathFindingDoc($upload->getButton()->getName()) . '/', $upload->getFilename());
+                $newFile->move(
+                    $this->folderService->pathFindingDoc(
+                        $upload->getButton()->getName()
+                    ) . '/',
+                    $upload->getFilename()
+                );
 
                 // Update the file path in the upload object
                 $upload->setPath($path);
@@ -172,8 +181,14 @@ class UploadModificationService extends AbstractController
                     $request->request->set('modification-outlined', 'heavy-modification');
                 }
 
-                if ($preExistingValidation && ($modificationOutlined == null || $modificationOutlined == '' || $modificationOutlined == 'heavy-modification')) {
-                    $this->validationService->resetApprobation($upload, $request, $globalModification);
+                if ($preExistingValidation && ($modificationOutlined == null ||
+                    $modificationOutlined == '' ||
+                    $modificationOutlined == 'heavy-modification')) {
+                    $this->validationService->resetApprobation(
+                        $upload,
+                        $request,
+                        $globalModification
+                    );
                 }
             } catch (\Exception $e) {
                 $this->logger->error('Error processing file modification: ' . $e->getMessage());
@@ -193,21 +208,53 @@ class UploadModificationService extends AbstractController
         $upload->setUploadedAt(new \DateTime());
         $this->em->persist($upload);
         $this->em->flush();
+        $this->logger->notice(
+            'UploadModificationService::modifyFile: Fichier modifié avec succès. ',
+            [
+                "Uploader username" => $user->getUsername(),
+                "Upload Name" => $upload->getFilename(),
+                "Full request" => $request->request->all()
+            ]
+        );
     }
 
 
 
 
-    public function modifyUploadTrainingValidationChecker(Request $request, Upload $upload, User $user): void
+
+
+    public function modifiedUploadValidationChecker(Request $request, Upload $upload, User $user): void
     {
-        $this->logger->debug('UploadModificationService::modifyUploadTrainingValidationChecker in validationService: request: ' , [$request->request->all()]);
+        $this->logger->info(
+            'UploadModificationService::modifiedUploadValidationChecker: request: ',
+            [$request->request->all()]
+        );
+
         $newValidation = filter_var($request->request->get('validatorRequired'), FILTER_VALIDATE_BOOLEAN);
+        $this->logger->info(
+            'UploadModificationService::modifiedUploadValidationChecker: newValidation: ',
+            [$newValidation]
+        );
+
         $preExistingValidation = !empty($upload->getValidation());
+        $this->logger->info(
+            'UploadModificationService::modifiedUploadValidationChecker: preExistingValidation: ',
+            [$preExistingValidation]
+        );
 
         if ($newValidation) {
-            $this->handleRequiredValidation($request, $upload, $user, $preExistingValidation);
+            $this->handleValidationRequired(
+                $request,
+                $upload,
+                $user,
+                $preExistingValidation
+            );
         } else {
-            $this->handleNoValidationRequired($request, $upload, $preExistingValidation);
+            $this->handleNoNewValidationRequired(
+                $request,
+                $upload,
+                $preExistingValidation
+            );
         }
     }
 
@@ -228,14 +275,24 @@ class UploadModificationService extends AbstractController
      * @param bool $preExistingValidation Whether the upload already had validation records
      * @return void
      */
-    private function handleRequiredValidation(Request $request, Upload $upload, User $user, bool $preExistingValidation): void
+    private function handleValidationRequired(Request $request, Upload $upload, User $user, bool $preExistingValidation): void
     {
+        $this->logger->info('UploadModificationService::handleValidationRequired');
 
-        $validated = $this->determineValidationStatus($request);
+        $validationNeeded = $this->determineIfValidationIsNeeded($request, $upload, $preExistingValidation);
+        $this->logger->info(
+            'UploadModificationService::handleValidationRequired: validated: ',
+            [$validationNeeded]
+        );
+
         $modificationOutlined = $request->request->get('modification-outlined');
+        $this->logger->info(
+            'UploadModificationService::handleValidationRequired: modificationOutlined: ',
+            [$modificationOutlined]
+        );
 
         // Set the validated boolean property
-        $upload->setValidated($validated);
+        $upload->setValidated($validationNeeded);
 
         // Update the uploader in the upload object
         $upload->setUploader($user);
@@ -243,8 +300,13 @@ class UploadModificationService extends AbstractController
         // Set the revision
         $upload->setRevision(1);
 
-        if ($validated === null) {
-            $this->updateOrCreateValidation($upload, $request, $preExistingValidation, $modificationOutlined);
+        if ($validationNeeded === null) {
+            $this->updateOrCreateValidation(
+                $upload,
+                $request,
+                $preExistingValidation,
+                $modificationOutlined
+            );
         }
     }
 
@@ -261,71 +323,21 @@ class UploadModificationService extends AbstractController
      * @param bool $preExistingValidation Whether the upload already had validation records
      * @return void
      */
-    private function handleNoValidationRequired(Request $request, Upload $upload, bool $preExistingValidation): void
+    private function handleNoNewValidationRequired(Request $request, Upload $upload, bool $preExistingValidation): void
     {
+        $this->logger->info(
+            'UploadModificationService::handleNoNewValidationRequired'
+        );
         $comment = $request->request->get('modificationComment');
+        $this->logger->info(
+            'UploadModificationService::handleNoNewValidationRequired: comment: ',
+            [$comment]
+        );
+
         if ($preExistingValidation && $comment != null) {
             $this->updateExistingValidationComment($upload, $request, $comment);
         }
     }
-
-
-
-
-    /**
-     * Determine if the upload needs validation based on request parameters
-     *
-     * Examines the request parameters to check if any validator users have been specified.
-     * If validator users are found, the upload requires validation (returns null).
-     * Otherwise, the upload is considered pre-validated (returns true).
-     *
-     * @param Request $request The HTTP request containing potential validator parameters
-     * @return bool|null Returns null if validation is needed, true if no validation is required
-     */
-    private function determineValidationStatus(Request $request): ?bool
-    {
-        foreach ($request->request->keys() as $key) {
-            if (strpos($key, 'validator_user') !== false) {
-                return null; // Needs validation
-            }
-        }
-        return true; // No validation needed
-    }
-
-
-
-
-
-    /**
-     * Updates or creates validation records for an upload based on modification type
-     *
-     * Determines whether to update existing validation records or create new ones
-     * based on whether the upload already has validation records and the type of
-     * modification being performed.
-     *
-     * @param Upload $upload The upload entity requiring validation
-     * @param Request $request The HTTP request containing validation parameters
-     * @param bool $preExistingValidation Whether the upload already had validation records
-     * @param string|null $modificationOutlined The type of modification being performed
-     * @return void
-     */
-    private function updateOrCreateValidation(Upload $upload, Request $request, bool $preExistingValidation, ?string $modificationOutlined): void
-    {
-        $this->logger->debug('UploadModification::updateOrCreateValidation()');
-        $isHeavyModification = $modificationOutlined == null ||
-            $modificationOutlined == '' ||
-            $modificationOutlined == 'heavy-modification';
-
-        if ($preExistingValidation && $isHeavyModification) {
-            $this->logger->debug('UploadModification::updateOrCreateValidation(): Updating existing validation and isHeavyModification');
-            $this->validationService->updateValidation($upload, $request);
-        } else {
-            $this->logger->debug('UploadModification::updateOrCreateValidation(): Creating new validation and not isHeavyModification');
-            $this->validationService->createValidation($upload, $request);
-        }
-    }
-
-
 
 
 
@@ -343,7 +355,9 @@ class UploadModificationService extends AbstractController
      */
     private function updateExistingValidationComment(Upload $upload, Request $request, string $comment): void
     {
-        $this->logger->debug('UploadModification::updateExistingValidationComment()');
+        $this->logger->info(
+            'UploadModification::updateExistingValidationComment()'
+        );
         $modificationOutlined = $request->request->get('modification-outlined');
 
         if ($modificationOutlined == 'minor-modification') {
@@ -355,6 +369,134 @@ class UploadModificationService extends AbstractController
         $this->em->persist($preExistingValidationEntity);
         $this->em->flush();
     }
+
+
+
+
+
+    /**
+     * Determine if the upload needs validation based on request parameters
+     *
+     * Examines the request parameters to check if any validator users have been specified.
+     * If validator users are found, the upload requires validation (returns null).
+     * Otherwise, the upload is considered pre-validated (returns true).
+     *
+     * @param Request $request The HTTP request containing potential validator parameters
+     * @return bool|null Returns null if validation is needed, true if no validation is required
+     */
+    private function determineIfValidationIsNeeded(Request $request, Upload $upload, bool $preExistingValidation): ?bool
+    {
+        $this->logger->info('UploadModification::determineIfValidationIsNeeded()');
+
+        (bool)$minorModification = $request->request->get('modification-outlined') === 'minor-modification';
+
+        $response = true;
+        if (!$minorModification) {
+            foreach ($request->request->keys() as $key) {
+                if (strpos($key, 'validator_user') !== false) {
+                    $response = null; // Needs validation
+                }
+            }
+        } elseif ($preExistingValidation && $minorModification) {
+            $this->checkApprobatorChange($request, $upload);
+        }
+
+
+        $this->logger->info(
+            'UploadModification::determineIfValidationIsNeeded() - No validator users found in request',
+            [
+                'full request' => $request->request->all(),
+                'Response' => $response
+            ]
+        );
+        return $response; // No validation needed
+    }
+
+
+
+    private function checkApprobatorChange(Request $request, Upload $upload): bool
+    {
+
+        foreach ($request->request->keys() as $key) {
+            // If the key contains 'validator_user', add its value to the validator_user_values array
+            if (
+                strpos($key, 'validator_user') !== false &&
+                $request->request->get($key) !== null &&
+                $request->request->get($key) !== ''
+            ) {
+                $validatorUserValues[] = $request->request->get($key);
+            }
+        }
+
+        $approbations = $upload->getValidation()->getApprobations();
+        foreach ($approbations as $approbation) {
+            $approbatorUserId = $approbation->getUserApprobator()->getId();
+        }
+
+        $diffInApprobators = array_diff($validatorUserValues, [$approbatorUserId]);
+
+        return 
+    }
+
+
+
+    /**
+     * Updates or creates validation records for an upload based on modification type
+     *
+     * Determines whether to update existing validation records or create new ones
+     * based on whether the upload already has validation records and the type of
+     * modification being performed.
+     *
+     * @param Upload $upload The upload entity requiring validation
+     * @param Request $request The HTTP request containing validation parameters
+     * @param bool $preExistingValidation Whether the upload already had validation records
+     * @param string|null $modificationOutlined The type of modification being performed
+     * @return void
+     */
+    private function updateOrCreateValidation(
+        Upload $upload,
+        Request $request,
+        bool $preExistingValidation,
+        ?string $modificationOutlined
+    ): void {
+
+        $this->logger->info('UploadModification::updateOrCreateValidation()');
+
+        $this->logger->info(
+            'UploadModification::updateOrCreateValidation(): preExistingValidation: ',
+            [$preExistingValidation]
+        );
+
+        $this->logger->info(
+            'UploadModification::updateOrCreateValidation(): modificationOutlined: ',
+            [$modificationOutlined]
+        );
+
+        $isHeavyModification = $modificationOutlined == null ||
+            $modificationOutlined == '' ||
+            $modificationOutlined == 'heavy-modification';
+
+        $this->logger->info(
+            'UploadModification::updateOrCreateValidation(): isHeavyModification: ',
+            [$isHeavyModification]
+        );
+
+        if ($isHeavyModification) {
+            if ($preExistingValidation) {
+                $this->logger->info(
+                    'UploadModification::updateOrCreateValidation(): Updating existing validation and isHeavyModification'
+                );
+                $this->validationService->updateValidation($upload, $request);
+            } else {
+                $this->logger->info(
+                    'UploadModification::updateOrCreateValidation(): Creating new validation and not isHeavyModification'
+                );
+                $this->validationService->createValidation($upload, $request);
+            }
+        }
+    }
+
+
 
 
 

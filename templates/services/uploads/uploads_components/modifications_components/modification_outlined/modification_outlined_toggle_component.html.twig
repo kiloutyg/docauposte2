@@ -9,18 +9,24 @@
 	class="col-md-3 col-sm-3 {{labelColValue}} ">
 	<label
 		for="modification-outlined"
-		class=" col-form-label tooltips-above"
-		aria-label="Si modification de semantique, grammaire, orthographe, mise en page."
-		style="color:white">
+		class="col-form-label toggle-container tooltips-above"
+		style="color:white"
+		aria-label="Si modification de semantique, grammaire, orthographe, mise en page.">
+
 		Modification mineure :
 	</label>
 </div>
 <div
-	class="col-md-9 col-sm-9 {{inputColValue}}">
-	<input
-		id="modification-outlined"
-		name="modification-outlined"
-		type="checkbox"
-		class="training-toggle-input col-8"
-		value="minor-modification">
+	class="col-md-9 col-sm-9 {{inputColValue}} position-relative">
+	<div
+		class="toggle-container tooltips-above"
+		aria-label="Si modification de semantique, grammaire, orthographe, mise en page.">
+		<input
+			title="Si modification de semantique, grammaire, orthographe, mise en page."
+			id="modification-outlined"
+			name="modification-outlined"
+			type="checkbox"
+			class="training-toggle-input col-8"
+			value="minor-modification">
+	</div>
 </div>

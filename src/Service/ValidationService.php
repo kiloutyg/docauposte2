@@ -69,7 +69,7 @@ class ValidationService extends AbstractController
     public function createValidation(Upload $upload, Request $request)
     {
 
-        $this->logger->debug('ValidationService::createValidation : request: ', [$request->request->all()]);
+        $this->logger->info('ValidationService::createValidation : request: ', [$request->request->all()]);
         // Create empty arrays to store values for validator_department and validator_user
         $validator_user_values = [];
 
@@ -140,7 +140,7 @@ class ValidationService extends AbstractController
 
     public function updateValidation(Upload $upload, Request $request)
     {
-        // // $this->logger->info('updateValidation in validationService: upload: ' . $upload->getId() . ' request: ' . $request->request->all())
+        $this->logger->info('ValidationService::updateValidation : request: ', [$request->request->all()]);
 
         // Get the Validation instance associated with the Upload instance
         $validation = $upload->getValidation();
@@ -172,7 +172,11 @@ class ValidationService extends AbstractController
         // Iterate through the keys in the request to get the id for  validator_user
         foreach ($request->request->keys() as $key) {
             // If the key contains 'validator_user', add its value to the validator_user_values array
-            if (strpos($key, 'validator_user') !== false && $request->request->get($key) !== null && $request->request->get($key) !== '') {
+            if (
+                strpos($key, 'validator_user') !== false &&
+                $request->request->get($key) !== null &&
+                $request->request->get($key) !== ''
+            ) {
                 $validator_user_values[] = $request->request->get($key);
             }
         }
@@ -400,7 +404,7 @@ class ValidationService extends AbstractController
 
         // Store the comment in a variable
         $comment = $request->request->get('modificationComment');
-        // If the user added a comment persist the comment 
+        // If the user added a comment persist the comment
         if ($comment != null) {
             $validation->setComment($comment);
         }

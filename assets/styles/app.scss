@@ -552,6 +552,45 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
     outline: none;
 }
 
+
+
+/* Add this new class */
+.toggle-container {
+    display: inline-block;
+    position: relative;
+}
+
+
+
+/* Adjust the tooltip positioning for toggle inputs */
+.toggle-container.tooltips-above:hover::after,
+.toggle-container.tooltips-above:focus::after {
+    content: attr(aria-label);
+    position: absolute;
+    top: -2.4em;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    white-space: nowrap;
+    padding: 5px 14px;
+    background: #413219;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 1.2rem;
+}
+
+.toggle-container.tooltips-above[aria-label]:hover:before,
+.toggle-container.tooltips-above[aria-label]:focus:before {
+    content: "▼";
+    position: absolute;
+    top: -1em;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    color: #413219;
+}
+
+
 .pretty-toggle {
     --s: 25px;
     /* adjust this to control the size*/
