@@ -7,7 +7,7 @@ use App\Entity\Zone;
 use App\Service\Facade\EntityManagerFacade;
 use App\Service\Facade\ContentManagerFacade;
 use App\Service\ErrorService;
-
+use App\Service\TrainingRecordService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,13 +19,16 @@ class SuperAdminController extends AbstractController
 {
     private $entityManagerFacade;
     private $contentManagerFacade;
+    private $trainingRecordService;
 
     public function __construct(
         EntityManagerFacade $entityManagerFacade,
         ContentManagerFacade $contentManagerFacade,
+        TrainingRecordService $trainingRecordService
     ) {
         $this->entityManagerFacade = $entityManagerFacade;
         $this->contentManagerFacade = $contentManagerFacade;
+        $this->trainingRecordService = $trainingRecordService;
     }
 
 
@@ -111,5 +114,16 @@ class SuperAdminController extends AbstractController
         }
     }
 
-
+    // A route that use a method to revalid automatically every training records of a certain date
+    #[Route('superadmin/cheattrain/{uploadId}', name: 'app_super_admin_cheat_train')]
+    public function cheatTrain(int $uploadId)
+{
+    if ($this->isGranted('ROLE_SUPER_ADMIN')) {
+        $this->trainingRecordService->cheatTrain($uploadId);
+        return $this->redirectToRoute('app_super_admin');
+    } else {
+        $this->addFlash('danger', 'Vous n\'êtes pas autorisé à accéder à cette page');
+        return $this->redirectToRoute('app_login');
+    }
+}
 }
