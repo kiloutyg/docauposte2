@@ -20,6 +20,7 @@ use App\Entity\Approbation;
 
 use App\Service\MailerService;
 use App\Service\TrainingRecordService;
+use Doctrine\Common\Collections\Collection;
 
 class ValidationService extends AbstractController
 {
@@ -111,7 +112,7 @@ class ValidationService extends AbstractController
         if ($request->request->get('modificationComment') !== null) {
             // Store the comment in a variable
             $comment = $request->request->get('modificationComment');
-            // If the user added a comment persist the comment 
+            // If the user added a comment persist the comment
             $validation->setComment($comment);
         }
         // Persist the Validation instance to the database
@@ -172,10 +173,10 @@ class ValidationService extends AbstractController
 
         // Store the comment in a variable
         $comment = $request->request->get('modificationComment');
-        
-        $modificationOutlined = $request->request->get('modification-outlined');
 
-        if ($modificationOutlined == 'minor-modification') {
+        $minorModification = $request->request->get('modification-outlined') === 'minor-modification';
+
+        if ($minorModification) {
             $comment = $comment . ' (modification mineure)';
         }
         // If the user added a comment persist the comment
@@ -196,7 +197,7 @@ class ValidationService extends AbstractController
         // Send a notification email to the validator
         $this->mailerService->approbationEmail($validation);
         // $this->logger->info('forcedDisplay: ' . $upload->isForcedDisplay() . ' training-needed: ' . $request->request->get('training-needed') . ' display-needed: ' . $request->request->get('display-needed'));
-        if ($request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
+        if (!$minorModification && $request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
             $this->trainingRecordService->updateTrainingRecord($upload);
         }
     }
@@ -238,53 +239,94 @@ class ValidationService extends AbstractController
         }
 
         if ($minorModification) {
-            $this->logger->info('ValidationService::approbationChangeDetermination: minor modification');
-            $diffInApprobators = $this->checkApprobatorChange($request, $validation->getUpload());
-            $this->logger->info('ValidationService::approbationChangeDetermination: diffInApprobators: ', $diffInApprobators);
-            if (!empty($diffInApprobators)) {
-                foreach ($approbations as $approbation) {
-                    $this->logger->info('ValidationService::approbationChangeDetermination: removing approbators before checks', [$approbation]);
-                    if (in_array(($approbation->getUserApprobator()->getId()), $diffInApprobators['removedApprobators'])) {
-                        $this->logger->info('ValidationService::approbationChangeDetermination: removing approbation after checks', [$approbation]);
-                        $this->em->remove($approbation);
-                    }
-                }
-                foreach ($diffInApprobators['newApprobators'] as $newApprobatorId) {
-                    $newApprobatorEntity = $this->userRepository->find($newApprobatorId);
-                    $this->logger->info('ValidationService::approbationChangeDetermination: creating new approbation', [$newApprobatorEntity]);
-                    $this->createApprobationProcess(
-                        $validation,
-                        $newApprobatorEntity
-                    );
-                }
-            }
+            $this->approbationChangeMinorModification($validation, $request, $approbations);
         } else {
+            $this->approbationChangeMajorModification($validation, $approbations, $validator_user_values);
+        }
+    }
 
-            $this->logger->info('ValidationService::approbationChangeDetermination: non minor modification');
 
+    
+
+    /**
+     * Processes approbation changes for minor modifications to a validation.
+     *
+     * This method handles the selective updating of approbations when a document undergoes
+     * minor modifications. It identifies which approbators were removed and which were added,
+     * then removes approbations for removed approbators and creates new approbations for
+     * newly added approbators, preserving existing approbations that weren't changed.
+     *
+     * @param Validation $validation The validation entity whose approbations need to be updated
+     * @param Request $request The HTTP request containing the updated validator selections
+     * @param Collection $approbations The collection of existing approbations associated with the validation
+     *
+     * @return void This method doesn't return any value
+     */
+    private function approbationChangeMinorModification(Validation $validation, Request $request, Collection $approbations)
+    {
+        $this->logger->info('ValidationService::approbationChangeDetermination: minor modification');
+        $diffInApprobators = $this->checkApprobatorChange($request, $validation->getUpload());
+        $this->logger->info('ValidationService::approbationChangeDetermination: diffInApprobators: ', $diffInApprobators);
+        if (!empty($diffInApprobators)) {
             foreach ($approbations as $approbation) {
-                // Remove the Approbation instance from the database
-                $this->em->remove($approbation);
-            }
-
-            // Loop through each validator_user value
-            foreach ($validator_user_values as $validator_user_value) {
-                // If the validator_user value is not null
-                if ($validator_user_value !== null || $validator_user_value !== '') {
-                    // Find the User entity using the repository and the validator_user value
-                    $validator_user = $this->userRepository->find($validator_user_value);
+                $this->logger->info('ValidationService::approbationChangeDetermination: removing approbators before checks', [$approbation]);
+                if (in_array(($approbation->getUserApprobator()->getId()), $diffInApprobators['removedApprobators'])) {
+                    $this->logger->info('ValidationService::approbationChangeDetermination: removing approbation after checks', [$approbation]);
+                    $this->em->remove($approbation);
                 }
-                // Call the createApprobationProcess method to create an Approbation process
+            }
+            foreach ($diffInApprobators['newApprobators'] as $newApprobatorId) {
+                $newApprobatorEntity = $this->userRepository->find($newApprobatorId);
+                $this->logger->info('ValidationService::approbationChangeDetermination: creating new approbation', [$newApprobatorEntity]);
                 $this->createApprobationProcess(
                     $validation,
-                    $validator_user
+                    $newApprobatorEntity
                 );
-                $validator_user = null;
             }
         }
     }
 
 
+
+
+    /**
+     * Processes approbation changes for major modifications to a validation.
+     *
+     * This method handles the complete replacement of approbations when a document undergoes
+     * major modifications. It removes all existing approbations associated with the validation
+     * and creates new approbation processes for each validator specified in the validator_user_values array.
+     *
+     * @param Validation $validation The validation entity whose approbations need to be replaced
+     * @param Collection $approbations The collection of existing approbations to be removed
+     * @param array $validator_user_values Array of user IDs to be set as new validators/approbators
+     *
+     * @return void This method doesn't return any value
+     */
+    private function approbationChangeMajorModification(Validation $validation, Collection $approbations, array $validator_user_values)
+    {
+    
+        $this->logger->info('ValidationService::approbationChangeDetermination: non minor modification');
+    
+        foreach ($approbations as $approbation) {
+            // Remove the Approbation instance from the database
+            $this->em->remove($approbation);
+        }
+    
+        // Loop through each validator_user value
+        foreach ($validator_user_values as $validator_user_value) {
+            // If the validator_user value is not null
+            if ($validator_user_value !== null || $validator_user_value !== '') {
+                // Find the User entity using the repository and the validator_user value
+                $validator_user = $this->userRepository->find($validator_user_value);
+            }
+            // Call the createApprobationProcess method to create an Approbation process
+            $this->createApprobationProcess(
+                $validation,
+                $validator_user
+            );
+            $validator_user = null;
+        }
+    }
 
 
 
@@ -537,7 +579,7 @@ class ValidationService extends AbstractController
      */
     public function updateValidationAndUploadStatus(Validation $validation, ?bool $status)
     {
-        // // $this->logger->info('updateValidationAndUploadStatus: ' . $validation->getId() . ' status: ' . $status);
+        $this->logger->info('updateValidationAndUploadStatus: ' . $validation->getId() . ' status: ' . $status);
 
         if ($validation->isStatus() === false) {
             return;
@@ -570,7 +612,7 @@ class ValidationService extends AbstractController
             $this->em->remove($oldUpload);
             $this->em->flush($oldUpload);
         }
-        // $this->logger->info('validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay());
+        $this->logger->info('validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay());
         if ($validation->isStatus() === true && $upload->isForcedDisplay() === false) {
             $this->mailerService->sendApprovalEmail($validation);
             $this->trainingRecordService->updateTrainingRecord($upload);
@@ -695,7 +737,6 @@ class ValidationService extends AbstractController
         $uploadsWaitingValidationRaw = [];
 
         $uploaders = [];
-        // $this->qualityCheckUp();
 
         if ($this->params->get('kernel.environment') !== 'dev' && ($today->format('d') % 2 == 0 && (!file_exists($filePath) || strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false))) {
 
@@ -831,7 +872,7 @@ class ValidationService extends AbstractController
      * @param Request $request The HTTP request containing the form data with validator selections
      * @param int $neededValidator The minimum number of validators required
      *
-     * @return bool Returns true if the number of selected validators is equal to or greater 
+     * @return bool Returns true if the number of selected validators is equal to or greater
      *              than the required minimum, false otherwise
      */
     public function checkNumberOfValidator(Request $request, Int $neededValidator): bool

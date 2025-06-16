@@ -182,7 +182,7 @@ class UploadModificationService extends AbstractController
                     // Reset the validation and approbation property
                     $request->request->set('modification-outlined', 'heavy-modification');
                 }
-                // This code is responsible for handling approbations resets for significant changes. I think it doubled the logic. TODO : Check and correct the code.
+
                 if ($preExistingValidation && ($modificationOutlined == null ||
                     $modificationOutlined == '' ||
                     $modificationOutlined == 'heavy-modification')) {
@@ -487,16 +487,6 @@ class UploadModificationService extends AbstractController
             [$modificationOutlined]
         );
 
-        // $isHeavyModification = $modificationOutlined == null ||
-        //     $modificationOutlined == '' ||
-        //     $modificationOutlined == 'heavy-modification';
-
-        // $this->logger->info(
-        //     'UploadModification::updateOrCreateValidation(): isHeavyModification: ',
-        //     [$isHeavyModification]
-        // );
-
-        // if ($isHeavyModification) {
             if ($preExistingValidation) {
                 $this->logger->info(
                     'UploadModification::updateOrCreateValidation(): Updating existing validation and isHeavyModification'
@@ -508,7 +498,6 @@ class UploadModificationService extends AbstractController
                 );
                 $this->validationService->createValidation($upload, $request);
             }
-        // }
     }
 
 
