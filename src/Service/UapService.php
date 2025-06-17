@@ -24,6 +24,14 @@ class UapService extends AbstractController
 
     
 
+    /**
+     * Initializes a default UAP with the name 'INDEFINI'.
+     *
+     * This function creates a new UAP entity with a predefined name,
+     * persists it to the database, and commits the transaction.
+     *
+     * @return void
+     */
     public function UapInitialization()
     {
         $uap = new Uap();
@@ -37,7 +45,15 @@ class UapService extends AbstractController
 
 
     /**
-     * Update the UAPs associated with an operator
+     * Updates the UAPs associated with an operator.
+     *
+     * This function removes the operator from all existing UAPs and then
+     * adds the operator to the specified UAPs in the provided array.
+     * If the array is empty, the function returns without making any changes.
+     *
+     * @param array $newUapsArray An array of Uap entities to associate with the operator
+     * @param Operator $operator The operator whose UAP associations will be updated
+     * @return void
      */
     public function updateOperatorUaps(array $newUapsArray, Operator $operator): void
     {

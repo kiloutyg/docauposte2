@@ -108,6 +108,34 @@ class OperatorImportService extends AbstractController
 
 
 
+    /**
+     * Processes operator data extracted from a CSV file and persists valid operators to the database.
+     *
+     * This method handles the core logic of operator import by:
+     * - Validating operator names against a regex pattern
+     * - Checking for duplicate operators to avoid conflicts
+     * - Associating operators with teams and UAPs
+     * - Validating the created operator entities
+     * - Persisting valid operators to the database within a transaction
+     *
+     * The entire operation is wrapped in a transaction to ensure data integrity.
+     * If any critical error occurs, the transaction is rolled back.
+     *
+     * @param array $ope_data An array of arrays containing operator data from the CSV file.
+     *                        Each inner array should contain operator details in the following order:
+     *                        [0] => unknown/unused
+     *                        [1] => operator code
+     *                        [2] => operator first name
+     *                        [3] => operator surname
+     *                        [4] => team name
+     *                        [5] => UAP name
+     *
+     * @return Response A Symfony Response object containing a summary of the import operation:
+     *                  - Number of successfully imported operators
+     *                  - Number of duplicates skipped
+     *                  - Number of errors encountered
+     *                  Returns HTTP 500 if a critical error occurs during processing.
+     */
     private function processOpeData($ope_data): Response
     {
         $this->logger->info('OperatorImportService::processOpeData');

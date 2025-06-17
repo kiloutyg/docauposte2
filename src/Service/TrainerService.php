@@ -110,9 +110,18 @@ class TrainerService extends AbstractController
 
 
 
+    /**
+     * Checks if a trainer has been active within the required retraining period.
+     *
+     * This function verifies if a trainer has conducted any training sessions within
+     * the configured retraining delay period. If the trainer has recent activity,
+     * their status is updated to active and their last training date is recorded.
+     *
+     * @param Operator $operator The operator with trainer status to check for activity
+     * @return bool True if the trainer has been active within the retraining period, false otherwise
+     */
     public function trainerInactivityCheck(Operator $operator): bool
     {
-
         $this->logger->info('Checking trainer activity for operator name : ' . $operator->getName());
 
         $operatorRetrainingDateInterval = $this->settingsService->getSettings()->getOperatorRetrainingDelay();

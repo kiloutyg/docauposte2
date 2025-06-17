@@ -75,6 +75,20 @@ class OperatorAdminController extends AbstractController
     }
 
 
+    /**
+     * Renders the operator administration page.
+     *
+     * This function handles the creation of new operators and the search for existing ones.
+     * It processes form submissions for new operators, handles search requests, and prepares
+     * forms for displaying and editing operators. If no search results are found, it displays
+     * deactivated operators.
+     *
+     * @param Request $request The HTTP request object containing form data, search parameters,
+     *                         and session information
+     *
+     * @return Response A rendered view containing forms for creating and editing operators,
+     *                  along with search results or deactivated operators if no search was performed
+     */
     #[Route('/operator/admin', name: 'app_operator')]
     public function operatorAdminPage(Request $request): Response
     {
@@ -284,6 +298,19 @@ class OperatorAdminController extends AbstractController
 
 
 
+    /**
+     * Manages the creation and administration of teams and UAPs (Unit Assembly Production).
+     *
+     * This function handles the display and processing of forms for creating new teams and UAPs.
+     * It initializes the necessary data structures, creates empty entities and their corresponding forms,
+     * and either displays the management interface or processes form submissions based on the request method
+     * and user permissions.
+     *
+     * @param Request $request The HTTP request object containing form data and method information
+     *
+     * @return Response A rendered view containing team and UAP management forms for GET requests
+     *                  or a redirect response after processing form submissions for POST requests
+     */
     #[Route('/operator/operator_team_or_uap_management', name: 'app_operator_team_or_uap_management')]
     public function operatorTeamUapManagement(Request $request): Response
     {
@@ -310,6 +337,20 @@ class OperatorAdminController extends AbstractController
 
 
     // Route to delete UAP or Team without breaking operators and training records database
+    /**
+     * Handles the deletion of UAP or Team entities while preserving database integrity.
+     *
+     * This function delegates the deletion process to the operatorBaseController's
+     * deleteActionOperatorController method, ensuring that related operators and
+     * training records are properly handled during the deletion process.
+     *
+     * @param string $entityType The type of entity to delete ('uap' or 'team')
+     * @param int $entityId The unique identifier of the entity to be deleted
+     * @param Request $request The HTTP request object that may contain additional parameters
+     *
+     * @return Response A response object that typically redirects to a confirmation page
+     *                  or back to the management page with a status message
+     */
     #[Route('/operator/delete-uap-or-team/{entityType}/{entityId}', name: 'app_delete_uap_or_team')]
     public function deleteUapTeamProperly(string $entityType, int $entityId, Request $request): Response
     {

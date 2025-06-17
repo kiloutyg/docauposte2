@@ -30,7 +30,6 @@ class OperatorService extends AbstractController
 {
     private     $logger;
     private     $projectDir;
-
     private     $validator;
     private    $entityManagerFacade;
     private    $trainingManagerFacade;
