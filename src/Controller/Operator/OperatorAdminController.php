@@ -215,7 +215,7 @@ class OperatorAdminController extends AbstractController
             }
         }
         // elseif ($request->getSession()->has('operatorSearchParams')) {
-        //     $this->logger->info('OperatorAdminController: editOperatorAction - operatorSearchParams', [$request->getSession()->get('operatorSearchParams')]);   
+        //     $this->logger->info('OperatorAdminController: editOperatorAction - operatorSearchParams', [$request->getSession()->get('operatorSearchParams')]);
         //     $operators = $this->operatorService->operatorEntitySearchBySession($request);
         //     foreach ($operators as $operator) {
         //         $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
