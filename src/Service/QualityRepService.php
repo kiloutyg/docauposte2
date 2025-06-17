@@ -30,6 +30,15 @@ class QualityRepService extends AbstractController
         $this->qualityRepRepository = $qualityRepRepository;
     }
 
+    /**
+     * Processes the quality report creation form by persisting the data to the database.
+     *
+     * This function extracts data from the submitted form, persists it to the database,
+     * and returns the username of the user associated with the quality report.
+     *
+     * @param Form $qualityRepForm The submitted form containing quality report data
+     * @return string The username of the user associated with the quality report
+     */
     public function qualityRepCreationFormProcessing(Form $qualityRepForm): string
     {
         try {

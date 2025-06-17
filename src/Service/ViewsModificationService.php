@@ -8,16 +8,9 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 
-use App\Repository\ButtonRepository;
-use App\Repository\CategoryRepository;
-use App\Repository\ProductLineRepository;
-use App\Repository\ZoneRepository;
-use App\Repository\UploadRepository;
-use App\Repository\OldUploadRepository;
-use App\Repository\IncidentRepository;
-use App\Repository\UserRepository;
-
 use App\Service\FolderService;
+
+use App\Service\Factory\RepositoryFactory;
 
 class ViewsModificationService extends AbstractController
 {
@@ -25,6 +18,8 @@ class ViewsModificationService extends AbstractController
     private $projectDir;
     private $logger;
 
+    private $repositoryFactory;
+    
     private $zoneRepository;
     private $productLineRepository;
     private $categoryRepository;
@@ -40,34 +35,43 @@ class ViewsModificationService extends AbstractController
         EntityManagerInterface $em,
         ParameterBagInterface $params,
         LoggerInterface $logger,
-
-        ZoneRepository $zoneRepository,
-        ProductLineRepository $productLineRepository,
-        CategoryRepository $categoryRepository,
-        ButtonRepository $buttonRepository,
-        UploadRepository $uploadRepository,
-        OldUploadRepository $oldUploadRepository,
-        IncidentRepository $incidentRepository,
-        UserRepository $userRepository,
+        RepositoryFactory $repositoryFactory,
 
         FolderService $folderService,
     ) {
         $this->em                       = $em;
         $this->projectDir               = $params->get('kernel.project_dir');
         $this->logger                   = $logger;
+        $this->repositoryFactory        = $repositoryFactory;
 
-        $this->zoneRepository           = $zoneRepository;
-        $this->productLineRepository    = $productLineRepository;
-        $this->categoryRepository       = $categoryRepository;
-        $this->buttonRepository         = $buttonRepository;
-        $this->uploadRepository         = $uploadRepository;
-        $this->oldUploadRepository      = $oldUploadRepository;
-        $this->incidentRepository       = $incidentRepository;
-        $this->userRepository           = $userRepository;
+        $this->zoneRepository           = $this->repositoryFactory->getRepository('zone');
+        $this->productLineRepository    = $this->repositoryFactory->getRepository('productLine');
+        $this->categoryRepository       = $this->repositoryFactory->getRepository('category');
+        $this->buttonRepository         = $this->repositoryFactory->getRepository('button');
+        $this->uploadRepository         = $this->repositoryFactory->getRepository('upload');
+        $this->oldUploadRepository      = $this->repositoryFactory->getRepository('oldUpload');
+        $this->incidentRepository       = $this->repositoryFactory->getRepository('incident');
+        $this->userRepository           = $this->repositoryFactory->getRepository('user');
 
         $this->folderService            = $folderService;
     }
 
+    /**
+     * Updates the sort order of all entities in the hierarchy.
+     *
+     * This method resets and reassigns sequential sort order values for all entities
+     * in the hierarchy (zones, product lines, categories, and buttons). It ensures
+     * that each entity at its respective level has a unique, sequential sort order
+     * starting from 1.
+     *
+     * The hierarchy is processed in a top-down approach:
+     * 1. Zones are processed first
+     * 2. For each zone, its product lines are processed
+     * 3. For each product line, its categories are processed
+     * 4. For each category, its buttons are processed
+     *
+     * @return void
+     */
     public function updateTheUpdatingOfTheSortOrder()
     {
         $zones = $this->zoneRepository->findAll();
@@ -100,9 +104,21 @@ class ViewsModificationService extends AbstractController
         }
         $this->em->flush();
     }
-    // 
-    // 
-    //     
+
+
+
+    /**
+     * Extracts components from a formatted key string.
+     *
+     * Parses a string in the format "entity_id_field" and extracts its components.
+     * The key is expected to have exactly three parts separated by underscores,
+     * with the middle part being a numeric ID.
+     *
+     * @param string $key The formatted key string to parse (e.g., "zone_123_name")
+     *
+     * @return array|null Returns an associative array with 'entity', 'id', and 'field' keys
+     *                    if the key is properly formatted, or null if the format is invalid
+     */
     public function extractComponentsFromKey($key)
     {
         // Split the string by underscores
@@ -118,9 +134,21 @@ class ViewsModificationService extends AbstractController
         }
         return null;
     }
-    // 
-    // 
-    //     
+
+
+
+
+    /**
+     * Determines the appropriate repository based on the entity type.
+     *
+     * This method maps an entity type string to its corresponding repository object.
+     * It supports 'zone', 'productLine', 'category', and 'button' entity types.
+     *
+     * @param string $entityType The type of entity to get the repository for
+     *
+     * @return mixed|false Returns the repository object if the entity type is valid,
+     *                     or false if the entity type is not supported
+     */
     public function defineEntityType($entityType)
     {
         $repository = null;
@@ -144,9 +172,22 @@ class ViewsModificationService extends AbstractController
         }
         return $repository;
     }
-    // 
-    // 
-    //     
+
+
+
+
+    /**
+     * Retrieves the original value of a specified field from an entity.
+     *
+     * This method extracts the current value of a given field from an entity object.
+     * It supports retrieving values for 'sortOrder', 'name', and 'creator' fields.
+     * For the 'creator' field, it returns the creator's ID or null if no creator exists.
+     *
+     * @param object $entity The entity object to extract the value from
+     * @param string $field  The field name to retrieve ('sortOrder', 'name', or 'creator')
+     *
+     * @return mixed The original value of the specified field, or null if the field is not supported
+     */
     public function defineOriginalValue($entity, $field)
     {
         $OriginalValue = null;
@@ -167,9 +208,29 @@ class ViewsModificationService extends AbstractController
         }
         return $OriginalValue;
     }
-    // 
-    // 
-    //     
+
+
+
+
+
+    /**
+     * Updates an entity's field with a new value and handles related operations.
+     *
+     * This method updates a specified field of an entity with a new value and performs
+     * any necessary related operations based on the field type. It supports updating
+     * 'sortOrder', 'name', and 'creator' fields, with different handling for each:
+     * - For sortOrder: Updates the sort order in the parent entity hierarchy
+     * - For name: Updates the name and propagates changes to folder structures
+     * - For creator: Sets a new creator entity based on the provided ID
+     *
+     * @param string $entityType    The type of entity being updated ('zone', 'productLine', 'category', 'button')
+     * @param object $entity        The entity object to be updated
+     * @param string $field         The field to update ('sortOrder', 'name', 'creator')
+     * @param mixed  $newValue      The new value to set for the field
+     * @param mixed  $originalValue The original value of the field before update (used for folder renaming)
+     *
+     * @return void
+     */
     public function updateEntity($entityType, $entity, $field, $newValue, $originalValue)
     {
 
@@ -192,9 +253,25 @@ class ViewsModificationService extends AbstractController
         $this->em->persist($entity);
         $this->em->flush();
     }
-    // 
-    // 
-    //     
+
+
+
+
+
+    /**
+     * Updates the sort order of entities when one entity's position changes.
+     *
+     * This method handles the reordering of entities when a specific entity's sort order
+     * is changed. It ensures all entities maintain a valid, sequential sort order without
+     * duplicates or gaps. If duplicate or invalid sort orders are detected, it performs
+     * a complete reorganization of all entities.
+     *
+     * @param array  $otherEntities An array of entities excluding the one being moved
+     * @param object $entity        The entity being moved to a new position
+     * @param int    $newValue      The desired new sort order value for the entity
+     *
+     * @return void
+     */
     public function updateSortOrders($otherEntities, $entity, $newValue)
     {
         $entityCount = count($otherEntities) + 1;
@@ -258,9 +335,26 @@ class ViewsModificationService extends AbstractController
         // Finally set the target entity's sort order
         $entity->setSortOrder($newValue);
     }
-    // 
-    // 
-    // 
+
+
+
+
+
+    /**
+     * Updates an entity's name to maintain the hierarchical naming inheritance pattern.
+     *
+     * This method updates an entity's name when its parent's name changes, preserving
+     * the hierarchical naming structure (e.g., "child.parent"). It extracts the entity's
+     * base name, combines it with the new parent name, and updates the entity in the database.
+     * After updating, it recursively propagates the name change to child entities.
+     *
+     * @param string $entityType    The type of entity being updated ('zone', 'productLine', 'category', 'button')
+     * @param object $entity        The entity object whose name needs to be updated
+     * @param string $newParentName The new name of the parent entity to be incorporated
+     * @param string $field         The field being updated (typically 'name')
+     *
+     * @return void
+     */
     public function updateEntityNameInheritance($entityType, $entity, $newParentName, $field)
     {
 
@@ -277,9 +371,24 @@ class ViewsModificationService extends AbstractController
 
         $this->updateByParentEntity($entityType, $entityId, $newName, $field);
     }
-    // 
-    // 
-    //     
+
+
+
+
+    /**
+     * Updates the file path for document entities based on their parent's name.
+     *
+     * This method recalculates and updates the file path for document-related entities
+     * (uploads, old uploads, and incidents) when their parent entity's name changes.
+     * It constructs a new path by parsing the hierarchical parent name structure and
+     * appending the entity's filename or name to create the complete file path.
+     *
+     * @param string $entityType     The type of document entity to update ('upload', 'oldupload', or 'incident')
+     * @param object $entity         The document entity object whose path needs to be updated
+     * @param string $newParentName  The new hierarchical name of the parent entity (dot-separated format)
+     *
+     * @return void
+     */
     public function updateDocumentPath($entityType, $entity, $newParentName)
     {
         $public_dir = $this->projectDir . '/public';
@@ -320,12 +429,32 @@ class ViewsModificationService extends AbstractController
                 break;
         }
     }
-    // 
-    //     
-    //     
+
+
+
+
+
+
+    /**
+     * Updates an entity and propagates changes to its child entities based on the entity type and field.
+     *
+     * This method handles cascading updates through the entity hierarchy when a parent entity
+     * is modified. It supports different update behaviors based on the entity type (zone, productLine,
+     * category, button, upload, incident, oldupload) and the field being updated (name, sortOrder, creator).
+     * For name changes, it updates the hierarchical naming of child entities. For sort order changes,
+     * it reorders entities within their parent context. For creator changes, it propagates the creator
+     * to child entities.
+     *
+     * @param string $entityType    The type of entity being updated ('zone', 'productLine', 'category', 'button', etc.)
+     * @param int    $id            The ID of the entity to update
+     * @param mixed  $newName       The new value for the field (despite the parameter name, this is used for any field value)
+     * @param string $field         The field being updated ('name', 'sortOrder', 'creator')
+     * @param mixed  $originalValue The original value of the field before update (optional, used for certain operations)
+     *
+     * @return array An empty array if the entity or repository is not found, otherwise no explicit return value
+     */
     public function updateByParentEntity($entityType, $id, $newName, $field, $originalValue = null)
     {
-
         // Get the repository of the entity type
         $repository = null;
         switch ($entityType) {
@@ -363,7 +492,7 @@ class ViewsModificationService extends AbstractController
         }
         // Get the entity from the database and return an empty array if it doesn't exist
         $entity = $repository->find($id);
-        // $this->logger->info('updateByParentEntity: entityName: ' . $entity->getName());
+        $this->logger->info('updateByParentEntity: entityName: ' . $entity->getName());
         if (!$entity) {
             return [];
         }
@@ -398,7 +527,6 @@ class ViewsModificationService extends AbstractController
                     $this->updateEntityNameInheritance('button', $button, $newName, $field);
                 }
             } elseif ($field === 'sortOrder') {
-                $parentEntityId = $entity->getProductLine()->getId();
                 $this->updateSortOrders($repository->findAllExceptOne($id), $entity, $newName);
             }
         } elseif ($entityType === 'button') {

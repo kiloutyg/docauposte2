@@ -15,6 +15,14 @@ class TeamService extends AbstractController
         $this->em = $em;
     }
 
+    /**
+     * Initializes a default team with the name 'INDEFINI'.
+     *
+     * This function creates a new Team entity, sets its name to 'INDEFINI',
+     * persists it to the database, and then flushes the changes.
+     *
+     * @return void
+     */
     public function teamInitialization()
     {
         $team = new Team();

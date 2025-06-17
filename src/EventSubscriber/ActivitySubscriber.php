@@ -22,12 +22,26 @@ class ActivitySubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
 
         // Skip AJAX inactivity checks
-        if ($request->getPathInfo() === '/inactivity_check' || $request->getPathInfo() === '/cycling_incident' || $request->getPathInfo() === '/api/settings'  || $request->getPathInfo() === '/api/user_data'  || $request->getPathInfo() === '/api/entity_data') {
+        if (
+            $request->getPathInfo() === '/inactivity_check' ||
+            $request->getPathInfo() === '/cycling_incident' ||
+            $request->getPathInfo() === '/api/settings'  ||
+            $request->getPathInfo() === '/api/user_data'  ||
+            $request->getPathInfo() === '/api/entity_data'
+        ) {
             return;
         }
         $stuff_route = $request->attributes->get('_route');
 
-        if ($request->isXmlHttpRequest() || !in_array($stuff_route, ['app_zone', 'app_productLine', 'app_category', 'app_button'])) {
+        if (
+            $request->isXmlHttpRequest() ||
+            !in_array($stuff_route, [
+                'app_zone',
+                'app_productLine',
+                'app_category',
+                'app_button'
+            ])
+        ) {
             return;
         }
 
@@ -47,7 +61,6 @@ class ActivitySubscriber implements EventSubscriberInterface
 
         $stuff_param = $request->attributes->get('_route_params');
         $session->set('stuff_param', $stuff_param);
-
     }
 
     public static function getSubscribedEvents()

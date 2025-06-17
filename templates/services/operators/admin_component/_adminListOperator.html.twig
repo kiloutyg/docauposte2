@@ -30,58 +30,59 @@
 			</div>
 		</div>
 	</ul>
+<ul>
+	{% if operatorForms|length > 0 %}
 
-	<ul>
-		{% if operatorForms|length > 0 %}
-
-			{% for operatorId, operatorForm in operatorForms %}
+		{% for operatorId, operatorForm in operatorForms %}
 			{% form_theme operatorForm 'bootstrap_5_layout.html.twig' %}
-				{% if operatorForm.vars.data.tobedeleted is not empty %}
-					{{ form_start(operatorForm, {'attr': {'class': 'row bg-dark', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'operator': operatorId})}) }}
-				{% else %}
-					{{ form_start(operatorForm, {'attr': {'class': 'row', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'operator': operatorId})}) }}
-				{% endif %}
+			{% if operatorForm.vars.data.tobedeleted is not empty %}
+				{{ form_start(operatorForm, {'attr': {'class': 'row bg-dark', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'operator': operatorId})}) }}
+			{% else %}
+				{{ form_start(operatorForm, {'attr': {'class': 'row', 'id': 'operatorForm' ~ operatorId, 'data-controller': 'operator-admin-edit'}, 'action': path('app_operator_edit', {'operator': operatorId})}) }}
+			{% endif %}
 
-				{% for field in fields %}
-     				{% set customId = 'operatorForm' ~ field|capitalize ~ operatorId %}
-					{{ form_row(operatorForm[field], 
+			{% for field in fields %}
+				{% set customId = 'operatorForm' ~ field|capitalize ~ operatorId %}
+				{{ form_row(operatorForm[field], 
 					{						
 					'id': customId,
 					'attr': {
 						'data-action': field == 'code' ? 'keyup->operator-admin-edit#editedCodeChecker' : null,
-						'data-operator-admin-edit-target': field == 'isTrainer' ? 'operatorFormIsTrainer' : 'operatorForm' ~ field|capitalize}}) }}
-				{% endfor %}
-				{% if operatorForm.vars.data.tobedeleted is not empty %}
-					<div
-						class="col my-auto mx-auto">
-						<button
-							type="submit"
-							class="btn btn-primary text-uppercase ">
-							Réactualiser
-						</button>
-						<a
-							href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase delete-operator">
-							Supprimer
-						</a>
-					</div>
-				{% else %}
-					<div
-						class="col-2 my-auto mx-auto">
-						<button
-							type="submit"
-							class="btn btn-primary text-uppercase submit-operator-modification">
-							Modifier l'Opé
-						</button>
-						<a
-							href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase delete-operator">
-							Supprimer
-						</a>
-						<a
-							href="{{ path('app_operator_detail', {'operatorId': operatorId}) }}" class="btn btn-light text-uppercase"  target="_blank">
-							Code
-						</a>
-					</div>
-				{% endif %}
+						'data-operator-admin-edit-target': field == 'isTrainer' ? 'operatorFormIsTrainer' : 'operatorForm' ~ field|capitalize}}
+				) }}
+			{% endfor %}
+			{% if operatorForm.vars.data.tobedeleted is not empty %}
+				<div
+					class="col my-auto mx-auto">
+					<button
+						type="submit"
+						class="btn btn-primary text-uppercase ">
+						Réactualiser
+					</button>
+					<a
+						href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase delete-operator">
+						Supprimer
+					</a>
+				</div>
+			{% else %}
+				<div
+					class="col-2 my-auto mx-auto">
+					<button
+						type="submit"
+						class="btn btn-primary text-uppercase submit-operator-modification">
+						Modifier l'Opé
+					</button>
+					<a
+						href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase delete-operator">
+						Supprimer
+					</a>
+					<a
+						href="{{ path('app_operator_detail', {'operatorId': operatorId}) }}" class="btn btn-light text-uppercase"
+						target="_blank">
+						Code
+					</a>
+				</div>
+			{% endif %}
 			{{ form_end(operatorForm) }}
 			<hr
 				class="my-4">

@@ -41,6 +41,13 @@ class SettingsService extends AbstractController
 
 
     // This function is responsible for getting the settings from the database and creating a form
+    /**
+     * Gets the settings form.
+     *
+     * This function is responsible for getting the settings from the database and creating a form.
+     *
+     * @return FormInterface The form object containing the settings entity
+     */
     public function getSettingsForm(): FormInterface
     {
         $settingsEntity = $this->getSettings();
@@ -51,6 +58,15 @@ class SettingsService extends AbstractController
 
 
     // This function is responsible for getting all the settings from the database
+    /**
+     * Retrieves the application settings from the database.
+     *
+     * This function checks if settings are already loaded in memory. If not, it fetches them
+     * from the repository. If no settings exist in the database, it creates default settings
+     * with two departments ('I.T.' and 'QUALITY') and persists them to the database.
+     *
+     * @return Settings The settings entity containing all application configuration
+     */
     public function getSettings(): Settings
     {
         if (null === $this->settings) {
@@ -77,6 +93,17 @@ class SettingsService extends AbstractController
 
 
     // This function is responsible for updating the settings in the database
+    /**
+     * Updates the application settings in the database.
+     *
+     * This function processes the submitted settings form, validates the data,
+     * and persists the updated settings to the database. If successful, it returns
+     * a Response with a boolean true. If an error occurs during the update process,
+     * it logs the error and returns a Response containing the error message.
+     *
+     * @param Request $request The HTTP request containing the submitted form data
+     * @return Response A Response object containing either true on success or an error message on failure
+     */
     public function updateSettings(Request $request): Response
     {
         $settingsEntity = $this->getSettings();
@@ -106,6 +133,15 @@ class SettingsService extends AbstractController
 
 
 
+    /**
+     * Retrieves the auto-display timer duration for incidents in seconds.
+     *
+     * This function checks if the timer value is already loaded in memory.
+     * If not, it fetches the value from the settings repository.
+     * The timer controls how long incidents are automatically displayed.
+     *
+     * @return int|null The incident auto-display timer duration in seconds
+     */
     public function getIncidentAutoDisplayTimerInSeconds()
     {
         if ($this->incidentAutoDisplayTimerInSeconds === null) {
@@ -115,6 +151,14 @@ class SettingsService extends AbstractController
     }
 
 
+    /**
+     * Retrieves the current operator code regex pattern from settings.
+     *
+     * This function gets the regular expression pattern used for validating
+     * operator codes from the application settings.
+     *
+     * @return string The regular expression pattern for operator code validation
+     */
     public function getCurrentCodeOpeRegexPattern(): string
     {
         return $this->getSettings()->getOperatorCodeRegex();

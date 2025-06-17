@@ -10,6 +10,18 @@ use TomasVotruba\BarcodeBundle\Base2DBarcode;
 class PdfGeneratorService
 {
 
+    /**
+     * Generates a PDF document containing operator information with barcodes.
+     *
+     * This function creates a PDF with the operator's name, a Code128 barcode,
+     * and a Data Matrix barcode representing the operator's code.
+     *
+     * @param object $operator The operator object containing name and code information
+     *                         Must have getName() and getCode() methods
+     *
+     * @return string The generated PDF document as a string, sent to the browser
+     *                with filename 'OpeInfo_[operator name].pdf'
+     */
     public function generateOperatorPdf($operator)
     {
         // Create a new PDF document

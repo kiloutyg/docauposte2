@@ -23,6 +23,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Component\Routing\Annotation\Route;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * UploadController
  *
@@ -66,6 +68,8 @@ class UploadController extends AbstractController
      */
     private $absentFileId = 'No File with this ID exist';
 
+    private $logger;
+
     /**
      * Constructor for UploadController
      *
@@ -77,6 +81,7 @@ class UploadController extends AbstractController
      * @param SettingsService $settingsService Service for accessing application settings
      * @param EntityManagerFacade $entityManagerFacade Facade for entity management operations
      * @param ContentManagerFacade $contentManagerFacade Facade for content management operations
+     * @param LoggerInterface $logger The logging service for recording operations
      */
     public function __construct(
         // Services classes
@@ -87,6 +92,8 @@ class UploadController extends AbstractController
         // Facade classes
         EntityManagerFacade             $entityManagerFacade,
         ContentManagerFacade            $contentManagerFacade,
+        LoggerInterface                 $logger,
+        // Other variables and constants
 
     ) {
         // Variables related to the services
@@ -97,6 +104,8 @@ class UploadController extends AbstractController
         // Variables related to the facades
         $this->entityManagerFacade          = $entityManagerFacade;
         $this->contentManagerFacade         = $contentManagerFacade;
+        // Other variables and constants
+        $this->logger                       = $logger;
     }
 
     /**
@@ -161,12 +170,7 @@ class UploadController extends AbstractController
         // Find the Button entity in the repository based on its ID
         $buttonEntity = $this->entityManagerFacade->find('button', $button);
 
-        // Filename checks to see if compliant and if a newname has been chosen by user
-        if (!$this->contentManagerFacade->filenameChecks($request, $request->request->get('newFilename'))) {
-            return $this->redirect($originUrl);
-        } else {
-            $filename = $this->contentManagerFacade->filenameChecks($request, $request->request->get('newFilename'));
-        }
+        $filename = $this->contentManagerFacade->filenameChecks($request, $request->request->get('newFilename'));
 
         // Check if the file already exists by comparing the filename and the button
         $conflictFile = '';
@@ -174,11 +178,13 @@ class UploadController extends AbstractController
         // If the file already exists, return an error message
         if ($conflictFile) {
             $this->addFlash('error', 'Le fichier ' . $filename . ' existe déjà.');
+            $this->logger->error('UploadController::genericUploadFiles - File upload conflict', ['filename' => $filename]);
             return $this->redirect($originUrl);
         } else {
             // Use the UploadService to handle file uploads
             $name = $this->uploadService->uploadFiles($request, $buttonEntity, $user, $filename);
             $this->addFlash('success', 'Le document ' . $name . ' a été correctement chargé');
+            $this->logger->notice('UploadController::genericUploadFiles - File uploaded', ['filename' => $name]);
             return $this->redirect($originUrl);
         }
     }

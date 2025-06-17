@@ -30,7 +30,6 @@ class OperatorService extends AbstractController
 {
     private     $logger;
     private     $projectDir;
-
     private     $validator;
     private    $entityManagerFacade;
     private    $trainingManagerFacade;
@@ -276,7 +275,6 @@ class OperatorService extends AbstractController
      */
     public function processOperatorFromRequest(string $operatorName, int $operatorCode, int $teamId, int $uapId)
     {
-
         $team = $this->entityManagerFacade->find('team', $teamId);
         $uap = $this->entityManagerFacade->find('uap', $uapId);
         $em = $this->entityManagerFacade->getEntityManager();
@@ -400,7 +398,7 @@ class OperatorService extends AbstractController
      * @param Request $request The HTTP request containing search parameters.
      * @return array Search results.
      */
-    public function operatorEntitySearch(Request $request): array
+    public function operatorEntitySearchByRequest(Request $request): array
     {
         if ($request->getContentTypeFormat() == 'json') {
             $data = json_decode($request->getContent(), true);
@@ -416,8 +414,56 @@ class OperatorService extends AbstractController
             $uap        = $request->request->get('search_uap');
             $trainer    = $request->request->get('search_trainer');
         }
+        $session = $request->getSession();
+
+        if (!$session->isStarted()) {
+            $session->start();
+        }
+
+        $session->set('operatorSearchParams', ['searched_name' => $name, 'searched_code' => $code, 'searched_team' => $team, 'searched_uap' => $uap, 'searched_trainer' => $trainer]);
+
+
         return $this->entityManagerFacade->findBySearchQuery($name, $code, $team, $uap, $trainer);
     }
+
+
+
+    /**
+     * Retrieves operators based on search parameters stored in the session.
+     *
+     * This function loads previously saved search criteria from the session and uses them
+     * to perform a search for operators. It's typically used to maintain search state
+     * between page loads or after redirects.
+     *
+     * @param Request $request The HTTP request object containing the session
+     *
+     * @return array An array of operator entities matching the search criteria
+     */
+    public function operatorEntitySearchBySession(Request $request): array
+    {
+        $this->logger->info('OperatorService::operatorEntitySearchBySession');
+        $operatorSearchParams = $request->getSession()->get('operatorSearchParams') ?? [];
+        $this->logger->info('OperatorService::operatorEntitySearchBySession - operatorSearchParams', [$operatorSearchParams]);
+
+        if (!empty($operatorSearchParams)) {
+            $name       = $operatorSearchParams['searched_name'] ?? "";
+            $code       = $operatorSearchParams['searched_code'] ?? "";
+            $team       = $operatorSearchParams['searched_team'] ?? "";
+            $uap        = $operatorSearchParams['searched_uap'] ?? "";
+            $trainer    = $operatorSearchParams['searched_trainer'] ?? "";
+        }
+
+        $this->logger->info('OperatorService::operatorEntitySearchBySession - operatorSearchParams - elements', [
+            'name' => $name,
+            'code' => $code,
+            'team' => $team,
+            'uap' => $uap,
+            'trainer' => $trainer
+        ]);
+
+        return $this->entityManagerFacade->findBySearchQuery($name, $code, $team, $uap, $trainer);
+    }
+
 
 
 
@@ -491,8 +537,8 @@ class OperatorService extends AbstractController
      * @return Response The HTTP response (redirect).
      */
     public function deleteActionOperatorService(string $entityType, int $entityId, ?Request $request = null): Response
-
     {
+        $this->logger->info('OperatorService::deleteActionOperatorService - entityType: ' . $entityType . '- entityId: ' . $entityId);
         $result = $this->entityManagerFacade->deleteEntity($entityType, $entityId);
 
         if (!$result) {
@@ -500,13 +546,15 @@ class OperatorService extends AbstractController
         } else {
             $this->addFlash('success', $entityType . ' a bien été supprimé');
         }
-
+        $this->logger->info('OperatorService::deleteActionOperatorService - After deletion and before redirect');
         // Check if this is a Turbo frame request
         if ($request && $request->headers->get('Turbo-Frame')) {
+            $this->logger->info('OperatorService::deleteActionOperatorService - Turbo frame request detected');
             // For Turbo frame requests, redirect to the edit route with a dummy operator ID
             // This will trigger the editOperatorAction which renders the correct template
             return $this->redirectToRoute('app_operator_edit', ['operator' => $entityId]);
         } else {
+            $this->logger->info('OperatorService::deleteActionOperatorService - Regular request detected');
             // For regular requests, redirect to the referring page
             $originUrl = $request->headers->get('referer') ?? 'app_base';
             return $this->redirect($originUrl);
