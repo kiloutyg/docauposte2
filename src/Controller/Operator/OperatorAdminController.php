@@ -208,6 +208,19 @@ class OperatorAdminController extends AbstractController
 
 
     // Route to delete operator from the administrator view
+    /**
+     * Handles the deletion of an operator entity.
+     *
+     * This function delegates the deletion process to the operatorBaseController's
+     * deleteActionOperatorController method, specifying that an 'operator' entity
+     * should be deleted.
+     *
+     * @param int $id The unique identifier of the operator to be deleted
+     * @param Request $request The HTTP request object that may contain additional parameters
+     *
+     * @return Response A response object that typically redirects to a confirmation page
+     *                  or back to the operator listing with a status message
+     */
     #[Route('/operator/delete/{id}', name: 'app_operator_delete')]
     public function deleteOperatorAction(int $id, Request $request): Response
     {
