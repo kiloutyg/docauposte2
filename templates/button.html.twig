@@ -12,6 +12,18 @@
 	{{ encore_entry_script_tags('document-validator') }}
 	{{ encore_entry_script_tags('cascading-dropdowns') }}
 	{{ encore_entry_script_tags('inactivity-timer') }}
+	<script>
+	var zoneIdFromServer = {{ button.category.productLine.zone.getId()|default('null')|json_encode|raw }};
+</script>
+<script>
+	var productLineIdFromServer = {{ button.category.productLine.getId()|default('null')|json_encode|raw }};
+</script>
+<script>
+	var categoryIdFromServer = {{ button.category.getId()|default('null')|json_encode|raw }};
+</script>
+<script>
+	var buttonIdFromServer = {{ button.getId()|default('null')|json_encode|raw }};
+</script>
 {% endblock %}
 
 {% block body %}

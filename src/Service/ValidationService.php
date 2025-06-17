@@ -79,7 +79,7 @@ class ValidationService extends AbstractController
      *
      * @return Validation The newly created and persisted Validation entity
      */
-    public function createValidation(Upload $upload, Request $request)
+    public function createValidation(Upload $upload, Request $request): void
     {
 
         $this->logger->info('ValidationService::createValidation : request: ', [$request->request->all()]);
@@ -141,9 +141,6 @@ class ValidationService extends AbstractController
 
         // Send a notification email to the validator
         $this->mailerService->approbationEmail($validation);
-
-        // Return the Validation instance
-        return $validation;
     }
 
 

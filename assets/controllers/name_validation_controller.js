@@ -1,7 +1,14 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class NameValidationController extends Controller {
-    static targets = ["teamName", "uapName", "teamUapNameMessage", "productName", "productNameMessage", "workstationName", "workstationNameMessage", "saveButton"];
+    static targets = ["teamName",
+        "uapName",
+        "teamUapNameMessage",
+        "productName",
+        "productNameMessage",
+        "workstationName",
+        "workstationNameMessage",
+        "saveButton"];
 
     /**
      * Lifecycle method called when the controller is connected to the DOM.

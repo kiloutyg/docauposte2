@@ -78,6 +78,9 @@ class OperatorAdminController extends AbstractController
     #[Route('/operator/admin', name: 'app_operator')]
     public function operatorAdminPage(Request $request): Response
     {
+
+        $this->logger->info('OperatorAdminController: operatorAdminPage');
+
         $newOperator = new Operator();
         $newOperatorForm = $this->createForm(OperatorType::class, $newOperator);
         $newOperatorForm->handleRequest($request);
@@ -102,17 +105,20 @@ class OperatorAdminController extends AbstractController
         }
 
         if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
-            $operators = $this->operatorService->operatorEntitySearch($request);
+            $operators = $this->operatorService->operatorEntitySearchByRequest($request);
+            // } elseif ($request->getSession()->has('operatorSearchParams')) {
+            //     $operators = $this->operatorService->operatorEntitySearchBySession($request);
         } else {
             $operators = [];
         }
 
+
         $operatorForms = [];
-        $this->logger->info('operators', [$operators]);
+        $this->logger->info('OperatorAdminController: operatorAdminPage - operators', [$operators]);
 
         // Create and handle forms
         foreach ($operators as $operator) {
-            $this->logger->info('operator', [$operator->getUaps()->getValues()]);
+            $this->logger->info('OperatorAdminController: operatorAdminPage - operator', [$operator->getUaps()->getValues()]);
 
             $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
                 'operator_id' => $operator->getId(),
@@ -120,6 +126,7 @@ class OperatorAdminController extends AbstractController
         }
 
         if (empty($operatorForms)) {
+            $this->logger->info('OperatorAdminController: operatorAdminPage - operatorForms is empty');
             $inActiveOperators = $this->operatorRepository->findDeactivatedOperators();
             foreach ($inActiveOperators as $operator) {
                 $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
@@ -127,6 +134,8 @@ class OperatorAdminController extends AbstractController
                 ])->createView();
             }
         }
+
+        $this->logger->info('OperatorAdminController::operatorAdminPage', ['operators' => $operators, 'operatorForms' => $operatorForms]);
 
         return $this->render('services/operators/operators_admin.html.twig', [
             'newOperatorForm'   => $newOperatorForm->createView(),
@@ -156,20 +165,15 @@ class OperatorAdminController extends AbstractController
     public function editOperatorAction(Request $request, ?Operator $operator = null): Response
     {
 
+        $this->logger->info('OperatorAdminController::editOperatorAction', ['operator' => $operator]);
+
+        $operators = [];
         $operatorForms = [];
         $form = null;
-        if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
-            $operators = $this->operatorService->operatorEntitySearch($request);
 
-            // Create and handle forms
-            foreach ($operators as $operator) {
-                $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
-                    'operator_id' => $operator->getId(),
-                ])->createView();
-            }
-        }
 
         if ($operator) {
+
             $form = $this->createForm(OperatorType::class, $operator, [
                 'operator_id' => $operator->getId(),
             ]);
@@ -180,6 +184,7 @@ class OperatorAdminController extends AbstractController
                 try {
                     $this->operatorService->editOperatorService($form, $operator);
                     $this->addFlash('success', 'L\'opérateur a bien été modifié');
+                    $this->logger->notice('Operator updated successfully', ['operator' => $operator]);
                 } catch (\Exception $e) {
                     $this->addFlash('danger', 'L\'opérateur n\'a pas pu être modifié. Erreur: ' . $e->getMessage());
                     $this->logger->error('Error while editing operator in try catch', [$e->getMessage()]);
@@ -196,6 +201,33 @@ class OperatorAdminController extends AbstractController
             }
         }
 
+
+        if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
+            $operators = $this->operatorService->operatorEntitySearchByRequest($request);
+
+            $this->logger->info('OperatorAdminController: editOperatorAction - operators with request key search', [$operators]);
+
+            foreach ($operators as $operator) {
+                $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
+                    'operator_id' => $operator->getId(),
+                ])->createView();
+                $this->logger->info('OperatorAdminController: editOperatorAction - operator', [$operator]);
+            }
+        }
+        // elseif ($request->getSession()->has('operatorSearchParams')) {
+        //     $this->logger->info('OperatorAdminController: editOperatorAction - operatorSearchParams', [$request->getSession()->get('operatorSearchParams')]);   
+        //     $operators = $this->operatorService->operatorEntitySearchBySession($request);
+        //     foreach ($operators as $operator) {
+        //         $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
+        //             'operator_id' => $operator->getId(),
+        //         ])->createView();
+        //         $this->logger->info('OperatorAdminController: editOperatorAction - operator', [$operator]);
+        //     }
+        // }
+
+
+
+        $this->logger->info('OperatorAdminController::editOperatorAction', ['operators' => $operators, 'operatorForms' => $operatorForms]);
         return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
             'form' => $form?->createView(),
             'operator' => $operator ?? null,
