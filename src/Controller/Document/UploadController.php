@@ -464,4 +464,6 @@ class UploadController extends AbstractController
             $this->addFlash('error', 'Invalid form. Could not get submitted. Check the entered data.');
         }
     }
+
+    
 }

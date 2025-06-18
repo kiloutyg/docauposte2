@@ -355,8 +355,8 @@ class TrainingRecordService extends AbstractController
         $trainingRecords = $this->trainingRecordRepository->findBy(['upload' => $uploadEntity]);
         $this->logger->info('TrainingRecordService: cheatTrain: trainingRecords: ', [count($trainingRecords)]);
         foreach ($trainingRecords as $trainingRecord) {
-            if ($trainingRecord->isTrained() === false) {
-                $trainingRecord->setTrained(true);
+            if ($trainingRecord->isTrained() === true) {
+                $trainingRecord->setTrained(false);
                 $this->em->persist($trainingRecord);
                 $this->em->flush();
             }
@@ -364,6 +364,17 @@ class TrainingRecordService extends AbstractController
     }
 
 
+    /**
+     * Compares the upload date with the latest training record date.
+     *
+     * This method determines if an upload is newer than the most recent training record
+     * associated with it. This is useful for identifying uploads that require new training
+     * because their content has been updated since the last training session.
+     *
+     * @param Upload $upload The upload entity to check against training records
+     * @return bool Returns true if the upload date is more recent than the latest training date,
+     *              indicating that new training is required; false otherwise
+     */
     public function lastTrainingDateUploadDateComparison(Upload $upload)
     {
         $response = false;

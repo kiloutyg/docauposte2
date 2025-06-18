@@ -141,7 +141,7 @@ class ValidationService extends AbstractController
 
         // Send a notification email to the validator
         $this->mailerService->approbationEmail($validation);
-        
+
         $minorModification = $request->request->get(key: 'modification-outlined') === 'minor-modification';
 
         if (!$minorModification && $request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
@@ -199,7 +199,7 @@ class ValidationService extends AbstractController
 
         // Send a notification email to the validator
         $this->mailerService->approbationEmail($validation);
-        // $this->logger->info('forcedDisplay: ' . $upload->isForcedDisplay() . ' training-needed: ' . $request->request->get('training-needed') . ' display-needed: ' . $request->request->get('display-needed'));
+        $this->logger->info('forcedDisplay: ' . $upload->isForcedDisplay() . ' training-needed: ' . $request->request->get('training-needed') . ' display-needed: ' . $request->request->get('display-needed'));
         if (!$minorModification && $request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
             $this->trainingRecordService->updateTrainingRecord($upload);
         }
@@ -627,7 +627,9 @@ class ValidationService extends AbstractController
         }
         $this->logger->info('ValidationService::updateValidationAndUploadStatus - validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay() . ' upload->isTraining(): ' . $upload->isTraining() . ' $this->trainingRecordService->lastTrainingDateUploadDateComparison($upload): ' . $this->trainingRecordService->lastTrainingDateUploadDateComparison($upload));
 
-        if ($upload->isTraining() && $validation->isStatus() && ($this->trainingRecordService->lastTrainingDateUploadDateComparison($upload) || !$upload->isForcedDisplay())) {
+        if ($upload->isTraining() &&
+         $validation->isStatus() &&
+         ($this->trainingRecordService->lastTrainingDateUploadDateComparison($upload) || !$upload->isForcedDisplay())) {
             $this->logger->info('ValidationService::updateValidationAndUploadStatus() - $upload->isTraining() && $validation->isStatus() && ($this->trainingRecordService->lastTrainingDateUploadDateComparison($upload) || !$upload->isForcedDisplay())');
             $this->trainingRecordService->updateTrainingRecord($upload);
             $this->logger->info('ValidationService::updateValidationAndUploadStatus() - Sending approval email to uploader');
