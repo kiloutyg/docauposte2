@@ -141,6 +141,12 @@ class ValidationService extends AbstractController
 
         // Send a notification email to the validator
         $this->mailerService->approbationEmail($validation);
+        
+        $minorModification = $request->request->get(key: 'modification-outlined') === 'minor-modification';
+
+        if (!$minorModification && $request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
+            $this->trainingRecordService->updateTrainingRecord($upload);
+        }
     }
 
 
@@ -171,7 +177,7 @@ class ValidationService extends AbstractController
         // Store the comment in a variable
         $comment = $request->request->get('modificationComment');
 
-        $minorModification = $request->request->get('modification-outlined') === 'minor-modification';
+        $minorModification = $request->request->get(key: 'modification-outlined') === 'minor-modification';
 
         if ($minorModification) {
             $comment = $comment . ' (modification mineure)';
@@ -476,8 +482,9 @@ class ValidationService extends AbstractController
      */
     public function validationApproval(Approbation $approbation, Request $request): bool
     {
-        // Set return bool value to true
-        $return = true;
+        $this->logger->info('ValidationService::validationApproval()');
+        // Set response bool value to true
+        $response = true;
 
         // Get the value of the 'approvalRadio' input from the request
         $approvalStr = $request->request->get('approvalRadio');
@@ -506,12 +513,15 @@ class ValidationService extends AbstractController
         $validation = $approbation->getValidation();
 
         if ($approbation->isApproval() === false) {
-            $return = false;
+            $response = false;
             $this->mailerService->sendDisapprobationEmail($validation);
         }
         // Call the approbationCheck method to check if all approbations are approved
         $this->approbationCheck($validation);
-        return $return;
+
+        $this->logger->info('ValidationService::validationApproval() - response: ', [$response]);
+
+        return $response;
     }
 
 
@@ -533,6 +543,9 @@ class ValidationService extends AbstractController
      */
     public function approbationCheck(Validation $validation)
     {
+
+        $this->logger->info('ValidationService::approbationCheck() - validationId: ', [$validation]);
+
         // Get the ID of the Validation instance
         $validationId = $validation->getId();
 
@@ -545,12 +558,15 @@ class ValidationService extends AbstractController
         $noApprobations  = $this->approbationRepository->findBy(['Validation' => $validationId, 'approval' => null]);
 
         if ($negApprobations) {
+            $this->logger->notice('ValidationService::approbationCheck() - Validation has rejected approbations');
             $status = false;
             $this->updateValidationAndUploadStatus($validation, $status);
         } elseif ($noApprobations) {
+            $this->logger->notice('ValidationService::approbationCheck() - Validation has no approbations');
             $status = null;
             return;
         } elseif (count($posApprobations) === $approbationCount) {
+            $this->logger->notice('ValidationService::approbationCheck() - Validation has all approbations approved');
             $status = true;
             $this->updateValidationAndUploadStatus($validation, $status);
         }
@@ -576,7 +592,7 @@ class ValidationService extends AbstractController
      */
     public function updateValidationAndUploadStatus(Validation $validation, ?bool $status)
     {
-        $this->logger->info('updateValidationAndUploadStatus: ' . $validation->getId() . ' status: ' . $status);
+        $this->logger->info('ValidationService::updateValidationAndUploadStatus: ' . $validation->getId() . ' status: ' . $status);
 
         if ($validation->isStatus() === false) {
             return;
@@ -609,10 +625,13 @@ class ValidationService extends AbstractController
             $this->em->remove($oldUpload);
             $this->em->flush($oldUpload);
         }
-        $this->logger->info('validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay());
-        if ($validation->isStatus() === true && $upload->isForcedDisplay() === false) {
-            $this->mailerService->sendApprovalEmail($validation);
+        $this->logger->info('ValidationService::updateValidationAndUploadStatus - validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay() . ' upload->isTraining(): ' . $upload->isTraining() . ' $this->trainingRecordService->lastTrainingDateUploadDateComparison($upload): ' . $this->trainingRecordService->lastTrainingDateUploadDateComparison($upload));
+
+        if ($upload->isTraining() && $validation->isStatus() && ($this->trainingRecordService->lastTrainingDateUploadDateComparison($upload) || !$upload->isForcedDisplay())) {
+            $this->logger->info('ValidationService::updateValidationAndUploadStatus() - $upload->isTraining() && $validation->isStatus() && ($this->trainingRecordService->lastTrainingDateUploadDateComparison($upload) || !$upload->isForcedDisplay())');
             $this->trainingRecordService->updateTrainingRecord($upload);
+            $this->logger->info('ValidationService::updateValidationAndUploadStatus() - Sending approval email to uploader');
+            $this->mailerService->sendApprovalEmail($validation);
         } elseif ($validation->isStatus() === true) {
             $this->mailerService->sendApprovalEmail($validation);
         }
@@ -641,6 +660,7 @@ class ValidationService extends AbstractController
      */
     public function resetApprobation(Upload $upload, Request $request, ?bool $globalModification = false)
     {
+        $this->logger->info('ValidationService::resetApprobation() - uploadId: ' . $upload->getId());
         if ($upload->getValidation() == null) {
             return;
         }
@@ -708,8 +728,6 @@ class ValidationService extends AbstractController
         if ($request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
             $this->trainingRecordService->updateTrainingRecord($upload);
         }
-        // Return early
-        return;
     }
 
 
