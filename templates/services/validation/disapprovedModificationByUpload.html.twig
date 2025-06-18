@@ -58,7 +58,8 @@
 				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyDisapprovedForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_validation_disapproved_modify_by_upload', {'uploadId': upload.id})}) }}
 
 				<div
-					class="fallback">
+					class="fallback"
+					data-controller="filename-validation">
 					{% set toBeCorrected = [] %}
 					{% for upload in app.user.uploads %}
 						{% if upload.isValidated is same as (false) %}
@@ -151,13 +152,18 @@
 					<hr
 						class="my-4">
 					<div
-						class="row justify-content-center ">
+						class="row justify-content-center">
+
 						<div
 							class="col-8">
 							{{ form_label(form.file, 'Choisissez un ficher à ajouter :', {'label_attr': {'class': 'form-label', 'style': 'color:white'}}
 							) }}
+
 							{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}
 							) }}
+							<div
+								data-filename-validation-target="message"
+								class="filename-message"></div>
 							<div
 								class="d-flex align-items-left mt-2 ">
 								{{ include('services/operators/training_toggles/training_toggle_component.html.twig', {checkStatus: false}) }}

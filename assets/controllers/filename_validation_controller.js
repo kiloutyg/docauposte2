@@ -4,7 +4,7 @@ export default class FilenameValidationController extends Controller {
     static targets = ["filename", "newFilename", "message"];
 
     validateFilename(event) {
-        const regex = /^[\p{L}0-9][\p{L}0-9() _.'-]{2,253}[\p{L}0-9]$/gmu;
+        const regex = /^[\p{L}0-9()][\p{L}0-9()_.'-]{2,253}[\p{L}0-9]$/gmu;
 
         let isValid = true;
         const fileInput = this.filenameTarget;
@@ -30,7 +30,7 @@ export default class FilenameValidationController extends Controller {
         }
     }
     validateNewFilename() {
-        const regex = /^[\p{L}0-9][\p{L}0-9() _.'-]{2,253}[\p{L}0-9]$/gmu;
+        const regex = /^[\p{L}0-9()][\p{L}0-9()_.'-]{2,253}[\p{L}0-9]$/gmu;
 
         let isValid = true;
         let name = this.newFilenameTarget.value;

@@ -68,7 +68,7 @@ class ValidationController extends AbstractController
 
         // Variables related to the services
         $this->validationService            = $validationService;
-        $this->uploadModificationService                = $uploadModificationService;
+        $this->uploadModificationService    = $uploadModificationService;
         $this->namingService                = $namingService;
     }
 
@@ -178,6 +178,7 @@ class ValidationController extends AbstractController
         Request $request,
         ?int $uploadId = null
     ): Response {
+        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload - upload ID: ' . $uploadId);
 
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $validation = $upload->getValidation();
@@ -199,9 +200,10 @@ class ValidationController extends AbstractController
         $form->remove('approbator');
         $form->remove('modificationType');
 
-        if ($request->isMethod('POST')) {
-
+        if ($request->isMethod(method: 'POST')) {
+            $this->logger->info('ValidationController::disapprovedValidationModificationByUpload - form submitted full request before name checking: ' , $request->request->all());
             $this->namingService->requestUploadFilenameChecks($request);
+            $this->logger->info('ValidationController::disapprovedValidationModificationByUpload - form submitted full request after name checking: ' , $request->request->all());
 
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
