@@ -362,4 +362,20 @@ class TrainingRecordService extends AbstractController
             }
         }
     }
+
+
+    public function lastTrainingDateUploadDateComparison(Upload $upload)
+    {
+        $response = false;
+        $this->logger->info('TrainingRecordService: lastTrainingDateUploadDateComparison: upload: ', [$upload]);
+        $lastTrainingRecord = $this->trainingRecordRepository->getLatestTrainingRecord($upload);
+        $this->logger->info('TrainingRecordService: lastTrainingDateUploadDateComparison: lastTrainingRecord: ', [$lastTrainingRecord]);
+        $uploadDate = $upload->getUploadedAt();
+        $this->logger->info('TrainingRecordService: lastTrainingDateUploadDateComparison: uploadDate: ', [$uploadDate]);
+        if ($uploadDate > $lastTrainingRecord->getDate()) {
+            $response = true;
+        }
+        $this->logger->info('TrainingRecordService: lastTrainingDateUploadDateComparison: response: ', [$response]);
+        return $response;
+    }
 }

@@ -68,13 +68,12 @@ class ValidationController extends AbstractController
 
         // Variables related to the services
         $this->validationService            = $validationService;
-        $this->uploadModificationService                = $uploadModificationService;
+        $this->uploadModificationService    = $uploadModificationService;
         $this->namingService                = $namingService;
     }
 
 
 
-    // Is not currently in use, but might get useful for the operator side validation.
     #[Route('/validation/{uploadId}', name: 'app_validation')]
     public function validationViewBasePage(
         int $uploadId,
@@ -96,6 +95,20 @@ class ValidationController extends AbstractController
 
 
 
+    /**
+     * Displays the approbation page for a validation request.
+     *
+     * This function retrieves an approbation record by its ID and renders a page
+     * where users can approve or disapprove a document. If the approbation has
+     * already been responded to, the user is redirected to the base page with
+     * an error message.
+     *
+     * @param int|null $approbationId The ID of the approbation record to display,
+     *                                null if not provided
+     *
+     * @return Response A Symfony Response object that either renders the approbation
+     *                  page or redirects to the base page if already processed
+     */
     #[Route('/validation/approbation/{approbationId}', name: 'app_validation_approbation')]
     public function validationApprobationPage(
         ?int $approbationId = null
@@ -113,6 +126,18 @@ class ValidationController extends AbstractController
 
 
 
+    /**
+     * Downloads a file associated with a specific approbation request.
+     *
+     * This function retrieves an approbation record by its ID, gets the associated validation
+     * and upload file, and serves the file for inline viewing in the browser.
+     *
+     * @param int|null $approbationId The ID of the approbation record to retrieve the file from,
+     *                                null if not provided
+     *
+     * @return Response A Symfony Response object that serves the requested file
+     *                  for inline viewing in the browser
+     */
     #[Route('/validation/approbation/download/{approbationId}', name: 'app_validation_approbation_file')]
     public function validationDownloadFile(
         ?int $approbationId = null
@@ -128,6 +153,19 @@ class ValidationController extends AbstractController
 
 
 
+    /**
+     * Handles the viewing of a file that is pending validation.
+     *
+     * This function retrieves a file based on its upload ID and displays it to the user.
+     * If the file has already been validated, the user is redirected back to the previous page
+     * with an error message. Otherwise, the file is served for inline viewing in the browser.
+     *
+     * @param Request $request The HTTP request object containing headers and other request data
+     * @param int|null $uploadId The ID of the upload to be viewed, null if not provided
+     *
+     * @return Response A Symfony Response object that either redirects the user or
+     *                  serves the requested file for inline viewing
+     */
     #[Route('/validation/download/{uploadId}', name: 'app_validation_view_file')]
     public function validationFileView(
         Request $request,
@@ -151,11 +189,25 @@ class ValidationController extends AbstractController
 
 
 
+    /**
+     * Processes the approval or disapproval of a document validation request.
+     *
+     * This function handles the validation decision for a document based on an approbation request.
+     * It retrieves the approbation record, processes the approval/disapproval action through the
+     * validation service, and provides appropriate feedback to the user via flash messages.
+     *
+     * @param Request $request The HTTP request object containing validation decision data
+     * @param int|null $approbationId The ID of the approbation record to process, null if not provided
+     *
+     * @return Response A Symfony Response object that redirects to the base application page
+     *                  after processing the validation decision
+     */
     #[Route('/validation/approval/{approbationId}', name: 'app_validation_approval')]
     public function validationApproval(
         Request $request,
         ?int $approbationId = null
     ): Response {
+        $this->logger->info('ValidationController::validationApproval - approbation ID: '. $approbationId);
         $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
         try {
             $response = $this->validationService->validationApproval($approbation, $request);
@@ -173,11 +225,25 @@ class ValidationController extends AbstractController
     }
 
 
+    /**
+     * Handles the modification of a disapproved file upload.
+     *
+     * This function allows users to modify a file that was previously disapproved during validation.
+     * It retrieves the upload, creates a form for modification, processes the form submission,
+     * and handles the file modification process.
+     *
+     * @param Request $request The HTTP request object containing form data and headers
+     * @param int|null $uploadId The ID of the upload to be modified, null if not provided
+     *
+     * @return Response A Symfony Response object that either renders the modification form
+     *                  or redirects to another page based on the operation's outcome
+     */
     #[Route('/validation/disapproved/modifyByUpload/{uploadId}', name: 'app_validation_disapproved_modify_by_upload')]
     public function disapprovedValidationModificationByUpload(
         Request $request,
         ?int $uploadId = null
     ): Response {
+        $this->logger->info('ValidationController::disapprovedValidationModificationByUpload - upload ID: ' . $uploadId);
 
         $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
         $validation = $upload->getValidation();
@@ -199,9 +265,10 @@ class ValidationController extends AbstractController
         $form->remove('approbator');
         $form->remove('modificationType');
 
-        if ($request->isMethod('POST')) {
-
+        if ($request->isMethod(method: 'POST')) {
+            $this->logger->info('ValidationController::disapprovedValidationModificationByUpload - form submitted full request before name checking: ' , $request->request->all());
             $this->namingService->requestUploadFilenameChecks($request);
+            $this->logger->info('ValidationController::disapprovedValidationModificationByUpload - form submitted full request after name checking: ' , $request->request->all());
 
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {

@@ -120,8 +120,8 @@ class OperatorAdminController extends AbstractController
 
         if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
             $operators = $this->operatorService->operatorEntitySearchByRequest($request);
-            // } elseif ($request->getSession()->has('operatorSearchParams')) {
-            //     $operators = $this->operatorService->operatorEntitySearchBySession($request);
+        } elseif ($request->getSession()->has('operatorSearchParams')) {
+            $operators = $this->operatorService->operatorEntitySearchBySession($request);
         } else {
             $operators = [];
         }
@@ -227,17 +227,16 @@ class OperatorAdminController extends AbstractController
                 ])->createView();
                 $this->logger->info('OperatorAdminController: editOperatorAction - operator', [$operator]);
             }
+        } elseif ($request->getSession()->has('operatorSearchParams')) {
+            $this->logger->info('OperatorAdminController: editOperatorAction - operatorSearchParams', [$request->getSession()->get('operatorSearchParams')]);
+            $operators = $this->operatorService->operatorEntitySearchBySession($request);
+            foreach ($operators as $operator) {
+                $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
+                    'operator_id' => $operator->getId(),
+                ])->createView();
+                $this->logger->info('OperatorAdminController: editOperatorAction - operator', [$operator]);
+            }
         }
-        // elseif ($request->getSession()->has('operatorSearchParams')) {
-        //     $this->logger->info('OperatorAdminController: editOperatorAction - operatorSearchParams', [$request->getSession()->get('operatorSearchParams')]);
-        //     $operators = $this->operatorService->operatorEntitySearchBySession($request);
-        //     foreach ($operators as $operator) {
-        //         $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
-        //             'operator_id' => $operator->getId(),
-        //         ])->createView();
-        //         $this->logger->info('OperatorAdminController: editOperatorAction - operator', [$operator]);
-        //     }
-        // }
 
 
 

@@ -74,4 +74,27 @@ class TrainingRecordRepository extends ServiceEntityRepository
     }
 
 
+
+    /**
+     * Retrieves the most recent training record for a specific upload.
+     *
+     * This function queries the database for training records associated with the given upload,
+     * orders them by date in descending order, and returns the most recent one.
+     *
+     * @param Upload $upload The upload entity for which to find the latest training record
+     *
+     * @return TrainingRecord|null The most recent training record for the given upload,
+     *                            or null if no records exist
+     */
+    public function getLatestTrainingRecord(Upload $upload): TrainingRecord
+    {
+        $qb = $this->createQueryBuilder('tr')
+            ->where('tr.upload = :upload')
+            ->setParameter('upload', $upload)
+            ->orderBy('tr.date', 'DESC')
+            ->setMaxResults(1)
+        ;
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
 }

@@ -48,7 +48,7 @@ class NamingService extends AbstractController
         $this->logger->info('NamingService::filenameChecks() - filename before normalize', ['filename' => $filename]);
         $newName = $this->normalizeFilename($filename);
         $this->logger->info('NamingService::filenameChecks() - filename after normalize', ['filename' => $newName]);
-        $regexFilename = "/^[()][\p{L}0-9][\p{L}0-9()_.'-]{2,253}[\p{L}0-9]$/mu";
+        $regexFilename = "/^[\p{L}0-9()][\p{L}0-9()_.'-]{2,253}[\p{L}0-9]$/mu";
         if (!preg_match($regexFilename, $newName)) {
             $this->addFlash('error', 'Le document ' . $filename . ' n\'est pas nommé correctement. ');
             $this->logger->error('NamingService::filenameChecks() - Invalid filename format', ['newName' => $newName]);
@@ -81,7 +81,7 @@ class NamingService extends AbstractController
             $filename = $originalName;
         }
         $newName = $this->normalizeFilename($filename);
-        $regexFilename = "/^[()][\p{L}0-9][\p{L}0-9()_.'-]{2,253}[\p{L}0-9]$/mu";
+        $regexFilename = "/^[\p{L}0-9()][\p{L}0-9()_.'-]{2,253}[\p{L}0-9]$/mu";
         if (!preg_match($regexFilename, $newName)) {
             $this->addFlash('error', 'Le document ' . $filename . ' n\'est pas nommé correctement chargé');
             return false;
@@ -100,8 +100,10 @@ class NamingService extends AbstractController
      */
     public function requestUploadFilenameChecks(Request $request): void
     {
+        $this->logger->info('NamingService::requestUploadFilenameChecks() - request', ['request' => $request->request->all()]);
         $requestArray = $request->request->all();
-        $newName = $this->nameChecks($requestArray['upload']['filename']);
+        $filename = $requestArray['upload']['filename'];
+        $newName = $this->nameChecks($filename);
         $requestArray['upload']['filename'] = $newName;
         $request->request->replace($requestArray);
     }
