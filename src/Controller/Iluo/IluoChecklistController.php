@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 use App\Entity\TrainingMaterialType;
 
-use App\Form\TrainingMaterialTypeType;
+use App\Form\Iluo\TrainingMaterialTypeType;
 
 use App\Service\EntityFetchingService;
 use App\Service\IluoService;
