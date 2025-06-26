@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Iluo;
 
 use App\Service\ProductsService;
 use App\Service\QualityRepService;

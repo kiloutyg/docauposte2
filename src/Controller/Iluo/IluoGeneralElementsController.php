@@ -20,7 +20,7 @@ use App\Form\Iluo\ShiftLeadersType;
 use App\Form\Iluo\QualityRepType;
 
 use App\Service\EntityFetchingService;
-use App\Service\IluoService;
+use App\Service\Iluo\IluoService;
 
 
 #[Route('/iluo/', name: 'app_iluo_')]

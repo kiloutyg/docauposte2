@@ -24,7 +24,7 @@ use App\Form\Iluo\QualityRepType;
 use App\Form\vWorkstationType;
 
 use App\Service\EntityFetchingService;
-use App\Service\IluoService;
+use App\Service\Iluo\IluoService;
 
 
 #[Route('/iluo/', name: 'app_iluo_')]
