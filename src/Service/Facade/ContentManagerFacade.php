@@ -4,8 +4,8 @@ namespace App\Service\Facade;
 
 use Symfony\Component\HttpFoundation\Request;
 
-use App\Service\IncidentService;
-use App\Service\UploadService;
+use App\Service\Incident\IncidentService;
+use App\Service\Upload\UploadService;
 use App\Service\FolderService;
 use App\Service\NamingService;
 

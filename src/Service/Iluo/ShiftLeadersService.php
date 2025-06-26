@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Iluo;
 
 use Psr\Log\LoggerInterface;
 
@@ -16,8 +16,8 @@ class ShiftLeadersService extends AbstractController
 {
     private $em;
     private $logger;
-
     private $shiftLeadersRepository;
+
     /**
      * Constructor for the ShiftLeadersService class.
      *

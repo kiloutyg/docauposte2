@@ -11,7 +11,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 use App\Service\FolderService;
-use App\Service\IncidentService;
+use App\Service\Incident\IncidentService;
 use App\Service\Factory\RepositoryFactory;
 
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Operator;
 
 use App\Entity\Uap;
 use App\Entity\Operator;

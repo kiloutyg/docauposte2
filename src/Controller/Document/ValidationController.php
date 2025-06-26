@@ -20,8 +20,8 @@ use App\Repository\ApprobationRepository;
 
 use App\Form\UploadType;
 
-use App\Service\UploadModificationService;
-use App\Service\ValidationService;
+use App\Service\Upload\UploadModificationService;
+use App\Service\Validation\ValidationService;
 use App\Service\NamingService;
 
 
@@ -207,7 +207,7 @@ class ValidationController extends AbstractController
         Request $request,
         ?int $approbationId = null
     ): Response {
-        $this->logger->info('ValidationController::validationApproval - approbation ID: '. $approbationId);
+        $this->logger->info('ValidationController::validationApproval - approbation ID: ' . $approbationId);
         $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
         try {
             $response = $this->validationService->validationApproval($approbation, $request);
@@ -266,9 +266,9 @@ class ValidationController extends AbstractController
         $form->remove('modificationType');
 
         if ($request->isMethod(method: 'POST')) {
-            $this->logger->info('ValidationController::disapprovedValidationModificationByUpload - form submitted full request before name checking: ' , $request->request->all());
+            $this->logger->info('ValidationController::disapprovedValidationModificationByUpload - form submitted full request before name checking: ', $request->request->all());
             $this->namingService->requestUploadFilenameChecks($request);
-            $this->logger->info('ValidationController::disapprovedValidationModificationByUpload - form submitted full request after name checking: ' , $request->request->all());
+            $this->logger->info('ValidationController::disapprovedValidationModificationByUpload - form submitted full request after name checking: ', $request->request->all());
 
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {

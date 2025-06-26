@@ -7,9 +7,9 @@ use App\Entity\Upload;
 use App\Form\UploadType;
 
 use App\Service\SettingsService;
-use App\Service\ValidationService;
-use App\Service\UploadService;
-use App\Service\UploadModificationService;
+use App\Service\Validation\ValidationService;
+use App\Service\Upload\UploadService;
+use App\Service\Upload\UploadModificationService;
 
 use App\Service\Facade\EntityManagerFacade;
 use App\Service\Facade\ContentManagerFacade;
@@ -464,6 +464,4 @@ class UploadController extends AbstractController
             $this->addFlash('error', 'Invalid form. Could not get submitted. Check the entered data.');
         }
     }
-
-    
 }

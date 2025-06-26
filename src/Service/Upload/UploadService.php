@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Upload;
 
 use Psr\Log\LoggerInterface;
 
@@ -18,11 +18,11 @@ use App\Repository\UploadRepository;
 use App\Entity\Upload;
 use App\Entity\User;
 
-use App\Service\ValidationService;
-use App\Service\OldUploadService;
+use App\Service\Validation\ValidationService;
+use App\Service\Upload\OldUploadService;
 use App\Service\SettingsService;
 use App\Service\FolderService;
-use App\Service\FileTypeService;
+use App\Service\Upload\FileTypeService;
 
 
 /**
@@ -501,7 +501,6 @@ class UploadService extends AbstractController
      *
      * @return string The determined file path.
      *
-     * @throws Exception If the file object is not valid and does not have an old upload.
      */
     private function determineFilePath($file): string
     {

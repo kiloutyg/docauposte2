@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Incident;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +16,7 @@ use App\Entity\Incident;
 
 use App\Service\NamingService;
 use App\Service\FolderService;
-use App\Service\FileTypeService;
+use App\Service\Upload\FileTypeService;
 
 
 // This class is responsible for the logic of managing the incidents files

@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-use App\Service\TrainingRecordService;
+use App\Service\Operator\TrainingRecordService;
 
 /**
  * TrainingRecordController
@@ -25,7 +25,7 @@ class TrainingRecordController extends AbstractController
      * @var AuthorizationCheckerInterface Authorization checker for role-based access control
      */
     private $authChecker;
-    
+
     /**
      * @var TrainingRecordService Service for training record operations
      */

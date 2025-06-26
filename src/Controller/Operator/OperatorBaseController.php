@@ -8,7 +8,7 @@ use App\Repository\UploadRepository;
 use App\Repository\ValidationRepository;
 
 use App\Service\EntityFetchingService;
-use App\Service\OperatorService;
+use App\Service\Operator\OperatorService;
 
 use App\Service\Factory\RepositoryFactory;
 

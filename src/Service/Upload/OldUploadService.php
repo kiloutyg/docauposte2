@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Upload;
 
 use App\Entity\OldUpload;
 use App\Entity\Upload;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Validation;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +19,7 @@ use App\Entity\Validation;
 use App\Entity\Approbation;
 
 use App\Service\MailerService;
-use App\Service\TrainingRecordService;
+use App\Service\Operator\TrainingRecordService;
 use Doctrine\Common\Collections\Collection;
 
 class ValidationService extends AbstractController
@@ -627,9 +627,11 @@ class ValidationService extends AbstractController
         }
         $this->logger->info('ValidationService::updateValidationAndUploadStatus - validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay() . ' upload->isTraining(): ' . $upload->isTraining() . ' $this->trainingRecordService->lastTrainingDateUploadDateComparison($upload): ' . $this->trainingRecordService->lastTrainingDateUploadDateComparison($upload));
 
-        if ($upload->isTraining() &&
-         $validation->isStatus() &&
-         ($this->trainingRecordService->lastTrainingDateUploadDateComparison($upload) || !$upload->isForcedDisplay())) {
+        if (
+            $upload->isTraining() &&
+            $validation->isStatus() &&
+            ($this->trainingRecordService->lastTrainingDateUploadDateComparison($upload) || !$upload->isForcedDisplay())
+        ) {
             $this->logger->info('ValidationService::updateValidationAndUploadStatus() - $upload->isTraining() && $validation->isStatus() && ($this->trainingRecordService->lastTrainingDateUploadDateComparison($upload) || !$upload->isForcedDisplay())');
             $this->trainingRecordService->updateTrainingRecord($upload);
             $this->logger->info('ValidationService::updateValidationAndUploadStatus() - Sending approval email to uploader');

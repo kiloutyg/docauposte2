@@ -14,8 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\SecurityBundle\Security;
 
 use App\Service\SettingsService;
-use App\Service\IncidentRedirectService;
-use App\Service\IncidentService;
+use App\Service\Incident\IncidentRedirectService;
+use App\Service\Incident\IncidentService;
 
 
 #[Route('/', name: 'app_')]

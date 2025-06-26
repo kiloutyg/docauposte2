@@ -26,8 +26,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Repository\OperatorRepository;
 
 use App\Service\EntityFetchingService;
-use App\Service\PdfGeneratorService;
-use App\Service\OperatorService;
+use App\Service\Operator\PdfGeneratorService;
+use App\Service\Operator\OperatorService;
 
 
 class OperatorAdminController extends AbstractController

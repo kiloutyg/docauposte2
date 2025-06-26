@@ -2,8 +2,8 @@
 
 namespace App\Controller\Operator;
 
-use App\Service\OperatorService;
-use App\Service\OperatorImportService;
+use App\Service\Operator\OperatorService;
+use App\Service\Operator\OperatorImportService;
 
 use \Psr\Log\LoggerInterface;
 

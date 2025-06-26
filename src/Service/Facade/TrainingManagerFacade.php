@@ -4,9 +4,9 @@ namespace App\Service\Facade;
 
 use App\Entity\Operator;
 
-use App\Service\TeamService;
-use App\Service\TrainerService;
-use App\Service\UapService;
+use App\Service\Operator\TeamService;
+use App\Service\Operator\TrainerService;
+use App\Service\Operator\UapService;
 
 
 class TrainingManagerFacade

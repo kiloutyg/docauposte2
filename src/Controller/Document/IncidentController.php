@@ -20,7 +20,7 @@ use App\Entity\IncidentCategory;
 
 use App\Form\IncidentType;
 
-use App\Service\IncidentService;
+use App\Service\Incident\IncidentService;
 use App\Service\Facade\EntityManagerFacade;
 use App\Service\Facade\ContentManagerFacade;
 
