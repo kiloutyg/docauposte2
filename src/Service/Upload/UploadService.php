@@ -237,64 +237,130 @@ class UploadService extends AbstractController
 
 
 
-    // This function is responsible for the logic of grouping the uploads files by parent entities
     /**
-     * Groups all the uploads by their respective zone, product line, category, and button.
+     * Groups uploads into hierarchical arrays based on their organizational structure.
      *
-     * @param array $uploads An array of Upload entities to be grouped.
+     * This function organizes uploads into nested arrays based on their zone, product line,
+     * category, and button. It creates two separate groupings: one for all uploads and
+     * another specifically for uploads that have validation data.
+     *
+     * @param array $uploads An array of Upload entities to be grouped
      *
      * @return array An array containing two elements:
-     *               - The first element is a multi-dimensional array representing the grouped uploads.
-     *               - The second element is a multi-dimensional array representing the grouped validated uploads.
+     *               - First element: Hierarchical array of all uploads grouped by organizational structure
+     *               - Second element: Hierarchical array of only validated uploads grouped by organizational structure
      */
-    public function groupAllUploads($uploads)
+    public function groupAllUploads($uploads): array
     {
         $groupedUploads = [];
         $groupedValidatedUploads = [];
-
+    
         // Group uploads by zone, productLine, category, and button
         foreach ($uploads as $upload) {
             $zoneName        = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
             $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
             $categoryName    = $upload->getButton()->getCategory()->getName();
             $buttonName      = $upload->getButton()->getName();
-
-            if (!isset($groupedUploads[$zoneName])) {
-                $groupedUploads[$zoneName] = [];
-            }
-            if (!isset($groupedUploads[$zoneName][$productLineName])) {
-                $groupedUploads[$zoneName][$productLineName] = [];
-            }
-            if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName])) {
-                $groupedUploads[$zoneName][$productLineName][$categoryName] = [];
-            }
-            if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
-                $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
-            }
-            $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
-
+    
+            $groupedUploads = $this->groupingNonValidatedUpload($groupedUploads, $upload, $zoneName, $productLineName, $categoryName, $buttonName);
+    
             if ($upload->getValidation()) {
-                if (!isset($groupedValidatedUploads[$zoneName])) {
-                    $groupedValidatedUploads[$zoneName] = [];
-                }
-                if (!isset($groupedValidatedUploads[$zoneName][$productLineName])) {
-                    $groupedValidatedUploads[$zoneName][$productLineName] = [];
-                }
-                if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName])) {
-                    $groupedValidatedUploads[$zoneName][$productLineName][$categoryName] = [];
-                }
-                if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
-                    $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
-                }
-                $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
+                $groupedValidatedUploads = $this->groupingValidatedUpload($groupedValidatedUploads, $upload, $zoneName, $productLineName, $categoryName, $buttonName);
             }
         }
-
+    
         return [$groupedUploads, $groupedValidatedUploads];
     }
 
 
 
+
+    /**
+     * Groups a non-validated upload into a hierarchical array structure based on organizational elements.
+     *
+     * This function organizes uploads into a nested array structure according to their zone,
+     * product line, category, and button. It ensures that all necessary array levels exist
+     * before adding the upload to the appropriate location in the hierarchy.
+     *
+     * @param array  $groupedUploads   The existing hierarchical array of grouped uploads
+     * @param Upload $upload           The upload entity to be added to the grouped structure
+     * @param string $zoneName         The name of the zone associated with the upload
+     * @param string $productLineName  The name of the product line associated with the upload
+     * @param string $categoryName     The name of the category associated with the upload
+     * @param string $buttonName       The name of the button associated with the upload
+     *
+     * @return array The updated hierarchical array with the new upload added
+     */
+    public function groupingNonValidatedUpload(
+        array  $groupedUploads,
+        Upload $upload,
+        string $zoneName,
+        string $productLineName,
+        string $categoryName,
+        string $buttonName
+    ): array {
+
+        if (!isset($groupedUploads[$zoneName])) {
+            $groupedUploads[$zoneName] = [];
+        }
+        if (!isset($groupedUploads[$zoneName][$productLineName])) {
+            $groupedUploads[$zoneName][$productLineName] = [];
+        }
+        if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName])) {
+            $groupedUploads[$zoneName][$productLineName][$categoryName] = [];
+        }
+        if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
+            $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
+        }
+        $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
+
+        return $groupedUploads;
+    }
+
+
+
+    
+    /**
+     * Groups a validated upload into a hierarchical array structure based on organizational elements.
+     *
+     * This function organizes validated uploads into a nested array structure according to their zone,
+     * product line, category, and button. It ensures that all necessary array levels exist
+     * before adding the upload to the appropriate location in the hierarchy.
+     *
+     * @param array  $groupedValidatedUploads The existing hierarchical array of grouped validated uploads
+     * @param Upload $upload                  The validated upload entity to be added to the grouped structure
+     * @param string $zoneName                The name of the zone associated with the upload
+     * @param string $productLineName         The name of the product line associated with the upload
+     * @param string $categoryName            The name of the category associated with the upload
+     * @param string $buttonName              The name of the button associated with the upload
+     *
+     * @return array The updated hierarchical array with the new validated upload added
+     */
+    public function groupingValidatedUpload(
+        array $groupedValidatedUploads,
+        Upload $upload,
+        string $zoneName,
+        string $productLineName,
+        string $categoryName,
+        string $buttonName
+    ): array {
+
+        if (!isset($groupedValidatedUploads[$zoneName])) {
+            $groupedValidatedUploads[$zoneName] = [];
+        }
+        if (!isset($groupedValidatedUploads[$zoneName][$productLineName])) {
+            $groupedValidatedUploads[$zoneName][$productLineName] = [];
+        }
+        if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName])) {
+            $groupedValidatedUploads[$zoneName][$productLineName][$categoryName] = [];
+        }
+        if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
+            $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
+        }
+        $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
+
+        return $groupedValidatedUploads;
+    }
 
 
     /**
