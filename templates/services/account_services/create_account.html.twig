@@ -49,12 +49,25 @@
 											{% include "services/account_services/account_tool_components/account_crea_mod.html.twig" %}
 											<hr
 												class="my-4">
+											<div
+												id="flash-messages">
+												{% for label, messages in app.flashes %}
+													<div
+														class="alert alert-{{ label }}">
+														{% for message in messages %}
+															<p>
+																{{ message }}
+															</p>
+														{% endfor %}
+													</div>
+												{% endfor %}
+											</div>
 											<turbo-frame
 												loading="lazy"
 												class="px-0 px-md-2">
 												{{ render(controller('App\\Controller\\DepartmentController::departmentView'), options = []) }}
 											</turbo-frame>
-											{% include "services/account_services/account_tool_components/user_list.html.twig" %}
+												{% include "services/account_services/account_tool_components/user_list.html.twig" %}
 										</div>
 									</div>
 								</div>

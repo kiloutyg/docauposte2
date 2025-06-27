@@ -93,20 +93,20 @@
 														{% if user.uploads is not empty or user.incidents is not empty %}
 															<a
 																href="{{path('app_account_modify_account', {userId: user.id})}}" class="btn btn-danger"
-																data-turbo-frame="_top">
+																>
 																Transfer of works
 															</a>
 														{% else %}
 															<a
 																href="{{path('app_account_delete_account', {userId: user.id})}}" class="btn btn-danger definitively-delete-user"
-																data-turbo-frame="_top">
+																>
 																Supprimer definitivement
 															</a>
 														{% endif %}
 													{% else %}
 														<a
 															href="{{path('app_account_block_account', {userId: user.id})}}" class="btn btn-danger delete-user"
-															data-turbo-frame="_top">
+															>
 															Bloquer
 														</a>
 													{% endif %}
