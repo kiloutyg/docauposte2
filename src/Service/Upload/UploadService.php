@@ -18,12 +18,15 @@ use App\Repository\UploadRepository;
 use App\Entity\Upload;
 use App\Entity\User;
 
-use App\Service\Validation\ValidationService;
-use App\Service\Upload\OldUploadService;
 use App\Service\SettingsService;
 use App\Service\FolderService;
+
+use App\Service\Validation\ValidationService;
+
+use App\Service\Upload\OldUploadService;
 use App\Service\Upload\FileTypeService;
 
+use App\Service\Factory\ServiceFactory;
 
 /**
  * UploadService - Core service for managing document uploads and file operations
@@ -42,6 +45,9 @@ use App\Service\Upload\FileTypeService;
 class UploadService extends AbstractController
 {
 
+    /**
+     * @var LoggerInterface Logger for recording service operations and errors
+     */
     private $logger;
 
     /**
@@ -79,6 +85,10 @@ class UploadService extends AbstractController
      */
     private $fileTypeService;
 
+    /**
+     * @var ServiceFactory Service for creating and managing service instances
+     */
+    private $serviceFactory;
 
     /**
      * Constructor for the UploadService class.
@@ -93,28 +103,26 @@ class UploadService extends AbstractController
      * @param SettingsService        $settingsService   Service for accessing application settings
      * @param FolderService          $folderService     Service for managing folder structures and paths
      * @param FileTypeService        $fileTypeService   Service for validating and handling file types
+     * @param ServiceFactory         $serviceFactory    Service for creating and managing service instances
      */
+
     public function __construct(
-        LoggerInterface         $logger,
-        EntityManagerInterface  $em,
-        UploadRepository        $uploadRepository,
-
-        ValidationService       $validationService,
-        OldUploadService        $oldUploadService,
-        SettingsService         $settingsService,
-        FolderService           $folderService,
-        FileTypeService         $fileTypeService,
+        LoggerInterface                 $logger,
+        EntityManagerInterface          $em,
+        UploadRepository                $uploadRepository,
+        ServiceFactory                  $serviceFactory
     ) {
-        $this->logger                = $logger;
-        $this->em                    = $em;
+        $this->logger                   = $logger;
+        $this->em                       = $em;
 
-        $this->uploadRepository      = $uploadRepository;
+        $this->uploadRepository         = $uploadRepository;
+        $this->serviceFactory            = $serviceFactory;
 
-        $this->validationService     = $validationService;
-        $this->oldUploadService      = $oldUploadService;
-        $this->settingsService       = $settingsService;
-        $this->folderService         = $folderService;
-        $this->fileTypeService       = $fileTypeService;
+        $this->validationService        = $this->serviceFactory->getService(className: 'Validation\\Validation');
+        $this->oldUploadService         = $this->serviceFactory->getService(className: 'Upload\\OldUpload');
+        $this->settingsService          = $this->serviceFactory->getService(className: 'Settings');
+        $this->folderService            = $this->serviceFactory->getService(className: 'Folder');
+        $this->fileTypeService          = $this->serviceFactory->getService(className: 'Upload\\FileType');
     }
 
 
@@ -198,7 +206,7 @@ class UploadService extends AbstractController
             }
         } else {
             $validated = true;
-        };
+        }
 
         if ($request->request->get('training-needed') === 'true') {
             $trainingNeeded = true;

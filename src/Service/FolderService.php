@@ -4,12 +4,13 @@ namespace App\Service;
 
 use Psr\Log\LoggerInterface;
 
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 use App\Entity\Upload;
 
 // This class is responsible for the logic of creating and deleting the folder structure used to store the files and organize them in the server filesystem making it easier to manage.
-class FolderService
+class FolderService extends AbstractController
 {
     protected $docDir;
     protected $logger;
