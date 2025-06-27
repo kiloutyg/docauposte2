@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Iluo;
 
 use Psr\Log\LoggerInterface;
 
@@ -16,8 +16,8 @@ class QualityRepService extends AbstractController
 {
     private $em;
     private $logger;
-
     private $qualityRepRepository;
+
     public function __construct(
         EntityManagerInterface $em,
         LoggerInterface $logger,

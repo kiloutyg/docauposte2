@@ -18,13 +18,13 @@ use App\Entity\ShiftLeaders;
 use App\Entity\QualityRep;
 use App\Entity\Workstation;
 
-use App\Form\ProductType;
-use App\Form\ShiftLeadersType;
-use App\Form\QualityRepType;
-use App\Form\WorkstationType;
+use App\Form\Iluo\ProductType;
+use App\Form\Iluo\ShiftLeadersType;
+use App\Form\Iluo\QualityRepType;
+use App\Form\vWorkstationType;
 
 use App\Service\EntityFetchingService;
-use App\Service\IluoService;
+use App\Service\Iluo\IluoService;
 
 
 #[Route('/iluo/', name: 'app_iluo_')]

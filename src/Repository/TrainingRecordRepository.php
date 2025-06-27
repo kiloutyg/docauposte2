@@ -86,7 +86,7 @@ class TrainingRecordRepository extends ServiceEntityRepository
      * @return TrainingRecord|null The most recent training record for the given upload,
      *                            or null if no records exist
      */
-    public function getLatestTrainingRecord(Upload $upload): TrainingRecord
+    public function getLatestTrainingRecord(Upload $upload): ?TrainingRecord
     {
         $qb = $this->createQueryBuilder('tr')
             ->where('tr.upload = :upload')

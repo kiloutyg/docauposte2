@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Upload;
 
 use Psr\Log\LoggerInterface;
 
@@ -18,12 +18,7 @@ use App\Repository\UploadRepository;
 use App\Entity\Upload;
 use App\Entity\User;
 
-use App\Service\ValidationService;
-use App\Service\OldUploadService;
-use App\Service\SettingsService;
-use App\Service\FolderService;
-use App\Service\FileTypeService;
-
+use App\Service\Factory\ServiceFactory;
 
 /**
  * UploadService - Core service for managing document uploads and file operations
@@ -42,6 +37,9 @@ use App\Service\FileTypeService;
 class UploadService extends AbstractController
 {
 
+    /**
+     * @var LoggerInterface Logger for recording service operations and errors
+     */
     private $logger;
 
     /**
@@ -54,31 +52,20 @@ class UploadService extends AbstractController
      */
     private $uploadRepository;
 
-    /**
-     * @var ValidationService Service for handling document validation processes
-     */
     private $validationService;
 
-    /**
-     * @var OldUploadService Service for managing previous versions of uploads
-     */
     private $oldUploadService;
 
-    /**
-     * @var SettingsService Service for accessing application settings
-     */
     private $settingsService;
 
-    /**
-     * @var FolderService Service for managing folder structures and paths
-     */
     private $folderService;
 
-    /**
-     * @var FileTypeService Service for validating and handling file types
-     */
     private $fileTypeService;
 
+    /**
+     * @var ServiceFactory Service for creating and managing service instances
+     */
+    private $serviceFactory;
 
     /**
      * Constructor for the UploadService class.
@@ -88,33 +75,26 @@ class UploadService extends AbstractController
      *
      * @param EntityManagerInterface $em                The entity manager for database operations
      * @param UploadRepository       $uploadRepository  Repository for Upload entity operations
-     * @param ValidationService      $validationService Service for handling file validation processes
-     * @param OldUploadService       $oldUploadService  Service for managing previous versions of uploads
-     * @param SettingsService        $settingsService   Service for accessing application settings
-     * @param FolderService          $folderService     Service for managing folder structures and paths
-     * @param FileTypeService        $fileTypeService   Service for validating and handling file types
+     * @param ServiceFactory         $serviceFactory    Service for creating and managing service instances
      */
+
     public function __construct(
-        LoggerInterface         $logger,
-        EntityManagerInterface  $em,
-        UploadRepository        $uploadRepository,
-
-        ValidationService       $validationService,
-        OldUploadService        $oldUploadService,
-        SettingsService         $settingsService,
-        FolderService           $folderService,
-        FileTypeService         $fileTypeService,
+        LoggerInterface                 $logger,
+        EntityManagerInterface          $em,
+        UploadRepository                $uploadRepository,
+        ServiceFactory                  $serviceFactory
     ) {
-        $this->logger                = $logger;
-        $this->em                    = $em;
+        $this->logger                   = $logger;
+        $this->em                       = $em;
 
-        $this->uploadRepository      = $uploadRepository;
+        $this->uploadRepository         = $uploadRepository;
+        $this->serviceFactory            = $serviceFactory;
 
-        $this->validationService     = $validationService;
-        $this->oldUploadService      = $oldUploadService;
-        $this->settingsService       = $settingsService;
-        $this->folderService         = $folderService;
-        $this->fileTypeService       = $fileTypeService;
+        $this->validationService        = $this->serviceFactory->getService(className: 'Validation\\Validation');
+        $this->oldUploadService         = $this->serviceFactory->getService(className: 'Upload\\OldUpload');
+        $this->settingsService          = $this->serviceFactory->getService(className: 'Settings');
+        $this->folderService            = $this->serviceFactory->getService(className: 'Folder');
+        $this->fileTypeService          = $this->serviceFactory->getService(className: 'Upload\\FileType');
     }
 
 
@@ -198,7 +178,7 @@ class UploadService extends AbstractController
             }
         } else {
             $validated = true;
-        };
+        }
 
         if ($request->request->get('training-needed') === 'true') {
             $trainingNeeded = true;
@@ -229,64 +209,130 @@ class UploadService extends AbstractController
 
 
 
-    // This function is responsible for the logic of grouping the uploads files by parent entities
     /**
-     * Groups all the uploads by their respective zone, product line, category, and button.
+     * Groups uploads into hierarchical arrays based on their organizational structure.
      *
-     * @param array $uploads An array of Upload entities to be grouped.
+     * This function organizes uploads into nested arrays based on their zone, product line,
+     * category, and button. It creates two separate groupings: one for all uploads and
+     * another specifically for uploads that have validation data.
+     *
+     * @param array $uploads An array of Upload entities to be grouped
      *
      * @return array An array containing two elements:
-     *               - The first element is a multi-dimensional array representing the grouped uploads.
-     *               - The second element is a multi-dimensional array representing the grouped validated uploads.
+     *               - First element: Hierarchical array of all uploads grouped by organizational structure
+     *               - Second element: Hierarchical array of only validated uploads grouped by organizational structure
      */
-    public function groupAllUploads($uploads)
+    public function groupAllUploads($uploads): array
     {
         $groupedUploads = [];
         $groupedValidatedUploads = [];
-
+    
         // Group uploads by zone, productLine, category, and button
         foreach ($uploads as $upload) {
             $zoneName        = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
             $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
             $categoryName    = $upload->getButton()->getCategory()->getName();
             $buttonName      = $upload->getButton()->getName();
-
-            if (!isset($groupedUploads[$zoneName])) {
-                $groupedUploads[$zoneName] = [];
-            }
-            if (!isset($groupedUploads[$zoneName][$productLineName])) {
-                $groupedUploads[$zoneName][$productLineName] = [];
-            }
-            if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName])) {
-                $groupedUploads[$zoneName][$productLineName][$categoryName] = [];
-            }
-            if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
-                $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
-            }
-            $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
-
+    
+            $groupedUploads = $this->groupingNonValidatedUpload($groupedUploads, $upload, $zoneName, $productLineName, $categoryName, $buttonName);
+    
             if ($upload->getValidation()) {
-                if (!isset($groupedValidatedUploads[$zoneName])) {
-                    $groupedValidatedUploads[$zoneName] = [];
-                }
-                if (!isset($groupedValidatedUploads[$zoneName][$productLineName])) {
-                    $groupedValidatedUploads[$zoneName][$productLineName] = [];
-                }
-                if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName])) {
-                    $groupedValidatedUploads[$zoneName][$productLineName][$categoryName] = [];
-                }
-                if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
-                    $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
-                }
-                $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
+                $groupedValidatedUploads = $this->groupingValidatedUpload($groupedValidatedUploads, $upload, $zoneName, $productLineName, $categoryName, $buttonName);
             }
         }
-
+    
         return [$groupedUploads, $groupedValidatedUploads];
     }
 
 
 
+
+    /**
+     * Groups a non-validated upload into a hierarchical array structure based on organizational elements.
+     *
+     * This function organizes uploads into a nested array structure according to their zone,
+     * product line, category, and button. It ensures that all necessary array levels exist
+     * before adding the upload to the appropriate location in the hierarchy.
+     *
+     * @param array  $groupedUploads   The existing hierarchical array of grouped uploads
+     * @param Upload $upload           The upload entity to be added to the grouped structure
+     * @param string $zoneName         The name of the zone associated with the upload
+     * @param string $productLineName  The name of the product line associated with the upload
+     * @param string $categoryName     The name of the category associated with the upload
+     * @param string $buttonName       The name of the button associated with the upload
+     *
+     * @return array The updated hierarchical array with the new upload added
+     */
+    public function groupingNonValidatedUpload(
+        array  $groupedUploads,
+        Upload $upload,
+        string $zoneName,
+        string $productLineName,
+        string $categoryName,
+        string $buttonName
+    ): array {
+
+        if (!isset($groupedUploads[$zoneName])) {
+            $groupedUploads[$zoneName] = [];
+        }
+        if (!isset($groupedUploads[$zoneName][$productLineName])) {
+            $groupedUploads[$zoneName][$productLineName] = [];
+        }
+        if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName])) {
+            $groupedUploads[$zoneName][$productLineName][$categoryName] = [];
+        }
+        if (!isset($groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
+            $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
+        }
+        $groupedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
+
+        return $groupedUploads;
+    }
+
+
+
+    
+    /**
+     * Groups a validated upload into a hierarchical array structure based on organizational elements.
+     *
+     * This function organizes validated uploads into a nested array structure according to their zone,
+     * product line, category, and button. It ensures that all necessary array levels exist
+     * before adding the upload to the appropriate location in the hierarchy.
+     *
+     * @param array  $groupedValidatedUploads The existing hierarchical array of grouped validated uploads
+     * @param Upload $upload                  The validated upload entity to be added to the grouped structure
+     * @param string $zoneName                The name of the zone associated with the upload
+     * @param string $productLineName         The name of the product line associated with the upload
+     * @param string $categoryName            The name of the category associated with the upload
+     * @param string $buttonName              The name of the button associated with the upload
+     *
+     * @return array The updated hierarchical array with the new validated upload added
+     */
+    public function groupingValidatedUpload(
+        array $groupedValidatedUploads,
+        Upload $upload,
+        string $zoneName,
+        string $productLineName,
+        string $categoryName,
+        string $buttonName
+    ): array {
+
+        if (!isset($groupedValidatedUploads[$zoneName])) {
+            $groupedValidatedUploads[$zoneName] = [];
+        }
+        if (!isset($groupedValidatedUploads[$zoneName][$productLineName])) {
+            $groupedValidatedUploads[$zoneName][$productLineName] = [];
+        }
+        if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName])) {
+            $groupedValidatedUploads[$zoneName][$productLineName][$categoryName] = [];
+        }
+        if (!isset($groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName])) {
+            $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName] = [];
+        }
+        $groupedValidatedUploads[$zoneName][$productLineName][$categoryName][$buttonName][] = $upload;
+
+        return $groupedValidatedUploads;
+    }
 
 
     /**
@@ -501,7 +547,6 @@ class UploadService extends AbstractController
      *
      * @return string The determined file path.
      *
-     * @throws Exception If the file object is not valid and does not have an old upload.
      */
     private function determineFilePath($file): string
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Upload;
 
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -11,10 +11,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\Upload;
 use App\Entity\User;
 
-use App\Service\ValidationService;
-use App\Service\OldUploadService;
+use App\Service\Validation\ValidationService;
+use App\Service\Upload\OldUploadService;
 use App\Service\FolderService;
-use App\Service\FileTypeService;
+use App\Service\Upload\FileTypeService;
 
 use Psr\Log\LoggerInterface;
 
@@ -487,17 +487,17 @@ class UploadModificationService extends AbstractController
             [$modificationOutlined]
         );
 
-            if ($preExistingValidation) {
-                $this->logger->info(
-                    'UploadModification::updateOrCreateValidation(): Updating existing validation and isHeavyModification'
-                );
-                $this->validationService->updateValidation($upload, $request);
-            } else {
-                $this->logger->info(
-                    'UploadModification::updateOrCreateValidation(): Creating new validation and not isHeavyModification'
-                );
-                $this->validationService->createValidation($upload, $request);
-            }
+        if ($preExistingValidation) {
+            $this->logger->info(
+                'UploadModification::updateOrCreateValidation(): Updating existing validation and isHeavyModification'
+            );
+            $this->validationService->updateValidation($upload, $request);
+        } else {
+            $this->logger->info(
+                'UploadModification::updateOrCreateValidation(): Creating new validation and not isHeavyModification'
+            );
+            $this->validationService->createValidation($upload, $request);
+        }
     }
 
 

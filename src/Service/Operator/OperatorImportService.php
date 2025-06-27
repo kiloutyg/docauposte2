@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Operator;
 
 use App\Entity\Operator;
 
 use App\Service\EntityFetchingService;
-use App\Service\OperatorService;
+use App\Service\Operator\OperatorService;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;

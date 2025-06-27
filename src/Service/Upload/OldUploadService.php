@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Upload;
 
 use App\Entity\OldUpload;
 use App\Entity\Upload;
@@ -41,15 +41,17 @@ class OldUploadService extends AbstractController
     }
 
 
-
-    // public function retireOldUpload(Upload $upload)
     /**
-     * Retires the old upload by creating a new OldUpload entity and copying the file with a new name.
+     * Retires an existing upload by creating an OldUpload entity.
      *
-     * @param string $oldFilePath The path of the old file to be retired.
-     * @param string $oldFileName The name of the old file to be retired.
+     * This function takes a file path and name, creates a copy of the file with an "Old_" prefix,
+     * and associates it with the original upload as an OldUpload entity. If the upload already has
+     * an associated old upload with identical content, no action is taken.
      *
-     * @throws \Exception If the file could not be copied.
+     * @param string $oldFilePath The file path of the upload to be retired
+     * @param string $oldFileName The file name of the upload to be retired
+     *
+     * @throws \Exception If there is an error copying the file
      *
      * @return void
      */
@@ -89,12 +91,24 @@ class OldUploadService extends AbstractController
             }
             $oldPath = $folderPath . '/' . $oldFilename;
 
-            // Copy the file with the new name
-            if (copy($path, $oldPath)) {
-                // The file has been copied to $oldPath
-            } else {
-                // The file could not be copied
-                throw new \Exception("File could not be copied.");
+            try {
+                // Copy the file with the new name
+                if (!copy($path, $oldPath)) {
+                    $this->logger->error('Failed to copy file', [
+                        'source' => $path,
+                        'destination' => $oldPath
+                    ]);
+                }
+                // The file has been successfully copied to $oldPath
+            } catch (\Exception $e) {
+                // This will catch any other unexpected exceptions that might occur
+                $this->logger->error('Exception occurred while copying file', [
+                    'source' => $path,
+                    'destination' => $oldPath,
+                    'exception' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                throw $e; // Re-throw the exception to be handled by the caller
             }
 
             $uploadedAt         = $upload->getUploadedAt();
@@ -147,7 +161,6 @@ class OldUploadService extends AbstractController
             $this->addFlash(type: 'danger', message: 'Le fichier n\existe pas.');
             return $this->redirectToRoute(route: 'app_base');
         }
-        // Initially i used to check if the old upload is validated. TODO: Uncomment and fix this validation check and all oldupload related BS.
         return $this->redirectToRoute(
             route: 'app_training_front_by_old_upload',
             parameters: ['oldUploadId' => $oldUpload->getId()]

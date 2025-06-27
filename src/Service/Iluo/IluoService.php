@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Iluo;
 
-use App\Service\ProductsService;
-use App\Service\QualityRepService;
-use App\Service\ShiftLeadersService;
-use App\Service\WorkstationService;
-use App\Service\TrainingMaterialTypeService;
+use App\Service\Iluo\ProductsService;
+use App\Service\Iluo\QualityRepService;
+use App\Service\Iluo\ShiftLeadersService;
+use App\Service\Iluo\WorkstationService;
+use App\Service\Operator\TrainingMaterialTypeService;
 
 use Psr\Log\LoggerInterface;
 

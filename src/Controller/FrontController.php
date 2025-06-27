@@ -16,8 +16,8 @@ use App\Entity\Button;
 use App\Service\EntityFetchingService;
 use App\Service\AccountService;
 use App\Service\SettingsService;
-use App\Service\ValidationService;
-use App\Service\OperatorService;
+use App\Service\Validation\ValidationService;
+use App\Service\Operator\OperatorService;
 
 // This controller manage the logic of the front interface, it is the main controller of the application and is responsible for rendering the front interface.
 // It is also responsible for creating the super-admin account.
@@ -110,7 +110,7 @@ class FrontController extends AbstractController
 
 
 
-    
+
     /**
      * Renders the base page of the application.
      *

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Validation;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -8,18 +8,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-use App\Repository\UserRepository;
-use App\Repository\ValidationRepository;
-use App\Repository\ApprobationRepository;
-
 use App\Entity\Upload;
 use App\Entity\User;
 use App\Entity\Department;
 use App\Entity\Validation;
 use App\Entity\Approbation;
 
-use App\Service\MailerService;
-use App\Service\TrainingRecordService;
+use App\Service\Factory\RepositoryFactory;
+use App\Service\Factory\ServiceFactory;
+
 use Doctrine\Common\Collections\Collection;
 
 class ValidationService extends AbstractController
@@ -29,13 +26,15 @@ class ValidationService extends AbstractController
     private   $projectDir;
     private   $params;
 
+    private   $repositoryFactory;
+    private   $serviceFactory;
     private   $userRepository;
     private   $validationRepository;
     private   $approbationRepository;
 
     private   $mailerService;
 
-    private     $trainingRecordService;
+    private   $trainingRecordService;
 
 
     public function __construct(
@@ -43,25 +42,23 @@ class ValidationService extends AbstractController
         EntityManagerInterface          $em,
         ParameterBagInterface           $params,
 
-        UserRepository                  $userRepository,
-        ValidationRepository            $validationRepository,
-        ApprobationRepository           $approbationRepository,
-
-        MailerService                   $mailerService,
-        TrainingRecordService           $trainingRecordService,
-
+        RepositoryFactory               $repositoryFactory,
+        ServiceFactory                  $serviceFactory
     ) {
         $this->logger                   = $logger;
         $this->em                       = $em;
-        $this->projectDir               = $params->get('kernel.project_dir');
+        $this->projectDir               = $params->get(name: 'kernel.project_dir');
         $this->params                   = $params;
 
-        $this->userRepository           = $userRepository;
-        $this->validationRepository     = $validationRepository;
-        $this->approbationRepository    = $approbationRepository;
+        $this->repositoryFactory        = $repositoryFactory;
+        $this->serviceFactory           = $serviceFactory;
 
-        $this->mailerService            = $mailerService;
-        $this->trainingRecordService    = $trainingRecordService;
+        $this->userRepository           = $this->repositoryFactory->getRepository(entityType: 'user');
+        $this->validationRepository     = $this->repositoryFactory->getRepository(entityType: 'validation');
+        $this->approbationRepository    = $this->repositoryFactory->getRepository(entityType: 'approbation');
+
+        $this->mailerService            = $this->serviceFactory->getService(className: 'mailer');
+        $this->trainingRecordService    = $this->serviceFactory->getService(className: 'operator\\trainingRecord');
     }
 
 
@@ -106,7 +103,7 @@ class ValidationService extends AbstractController
         if ($request->request->get('validationComment') !== null) {
             // Store the comment in a variable
             $comment = $request->request->get('validationComment');
-            // If the user added a comment persist the comment 
+            // If the user added a comment persist the comment
             $validation->setComment($comment);
         }
         if ($request->request->get('modificationComment') !== null) {
@@ -564,7 +561,6 @@ class ValidationService extends AbstractController
         } elseif ($noApprobations) {
             $this->logger->notice('ValidationService::approbationCheck() - Validation has no approbations');
             $status = null;
-            return;
         } elseif (count($posApprobations) === $approbationCount) {
             $this->logger->notice('ValidationService::approbationCheck() - Validation has all approbations approved');
             $status = true;
@@ -627,9 +623,11 @@ class ValidationService extends AbstractController
         }
         $this->logger->info('ValidationService::updateValidationAndUploadStatus - validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay() . ' upload->isTraining(): ' . $upload->isTraining() . ' $this->trainingRecordService->lastTrainingDateUploadDateComparison($upload): ' . $this->trainingRecordService->lastTrainingDateUploadDateComparison($upload));
 
-        if ($upload->isTraining() &&
-         $validation->isStatus() &&
-         ($this->trainingRecordService->lastTrainingDateUploadDateComparison($upload) || !$upload->isForcedDisplay())) {
+        if (
+            $upload->isTraining() &&
+            $validation->isStatus() &&
+            ($this->trainingRecordService->lastTrainingDateUploadDateComparison($upload) || !$upload->isForcedDisplay())
+        ) {
             $this->logger->info('ValidationService::updateValidationAndUploadStatus() - $upload->isTraining() && $validation->isStatus() && ($this->trainingRecordService->lastTrainingDateUploadDateComparison($upload) || !$upload->isForcedDisplay())');
             $this->trainingRecordService->updateTrainingRecord($upload);
             $this->logger->info('ValidationService::updateValidationAndUploadStatus() - Sending approval email to uploader');
@@ -637,7 +635,6 @@ class ValidationService extends AbstractController
         } elseif ($validation->isStatus() === true) {
             $this->mailerService->sendApprovalEmail($validation);
         }
-        return;
     }
 
 
@@ -675,10 +672,9 @@ class ValidationService extends AbstractController
 
         // Store the comment in a variable
         $comment = $request->request->get('modificationComment');
+
         // If the user added a comment persist the comment
-        if ($comment != null) {
-            $validation->setComment($comment);
-        }
+        $validation->setComment($comment);
 
         // Persist the Validation instance to the database
         $this->em->persist($validation);
@@ -705,7 +701,7 @@ class ValidationService extends AbstractController
                     }
                 }
                 // If the Approbation is not approved or the Approval property is null
-                elseif ($approbation->isApproval() == false) {
+                elseif ($approbation->isApproval() === false) {
                     // Remove the Approbation instance from the database
                     $approbation->setApproval(null);
                     $approbation->setApprovedAt(null);
@@ -734,17 +730,19 @@ class ValidationService extends AbstractController
 
 
 
+
     /**
-     * Checks for pending validations and sends reminder emails to validators and uploaders.
+     * Checks for pending validations and sends reminder emails to relevant users.
      *
-     * This function runs on even-numbered days of the month in non-development environments.
-     * It identifies uploads waiting for validation for more than 14 days and approbations
-     * that have not been answered for more than 1 day. It then sends reminder emails to
-     * the appropriate validators and uploaders.
+     * This method runs on even-numbered days and checks for documents awaiting validation.
+     * It sends reminder emails to validators with pending approvals, to uploaders whose
+     * documents are waiting for validation or have been refused, and a general reminder
+     * to all users about documents that have been waiting for validation for more than 14 days.
+     * The method uses a tracking file to ensure emails are not sent multiple times on the same day.
      *
-     * @param array $users An array of User objects to check for validator roles
+     * @param array $users An array of User entities to check for validator roles and send reminders to
      *
-     * @return void This function doesn't return any value
+     * @return void This method doesn't return any value
      */
     public function remindCheck(array $users)
     {
@@ -752,7 +750,6 @@ class ValidationService extends AbstractController
         $fileName = 'email_sent.txt';
         $filePath = $this->projectDir . '/public/doc/' . $fileName;
         $uploadsWaitingValidationRaw = [];
-
         $uploaders = [];
 
         if (
@@ -764,75 +761,190 @@ class ValidationService extends AbstractController
 
             $nonValidatedValidations = $this->validationRepository->findNonValidatedValidations();
 
-            foreach ($nonValidatedValidations as $validation) {
-                $uploadedAt = $validation->getUpload()->getUploadedAt();
-                if (date_diff($today, $uploadedAt)->days >= 14) {
-                    $uploadsWaitingValidationRaw[] = $validation->getUpload();
-                }
-            }
+            $uploadsWaitingValidationRaw = $this->uploadsWaitingValidationRaw(
+                nonValidatedValidations: $nonValidatedValidations,
+                today: $today
+            );
 
-            $rolesToCheck = ['ROLE_LINE_ADMIN_VALIDATOR', 'ROLE_ADMIN_VALIDATOR'];
-            foreach ($users as $user) {
-                if (array_intersect($rolesToCheck, $user->getRoles())) {
-                    $validators[] = $user;
-                }
-            }
-
-            $return = false;
+            $validators = $this->validatorsDelimitation(users: $users);
 
             foreach ($validators as $validator) {
-                $uploadsWaitingValidation = [];
-                $uploadsRefused = [];
-                $approbationsNotAnswered = $this->approbationRepository->findBy(['UserApprobator' => $validator, 'approval' => null]);
-                $approbationsRefused = $this->approbationRepository->findBy(['UserApprobator' => $validator, 'approval' => false]);
-                foreach ($approbationsNotAnswered as $approbationNotAnswered) {
-                    $upload = $approbationNotAnswered->getValidation()->getUpload();
-                    $uploadedAt = $upload->getUploadedAt();
-                    if (date_diff($today, $uploadedAt)->days >= 1) {
-                        $uploadsWaitingValidation[] = $upload;
-                    }
-                }
-                if (count($uploadsWaitingValidation) > 0) {
-                    $return = $this->mailerService->sendReminderEmail($validator, $uploadsWaitingValidation);
 
-                    foreach ($uploadsWaitingValidation as $upload) {
-                        $uploaderId = $upload->getUploader()->getId();
-                        $uploaders[$uploaderId] = $upload->getUploader();
-                    }
-                }
+                $approbationsNotAnswered = $this->approbationRepository->findBy([
+                    'UserApprobator' => $validator,
+                    'approval' => null
+                ]);
 
-                foreach ($approbationsRefused as $approbationRefused) {
-                    $upload = $approbationRefused->getValidation()->getUpload();
-                    $uploadedAt = $upload->getUploadedAt();
-                    if (date_diff($today, $uploadedAt)->days >= 1) {
-                        $uploadsRefused[] = $upload;
-                    }
-                }
-                if (count($uploadsRefused) > 0) {
-                    foreach ($uploadsRefused as $upload) {
-                        $uploaderId = $upload->getUploader()->getId();
-                        $uploaders[$uploaderId] = $upload->getUploader();
-                    }
-                }
+                $approbationsRefused = $this->approbationRepository->findBy([
+                    'UserApprobator' => $validator,
+                    'approval' => false
+                ]);
+
+                $uploaders[] = $this->defineUploadersOfUploadsWaitingValidation(
+                    approbationsNotAnswered: $approbationsNotAnswered,
+                    validator: $validator,
+                    today: $today,
+                    filePath: $filePath
+                );
+
+                $uploaders[] = $this->defineUploadersOfRefusedUploads(
+                    approbationsRefused: $approbationsRefused,
+                    today: $today,
+                );
             }
 
-            if ($return) {
-                file_put_contents($filePath, $today->format('Y-m-d'));
-            }
             foreach ($uploaders as $uploader) {
                 $this->mailerService->sendReminderEmailToUploader($uploader);
             }
 
-            if (count($uploadsWaitingValidationRaw) > 0) {
+            if (!empty($uploadsWaitingValidationRaw)) {
                 $this->mailerService->sendReminderEmailToAllUsers($uploadsWaitingValidationRaw);
             }
         }
     }
 
 
+    /**
+     * Filters validations to identify uploads waiting for validation for 14 days or more.
+     *
+     * This method examines a list of non-validated validations and identifies those
+     * whose associated uploads have been waiting for validation for at least 14 days.
+     * It compares the upload date with the current date to determine the waiting period.
+     *
+     * @param array $nonValidatedValidations An array of Validation entities that have not been validated
+     * @param \DateTime $today The current date used for comparison with upload dates
+     *
+     * @return array An array of Upload entities that have been waiting for validation for 14 days or more
+     */
+    private function uploadsWaitingValidationRaw(
+        array $nonValidatedValidations,
+        \DateTime $today
+    ): array {
+        foreach ($nonValidatedValidations as $validation) {
+            $uploadedAt = $validation->getUpload()->getUploadedAt();
+            if (date_diff($today, $uploadedAt)->days >= 14) {
+                $uploadsWaitingValidationRaw[] = $validation->getUpload();
+            }
+        }
+        return $uploadsWaitingValidationRaw;
+    }
+
+
+    /**
+     * Filters users to identify those with validator roles.
+     *
+     * This method examines a list of users and identifies those who have
+     * validator roles (ROLE_LINE_ADMIN_VALIDATOR or ROLE_ADMIN_VALIDATOR).
+     * It creates a filtered list containing only users with these specific roles.
+     *
+     * @param array $users An array of User entities to check for validator roles
+     *
+     * @return array An array of User entities that have validator roles
+     */
+    private function validatorsDelimitation(array $users): array
+    {
+        $rolesToCheck = ['ROLE_LINE_ADMIN_VALIDATOR', 'ROLE_ADMIN_VALIDATOR'];
+        foreach ($users as $user) {
+            if (array_intersect($rolesToCheck, $user->getRoles())) {
+                $validators[] = $user;
+            }
+        }
+        return $validators;
+    }
+
+
+    /**
+     * Identifies uploads waiting for validation and sends reminder emails to validators.
+     *
+     * This method processes approbations that have not been answered yet, identifies uploads
+     * that have been waiting for validation for at least one day, sends reminder emails to
+     * the validator responsible for those approbations, and collects the uploaders of those
+     * documents for further notification processing.
+     *
+     * @param Collection $approbationsNotAnswered Collection of approbations that have not been answered
+     * @param User $validator The validator user who needs to be reminded
+     * @param \DateTime $today The current date used for comparison with upload dates
+     * @param string $filePath Path to the tracking file that records when emails were sent
+     *
+     * @return array An associative array of uploaders indexed by their IDs, who have uploads
+     *               waiting for validation by the specified validator
+     */
+    private function defineUploadersOfUploadsWaitingValidation(
+        Collection $approbationsNotAnswered,
+        User $validator,
+        \DateTime $today,
+        string $filePath
+    ): array {
+        $return = false;
+        $uploadsWaitingValidation = [];
+
+        foreach ($approbationsNotAnswered as $approbationNotAnswered) {
+            $upload = $approbationNotAnswered->getValidation()->getUpload();
+            $uploadedAt = $upload->getUploadedAt();
+            if (date_diff($today, $uploadedAt)->days >= 1) {
+                $uploadsWaitingValidation[] = $upload;
+            }
+        }
+
+        if (!empty($uploadsWaitingValidation)) {
+            $return = $this->mailerService->sendReminderEmail(
+                $validator,
+                $uploadsWaitingValidation
+            );
+
+            foreach ($uploadsWaitingValidation as $upload) {
+                $uploaderId = $upload->getUploader()->getId();
+                $uploaders[$uploaderId] = $upload->getUploader();
+            }
+        }
+
+        if ($return) {
+            file_put_contents($filePath, $today->format('Y-m-d'));
+        }
+
+        return $uploaders;
+    }
 
 
 
+    /**
+     * Identifies uploads that have been refused and collects their uploaders.
+     *
+     * This method processes approbations that have been explicitly refused, identifies uploads
+     * that have been refused for at least one day, and collects the uploaders of those
+     * documents for notification purposes.
+     *
+     * @param Collection $approbationsRefused Collection of approbations that have been refused
+     * @param \DateTime $today The current date used for comparison with upload dates
+     *
+     * @return array An associative array of uploaders indexed by their IDs, who have uploads
+     *               that have been refused
+     */
+    private function defineUploadersOfRefusedUploads(
+        Collection $approbationsRefused,
+        \DateTime $today
+    ): array {
+        $uploadsRefused = [];
+
+        foreach ($approbationsRefused as $approbationRefused) {
+            $upload = $approbationRefused->getValidation()->getUpload();
+            $uploadedAt = $upload->getUploadedAt();
+            if (date_diff($today, $uploadedAt)->days >= 1) {
+                $uploadsRefused[] = $upload;
+            }
+        }
+
+        if (!empty($uploadsRefused)) {
+            foreach ($uploadsRefused as $upload) {
+                $uploaderId = $upload->getUploader()->getId();
+                $uploaders[$uploaderId] = $upload->getUploader();
+            }
+        }
+        return $uploaders;
+    }
+
+
+    
     /**
      * Performs a monthly quality check and sends a quality resume email.
      *

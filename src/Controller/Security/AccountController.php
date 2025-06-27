@@ -76,24 +76,18 @@ class AccountController extends AbstractController
     #[Route(path: '/account/create', name: 'app_account_create')]
     public function createAccountController(Request $request): Response
     {
-        
-        if ($request->isMethod('POST')) {
-            try {
-                $this->accountService->createAccount($request);
-                $this->addFlash('success', 'Le compte a bien été créé.');
-            } catch (\Exception $e) {
-                $this->addFlash('danger', $e->getMessage());
-            }
-            return $this->redirectToRoute('app_super_admin');
+
+        if ($request->isMethod('GET')) {
+            return $this->renderAccountCreationTemplate();
         }
 
-
-        return $this->render(
-            '/services/account_services/create_account.html.twig',
-            [
-                'users' => $this->userRepository->getAllUsersOrderedByLastname(),
-            ]
-        );
+        try {
+            $this->accountService->createAccount($request);
+            $this->addFlash('success', 'Le compte a bien été créé.');
+        } catch (\Exception $e) {
+            $this->addFlash('danger', $e->getMessage());
+        }
+        return $this->renderAccountCreationTemplate(keepOpen: true);
     }
 
 
@@ -116,7 +110,12 @@ class AccountController extends AbstractController
     {
         if (!($user = $this->userRepository->find($userId))) {
             $this->addFlash('warning', 'This User does not exist');
-            return $this->redirectToRoute('app_super_admin');
+            return $this->render(
+                '/services/account_services/create_account.html.twig',
+                [
+                    'users' => $this->userRepository->getAllUsersOrderedByLastname(),
+                ]
+            );
         }
         if ($request->isMethod('GET')) {
             return $this->render('services/account_services/modify_account_view.html.twig', [
@@ -178,7 +177,7 @@ class AccountController extends AbstractController
         } catch (\Exception $e) {
             $this->addFlash('danger', 'Le compte ne peut pas être bloqué : ' . $e->getMessage());
         }
-        return $this->redirectToRoute('app_super_admin');
+        return $this->renderAccountCreationTemplate(keepOpen: true);
     }
 
     /**
@@ -197,13 +196,14 @@ class AccountController extends AbstractController
     #[Route(path: '/account/delete_account/unblock_account', name: 'app_account_unblock_account')]
     public function unblockAccount(Request $request): Response
     {
+        $user = $this->userRepository->find($request->query->get('userId'));
         try {
-            $this->accountService->unblockUser($this->userRepository->find($request->query->get('userId')));
+            $this->accountService->unblockUser($user);
             $this->addFlash('success', 'Le compte a été débloqué, vous devez réaffecter un Mot de passe et un Role à l\'utilisateur.');
         } catch (\Exception $e) {
             $this->addFlash('danger', 'Le compte ne peut pas être débloqué : ' . $e->getMessage());
         }
-        return $this->redirectToRoute('app_super_admin');
+        return $this->redirectToRoute('app_account_modify_account', ['userId' => $user->getId()]);
     }
 
     /**
@@ -222,11 +222,11 @@ class AccountController extends AbstractController
     {
         try {
             $this->entityDeletionService->deleteEntity('user', $request->query->get('userId'));
-            $this->addFlash('success', 'Le compte de ' . $this->userRepository->find($request->query->get('userId'))->getUsername() . ' a été supprimé');
+            $this->addFlash('success', 'Le compte a été supprimé');
         } catch (\Exception $e) {
             $this->addFlash('danger', 'Le compte ne peut pas être supprimé : ' . $e->getMessage());
         }
-        return $this->redirectToRoute('app_super_admin');
+        return $this->renderAccountCreationTemplate(keepOpen: true);
     }
 
     /**
@@ -250,9 +250,36 @@ class AccountController extends AbstractController
             $this->accountService->transferWork($originalUser, $recipient);
         } catch (\Exception $e) {
             $this->addFlash('danger', 'Le travail n\'a pas pu être transféré : ' . $e->getMessage());
-            return $this->redirectToRoute('app_super_admin');
         }
         $this->addFlash('success', 'Le travail a été transféré');
-        return $this->redirectToRoute('app_super_admin');
+        return $this->renderAccountCreationTemplate(keepOpen: true);
+    }
+
+
+
+    /**
+     * Renders the account creation template with a list of all users
+     *
+     * This helper method renders the account creation template with data needed for
+     * displaying the user management interface. It fetches all users from the repository
+     * ordered by lastname and passes them to the template.
+     *
+     * @param bool $keepOpen Whether to keep the accordion open
+     * @return Response A response object containing the rendered account creation template
+     */
+    private function renderAccountCreationTemplate(bool $keepOpen = false): Response
+    {
+        $params = [
+            'users' => $this->userRepository->getAllUsersOrderedByLastname(),
+        ];
+
+        if ($keepOpen) {
+            $params['openAccordion'] = true;
+        }
+
+        return $this->render(
+            '/services/account_services/create_account.html.twig',
+            $params
+        );
     }
 }

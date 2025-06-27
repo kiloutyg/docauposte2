@@ -1,7 +1,7 @@
 <turbo-frame
 	id="create-account">
 	{% if is_granted('ROLE_SUPER_ADMIN') or users is empty %}
-		{% if usersExist is null %}
+		{% if usersExist is null or openAccordion is defined  %}
 			{% set superAdminCreationButton = "" %}
 			{% set superAdminCreationAria = "true" %}
 			{% set superAdminCreationDiv = "show" %}
@@ -49,6 +49,19 @@
 											{% include "services/account_services/account_tool_components/account_crea_mod.html.twig" %}
 											<hr
 												class="my-4">
+											<div
+												id="flash-messages">
+												{% for label, messages in app.flashes %}
+													<div
+														class="alert alert-{{ label }}">
+														{% for message in messages %}
+															<p>
+																{{ message }}
+															</p>
+														{% endfor %}
+													</div>
+												{% endfor %}
+											</div>
 											<turbo-frame
 												loading="lazy"
 												class="px-0 px-md-2">

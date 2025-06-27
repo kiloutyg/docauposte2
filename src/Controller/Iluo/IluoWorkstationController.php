@@ -13,10 +13,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 use App\Entity\Workstation;
 
-use App\Form\WorkstationType;
+use App\Form\Iluo\WorkstationType;
 
 use App\Service\EntityFetchingService;
-use App\Service\IluoService;
+use App\Service\Iluo\IluoService;
 
 
 #[Route('/iluo/', name: 'app_iluo_')]

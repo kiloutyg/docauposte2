@@ -13,10 +13,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 use App\Entity\TrainingMaterialType;
 
-use App\Form\TrainingMaterialTypeType;
+use App\Form\Iluo\TrainingMaterialTypeType;
 
 use App\Service\EntityFetchingService;
-use App\Service\IluoService;
+use App\Service\Iluo\IluoService;
 
 
 #[Route('/iluo/', name: 'app_iluo_')]

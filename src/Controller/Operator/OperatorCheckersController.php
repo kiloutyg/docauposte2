@@ -3,7 +3,7 @@
 namespace App\Controller\Operator;
 
 use App\Service\EntityFetchingService;
-use App\Service\OperatorService;
+use App\Service\Operator\OperatorService;
 
 use \Psr\Log\LoggerInterface;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Incident;
 
 use Psr\Log\LoggerInterface;
 
@@ -58,6 +58,21 @@ class IncidentRedirectService extends AbstractController
 
 
 
+    /**
+     * Checks if the user session has been inactive for longer than the configured time limit.
+     *
+     * This function manages the inactivity tracking by:
+     * - Ensuring the session is started
+     * - Initializing inactivity tracking if not already set
+     * - Comparing the last activity time with the current time
+     * - Triggering redirection if the inactivity threshold is exceeded
+     *
+     * @param Request $request The HTTP request object containing the session
+     *
+     * @return JsonResponse A JSON response indicating whether redirection is needed:
+     *                      - ['redirect' => false, 'cause' => string] if no redirection is needed
+     *                      - ['redirect' => URL] if redirection should occur (from redirectionManagement)
+     */
     public function inactivityCheck(Request $request): JsonResponse
     {
         $session = $request->getSession();
@@ -86,6 +101,22 @@ class IncidentRedirectService extends AbstractController
 
 
 
+    /**
+     * Manages the redirection process based on the current route stored in the session.
+     *
+     * This function determines the appropriate incident to display based on the current route
+     * and its parameters. It handles the redirection logic for zones, product lines, categories,
+     * and buttons, setting up necessary session variables for incident cycling if multiple
+     * incidents are found.
+     *
+     * @param SessionInterface $session The session containing route information and where
+     *                                  incident data will be stored
+     *
+     * @return JsonResponse A JSON response containing either:
+     *                      - ['redirect' => URL] with the URL to redirect to if an incident is found
+     *                      - ['redirect' => null, 'cause' => string] if no redirection is possible,
+     *                        with an explanation of why
+     */
     public function redirectionManagement(SessionInterface $session): JsonResponse
     {
 
@@ -93,12 +124,17 @@ class IncidentRedirectService extends AbstractController
         $routeParams =  $session->get('stuff_param');
 
 
-        if (($routeName == 'app_zone' || $routeName == 'app_productLine' || $routeName == 'app_category' || $routeName == 'app_button') && $routeParams != null) {
+        if (($routeName == 'app_zone' ||
+                $routeName == 'app_productLine' ||
+                $routeName == 'app_category' ||
+                $routeName == 'app_button') &&
+            $routeParams != null
+        ) {
 
             $response = $this->incidentRouteDetermination($routeName, $routeParams);
 
             if ($response) {
-                $session->remove('lastActivity', time());
+                $session->remove('lastActivity');
                 $session->set('inactive', false);
 
                 $arrayOfProductLines = $response[0];
@@ -122,12 +158,12 @@ class IncidentRedirectService extends AbstractController
                 ]);
             }
 
-            $session->remove('lastActivity', time());
+            $session->remove('lastActivity');
             $session->set('inactive', false);
             return new JsonResponse(['redirect' => null, 'cause' => 'issue in incidentRouteDetermination service response not correct, no incident found']);
         }
 
-        $session->remove('lastActivity', time());
+        $session->remove('lastActivity');
         $session->set('inactive', false);
         return new JsonResponse(['redirect' => null, 'cause' => 'issue in redirectionManagement service, no correct route stored']);
     }
@@ -136,6 +172,20 @@ class IncidentRedirectService extends AbstractController
 
 
 
+    /**
+     * Handles the cycling between multiple incidents for automatic display.
+     *
+     * This function checks if it's time to cycle to the next incident based on the
+     * cycling timer. If multiple incidents are available and enough time has passed
+     * since the last cycle, it will prepare a redirect to the next incident in the sequence.
+     *
+     * @param Request $request The HTTP request object containing the session with incident data
+     *
+     * @return JsonResponse A JSON response indicating whether redirection is needed:
+     *                      - ['redirect' => URL] if it's time to show the next incident
+     *                      - ['redirect' => false, 'cause' => string] if no redirection should occur,
+     *                        with an explanation of why
+     */
     public function cyclingIncident(Request $request): JsonResponse
     {
         $session = $request->getSession();
@@ -164,6 +214,22 @@ class IncidentRedirectService extends AbstractController
 
 
 
+    /**
+     * Prepares a JSON response for redirecting to the next incident in the cycling sequence.
+     *
+     * This function handles the logic for cycling through multiple incidents by:
+     * - Updating the cycling timer to the current time
+     * - Incrementing the incident index and handling wrap-around when reaching the end
+     * - Determining the correct product line for the current incident
+     * - Generating a redirect URL to the next incident if valid data exists
+     *
+     * @param SessionInterface $session           The session containing incident data and cycling information
+     * @param int              $numberOfIncidents The total number of incidents available for cycling
+     *
+     * @return JsonResponse A JSON response containing either:
+     *                      - ['redirect' => URL] with the URL to redirect to the next incident
+     *                      - ['redirect' => false, 'cause' => string] if redirection is not possible
+     */
     public function getNextIncidentRedirectResponse(SessionInterface $session, int $numberOfIncidents): JsonResponse
     {
         // Update cycling timer
@@ -214,6 +280,16 @@ class IncidentRedirectService extends AbstractController
 
 
 
+    /**
+     * Compares a given timestamp with the current time to determine if enough time has elapsed.
+     *
+     * This function checks if the difference between the current time and the provided timestamp
+     * exceeds the configured auto-display timer threshold from the settings service.
+     *
+     * @param int $time The timestamp to compare against the current time
+     *
+     * @return bool Returns true if the elapsed time exceeds the configured threshold, false otherwise
+     */
     public function timeComparison(int $time): bool
     {
 
@@ -227,6 +303,20 @@ class IncidentRedirectService extends AbstractController
 
 
 
+    /**
+     * Determines the appropriate incidents based on the current route and its parameters.
+     *
+     * This function identifies the entity (Zone, ProductLine, Category, or Button) from the route
+     * and delegates to the appropriate method to retrieve related incidents. It handles the routing
+     * logic for finding incidents associated with different levels of the application hierarchy.
+     *
+     * @param string $routeName   The name of the current route (e.g., 'app_zone', 'app_productLine')
+     * @param array  $routeParams The parameters associated with the route, containing entity IDs
+     *
+     * @return array|false Returns either:
+     *                     - An array containing [productLineIdsArray, incidentIdsArray] if incidents are found
+     *                     - False if no incidents are found or if the route is not recognized
+     */
     public function incidentRouteDetermination(string $routeName, array $routeParams)
     {
 
@@ -280,6 +370,18 @@ class IncidentRedirectService extends AbstractController
 
 
 
+    /**
+     * Retrieves incidents associated with a specific zone.
+     *
+     * This function collects all incidents from product lines belonging to the given zone,
+     * sorts them by priority, and returns arrays of product line IDs and incident IDs.
+     *
+     * @param Zone $zone The zone entity for which to find incidents
+     *
+     * @return array|false Returns either:
+     *                     - An array containing [productLineIdsArray, incidentIdsArray] if incidents are found
+     *                     - False if no incidents are found for the zone
+     */
     public function incidentByZone(Zone $zone)
     {
         $productLines = $zone->getProductLines();
@@ -318,6 +420,19 @@ class IncidentRedirectService extends AbstractController
 
 
 
+    /**
+     * Retrieves incidents associated with a specific product line.
+     *
+     * This function collects all incidents from the given product line,
+     * sorts them by priority if multiple incidents exist, and returns arrays
+     * of the product line ID and incident IDs.
+     *
+     * @param ProductLine $productLine The product line entity for which to find incidents
+     *
+     * @return array|false Returns either:
+     *                     - An array containing [productLineIdsArray, incidentIdsArray] if incidents are found
+     *                     - False if no incidents are found for the product line
+     */
     public function incidentByProductLine(ProductLine $productLine)
     {
         $response = false;
@@ -344,6 +459,18 @@ class IncidentRedirectService extends AbstractController
 
 
 
+    /**
+     * Retrieves incidents associated with a specific category.
+     *
+     * This function gets the product line associated with the given category
+     * and delegates to incidentByProductLine to retrieve the incidents.
+     *
+     * @param Category $category The category entity for which to find incidents
+     *
+     * @return array|false Returns either:
+     *                     - An array containing [productLineIdsArray, incidentIdsArray] if incidents are found
+     *                     - False if no incidents are found for the category's product line
+     */
     public function incidentByCategory(Category $category)
     {
         $productLine = $category->getProductLine();
@@ -353,6 +480,18 @@ class IncidentRedirectService extends AbstractController
 
 
 
+    /**
+     * Retrieves incidents associated with a specific button.
+     *
+     * This function gets the category associated with the given button
+     * and delegates to incidentByCategory to retrieve the incidents.
+     *
+     * @param Button $button The button entity for which to find incidents
+     *
+     * @return array|false Returns either:
+     *                     - An array containing [productLineIdsArray, incidentIdsArray] if incidents are found
+     *                     - False if no incidents are found for the button's category
+     */
     public function incidentByButton(Button $button)
     {
         $category = $button->getCategory();
@@ -362,6 +501,16 @@ class IncidentRedirectService extends AbstractController
 
 
 
+    /**
+     * Sorts an array of incident objects by their auto-display priority in descending order.
+     *
+     * This function uses PHP's usort to sort the incidents based on their priority values,
+     * ensuring that incidents with higher priority values appear first in the resulting array.
+     *
+     * @param array $incidentsArray An array of incident objects to be sorted
+     *
+     * @return array The sorted array of incidents in descending order of priority
+     */
     public function incidentArraySortByPriority(array $incidentsArray)
     {
         usort($incidentsArray, function ($a, $b) {

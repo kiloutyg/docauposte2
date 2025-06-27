@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Operator;
 
 use App\Entity\Operator;
 use App\Entity\Trainer;
