@@ -77,16 +77,17 @@ class AccountController extends AbstractController
     public function createAccountController(Request $request): Response
     {
 
-        if ($request->isMethod('POST')) {
-            try {
-                $this->accountService->createAccount($request);
-                $this->addFlash('success', 'Le compte a bien été créé.');
-            } catch (\Exception $e) {
-                $this->addFlash('danger', $e->getMessage());
-            }
+        if ($request->isMethod('GET')) {
+            return $this->renderAccountCreationTemplate();
         }
 
-        return $this->renderAccountCreationTemplate();
+        try {
+            $this->accountService->createAccount($request);
+            $this->addFlash('success', 'Le compte a bien été créé.');
+        } catch (\Exception $e) {
+            $this->addFlash('danger', $e->getMessage());
+        }
+        return $this->renderAccountCreationTemplate(keepOpen: true);
     }
 
 
@@ -176,7 +177,7 @@ class AccountController extends AbstractController
         } catch (\Exception $e) {
             $this->addFlash('danger', 'Le compte ne peut pas être bloqué : ' . $e->getMessage());
         }
-        return $this->renderAccountCreationTemplate();
+        return $this->renderAccountCreationTemplate(keepOpen: true);
     }
 
     /**
@@ -225,7 +226,7 @@ class AccountController extends AbstractController
         } catch (\Exception $e) {
             $this->addFlash('danger', 'Le compte ne peut pas être supprimé : ' . $e->getMessage());
         }
-        return $this->renderAccountCreationTemplate();
+        return $this->renderAccountCreationTemplate(keepOpen: true);
     }
 
     /**
@@ -251,7 +252,7 @@ class AccountController extends AbstractController
             $this->addFlash('danger', 'Le travail n\'a pas pu être transféré : ' . $e->getMessage());
         }
         $this->addFlash('success', 'Le travail a été transféré');
-        return $this->renderAccountCreationTemplate();
+        return $this->renderAccountCreationTemplate(keepOpen: true);
     }
 
 
@@ -263,15 +264,22 @@ class AccountController extends AbstractController
      * displaying the user management interface. It fetches all users from the repository
      * ordered by lastname and passes them to the template.
      *
+     * @param bool $keepOpen Whether to keep the accordion open
      * @return Response A response object containing the rendered account creation template
      */
-    private function renderAccountCreationTemplate(): Response
+    private function renderAccountCreationTemplate(bool $keepOpen = false): Response
     {
+        $params = [
+            'users' => $this->userRepository->getAllUsersOrderedByLastname(),
+        ];
+
+        if ($keepOpen) {
+            $params['openAccordion'] = true;
+        }
+
         return $this->render(
             '/services/account_services/create_account.html.twig',
-            [
-                'users' => $this->userRepository->getAllUsersOrderedByLastname(),
-            ]
+            $params
         );
     }
 }

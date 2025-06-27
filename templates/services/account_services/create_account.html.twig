@@ -1,7 +1,7 @@
 <turbo-frame
 	id="create-account">
 	{% if is_granted('ROLE_SUPER_ADMIN') or users is empty %}
-		{% if usersExist is null %}
+		{% if usersExist is null or openAccordion is defined  %}
 			{% set superAdminCreationButton = "" %}
 			{% set superAdminCreationAria = "true" %}
 			{% set superAdminCreationDiv = "show" %}
@@ -67,7 +67,7 @@
 												class="px-0 px-md-2">
 												{{ render(controller('App\\Controller\\DepartmentController::departmentView'), options = []) }}
 											</turbo-frame>
-												{% include "services/account_services/account_tool_components/user_list.html.twig" %}
+											{% include "services/account_services/account_tool_components/user_list.html.twig" %}
 										</div>
 									</div>
 								</div>
