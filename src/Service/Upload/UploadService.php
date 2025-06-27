@@ -18,14 +18,6 @@ use App\Repository\UploadRepository;
 use App\Entity\Upload;
 use App\Entity\User;
 
-use App\Service\SettingsService;
-use App\Service\FolderService;
-
-use App\Service\Validation\ValidationService;
-
-use App\Service\Upload\OldUploadService;
-use App\Service\Upload\FileTypeService;
-
 use App\Service\Factory\ServiceFactory;
 
 /**
@@ -60,29 +52,14 @@ class UploadService extends AbstractController
      */
     private $uploadRepository;
 
-    /**
-     * @var ValidationService Service for handling document validation processes
-     */
     private $validationService;
 
-    /**
-     * @var OldUploadService Service for managing previous versions of uploads
-     */
     private $oldUploadService;
 
-    /**
-     * @var SettingsService Service for accessing application settings
-     */
     private $settingsService;
 
-    /**
-     * @var FolderService Service for managing folder structures and paths
-     */
     private $folderService;
 
-    /**
-     * @var FileTypeService Service for validating and handling file types
-     */
     private $fileTypeService;
 
     /**
@@ -98,11 +75,6 @@ class UploadService extends AbstractController
      *
      * @param EntityManagerInterface $em                The entity manager for database operations
      * @param UploadRepository       $uploadRepository  Repository for Upload entity operations
-     * @param ValidationService      $validationService Service for handling file validation processes
-     * @param OldUploadService       $oldUploadService  Service for managing previous versions of uploads
-     * @param SettingsService        $settingsService   Service for accessing application settings
-     * @param FolderService          $folderService     Service for managing folder structures and paths
-     * @param FileTypeService        $fileTypeService   Service for validating and handling file types
      * @param ServiceFactory         $serviceFactory    Service for creating and managing service instances
      */
 
