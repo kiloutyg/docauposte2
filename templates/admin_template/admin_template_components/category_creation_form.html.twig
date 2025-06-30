@@ -51,7 +51,8 @@
 												</h5>
 												<form
 													class="form-floating"
-													method='POST'>
+													method='POST'
+													data-controller="name-validation">
 													<div
 														class="form-control mb-3">
 														<label
@@ -64,13 +65,20 @@
 															placeholder="Nom de la Catégorie"
 															required
 															class="form-control"
-															id="categoryname">
+															id="categoryname"
+															data-name-validation-target='organizationEntityName'
+															data-action='input->name-validation#validateOrganizationEntityName'>
+														<div
+															data-name-validation-target="organizationEntityNameMessage"
+															class="organizationEntityName-message"></div>
 													</div>
 													<div
 														class="d-grid">
 														<button
 															class="btn btn-primary btn-login text-first|uppercase fw-bold"
-															type="submit">
+															type="submit"
+															data-name-validation-target='submitButton'
+															disabled='true'>
 															Valider
 														</button>
 													</div>
