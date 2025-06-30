@@ -755,7 +755,7 @@ class ValidationService extends AbstractController
         $uploaders = [];
 
         if (
-            // $this->params->get('kernel.environment') !== 'dev' &&
+            $this->params->get('kernel.environment') !== 'dev' &&
             ($today->format('d') % 2 == 0 &&
                 (!file_exists($filePath) ||
                     strpos(file_get_contents($filePath), $today->format('Y-m-d')) === false))
@@ -792,7 +792,7 @@ class ValidationService extends AbstractController
                 );
 
                 $this->logger->debug('ValidationService::remindCheck() - uploadersOfUploadsWaitingValidation: ', [$uploadersOfUploadsWaitingValidation]);
-                $uploadersOfRefusedUploads= $this->defineUploadersOfRefusedUploads(
+                $uploadersOfRefusedUploads = $this->defineUploadersOfRefusedUploads(
                     approbationsRefused: $approbationsRefused,
                     today: $today,
                 );
