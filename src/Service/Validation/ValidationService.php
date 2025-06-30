@@ -79,7 +79,7 @@ class ValidationService extends AbstractController
     public function createValidation(Upload $upload, Request $request): void
     {
 
-        $this->logger->info('ValidationService::createValidation : request: ', [$request->request->all()]);
+        $this->logger->debug('ValidationService::createValidation : request: ', [$request->request->all()]);
         // Create empty arrays to store values for validator_department and validator_user
         $validator_user_values = [];
 
@@ -166,7 +166,7 @@ class ValidationService extends AbstractController
      */
     public function updateValidation(Upload $upload, Request $request)
     {
-        $this->logger->info('ValidationService::updateValidation : request: ', [$request->request->all()]);
+        $this->logger->debug('ValidationService::updateValidation : request: ', [$request->request->all()]);
 
         // Get the Validation instance associated with the Upload instance
         $validation = $upload->getValidation();
@@ -190,13 +190,13 @@ class ValidationService extends AbstractController
         // Flush changes to the database
         $this->em->flush();
 
-        $this->logger->info('ValidationService::updateValidation : Before approbationChangeDetermination');
+        $this->logger->debug('ValidationService::updateValidation : Before approbationChangeDetermination');
         $this->approbationChangeDetermination(validation: $validation, request: $request);
-        $this->logger->info('ValidationService::updateValidation : After approbationChangeDetermination');
+        $this->logger->debug('ValidationService::updateValidation : After approbationChangeDetermination');
 
         // Send a notification email to the validator
         $this->mailerService->approbationEmail($validation);
-        $this->logger->info('forcedDisplay: ' . $upload->isForcedDisplay() . ' training-needed: ' . $request->request->get('training-needed') . ' display-needed: ' . $request->request->get('display-needed'));
+        $this->logger->debug('forcedDisplay: ' . $upload->isForcedDisplay() . ' training-needed: ' . $request->request->get('training-needed') . ' display-needed: ' . $request->request->get('display-needed'));
         if (!$minorModification && $request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
             $this->trainingRecordService->updateTrainingRecord($upload);
         }
@@ -220,7 +220,7 @@ class ValidationService extends AbstractController
     private function approbationChangeDetermination(Validation $validation, Request $request)
     {
 
-        $this->logger->info('ValidationService::approbationChangeDetermination : request: ', [$request->request->all()]);
+        $this->logger->debug('ValidationService::approbationChangeDetermination : request: ', [$request->request->all()]);
         // Get the approbators associated with the Validation instance
         $approbations = [];
         $approbations = $validation->getApprobations();
@@ -264,20 +264,21 @@ class ValidationService extends AbstractController
      */
     private function approbationChangeMinorModification(Validation $validation, Request $request, Collection $approbations)
     {
-        $this->logger->info('ValidationService::approbationChangeDetermination: minor modification');
+        $this->logger->debug('ValidationService::approbationChangeMinorModification: approbations: ', [$approbations]);
+        $this->logger->debug('ValidationService::approbationChangeDetermination: minor modification');
         $diffInApprobators = $this->checkApprobatorChange($request, $validation->getUpload());
-        $this->logger->info('ValidationService::approbationChangeDetermination: diffInApprobators: ', $diffInApprobators);
+        $this->logger->debug('ValidationService::approbationChangeDetermination: diffInApprobators: ', $diffInApprobators);
         if (!empty($diffInApprobators)) {
             foreach ($approbations as $approbation) {
-                $this->logger->info('ValidationService::approbationChangeDetermination: removing approbators before checks', [$approbation]);
+                $this->logger->debug('ValidationService::approbationChangeDetermination: removing approbators before checks', [$approbation]);
                 if (in_array(($approbation->getUserApprobator()->getId()), $diffInApprobators['removedApprobators'])) {
-                    $this->logger->info('ValidationService::approbationChangeDetermination: removing approbation after checks', [$approbation]);
+                    $this->logger->debug('ValidationService::approbationChangeDetermination: removing approbation after checks', [$approbation]);
                     $this->em->remove($approbation);
                 }
             }
             foreach ($diffInApprobators['newApprobators'] as $newApprobatorId) {
                 $newApprobatorEntity = $this->userRepository->find($newApprobatorId);
-                $this->logger->info('ValidationService::approbationChangeDetermination: creating new approbation', [$newApprobatorEntity]);
+                $this->logger->debug('ValidationService::approbationChangeDetermination: creating new approbation', [$newApprobatorEntity]);
                 $this->createApprobationProcess(
                     $validation,
                     $newApprobatorEntity
@@ -305,8 +306,8 @@ class ValidationService extends AbstractController
     private function approbationChangeMajorModification(Validation $validation, Collection $approbations, array $validator_user_values)
     {
 
-        $this->logger->info('ValidationService::approbationChangeDetermination: non minor modification');
-
+        $this->logger->debug('ValidationService::approbationChangeDetermination: non minor modification');
+        $this->logger->debug('ValidationService::approbationChangeMajorModification: approbations: ', [$approbations]);
         foreach ($approbations as $approbation) {
             // Remove the Approbation instance from the database
             $this->em->remove($approbation);
@@ -406,7 +407,7 @@ class ValidationService extends AbstractController
         // Find values in $approbatorUserId that are not in $validatorUserValues
         $removedApprobators = array_diff($approbatorUserId, $validatorUserValues);
 
-        $this->logger->info(
+        $this->logger->debug(
             'ValidationService::checkApprobatorChange() - Changes in approbators',
             [
                 'newApprobators' => $newApprobators,
@@ -479,7 +480,7 @@ class ValidationService extends AbstractController
      */
     public function validationApproval(Approbation $approbation, Request $request): bool
     {
-        $this->logger->info('ValidationService::validationApproval()');
+        $this->logger->debug('ValidationService::validationApproval()');
         // Set response bool value to true
         $response = true;
 
@@ -516,7 +517,7 @@ class ValidationService extends AbstractController
         // Call the approbationCheck method to check if all approbations are approved
         $this->approbationCheck($validation);
 
-        $this->logger->info('ValidationService::validationApproval() - response: ', [$response]);
+        $this->logger->debug('ValidationService::validationApproval() - response: ', [$response]);
 
         return $response;
     }
@@ -541,7 +542,7 @@ class ValidationService extends AbstractController
     public function approbationCheck(Validation $validation)
     {
 
-        $this->logger->info('ValidationService::approbationCheck() - validationId: ', [$validation]);
+        $this->logger->debug('ValidationService::approbationCheck() - validationId: ', [$validation]);
 
         // Get the ID of the Validation instance
         $validationId = $validation->getId();
@@ -588,7 +589,7 @@ class ValidationService extends AbstractController
      */
     public function updateValidationAndUploadStatus(Validation $validation, ?bool $status)
     {
-        $this->logger->info('ValidationService::updateValidationAndUploadStatus: ' . $validation->getId() . ' status: ' . $status);
+        $this->logger->debug('ValidationService::updateValidationAndUploadStatus: ' . $validation->getId() . ' status: ' . $status);
 
         if ($validation->isStatus() === false) {
             return;
@@ -621,16 +622,16 @@ class ValidationService extends AbstractController
             $this->em->remove($oldUpload);
             $this->em->flush($oldUpload);
         }
-        $this->logger->info('ValidationService::updateValidationAndUploadStatus - validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay() . ' upload->isTraining(): ' . $upload->isTraining() . ' $this->trainingRecordService->lastTrainingDateUploadDateComparison($upload): ' . $this->trainingRecordService->lastTrainingDateUploadDateComparison($upload));
+        $this->logger->debug('ValidationService::updateValidationAndUploadStatus - validation->isStatus(): ' . $validation->isStatus() . ' upload->isForcedDisplay(): ' . $upload->isForcedDisplay() . ' upload->isTraining(): ' . $upload->isTraining() . ' $this->trainingRecordService->lastTrainingDateUploadDateComparison($upload): ' . $this->trainingRecordService->lastTrainingDateUploadDateComparison($upload));
 
         if (
             $upload->isTraining() &&
             $validation->isStatus() &&
             ($this->trainingRecordService->lastTrainingDateUploadDateComparison($upload) || !$upload->isForcedDisplay())
         ) {
-            $this->logger->info('ValidationService::updateValidationAndUploadStatus() - $upload->isTraining() && $validation->isStatus() && ($this->trainingRecordService->lastTrainingDateUploadDateComparison($upload) || !$upload->isForcedDisplay())');
+            $this->logger->debug('ValidationService::updateValidationAndUploadStatus() - $upload->isTraining() && $validation->isStatus() && ($this->trainingRecordService->lastTrainingDateUploadDateComparison($upload) || !$upload->isForcedDisplay())');
             $this->trainingRecordService->updateTrainingRecord($upload);
-            $this->logger->info('ValidationService::updateValidationAndUploadStatus() - Sending approval email to uploader');
+            $this->logger->debug('ValidationService::updateValidationAndUploadStatus() - Sending approval email to uploader');
             $this->mailerService->sendApprovalEmail($validation);
         } elseif ($validation->isStatus() === true) {
             $this->mailerService->sendApprovalEmail($validation);
@@ -659,7 +660,7 @@ class ValidationService extends AbstractController
      */
     public function resetApprobation(Upload $upload, Request $request, ?bool $globalModification = false)
     {
-        $this->logger->info('ValidationService::resetApprobation() - uploadId: ' . $upload->getId());
+        $this->logger->debug('ValidationService::resetApprobation() - uploadId: ' . $upload->getId());
         if ($upload->getValidation() == null) {
             return;
         }
@@ -687,7 +688,7 @@ class ValidationService extends AbstractController
             $approbations = [];
             // Get the ID of the Validation instance
             $approbations = $validation->getApprobations();
-            // $this->logger->info('Resetting approbations' . json_encode($approbations));
+            // $this->logger->debug('Resetting approbations' . json_encode($approbations));
             // Loop through each Approbation instance
             foreach ($approbations as $approbation) {
                 //If it's a major modification reset all approbations
@@ -721,7 +722,7 @@ class ValidationService extends AbstractController
         // Flush changes to the database
         $this->em->flush();
 
-        $this->logger->info('display-needed: ' . $request->request->get('display-needed') . ' training-needed: ' . $request->request->get('training-needed'));
+        $this->logger->debug('display-needed: ' . $request->request->get('display-needed') . ' training-needed: ' . $request->request->get('training-needed'));
 
         if ($request->request->get('display-needed') === 'true' && $request->request->get('training-needed') === 'true') {
             $this->trainingRecordService->updateTrainingRecord($upload);
@@ -746,6 +747,7 @@ class ValidationService extends AbstractController
      */
     public function remindCheck(array $users)
     {
+        $this->logger->debug('ValidationService::remindCheck() - Checking for pending validations');
         $today = new \DateTime();
         $fileName = 'email_sent.txt';
         $filePath = $this->projectDir . '/public/doc/' . $fileName;
@@ -774,25 +776,30 @@ class ValidationService extends AbstractController
                     'UserApprobator' => $validator,
                     'approval' => null
                 ]);
+                $this->logger->debug('ValidationService::remindCheck() - approbationsNotAnswered: ', [$approbationsNotAnswered]);
 
                 $approbationsRefused = $this->approbationRepository->findBy([
                     'UserApprobator' => $validator,
                     'approval' => false
                 ]);
+                $this->logger->debug('ValidationService::remindCheck() - approbationsRefused: ', [$approbationsRefused]);
 
-                $uploaders[] = $this->defineUploadersOfUploadsWaitingValidation(
+                $uploadersOfUploadsWaitingValidation = $this->defineUploadersOfUploadsWaitingValidation(
                     approbationsNotAnswered: $approbationsNotAnswered,
                     validator: $validator,
                     today: $today,
                     filePath: $filePath
                 );
 
-                $uploaders[] = $this->defineUploadersOfRefusedUploads(
+                $this->logger->debug('ValidationService::remindCheck() - uploadersOfUploadsWaitingValidation: ', [$uploadersOfUploadsWaitingValidation]);
+                $uploadersOfRefusedUploads = $this->defineUploadersOfRefusedUploads(
                     approbationsRefused: $approbationsRefused,
                     today: $today,
                 );
+                $this->logger->debug('ValidationService::remindCheck() - uploadersOfRefusedUploads: ', [$uploadersOfRefusedUploads]);
             }
 
+            $uploaders = array_merge($uploadersOfUploadsWaitingValidation, $uploadersOfRefusedUploads);
             foreach ($uploaders as $uploader) {
                 $this->mailerService->sendReminderEmailToUploader($uploader);
             }
@@ -861,7 +868,7 @@ class ValidationService extends AbstractController
      * the validator responsible for those approbations, and collects the uploaders of those
      * documents for further notification processing.
      *
-     * @param Collection $approbationsNotAnswered Collection of approbations that have not been answered
+     * @param array $approbationsNotAnswered array of approbations that have not been answered
      * @param User $validator The validator user who needs to be reminded
      * @param \DateTime $today The current date used for comparison with upload dates
      * @param string $filePath Path to the tracking file that records when emails were sent
@@ -870,14 +877,15 @@ class ValidationService extends AbstractController
      *               waiting for validation by the specified validator
      */
     private function defineUploadersOfUploadsWaitingValidation(
-        Collection $approbationsNotAnswered,
+        array $approbationsNotAnswered,
         User $validator,
         \DateTime $today,
         string $filePath
     ): array {
+        $uploaders = [];
         $return = false;
         $uploadsWaitingValidation = [];
-
+        $this->logger->debug('ReminderCheck::defineUploadersOfUploadsWaitingValidation() - approbationsNotAnswered: ', [$approbationsNotAnswered]);
         foreach ($approbationsNotAnswered as $approbationNotAnswered) {
             $upload = $approbationNotAnswered->getValidation()->getUpload();
             $uploadedAt = $upload->getUploadedAt();
@@ -914,18 +922,20 @@ class ValidationService extends AbstractController
      * that have been refused for at least one day, and collects the uploaders of those
      * documents for notification purposes.
      *
-     * @param Collection $approbationsRefused Collection of approbations that have been refused
+     * @param array $approbationsRefused array of approbations that have been refused
      * @param \DateTime $today The current date used for comparison with upload dates
      *
      * @return array An associative array of uploaders indexed by their IDs, who have uploads
      *               that have been refused
      */
     private function defineUploadersOfRefusedUploads(
-        Collection $approbationsRefused,
+        array $approbationsRefused,
         \DateTime $today
     ): array {
         $uploadsRefused = [];
+        $uploaders = [];
 
+        $this->logger->debug('ReminderCheck::defineUploadersOfRefusedUploads() - approbationsRefused: ', [$approbationsRefused]);
         foreach ($approbationsRefused as $approbationRefused) {
             $upload = $approbationRefused->getValidation()->getUpload();
             $uploadedAt = $upload->getUploadedAt();
@@ -944,7 +954,7 @@ class ValidationService extends AbstractController
     }
 
 
-    
+
     /**
      * Performs a monthly quality check and sends a quality resume email.
      *

@@ -19,12 +19,15 @@ use App\Service\SettingsService;
 use App\Service\Validation\ValidationService;
 use App\Service\Operator\OperatorService;
 
+use Psr\Log\LoggerInterface;
+
 // This controller manage the logic of the front interface, it is the main controller of the application and is responsible for rendering the front interface.
 // It is also responsible for creating the super-admin account.
 
 #[Route('/', name: 'app_')]
 class FrontController extends AbstractController
 {
+    private $logger;
 
     private $authChecker;
 
@@ -42,6 +45,7 @@ class FrontController extends AbstractController
      * Initializes the controller with necessary services and repositories for managing
      * the front interface of the application.
      *
+     * @param LoggerInterface $logger                              Logger service for recording operation information and errors
      * @param AuthorizationCheckerInterface $authChecker           Service for checking user authorization
      * @param SettingsService $settingsService                     Service for managing application settings
      * @param OperatorService $operatorService                     Service for operator-related operations
@@ -52,7 +56,7 @@ class FrontController extends AbstractController
      * @return void
      */
     public function __construct(
-
+        LoggerInterface                     $logger,
         AuthorizationCheckerInterface       $authChecker,
 
         SettingsService                     $settingsService,
@@ -61,6 +65,7 @@ class FrontController extends AbstractController
         EntityFetchingService               $entityFetchingService,
         AccountService                      $accountService,
     ) {
+        $this->logger                       = $logger;
         $this->authChecker                  = $authChecker;
 
         $this->operatorService              = $operatorService;
@@ -128,7 +133,12 @@ class FrontController extends AbstractController
     {
         $users = $this->entityFetchingService->getUsers();
         $settings = $this->settingsService->getSettings();
+        $this->logger->debug(
+            'FrontController::base() $settings->isUploadValidation() && $this->entityFetchingService->getValidations() != null',
+            [$settings->isUploadValidation(), $this->entityFetchingService->getValidations()]
+        );
         if ($settings->isUploadValidation() && $this->entityFetchingService->getValidations() != null) {
+            $this->logger->debug('FrontController::base() Reminding to check for upload validations');
             $this->validationService->remindCheck($users);
         }
 
