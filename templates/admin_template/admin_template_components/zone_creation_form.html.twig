@@ -36,7 +36,7 @@
 									<form
 										class="w-100"
 										method="POST"
-										action="{{ path('app_super_admin_create_zone') }}">
+										action="{{ path('app_super_admin_create_zone') }}" data-controller="name-validation">
 										<div>
 											<h3
 												class="card-title text-center m-2 fw-light fs-4">
@@ -56,13 +56,20 @@
 													placeholder="Nom de la zone"
 													required
 													class="form-control"
-													id="zonename">
+													id="zonename"
+													data-name-validation-target='organizationEntityName'
+													data-action='input->name-validation#validateOrganizationEntityName'>
 											</div>
+											<div
+												data-name-validation-target="organizationEntityNameMessage"
+												class="organizationEntityName-message"></div>
 											<div
 												class="d-grid">
 												<button
 													class="btn btn-primary btn-login text-first|uppercase fw-bold"
-													type="submit">
+													type="submit"
+													data-name-validation-target='submitButton'
+													disabled='true'>
 													Valider
 												</button>
 											</div>

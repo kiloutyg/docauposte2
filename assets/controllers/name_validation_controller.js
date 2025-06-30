@@ -8,7 +8,10 @@ export default class NameValidationController extends Controller {
         "productNameMessage",
         "workstationName",
         "workstationNameMessage",
-        "saveButton"];
+        "saveButton",
+        "organizationEntityName",
+        "organizationEntityNameMessage",
+        "submitButton"];
 
     /**
      * Lifecycle method called when the controller is connected to the DOM.
@@ -122,6 +125,23 @@ export default class NameValidationController extends Controller {
             this.workstationNameMessageTarget.textContent = "Format invalide. Veuillez saisir sous la forme: Assy-P674-Poinçonneuse Peau";
             this.workstationNameMessageTarget.style.color = "DarkRed"; // Display the message in red color.
             this.saveButtonTarget.disabled = true;
+        }
+    }
+
+    validateOrganizationEntityName() {
+        const regex = /^[A-Za-z0-9\s\-()]+$/;
+        let isValid = true;
+        let name = this.organizationEntityNameTarget.value.toUpperCase();
+        if (name != '') {
+            isValid = regex.test(name);
+        }
+        if (isValid) {
+            this.organizationEntityNameMessageTarget.textContent = "";
+            this.submitButtonTarget.disabled = false;
+        } else {
+            this.organizationEntityNameMessageTarget.textContent = "Format invalide. Veuillez saisir uniquement des lettres, chiffres, espaces, tirets et parenthèses.";
+            this.organizationEntityNameMessageTarget.style.color = "DarkRed"; // Display the message in red color.
+            this.submitButtonTarget.disabled = true;
         }
     }
 }
