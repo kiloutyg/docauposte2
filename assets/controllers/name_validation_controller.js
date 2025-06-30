@@ -94,6 +94,20 @@ export default class NameValidationController extends Controller {
     }
 
 
+    /**
+     * Validates the product name input against a specific format.
+     * The validation ensures the name follows the pattern:
+     * - One or more uppercase letters followed by one or more digits
+     * - Example: ABC123
+     * 
+     * The function also:
+     * - Converts input to uppercase
+     * - Enables or disables the save button based on validation
+     * - Displays an error message if validation fails
+     * 
+     * No parameters as it uses controller targets.
+     * No return value as it updates the DOM directly.
+     */
     validateProductName() {
         const regex = /^[A-Z]+\d+$/;
         let isValid = true;
@@ -111,6 +125,26 @@ export default class NameValidationController extends Controller {
         }
     }
 
+    /**
+     * Validates the workstation name input against a specific format.
+     * The validation ensures the name contains only:
+     * - Letters (A-Z, a-z)
+     * - Numbers (0-9)
+     * - Spaces
+     * - Hyphens (-)
+     * - Forward slashes (/)
+     * - Parentheses ()
+     * - Plus signs (+)
+     * - Periods (.)
+     * 
+     * The function also:
+     * - Converts input to uppercase
+     * - Enables or disables the save button based on validation
+     * - Displays an error message if validation fails
+     * 
+     * No parameters as it uses controller targets.
+     * No return value as it updates the DOM directly.
+     */
     validateWorkstationName() {
         const regex = /^[A-Za-z0-9\s\-/()+.]+$/;
         let isValid = true;
@@ -128,6 +162,23 @@ export default class NameValidationController extends Controller {
         }
     }
 
+    /**
+     * Validates the organization entity name input against a specific format.
+     * The validation ensures the name contains only:
+     * - Letters (A-Z, a-z)
+     * - Numbers (0-9)
+     * - Spaces
+     * - Hyphens (-)
+     * - Parentheses ()
+     * 
+     * The function also:
+     * - Converts input to uppercase
+     * - Enables or disables the submit button based on validation
+     * - Displays an error message if validation fails
+     * 
+     * No parameters as it uses controller targets.
+     * No return value as it updates the DOM directly.
+     */
     validateOrganizationEntityName() {
         const regex = /^[A-Za-z0-9\s\-()]+$/;
         let isValid = true;
