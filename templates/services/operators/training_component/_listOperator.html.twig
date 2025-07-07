@@ -15,66 +15,74 @@
 			action="{{path('app_training_record_form', {'uploadId': upload.id, 'teamId': team.id, 'uapId': uap.id})}}">
 			<p
 				style="flex:1;"
+				class=" mx-2 mt-2 card text-center">
+				{% for approbation in upload.validation.approbations %}
+					{{approbation.userapprobator.username|capitalize|split('.')|first }}
+					{{approbation.userapprobator.username|upper|split('.')|last }}
+					{{approbation.approval is same as(true) ? ' a validé' : (approbation.approval is same as(false) ? ' a refusé' : (approbation.approval is same as(null) ? ' n\'a pas rendu son avis')) }}
+				{% if not loop.last %}
+					,
+				{% endif %}
+			{% endfor %}
+		</p>
+			<p
+				style="flex:1;"
 				class=" mx-2 card text-center">
 				Liste des Opérateurs de l'équipe
 				{{team.name|upper}}
-				pour l'
-				{{uap.name|upper ~ '.'}}
-			</p>
+					pour l'
+					{{uap.name|upper ~ '.'}}
+				</p>
 
-			<strong>
-				{% if operatorsByTrainer is defined and operatorsByTrainer is not empty %}
-					{% for trainerName, operators in operatorsByTrainer %}
-						<p
-							class="mx-2 card text-center"
-							style="flex:1;">
-							Opérateurs formés par
-							{{ trainerName != null ? trainerName|upper|split('.')|last ~ ' ' ~ trainerName|capitalize|split('.')|first 
+				<strong>
+					{% if operatorsByTrainer is defined and operatorsByTrainer is not empty %}
+						{% for trainerName, operators in operatorsByTrainer %}
+							<p
+								class="mx-2 card text-center"
+								style="flex:1;">
+								Opérateurs formés par
+								{{ trainerName != null ? trainerName|upper|split('.')|last ~ ' ' ~ trainerName|capitalize|split('.')|first 
 							: 'un formateur inconnu' }}
-						</p>
+							</p>
 
-						{% for operator in operators  %}
-							{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-							{% include 'services/operators/training_component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
+							{% for operator in operators  %}
+								{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+								{% include 'services/operators/training_component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
+							{% endfor %}
 						{% endfor %}
-					{% endfor %}
-				{% endif %}
-				{% if inTrainingOperatorsByTrainer is defined and inTrainingOperatorsByTrainer is not empty %}
-					{% for trainerName, operators in inTrainingOperatorsByTrainer %}
+					{% endif %}
+					{% if inTrainingOperatorsByTrainer is defined and inTrainingOperatorsByTrainer is not empty %}
+						{% for trainerName, operators in inTrainingOperatorsByTrainer %}
 
+							<p
+								style="flex:1;"
+								class=" mx-2 mt-2 card text-center">
+								Opérateurs à requalifier. Anciennement formé par
+								{{ trainerName != null ? trainerName|upper|split('.')|last ~ ' ' ~ trainerName|capitalize|split('.')|first ~ '.'}}
+							</p>
+							{% for operator in operators %}
+								{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+								{% include 'services/operators/training_component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
+							{% endfor %}
+
+						{% endfor %}
+					{% endif %}
+					{% if untrainedOperators is defined and untrainedOperators is not empty %}
 						<p
 							style="flex:1;"
-							class=" mx-2 mt-2 card text-center">
-							Opérateurs à requalifier. Anciennement formé par
-							{{ trainerName != null ? trainerName|upper|split('.')|last ~ ' ' ~ trainerName|capitalize|split('.')|first ~ '.'}}
+							class=" mx-2 card text-center">
+							Opérateurs jamais formés au process.
 						</p>
-						{% for operator in operators %}
+						{% for operator in untrainedOperators %}
 							{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
 							{% include 'services/operators/training_component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
 						{% endfor %}
-
-					{% endfor %}
-				{% endif %}
-				{% if untrainedOperators is defined and untrainedOperators is not empty %}
-					<p
-						style="flex:1;"
-						class=" mx-2 card text-center">
-						Opérateurs jamais formés au process.
-					</p>
-					{% for operator in untrainedOperators %}
-						{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-						{% include 'services/operators/training_component/_listOperatorPart_operator_listing_form.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
-
-
-					{% endfor %}
-				{% endif %}
-
-			</strong>
-
-
-			<div
-				id="trainingValidationSubmitContainer"
-				name="trainingValidationSubmitContainer"></div>
+					{% endif %}
+				</strong>
+				<div
+					id="trainingValidationSubmitContainer"
+					name="trainingValidationSubmitContainer"></div>
+			</p>
 		</form>
 	{% else %}
 		<p
@@ -129,48 +137,59 @@
 				{% endif %}
 			{% endfor %}
 		{% else %}
-			<p
-				style="flex:1;"
-				class="mx-2 mt-2 card text-center">
-				Aucune liste correspondant aux critères n’a été trouvée. Veuillez sélectionner d’autres critères ou ajouter des opérateurs à la liste.
-			</p>
-			<p
-				style="flex:1;"
-				class="  mt-2 mx-2 card text-center">
-				Opérateurs formés.
-			</p>
-			{% for operator in operators %}
-				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-				{% if trainingRecord == true %}
-					{% if trainingRecord.trained == true %}
-						{% include 'services/operators/training_component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
-					{% endif %}
+		<p
+			style="flex:1;"
+			class=" mx-2 mt-2 card text-center">
+			{% for approbation in upload.validation.approbations %}
+				{{approbation.userapprobator.username|capitalize|split('.')|first }}
+				{{approbation.userapprobator.username|upper|split('.')|last }}
+				{{approbation.approval is same as(true) ? ' a validé' : (approbation.approval is same as(false) ? ' a refusé' : (approbation.approval is same as(null) ? ' n\'a pas rendu son avis')) }}
+				{% if not loop.last %}
+					,
 				{% endif %}
 			{% endfor %}
-			<p
-				style="flex:1;"
-				class=" mt-2  mx-2 card text-center">
-				Opérateurs à requalifier
-			</p>
-			{% for operator in operators %}
-				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-				{% if trainingRecord == true %}
-					{% if trainingRecord.trained == false %}
-						{% include 'services/operators/training_component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
-					{% endif %}
-				{% endif %}
-			{% endfor %}
-			<p
-				style="flex:1;"
-				class=" mt-2  mx-2 card text-center">
-				Opérateurs Non-formés.
-			</p>
-			{% for operator in operators %}
-				{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
-				{% if trainingRecord != true %}
+		</p>
+		<p
+			style="flex:1;"
+			class="mx-2 mt-2 card text-center">
+			Aucune liste correspondant aux critères n’a été trouvée. Veuillez sélectionner d’autres critères ou ajouter des opérateurs à la liste.
+		</p>
+		<p
+			style="flex:1;"
+			class="  mt-2 mx-2 card text-center">
+			Opérateurs formés.
+		</p>
+		{% for operator in operators %}
+			{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+			{% if trainingRecord == true %}
+				{% if trainingRecord.trained == true %}
 					{% include 'services/operators/training_component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
 				{% endif %}
-			{% endfor %}
-		{% endif %}
+			{% endif %}
+		{% endfor %}
+		<p
+			style="flex:1;"
+			class=" mt-2  mx-2 card text-center">
+			Opérateurs à requalifier
+		</p>
+		{% for operator in operators %}
+			{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+			{% if trainingRecord == true %}
+				{% if trainingRecord.trained == false %}
+					{% include 'services/operators/training_component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
+				{% endif %}
+			{% endif %}
+		{% endfor %}
+		<p
+			style="flex:1;"
+			class=" mt-2  mx-2 card text-center">
+			Opérateurs Non-formés.
+		</p>
+		{% for operator in operators %}
+			{% set trainingRecord = operator.trainingRecords|filter(record => record.upload.id == upload.id) | first %}
+			{% if trainingRecord != true %}
+				{% include 'services/operators/training_component/_listOperatorPart_operator_listing.html.twig' with {'operator': operator, 'trainingRecord': trainingRecord} %}
+			{% endif %}
+		{% endfor %}
 	{% endif %}
-</turbo-frame>
+{% endif %}</turbo-frame>
