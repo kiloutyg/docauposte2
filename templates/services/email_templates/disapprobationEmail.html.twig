@@ -4,24 +4,42 @@
 <p>
 	Votre document
 	<strong>
-		<i>{{upload.filename}}</i>
+		<i>
+			{{upload.filename}}
+		</i>
 	</strong>
 	a été refusé par:
 	{% for approbation in approbations %}
 		<li>
-			<strong>{{ approbation.userapprobator.username|capitalize|split('.')|first }}
-				{{ approbation.userapprobator.username|upper|split('.')|last }}</strong>
+			<strong>
+				{{ approbation.userapprobator.username|capitalize|split('.')|first }}
+				{{ approbation.userapprobator.username|upper|split('.')|last }}
+			</strong>
 			{% if approbation.comment is not empty %}
 				avec le commentaire suivant :
-				<ul>"{{ approbation.comment }}"</ul>
+				<ul>
+					"
+					{{ approbation.comment }}
+					"
+				</ul>
 			{% endif %}
 		</li>
 	{% endfor %}
+	{% if upload.originalFilePath is not empty %}
+		<p>
+			Le fichier original est disponible à l'emplacement suivant :
+			{{ upload.originalFilePath }}
+		</p>
+	{% endif %}
 </p>
 <p>
 	Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant :
-	<a class='btn-info' href='http://{{ hostname|lower }}/docauposte/login'>Page de connexion</a>
+	<a
+		class='btn-info'
+		href='http://{{ hostname|lower }}/docauposte/login'>
+		Page de connexion
+	</a>
 </p>
 <p>
-	Cordialement,
+	Cordialement
 </p>

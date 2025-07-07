@@ -118,6 +118,7 @@ class UploadService extends AbstractController
 
         // Iterate over each file
         foreach ($files as $file) {
+            $this->logger->debug('UploadService::uploadFiles - Uploading file: ', [$request->request->all()]);
 
             $this->fileTypeService->checkFileType($file);
 
@@ -135,7 +136,6 @@ class UploadService extends AbstractController
 
             // Create a new Upload object
             $upload = new Upload();
-
             // Set the file property using the path
             $upload->setFile(new File($path));
             // Set the filename property
@@ -150,6 +150,9 @@ class UploadService extends AbstractController
             $upload->setUploadedAt(new \DateTime());
             // Set the revision property
             $upload->setRevision(1);
+            // Set the originalFilePath property
+            $originalFilePath = $request->request->get('originalFilePath') ?? null;
+            $upload->setOriginalFilePath($originalFilePath);
             // Persist the upload object
             $this->em->persist($upload);
             // Set training and validation related stuff

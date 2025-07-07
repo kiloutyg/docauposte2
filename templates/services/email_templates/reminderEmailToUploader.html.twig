@@ -13,11 +13,15 @@
 				<ul>
 					<h3>
 						<strong>
-							<i>{{upload.filename}}</i>
+							<i>
+								{{upload.filename}}
+							</i>
 						</strong>
 						uploadé le
 						<strong>
-							<i>{{upload.uploadedAt|date('d/m/Y') }}</i>
+							<i>
+								{{upload.uploadedAt|date('d/m/Y') }}
+							</i>
 						</strong>
 					</h3>
 					{% for approbation in upload.validation.approbations %}
@@ -34,41 +38,56 @@
 							{% endif %}
 						</li>
 					</ul>
-				{% endfor %}			
-				</ul>
-			{% endfor %}
-		</p>
-	{% endif %}
-{% endif %}
+				{% endfor %}	
+				{% if upload.originalFilePath is not empty %}
+					<p>
+						Le fichier original est disponible à l'emplacement suivant :
+						{{ upload.originalFilePath }}
+								</p>
+							{% endif %}
+						</ul>
 
-{% if waitingUploads is defined  %}
-	{% if waitingUploads is not empty %}
-		<p>
-			Vous avez
-			{{ waitingUploads|length }}
-			documents en attente de validations.
-			{% for upload in waitingUploads %}
-				<ul>
-					<h3>
-						<strong>
-							<i>{{upload.filename}}</i>
-						</strong>
-						uploadé le
-						<strong>
-							<i>{{upload.uploadedAt|date('d/m/Y') }}</i>
-						</strong>
-					</h3>
-				{% for approbation in upload.validation.approbations %}
-					<ul>
-						<li>
-						<strong>
-							{{ approbation.userapprobator.username|capitalize|split('.')|first }}
-							{{ approbation.userapprobator.username|upper|split('.')|last }}
-							{{approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé' : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}
+					{% endfor %}
+				</p>
+			{% endif %}
+		{% endif %}
+
+		{% if waitingUploads is defined  %}
+			{% if waitingUploads is not empty %}
+				<p>
+					Vous avez
+					{{ waitingUploads|length }}
+					documents en attente de validations.
+					{% for upload in waitingUploads %}
+						<ul>
+							<h3>
+								<strong>
+									<i>
+										{{upload.filename}}
+									</i>
+								</strong>
+								uploadé le
+								<strong>
+									<i>
+										{{upload.uploadedAt|date('d/m/Y') }}
+									</i>
+								</strong>
+							</h3>
+							{% for approbation in upload.validation.approbations %}
+								<ul>
+									<li>
+										<strong>
+											{{ approbation.userapprobator.username|capitalize|split('.')|first }}
+											{{ approbation.userapprobator.username|upper|split('.')|last }}
+											{{approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé' : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}
 								</strong>
 								{% if approbation.comment is not empty %}
 									avec le commentaire suivant :
-									<i>"{{ approbation.comment }}"</i>
+									<i>
+										"
+										{{ approbation.comment }}
+										"
+									</i>
 								{% endif %}
 
 							</li>
@@ -82,7 +101,11 @@
 {% endif %}
 <p>
 	Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant :
-	<a class='btn-info' href='http://{{ hostname|lower }}/docauposte/login'>Page de connexion</a>
+	<a
+		class='btn-info'
+		href='http://{{ hostname|lower }}/docauposte/login'>
+		Page de connexion
+	</a>
 </p>
 <p>
 	Cordialement

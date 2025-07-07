@@ -351,6 +351,7 @@ class UploadController extends AbstractController
     #[Route('/modification/modifying/{uploadId}', name: 'app_modifying_file')]
     public function modifyingFile(Request $request, int $uploadId): Response
     {
+        $this->logger->debug('ModifyingFileController::modifyingFile', ['full request' => $request->request->all()]);
         if (!$request->isMethod('POST')) {
             $this->addFlash('warning', 'Invalid request.');
             return $this->redirectToRoute('app_modify_file', [
