@@ -10,90 +10,22 @@
 			{{ refusedUploads|length }}
 			documents refusés.
 			{% for upload in refusedUploads %}
-				<ul>
-					<h3>
-						<strong>
-							<i>
-								{{upload.filename}}
-							</i>
-						</strong>
-						uploadé le
-						<strong>
-							<i>
-								{{upload.uploadedAt|date('d/m/Y') }}
-							</i>
-						</strong>
-					</h3>
-					{% for approbation in upload.validation.approbations %}
-						<ul>
-							<li>
-								<strong>
-									{{ approbation.userapprobator.username|capitalize|split('.')|first }}
-									{{ approbation.userapprobator.username|upper|split('.')|last }}
-									{{approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé' : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}
-								</strong>
-							{% if approbation.comment is not empty %}
-								avec le commentaire suivant :
-								<i>"{{ approbation.comment }}"</i>
-							{% endif %}
-						</li>
-					</ul>
-				{% endfor %}	
-				{% if upload.originalFilePath is not empty %}
-					<p>
-						Le fichier original est disponible à l'emplacement suivant :
-						{{ upload.originalFilePath }}
-								</p>
-							{% endif %}
-						</ul>
+				{% include "services/email_templates/email_templates_component/reminderEmailToUploader_component.html.twig" %}
 
-					{% endfor %}
-				</p>
-			{% endif %}
-		{% endif %}
+			{% endfor %}
+		</p>
+	{% endif %}
+{% endif %}
 
-		{% if waitingUploads is defined  %}
-			{% if waitingUploads is not empty %}
-				<p>
-					Vous avez
-					{{ waitingUploads|length }}
-					documents en attente de validations.
-					{% for upload in waitingUploads %}
-						<ul>
-							<h3>
-								<strong>
-									<i>
-										{{upload.filename}}
-									</i>
-								</strong>
-								uploadé le
-								<strong>
-									<i>
-										{{upload.uploadedAt|date('d/m/Y') }}
-									</i>
-								</strong>
-							</h3>
-							{% for approbation in upload.validation.approbations %}
-								<ul>
-									<li>
-										<strong>
-											{{ approbation.userapprobator.username|capitalize|split('.')|first }}
-											{{ approbation.userapprobator.username|upper|split('.')|last }}
-											{{approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé' : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}
-								</strong>
-								{% if approbation.comment is not empty %}
-									avec le commentaire suivant :
-									<i>
-										"
-										{{ approbation.comment }}
-										"
-									</i>
-								{% endif %}
+{% if waitingUploads is defined  %}
+	{% if waitingUploads is not empty %}
+		<p>
+			Vous avez
+			{{ waitingUploads|length }}
+			documents en attente de validations.
+			{% for upload in waitingUploads %}
 
-							</li>
-						</ul>
-					{% endfor %}
-				</ul>
+				{% include "services/email_templates/email_templates_component/reminderEmailToUploader_component.html.twig" %}
 
 			{% endfor %}
 		</p>
