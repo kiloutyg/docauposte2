@@ -82,6 +82,9 @@ class Upload
     #[ORM\OneToMany(targetEntity: Workstation::class, mappedBy: 'upload')]
     private Collection $workstations;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $originalFilePath = null;
+
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
@@ -332,6 +335,18 @@ class Upload
                 $workstation->setUpload(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getOriginalFilePath(): ?string
+    {
+        return $this->originalFilePath;
+    }
+
+    public function setOriginalFilePath(?string $originalFilePath): static
+    {
+        $this->originalFilePath = $originalFilePath;
 
         return $this;
     }
