@@ -181,10 +181,15 @@ class UploadController extends AbstractController
             $this->logger->error('UploadController::genericUploadFiles - File upload conflict', ['filename' => $filename]);
             return $this->redirect($originUrl);
         } else {
+            try {
+                $name = $this->uploadService->uploadFiles($request, $buttonEntity, $user, $filename);
+                $this->addFlash('success', 'Le document ' . $name . ' a été correctement chargé');
+                $this->logger->notice('UploadController::genericUploadFiles - File uploaded', ['filename' => $name]);
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Le document n\'a pas été correctement chargé.');
+                $this->logger->error('UploadController::genericUploadFiles - File upload error', ['error' => $e->getMessage()]);
+            }
             // Use the UploadService to handle file uploads
-            $name = $this->uploadService->uploadFiles($request, $buttonEntity, $user, $filename);
-            $this->addFlash('success', 'Le document ' . $name . ' a été correctement chargé');
-            $this->logger->notice('UploadController::genericUploadFiles - File uploaded', ['filename' => $name]);
             return $this->redirect($originUrl);
         }
     }

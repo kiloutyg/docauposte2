@@ -106,14 +106,14 @@ class TrainingRecordService extends AbstractController
      */
     public function getOrderedTrainingRecordsByUpload($upload)
     {
-        $this->logger->info('Ordering training records by upload');
+        $this->logger->debug('Ordering training records by upload');
         $uploadTR = $upload->getTrainingRecords();
 
-        $this->logger->info('getOrderedTrainingRecordsByUpload: uploadTR: ', [$uploadTR]);
+        $this->logger->debug('getOrderedTrainingRecordsByUpload: uploadTR: ', [$uploadTR]);
 
         $trainingRecords = $uploadTR->toArray();
 
-        $this->logger->info('getOrderedTrainingRecordsByUpload: trainingRecords: ', [$trainingRecords]);
+        $this->logger->debug('getOrderedTrainingRecordsByUpload: trainingRecords: ', [$trainingRecords]);
 
         return $this->orderedTrainingRecordsLoop($trainingRecords);
     }
@@ -148,16 +148,16 @@ class TrainingRecordService extends AbstractController
      */
     private function orderedTrainingRecordsLoop(array $trainingRecords)
     {
-        $this->logger->info(message: 'Ordering training records in TrainingRecordService::orderedTrainingRecordsLoop');
+        $this->logger->debug(message: 'Ordering training records in TrainingRecordService::orderedTrainingRecordsLoop');
         $operators = array_map(callback: function ($trainingRecord): mixed {
             return $trainingRecord->getOperator();
         }, array: $trainingRecords);
 
-        $this->logger->info('orderedTrainingRecordsLoop: operators: ', [$operators]);
+        $this->logger->debug('orderedTrainingRecordsLoop: operators: ', [$operators]);
 
         usort(array: $operators, callback: [$this->trainingRecordRepository, 'compareOperator']);
 
-        $this->logger->info('orderedTrainingRecordsLoop after usort : operators: ', [$operators]);
+        $this->logger->debug('orderedTrainingRecordsLoop after usort : operators: ', [$operators]);
 
         $orderedTrainingRecords = [];
         foreach ($operators as $operator) {
@@ -200,7 +200,7 @@ class TrainingRecordService extends AbstractController
      *
      * This method handles the creation or update of training records for operators based on
      * the submitted form data. It identifies trained operators, creates or updates their
-     * training records, updates operator status information, and ensures the trainer is
+     * training records, updates operator status debugrmation, and ensures the trainer is
      * also recorded as trained.
      *
      * @param Request $request The HTTP request containing training data:
@@ -231,7 +231,7 @@ class TrainingRecordService extends AbstractController
             $this->em->flush();
             $this->em->commit();
 
-            $this->logger->info('Successfully processed training records for upload ID: ' . $upload->getId());
+            $this->logger->debug('Successfully processed training records for upload ID: ' . $upload->getId());
         } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
             $this->em->rollback();
             $this->logger->warning('Attempted to create duplicate training record', [
@@ -271,18 +271,18 @@ class TrainingRecordService extends AbstractController
             }
 
             if ($operatorEntity === $trainerOperator) {
-                $this->logger->info('Trainer is trying to train himself', ['operatorId' => $operatorEntity->getId()]);
+                $this->logger->debug('Trainer is trying to train himself', ['operatorId' => $operatorEntity->getId()]);
                 continue;
             }
 
             // Get all training records as a collection
             $operatorTrainingRecords = $operatorEntity->getTrainingRecords();
-            $this->logger->info('processOperatorTrainingRecords :: Operator name ', [$operatorEntity->getName()]);
+            $this->logger->debug('processOperatorTrainingRecords :: Operator name ', [$operatorEntity->getName()]);
             // Filter the collection to find the record with the matching $upload
             $filteredRecords = $operatorTrainingRecords->filter(function ($trainingRecord) use ($upload) {
                 return $trainingRecord->getUpload()->getId() === $upload->getId();
             });
-            $this->logger->info('processOperatorTrainingRecords :: filteredRecords: ', [$filteredRecords]);
+            $this->logger->debug('processOperatorTrainingRecords :: filteredRecords: ', [$filteredRecords]);
             // If the collection is empty, create a new TrainingRecord
             if ($filteredRecords->isEmpty()) {
                 $trainingRecord = new TrainingRecord();
@@ -315,7 +315,7 @@ class TrainingRecordService extends AbstractController
      */
     private function processTrainerTrainingRecord(Operator $trainerOperator, Trainer $trainerEntity, Upload $upload): void
     {
-        $this->logger->info('processTrainerTrainingRecord :: trainer name ', [$trainerOperator->getName()]);
+        $this->logger->debug('processTrainerTrainingRecord :: trainer name ', [$trainerOperator->getName()]);
 
         // Check if the trainer already has a training record for this upload
         $operatorTrainingRecords = $trainerOperator->getTrainingRecords();
@@ -323,7 +323,7 @@ class TrainingRecordService extends AbstractController
             return $trainingRecord->getUpload()->getId() === $upload->getId();
         });
 
-        $this->logger->info('processTrainerTrainingRecord :: filteredRecords: ', [$filteredRecords]);
+        $this->logger->debug('processTrainerTrainingRecord :: filteredRecords: ', [$filteredRecords]);
 
         if ($filteredRecords->isEmpty()) {
             $trainingRecord = new TrainingRecord();
@@ -349,11 +349,11 @@ class TrainingRecordService extends AbstractController
     public function cheatTrain(int $upload)
     {
         $uploadEntity = $this->uploadRepository->find($upload);
-        $this->logger->info('TrainingRecordService: cheatTrain: uploadEntity: ', [$uploadEntity]);
+        $this->logger->debug('TrainingRecordService: cheatTrain: uploadEntity: ', [$uploadEntity]);
 
         $uploadEntity = $this->uploadRepository->find($upload);
         $trainingRecords = $this->trainingRecordRepository->findBy(['upload' => $uploadEntity]);
-        $this->logger->info('TrainingRecordService: cheatTrain: trainingRecords: ', [count($trainingRecords)]);
+        $this->logger->debug('TrainingRecordService: cheatTrain: trainingRecords: ', [count($trainingRecords)]);
         foreach ($trainingRecords as $trainingRecord) {
             if ($trainingRecord->isTrained() === true) {
                 $trainingRecord->setTrained(false);
@@ -378,15 +378,19 @@ class TrainingRecordService extends AbstractController
     public function lastTrainingDateUploadDateComparison(Upload $upload)
     {
         $response = false;
-        $this->logger->info('TrainingRecordService: lastTrainingDateUploadDateComparison: upload: ', [$upload]);
+        $this->logger->debug('TrainingRecordService: lastTrainingDateUploadDateComparison: upload: ', [$upload]);
+
         $lastTrainingRecord = $this->trainingRecordRepository->getLatestTrainingRecord($upload);
-        $this->logger->info('TrainingRecordService: lastTrainingDateUploadDateComparison: lastTrainingRecord: ', [$lastTrainingRecord]);
+        $this->logger->debug('TrainingRecordService: lastTrainingDateUploadDateComparison: lastTrainingRecord: ', [$lastTrainingRecord]);
+
         $uploadDate = $upload->getUploadedAt();
-        $this->logger->info('TrainingRecordService: lastTrainingDateUploadDateComparison: uploadDate: ', [$uploadDate]);
-        if ($uploadDate > $lastTrainingRecord->getDate()) {
+        $this->logger->debug('TrainingRecordService: lastTrainingDateUploadDateComparison: uploadDate: ', [$uploadDate]);
+
+        if ($lastTrainingRecord != null && $uploadDate > $lastTrainingRecord->getDate()) {
             $response = true;
         }
-        $this->logger->info('TrainingRecordService: lastTrainingDateUploadDateComparison: response: ', [$response]);
+        $this->logger->debug('TrainingRecordService: lastTrainingDateUploadDateComparison: response: ', [$response]);
+
         return $response;
     }
 }

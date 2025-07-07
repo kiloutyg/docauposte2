@@ -17,7 +17,7 @@ export default class FilenameValidationController extends Controller {
      *                   - Displays an error message if validation fails
      */
     validateFilename(event) {
-        const regex = /^[\p{L}0-9()][\p{L}0-9()_.\s'-]{2,253}[\p{L}0-9]$/mu;
+        const regex = /^[\p{L}0-9()][\p{L}0-9()_.\s'-]{2,253}[\p{L}0-9()]$/mu;
         let isValid = true;
         const fileInput = this.filenameTarget;
 
@@ -42,7 +42,7 @@ export default class FilenameValidationController extends Controller {
         }
     }
 
-    
+
     /**
      * Validates the value of the newFilename input field against a regular expression pattern.
      * The function checks if the filename follows the required format rules:
@@ -56,7 +56,7 @@ export default class FilenameValidationController extends Controller {
      *                   - Displays an error message if validation fails
      */
     validateNewFilename() {
-        const regex = /^[\p{L}0-9()][\p{L}0-9()_.\s'-]{2,253}[\p{L}0-9]$/mu;
+        const regex = /^[\p{L}0-9()][\p{L}0-9()_.\s'-]{2,253}[\p{L}0-9()]$/mu;
 
         let isValid = true;
         let name = this.newFilenameTarget.value;

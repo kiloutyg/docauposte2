@@ -124,8 +124,14 @@ class UploadService extends AbstractController
             // Construct the full path of the file
             $folderPath = $this->folderService->pathFindingDoc($button->getName());
             $path = $folderPath . '/' . $filename;
-            // Move the file to the specified folder
-            $file->move($folderPath . '/', $filename);
+            try {
+                // Move the file to the specified folder
+                $file->move($folderPath . '/', $filename);
+            } catch (\Exception $e) {
+                $this->logger->error('Error while moving the file: ' . $e->getMessage());
+                $this->addFlash('error', 'Erreur lors du déplacement du fichier');
+            }
+
 
             // Create a new Upload object
             $upload = new Upload();
@@ -226,21 +232,21 @@ class UploadService extends AbstractController
     {
         $groupedUploads = [];
         $groupedValidatedUploads = [];
-    
+
         // Group uploads by zone, productLine, category, and button
         foreach ($uploads as $upload) {
             $zoneName        = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
             $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
             $categoryName    = $upload->getButton()->getCategory()->getName();
             $buttonName      = $upload->getButton()->getName();
-    
+
             $groupedUploads = $this->groupingNonValidatedUpload($groupedUploads, $upload, $zoneName, $productLineName, $categoryName, $buttonName);
-    
+
             if ($upload->getValidation()) {
                 $groupedValidatedUploads = $this->groupingValidatedUpload($groupedValidatedUploads, $upload, $zoneName, $productLineName, $categoryName, $buttonName);
             }
         }
-    
+
         return [$groupedUploads, $groupedValidatedUploads];
     }
 
@@ -291,7 +297,7 @@ class UploadService extends AbstractController
 
 
 
-    
+
     /**
      * Groups a validated upload into a hierarchical array structure based on organizational elements.
      *
