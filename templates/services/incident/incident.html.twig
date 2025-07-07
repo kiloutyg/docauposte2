@@ -59,7 +59,7 @@
 														name="incident_file"
 														accept=".pdf"
 														data-filename-validation-target='filename'
-														data-action='keyup->filename-validation#validateFilename'
+														data-action='change->filename-validation#validateFilename'
 														required>
 
 													<div
@@ -80,7 +80,7 @@
 															id="incident_newFileName"
 															name="incident_newFileName"
 															data-filename-validation-target='newFilename'
-															data-action='keyup->filename-validation#validateNewFilename'
+															data-action='change->filename-validation#validateNewFilename'
 															placeholder="Entrer un nouveau nom de fichier (optionnel)">
 														<div
 															data-filename-validation-target="message"

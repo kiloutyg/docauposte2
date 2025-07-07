@@ -54,7 +54,7 @@ class IncidentType extends AbstractType
                     'empty_data' => null,
                     'attr' => [
                         'data-filename-validation-target' => 'filename',
-                        'data-action' => 'keyup->filename-validation#validateFilename'
+                        'data-action' => 'change->filename-validation#validateFilename'
                     ]
                 ]
             )
