@@ -492,34 +492,38 @@ class ValidationService extends AbstractController
 
         // Get the value of the 'approbationComment' input from the request
         $comment = $request->request->get('approbationComment');
+        try {        // Set the Approval property of the Approbation instance
+            $approbation->setApproval($approval);
 
-        // Set the Approval property of the Approbation instance
-        $approbation->setApproval($approval);
+            // Set the Approval Date property of the Approbation instance
+            $approbation->setApprovedAt(new \DateTime());
 
-        // Set the Approval Date property of the Approbation instance
-        $approbation->setApprovedAt(new \DateTime());
+            // Set the Comment property of the Approbation instance
+            $approbation->setComment($comment);
 
-        // Set the Comment property of the Approbation instance
-        $approbation->setComment($comment);
+            // Persist the Approbation instance to the database
+            $this->em->persist($approbation);
+            // Flush changes to the database
+            $this->em->flush();
 
-        // Persist the Approbation instance to the database
-        $this->em->persist($approbation);
-        // Flush changes to the database
-        $this->em->flush();
+            // Get the Validation object associated with the Approbation instance
+            $validation = $approbation->getValidation();
 
-        // Get the Validation object associated with the Approbation instance
-        $validation = $approbation->getValidation();
+            if ($approbation->isApproval() === false) {
+                $response = false;
+                $this->mailerService->sendDisapprobationEmail($validation);
+            }
 
-        if ($approbation->isApproval() === false) {
-            $response = false;
-            $this->mailerService->sendDisapprobationEmail($validation);
+            // Call the approbationCheck method to check if all approbations are approved
+            $this->approbationCheck($validation);
+
+            $this->logger->debug('ValidationService::validationApproval() - response: ', [$response]);
+
+            return $response;
+        } catch (\Exception $e) {
+            $this->logger->error('ValidationService::validationApproval() - Error occurred: ', [$e->getMessage()]);
+            return false;
         }
-        // Call the approbationCheck method to check if all approbations are approved
-        $this->approbationCheck($validation);
-
-        $this->logger->debug('ValidationService::validationApproval() - response: ', [$response]);
-
-        return $response;
     }
 
 
@@ -602,6 +606,7 @@ class ValidationService extends AbstractController
         $this->em->persist($validation);
         // Flush changes to the database
         $this->em->flush($validation);
+        // Get the Upload object associated with the Validation instance
         $upload = $validation->getUpload();
         $upload->setValidated($status);
         // Delete the previously retired file if it exists
