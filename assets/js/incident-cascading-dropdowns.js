@@ -82,6 +82,12 @@ function preselectDropdownValues() {
   const zoneDropdown = document.getElementById("incident_zone");
   const productLineDropdown = document.getElementById("incident_productLine");
 
+  console.log('preselect dropdown stuff');
+  console.log('zoneIdFromServer', zoneIdFromServer);
+  console.log('productLineIdFromServer', productLineIdFromServer)
+  console.log('categoryIdFromServer', categoryIdFromServer)
+  console.log('buttonIdFromServer', buttonIdFromServer)
+
   preselectValues([
     {
       dropdown: zoneDropdown,
@@ -95,14 +101,12 @@ function preselectDropdownValues() {
     const filteredProductLines = filterData(incidentProductLinesData, "zone_id", parseInt(zoneIdFromServer));
     populateDropdown(productLineDropdown, filteredProductLines, {
       selectedId: productLineIdFromServer,
-      defaultText: 'Sélectionner une Ligne',
+      defaultText: 'Choisissez d\'abord une Zone',
       textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
     });
   }
 
-  if (productLineIdFromServer && productLineDropdown) {
-    productLineDropdown.value = productLineIdFromServer;
-  }
+
 }
 
 /**
