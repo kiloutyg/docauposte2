@@ -104,7 +104,7 @@ function preselectDropdownValues() {
     const filteredProductLines = filterData(productLinesData, "zone_id", parseInt(zoneIdFromServer));
     populateDropdown(productLineDropdown, filteredProductLines, {
       selectedId: productLineIdFromServer,
-      defaultText: 'Sélectionner une Ligne',
+      defaultText: 'Choisissez d\'abord une Zone',
       textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
     });
   }
@@ -113,7 +113,7 @@ function preselectDropdownValues() {
     const filteredCategories = filterData(categoriesData, "product_line_id", parseInt(productLineIdFromServer));
     populateDropdown(categoryDropdown, filteredCategories, {
       selectedId: categoryIdFromServer,
-      defaultText: 'Sélectionner une Catégorie',
+      defaultText: 'Choisissez d\'abord une Ligne',
       textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
     });
   }
@@ -122,7 +122,7 @@ function preselectDropdownValues() {
     const filteredButtons = filterData(buttonsData, "category_id", parseInt(categoryIdFromServer));
     populateDropdown(buttonDropdown, filteredButtons, {
       selectedId: buttonIdFromServer,
-      defaultText: 'Sélectionner un Bouton',
+      defaultText: 'Choisissez d\'abord une Catégorie',
       textFormatter: (text) => text.split(".")[0].charAt(0).toUpperCase() + text.split(".")[0].slice(1),
     });
   }

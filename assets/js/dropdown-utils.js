@@ -40,6 +40,7 @@ export function populateDropdown(dropdown, data, options = {}) {
     textFormatter = null,
   } = options;
 
+  console.log("dropdown-utils::populateDropdown - dropdown", dropdown);
   // Clear existing options
   dropdown.innerHTML = '';
 
@@ -50,6 +51,8 @@ export function populateDropdown(dropdown, data, options = {}) {
   defaultOption.disabled = true;
   defaultOption.hidden = true;
   defaultOption.textContent = defaultText;
+
+  console.log("dropdown-utils::populateDropdown - defaultOption", defaultOption);
   dropdown.appendChild(defaultOption);
 
   // Populate the dropdown with data
@@ -60,6 +63,7 @@ export function populateDropdown(dropdown, data, options = {}) {
     }
 
     const option = document.createElement('option');
+    console.log("dropdown-utils::populateDropdown - item", item);
     option.value = item[valueKey];
 
     let text = item[nameKey] || item[usernameKey];
@@ -71,7 +75,7 @@ export function populateDropdown(dropdown, data, options = {}) {
     if (item[valueKey] === selectedId) {
       option.selected = true;
     }
-
+    console.log("dropdown-utils::populateDropdown - option", option);
     dropdown.appendChild(option);
   });
 }

@@ -60,10 +60,9 @@ class NamingService extends AbstractController
         }
 
         if ($entityType === 'incident') {
-            return $this->filenameUniqid($filename);
-        } else {
-            return $newName;
+            $newName = $this->filenameUniqid($newName);
         }
+        return $newName;
     }
 
     /**

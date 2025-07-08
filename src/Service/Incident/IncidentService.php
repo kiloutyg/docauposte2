@@ -77,16 +77,13 @@ class IncidentService extends AbstractController
      *                         - incident_newFileName: Optional new filename for the uploaded file
      *                         - incident_autoDisplayPriority: Priority for auto-display functionality
      *
-     * @return string|RedirectResponse Returns the filename of the last processed file if successful,
+     * @return string Returns the filename of the last processed file if successful,
      *                         or a redirect response if filename validation fails
      *
      * @throws \Exception If file type validation fails
      */
     public function uploadIncidentFiles(Request $request)
     {
-        // Get the URL of the page from which the request originated
-        $originUrl = $request->headers->get('referer');
-
         $files = $request->files->all();
 
         $incidentCategory = $this->incidentCategoryRepository->find($request->request->get('incident_incidentCategory'));
@@ -98,12 +95,9 @@ class IncidentService extends AbstractController
         foreach ($files as $file) {
 
             $this->fileTypeService->checkFileType($file);
+
             // Filename checks to see if compliant and if a newname has been chosen by user
-            if (!$this->namingService->filenameChecks($request, $request->request->get('incident_newFileName'))) {
-                return $this->redirect($originUrl);
-            } else {
-                $name = $this->namingService->filenameChecks($request, $request->request->get('incident_newFileName'));
-            }
+            $name = $this->namingService->filenameChecks($request, $request->request->get('incident_newFileName'));
 
             // Dynamic folder creation in the case it does not aleady exist
             $folderPath = $this->folderService->pathFindingDoc($productLine->getName());
