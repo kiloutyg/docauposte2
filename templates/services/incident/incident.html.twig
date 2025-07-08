@@ -23,134 +23,124 @@
 		<div
 			class="accordion-body accordion-bg shadow shadow-inset">
 			<div
-				class="card border-0 shadow rounded-3 my-5">
+				class="card border-0 shadow rounded-3 my-5 form-floating row mx-auto">
 				<div
-					class="card-body">
+					class="card-body mx-auto justify-content-center">
 					<div
-						class="row">
-						<form
-							action="{{path('app_generic_upload_incident_files')}}" method="POST"
-							enctype="multipart/form-data">
+						class="card border-0 shadow rounded-3 my-5 bg-secondary justify-content-center">
+						<div>
 							<div
-								class="card border-0 shadow rounded-3 my-5 bg-secondary">
-								<div
-									class="card-body "
+								class="col-lg-10 col-md-12 col-sm-12 justify-content-center mx-auto">
+								<form
+									class="col-lg-10 col-md-12 col-sm-12 mx-auto"
+									id="upload-form"
+									action="{{path('app_generic_upload_incident_files')}}" method="POST"
+									enctype="multipart/form-data"
 									data-controller="filename-validation">
+									<p
+										class="text-white mx-2">
+										Ajouter un fichier:
+									</p>
 									<div
-										class="row d-flex align-items-center gy-lg-0 gy-5">
+										class="fallback">
+										<input
+											type="file"
+											class="form-control"
+											id="incident_file"
+											name="incident_file"
+											accept=".pdf"
+											data-filename-validation-target='filename'
+											data-action='change->filename-validation#validateFilename'
+											required>
 
 										<div
-											class="col-lg-6 col-md-12 col-sm-12">
-											<p
-												class="text-white m-0">
-												Ajouter un fichier:
-											</p>
-											<form
-												class="form-floating justify-content-center "
-												id="upload-form"
-												action="{{path('app_generic_upload_incident_files')}}" method="POST"
-												enctype="multipart/form-data">
-												<div
-													class="fallback">
-													<input
-														type="file"
-														class="form-control"
-														id="incident_file"
-														name="incident_file"
-														accept=".pdf"
-														data-filename-validation-target='filename'
-														data-action='change->filename-validation#validateFilename'
-														required>
+											class="mb-3">
+											<div
+												data-filename-validation-target="message"
+												class="filename-message"></div>
+											<label
+												for="incident_newFileName"
+												style="color:white"
+												class="form-label">
+												Nom du fichier:
+											</label>
 
-													<div
-														class="mb-3">
-														<div
-															data-filename-validation-target="message"
-															class="filename-message"></div>
-														<label
-															for="incident_newFileName"
-															style="color:white"
-															class="form-label">
-															Nom du fichier:
-														</label>
-
-														<input
-															type="text"
-															class="form-control"
-															id="incident_newFileName"
-															name="incident_newFileName"
-															data-filename-validation-target='newFilename'
-															data-action='change->filename-validation#validateNewFilename'
-															placeholder="Entrer un nouveau nom de fichier (optionnel)">
-														<div
-															data-filename-validation-target="message"
-															class="newFilename-message"></div>
-													</div>
-													{% include 'services/incident/cascading_dropdowns_incident.html.twig' %}
-												</div>
-												<div
-													class="d-grid gap-2 d-md-flex justify-content-md-center mt-2 mb-5">
-													<button
-														type="submit"
-														class="btn btn-primary">
-														Charger
-													</button>
-												</div>
-											</form>
-											<hr>
-											{% if is_granted('ROLE_ADMIN') %}
-												<div
-													class="row mt-5 mb-3">
-													<label
-														for="incident_newFileName"
-														style="color:white"
-														class="form-label">
-														Ajout d'un nouveau Type d'Incident:
-													</label>
-													<div
-														class="col-sm">
-														<input
-															type="text"
-															class="form-control"
-															id="incident_incidentCategory_name"
-															name="incident_incidentCategory_name"
-															placeholder="Entrer un nouveau type d'incident">
-													</div>
-													<div
-														class="col-sm-auto">
-														<input
-															type="button"
-															id="create_incident_incidentCategory"
-															class="btn btn-secondary shadow border border-dark-subtle"
-															value="Ajouter un nouveau type d'incident">
-													</div>
-												</div>
-												{% for incidentCategory in incidentCategories %}
-													<ul
-														class="row mb-3">
-														<li
-															class="form-control shadow d-flex justify-content-between align-items-center">
-															{{incidentCategory.name|split('.')|first|upper}}
-															<a
-																href="{{ path('app_incident_incidentCategory_deletion', {incidentCategoryId : incidentCategory.id}) }}" type="button"
-																class="btn btn-danger shadow border border-dark-subtle delete-incidentCategory">
-																supprimer
-															</a>
-														</li>
-
-													</ul>
-												{% endfor %}
-											{% endif %}
+											<input
+												type="text"
+												class="form-control"
+												id="incident_newFileName"
+												name="incident_newFileName"
+												data-filename-validation-target='newFilename'
+												data-action='change->filename-validation#validateNewFilename'
+												placeholder="Entrer un nouveau nom de fichier (optionnel)">
+											<div
+												data-filename-validation-target="message"
+												class="newFilename-message"></div>
+										</div>
+										{% include 'services/incident/cascading_dropdowns_incident.html.twig' %}
+									</div>
+									<div
+										class="d-grid gap-2 d-md-flex justify-content-md-center mt-2 mb-5">
+										<button
+											type="submit"
+											class="btn btn-primary">
+											Charger
+										</button>
+									</div>
+								</form>
+								<hr>
+								{% if is_granted('ROLE_ADMIN') %}
+									<div
+										class="col-lg-10 col-md-12 col-sm-12  mx-auto">
+										<label
+											for="incident_newFileName"
+											style="color:white"
+											class="form-label">
+											Ajout d'un nouveau Type d'Incident:
+										</label>
+										<div
+											class="col">
+											<input
+												type="text"
+												class="form-control"
+												id="incident_incidentCategory_name"
+												name="incident_incidentCategory_name"
+												placeholder="Entrer un nouveau type d'incident">
 										</div>
 										<div
-											class="col-lg-6 col-md-12 col-sm-12">
-											{% include 'services/incident/incident_list.html.twig' %}
+											class="col-sm-auto">
+											<input
+												type="button"
+												id="create_incident_incidentCategory"
+												class="btn btn-secondary shadow border border-dark-subtle"
+												value="Ajouter un nouveau type d'incident">
 										</div>
 									</div>
-								</div>
+									{% for incidentCategory in incidentCategories %}
+										<ul
+											class="col-lg-10 col-md-12 col-sm-12  mx-auto">
+											<li
+												class="form-control shadow d-flex justify-content-between align-items-center">
+												{{incidentCategory.name|split('.')|first|upper}}
+												<a
+													href="{{ path('app_incident_incidentCategory_deletion', {incidentCategoryId : incidentCategory.id}) }}" type="button"
+													class="btn btn-danger shadow border border-dark-subtle delete-incidentCategory">
+													supprimer
+												</a>
+											</li>
+
+										</ul>
+									{% endfor %}
+								{% endif %}
+								<hr>
 							</div>
-						</form>
+							<div
+								class="col-lg-10 col-md-12 col-sm-12 mx-auto">
+								{% include 'services/incident/incident_list.html.twig' %}
+							</div>
+						</div>
 					</div>
+
 				</div>
 			</div>
 		</div>
