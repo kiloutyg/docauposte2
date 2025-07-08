@@ -51,6 +51,13 @@
 					) }}
 				</div>
 				<div
+					class="mb-3">
+					{{ form_label(form.originalFilePath, 'Emplacement du fichier source (optionnel) :', {'label_attr': {'class': 'form-label', 'style': 'color:black'}}
+					) }}
+					{{ form_widget(form.originalFilePath, {'attr': {'class': 'form-control', 'id': 'originalFilePath', 'placeholder': 'Entrer l\'emplacement du fichier source (optionnel)'}}
+					) }}
+				</div>
+				<div
 					style='color:black'>
 					{# Display the current button hierarchy #}
 					Zone:

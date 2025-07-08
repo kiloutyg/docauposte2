@@ -181,10 +181,15 @@ class UploadController extends AbstractController
             $this->logger->error('UploadController::genericUploadFiles - File upload conflict', ['filename' => $filename]);
             return $this->redirect($originUrl);
         } else {
+            try {
+                $name = $this->uploadService->uploadFiles($request, $buttonEntity, $user, $filename);
+                $this->addFlash('success', 'Le document ' . $name . ' a été correctement chargé');
+                $this->logger->notice('UploadController::genericUploadFiles - File uploaded', ['filename' => $name]);
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Le document n\'a pas été correctement chargé.');
+                $this->logger->error('UploadController::genericUploadFiles - File upload error', ['error' => $e->getMessage()]);
+            }
             // Use the UploadService to handle file uploads
-            $name = $this->uploadService->uploadFiles($request, $buttonEntity, $user, $filename);
-            $this->addFlash('success', 'Le document ' . $name . ' a été correctement chargé');
-            $this->logger->notice('UploadController::genericUploadFiles - File uploaded', ['filename' => $name]);
             return $this->redirect($originUrl);
         }
     }
@@ -346,6 +351,7 @@ class UploadController extends AbstractController
     #[Route('/modification/modifying/{uploadId}', name: 'app_modifying_file')]
     public function modifyingFile(Request $request, int $uploadId): Response
     {
+        $this->logger->debug('ModifyingFileController::modifyingFile', ['full request' => $request->request->all()]);
         if (!$request->isMethod('POST')) {
             $this->addFlash('warning', 'Invalid request.');
             return $this->redirectToRoute('app_modify_file', [

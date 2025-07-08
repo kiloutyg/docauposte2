@@ -34,10 +34,9 @@
 								<div
 									class="row align-items-center gy-lg-0 gy-5 ">
 									<div
-										class="col-md-6">
-
+										class="col-lg-6 col-md-6 col-sm-12 ">
 										<h3
-											class="card-title text-center mb-5 fw-light fs-5">
+											class="card-title text-center m-2 fw-light fs-4">
 											<strong>
 												Création de Lignes
 											</strong>
@@ -46,7 +45,7 @@
 										<form
 											class="d-flex flex-column"
 											method="POST"
-											action="{{ path('app_zone_admin_create_productline', {'zoneId': zone.id}) }}">
+											action="{{ path('app_zone_admin_create_productline', {'zoneId': zone.id}) }}" data-controller="name-validation">
 											<div
 												class="form-control mb-3">
 												<label
@@ -59,13 +58,20 @@
 													placeholder="Nom de la Ligne"
 													required
 													class="form-control"
-													id="productLineName">
+													id="productLineName"
+													data-name-validation-target='organizationEntityName'
+													data-action='input->name-validation#validateOrganizationEntityName'>
+												<div
+													data-name-validation-target="organizationEntityNameMessage"
+													class="organizationEntityName-message"></div>
 											</div>
 											<div
 												class="d-grid">
 												<button
 													class="btn btn-primary btn-login text-first|uppercase fw-bold"
-													type="submit">
+													type="submit"
+													data-name-validation-target='submitButton'
+													disabled='true'>
 													Valider
 												</button>
 											</div>

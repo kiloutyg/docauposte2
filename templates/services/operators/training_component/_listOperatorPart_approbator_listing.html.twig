@@ -1,0 +1,12 @@
+<p
+	style="flex:1;"
+	class=" mx-2 mt-2 card text-center">
+	{% for approbation in upload.validation.approbations %}
+		{{approbation.userapprobator.username|capitalize|split('.')|first }}
+		{{approbation.userapprobator.username|upper|split('.')|last }}
+		{{approbation.approval is same as(true) ? ' a validé' : (approbation.approval is same as(false) ? ' a refusé' : (approbation.approval is same as(null) ? ' n\'a pas rendu son avis')) }}
+        {% if not loop.last %}
+            ,
+        {% endif %}
+    {% endfor %}
+</p>

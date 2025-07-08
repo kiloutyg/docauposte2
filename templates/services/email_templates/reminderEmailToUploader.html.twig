@@ -10,32 +10,8 @@
 			{{ refusedUploads|length }}
 			documents refusés.
 			{% for upload in refusedUploads %}
-				<ul>
-					<h3>
-						<strong>
-							<i>{{upload.filename}}</i>
-						</strong>
-						uploadé le
-						<strong>
-							<i>{{upload.uploadedAt|date('d/m/Y') }}</i>
-						</strong>
-					</h3>
-					{% for approbation in upload.validation.approbations %}
-						<ul>
-							<li>
-								<strong>
-									{{ approbation.userapprobator.username|capitalize|split('.')|first }}
-									{{ approbation.userapprobator.username|upper|split('.')|last }}
-									{{approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé' : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}
-								</strong>
-							{% if approbation.comment is not empty %}
-								avec le commentaire suivant :
-								<i>"{{ approbation.comment }}"</i>
-							{% endif %}
-						</li>
-					</ul>
-				{% endfor %}			
-				</ul>
+				{% include "services/email_templates/email_templates_component/reminderEmailToUploader_component.html.twig" %}
+
 			{% endfor %}
 		</p>
 	{% endif %}
@@ -48,33 +24,8 @@
 			{{ waitingUploads|length }}
 			documents en attente de validations.
 			{% for upload in waitingUploads %}
-				<ul>
-					<h3>
-						<strong>
-							<i>{{upload.filename}}</i>
-						</strong>
-						uploadé le
-						<strong>
-							<i>{{upload.uploadedAt|date('d/m/Y') }}</i>
-						</strong>
-					</h3>
-				{% for approbation in upload.validation.approbations %}
-					<ul>
-						<li>
-						<strong>
-							{{ approbation.userapprobator.username|capitalize|split('.')|first }}
-							{{ approbation.userapprobator.username|upper|split('.')|last }}
-							{{approbation.approval is same as(true) ? ' a validé' : approbation.approval is same as(false) ? ' a refusé' : approbation.approval is same as(null) ? ' n\'a pas rendu son avis' }}
-								</strong>
-								{% if approbation.comment is not empty %}
-									avec le commentaire suivant :
-									<i>"{{ approbation.comment }}"</i>
-								{% endif %}
 
-							</li>
-						</ul>
-					{% endfor %}
-				</ul>
+				{% include "services/email_templates/email_templates_component/reminderEmailToUploader_component.html.twig" %}
 
 			{% endfor %}
 		</p>
@@ -82,7 +33,11 @@
 {% endif %}
 <p>
 	Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant :
-	<a class='btn-info' href='http://{{ hostname|lower }}/docauposte/login'>Page de connexion</a>
+	<a
+		class='btn-info'
+		href='http://{{ hostname|lower }}/docauposte/login'>
+		Page de connexion
+	</a>
 </p>
 <p>
 	Cordialement

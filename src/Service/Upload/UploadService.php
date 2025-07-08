@@ -118,18 +118,24 @@ class UploadService extends AbstractController
 
         // Iterate over each file
         foreach ($files as $file) {
+            $this->logger->debug('UploadService::uploadFiles - Uploading file: ', [$request->request->all()]);
 
             $this->fileTypeService->checkFileType($file);
 
             // Construct the full path of the file
             $folderPath = $this->folderService->pathFindingDoc($button->getName());
             $path = $folderPath . '/' . $filename;
-            // Move the file to the specified folder
-            $file->move($folderPath . '/', $filename);
+            try {
+                // Move the file to the specified folder
+                $file->move($folderPath . '/', $filename);
+            } catch (\Exception $e) {
+                $this->logger->error('Error while moving the file: ' . $e->getMessage());
+                $this->addFlash('error', 'Erreur lors du déplacement du fichier');
+            }
+
 
             // Create a new Upload object
             $upload = new Upload();
-
             // Set the file property using the path
             $upload->setFile(new File($path));
             // Set the filename property
@@ -144,6 +150,9 @@ class UploadService extends AbstractController
             $upload->setUploadedAt(new \DateTime());
             // Set the revision property
             $upload->setRevision(1);
+            // Set the originalFilePath property
+            $originalFilePath = $request->request->get('originalFilePath') ?? null;
+            $upload->setOriginalFilePath($originalFilePath);
             // Persist the upload object
             $this->em->persist($upload);
             // Set training and validation related stuff
@@ -226,21 +235,21 @@ class UploadService extends AbstractController
     {
         $groupedUploads = [];
         $groupedValidatedUploads = [];
-    
+
         // Group uploads by zone, productLine, category, and button
         foreach ($uploads as $upload) {
             $zoneName        = $upload->getButton()->getCategory()->getProductLine()->getZone()->getName();
             $productLineName = $upload->getButton()->getCategory()->getProductLine()->getName();
             $categoryName    = $upload->getButton()->getCategory()->getName();
             $buttonName      = $upload->getButton()->getName();
-    
+
             $groupedUploads = $this->groupingNonValidatedUpload($groupedUploads, $upload, $zoneName, $productLineName, $categoryName, $buttonName);
-    
+
             if ($upload->getValidation()) {
                 $groupedValidatedUploads = $this->groupingValidatedUpload($groupedValidatedUploads, $upload, $zoneName, $productLineName, $categoryName, $buttonName);
             }
         }
-    
+
         return [$groupedUploads, $groupedValidatedUploads];
     }
 
@@ -291,7 +300,7 @@ class UploadService extends AbstractController
 
 
 
-    
+
     /**
      * Groups a validated upload into a hierarchical array structure based on organizational elements.
      *

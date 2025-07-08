@@ -17,10 +17,9 @@
 	{% endblock %}
 
 
-
 	<div
 		class="card border-0 shadow rounded-3 my-5 bg-secondary"
-		data-controller="document-training document-display">
+		data-controller="document-training document-display filename-validation">
 		<div
 			class="card-body ">
 			{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyForm', 'method': 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_modifying_file', {'uploadId': upload.id})}) }}
@@ -49,6 +48,9 @@
 					) }}
 					{{ form_widget(form.file, {'attr': {'class': 'form-control', 'id': 'file', 'accept' : '.pdf'}}
 					) }}
+					<div
+						data-filename-validation-target="message"
+						class="filename-message"></div>
 					{% if settings.isTraining %}
 						<div
 							class="d-flex align-items-left mt-2  ">

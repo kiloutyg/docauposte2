@@ -52,6 +52,15 @@ class UploadType extends AbstractType
                     ]
                 ]
             )
+            ->add(
+                'originalFilePath',
+                TextType::class,
+                [
+                    'label' => 'Emplacement du fichier source (optionnel) :',
+                    'required' => false,
+                    'empty_data' => null,
+                ]
+            )
             // Adds an entity field for selecting a button to the form
             ->add(
                 'button',

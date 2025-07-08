@@ -147,6 +147,13 @@ class UploadModificationService extends AbstractController
             filter_var($request->request->get('display-needed'), FILTER_VALIDATE_BOOLEAN)
         );
 
+        // Set the originalFilePath property
+        $otherMod = $request->request->all()['upload'] ?? null;
+        $this->logger->debug('UploadModificationService::modifyFile - OtherMod: ', [$otherMod]);
+        $originalFilePath = $otherMod['originalFilePath'] ?? null;
+        $this->logger->debug('UploadModificationService::modifyFile - OriginalFilePath: ', [$originalFilePath]);
+        $upload->setOriginalFilePath($originalFilePath);
+
         // If new file exists, process it and delete the old one
         if ($newFile) {
             try {
@@ -530,6 +537,12 @@ class UploadModificationService extends AbstractController
         $oldFilePath = $upload->getPath();
 
         $path = $this->folderService->uploadPath($upload);
+
+        // Set the originalFilePath property
+        $originalFilePath = $request->request->get('originalFilePath') ?? null;
+        $upload->setOriginalFilePath($originalFilePath);
+
+
         // If new file exists, process it and delete the old one
         if ($newFile) {
 

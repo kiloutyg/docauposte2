@@ -70,13 +70,14 @@
 													<div
 														data-filename-validation-target="message"
 														class="filename-message"></div>
+
 													<div
 														class="mb-3">
 														<label
 															for="newFilename"
 															class="form-label"
 															style="color:white">
-															Nom du fichier :
+															Nouveau nom du fichier (optionnel):
 														</label>
 														<input
 															type="text"
@@ -86,11 +87,25 @@
 															data-action='keyup->filename-validation#validateNewFilename'
 															name="newFilename"
 															placeholder="Entrer un nouveau nom de fichier (optionnel)">
-
 													</div>
 													<div
 														data-filename-validation-target="message"
 														class="newFilename-message"></div>
+													<div
+														class="mb-3">
+														<label
+															for="originalFilePath"
+															class="form-label"
+															style="color:white">
+															Emplacement du fichier source (optionnel) :
+														</label>
+														<input
+															type="text"
+															class="form-control"
+															id="originalFilePath"
+															name="originalFilePath"
+															placeholder="Entrer l'emplacement du fichier source (optionnel)">
+													</div>
 													{% include 'services/uploads/uploads_components/cascading_dropdowns.html.twig' %}
 												</div>
 											</div>

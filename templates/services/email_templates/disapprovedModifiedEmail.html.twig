@@ -4,15 +4,30 @@
 <p>
 	Vous avez une validation à effectuer d'une nouvelle version du document
 	<strong>
-		<i>{{upload.filename}}</i>
+		<i>
+			{{upload.filename}}
+		</i>
 	</strong>
 	qui a été uploadé par
-	<strong>{{upload.uploader.username|capitalize|split('.')|first}}
-		{{upload.uploader.username|upper|split('.')|last }}</strong>
-	consécutivement à refus.</p>
+	<strong>
+		{{upload.uploader.username|capitalize|split('.')|first}}
+		{{upload.uploader.username|upper|split('.')|last }}
+	</strong>
+	consécutivement à refus.
+</p>
+{% if upload.originalFilePath is not empty %}
+	<p>
+		Le fichier original est disponible à l'emplacement suivant :
+		{{ upload.originalFilePath }}
+	</p>
+{% endif %}
 <p>
 	Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant :
-	<a class='btn-info' href='http://{{ hostname|lower }}/docauposte/login'>Page de connexion</a>
+	<a
+		class='btn-info'
+		href='http://{{ hostname|lower }}/docauposte/login'>
+		Page de connexion
+	</a>
 </p>
 <p>
 	Cordialement

@@ -15,6 +15,14 @@
 	</strong>
 	.
 </p>
+
+{% if upload.originalFilePath is not empty %}
+	<p>
+		Le fichier original est disponible à l'emplacement suivant :
+		{{ upload.originalFilePath }}
+	</p>
+{% endif %}
+
 {% if approbators|length > 0  %}
 	<p>
 		Le document doit aussi être validé par
@@ -35,12 +43,13 @@
 		{% endfor %}
 		.
 	</p>
-
 {% endif %}
 
 <p>
 	Vous pouvez accéder au document en vous connectant à l'application en cliquant sur le lien suivant :
-	<a class='btn-info' href='https://{{ hostname|lower }}/docauposte/login'>
+	<a
+		class='btn-info'
+		href='https://{{ hostname|lower }}/docauposte/login'>
 		Page de connexion
 	</a>
 </p>
