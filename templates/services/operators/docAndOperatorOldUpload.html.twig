@@ -6,7 +6,33 @@
 {% block javascripts %}
 	{{ parent()}}
 	{{encore_entry_script_tags('inactivity-timer')}}
+	{{encore_entry_script_tags('dynamic-iframe')}}
+{% endblock %}
 
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		.split-container {
+			display: flex;
+			height: 100vh;
+		}
+		.split-panel {
+			overflow: hidden;
+		}
+		iframe {
+			width: 100%;
+			height: 100%;
+			border: none;
+		}
+		.gutter {
+			background-color: #eee;
+			background-repeat: no-repeat;
+			background-position: 50%;
+		}
+		.gutter:hover {
+			background-color: #ddd;
+		}
+	</style>
 {% endblock %}
 {% block body %}
 
