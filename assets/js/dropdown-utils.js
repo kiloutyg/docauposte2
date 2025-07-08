@@ -63,7 +63,7 @@ export function populateDropdown(dropdown, data, options = {}) {
     }
 
     const option = document.createElement('option');
-    // console.log("dropdown-utils::populateDropdown - item", item);
+    console.log("dropdown-utils::populateDropdown - item", item);
     option.value = item[valueKey];
 
     let text = item[nameKey] || item[usernameKey];
@@ -75,7 +75,7 @@ export function populateDropdown(dropdown, data, options = {}) {
     if (item[valueKey] === selectedId) {
       option.selected = true;
     }
-    // console.log("dropdown-utils::populateDropdown - option", option);
+    console.log("dropdown-utils::populateDropdown - option", option);
     dropdown.appendChild(option);
   });
 }

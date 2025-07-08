@@ -81,7 +81,7 @@ class MailerService extends AbstractController
      * @param string $subject The subject line of the email
      * @param string $html The HTML content of the email body
      *
-     * @return bool|string Returns true if the email was sent successfully, 
+     * @return bool|string Returns true if the email was sent successfully,
      *                     or the error message string if sending failed
      */
     public function sendEmail(User $recipient, string $subject, string $html)
@@ -111,7 +111,7 @@ class MailerService extends AbstractController
      *
      * @param Approbation $approbation The approbation entity containing the approbator and validation details
      *
-     * @return bool|string Returns true if the email was sent successfully, 
+     * @return bool|string Returns true if the email was sent successfully,
      *                     or the error message string if sending failed
      */
     public function sendApprobationEmail($approbation)
@@ -207,7 +207,7 @@ class MailerService extends AbstractController
      * @param Approbation $approbation The approbation entity containing the approbator who will be notified
      *                                 and the validation details of the corrected document
      *
-     * @return bool|string Returns true if the email was sent successfully, 
+     * @return bool|string Returns true if the email was sent successfully,
      *                     or the error message string if sending failed
      */
     public function sendDisapprovedModifiedEmail(Approbation $approbation)
@@ -249,7 +249,7 @@ class MailerService extends AbstractController
      *
      * @param Validation $validation The validation entity containing the document that was approved
      *
-     * @return bool|string Returns true if the email was sent successfully, 
+     * @return bool|string Returns true if the email was sent successfully,
      *                     or the error message string if sending failed
      */
     public function sendApprovalEmail(Validation $validation)
