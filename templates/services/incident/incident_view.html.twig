@@ -1,52 +1,57 @@
 {% extends 'blank.html.twig' %}
 {% block title %}
 	Incident-Alert
-
 {% endblock %}
-
 {% block body %}
 	<div
-		class="d-flex align-items-center  flex-row">
-
-		<iframe
-			title="incident-file-display-for-view"
-			src="{{ path('app_incident_download_file', { 'incidentId': incident.id }) }}" width="80%"
-			class="vh-100"
-			target="_blank"></iframe>
+		class=" split-container">
 		<div
-			style="width: 2%"></div>
+			id="split-left"
+			class="split-panel">
+			<iframe
+				title="incident-file-display-for-view"
+				src="{{ path('app_incident_download_file', { 'incidentId': incident.id }) }}" target="_blank"></iframe>
+		</div>
 		<div
-			style="width: 16%"
-			class="text-center">
-
-			<h1
-				style="text-align: center;">
-				<strong>
-					{{incidentCategory.name|split('.')|first|upper}}
-				</strong>
-			</h1>
+			id="split-right"
+			class="split-panel"
+			style="text-align: center; height: 100vh">
 			<div
-				style="height: 40vh;"></div>
-
-			<a
-				href="{{ path('app_mandatory_incident', {'incidentId': nextIncidentId, 'productLineId' : productLineId})}}" class="btn btn-warning btn-lg">
-				<strong>
-					Ok, J'ai compris
-				</strong>
-			</a>
+				style="height: 30vh;"></div>
+			<div
+				style="vertical-align: top;"
+				class="mx-auto">
+				<h1>
+					<strong>
+						{{incidentCategory.name|split('.')|first|upper}}
+					</strong>
+				</h1>
+			</div>
 			<div
 				style="height: 10vh;"></div>
-			<a
-				href="javascript:void(0)"
-				class="btn btn-secondary"
-				onclick="event.preventDefault(); window.history.back();"
-				style="color:black">
-				Retour
-			</a>
 			<div
-				style="width: 2%"></div>
-
+				style="vertical-align: middle;"
+				class="mx-auto">
+				<a
+					href="{{ path('app_mandatory_incident', {'incidentId': nextIncidentId, 'productLineId' : productLineId})}}" class="btn btn-warning btn-lg">
+					<strong>
+						Ok, J'ai compris
+					</strong>
+				</a>
+			</div>
+			<div
+				style="height: 10vh;"></div>
+			<div
+				style=" vertical-align: bottom;"
+				class="mx-auto">
+				<a
+					href="javascript:void(0)"
+					class="btn btn-secondary"
+					onclick="event.preventDefault(); window.history.back();"
+					style="color:black;">
+					Retour
+				</a>
+			</div>
 		</div>
 	</div>
-
 {% endblock %}
