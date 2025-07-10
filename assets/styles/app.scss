@@ -692,6 +692,30 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
     animation: bounce 1s infinite alternate;
 }
 
+iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.split-container {
+    display: flex;
+    height: 100vh;
+}
+.split-panel {
+    overflow: hidden;
+}
+
+.gutter {
+    background-color: #eee;
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+.gutter:hover {
+    background-color: #ddd;
+}
+
+
 @keyframes pulse {
     0% {
         opacity: 0.6;
@@ -712,3 +736,4 @@ $shadow-color: rgba(0, 0, 0, 1); // Change to desired color
         transform: translateY(-10px);
     }
 }
+

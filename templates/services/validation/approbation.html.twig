@@ -5,18 +5,33 @@
 	{{ encore_entry_script_tags('document-validator') }}
 {% endblock %}
 {% block body %}
-	<div
-		class=" d-flex align-items-center flex-row"
-		style="background-color:#0E3571;">
 
-		<iframe
-			src="{{ path('app_validation_approbation_file', { 'approbationId': approbation.id }) }}" class=" vh-100"
-			width="69%"
-			target="_blank"></iframe>
+	<div
+		class="split-container">
 		<div
-			style="width: 32%"
-			class="text-center">
-			{% include 'services/validation/approbation_components/_approbationWindow.html.twig' %}
+			id="split-left"
+			class="split-panel">
+			<iframe
+				title="validation-file-display-for-view"
+				src="{{ path('app_validation_approbation_file', { 'approbationId': approbation.id }) }}" class="vh-100"
+				target="_blank"></iframe>
+		</div>
+
+		<div
+			id="split-right"
+			class="split-panel">
+			<div
+				style="height: 15vh;"></div>
+			<div
+				style="text-align: center;">
+				<div
+					class="text-center">
+					{% include 'services/validation/approbation_components/_approbationWindow.html.twig' %}
+				</div>
+			</div>
+			<div
+				style="height: 15vh;"></div>
 		</div>
 	</div>
+
 {% endblock %}
