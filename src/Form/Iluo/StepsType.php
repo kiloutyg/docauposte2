@@ -61,17 +61,8 @@ class StepsType extends AbstractBaseFormType
             choiceLabel: 'id',
             placeholder: 'Sélectionner un Type de Matériel d\'Apprentissage',
             required: true,
-            additionalOptions: ['multiple' => true],
+            additionalOptions: ['multiple' => true]
         );
-        // $this->addEntityField(
-        //     builder: $builder,
-        //     fieldName: 'iluoChecklist',
-        //     label: 'Liste de Contrôle ILUO',
-        //     entityClass: IluoChecklist::class,
-        //     choiceLabel: 'id',
-        //     placeholder: 'Sélectionner une Liste de Contrôle ILUO',
-        //     required: false,
-        // );
         // $this->addEntityField(
         //     builder: $builder,
         //     fieldName: 'uploads',
