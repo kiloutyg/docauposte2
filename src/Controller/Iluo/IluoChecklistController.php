@@ -11,8 +11,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\Routing\Annotation\Route;
 
+use App\Entity\IluoLevels;
+use App\Entity\Steps;
+use App\Entity\StepsSubheadings;
+use App\Entity\StepsTitle;
 use App\Entity\TrainingMaterialType;
 
+use App\Form\Iluo\IluoLevelsType;
+use App\Form\Iluo\StepsType;
+use App\Form\Iluo\StepsSubheadingsType;
+use App\Form\Iluo\StepsTitleType;
 use App\Form\Iluo\TrainingMaterialTypeType;
 
 use App\Service\EntityFetchingService;
@@ -62,6 +70,8 @@ class IluoChecklistController extends AbstractController
         return $this->render('services/iluo/iluo_admin_component/iluo_checklist_admin_content.html.twig', []);
     }
 
+
+
     /**
      * Handles the GET request for the training material type admin page.
      *
@@ -76,7 +86,7 @@ class IluoChecklistController extends AbstractController
      * @return Response Returns either a rendered template response for GET requests
      *                  or a redirect response for non-GET requests
      */
-    #[Route(path: 'admin/training_material_type_checklist', name: 'trainingmaterialtype_checklist_admin')]
+    #[Route(path: 'admin/training_material_type_checklist', name: 'training_material_type_checklist_admin')]
     public function trainingMaterialTypeAdminPageGet(Request $request): Response
     {
         $trainingMaterialTypes = $this->entityFetchingService->findAll(entityType: 'trainingMaterialType');
@@ -89,6 +99,140 @@ class IluoChecklistController extends AbstractController
         return $this->render(view: '/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_training_material_type_checklist_admin_component.html.twig', parameters: [
             'trainingMaterialTypeForm' => $trainingMaterialTypeForm->createView(),
             'trainingMaterialTypes'    => $trainingMaterialTypes,
+        ]);
+    }
+
+
+    
+
+
+    /**
+     * Handles the GET request for the ILUO levels admin page.
+     *
+     * This function manages the ILUO levels administration interface by fetching all existing
+     * ILUO levels, creating a form for adding new levels, and handling form submissions.
+     * For GET requests, it renders the ILUO levels admin template with the form and existing
+     * levels data. For POST requests, it logs the form submission and delegates the form
+     * processing to the IluoService.
+     *
+     * @param Request $request The incoming HTTP request object containing request data and method information
+     *
+     * @return Response Returns either a rendered template response for GET requests containing the ILUO
+     *                  levels admin interface, or a redirect response for POST requests after form processing
+     */
+    #[Route(path: 'admin/iluo_levels', name: 'iluo_levels_admin')]
+    public function iluoLevelsAdminPageGet(Request $request): Response
+    {
+        $iluoLevels = $this->entityFetchingService->findAll(entityType: 'iluoLevels');
+        $newIluoLevel = new IluoLevels;
+        $iluoLevelsForm = $this->createForm(type: IluoLevelsType::class, data: $newIluoLevel);
+        if ($request->isMethod(method: 'POST')) {
+            $this->logger->debug(message: 'IluoLevels form submitted', context: [$request->request->all()]);
+            return $this->iluoService->iluoComponentFormManagement(entityType: 'iluoLevels', form: $iluoLevelsForm, request: $request);
+        }
+        return $this->render(view: '/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_levels_admin_component.html.twig', parameters: [
+            'iluoLevelsForm' => $iluoLevelsForm->createView(),
+            'iluoLevels'    => $iluoLevels,
+        ]);
+    }
+
+
+
+
+
+    /**
+     * Handles the GET request for the steps title admin page.
+     *
+     * This function manages the steps title administration interface by fetching all existing
+     * steps titles, creating a form for adding new steps titles, and handling form submissions.
+     * For GET requests, it renders the steps title admin template with the form and existing
+     * steps title data. For POST requests, it logs the form submission and delegates the form
+     * processing to the IluoService.
+     *
+     * @param Request $request The incoming HTTP request object containing request data and method information
+     *
+     * @return Response Returns either a rendered template response for GET requests containing the steps
+     *                  title admin interface, or a redirect response for POST requests after form processing
+     */
+    #[Route(path: 'admin/steps_title_checklist', name: 'steps_title_checklist_admin')]
+    public function stepsTitleAdminPageGet(Request $request): Response
+    {
+        $stepsTitle = $this->entityFetchingService->findAll(entityType: 'stepsTitle');
+        $newStepTitle = new StepsTitle;
+        $stepsTitleForm = $this->createForm(type: StepsTitleType::class, data: $newStepTitle);
+        if ($request->isMethod(method: 'POST')) {
+            $this->logger->debug(message: 'StepsTitle form submitted', context: [$request->request->all()]);
+            return $this->iluoService->iluoComponentFormManagement(entityType: 'stepsTitle', form: $stepsTitleForm, request: $request);
+        }
+        return $this->render(view: '/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_steps_title_checklist_admin_component.html.twig', parameters: [
+            'stepsTitleForm' => $stepsTitleForm->createView(),
+            'stepsTitle'    => $stepsTitle,
+        ]);
+    }
+
+
+
+
+    /**
+     * Handles the GET request for the steps subheadings admin page.
+     *
+     * This function manages the steps subheadings administration interface by fetching all existing
+     * steps subheadings, creating a form for adding new steps subheadings, and handling form submissions.
+     * For GET requests, it renders the steps subheadings admin template with the form and existing
+     * steps subheadings data. For POST requests, it logs the form submission and delegates the form
+     * processing to the IluoService.
+     *
+     * @param Request $request The incoming HTTP request object containing request data and method information
+     *
+     * @return Response Returns either a rendered template response for GET requests containing the steps
+     *                  subheadings admin interface, or a redirect response for POST requests after form processing
+     */
+    #[Route(path: 'admin/steps_subheadings_checklist', name: 'steps_subheadings_checklist_admin')]
+    public function stepsSubheadingsAdminPageGet(Request $request): Response
+    {
+        $stepsSubheadings = $this->entityFetchingService->findAll(entityType: 'stepsSubheadings');
+        $newStepSubheadings = new StepsSubheadings;
+        $stepsSubheadingsForm = $this->createForm(type: StepsSubheadingsType::class, data: $newStepSubheadings);
+        if ($request->isMethod(method: 'POST')) {
+            $this->logger->debug(message: 'Steps form submitted', context: [$request->request->all()]);
+            return $this->iluoService->iluoComponentFormManagement(entityType: 'stepsSubheadings', form: $stepsSubheadingsForm, request: $request);
+        }
+        return $this->render(view: '/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_steps_subheadings_checklist_admin_component.html.twig', parameters: [
+            'stepsSubheadingsForm' => $stepsSubheadingsForm->createView(),
+            'stepsSubheadings'    => $stepsSubheadings,
+        ]);
+    }
+
+
+
+
+
+    /**
+     * Handles the GET request for the steps admin page.
+     *
+     * This function manages the steps administration interface by fetching all existing steps,
+     * creating a form for adding new steps, and handling form submissions. For GET requests,
+     * it renders the steps admin template with the form and existing steps data. For POST
+     * requests, it logs the form submission and delegates the form processing to the IluoService.
+     *
+     * @param Request $request The incoming HTTP request object containing request data and method information
+     *
+     * @return Response Returns either a rendered template response for GET requests containing the steps
+     *                  admin interface, or a redirect response for POST requests after form processing
+     */
+    #[Route(path: 'admin/steps_checklist', name: 'steps_checklist_admin')]
+    public function stepsAdminPageGet(Request $request): Response
+    {
+        $steps = $this->entityFetchingService->findAll(entityType: 'steps');
+        $newStep = new Steps;
+        $stepsForm = $this->createForm(type: StepsType::class, data: $newStep);
+        if ($request->isMethod(method: 'POST')) {
+            $this->logger->debug(message: 'Steps form submitted', context: [$request->request->all()]);
+            return $this->iluoService->iluoComponentFormManagement(entityType: 'steps', form: $stepsForm, request: $request);
+        }
+        return $this->render(view: '/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_steps_checklist_admin_component.html.twig', parameters: [
+            'stepsForm' => $stepsForm->createView(),
+            'steps'    => $steps,
         ]);
     }
 }

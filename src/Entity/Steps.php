@@ -26,10 +26,10 @@ class Steps
     private Collection $uploads;
 
     #[ORM\ManyToOne(inversedBy: 'steps')]
-    private ?StepsSubheadings $subheading = null;
+    private ?StepsSubheadings $stepsSubheadings = null;
 
     #[ORM\ManyToOne(inversedBy: 'steps')]
-    private ?StepsTitle $title = null;
+    private ?StepsTitle $stepsTitle = null;
 
     #[ORM\ManyToOne(inversedBy: 'steps')]
     private ?IluoLevels $iluoLevel = null;
@@ -94,26 +94,26 @@ class Steps
         return $this;
     }
 
-    public function getSubheading(): ?StepsSubheadings
+    public function getStepsSubheadings(): ?StepsSubheadings
     {
-        return $this->subheading;
+        return $this->stepsSubheadings;
     }
 
-    public function setSubheading(?StepsSubheadings $subheading): static
+    public function setStepsSubheadings(?StepsSubheadings $stepsSubheadings): static
     {
-        $this->subheading = $subheading;
+        $this->stepsSubheadings = $stepsSubheadings;
 
         return $this;
     }
 
-    public function getTitle(): ?StepsTitle
+    public function getStepsTitle(): ?StepsTitle
     {
-        return $this->title;
+        return $this->stepsTitle;
     }
 
-    public function setTitle(?StepsTitle $title): static
+    public function setStepsTitle(?StepsTitle $stepsTitle): static
     {
-        $this->title = $title;
+        $this->stepsTitle = $stepsTitle;
 
         return $this;
     }

@@ -8,36 +8,41 @@
 {% endblock %}
 {% block body %}
 	<div
-		class="d-flex align-items-center  flex-row">
-		<iframe
-			title="incident display on automatic redirection event"
-			src="{{ path('app_incident_download_file', { 'incidentId': incidentId }) }}" width="85%"
-			class="vh-100"
-			target="_blank"></iframe>
+		class="split-container">
 		<div
-			style="width: 1%"></div>
+			id="split-left"
+			class="split-panel">
+			<iframe
+				title="incident-file-display-for-view"
+				src="{{ path('app_incident_download_file', { 'incidentId': incident.id }) }}" target="_blank"></iframe>
+		</div>
 		<div
-			style="width: 13%"
-			class="text-center">
-			<h1
-				style="text-align: center;">
-				<strong>
-					{{incidentCategory.name|split('.')|first|upper}}
-				</strong>
-			</h1>
+			id="split-right"
+			class="split-panel"
+			style="text-align: center; height: 100vh">
 			<div
-				style="height: 40vh;"></div>
+				style="height: 30vh;"></div>
+			<div
+				style="vertical-align: top;"
+				class="mx-auto">
+				<h1>
+					<strong>
+						{{incidentCategory.name|split('.')|first|upper}}
+					</strong>
+				</h1>
+			</div>
 			<div
 				style="height: 10vh;"></div>
-			<a
-				href="{{path('app_zone',{'zoneId': zoneId})}}" class="btn btn-warning btn-lg"
-				style="color:black">
-				<strong>
-					Ok, J'ai compris
-				</strong>
-			</a>
 			<div
-				style="width: 1%"></div>
+				style="vertical-align: middle;"
+				class="mx-auto">
+				<a
+					href="{{ path('app_mandatory_incident', {'incidentId': nextIncidentId, 'productLineId' : productLineId})}}" class="btn btn-warning btn-lg">
+					<strong>
+						Ok, J'ai compris
+					</strong>
+				</a>
+			</div>
 		</div>
 	</div>
 {% endblock %}

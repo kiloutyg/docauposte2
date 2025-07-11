@@ -1,13 +1,22 @@
 <turbo-frame
-	id="training-material-type-section"
+	id="steps-title-checklist-section"
 	class="container row mx-auto px-0 px-md-2">
-	{{ form_start(trainingMaterialTypeForm, { attr: {class: 'col-lg-6 col-md-12 col-sm-12 d-flex flex-column', method: 'POST', action: path('app_iluo_training_material_type_checklist_admin')}}
+	{{ form_start(stepsTitleForm, { attr: {class: 'col-lg-6 col-md-12 col-sm-12 d-flex flex-column', 
+	method: 'POST', action: path('app_iluo_steps_title_checklist_admin')}}
 	) }}
 	<div
 		class="col-12">
-		{{ form_label(trainingMaterialTypeForm.name) }}
-		{{ form_widget(trainingMaterialTypeForm.name) }}
-		{{ form_widget(trainingMaterialTypeForm.save) }}
+		{{ form_label(stepsTitleForm.title) }}
+		{{ form_widget(stepsTitleForm.title) }}
+	</div>
+	<div
+		class="col-12">
+		{{ form_label(stepsTitleForm.iluoLevel) }}
+		{{ form_widget(stepsTitleForm.iluoLevel) }}
+	</div>
+	<div
+		class="col-12">
+		{{ form_widget(stepsTitleForm.save) }}
 	</div>
 	<div
 		id="flash-messages">
@@ -22,46 +31,44 @@
 			</div>
 		{% endfor %}
 	</div>
-	{{ form_end(trainingMaterialTypeForm) }}
-	{% if trainingMaterialTypes is not empty %}
+	{{ form_end(stepsTitleForm) }}
+	{% if stepsTitle is not empty %}
 		<div
 			class="col-lg-6 col-md-12 col-sm-12 mt-auto mb-auto accordion"
-			id="accordionTrainingMaterialTypeList">
+			id="accordionStepsTitleList">
 			<div
 				class="accordion-item shadow-lg shadow-lg-inset border border-dark">
 				<h2
 					class="accordion-header"
-					id="headingTrainingMaterialTypeList">
+					id="headingStepsTitleList">
 					<button
 						class="accordion-button bg-white text-dark collapsed"
 						type="button"
 						data-bs-toggle="collapse"
-						data-bs-target="#collapseTrainingMaterialTypeList"
+						data-bs-target="#collapseStepsTitleList"
 						aria-expanded="false"
-						aria-controls="collapseTrainingMaterialTypeList">
+						aria-controls="collapseStepsTitleList">
 						<strong>
 							Liste des Produits
 						</strong>
 					</button>
 				</h2>
 				<div
-					id="collapseTrainingMaterialTypeList"
+					id="collapseStepsTitleList"
 					class="accordion-collapse collapse "
-					aria-labelledby="headingTrainingMaterialTypeList"
-					data-bs-parent="#accordionTrainingMaterialTypeList">
+					aria-labelledby="headingStepsTitleList"
+					data-bs-parent="#accordionStepsTitleList">
 					<div
 						class="accordion-body bg-white text-dark">
 						<ul
 							class="list-group">
-							{% for trainingMaterialType in trainingMaterialTypes %}
+							{% for stepTitle in stepsTitle %}
 								<li
 									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
 									<strong>
-										{{ trainingMaterialType.name }}
+										{{ stepTitle.name }}
 									</strong>
-
-									{{ delete_form('trainingMaterialType', trainingMaterialType.id, 'app_iluo_trainingmaterialtype_checklist_admin') }}
-
+									{{ delete_form('stepsTitle', stepTitle.id, 'app_iluo_steps_title_checklist_admin') }}
 								</li>
 							{% endfor %}
 						</ul>
