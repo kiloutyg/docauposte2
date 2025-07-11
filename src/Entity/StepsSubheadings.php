@@ -21,11 +21,11 @@ class StepsSubheadings
     /**
      * @var Collection<int, Steps>
      */
-    #[ORM\OneToMany(targetEntity: Steps::class, mappedBy: 'subheading')]
+    #[ORM\OneToMany(targetEntity: Steps::class, mappedBy: 'stepsSubheadings')]
     private Collection $steps;
 
     #[ORM\ManyToOne(inversedBy: 'stepsSubheadings')]
-    private ?StepsTitle $title = null;
+    private ?StepsTitle $stepsTitle = null;
 
     #[ORM\ManyToOne(inversedBy: 'stepsSubheadings')]
     private ?IluoLevels $iluoLevel = null;
@@ -64,7 +64,7 @@ class StepsSubheadings
     {
         if (!$this->steps->contains($step)) {
             $this->steps->add($step);
-            $step->setSubheading($this);
+            $step->setStepsSubheadings($this);
         }
 
         return $this;
@@ -74,22 +74,22 @@ class StepsSubheadings
     {
         if ($this->steps->removeElement($step)) {
             // set the owning side to null (unless already changed)
-            if ($step->getSubheading() === $this) {
-                $step->setSubheading(null);
+            if ($step->getStepsSubheadings() === $this) {
+                $step->setStepsSubheadings(null);
             }
         }
 
         return $this;
     }
 
-    public function getTitle(): ?StepsTitle
+    public function getStepsTitle(): ?StepsTitle
     {
-        return $this->title;
+        return $this->stepsTitle;
     }
 
-    public function setTitle(?StepsTitle $title): static
+    public function setStepsTitle(?StepsTitle $stepsTitle): static
     {
-        $this->title = $title;
+        $this->stepsTitle = $stepsTitle;
 
         return $this;
     }

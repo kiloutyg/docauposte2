@@ -1,0 +1,84 @@
+<turbo-frame
+	id="steps-subheadings-checklist-section"
+	class="container row mx-auto px-0 px-md-2">
+	{{ form_start(stepsSubheadingsForm, { attr: {class: 'col-lg-6 col-md-12 col-sm-12 d-flex flex-column', method: 'POST', action: path('app_iluo_steps_subheadings_checklist_admin')}}
+	) }}
+	<div
+		class="col-12">
+		{{ form_label(stepsSubheadingsForm.heading) }}
+		{{ form_widget(stepsSubheadingsForm.heading) }}
+	</div>
+	<div
+		class="col-12">
+		{{ form_label(stepsSubheadingsForm.iluoLevel) }}
+		{{ form_widget(stepsSubheadingsForm.iluoLevel) }}
+	</div>
+	<div
+		class="col-12">
+		{{ form_label(stepsSubheadingsForm.stepsTitle) }}
+		{{ form_widget(stepsSubheadingsForm.stepsTitle) }}
+	</div>
+	<div
+		class="col-12">
+		{{ form_widget(stepsSubheadingsForm.save) }}
+	</div>
+	<div
+		id="flash-messages">
+		{% for label, messages in app.flashes %}
+			<div
+				class="alert alert-{{ label }}">
+				{% for message in messages %}
+					<p>
+						{{ message }}
+					</p>
+				{% endfor %}
+			</div>
+		{% endfor %}
+	</div>
+	{{ form_end(stepsSubheadingsForm) }}
+	{% if stepsSubheadings is not empty %}
+		<div
+			class="col-lg-6 col-md-12 col-sm-12 mt-auto mb-auto accordion"
+			id="accordionStepsSubheadingsList">
+			<div
+				class="accordion-item shadow-lg shadow-lg-inset border border-dark">
+				<h2
+					class="accordion-header"
+					id="headingStepsSubheadingsList">
+					<button
+						class="accordion-button bg-white text-dark collapsed"
+						type="button"
+						data-bs-toggle="collapse"
+						data-bs-target="#collapseStepsSubheadingsList"
+						aria-expanded="false"
+						aria-controls="collapseStepsSubheadingsList">
+						<strong>
+							Liste des Produits
+						</strong>
+					</button>
+				</h2>
+				<div
+					id="collapseStepsSubheadingsList"
+					class="accordion-collapse collapse "
+					aria-labelledby="headingStepsSubheadingsList"
+					data-bs-parent="#accordionStepsSubheadingsList">
+					<div
+						class="accordion-body bg-white text-dark">
+						<ul
+							class="list-group">
+							{% for stepSubheadings in stepsSubheadings %}
+								<li
+									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+									<strong>
+										{{ stepSubheadings.name }}
+									</strong>
+									{{ delete_form('stepsSubheadings', stepSubheadings.id, 'app_iluo_steps_subheadings_checklist_admin') }}
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+</turbo-frame>

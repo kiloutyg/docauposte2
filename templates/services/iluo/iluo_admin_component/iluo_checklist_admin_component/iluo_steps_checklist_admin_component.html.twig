@@ -1,0 +1,101 @@
+<turbo-frame
+	id="steps-checklist-section"
+	class="container row mx-auto px-0 px-md-2">
+	{{ form_start(stepsForm, { attr: {class: 'col-lg-6 col-md-12 col-sm-12 d-flex flex-column', method: 'POST', action: path('app_iluo_steps_checklist_admin')}}
+	) }}
+	<div
+		class="col-12">
+		{{ form_label(stepsForm.question) }}
+		{{ form_widget(stepsForm.question) }}
+	</div>
+	<div
+		class="col-12">
+		{{ form_label(stepsForm.iluoLevel) }}
+		{{ form_widget(stepsForm.iluoLevel) }}
+	</div>
+	<div
+		class="col-12">
+		{{ form_label(stepsForm.stepsTitle) }}
+		{{ form_widget(stepsForm.stepsTitle) }}
+	</div>
+	<div
+		class="col-12">
+		{{ form_label(stepsForm.stepsSubheadings) }}
+		{{ form_widget(stepsForm.stepsSubheadings) }}
+	</div>
+	{# <div
+		class="col-12">
+		{{ form_label(stepsForm.trainingMaterialType) }}
+		{{ form_widget(stepsForm.trainingMaterialType) }}
+	</div> #}
+	{# <div
+		class="col-12">
+		{{ form_label(stepsForm.upload) }}
+		{{ form_widget(stepsForm.upload) }}
+	</div> #}
+	<div
+		class="col-12">
+		{{ form_widget(stepsForm.save) }}
+	</div>
+	<div
+		id="flash-messages">
+		{% for label, messages in app.flashes %}
+			<div
+				class="alert alert-{{ label }}">
+				{% for message in messages %}
+					<p>
+						{{ message }}
+					</p>
+				{% endfor %}
+			</div>
+		{% endfor %}
+	</div>
+	{{ form_end(stepsForm) }}
+	{% if steps is not empty %}
+		<div
+			class="col-lg-6 col-md-12 col-sm-12 mt-auto mb-auto accordion"
+			id="accordionStepsList">
+			<div
+				class="accordion-item shadow-lg shadow-lg-inset border border-dark">
+				<h2
+					class="accordion-header"
+					id="headingStepsList">
+					<button
+						class="accordion-button bg-white text-dark collapsed"
+						type="button"
+						data-bs-toggle="collapse"
+						data-bs-target="#collapseStepsList"
+						aria-expanded="false"
+						aria-controls="collapseStepsList">
+						<strong>
+							Liste des Produits
+						</strong>
+					</button>
+				</h2>
+				<div
+					id="collapseStepsList"
+					class="accordion-collapse collapse "
+					aria-labelledby="headingStepsList"
+					data-bs-parent="#accordionStepsList">
+					<div
+						class="accordion-body bg-white text-dark">
+						<ul
+							class="list-group">
+							{% for step in steps %}
+								<li
+									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+									<strong>
+										{{ step.name }}
+									</strong>
+
+									{{ delete_form('steps', step.id, 'app_iluo_steps_checklist_admin') }}
+
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+</turbo-frame>

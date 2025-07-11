@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\IluoLevelsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: IluoLevelsRepository::class)]
@@ -41,6 +42,9 @@ class IluoLevels
      */
     #[ORM\OneToMany(targetEntity: IluoChecklist::class, mappedBy: 'iluoLevel')]
     private Collection $iluoChecklists;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
 
     public function __construct()
     {
@@ -183,6 +187,18 @@ class IluoLevels
                 $iluoChecklist->setIluoLevel(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

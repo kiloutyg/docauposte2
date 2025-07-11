@@ -4,11 +4,40 @@
 
 	<turbo-frame
 		id="training-material-type-section"
-		src="{{ path('app_iluo_trainingmaterialtype_checklist_admin') }}" loading="lazy"
+		src="{{ path('app_iluo_training_material_type_checklist_admin') }}" loading="lazy"
 		class="row">
 		{{ loading.content_placeholder('text', 2, '90%') }}
-
 	</turbo-frame>
 	<hr
 		class="my-4">
+	<turbo-frame
+		id="iluo-levels-section"
+		src="{{ path('app_iluo_iluo_levels_admin') }}" loading="lazy"
+		class="row">
+		{{ loading.content_placeholder('text', 2, '90%') }}
+	</turbo-frame>
+	<hr
+		class="my-4">
+	<turbo-frame
+		id="steps-title-checklist-section"
+		src="{{ path('app_iluo_steps_title_checklist_admin') }}" loading="lazy"
+		class="row">
+		{{ loading.content_placeholder('text', 2, '90%') }}
+	</turbo-frame>
+	<hr
+		class="my-4">
+	<turbo-frame
+		id="steps-subheadings-checklist-section"
+		src="{{ path('app_iluo_steps_subheadings_checklist_admin') }}" loading="lazy"
+		class="row">
+		{{ loading.content_placeholder('text', 2, '90%') }}
+	</turbo-frame>
+	<hr
+		class="my-4">
+	<turbo-frame
+		id="steps-checklist-section"
+		src="{{ path('app_iluo_steps_checklist_admin') }}" loading="lazy"
+		class="row">
+		{{ loading.content_placeholder('text', 2, '90%') }}
+	</turbo-frame>
 </turbo-frame>

@@ -21,13 +21,13 @@ class StepsTitle
     /**
      * @var Collection<int, Steps>
      */
-    #[ORM\OneToMany(targetEntity: Steps::class, mappedBy: 'title')]
+    #[ORM\OneToMany(targetEntity: Steps::class, mappedBy: 'stepsTitle')]
     private Collection $steps;
 
     /**
      * @var Collection<int, StepsSubheadings>
      */
-    #[ORM\OneToMany(targetEntity: StepsSubheadings::class, mappedBy: 'title')]
+    #[ORM\OneToMany(targetEntity: StepsSubheadings::class, mappedBy: 'stepsTitle')]
     private Collection $stepsSubheadings;
 
     #[ORM\ManyToOne(inversedBy: 'stepsTitles')]
@@ -68,7 +68,7 @@ class StepsTitle
     {
         if (!$this->steps->contains($step)) {
             $this->steps->add($step);
-            $step->setTitle($this);
+            $step->setStepsTitle($this);
         }
 
         return $this;
@@ -78,8 +78,8 @@ class StepsTitle
     {
         if ($this->steps->removeElement($step)) {
             // set the owning side to null (unless already changed)
-            if ($step->getTitle() === $this) {
-                $step->setTitle(null);
+            if ($step->getStepsTitle() === $this) {
+                $step->setStepsTitle(null);
             }
         }
 
@@ -98,7 +98,7 @@ class StepsTitle
     {
         if (!$this->stepsSubheadings->contains($stepsSubheading)) {
             $this->stepsSubheadings->add($stepsSubheading);
-            $stepsSubheading->setTitle($this);
+            $stepsSubheading->setStepsTitle($this);
         }
 
         return $this;
@@ -108,8 +108,8 @@ class StepsTitle
     {
         if ($this->stepsSubheadings->removeElement($stepsSubheading)) {
             // set the owning side to null (unless already changed)
-            if ($stepsSubheading->getTitle() === $this) {
-                $stepsSubheading->setTitle(null);
+            if ($stepsSubheading->getStepsTitle() === $this) {
+                $stepsSubheading->setStepsTitle(null);
             }
         }
 
