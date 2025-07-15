@@ -472,7 +472,7 @@ export default class extends Controller {
 
         console.log('BatchOperatorProcessorController: Operator IDs to delete', operatorIds);
 
-        fetch('/wdocauposte/operator/batch-delete', {
+        fetch('/docauposte/operator/batch-delete', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
