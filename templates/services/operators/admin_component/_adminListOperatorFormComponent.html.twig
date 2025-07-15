@@ -1,5 +1,5 @@
 {% if operatorForms|length > 0 %}
-	{% if app.environment is same as 'dev' and operatorForms|length > 10 %}
+	{% if operatorForms|length > 10 %}
 
 		<div
 			class="card mb-3">
@@ -75,7 +75,7 @@
 						 'operatorForm' ~ field|capitalize}}
 			) }}
 		{% endfor %}
-		{% operatorForms|length > 10 %}
+		{% if operatorForms|length > 10 %}
 			{% if operatorForm.vars.data.tobedeleted is not empty %}
 				<div
 					class="col-auto form-check align-self-center">
