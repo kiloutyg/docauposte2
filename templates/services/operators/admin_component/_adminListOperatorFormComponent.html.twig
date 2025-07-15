@@ -75,7 +75,7 @@
 						 'operatorForm' ~ field|capitalize}}
 			) }}
 		{% endfor %}
-		{% if app.environment is same as 'dev' and operatorForms|length > 10 %}
+		{% operatorForms|length > 10 %}
 			{% if operatorForm.vars.data.tobedeleted is not empty %}
 				<div
 					class="col-auto form-check align-self-center">
