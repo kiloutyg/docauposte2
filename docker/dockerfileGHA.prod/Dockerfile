@@ -26,11 +26,11 @@ RUN \
   curl \
   git \
   gnupg \
+  libcap2-bin \
   libmagickwand-dev \
   libxslt-dev \
   libzip-dev \
   wget \
-  libcap2-bin \
   # Install PHP extensions
   && docker-php-ext-install \
   bcmath \

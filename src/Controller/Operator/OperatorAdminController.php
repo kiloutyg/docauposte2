@@ -10,6 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Symfony\Component\HttpFoundation\Request;
 
@@ -185,7 +186,6 @@ class OperatorAdminController extends AbstractController
         $operatorForms = [];
         $form = null;
 
-
         if ($operator) {
 
             $form = $this->createForm(OperatorType::class, $operator, [
@@ -215,7 +215,6 @@ class OperatorAdminController extends AbstractController
             }
         }
 
-
         if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
             $operators = $this->operatorService->operatorEntitySearchByRequest($request);
 
@@ -237,8 +236,6 @@ class OperatorAdminController extends AbstractController
                 $this->logger->info('OperatorAdminController: editOperatorAction - operator', [$operator]);
             }
         }
-
-
 
         $this->logger->info('OperatorAdminController::editOperatorAction', ['operators' => $operators, 'operatorForms' => $operatorForms]);
         return $this->render('services/operators/admin_component/_adminListOperator.html.twig', [
@@ -354,5 +351,136 @@ class OperatorAdminController extends AbstractController
     public function deleteUapTeamProperly(string $entityType, int $entityId, Request $request): Response
     {
         return $this->operatorBaseController->deleteActionOperatorController($entityType, $entityId, $request);
+    }
+
+
+
+
+
+
+
+
+
+    #[Route('/operator/batch-edit', name: 'app_operator_batch_edit', methods: ['POST'])]
+    public function batchEditOperators(Request $request): JsonResponse
+    {
+        $this->logger->debug('OperatorAdminController::batchEditOperators - request', ['request' => $request->request->all()]);
+
+        try {
+            $operatorsData = $request->request->all('operators');
+            $this->logger->debug('OperatorAdminController::batchEditOperators - operatorsData', ['operatorsData' => $operatorsData]);
+            $successCount = 0;
+            $errors = [];
+
+            foreach ($operatorsData as $operatorId => $operatorData) {
+                try {
+                    $operator = $this->operatorRepository->find($operatorId);
+                    if (!$operator) {
+                        $errors[] = "Opérateur avec l'ID {$operatorId} non trouvé";
+                        continue;
+                    }
+
+                    $form = $this->createForm(OperatorType::class, $operator, [
+                        'operator_id' => $operator->getId(),
+                    ]);
+                    $this->logger->debug('OperatorAdminController::batchEditOperators - form', ['form' => $form->getData()]);
+
+                    $this->logger->debug('OperatorAdminController::batchEditOperators - form data', ['formData' => $operatorData]);
+                    $form->submit($operatorData);
+
+                    if ($form->isValid()) {
+                        $this->operatorService->editOperatorService($form, $operator);
+                        $successCount++;
+                        $this->logger->debug('OperatorAdminController::batchEditOperators - operator updated successfully', ['operatorId' => $operatorId]);
+                    } else {
+                        // Get detailed form errors
+                        $formErrors = [];
+                        foreach ($form->getErrors(true) as $error) {
+                            $formErrors[] = $error->getMessage();
+                        }
+                        $errorMessage = "Erreur de validation pour l'opérateur {$operatorId}: " . implode(', ', $formErrors);
+                        $errors[] = $errorMessage;
+                        $this->logger->error('OperatorAdminController::batchEditOperators - Form validation failed', [
+                            'operatorId' => $operatorId,
+                            'errors' => $formErrors,
+                            'submittedData' => $operatorData
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    $errors[] = "Erreur lors de la modification de l'opérateur {$operatorId}: " . $e->getMessage();
+                    $this->logger->error('OperatorAdminController::batchEditOperators - Batch edit error for operator ' . $operatorId, ['exception' => $errors]);
+                }
+            }
+
+            $message = "{$successCount} opérateur(s) modifié(s) avec succès";
+            if (!empty($errors)) {
+                $message .= ". Erreurs: " . implode(', ', $errors);
+            }
+
+            return new JsonResponse([
+                'success' => $successCount > 0,
+                'message' => $message,
+                'successCount' => $successCount,
+                'errorCount' => count($errors),
+                'errors' => $errors
+            ]);
+        } catch (\Exception $e) {
+            $this->logger->error('OperatorAdminController::batchEditOperators - Batch edit operators error', ['exception' => $e]);
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Erreur lors de la modification en lot: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
+    #[Route('/operator/batch-delete', name: 'app_operator_batch_delete', methods: ['POST'])]
+    public function batchDeleteOperators(Request $request): JsonResponse
+    {
+        $this->logger->debug('OperatorAdminController::batchDeleteOperators - request', ['request' => $request->request->all()]);
+        try {
+            $data = json_decode($request->getContent(), true);
+            $operatorIds = $data['operatorIds'] ?? [];
+
+            if (empty($operatorIds)) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Aucun opérateur sélectionné'
+                ], 400);
+            }
+
+            $successCount = 0;
+            $errors = [];
+
+            foreach ($operatorIds as $operatorId) {
+                try {
+                    $this->operatorBaseController->deleteActionOperatorController('operator', $operatorId, $request);
+                    // Assuming successful deletion if no exception is thrown
+                    $successCount++;
+                } catch (\Exception $e) {
+                    $errors[] = "Erreur lors de la suppression de l'opérateur {$operatorId}: " . $e->getMessage();
+                    $this->logger->error('Batch delete error for operator ' . $operatorId, ['exception' => $e]);
+                }
+            }
+
+            $message = "{$successCount} opérateur(s) supprimé(s) avec succès";
+            if (!empty($errors)) {
+                $message .= ". Erreurs: " . implode(', ', $errors);
+            }
+
+            return new JsonResponse([
+                'success' => $successCount > 0,
+                'message' => $message,
+                'successCount' => $successCount,
+                'errorCount' => count($errors)
+            ]);
+        } catch (\Exception $e) {
+            $this->logger->error('Batch delete operators error', ['exception' => $e]);
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Erreur lors de la suppression en lot: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

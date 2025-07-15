@@ -4,8 +4,25 @@ import { getEntityData } from './server-variable.js';
 // Declaring variable 
 let departmentsData = null;
 
-// Function to fetch department data
-// // Event listener to fetch department data and initialize cascading dropdowns
+
+
+/**
+ * Event listener that initializes department data and cascading dropdowns when the page loads.
+ * This function is triggered by the Turbo framework's load event and handles the asynchronous
+ * fetching of entity data, specifically department information, then initializes the UI components.
+ * 
+ * @function
+ * @listens turbo:load - Turbo framework's page load event
+ * @returns {void} This function does not return a value
+ * 
+ * @description
+ * The function performs the following operations:
+ * 1. Fetches entity data from the server using getEntityData()
+ * 2. Assigns the departments data to the global departmentsData variable
+ * 3. Initializes cascading dropdown functionality
+ * 4. Resets all dropdowns to their default state
+ * 5. Handles any errors that occur during data fetching
+ */
 document.addEventListener("turbo:load", function () {
   getEntityData()
     .then((data) => {
@@ -23,13 +40,27 @@ document.addEventListener("turbo:load", function () {
 
 
 
-// This line declares a variable named departmentsData without assigning it a value.
+
 
 /**
- * Populates a dropdown with options based on the given data and selected id
- * @param {HTMLElement} dropdown - The dropdown element to be populated
- * @param {Array} data - The array of data to populate the dropdown with
- * @param {string} selectedId - The id of the option to be selected by default
+ * Populates a dropdown element with options based on provided data array.
+ * Clears the dropdown before populating it, creates a default "Select" option,
+ * and adds all items from the data array as selectable options.
+ * 
+ * @function populateDropdown
+ * @param {HTMLSelectElement} dropdown - The dropdown (select) element to populate with options
+ * @param {Array<Object>} data - Array of objects containing dropdown option data. Each object should have 'id' and 'name' properties
+ * @param {number|string} [selectedId] - Optional ID of the option that should be pre-selected in the dropdown
+ * @returns {void} This function does not return a value
+ * 
+ * @description
+ * The function performs the following operations:
+ * 1. Clears all existing options from the dropdown
+ * 2. Creates and adds a default disabled option with text "Selectionner un Service"
+ * 3. Iterates through the data array and creates an option element for each item
+ * 4. Sets the option's value to the item's id and text content to the item's name
+ * 5. If selectedId matches an item's id, marks that option as selected
+ * 6. Appends each created option to the dropdown element
  */
 function populateDropdown(dropdown, data, selectedId) {
   // Clear the dropdown before populating it
@@ -61,15 +92,28 @@ function populateDropdown(dropdown, data, selectedId) {
 
 
 
-// This is a function named populateDropdown that takes three parameters: dropdown, data, and selectedId. 
-// It populates the given dropdown element with options based on the provided data array. 
-// It clears the dropdown before populating it, creates a default "Select" option, and adds it to the dropdown. 
-// Then, for each item in the data array, it creates an option element with the item's id and name as its value and text content respectively. 
-// If the item's id matches the selectedId, it sets the selected attribute of the option element.
-// Finally, it appends the option element to the dropdown.
+
 
 /**
- * Initializes the cascading dropdowns
+ * Initializes cascading dropdown functionality for department selection elements.
+ * This function locates department dropdown elements by their IDs, populates them with
+ * department data, and resets them to their default state. It handles both the main
+ * department dropdown and the validator department dropdown.
+ * 
+ * @function initCascadingDropdowns
+ * @returns {void} This function does not return a value
+ * 
+ * @description
+ * The function performs the following operations:
+ * 1. Searches for the main department dropdown element with ID "department"
+ * 2. If found, populates it with departmentsData and resets it
+ * 3. Searches for the validator department dropdown element with ID "validator_department0"
+ * 4. If found, populates it with departmentsData and resets it
+ * 5. Uses the global departmentsData variable as the data source for both dropdowns
+ * 
+ * @requires departmentsData - Global variable containing department data array
+ * @requires populateDropdown - Function to populate dropdown with options
+ * @requires resetDropdowns - Function to reset dropdowns to default state
  */
 function initCascadingDropdowns() {
   const department = document.getElementById("department");
@@ -94,13 +138,23 @@ function initCascadingDropdowns() {
 
 
 
-// This is a function named initCascadingDropdowns that initializes the cascading dropdowns. 
-// It first gets the dropdown element with the id "department". 
-// If the dropdown exists, it calls the populateDropdown() function to populate the department dropdown with the departmentsData. 
-// Then it calls the resetDropdowns() function.
+
 
 /**
- * Resets the dropdown to its default value
+ * Resets department dropdown elements to their default selected state.
+ * This function locates specific dropdown elements by their IDs and sets their
+ * selectedIndex to 0, effectively selecting the first option (typically the default/placeholder option).
+ * 
+ * @function resetDropdowns
+ * @returns {void} This function does not return a value
+ * 
+ * @description
+ * The function performs the following operations:
+ * 1. Searches for the main department dropdown element with ID "department"
+ * 2. If found, resets its selectedIndex to 0 (first option)
+ * 3. Searches for the validator department dropdown element with ID "validator_department0"
+ * 4. If found, resets its selectedIndex to 0 (first option)
+ * 5. Safely handles cases where either dropdown element might not exist in the DOM
  */
 function resetDropdowns() {
   const department = document.getElementById("department");
@@ -117,12 +171,30 @@ function resetDropdowns() {
 
 
 
-// This code adds an event listener to the document object for the "turbo:load" event. 
-// When the event is triggered, it fetches department data from the API endpoint /api/entity_data. 
-// Once the data is successfully received, it assigns the departments property of the data to the departmentsData variable. 
-// Then, it calls two functions: initCascadingDropdowns() and resetDropdowns(). 
-// If there is an error during the fetch request, an error message will be logged to the console.
 
+
+
+/**
+ * Event listener that initializes dynamic department selection functionality when the page loads.
+ * This function is triggered by the Turbo framework's load event and sets up cascading dropdown
+ * behavior for validator department selection. It modifies the initial validator department element
+ * and establishes event handling for dynamic select element creation and management.
+ * 
+ * @function
+ * @listens turbo:load - Turbo framework's page load event
+ * @returns {void} This function does not return a value
+ * 
+ * @description
+ * The function performs the following operations:
+ * 1. Locates the validator department element with ID "validator_department"
+ * 2. Renames the element to "validator_department0" for consistent naming convention
+ * 3. Attaches a change event listener that manages cascading dropdown behavior
+ * 4. When a selection is made, removes all subsequent department select elements except the first
+ * 5. Triggers creation of new select elements based on the current selection
+ * 
+ * @requires createNewSelect - Function to create new department select elements
+ * @requires departmentSelects - CSS class selector for department select elements
+ */
 document.addEventListener('turbo:load', function () {
   // Get the element with the id 'validator_department'
   const validatorDepartment = document.getElementById('validator_department');
@@ -146,6 +218,30 @@ document.addEventListener('turbo:load', function () {
   }
 });
 
+
+
+/**
+ * Manages the creation of new department select elements in a cascading dropdown system.
+ * This function handles the logic for when to create new select elements based on user selections,
+ * removes select elements that come after a changed element, and ensures proper cascading behavior
+ * by only creating new elements when there's a valid selection and room for more elements.
+ * 
+ * @function createNewSelect
+ * @param {string} selectedValue - The value of the option selected in the dropdown. If empty string, no new select will be created
+ * @param {string} selectId - The ID of the select element that triggered the change event. Used to determine position in the cascade
+ * @returns {void} This function does not return a value
+ * 
+ * @description
+ * The function performs the following operations:
+ * 1. Validates that a non-empty value was selected
+ * 2. Identifies the last select element in the cascade
+ * 3. If the changed element is not the last one, removes all subsequent select elements
+ * 4. Checks if there's room to create more select elements (based on available departments)
+ * 5. Calls createSelectElement() to add a new select element if conditions are met
+ * 
+ * @requires departmentsData - Global variable containing department data array
+ * @requires createSelectElement - Function to create and append new select elements
+ */
 function createNewSelect(selectedValue, selectId) {
   // Check if the selected value is not empty
   if (selectedValue !== '') {
@@ -168,6 +264,29 @@ function createNewSelect(selectedValue, selectId) {
   }
 }
 
+/**
+ * Creates and appends a new department select element to the cascading dropdown system.
+ * This function dynamically generates a new select element with available department options,
+ * excluding departments that have already been selected in other dropdowns. The new element
+ * is automatically configured with proper styling, unique identifiers, and event handling
+ * to maintain the cascading dropdown functionality.
+ * 
+ * @function createSelectElement
+ * @returns {void} This function does not return a value
+ * 
+ * @description
+ * The function performs the following operations:
+ * 1. Creates a new HTML select element with appropriate CSS classes
+ * 2. Generates a unique ID based on the current number of existing department selects
+ * 3. Adds a default placeholder option for user guidance
+ * 4. Populates the select with available departments, excluding already selected ones
+ * 5. Appends the new select element to the 'departmentsContainer' in the DOM
+ * 6. Attaches a change event listener to enable continued cascading behavior
+ * 
+ * @requires departmentsData - Global variable containing department data array
+ * @requires createNewSelect - Function called when the new select element changes
+ * @requires DOM element with ID 'departmentsContainer' - Container where new select is appended
+ */
 function createSelectElement() {
   // Create a new select element
   var newSelect = document.createElement('select');
