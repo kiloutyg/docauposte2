@@ -1,0 +1,186 @@
+{% if operatorForms|length > 0 %}
+	{% if app.environment is same as 'dev' and operatorForms|length > 10 %}
+
+		<div
+			class="card mb-3">
+			<div
+				class="row align-items-center justify-content-center text-center">
+				<div
+					class="col-lg-auto col-md-auto col-sm-auto">
+					<div
+						class="form-check d-flex align-items-center justify-content-center">
+						<input
+							class="form-check-input me-2"
+							type="checkbox"
+							id="selectAllOperators">
+						<label
+							class="form-check-label"
+							for="selectAllOperators">
+							Sélectionner tout
+						</label>
+					</div>
+				</div>
+
+				<div
+					class="col-lg-auto col-md-auto col-sm-auto">
+					<button
+						type="button"
+						class="btn btn-primary me-2"
+						id="batchModifyOperators"
+						data-controller="batch-operator-processor"
+						data-action="click->batch-operator-processor#processBatchModification">
+						Modifier ou Réactualiser les opérateurs sélectionnés
+					</button>
+				</div>
+				<div
+					class="col-lg-auto col-md-auto col-sm-auto">
+					<button
+						type="button"
+						class="btn btn-danger"
+						id="batchDeleteOperators"
+						data-controller="batch-operator-processor"
+						data-action="click->batch-operator-processor#processBatchDeletion">
+						Supprimer les opérateurs sélectionnés
+					</button>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+	{% for operatorId, operatorForm in operatorForms %}
+		{% form_theme operatorForm 'bootstrap_5_layout.html.twig' %}
+
+		{% if operatorForm.vars.data.tobedeleted is not empty %}
+			{{ form_start(operatorForm, {'attr': {'class': 'row bg-dark align-items-center rounded',
+				'id': 'operatorForm' ~ operatorId,
+				'data-controller': 'operator-admin-edit operator-form',
+        		'data-operator-form-form-target': 'form'},
+				'action': path('app_operator_edit', {'operator': operatorId})}) }}
+		{% else %}
+			{{ form_start(operatorForm, {'attr': {'class': 'row align-items-center',
+				'id': 'operatorForm' ~ operatorId,
+				'data-controller': 'operator-admin-edit operator-form',
+        		'data-operator-form-form-target': 'form'},
+				'action': path('app_operator_edit', {'operator': operatorId})}) }}
+		{% endif %}
+
+		{% for field in fields %}
+			{% set customId = 'operatorForm' ~ field|capitalize ~ operatorId %}
+			{{ form_row(operatorForm[field], 
+					{						
+					'id': customId,
+					'attr': {
+						'data-action': field == 'code' ? 'keyup->operator-admin-edit#editedCodeChecker' : null,
+						'data-operator-admin-edit-target':
+						field == 'isTrainer' ? 'operatorFormIsTrainer' :
+						 'operatorForm' ~ field|capitalize}}
+			) }}
+		{% endfor %}
+		{% if app.environment is same as 'dev' and operatorForms|length > 10 %}
+			{% if operatorForm.vars.data.tobedeleted is not empty %}
+				<div
+					class="col-auto form-check align-self-center">
+					<input
+						class="form-check-input batch-operator-checkbox tooltips-above"
+						type="checkbox"
+						value="{{ operatorId }}" id="batchOperator{{ operatorId }}"
+						data-operator-form="operatorForm{{ operatorId }}"
+						aria-label="Sélectionner">
+					<label
+						class="form-check-label"
+						for="batchOperator{{ operatorId }}"
+						hidden>
+						Sélectionner
+					</label>
+				</div>
+				<div
+					class="col my-auto mx-auto">
+					<button
+						type="submit"
+						class="btn btn-primary text-uppercase ">
+						Réactualiser
+					</button>
+					<a
+						href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase delete-operator">
+						Supprimer
+					</a>
+				</div>
+			{% else %}
+				<div
+					class="col-auto form-check  align-self-center">
+					<input
+						class="form-check-input batch-operator-checkbox"
+						type="checkbox"
+						value="{{ operatorId }}" id="batchOperator{{ operatorId }}"
+						data-operator-form="operatorForm{{ operatorId }}">
+					<label
+						class="form-check-label"
+						for="batchOperator{{ operatorId }}"
+						hidden>
+						Sélectionner
+					</label>
+				</div>
+				<div
+					class="col">
+					<button
+						type="submit"
+						class="btn btn-primary text-uppercase submit-operator-modification">
+						Modifier l'Opé
+					</button>
+					<a
+						href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase delete-operator">
+						Sup.
+					</a>
+					<a
+						href="{{ path('app_operator_detail', {'operatorId': operatorId}) }}" class="btn btn-light text-uppercase"
+						target="_blank">
+						Code
+					</a>
+				</div>
+			{% endif %}
+
+		{% else %}
+			{% if operatorForm.vars.data.tobedeleted is not empty %}
+				<div
+					class="col my-auto mx-auto">
+					<button
+						type="submit"
+						class="btn btn-primary text-uppercase ">
+						Réactualiser
+					</button>
+					<a
+						href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase delete-operator">
+						Supprimer
+					</a>
+				</div>
+			{% else %}
+				<div
+					class="col">
+					<button
+						type="submit"
+						class="btn btn-primary text-uppercase submit-operator-modification">
+						Modifier l'Opé
+					</button>
+					<a
+						href="{{ path('app_operator_delete', {'id': operatorId}) }}" class="btn btn-danger text-uppercase delete-operator">
+						Sup.
+					</a>
+					<a
+						href="{{ path('app_operator_detail', {'operatorId': operatorId}) }}" class="btn btn-light text-uppercase"
+						target="_blank">
+						Code
+					</a>
+				</div>
+			{% endif %}
+
+		{% endif %}
+		{{ form_end(operatorForm) }}
+		<hr
+			class="my-1">
+	{% endfor %}
+{% else %}
+	<div
+		class="card alert alert-warning "
+		id="live-toast">
+		Aucun opérateur n'a été recherché.
+	</div>
+{% endif %}

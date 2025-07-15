@@ -51,11 +51,11 @@ class OperatorType extends AbstractType
         $operator = $builder->getData();
 
         // Default CSS class
-        $labelClass = 'btn btn-outline-primary mb-4';
+        $labelClass = 'btn btn-outline-primary';
 
         // Check if the operator exists and has a trainer who is demoted
         if ($operator instanceof Operator && $operator->getTrainer() && $operator->getTrainer()->isDemoted(true)) {
-            $labelClass = 'btn btn-outline-danger mb-4';
+            $labelClass = 'btn btn-outline-danger';
         }
 
         $operatorId = $options['operator_id'] ?? null;
@@ -65,7 +65,7 @@ class OperatorType extends AbstractType
                 'label' => false,
 
                 'attr' => [
-                    'class' => 'form-control mx-auto mt-2 capitalize-all-letters',
+                    'class' => 'form-control mx-auto mt-2 capitalize-all-letters ',
                     'placeholder' => 'NOM',
                     'required' => true,
                 ],
@@ -124,7 +124,7 @@ class OperatorType extends AbstractType
                 'placeholder' => 'Équipe',
 
                 'attr' => [
-                    'class' => 'form-control mx-auto mt-2',
+                    'class' => 'form-control mx-auto',
                     'required' => true
                 ],
                 'row_attr' => [
@@ -145,22 +145,23 @@ class OperatorType extends AbstractType
                 },
                 'label' => false,
                 'choice_label' => 'name',
-                'placeholder' => 'UAP',
+                'placeholder' => 'Sélectionnez au moins un UAP',
                 'multiple' => true,
                 'expanded' => false,
+                'required' => true, // This should prevent submission without selection
                 'attr' => [
-                    'class' => 'form-control mx-auto mt-2',
-                    'required' => true,
-                    'size' => '2',
-                    'data-bs-toggle' => 'tooltip',  // Bootstrap tooltip
+                    'class' => 'form-control mx-auto',
+                    'size' => '2', // Increase size to show more options
+                    'data-bs-toggle' => 'tooltip',
                     'title' => 'Maintenez Ctrl pour sélectionner plusieurs UAP',
+                    'data-validation-message' => 'Veuillez sélectionner au moins un UAP',
                 ],
                 'row_attr' => [
                     'class' => 'col'
                 ],
                 'label_attr' => [
                     'class' => 'form-label mb-4',
-                    'style' => 'font-weight: color: #ffffff;'
+                    'style' => 'font-weight: bold; color: #ffffff;'
                 ]
             ])
             ->add('isTrainer', CheckboxType::class, [
@@ -180,6 +181,7 @@ class OperatorType extends AbstractType
                     'style' => 'font-weight: bold; color: #ffffff;',
                 ],
                 'label' => 'Formateur',
+
             ]);
         $builder->get('firstname')
             ->addModelTransformer($this->firstNameTransformer);

@@ -31,8 +31,8 @@ class OperatorService extends AbstractController
     private     $logger;
     private     $projectDir;
     private     $validator;
-    private    $entityManagerFacade;
-    private    $trainingManagerFacade;
+    private     $entityManagerFacade;
+    private     $trainingManagerFacade;
 
     public function __construct(
         LoggerInterface                 $logger,
@@ -206,13 +206,17 @@ class OperatorService extends AbstractController
      */
     public function editOperatorService(Form $form, Operator $operator)
     {
-        $this->trainingManagerFacade->handleTrainerStatus($form->get('isTrainer')->getData(), $operator);
-        $this->reactivateOperatorIfNeeded($operator);
-        $this->trainingManagerFacade->updateOperatorUaps($form->get('uaps')->getData()->toArray(), $operator);
-
-        $this->entityManagerFacade->getEntityManager()->flush();
-
-        return true;
+        $this->logger->debug(message: 'OperatorService::editOperatorService', context: ['form' => $form, 'operator' => $operator]);
+        try {
+            $this->trainingManagerFacade->handleTrainerStatus($form->get('isTrainer')->getData(), $operator);
+            $this->reactivateOperatorIfNeeded($operator);
+            $this->trainingManagerFacade->updateOperatorUaps($form->get('uaps')->getData()->toArray(), $operator);
+            $this->entityManagerFacade->getEntityManager()->flush();
+            return true;
+        } catch (\Exception $e) {
+            $this->logger->error('Error while updating operator: ' . $e->getMessage());
+            return false;
+        }
     }
 
 

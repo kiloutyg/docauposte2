@@ -8,6 +8,29 @@ let productLinesData = null;
 let categoriesData = null;
 let buttonsData = null;
 
+/**
+ * Initializes the cascading dropdown system when the Turbo page loads.
+ * This event listener fetches entity data from the server and sets up the dropdown
+ * functionality for zone, product line, category, and button selections.
+ * 
+ * @function
+ * @listens turbo:load - Turbo framework page load event
+ * @returns {void} This function does not return a value
+ * 
+ * @description
+ * The function performs the following operations:
+ * 1. Fetches entity data (zones, product lines, categories, buttons) from the server
+ * 2. Assigns the fetched data to global variables for use throughout the application
+ * 3. Initializes the cascading dropdown functionality
+ * 4. Resets all dropdown elements to their default state
+ * 5. Preselects dropdown values if server-provided IDs are available
+ * 6. Handles any errors that occur during data fetching (currently silent)
+ * 
+ * @requires getEntityData - Function that fetches entity data from the server
+ * @requires initCascadingDropdowns - Function that sets up dropdown event listeners
+ * @requires resetDropdowns - Function that resets dropdown elements to default state
+ * @requires preselectDropdownValues - Function that preselects values based on server data
+ */
 document.addEventListener("turbo:load", () => {
   getEntityData()
     .then((data) => {
@@ -29,12 +52,38 @@ document.addEventListener("turbo:load", () => {
     });
 });
 
+
+
+
+/**
+ * Initializes cascading dropdown functionality for zone, product line, category, and button selections.
+ * Sets up event listeners to handle dependent dropdown filtering and population based on user selections.
+ * Each dropdown selection filters and populates the next dropdown in the hierarchy while resetting
+ * subsequent dependent dropdowns.
+ * 
+ * @function initCascadingDropdowns
+ * @returns {void} This function does not return a value
+ * 
+ * @description
+ * The function performs the following operations:
+ * 1. Retrieves DOM elements for all four dropdown menus
+ * 2. Populates the zone dropdown with initial data
+ * 3. Sets up change event listeners for each dropdown to handle cascading behavior:
+ *    - Zone selection filters and populates product lines
+ *    - Product line selection filters and populates categories
+ *    - Category selection filters and populates buttons
+ * 4. Resets dependent dropdowns when parent selections change
+ * 
+ * @requires zonesData - Global variable containing zones data array
+ * @requires productLinesData - Global variable containing product lines data array
+ * @requires categoriesData - Global variable containing categories data array
+ * @requires buttonsData - Global variable containing buttons data array
+ */
 function initCascadingDropdowns() {
   const zoneDropdown = document.getElementById("zone");
   const productLineDropdown = document.getElementById("productLine");
   const categoryDropdown = document.getElementById("category");
   const buttonDropdown = document.getElementById("upload_button");
-
 
   if (zoneDropdown && productLineDropdown && categoryDropdown) {
     populateDropdown(zoneDropdown, zonesData, {
@@ -79,6 +128,36 @@ function initCascadingDropdowns() {
   }
 }
 
+
+
+
+
+/**
+ * Preselects dropdown values based on server-provided IDs and populates dependent dropdowns
+ * with filtered data. This function handles the cascading relationship between zone, product line,
+ * category, and button dropdowns by filtering and populating each dropdown based on the
+ * previously selected values from the server.
+ * 
+ * @function preselectDropdownValues
+ * @returns {void} This function does not return a value
+ * 
+ * @description
+ * The function performs the following operations:
+ * 1. Retrieves DOM elements for all four dropdown menus
+ * 2. Preselects the zone dropdown using server-provided zoneIdFromServer
+ * 3. If a zone is preselected, filters and populates product lines for that zone
+ * 4. If a product line is preselected, filters and populates categories for that product line
+ * 5. If a category is preselected, filters and populates buttons for that category
+ * 
+ * @requires zoneIdFromServer - Global variable containing the zone ID from server
+ * @requires productLineIdFromServer - Global variable containing the product line ID from server
+ * @requires categoryIdFromServer - Global variable containing the category ID from server
+ * @requires buttonIdFromServer - Global variable containing the button ID from server
+ * @requires zonesData - Global variable containing zones data array
+ * @requires productLinesData - Global variable containing product lines data array
+ * @requires categoriesData - Global variable containing categories data array
+ * @requires buttonsData - Global variable containing buttons data array
+ */
 function preselectDropdownValues() {
   const zoneDropdown = document.getElementById("zone");
   const productLineDropdown = document.getElementById("productLine");

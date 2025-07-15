@@ -8,7 +8,18 @@ export default class ShiftLeadersFormController extends Controller {
     ]
 
 
+    /**
+     * Handles the change event of the user shift leaders dropdown.
+     * Disables or enables the operator shift leaders dropdown based on the selected user.
+     *
+     * @function userShiftLeadersChange
+     * @returns {void}
+     */
     userShiftLeadersChange() {
+        /**
+         * The selected value from the user shift leaders dropdown.
+         * @type {string}
+         */
         const selectedUser = this.userShiftLeadersTarget.value;
         console.log('User shift leaders changed', selectedUser);
 
@@ -21,7 +32,18 @@ export default class ShiftLeadersFormController extends Controller {
         }
     }
 
+    /**
+     * Handles the change event of the operator shift leaders dropdown.
+     * Disables or enables the user shift leaders dropdown based on the selected operator.
+     *
+     * @function operatorShiftLeadersChange
+     * @returns {void}
+     */
     operatorShiftLeadersChange() {
+        /**
+         * The selected value from the operator shift leaders dropdown.
+         * @type {string}
+         */
         const selectedOperator = this.operatorShiftLeadersTarget.value;
         console.log('Operator shift leaders changed', selectedOperator);
 

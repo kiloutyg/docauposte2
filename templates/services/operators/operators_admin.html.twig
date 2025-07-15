@@ -10,7 +10,7 @@
 	</script>
 
 	<div
-		class="card bg-secondary container row mb-2">
+		class="card bg-secondary row mb-2 ">
 		<h2
 			class="mt-2"
 			style="color:white;">
@@ -68,20 +68,15 @@
 								Seul un administrateur peut importer des opérateurs
 							</p>
 						</div>
-
 					{% endif %}
-
 				</form>
-
-
 			</div>
 
 			{% include '/services/operators/admin_component/_adminListOperatorSearchForm.html.twig' %}
 			<turbo-frame
 				id="adminListOperator"
-				 loading="lazy">
+				loading="lazy">
 				{% include '/services/operators/admin_component/_adminListOperator.html.twig' %}
-				{# {{ loading.skeleton_loader('table', 'Liste Opérateur','fa-cogs', 'success',4) }} #}
 			</turbo-frame>
 		</div>
 		{% if app.request.query.get('open_print') and app.session.get('print_operator_url') %}

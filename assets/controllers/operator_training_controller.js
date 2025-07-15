@@ -20,6 +20,11 @@ export default class OperatorTrainingController extends Controller {
 
     suggestionsResults = [];
 
+    /**
+     * Validates the new operator's surname.
+     * It checks if the entered surname is valid based on a regex pattern,
+     * updates the message accordingly, and enables the firstname field if the surname is valid.
+     */
     validateNewOperatorSurname() {
         clearTimeout(this.surnameTypingTimeout);
         this.surnameTypingTimeout = setTimeout(() => {
@@ -38,6 +43,11 @@ export default class OperatorTrainingController extends Controller {
         }, 1500);
     }
 
+    /**
+     * Validates the new operator's firstname.
+     * It checks if the entered firstname is valid based on a regex pattern,
+     * updates the message accordingly, and proceeds to validate the full name if the firstname is valid.
+     */
     validateNewOperatorFirstname() {
         document.getElementById('newOperatorFirstname').addEventListener('input', function (e) {
             var value = e.target.value;
@@ -64,12 +74,22 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Capitalizes the first letter of a string and converts the rest to lowercase.
+     * @param {string} string - The input string to be capitalized.
+     * @returns {string} The capitalized string.
+     */
     capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
 
 
 
+    /**
+     * Validates the new operator's combined name (firstname.surname).
+     * It checks if the entered name is valid based on a regex pattern,
+     * updates the message accordingly, and checks for existing entities by name if the name is valid.
+     */
     validateNewOperatorName() {
         clearTimeout(this.nameTypingTimeout);  // clear any existing timeout to reset the timer
 
@@ -101,6 +121,11 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Validates the new operator's code.
+     * It checks if the entered code is valid using the operatorCodeService,
+     * updates the message accordingly, and checks for existing entities by code if the code is valid.
+     */
     validateNewOperatorCode() {
         clearTimeout(this.codeTypingTimeout);
         this.codeTypingTimeout = setTimeout(async () => {
@@ -129,6 +154,12 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    
+
+    /**
+     * Checks for an existing entity by name, first using the standard name format and then the inverted format if necessary.
+     * It calls an API endpoint to check for duplicates and handles the response to update the UI accordingly.
+     */
     async checkForExistingEntityByName() {
         try {
             // Initial log indicating the start of a duplicate check
@@ -154,6 +185,12 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Checks for an existing entity by code.
+     * It calls an API endpoint to check for duplicates and handles the response to update the UI accordingly.
+     * @async
+     * @returns {Promise<void>} - A promise that resolves when the check is complete and the UI is updated.
+     */
     async checkForExistingEntityByCode() {
         try {
             const response = await this.checkForDuplicate('/docauposte/operator/check-duplicate-by-code', this.newOperatorCodeTarget.value);
@@ -167,6 +204,14 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Updates the text content of a target element based on the validity of a condition.
+     * If the condition is valid, the text content is cleared. Otherwise, an error message is displayed.
+     * @param {HTMLElement} targetElement - The HTML element whose text content will be updated.
+     * @param {boolean} isValid - A boolean indicating whether the condition is valid.
+     * @param {string} errorMessage - The error message to display if the condition is not valid.
+     * @returns {void}
+     */
     updateMessage(targetElement, isValid, errorMessage) {
         clearTimeout(this.messageTimeout);
         this.messageTimeout = setTimeout(() => {
@@ -185,6 +230,14 @@ export default class OperatorTrainingController extends Controller {
 
     duplicateCheckResults = { name: null, code: null };
 
+    /**
+     * Handles the response from a duplicate check, updating the UI based on whether a duplicate was found.
+     * @async
+     * @param {Object} response - The response object from the duplicate check API call.
+     * @param {HTMLElement} messageTarget - The HTML element where the response message will be displayed.
+     * @param {string} fieldName - The name of the field being checked for duplicates (e.g., "noms d'opérateurs", "codes opérateurs").
+     * @returns {Promise<void>} - A promise that resolves after the UI has been updated based on the response.
+     */
     async handleDuplicateResponse(response, messageTarget, fieldName) {
 
         messageTarget.textContent = response.data.found
@@ -216,6 +269,16 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Manages the state of the new operator submit button and resets the input fields.
+     * This function enables or disables the submit button based on the `enableButton` parameter,
+     * sets the submit button's value, and clears/resets various input fields and messages
+     * after a delay of 15 seconds.
+     * @param {boolean} [enableButton=false] - Determines whether to enable the submit button.
+     *                                          If true, the button is enabled; otherwise, it is disabled.
+     * @param {string} [submitValue="Ajouter"] - The text to display on the submit button.
+     * @returns {void}
+     */
     manageNewOperatorSubmitButton(enableButton = false, submitValue = "Ajouter") {
         if (this.suggestionsResults.length === 0) {
             this.newOperatorSubmitButtonTarget.disabled = !enableButton;
@@ -246,12 +309,26 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Sends a POST request to check for a duplicate value.
+     * @param {string} url - The URL endpoint to send the request to.
+     * @param {string} value - The value to check for duplication.
+     * @returns {Promise} A Promise that resolves with the response from the server.
+     */
     checkForDuplicate(url, value) {
         return axios.post(url, { value: value });
     }
 
 
 
+    /**
+     * Checks if there are corresponding entities based on the duplicate check results for both name and code.
+     * If both name and code have been found as duplicates, it executes the entity matching logic.
+     * If neither name nor code has been found as duplicates, it executes the entity non-matching logic.
+     * Otherwise, it disables the new operator submit button.
+     *
+     * @returns {void}
+     */
     checkForCorrespondingEntity() {
         if (this.duplicateCheckResults.name && this.duplicateCheckResults.code) {
 
@@ -270,6 +347,14 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Executes logic when both name and code duplicates are found, determining if the entities match and updating the UI accordingly.
+     *
+     * @param {boolean} matchesFound - Indicates whether both name and code duplicates were found.
+     *                                 If true, it proceeds to check if the operator IDs from the name and code match.
+     *                                 If false, it indicates that either name or code or both were not found as duplicates.
+     * @returns {void}
+     */
     executeEntityMatchingLogic(matchesFound) {
 
         const nameOperatorId = this.duplicateCheckResults.name?.data?.operator?.id;
@@ -290,6 +375,14 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Executes logic when both name and code duplicates are not found, indicating that the entered name and code do not correspond to any existing operator.
+     * It updates the UI to reflect this non-matching status and allows the user to add the new operator.
+     *
+     * @param {boolean} unMatchedFound - A boolean value that should be true when both the name and code do not match any existing operator.
+     *                                   This parameter is used to enable the submit button, allowing the user to add the new operator.
+     * @returns {void} This function does not return any value. It updates the UI to inform the user that the entered information does not match any existing operator and enables the submit button.
+     */
     executeEntityNonMatchingLogic(unMatchedFound) {
         this.newOperatorTransferMessageTarget.textContent = "Nom et Code opérateurs ne correspondent à aucun opérateur. Vous pouvez les ajouter.";
         this.newOperatorTransferMessageTarget.style.color = "green";
@@ -298,6 +391,13 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Resets the text content of specific message targets and enables all operator input fields.
+     * This function clears the content of the name and code message targets if the transfer message target has content.
+     * It also enables all input fields with the class 'operator-input'.
+     *
+     * @returns {void} This function does not return any value. It modifies the DOM by clearing text content and enabling input fields.
+     */
     resetUselessMessages() {
         if (this.newOperatorTransferMessageTarget.textContent !== "") {
             this.newOperatorNameMessageTarget.textContent = "";
@@ -311,6 +411,13 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Validates the entered training code after a delay, and checks the operator identity if the code is valid.
+     * It uses the operatorCodeService to validate the code and updates the UI accordingly.
+     * @async
+     * @function validateCodeEntryForTraining
+     * @returns {Promise<void>} - A promise that resolves when the validation and identity check are complete.
+     */
     async validateCodeEntryForTraining() {
         clearTimeout(this.trainingCodeTypingTimeout);
         this.trainingCodeTypingTimeout = setTimeout(async () => {
@@ -326,6 +433,13 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Checks the operator's identity by verifying the entered code against the operator's code stored in the database.
+     * If the code matches, it calls the inputSwitch method to update the UI. If not, it clears the input field and sets the placeholder text to "Erroné".
+     * @async
+     * @function checkOperatorIdentityByCode
+     * @returns {Promise<void>} - A promise that resolves when the identity check and UI update are complete.
+     */
     async checkOperatorIdentityByCode() {
         const code = this.trainingOperatorCodeTarget.value;
         const operatorId = this.trainingOperatorCodeTarget.dataset.operatorId;
@@ -347,12 +461,30 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Sends a POST request to check the entered code against the operator's code, team, and UAP.
+     * @param {string} url - The URL endpoint to send the request to. This should include the base path.
+     * @param {string} code - The code entered by the operator to be checked.
+     * @param {string} operatorId - The ID of the operator.
+     * @param {string} teamId - The ID of the team the operator belongs to.
+     * @param {string} uapId - The ID of the UAP (Unité Administrative Postale) the operator belongs to.
+     * @returns {Promise} A Promise that resolves with the response from the server after checking the code against the operator's details.
+     */
     checkCodeAgainstOperatorCode(url, code, operatorId, teamId, uapId) {
         return axios.post(`${url}/${teamId}/${uapId}`, { code: code, operatorId: operatorId, teamId: teamId, uapId: uapId });
     }
 
 
 
+    /**
+     * Updates the UI by replacing the training code input with a checkbox and label,
+     * allowing the user to mark an operator as trained.
+     * @param {Object} response - The response object containing data about the operator and training status.
+     * @param {boolean} response.found - Indicates whether the operator was found and the code is valid.
+     * @param {Object} response.operator - The operator object containing operator details.
+     * @param {string} response.operator.id - The ID of the operator.
+     * @returns {void}
+     */
     inputSwitch(response) {
 
         if (response.found) {
@@ -406,6 +538,14 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Proposes a compliant new code for the operator, sets it in the input field, and validates it.
+     * It calls the codeGenerator to get a new code, sets the code in the newOperatorCodeTarget,
+     * disables the input field, sets focus to it, and then validates the new code.
+     *
+     * @async
+     * @returns {Promise<void>} - A promise that resolves after the code is generated, set, and validated.
+     */
     async proposeCompliantNewCode() {
         const code = this.codeGenerator();
         this.newOperatorCodeTarget.value = code;
@@ -417,6 +557,12 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Checks if a generated training code already exists in the database.
+     * @async
+     * @param {string} code - The training code to check for existence.
+     * @returns {Promise<boolean>} - A promise that resolves with a boolean indicating whether the code was found (true) or not (false).
+     */
     async generatedTrainingCodeChecker(code) {
         // Since axios.post is asynchronous, we need to handle it with async/await or promises
         return axios.post('/docauposte/operator/check-if-code-exist', { code })
@@ -433,6 +579,13 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Suggests surnames based on the input value, triggering a delayed API call to fetch suggestions.
+     * It validates the input against a regex pattern before fetching suggestions.
+     * @param {Event} event - The input event that triggered the suggestion.
+     *                      The event target's value is used as the basis for the suggestions.
+     * @returns {void}
+     */
     suggestSurname(event) {
         const input = event.target.value;
         if (input.length > 0) { // Only start suggesting after at least 3 characters have been entered
@@ -454,6 +607,13 @@ export default class OperatorTrainingController extends Controller {
     }
 
 
+    /**
+     * Suggests firstnames based on the input value, triggering a delayed API call to fetch suggestions.
+     * It validates the input against a regex pattern before fetching suggestions.
+     * @param {Event} event - The input event that triggered the suggestion.
+     *                      The event target's value is used as the basis for the suggestions.
+     * @returns {void}
+     */
     suggestFirstname(event) {
         const input = event.target.value;
         if (input.length > 0) { // Only start suggesting after at least 3 characters have been entered
@@ -475,6 +635,14 @@ export default class OperatorTrainingController extends Controller {
         }
     }
 
+    /**
+     * Fetches name suggestions from the server based on the provided name and input field type.
+     * It also checks if there are existing suggestions for the first name or surname and stores them.
+     * @async
+     * @param {string} name - The name to fetch suggestions for.
+     * @param {string} inputField - The type of input field ('surname' or 'firstname') to determine the context of the name.
+     * @returns {Promise<Array>} - A promise that resolves with an array of name suggestions.
+     */
     async fetchNameSuggestions(name, inputField) {
         let response;
 
@@ -495,6 +663,16 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Checks if the suggestionsResults array is empty. If it's not empty, it filters the provided response
+     * to remove any suggestions that are already present in the suggestionsResults array. If it is empty,
+     * it assigns the response to the suggestionsResults array.
+     * @async
+     * @param {Array} response - An array of suggestion objects to check against existing results.
+     * @returns {Promise<Array>} - Returns a promise that resolves with an array of suggestion objects.
+     *   If suggestionsResults is not empty, it returns the filtered response containing only unique suggestions.
+     *   If suggestionsResults is empty, it returns the original response.
+     */
     async checkIfSuggestionsResultsEmpty(response) {
         if (this.suggestionsResults.length > 0) {
             const checkedResponses = await this.checkForDuplicatesuggestionsResults(response);
@@ -507,6 +685,15 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Checks for duplicate suggestions in the provided responses against existing suggestionsResults.
+     * It filters the responses to identify suggestions that already exist in the suggestionsResults array.
+     * If no duplicates are found, it clears the suggestionsResults array.
+     * @async
+     * @param {Array} responses - An array of suggestion objects to check for duplicates. Each object should have a unique 'id' property.
+     * @returns {Promise<Array>} - Returns a promise that resolves with an array containing only the duplicate suggestion objects found in the responses.
+     *   If no duplicates are found, the function may modify the suggestionsResults array by clearing it.
+     */
     async checkForDuplicatesuggestionsResults(responses) {
 
         const duplicateSuggestions = responses.filter(response => {
@@ -522,6 +709,16 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Displays name suggestions in the UI based on the provided responses.
+     * Each suggestion is a clickable item that updates the firstname and lastname input fields.
+     * The suggestions are cleared after a selection is made.
+     *
+     * @param {Array} responses - An array of objects representing name suggestions.
+     *                           Each object should have 'name', 'code', 'team', and 'uap' properties.
+     *
+     * @returns {void} This function does not return any value. It modifies the DOM to display name suggestions.
+     */
     displaySuggestions(responses) {
         // Assuming 'responses' is an array of objects each with 'name', 'code', 'team', and 'uap'
         this.nameSuggestionsTarget.innerHTML = responses.map(response => {
@@ -554,6 +751,15 @@ export default class OperatorTrainingController extends Controller {
 
 
 
+    /**
+     * Generates a unique training code for a new operator.
+     * It calls the generateUniqueCode method from the operatorCodeService to generate a unique code.
+     * The generated code is then logged to the console for debugging purposes.
+     *
+     * @async
+     * @function codeGenerator
+     * @returns {Promise<string>} - A promise that resolves with the generated unique training code.
+     */
     async codeGenerator() {
         console.log('OperatorAdminCreationController: Calling codeGenerator');
         const code = await operatorCodeService.generateUniqueCode();

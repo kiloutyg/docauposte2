@@ -19,7 +19,7 @@
 
 <ul
 	data-controller="operator-admin-creation">
-	{{ form_start(newOperatorForm, {'attr': {'class': 'row', 'name': 'newOperator', 'id': 'newOperator'}}
+	{{ form_start(newOperatorForm, {'attr': {'class': 'row align-items-center', 'name': 'newOperator', 'id': 'newOperator'}}
 	) }}
 	{% for field in fields %}
 		{% if field == 'lastname' %}
@@ -63,7 +63,7 @@
 	{% endfor %}
 	<button
 		type="submit"
-		class="btn btn-primary text-uppercase col my-auto mx-auto"
+		class="btn btn-primary text-uppercase col"
 		data-operator-admin-creation-target="newOperatorSubmitButton"
 		disabled>
 		Ajouter l'Opérateur
