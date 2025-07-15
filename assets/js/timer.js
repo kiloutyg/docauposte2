@@ -1,5 +1,12 @@
 import axios from 'axios'; // Import axios
 
+/**
+ * Initializes a timer that triggers an inactivity check after a specified delay.
+ * If the locationString is 'inactivity_check', it attaches event listeners to reset the timer on user activity.
+ *
+ * @param {number} delay - The delay in milliseconds before the inactivity function is triggered. Defaults to 300000 (5 minutes) if not provided.
+ * @param {string} locationString - A string used to determine the endpoint for the inactivity check and to conditionally attach event listeners.
+ */
 export function timer(delay, locationString) {
     let time;
 

@@ -1,4 +1,11 @@
 
+/**
+ * Initializes form modification tracking and handles form submission.
+ * Tracks original values of form inputs and submits only modified values.
+ *
+ * @param {Event} e - The event object for the 'DOMContentLoaded' event.
+ * @returns {void} This function does not return a value.
+ */
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('form.form');
     const originalValues = new Map();

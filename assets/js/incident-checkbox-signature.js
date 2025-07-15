@@ -1,3 +1,11 @@
+/**
+ * Initializes event listeners for checkboxes, a text field, and a button.
+ * Displays the text field when all checkboxes are checked and displays the button when the text field is not empty.
+ *
+ * @event turbo:load - Triggered when the page is fully loaded.
+ * @param {Event} event - The event object for the turbo:load event.
+ * @returns {void} This function does not return a value.
+ */
 document.addEventListener("turbo:load", function () // window.onload = function
 {
   let checkboxes = document.querySelectorAll(".checkbox-input");

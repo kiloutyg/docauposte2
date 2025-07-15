@@ -164,17 +164,20 @@ class OperatorAdminController extends AbstractController
 
 
     /**
-     * Handles the editing of an operator entity.
+     * Handles the editing of operator entities and displays operator search results.
      *
-     * This function processes both search requests and form submissions for operator editing.
-     * If a search request is detected, it retrieves matching operators and creates forms for each.
-     * For form submissions, it attempts to update the operator and provides appropriate feedback.
+     * This function processes operator editing requests and manages operator search functionality.
+     * When a specific operator is provided, it processes the operator's form for editing.
+     * It also handles search requests either from POST data or session parameters, creating
+     * forms for all found operators and rendering them in the admin interface.
      *
-     * @param Request $request The HTTP request object containing form data or search parameters
-     * @param Operator $operator The operator entity to be edited (auto-wired by Symfony)
-     * @param int|null $id Optional operator ID to fetch the operator if not provided via auto-wiring
+     * @param Request $request The HTTP request object containing form data, search parameters,
+     *                         and session information for operator editing and searching
+     * @param Operator|null $operator The specific operator entity to edit, or null if no specific
+     *                                operator is being edited
      *
-     * @return Response A rendered view containing the operator edit form or search results
+     * @return Response A rendered view containing the operator editing form and search results,
+     *                  displaying the admin list operator template with forms for found operators
      */
     #[Route('/operator/edit/{operator}', name: 'app_operator_edit')]
     public function editOperatorAction(Request $request, ?Operator $operator = null): Response
@@ -187,32 +190,9 @@ class OperatorAdminController extends AbstractController
         $form = null;
 
         if ($operator) {
-
-            $form = $this->createForm(OperatorType::class, $operator, [
-                'operator_id' => $operator->getId(),
-            ]);
-
-            $error = false;
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                try {
-                    $this->operatorService->editOperatorService($form, $operator);
-                    $this->addFlash('success', 'L\'opérateur a bien été modifié');
-                    $this->logger->notice('Operator updated successfully', ['operator' => $operator]);
-                } catch (\Exception $e) {
-                    $this->addFlash('danger', 'L\'opérateur n\'a pas pu être modifié. Erreur: ' . $e->getMessage());
-                    $this->logger->error('Error while editing operator in try catch', [$e->getMessage()]);
-                    $error = true;
-                }
-            } else {
-                $this->logger->error('Error in submitting form while editing operator');
-                $error = true;
-            }
-
-            if ($error) {
-                $this->logger->error('error true');
-                $operatorForms = [$operator->getId() => $form->createView()];
-            }
+            $response = $this->operatorFormProcessing($operator, $request);
+            $form = $response[0];
+            $operatorForms = $response[1];
         }
 
         if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
@@ -246,7 +226,54 @@ class OperatorAdminController extends AbstractController
     }
 
 
+    /**
+     * Processes an operator form submission for editing an existing operator entity.
+     *
+     * This function creates and handles an OperatorType form for the given operator,
+     * processes the form submission, and attempts to update the operator through the
+     * operator service. It manages success and error states, providing appropriate
+     * flash messages and logging. If an error occurs during processing, it prepares
+     * the form view for re-display with error information.
+     *
+     * @param Operator $operator The operator entity to be edited and processed
+     * @param Request $request The HTTP request object containing the form data
+     *                         and submission information
+     *
+     * @return array An array containing two elements:
+     *               - [0]: The form object (FormInterface) that was created and processed
+     *               - [1]: An array of operator form views indexed by operator ID,
+     *                      populated only if an error occurred during processing
+     */
+    private function operatorFormProcessing($operator, $request): array
+    {
+        $operatorForms = [];
+        $form = $this->createForm(OperatorType::class, $operator, [
+            'operator_id' => $operator->getId(),
+        ]);
 
+        $error = false;
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $this->operatorService->editOperatorService($form, $operator);
+                $this->addFlash('success', 'L\'opérateur a bien été modifié');
+                $this->logger->notice('Operator updated successfully', ['operator' => $operator]);
+            } catch (\Exception $e) {
+                $this->addFlash('danger', 'L\'opérateur n\'a pas pu être modifié. Erreur: ' . $e->getMessage());
+                $this->logger->error('Error while editing operator in try catch', [$e->getMessage()]);
+                $error = true;
+            }
+        } else {
+            $this->logger->error('Error in submitting form while editing operator');
+            $error = true;
+        }
+
+        if ($error) {
+            $this->logger->error('error true');
+            $operatorForms = [$operator->getId() => $form->createView()];
+        }
+        return [$form, $operatorForms];
+    }
 
 
     // Route to delete operator from the administrator view
@@ -361,6 +388,24 @@ class OperatorAdminController extends AbstractController
 
 
 
+    /**
+     * Handles batch editing of multiple operators in a single request.
+     *
+     * This function processes form data for multiple operators simultaneously, validating
+     * each operator's data through their respective forms and updating them via the
+     * operator service. It provides detailed feedback about successful updates and any
+     * validation or processing errors that occur during the batch operation.
+     *
+     * @param Request $request The HTTP request object containing the operators data array
+     *                         with operator IDs as keys and their form data as values
+     *
+     * @return JsonResponse A JSON response containing:
+     *                      - success: boolean indicating if any operators were successfully updated
+     *                      - message: string with summary of the operation results
+     *                      - successCount: integer count of successfully updated operators
+     *                      - errorCount: integer count of operators that failed to update
+     *                      - errors: array of detailed error messages for failed operations
+     */
     #[Route('/operator/batch-edit', name: 'app_operator_batch_edit', methods: ['POST'])]
     public function batchEditOperators(Request $request): JsonResponse
     {
@@ -435,6 +480,24 @@ class OperatorAdminController extends AbstractController
 
 
 
+    /**
+     * Handles batch deletion of multiple operators in a single request.
+     *
+     * This function processes a JSON request containing an array of operator IDs and attempts
+     * to delete each operator using the operatorBaseController's deletion method. It provides
+     * detailed feedback about successful deletions and any errors that occur during the batch
+     * operation, ensuring that partial failures don't prevent other deletions from proceeding.
+     *
+     * @param Request $request The HTTP request object containing JSON data with an 'operatorIds'
+     *                         array of operator IDs to be deleted
+     *
+     * @return JsonResponse A JSON response containing:
+     *                      - success: boolean indicating if any operators were successfully deleted
+     *                      - message: string with summary of the operation results
+     *                      - successCount: integer count of successfully deleted operators
+     *                      - errorCount: integer count of operators that failed to delete
+     *                      Returns HTTP 400 if no operators are selected, HTTP 500 for general errors
+     */
     #[Route('/operator/batch-delete', name: 'app_operator_batch_delete', methods: ['POST'])]
     public function batchDeleteOperators(Request $request): JsonResponse
     {

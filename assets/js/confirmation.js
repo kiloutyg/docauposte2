@@ -1,4 +1,10 @@
 // Define the confirmation handler once outside both event listeners
+/**
+ * Handles the confirmation dialog for a specific action.
+ * 
+ * @param {Event} event - The event object that triggered the confirmation.
+ * @param {string} message - The message to display in the confirmation dialog.
+ */
 const confirmationHandler = (event, message) => {
   const confirmed = confirm(message);
   if (!confirmed) {
@@ -7,6 +13,12 @@ const confirmationHandler = (event, message) => {
 };
 
 // Utility function to attach confirmations to elements
+/**
+ * Attaches a confirmation dialog to specific elements.
+ * 
+ * @param {string} selector - The CSS selector for the elements to attach the confirmation to.
+ * @param {string} message - The message to display in the confirmation dialog.
+ */
 const attachConfirmation = (selector, message) => {
   document.querySelectorAll(selector).forEach((button) => {
     button.addEventListener("click", (event) => {
@@ -16,6 +28,9 @@ const attachConfirmation = (selector, message) => {
 };
 
 // Main initialization function
+/**
+ * Initializes the confirmation utility by attaching confirmations to specific elements.
+ */
 const initConfirmations = () => {
   // Define all your button types and messages
   const confirmations = [

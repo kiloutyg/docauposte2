@@ -44,7 +44,7 @@
 
 	</head>
 	<body
-		class="d-flex flex-column  min-vh-100 ">
+		class="d-flex flex-column  min-vh-100">
 		<!-- Main Navigation -->
 		<nav
 			class="navbar navbar-expand-lg navbar-dark flex-shrink-0"
@@ -149,32 +149,32 @@
 					{% if usersExist is defined %}
 						{% if usersExist is not empty %}
 
-							
-								{% if app.user is null %}
-									<p>
-										<a
-											class="btn btn-primary"
-											href="{{ path('app_login') }}">
-											Connexion
-										</a>
-									</p>
-								{% else %}
-									<p
-										class="d-flex align-items-center">
-										<strong
-											class="ms-2 me-2">
-											{{ app.user.username|capitalize|split('.')|first }}
-											{{ app.user.username|upper|split('.')|last }}
-										</strong>
-										<a
-											class="btn btn-primary"
-											href="{{ path('app_logout') }}">
-											Déconnexion
-										</a>
-									</p>
+
+							{% if app.user is null %}
+								<p>
+									<a
+										class="btn btn-primary"
+										href="{{ path('app_login') }}">
+										Connexion
+									</a>
+								</p>
+							{% else %}
+								<p
+									class="d-flex align-items-center">
+									<strong
+										class="ms-2 me-2">
+										{{ app.user.username|capitalize|split('.')|first }}
+										{{ app.user.username|upper|split('.')|last }}
+									</strong>
+									<a
+										class="btn btn-primary"
+										href="{{ path('app_logout') }}">
+										Déconnexion
+									</a>
+								</p>
 
 
-								{% endif %}
+							{% endif %}
 						{% endif %}
 					{% endif %}
 					<div
@@ -218,11 +218,11 @@
 			{% endif %}
 		{% endif %}
 		<div
-			class="container flex-grow-1 d-flex flex-column">
+			class="container-fluid container-lg flex-grow-1 d-flex flex-column">
 			{% include "services/navbarservices/navbarservices.html.twig" %}
 			{% block body %}
 				<div
-					class="inner-container flex-grow-1 d-flex flex-column">
+					class="inner-container flex-grow-1 d-flex flex-column w-100">
 					{% if app.user %}
 						{% if  is_granted('ROLE_SUPER_ADMIN', object = null, field = null)%}
 							<aside

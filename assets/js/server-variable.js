@@ -6,6 +6,12 @@ let userDataPromise = null;
 let settingsDataPromise = null;
 
 // Function to get entity data
+/**
+ * Fetches and returns the entity data from the server.
+ * If the data has already been requested, it returns the existing promise.
+ *
+ * @returns {Promise<Object>} A promise that resolves to the entity data object.
+ */
 export function getEntityData() {
   if (!entityDataPromise) {
     entityDataPromise = fetch("/docauposte/api/entity_data")
@@ -15,6 +21,12 @@ export function getEntityData() {
 }
 
 // Function to get user data
+/**
+ * Fetches and returns the user data from the server.
+ * If the data has already been requested, it returns the existing promise.
+ *
+ * @returns {Promise<Object>} A promise that resolves to the user data object.
+ */
 export function getUserData() {
   if (!userDataPromise) {
     userDataPromise = fetch("/docauposte/api/user_data")
@@ -24,6 +36,12 @@ export function getUserData() {
 }
 
 // Function to get settings data
+/**
+ * Fetches and returns the settings data from the server.
+ * If the data has already been requested, it returns the existing promise.
+ *
+ * @returns {Promise<Object>} A promise that resolves to the settings data object.
+ */
 export function getSettingsData() {
   if (!settingsDataPromise) {
     settingsDataPromise = fetch("/docauposte/api/settings")
