@@ -192,7 +192,7 @@ class OperatorAdminController extends AbstractController
         if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
             $operators = $this->operatorService->operatorEntitySearchByRequest($request);
 
-            $this->logger->info('OperatorAdminController: editOperatorAction - operators with request key search and post', [$operators]);
+            $this->logger->info('OperatorAdminController::editOperatorAction - operators with request key search and post', [$operators]);
 
             foreach ($operators as $operator) {
                 $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
@@ -202,9 +202,17 @@ class OperatorAdminController extends AbstractController
         } elseif ($request->getSession()->has('operatorSearchParams')) {
 
             $operators = $this->operatorService->operatorEntitySearchBySession($request);
-            $this->logger->info('OperatorAdminController: editOperatorAction - operatorSearchParams operators', [$operators]);
+            $this->logger->info('OperatorAdminController::editOperatorAction - operatorSearchParams operators', [$operators]);
 
             foreach ($operators as $operator) {
+                $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
+                    'operator_id' => $operator->getId(),
+                ])->createView();
+            }
+        } else {
+            $this->logger->info('OperatorAdminController::editOperatorAction - operatorForms is empty');
+            $inActiveOperators = $this->operatorRepository->findDeactivatedOperators();
+            foreach ($inActiveOperators as $operator) {
                 $operatorForms[$operator->getId()] = $this->createForm(OperatorType::class, $operator, [
                     'operator_id' => $operator->getId(),
                 ])->createView();
