@@ -116,30 +116,30 @@ class Operator
     }
     public function getFirstName(): ?string
     {
-        return explode('.', $this->name)[0] ?? null;
+        return explode(separator: '.', string: $this->name)[0] ?? null;
     }
 
     public function setFirstName(string $firstName): self
     {
-        $names = explode('.', $this->name);
+        $names = explode(separator: '.', string: $this->name);
         $lastName = $names[1] ?? '';
         $name = $firstName . '.' . $lastName;
-        $this->name = strtolower($name);
+        $this->name = strtolower(string: $name);
         return $this;
     }
 
     public function getLastName(): ?string
     {
-        $names = explode('.', $this->name);
+        $names = explode(separator: '.', string: $this->name);
         return $names[1] ?? null;
     }
 
     public function setLastName(string $lastName): self
     {
-        $names = explode('.', $this->name);
+        $names = explode(separator: '.', string: $this->name);
         $firstName = $names[0] ?? '';
         $name = $firstName . '.' . $lastName;
-        $this->name = strtolower($name);
+        $this->name = strtolower(string: $name);
         return $this;
     }
 

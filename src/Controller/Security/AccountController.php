@@ -150,7 +150,7 @@ class AccountController extends AbstractController
             $modified = $this->accountService->modifyAccount($request, $user);
             $this->addFlash('success', $modified . ' du compte ' . $user->getUsername() . ' a été modifié');
         } catch (\Exception $e) {
-            $this->addFlash('danger', 'Error during ' . $user->getUsername() . 'account modification. ' . $e->getMessage());
+            $this->addFlash('danger', 'Error during ' . $user->getUsername() . ' account modification. ' . $e->getMessage());
         } finally {
             return $this->redirectToRoute('app_account_modify_account', ['userId' => $user->getId()]);
         }
