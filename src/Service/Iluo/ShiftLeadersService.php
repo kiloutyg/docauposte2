@@ -4,6 +4,8 @@ namespace App\Service\Iluo;
 
 use Psr\Log\LoggerInterface;
 
+use App\Entity\ShiftLeaders;
+
 use App\Repository\ShiftLeadersRepository;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -51,8 +53,19 @@ class ShiftLeadersService extends AbstractController
      */
     public function shiftLeadersCreationFormProcessing(Form $shiftLeaderForm): string
     {
+        $this->logger->debug(message: 'ShiftLeadersService::shiftLeadersCreationFormProcessing - Processing shift leaders creation form', context: [$shiftLeaderForm]);
         try {
             $shiftLeaderData = $shiftLeaderForm->getData();
+            $this->logger->debug(message: 'ShiftLeadersService::shiftLeadersCreationFormProcessing - Shift leader data', context: ['shiftLeaderData' => $shiftLeaderData]);
+
+            if ($shiftLeaderData->getOperator() && ($shiftLeaderData->getOperator()->getUser())) {
+                $this->logger->info(message: 'ShiftLeadersService::shiftLeadersCreationFormProcessing - Operator set and linked User entity found');
+                $shiftLeaderData->setUser($shiftLeaderData->getOperator()->getUser());
+            } elseif ($shiftLeaderData->getUser() && ($shiftLeaderData->getUser()->getOperator())) {
+                $this->logger->info(message: 'ShiftLeadersService::shiftLeadersCreationFormProcessing - User set and linked Operator entity found');
+                $shiftLeaderData->setOperator($shiftLeaderData->getUser()->getOperator());
+            }
+            $this->logger->debug(message: 'ShiftLeadersService::shiftLeadersCreationFormProcessing - Shift after user check', context: ['shiftLeaderData' => $shiftLeaderData]);
             $this->em->persist($shiftLeaderData);
             $this->em->flush();
         } finally {

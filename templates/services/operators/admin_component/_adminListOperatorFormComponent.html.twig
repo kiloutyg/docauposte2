@@ -63,6 +63,7 @@
 				'action': path('app_operator_edit', {'operator': operatorId})}) }}
 		{% endif %}
 
+		{% set fields = ['lastname', 'firstname', 'code', 'team', 'uaps', 'isTrainer'] %}
 		{% for field in fields %}
 			{% set customId = 'operatorForm' ~ field|capitalize ~ operatorId %}
 			{{ form_row(operatorForm[field], 

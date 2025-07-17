@@ -424,10 +424,21 @@ class OperatorService extends AbstractController
             $session->start();
         }
 
-        $session->set('operatorSearchParams', ['searched_name' => $name, 'searched_code' => $code, 'searched_team' => $team, 'searched_uap' => $uap, 'searched_trainer' => $trainer]);
+        $session->set('operatorSearchParams', [
+            'searched_name' => $name,
+            'searched_code' => $code,
+            'searched_team' => $team,
+            'searched_uap' => $uap,
+            'searched_trainer' => $trainer
+        ]);
 
-
-        return $this->entityManagerFacade->findBySearchQuery($name, $code, $team, $uap, $trainer);
+        return $this->entityManagerFacade->findBySearchQuery(
+            $name,
+            $code,
+            $team,
+            $uap,
+            $trainer
+        );
     }
 
 
@@ -465,7 +476,13 @@ class OperatorService extends AbstractController
             'trainer' => $trainer
         ]);
 
-        return $this->entityManagerFacade->findBySearchQuery($name, $code, $team, $uap, $trainer);
+        return $this->entityManagerFacade->findBySearchQuery(
+            $name,
+            $code,
+            $team,
+            $uap,
+            $trainer
+        );
     }
 
 
