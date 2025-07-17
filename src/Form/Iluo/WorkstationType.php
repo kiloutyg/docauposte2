@@ -57,6 +57,14 @@ class WorkstationType extends AbstractType
         $this->zoneRepository       = $zoneRepository;
     }
 
+    /**
+     * This function returns an array of default options for form elements.
+     *
+     * @param string $placeholder The placeholder text for the form element. Default is an empty string.
+     * @param array|null $optionalAttr An optional array of additional attributes for the form element. Default is null.
+     *
+     * @return array An array of default options for form elements.
+     */
     private function getDefaultOptions(string $placeholder = '', ?array $optionalAttr = []): array
     {
         return [
@@ -79,6 +87,15 @@ class WorkstationType extends AbstractType
         ];
     }
 
+    /**
+     * Adds an upload field to the form, with optional filtering based on the provided zone and product.
+     *
+     * @param FormInterface $form The form to which the upload field will be added.
+     * @param Zone|null $zone The zone to filter uploads related to. If null, no zone filtering will be applied.
+     * @param Products|null $product The product to filter uploads related to. If null, no product filtering will be applied.
+     *
+     * @return void
+     */
     public function addUploadField($form, ?Zone $zone = null, ?Products $product = null): void
     {
 
@@ -144,8 +161,11 @@ class WorkstationType extends AbstractType
 
         // Initialize default values
         $userDepartment = $existingData[0];
+        $this->logger->debug('WorstationType::buildForm - User department: ', ['department' => $userDepartment]);
         $userZone = $existingData[1];
+        $this->logger->debug('WorstationType::buildForm - User zone: ', ['zone' => $userZone]);
         $userUap = $existingData[2];
+        $this->logger->debug('WorstationType::buildForm - User UAP: ', ['uap' => $userUap]);
 
         $builder
             ->add('name', TextType::class, [
@@ -237,7 +257,7 @@ class WorkstationType extends AbstractType
             );
 
         if ($userZone) {
-            $this->logger->debug('Adding upload field with userZone: ' . $userZone);
+            $this->logger->debug('Adding upload field with userZone: ', [$userZone]);
             $this->addUploadField($builder, $userZone);
         } else {
             $this->logger->debug('Adding upload field without userZone');
@@ -262,6 +282,20 @@ class WorkstationType extends AbstractType
     }
 
 
+    /**
+     * Retrieves the user's default department, zone, and UAP.
+     *
+     * This function retrieves the user's department, and if the user has a department,
+     * it attempts to find a default zone and UAP. If the user's department has zones,
+     * the function selects the first zone. If the user's department has UAPs,
+     * the function selects the first UAP. If the user's department does not have UAPs,
+     * the function checks if the user has an operator and selects the operator's UAPs.
+     *
+     * @param User $user The user for whom to retrieve the default department, zone, and UAP.
+     *
+     * @return array An array containing the user's default department, zone, and UAP.
+     *               The array has the following structure: [userDepartment, userZone, userUap].
+     */
     public function preExistingUserData(User $user)
     {
         // Initialize default values
@@ -295,6 +329,16 @@ class WorkstationType extends AbstractType
     }
 
 
+    /**
+     * Handles the pre-submit event for the form.
+     *
+     * This method retrieves the form data, updates the department and UAP based on the selected zone,
+     * and updates the upload field based on the selected zone and product.
+     *
+     * @param FormEvent $event The form event that triggered this method
+     *
+     * @return void
+     */
     public function uploadFilterDetermination(FormEvent $event)
     {
         $data = $event->getData();
@@ -309,6 +353,19 @@ class WorkstationType extends AbstractType
         $this->updateUploadField($data, $form);
     }
 
+    /**
+     * Updates the department and UAP in the form data based on the selected zone.
+     *
+     * This function checks if a zone is selected in the form data. If a zone is present,
+     * it retrieves the corresponding Zone entity from the database. If the zone has a
+     * department associated with it, the department ID is set in the form data. If the
+     * department has UAPs, the first UAP ID is set in the form data.
+     *
+     * @param array &$data The form data array containing zone and department selections
+     * @param FormEvent $event The form event that triggered this method
+     *
+     * @return void
+     */
     public function updateDepartmentAndUapFromZone(array &$data, FormEvent $event): void
     {
         if (isset($data['zone']) && !empty($data['zone'])) {
@@ -326,6 +383,18 @@ class WorkstationType extends AbstractType
         }
     }
 
+    /**
+     * Updates the upload field in the form based on the selected zone and product.
+     *
+     * This method extracts zone and product information from the submitted form data,
+     * retrieves the corresponding entities from the database, and updates the upload
+     * field with appropriate filtering based on these selections.
+     *
+     * @param array $data The form data array containing zone and products selections
+     * @param FormInterface $form The form instance to which the upload field will be added
+     *
+     * @return void
+     */
     public function updateUploadField(array $data, FormInterface $form): void
     {
         $zone = null;
@@ -347,21 +416,49 @@ class WorkstationType extends AbstractType
         $this->addUploadField($form, $zone, $product);
     }
 
+
+
     /**
-     * Helper method to get Zone entity by ID
+     * Retrieves a Zone entity by its ID from the database.
+     *
+     * This method uses the ZoneRepository to find a Zone entity based on the provided zone ID.
+     * If a Zone with the given ID exists in the database, it is returned. Otherwise, null is returned.
+     *
+     * @param int $zoneId The ID of the Zone to retrieve
+     *
+     * @return Zone|null The Zone entity with the given ID, or null if not found
      */
     private function getZoneById($zoneId)
     {
         return $this->zoneRepository->find($zoneId);
     }
 
+
+
     /**
-     * Helper method to get Product entity by ID
+     * Retrieves a Product entity by its ID from the database.
+     *
+     * This method uses the ProductsRepository to find a Product entity based on the provided product ID.
+     * If a Product with the given ID exists in the database, it is returned. Otherwise, null is returned.
+     *
+     * @param int $productId The ID of the Product to retrieve
+     *
+     * @return Products|null The Product entity with the given ID, or null if not found
      */
     private function getProductById($productId)
     {
         return $this->productsRepository->find($productId);
     }
+
+
+
+    /**
+     * Configures the default options for this form type.
+     *
+     * @param OptionsResolver $resolver The resolver for the options.
+     *
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

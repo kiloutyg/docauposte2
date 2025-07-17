@@ -1,22 +1,22 @@
 <turbo-frame
 	id="adminListOperator">
-	<ul>
-		<div
-			id="flash-messages">
-			{% for label, messages in app.flashes %}
-				<div
-					class="alert alert-{{ label }}">
-					{% for message in messages %}
-						<p>
-							{{ message }}
-						</p>
-					{% endfor %}
-				</div>
-			{% endfor %}
-		</div>
-		<div
-			class="row">
-			{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAPs de l\'operateur', 'Est-il un formateur?'] %}
+
+	<div
+		id="flash-messages">
+		{% for label, messages in app.flashes %}
+			<div
+				class="alert alert-{{ label }}">
+				{% for message in messages %}
+					<p>
+						{{ message }}
+					</p>
+				{% endfor %}
+			</div>
+		{% endfor %}
+	</div>
+	<div
+		class="row">
+		{% set fieldsName = ['Nom de l\'operateur', 'Prenom de l\'operateur', 'Code de l\'operateur', 'Equipe de l\'operateur', 'UAPs de l\'operateur', 'Est-il un formateur?'] %}
 
 			{% for fieldName in fieldsName %}
 				<div
@@ -29,6 +29,7 @@
 				Actions
 			</div>
 		</div>
-	</ul>
+		{% set fields = ['lastname', 'firstname', 'code', 'team', 'uaps', 'isTrainer'] %}
+
 	{% include 'services/operators/admin_component/_adminListOperatorFormComponent.html.twig' %}
 </turbo-frame>

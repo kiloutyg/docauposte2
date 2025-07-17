@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use Psr\Log\LoggerInterface;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,9 +20,13 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  */
 class UserRepository extends BaseRepository implements PasswordUpgraderInterface
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    private $logger;
+    public function __construct(
+        ManagerRegistry $registry,
+        LoggerInterface $logger
+    ) {
         parent::__construct($registry, User::class);
+        $this->logger = $logger;
     }
 
     /**
@@ -89,7 +94,7 @@ class UserRepository extends BaseRepository implements PasswordUpgraderInterface
 
     /**
      * Sorts an array of User objects by their last name, then by first name.
-     * 
+     *
      * This function assumes usernames are in the format "firstname.lastname" and
      * sorts them alphabetically by lastname first, then by firstname if lastnames are identical.
      * If the username format is unexpected, it falls back to comparing the full usernames.
@@ -100,32 +105,25 @@ class UserRepository extends BaseRepository implements PasswordUpgraderInterface
      */
     public function getAllUsersOrderedByLastname(): array
     {
-
-        $users = $this->findBy([], ['username' => 'ASC']);
+        $users = $this->findBy(criteria: [], orderBy: ['username' => 'ASC']);
 
         usort(
-            $users,
-            function ($a, $b) {
-                $result = 0;
-                // Lower cases
-                $fullNameA = strtolower($a->getUsername());
-                $fullNameB = strtolower($b->getUsername());
+            array: $users,
+            callback: function ($a, $b): int {
+                // Lower cases and normalize once
+                $fullNameA = strtolower(string: $a->getUsername());
+                $fullNameB = strtolower(string: $b->getUsername());
 
-                try {
-                    // Split names to separate first name and last name
-                    list($firstNameA, $lastNameA) = explode('.', $fullNameA);
-                    list($firstNameB, $lastNameB) = explode('.', $fullNameB);
+                // Parse names once and handle edge cases
+                $namePartsA = $this->parseUserName($fullNameA);
+                $namePartsB = $this->parseUserName($fullNameB);
 
-                    // Compare last names
-                    $result = strcmp($lastNameA, $lastNameB);
+                // Compare last names first
+                $result = strcmp($namePartsA['lastname'], $namePartsB['lastname']);
 
-                    // If last names are equal, then compare first names
-                    if ($result == 0) {
-                        $result = strcmp($firstNameA, $firstNameB);
-                    }
-                } catch (\Exception $e) {
-                    // Fallback if name format is unexpected
-                    $result = strcmp($fullNameA, $fullNameB);
+                // If last names are equal, compare first names
+                if ($result === 0) {
+                    $result = strcmp($namePartsA['firstname'], $namePartsB['firstname']);
                 }
 
                 return $result;
@@ -133,5 +131,34 @@ class UserRepository extends BaseRepository implements PasswordUpgraderInterface
         );
 
         return $users;
+    }
+
+    /**
+     * Parses a username into firstname and lastname components.
+     *
+     * Handles usernames in "firstname.lastname" format. If the format is unexpected
+     * (no dot or only one part), uses the entire username as both firstname and lastname
+     * to ensure consistent sorting behavior.
+     *
+     * @param string $username The username to parse
+     * @return array{firstname: string, lastname: string} Associative array with firstname and lastname
+     */
+    private function parseUserName(string $username): array
+    {
+        $parts = explode('.', $username, 2); // Limit to 2 parts for efficiency
+        
+        if (count($parts) === 2) {
+            return [
+                'firstname' => $parts[0],
+                'lastname' => $parts[1]
+            ];
+        }
+        
+        // Fallback: use the entire username as both first and last name
+        // This ensures consistent sorting for usernames without dots
+        return [
+            'firstname' => $parts[0],
+            'lastname' => $parts[0]
+        ];
     }
 }
