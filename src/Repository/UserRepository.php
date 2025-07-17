@@ -94,7 +94,7 @@ class UserRepository extends BaseRepository implements PasswordUpgraderInterface
 
     /**
      * Sorts an array of User objects by their last name, then by first name.
-     * 
+     *
      * This function assumes usernames are in the format "firstname.lastname" and
      * sorts them alphabetically by lastname first, then by firstname if lastnames are identical.
      * If the username format is unexpected, it falls back to comparing the full usernames.
@@ -135,7 +135,7 @@ class UserRepository extends BaseRepository implements PasswordUpgraderInterface
 
     /**
      * Parses a username into firstname and lastname components.
-     * 
+     *
      * Handles usernames in "firstname.lastname" format. If the format is unexpected
      * (no dot or only one part), uses the entire username as both firstname and lastname
      * to ensure consistent sorting behavior.

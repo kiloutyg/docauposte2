@@ -344,20 +344,23 @@ class EntityFetchingService extends AbstractController
         return $this->findAll('qualityRep');
     }
 
+
     /**
      * Retrieves operator suggestions based on a username pattern.
      *
-     * This method parses a username (typically in format "firstname.lastname"),
-     * searches for operators matching either the firstname or lastname component,
-     * and returns a unique list of matching operator entities.
+     * This method searches for operators by splitting the provided username on dots
+     * and performing partial matches on both the first and last name components.
+     * It expects usernames in the format "firstname.lastname" and returns unique
+     * operator entities that match either the firstname or lastname portion.
+     * Duplicate results are filtered out based on operator ID.
      *
      * @param string $username The username to search for, expected in "firstname.lastname" format
-     * @return array An array of Operator entities matching the search criteria
+     * @return array An array of unique Operator entities that match the search criteria
      */
-    public function getOperatorSuggestionByUsername(string $username)
+    public function getOperatorSuggestionByUsername(string $username): array
     {
 
-        $explodedUsername = explode('.', $username);
+        $explodedUsername = explode(separator: '.', string: $username);
         $firstname = $explodedUsername[0] ?? null;
         $firstnameSuggestions = [];
         $lastname  = $explodedUsername[1] ?? null;
@@ -365,22 +368,38 @@ class EntityFetchingService extends AbstractController
 
 
         if ($firstname) {
-            $firstnameSuggestions = $this->fromNameToRepo('operator')->findByNameLikeForSuggestions($firstname);
+            $firstnameSuggestions = $this->fromNameToRepo(entityType: 'operator')->findByNameLikeForSuggestions($firstname);
         }
 
         if ($lastname) {
-            $lastnameSuggestions = $this->fromNameToRepo('operator')->findByNameLikeForSuggestions($lastname);
+            $lastnameSuggestions = $this->fromNameToRepo(entityType: 'operator')->findByNameLikeForSuggestions($lastname);
         }
 
         $rawSuggestions = array_merge($firstnameSuggestions, $lastnameSuggestions);
-        $suggestions = array_unique($rawSuggestions, SORT_REGULAR);
-        $response = [];
-        foreach ($suggestions as &$suggestionKey) {
-            if (isset($suggestionKey['id'])) {
-                $response[] = $this->find('operator', $suggestionKey['id']);
+        $this->logger->debug(message: 'EntityFetchingService::getOperatorSuggestionByUsername - rawSuggestions', context: [$rawSuggestions]);
+        $firstFilteredSuggestions = array_unique(array: $rawSuggestions, flags: SORT_REGULAR);
+        $this->logger->debug(message: 'EntityFetchingService::getOperatorSuggestionByUsername - firstFilteredSuggestions', context: [$firstFilteredSuggestions]);
+
+        // Remove duplicates based on ID
+        $suggestions = [];
+        $seenIds = [];
+
+        foreach ($firstFilteredSuggestions as $suggestion) {
+            $id = $suggestion['id'];
+            if (!in_array($id, $seenIds)) {
+                $seenIds[] = $id;
+                $suggestions[] = $suggestion;
             }
         }
 
+        $response = [];
+        foreach ($suggestions as &$suggestionKey) {
+            if (isset($suggestionKey['id'])) {
+                $response[] = $this->find(entityType: 'operator', entityId: $suggestionKey['id']);
+            }
+        }
+
+        $this->logger->debug(message: 'EntityFetchingService::getOperatorSuggestionByUsername - final response', context: [$response]);
         return $response;
     }
 

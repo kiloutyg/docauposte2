@@ -5,7 +5,8 @@
 	<turbo-frame
 		id="products-section"
 		src="{{ path('app_iluo_products_general_elements_admin') }}" loading="lazy"
-		class="row">
+		class="row"
+		data-controller="name-validation">
 		{{ loading.content_placeholder('text', 2, '90%') }}
 	</turbo-frame>
 
@@ -15,7 +16,8 @@
 	<turbo-frame
 		id="shiftleaders-section"
 		src="{{ path('app_iluo_shiftleaders_general_elements_admin') }}" loading="lazy"
-		class="row">
+		class="row"
+		data-controller="shift-leaders-form">
 		{{ loading.content_placeholder('text', 2, '90%') }}
 	</turbo-frame>
 
