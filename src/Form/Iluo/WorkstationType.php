@@ -144,8 +144,11 @@ class WorkstationType extends AbstractType
 
         // Initialize default values
         $userDepartment = $existingData[0];
+        $this->logger->debug('WorstationType::buildForm - User department: ', ['department' => $userDepartment]);
         $userZone = $existingData[1];
+        $this->logger->debug('WorstationType::buildForm - User zone: ', ['zone' => $userZone]);
         $userUap = $existingData[2];
+        $this->logger->debug('WorstationType::buildForm - User UAP: ', ['uap' => $userUap]);
 
         $builder
             ->add('name', TextType::class, [
@@ -237,7 +240,7 @@ class WorkstationType extends AbstractType
             );
 
         if ($userZone) {
-            $this->logger->debug('Adding upload field with userZone: ' . $userZone);
+            $this->logger->debug('Adding upload field with userZone: ' , [$userZone]);
             $this->addUploadField($builder, $userZone);
         } else {
             $this->logger->debug('Adding upload field without userZone');
