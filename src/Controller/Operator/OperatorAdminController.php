@@ -161,20 +161,24 @@ class OperatorAdminController extends AbstractController
 
 
 
+
     /**
-     * Handles the editing of an operator entity.
+     * Handles the editing of operator entities and displays the operator list with forms.
      *
-     * This function processes a POST request containing operator data.
-     * If the request method is POST and the 'search' parameter is 'true',
-     * it performs a search for operators based on the request data.
-     * If the 'operatorSearchParams' session variable is set, it performs a search
-     * for operators based on the session data.
-     * For each found operator, it creates a form for editing the operator's data.
+     * This function processes operator editing requests and manages the display of operator forms.
+     * If a specific operator is provided, it processes the form submission for that operator.
+     * It then retrieves operators based on search criteria (either from POST request or session)
+     * and creates forms for each operator. If no search criteria are found, it displays
+     * deactivated operators as a fallback.
      *
-     * @param Request $request The HTTP request object containing form data and method information.
-     * @param Operator|null $operator The operator entity to be edited. If null, it's assumed to be a new operator.
+     * @param Request $request The HTTP request object containing form data, search parameters,
+     *                         and session information for operator retrieval and form processing
+     * @param Operator|null $operator The specific operator entity to edit, or null if no specific
+     *                                operator is being edited. When provided, triggers form processing
+     *                                for that operator
      *
-     * @return Response A rendered view containing operator editing forms.
+     * @return Response A rendered view containing the operator list component with forms for
+     *                  editing operators, displaying either search results or deactivated operators
      */
     #[Route('/operator/edit/{operator}', name: 'app_operator_edit')]
     public function editOperatorAction(Request $request, ?Operator $operator = null): Response
