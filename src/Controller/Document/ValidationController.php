@@ -15,14 +15,15 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use App\Repository\UserRepository;
-use App\Repository\UploadRepository;
-use App\Repository\ApprobationRepository;
 
 use App\Form\UploadType;
 
 use App\Service\Upload\UploadModificationService;
 use App\Service\Validation\ValidationService;
 use App\Service\NamingService;
+
+use App\Service\Facade\EntityManagerFacade;
+use App\Service\Facade\ContentManagerFacade;
 
 
 class ValidationController extends AbstractController
@@ -31,8 +32,6 @@ class ValidationController extends AbstractController
     private $logger;
 
     // Repository methods
-    private $approbationRepository;
-    private $uploadRepository;
     private $userRepository;
 
 
@@ -41,6 +40,10 @@ class ValidationController extends AbstractController
     private $uploadModificationService;
     private $namingService;
 
+    private $entityManagerFacade;
+    private $contentManagerFacade;
+
+
 
 
     public function __construct(
@@ -48,8 +51,6 @@ class ValidationController extends AbstractController
         LoggerInterface                 $logger,
 
         // Repository methods
-        ApprobationRepository           $approbationRepository,
-        UploadRepository                $uploadRepository,
         UserRepository                  $userRepository,
 
 
@@ -58,18 +59,23 @@ class ValidationController extends AbstractController
         UploadModificationService       $uploadModificationService,
         NamingService                   $namingService,
 
+        EntityManagerFacade             $entityManagerFacade,
+        ContentManagerFacade            $contentManagerFacade,
+
     ) {
         $this->logger                       = $logger;
 
         // Variables related to the repositories
-        $this->approbationRepository        = $approbationRepository;
-        $this->uploadRepository             = $uploadRepository;
         $this->userRepository               = $userRepository;
 
         // Variables related to the services
         $this->validationService            = $validationService;
         $this->uploadModificationService    = $uploadModificationService;
         $this->namingService                = $namingService;
+
+        // Variables related to the facades
+        $this->entityManagerFacade          = $entityManagerFacade;
+        $this->contentManagerFacade         = $contentManagerFacade;
     }
 
 
@@ -79,7 +85,7 @@ class ValidationController extends AbstractController
         int $uploadId,
         Request $request
     ): Response {
-        $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $upload = $this->entityManagerFacade->find(entityType: 'upload', id: $uploadId);
 
         // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
@@ -93,7 +99,23 @@ class ValidationController extends AbstractController
         ]);
     }
 
-
+    #[Route('/validation_list/{parentEntityType}/{entityId}', name: 'app_validation_list')]
+    public function uploadedFiles(string $parentEntityType, ?int $entityId = null): Response
+    {
+        $entityIdInt = (int) $entityId;
+        if ($parentEntityType === 'super') {
+            $uploads = $this->entityManagerFacade->getAllUploadsWithAssociations();
+        } else {
+            $entity = $this->entityManagerFacade->find(entityType: $parentEntityType, id: $entityIdInt);
+            $uploads = $this->entityManagerFacade->uploadsByParentEntity(entityType: $parentEntityType, entity: $entity);
+        }
+        $uploadsArray = $this->contentManagerFacade->groupAllUploads(uploads: $uploads);
+        $groupedUploads = $uploadsArray[0];
+        return $this->render(
+            'services/uploads/uploaded_list.html.twig',
+            ['groupedUploads' => $groupedUploads]
+        );
+    }
 
     /**
      * Displays the approbation page for a validation request.
@@ -113,7 +135,7 @@ class ValidationController extends AbstractController
     public function validationApprobationPage(
         ?int $approbationId = null
     ): Response {
-        $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
+        $approbation = $this->entityManagerFacade->find(entityType: 'approbation', id: $approbationId);
         if ($approbation->isApproval() !== null) {
             $this->addFlash('error', 'Une réponse à cette demande de validation a déja été fourni.');
             return $this->redirectToRoute('app_base');
@@ -142,7 +164,7 @@ class ValidationController extends AbstractController
     public function validationDownloadFile(
         ?int $approbationId = null
     ): Response {
-        $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
+        $approbation = $this->entityManagerFacade->find(entityType: 'approbation', id: $approbationId);
         $validation  = $approbation->getValidation();
         $file        = $validation->getUpload();
 
@@ -172,7 +194,7 @@ class ValidationController extends AbstractController
         ?int $uploadId = null,
     ): Response {
 
-        $file = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $file = $this->entityManagerFacade->find(entityType: 'upload', id: $uploadId);
 
         // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
@@ -208,7 +230,7 @@ class ValidationController extends AbstractController
         ?int $approbationId = null
     ): Response {
         $this->logger->info('ValidationController::validationApproval - approbation ID: ' . $approbationId);
-        $approbation = $this->approbationRepository->findOneBy(['id' => $approbationId]);
+        $approbation = $this->entityManagerFacade->find(entityType: 'approbation', id: $approbationId);
         try {
             $response = $this->validationService->validationApproval($approbation, $request);
             if ($response) {
@@ -245,20 +267,19 @@ class ValidationController extends AbstractController
     ): Response {
         $this->logger->info('ValidationController::disapprovedValidationModificationByUpload - upload ID: ' . $uploadId);
 
-        $upload = $this->uploadRepository->findOneBy(['id' => $uploadId]);
+        $upload = $this->entityManagerFacade->find(entityType: 'upload', id: $uploadId);
         $validation = $upload->getValidation();
 
         $approbations = [];
         $approbations = $validation->getApprobations();
 
         $currentUser = $this->getUser();
-        $user        = $this->userRepository->find($currentUser);
 
         // Retrieve the origin URL
         $originUrl = $request->headers->get('Referer');
 
         $form = $this->createForm(UploadType::class, $upload, [
-            'current_user_id'        => $user->getId(),
+            'current_user_id'        => $currentUser->getId(),
             'current_upload_id'      => $upload->getId(),
         ]);
 
@@ -272,7 +293,7 @@ class ValidationController extends AbstractController
 
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
-                $this->uploadModificationService->modifyDisapprovedFile($upload, $user, $request);
+                $this->uploadModificationService->modifyDisapprovedFile($upload, $currentUser, $request);
                 $this->addFlash('success', 'Le fichier a été modifié.');
                 return $this->redirectToRoute('app_base');
             }
@@ -280,7 +301,7 @@ class ValidationController extends AbstractController
         if ($validation->isStatus() === false) {
             return $this->render('services/validation/disapprovedModificationByUpload.html.twig', [
                 'upload'       => $upload,
-                'user'         => $this->getUser(),
+                'user'         => $currentUser,
                 'form'         => $form->createView(),
                 'approbations' => $approbations,
 

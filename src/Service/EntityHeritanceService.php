@@ -7,24 +7,24 @@ namespace App\Service;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
-// use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 
 // This class is responsible for the logic of getting the related entities of a given entity
 class EntityHeritanceService extends AbstractController
 {
 
-    // private $logger;
+    private $logger;
 
     public function __construct(
 
-        // LoggerInterface $logger,
+        LoggerInterface $logger,
 
 
         // CacheService $cacheService
     ) {
 
-        // $this->logger = $logger;
+        $this->logger = $logger;
 
     }
 

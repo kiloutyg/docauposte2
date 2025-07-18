@@ -15,6 +15,7 @@
 	<div
 		class="row align-items-center">
 		{% if pageLevel is same as('super') %}
+			{% set entityId = null %}
 			<h1
 				class="my-4">
 				<strong>
@@ -22,6 +23,8 @@
 				</strong>
 			</h1>
 		{% elseif pageLevel is same as('zone') %}
+			{% set entityId = zone.id %}
+
 			{% if  is_granted('ROLE_SUPER_ADMIN') %}
 				<div
 					class='my-3'>
@@ -72,6 +75,8 @@
 				</strong>
 			</h1>
 		{% elseif pageLevel is same as('productLine') %}
+			{% set entityId = productLine.id %}
+
 			{% if is_granted('ROLE_ADMIN') %}
 				<div
 					class='my-3'>
@@ -124,6 +129,8 @@
 				</strong>
 			</h1>
 		{% elseif pageLevel is same as('category') %}
+			{% set entityId = category.id %}
+
 			{% if  is_granted('ROLE_LINE_ADMIN') %}
 				<div
 					class='my-3'>
@@ -215,7 +222,14 @@
 				{% endif %}
 			{% endif %}
 
-			{% include "services/uploads/uploaded_list.html.twig" %}
+			{# {% include "services/uploads/uploaded_list.html.twig" %} #}
+
+			<turbo-frame
+				id="uploaded-list"
+				src="{{ path('app_uploaded_list', { parentEntityType: pageLevel, entityId: entityId }) }}" data-accordion-frame-manager-target="turboFrame"
+				loading="lazy">
+				{{ loading.content_placeholder('text', 2, '90%') }}
+			</turbo-frame>
 
 			{% if settings.IsUploadValidation %}
 				{% include "services/validation/validation_list.html.twig" %}

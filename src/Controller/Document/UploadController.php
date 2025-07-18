@@ -121,18 +121,35 @@ class UploadController extends AbstractController
         return $this->render('/services/uploads/upload.html.twig', []);
     }
 
+
+    
     /**
-     * Renders the uploaded files interface
+     * Displays a list of uploaded files filtered by parent entity
      *
-     * This function displays a list of files that have been uploaded to the system.
+     * This method retrieves and displays uploaded files based on the parent entity type and ID.
+     * If the parent entity type is 'super', it returns all uploads with their associations.
+     * Otherwise, it finds the specific parent entity and returns uploads associated with it.
+     * The uploads are then grouped and rendered in a template for display.
      *
-     * @return Response The rendered uploaded files template
+     * @param string $parentEntityType The type of the parent entity (e.g., 'button', 'category', 'super')
+     * @param int|null $entityId The ID of the parent entity. If null, defaults to null and is cast to 0
+     * @return Response The rendered template displaying the grouped uploads list
      */
-    #[Route('/uploaded', name: 'app_uploaded_files')]
-    public function uploadedFiles(): Response
+    #[Route('/uploaded_list/{parentEntityType}/{entityId}', name: 'app_uploaded_list')]
+    public function uploadedFiles(string $parentEntityType, ?int $entityId = null): Response
     {
+        $entityIdInt = (int) $entityId;
+        if ($parentEntityType === 'super') {
+            $uploads = $this->entityManagerFacade->getAllUploadsWithAssociations();
+        } else {
+            $entity = $this->entityManagerFacade->find(entityType: $parentEntityType, id: $entityIdInt);
+            $uploads = $this->entityManagerFacade->uploadsByParentEntity(entityType: $parentEntityType, entity: $entity);
+        }
+        $uploadsArray = $this->contentManagerFacade->groupAllUploads(uploads: $uploads);
+        $groupedUploads = $uploadsArray[0];
         return $this->render(
-            'services/uploads/uploaded.html.twig'
+            'services/uploads/uploaded_list.html.twig',
+            ['groupedUploads' => $groupedUploads]
         );
     }
 

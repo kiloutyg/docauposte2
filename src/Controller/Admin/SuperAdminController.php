@@ -52,15 +52,15 @@ class SuperAdminController extends AbstractController
         $incidents = $this->entityManagerFacade->getIncidents();
 
         $uploadsArray = $this->contentManagerFacade->groupAllUploads($uploads);
-        $groupedUploads = $uploadsArray[0];
+        // $groupedUploads = $uploadsArray[0];
         $groupedValidatedUploads = $uploadsArray[1];
         $groupIncidents = $this->contentManagerFacade->groupIncidents($incidents);
 
         return $this->render('admin_template/admin_index.html.twig', [
             'pageLevel'                 => $pageLevel,
-            'groupedUploads'            => $groupedUploads,
+            // 'groupedUploads'            => $groupedUploads,
             'groupedValidatedUploads'   => $groupedValidatedUploads,
-            'groupincidents' => $groupIncidents,
+            'groupincidents'            => $groupIncidents,
             'zones'                     => $this->entityManagerFacade->getZones(),
         ]);
     }
