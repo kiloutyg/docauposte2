@@ -1,159 +1,160 @@
-{% if is_granted('ROLE_LINE_ADMIN') %}
-	<div
-		class="accordion-item">
-		<h2
-			class="accordion-header"
-			id="headingUploadedList">
-			<button
-				class="accordion-button fs-3 collapsed"
-				type="button"
-				data-bs-toggle="collapse"
-				data-bs-target="#collapseUploadedList"
-				aria-expanded="false"
-				aria-controls="collapseUploadedList">
-				<strong>
-					Liste des fichiers chargés :
-				</strong>
-			</button>
-		</h2>
+<turbo-frame
+	id='uploaded-list'>
+	{% if is_granted('ROLE_LINE_ADMIN') %}
 		<div
-			id="collapseUploadedList"
-			class="accordion-collapse collapse"
-			aria-labelledby="headingUploadedList"
-			data-bs-parent="#accordionAdmin">
+			class="accordion-item">
+			<h2
+				class="accordion-header"
+				id="headingUploadedList">
+				<button
+					class="accordion-button fs-3 collapsed"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#collapseUploadedList"
+					aria-expanded="false"
+					aria-controls="collapseUploadedList">
+					<strong>
+						Liste des fichiers chargés :
+					</strong>
+				</button>
+			</h2>
 			<div
-				class="accordion-body accordion-bg shadow shadow-inset">
+				id="collapseUploadedList"
+				class="accordion-collapse collapse"
+				aria-labelledby="headingUploadedList"
+				data-bs-parent="#accordionAdmin">
 				<div
-					class="row">
-					<div>
-						{% if (groupedUploads is defined) and (groupedUploads is not empty ) %}
-							<div
-								class="accordion col-11 mx-auto justify-content-center"
-								id="accordionUploadList">
-								{% set outerIndex = 0 %}
-								{% for zoneName, zoneKey in groupedUploads %}
-									{% set outerIndex = outerIndex + 1 %}
-									<div
-										class="accordion-item shadow-lg shadow-lg-inset border border-dark">
-										<h2
-											class="accordion-header"
-											id="headingZoneUploadList{{ outerIndex }}">
-											<button
-												class="accordion-button collapsed"
-												type="button"
-												data-bs-toggle="collapse"
-												data-bs-target="#collapseZoneUploadList{{ outerIndex }}"
-												aria-expanded="false"
-												aria-controls="collapseZoneUploadList{{ outerIndex }}">
-												Zone:
-												{{ zoneName|split('.')|first|upper }}
-											</button>
-										</h2>
+					class="accordion-body accordion-bg shadow shadow-inset">
+					<div
+						class="row">
+						<div>
+							{% if (groupedUploads is defined) and (groupedUploads is not empty ) %}
+								<div
+									class="accordion col-11 mx-auto justify-content-center"
+									id="accordionUploadList">
+									{% set outerIndex = 0 %}
+									{% for zoneName, zoneKey in groupedUploads %}
+										{% set outerIndex = outerIndex + 1 %}
 										<div
-											id="collapseZoneUploadList{{ outerIndex }}"
-											class="accordion-collapse collapse"
-											aria-labelledby="headingZoneUploadList{{ outerIndex }}"
-											data-bs-parent="#accordionUploadList">
+											class="accordion-item shadow-lg shadow-lg-inset border border-dark">
+											<h2
+												class="accordion-header"
+												id="headingZoneUploadList{{ outerIndex }}">
+												<button
+													class="accordion-button collapsed"
+													type="button"
+													data-bs-toggle="collapse"
+													data-bs-target="#collapseZoneUploadList{{ outerIndex }}"
+													aria-expanded="false"
+													aria-controls="collapseZoneUploadList{{ outerIndex }}">
+													Zone:
+													{{ zoneName|split('.')|first|upper }}
+												</button>
+											</h2>
 											<div
-												class="accordion-body">
-												{% set middleIndex = 0 %}
-												{% for productLineName, productLineKey in zoneKey %}
-													{% set middleIndex = middleIndex + 1 %}
-													<div
-														class="accordion"
-														id="productLineAccordionUploadList{{ outerIndex }}{{ middleIndex }}">
-
+												id="collapseZoneUploadList{{ outerIndex }}"
+												class="accordion-collapse collapse"
+												aria-labelledby="headingZoneUploadList{{ outerIndex }}"
+												data-bs-parent="#accordionUploadList">
+												<div
+													class="accordion-body">
+													{% set middleIndex = 0 %}
+													{% for productLineName, productLineKey in zoneKey %}
+														{% set middleIndex = middleIndex + 1 %}
 														<div
-															class="accordion-item">
-															<h2
-																class="accordion-header"
-																id="headingProductLineUploadList{{ outerIndex }}{{ middleIndex }}">
-																<button
-																	class="accordion-button collapsed"
-																	type="button"
-																	data-bs-toggle="collapse"
-																	data-bs-target="#collapseProductLineUploadList{{ outerIndex }}{{ middleIndex }}"
-																	aria-expanded="false"
-																	aria-controls="collapseProductLineUploadList{{ outerIndex }}{{ middleIndex }}">
-																	Produit:
-																	{{ productLineName|split('.')|first|upper }}
-																</button>
-															</h2>
+															class="accordion"
+															id="productLineAccordionUploadList{{ outerIndex }}{{ middleIndex }}">
+
 															<div
-																id="collapseProductLineUploadList{{ outerIndex }}{{ middleIndex }}"
-																class="accordion-collapse collapse"
-																aria-labelledby="headingProductLineUploadList{{ outerIndex }}{{ middleIndex }}"
-																data-bs-parent="#collapseZoneUploadList{{ outerIndex }}">
-
-
+																class="accordion-item">
+																<h2
+																	class="accordion-header"
+																	id="headingProductLineUploadList{{ outerIndex }}{{ middleIndex }}">
+																	<button
+																		class="accordion-button collapsed"
+																		type="button"
+																		data-bs-toggle="collapse"
+																		data-bs-target="#collapseProductLineUploadList{{ outerIndex }}{{ middleIndex }}"
+																		aria-expanded="false"
+																		aria-controls="collapseProductLineUploadList{{ outerIndex }}{{ middleIndex }}">
+																		Produit:
+																		{{ productLineName|split('.')|first|upper }}
+																	</button>
+																</h2>
 																<div
-																	class="accordion-body">
-																	{% set innerIndex = 0 %}
-																	{% for categoryName, categoryKey in productLineKey %}
-																		{% set innerIndex = innerIndex + 1 %}
-																		<div
-																			class="accordion"
-																			id="categoryAccordionUploadList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
-
+																	id="collapseProductLineUploadList{{ outerIndex }}{{ middleIndex }}"
+																	class="accordion-collapse collapse"
+																	aria-labelledby="headingProductLineUploadList{{ outerIndex }}{{ middleIndex }}"
+																	data-bs-parent="#collapseZoneUploadList{{ outerIndex }}">
+																	<div
+																		class="accordion-body">
+																		{% set innerIndex = 0 %}
+																		{% for categoryName, categoryKey in productLineKey %}
+																			{% set innerIndex = innerIndex + 1 %}
 																			<div
-																				class="accordion-item">
-																				<h2
-																					class="accordion-header"
-																					id="headingCategoryUploadList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
-																					<button
-																						class="accordion-button collapsed"
-																						type="button"
-																						data-bs-toggle="collapse"
-																						data-bs-target="#collapseCategoryUploadList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}"
-																						aria-expanded="false"
-																						aria-controls="collapseCategoryUploadList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
-																						Catégorie:
-																						{{ categoryName|split('.')|first|upper }}
-																					</button>
-																				</h2>
+																				class="accordion"
+																				id="categoryAccordionUploadList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
+
 																				<div
-																					id="collapseCategoryUploadList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}"
-																					class="accordion-collapse collapse"
-																					aria-labelledby="headingCategoryUploadList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}"
-																					data-bs-parent="#collapseProductLineUploadList{{ outerIndex }}{{ middleIndex }}">
-
+																					class="accordion-item">
+																					<h2
+																						class="accordion-header"
+																						id="headingCategoryUploadList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
+																						<button
+																							class="accordion-button collapsed"
+																							type="button"
+																							data-bs-toggle="collapse"
+																							data-bs-target="#collapseCategoryUploadList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}"
+																							aria-expanded="false"
+																							aria-controls="collapseCategoryUploadList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
+																							Catégorie:
+																							{{ categoryName|split('.')|first|upper }}
+																						</button>
+																					</h2>
 																					<div
-																						class="accordion-body">
-																						{% for buttonName, buttonKey in categoryKey %}
-																							<strong>
-																								Bouton:
-																							</strong>
-																							{{ buttonName|split('.')|first|upper }}
-																							{% include "services/uploads/uploads_list_components/uploaded_list_button_component.html.twig" %}
+																						id="collapseCategoryUploadList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}"
+																						class="accordion-collapse collapse"
+																						aria-labelledby="headingCategoryUploadList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}"
+																						data-bs-parent="#collapseProductLineUploadList{{ outerIndex }}{{ middleIndex }}">
 
-																						{% endfor %}
+																						<div
+																							class="accordion-body">
+																							{% for buttonName, buttonKey in categoryKey %}
+																								<strong>
+																									Bouton:
+																								</strong>
+																								{{ buttonName|split('.')|first|upper }}
+																								{% include "services/uploads/uploads_list_components/uploaded_list_button_component.html.twig" %}
+
+																							{% endfor %}
+																						</div>
 																					</div>
 																				</div>
 																			</div>
-																		</div>
-																	{% endfor %}
+																		{% endfor %}
+																	</div>
 																</div>
 															</div>
 														</div>
-													</div>
-												{% endfor %}
+													{% endfor %}
+												</div>
 											</div>
 										</div>
-									</div>
-								{% endfor %}
-							</div>
-						{% else %}
-							<div
-								class="alert alert-danger">
-								<a
-									href="{{path('app_base')}}">
-									Il n'y a pas de documents disponible
-								</a>
-							</div>
-						{% endif %}
+									{% endfor %}
+								</div>
+							{% else %}
+								<div
+									class="alert alert-danger">
+									<a
+										href="{{path('app_base')}}">
+										Il n'y a pas de documents disponible
+									</a>
+								</div>
+							{% endif %}
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-{% endif %}
+	{% endif %}
+</turbo-frame>

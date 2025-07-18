@@ -63,25 +63,28 @@ class IncidentController extends AbstractController
      *
      * @return Response A rendered Symfony Response object containing the incident management view
      */
-    #[Route('/admin/incidentmanagementview', name: 'incident_management_view')]
-    public function incidentManagementView(): Response
+    #[Route('/admin/incidentmanagementview/{parentEntityType}/{entityId}', name: 'incident_management_view')]
+    public function incidentManagementView(string $parentEntityType, ?int $entityId = null): Response
     {
+        $entityIdInt = (int) $entityId;
+        if ($parentEntityType === 'super') {
+            $incidents = $this->entityManagerFacade->getIncidents();
+        } else {
+            $entity = $this->entityManagerFacade->find(entityType: $parentEntityType, id: $entityIdInt);
+            $incidents = $this->entityManagerFacade->incidentsByParentEntity(entityType: $parentEntityType, entity: $entity);
+        }
 
-        $incidents = $this->entityManagerFacade->getIncidents();
-
-        $groupIncidents = $this->incidentService->groupIncidents($incidents);
+        $groupIncidents = $this->incidentService->groupIncidents(incidents: $incidents);
         $incidentCategories = $this->entityManagerFacade->getIncidentCategories();
 
         return $this->render(
-            'services/incident/incident.html.twig',
-            [
+            view: 'services/incident/incident.html.twig',
+            parameters: [
                 'groupincidents'            => $groupIncidents,
                 'incidentCategories'        => $incidentCategories,
             ]
         );
     }
-
-
 
 
     // Render the incidents page and filter the incidents by productLine and sort them by id ascending to display them in the right order

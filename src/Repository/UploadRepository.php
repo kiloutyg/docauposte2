@@ -94,6 +94,7 @@ class UploadRepository extends BaseRepository
 
         // Always join 'button' association
         $qb->leftJoin('u.button', 'b')
+            ->orderBy('b.SortOrder', 'ASC')
             ->addSelect('b');
 
         // Always join 'validation' association
@@ -103,16 +104,19 @@ class UploadRepository extends BaseRepository
         // Conditionally join associations based on resolved associations
         if (in_array('category', $resolvedAssociations)) {
             $qb->leftJoin('b.category', 'c')
+                ->orderBy('c.SortOrder', 'ASC')
                 ->addSelect('c');
         }
 
         if (in_array('productLine', $resolvedAssociations)) {
             $qb->leftJoin('c.productLine', 'p')
+                ->orderBy('p.SortOrder', 'ASC')
                 ->addSelect('p');
         }
 
         if (in_array('zone', $resolvedAssociations)) {
             $qb->leftJoin('p.zone', 'z')
+                ->orderBy('z.SortOrder', 'ASC')
                 ->addSelect('z');
         }
 
@@ -145,27 +149,27 @@ class UploadRepository extends BaseRepository
             'category' => ['button'],
             'button' => [],
         ];
-    
+
         $resolved = [];
-    
+
         foreach ($associations as $association) {
             // Add the association itself
             $resolved[] = $association;
-    
+
             // Recursively add dependencies
             if (isset($dependencies[$association])) {
                 $resolved = array_merge($resolved, $dependencies[$association]);
             }
         }
-    
+
         // Always include 'button' as it's a direct association
         if (!in_array('button', $resolved)) {
             $resolved[] = 'button';
         }
-    
+
         // Remove duplicates
         $resolved = array_unique($resolved);
-    
+
         return $resolved;
     }
 
@@ -186,7 +190,7 @@ class UploadRepository extends BaseRepository
         );
     }
 
-    
+
     /**
      * Retrieves all uploads with their complete association hierarchy.
      *

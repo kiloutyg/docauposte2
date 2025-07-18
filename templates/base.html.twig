@@ -1,3 +1,4 @@
+{% import 'macros/entity_ids.html.twig' as entity_macros %}
 <!DOCTYPE html>
 <html
 	lang="fr">
@@ -26,18 +27,12 @@
 			{{ encore_entry_script_tags('toast') }}
 			{{ encore_entry_script_tags('confirmation') }}
 
-			<script>
-				var zoneIdFromServer = {{ zone.getId()|default('null')|json_encode|raw }};
-			</script>
-			<script>
-				var productLineIdFromServer = {{ productLine.getId()|default('null')|json_encode|raw }};
-			</script>
-			<script>
-				var categoryIdFromServer = {{ category.getId()|default('null')|json_encode|raw }};
-			</script>
-			<script>
-				var buttonIdFromServer = {{ button.getId()|default('null')|json_encode|raw }};
-			</script>
+			{{ entity_macros.auto_entity_ids_script({
+                zone: zone|default(null),
+                productLine: productLine|default(null),
+                category: category|default(null),
+                button: button|default(null)
+            }) }}
 
 		{% endblock %}
 		{% include "services/_toasts.html.twig" %}

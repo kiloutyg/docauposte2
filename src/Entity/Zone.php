@@ -6,13 +6,11 @@ use App\Repository\ZoneRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\UX\Turbo\Attribute\Broadcast;
 
 use App\Entity\ProductLine;
 
 
 #[ORM\Entity(repositoryClass: ZoneRepository::class)]
-#[Broadcast]
 class Zone
 {
     #[ORM\Id]

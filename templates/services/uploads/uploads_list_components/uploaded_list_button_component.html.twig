@@ -4,7 +4,8 @@
 		class="list-group-item d-flex justify-content-between align-items-center mb-3 shadow-lg">
 		<a
 			href="{{ path('app_download_file', { 'uploadId': uploadId }) }}" class="btn btn-link"
-			target="_blank">
+			target="_blank"
+			data-turbo-frame="_top">
 			{{ upload.filename }}
 		</a>
 		<div
@@ -25,7 +26,7 @@
 			{% if upload.validation is not empty %}
 				{% if upload.validated is same as(false) %}
 					<a
-						href="{{path('app_validation', {'uploadId' : uploadId} )}}">
+						href="{{path('app_validation', {'uploadId' : uploadId} )}}" data-turbo-frame="_top">
 						Refusé
 					</a>
 
@@ -41,12 +42,14 @@
 			{{ upload.uploadedAt|date('d/m/Y') }}
 			{% if is_granted('ROLE_LINE_ADMIN') %}
 				<a
-					href="{{ path('app_modify_file', {'uploadId': uploadId}) }}" class="btn btn-modify shadow ">
+					href="{{ path('app_modify_file', {'uploadId': uploadId}) }}" class="btn btn-modify shadow "
+					data-turbo-frame="_top">
 					Modifier
 				</a>
 
 				<a
-					href="{{ path('app_delete_file', { 'uploadId': uploadId }) }}" class="btn btn-danger delete-upload shadow">
+					href="{{ path('app_delete_file', { 'uploadId': uploadId }) }}" class="btn btn-danger delete-upload shadow"
+					data-turbo-frame="_top">
 					Supprimer
 				</a>
 			{% endif %}

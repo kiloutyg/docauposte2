@@ -48,19 +48,8 @@ class SuperAdminController extends AbstractController
     {
         $pageLevel = 'super';
 
-        $uploads = $this->entityManagerFacade->getAllUploadsWithAssociations();
-        $incidents = $this->entityManagerFacade->getIncidents();
-
-        $uploadsArray = $this->contentManagerFacade->groupAllUploads($uploads);
-        $groupedUploads = $uploadsArray[0];
-        $groupedValidatedUploads = $uploadsArray[1];
-        $groupIncidents = $this->contentManagerFacade->groupIncidents($incidents);
-
         return $this->render('admin_template/admin_index.html.twig', [
             'pageLevel'                 => $pageLevel,
-            'groupedUploads'            => $groupedUploads,
-            'groupedValidatedUploads'   => $groupedValidatedUploads,
-            'groupincidents' => $groupIncidents,
             'zones'                     => $this->entityManagerFacade->getZones(),
         ]);
     }
@@ -146,6 +135,20 @@ class SuperAdminController extends AbstractController
     }
 
     // A route that use a method to revalid automatically every training records of a certain date
+    /**
+     * Automatically revalidates all training records for a specific upload.
+     *
+     * This method provides a way for super administrators to automatically revalidate
+     * all training records associated with a particular upload ID. It checks for proper
+     * authorization before executing the operation and redirects appropriately based
+     * on the user's permissions.
+     *
+     * @param int $uploadId The unique identifier of the upload whose training records
+     *                      should be automatically revalidated
+     *
+     * @return Response A Symfony Response object that redirects to the super admin dashboard
+     *                  if authorized, or to the login page if access is denied
+     */
     #[Route('superadmin/cheattrain/{uploadId}', name: 'app_super_admin_cheat_train')]
     public function cheatTrain(int $uploadId)
     {

@@ -15,6 +15,7 @@
 	<div
 		class="row align-items-center">
 		{% if pageLevel is same as('super') %}
+			{% set entityId = null %}
 			<h1
 				class="my-4">
 				<strong>
@@ -22,6 +23,8 @@
 				</strong>
 			</h1>
 		{% elseif pageLevel is same as('zone') %}
+			{% set entityId = zone.id %}
+
 			{% if  is_granted('ROLE_SUPER_ADMIN') %}
 				<div
 					class='my-3'>
@@ -72,6 +75,8 @@
 				</strong>
 			</h1>
 		{% elseif pageLevel is same as('productLine') %}
+			{% set entityId = productLine.id %}
+
 			{% if is_granted('ROLE_ADMIN') %}
 				<div
 					class='my-3'>
@@ -120,10 +125,12 @@
 						{% endfor %}
 					</ul>
 					de la Zone
-					{{productLine.zone.name|split('.')|first|upper}}
+					{{zone.name|split('.')|first|upper}}
 				</strong>
 			</h1>
 		{% elseif pageLevel is same as('category') %}
+			{% set entityId = category.id %}
+
 			{% if  is_granted('ROLE_LINE_ADMIN') %}
 				<div
 					class='my-3'>
@@ -184,7 +191,6 @@
 			{% if pageLevel is same as('super')  %}
 				{{ render_esi(controller('App\\Controller\\Support\\SettingsController::settingsIndex'), options = []) }}
 				{% include "admin_template/admin_template_components/zone_creation_form.html.twig" %}
-				{# {{ render_esi(controller('App\\Controller\\Security\\AccountController::createAccountController')) }} #}
 
 				<turbo-frame
 					id="create-account"
@@ -208,17 +214,28 @@
 			{% include "services/uploads/upload.html.twig" %}
 
 			{% if is_granted('ROLE_LINE_ADMIN') %}
-				{% if is_granted('ROLE_SUPER_ADMIN') %}
-					{{ render(controller('App\\Controller\\Document\\IncidentController::incidentManagementView'), options = []) }}
-				{% else %}
-					{% include "services/incident/incident.html.twig" %}
-				{% endif %}
+				<turbo-frame
+					id="incident_management_view"
+					src="{{ path('app_incident_management_view', { parentEntityType: pageLevel, entityId: entityId }) }}" data-accordion-frame-manager-target="turboFrame"
+					loading="lazy">
+					{{ loading.content_placeholder('text', 2, '90%') }}
+				</turbo-frame>
 			{% endif %}
 
-			{% include "services/uploads/uploaded_list.html.twig" %}
+			<turbo-frame
+				id="uploaded-list"
+				src="{{ path('app_uploaded_list', { parentEntityType: pageLevel, entityId: entityId }) }}" data-accordion-frame-manager-target="turboFrame"
+				loading="lazy">
+				{{ loading.content_placeholder('text', 2, '90%') }}
+			</turbo-frame>
 
 			{% if settings.IsUploadValidation %}
-				{% include "services/validation/validation_list.html.twig" %}
+				<turbo-frame
+					id="validation-list"
+					src="{{ path('app_validation_list', { parentEntityType: pageLevel, entityId: entityId }) }}" data-accordion-frame-manager-target="turboFrame"
+					loading="lazy">
+					{{ loading.content_placeholder('text', 2, '90%') }}
+				</turbo-frame>
 			{% endif %}
 
 		</div>
