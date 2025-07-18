@@ -31,12 +31,13 @@
 					Type d'incident:
 					{{ incident.incidentCategory.name|split('.')|first|upper }}
 				</p>
-				<iframe
-					title="incident-file-display-for-modification"
-					src="{{ path('app_incident_download_file', { 'incidentId': incident.id }) }}" width="69%"
-					height="950"
-					target="_blank"></iframe>
-
+				<div
+					class="ratio ratio-4x3">
+					<iframe
+						title="incident-file-display-for-modification"
+						src="{{ path('app_incident_download_file', { 'incidentId': incident.id }) }}" 
+						target="_blank"></iframe>
+				</div>
 
 				{{ form_start(form, {'attr': {'class': 'form-floating justify-content-center', 'id': 'modifyIncidentForm','method' : 'POST', 'enctype': 'multipart/form-data'}, 'action': path('app_incident_modify_file', {'incidentId': incident.id})}) }}
 				<div

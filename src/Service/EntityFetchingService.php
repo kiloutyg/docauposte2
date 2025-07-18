@@ -13,14 +13,11 @@ use Psr\Log\LoggerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-use Symfony\Contracts\Cache\CacheInterface;
-
 
 class EntityFetchingService extends AbstractController
 {
     private $logger;
 
-    private $cache;
 
     private $repositoryFactory;
 
@@ -31,19 +28,14 @@ class EntityFetchingService extends AbstractController
      * and repository access.
      *
      * @param LoggerInterface $logger The logger service for recording application events
-     * @param CacheInterface $cache The cache service for storing and retrieving cached data
      * @param RepositoryFactory $repositoryFactory Factory service to create and access entity repositories
      */
     public function __construct(
         LoggerInterface                 $logger,
 
-        CacheInterface                  $cache,
-
         RepositoryFactory               $repositoryFactory,
     ) {
         $this->logger                       = $logger;
-
-        $this->cache                        = $cache;
 
         $this->repositoryFactory            = $repositoryFactory;
     }
@@ -63,13 +55,28 @@ class EntityFetchingService extends AbstractController
     }
 
 
-    public function getDepartments()
+    /**
+     * Retrieves all departments from the database.
+     *
+     * This method fetches all department entities from the database and returns them as an array.
+     *
+     * @return array An array of Department entities
+     */
+    public function getDepartments(): array
     {
         return $this->findAll('department');
     }
 
 
-    public function getZones()
+    /**
+     * Retrieves all zones from the database sorted by SortOrder in ascending order.
+     *
+     * This method uses the findBy method from the EntityFetchingService to fetch all zones
+     * from the database. The zones are sorted by the SortOrder field in ascending order.
+     *
+     * @return array An array of Zone entities sorted by SortOrder in ascending order
+     */
+    public function getZones(): array
     {
         return $this->findBy(entityType: 'zone', criteria: [], orderBy: ['SortOrder' => 'ASC']);
     }

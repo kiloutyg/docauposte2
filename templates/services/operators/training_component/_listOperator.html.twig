@@ -74,14 +74,14 @@
 		</p>
 	</form>
 {% else %}
-	{% include 'services/operators/training_component/_listOperatorPart_approbator_listing.html.twig' %}
 
-	<p
-		style="flex:1;"
-		class=" mx-2 mt-2 card text-center">
-		Liste de tous les UAP et équipes confondus. Pour modifier ces informations, veuillez sélectionner une équipe et un UAP.
-	</p>
 	{% if trainingRecords is defined and trainingRecords is not empty %}
+		{% include 'services/operators/training_component/_listOperatorPart_approbator_listing.html.twig' %}
+		<p
+			style="flex:1;"
+			class=" mx-2 mt-2 card text-center">
+			Liste de tous les UAP et équipes confondus. Pour modifier ces informations, veuillez sélectionner une équipe et un UAP.
+		</p>
 		<p
 			style="flex:1;"
 			class="  mt-2 mx-2 card text-center">
@@ -115,6 +115,7 @@
 
 			{% endif %}
 		{% endfor %}
+
 	{% else %}
 		{% include 'services/operators/training_component/_listOperatorPart_approbator_listing.html.twig' %}
 

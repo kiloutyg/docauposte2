@@ -13,10 +13,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-use Symfony\UX\Turbo\Attribute\Broadcast;
 
 #[ORM\Entity(repositoryClass: ProductLineRepository::class)]
-#[Broadcast]
 class ProductLine
 {
     #[ORM\Id]

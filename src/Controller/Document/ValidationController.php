@@ -14,8 +14,6 @@ use Symfony\Component\HttpFoundation\File\File;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-use App\Repository\UserRepository;
-
 use App\Form\UploadType;
 
 use App\Service\Upload\UploadModificationService;
@@ -30,10 +28,6 @@ class ValidationController extends AbstractController
 {
 
     private $logger;
-
-    // Repository methods
-    private $userRepository;
-
 
     // Services methods
     private $validationService;
@@ -50,10 +44,6 @@ class ValidationController extends AbstractController
 
         LoggerInterface                 $logger,
 
-        // Repository methods
-        UserRepository                  $userRepository,
-
-
         // Services methods
         ValidationService               $validationService,
         UploadModificationService       $uploadModificationService,
@@ -64,9 +54,6 @@ class ValidationController extends AbstractController
 
     ) {
         $this->logger                       = $logger;
-
-        // Variables related to the repositories
-        $this->userRepository               = $userRepository;
 
         // Variables related to the services
         $this->validationService            = $validationService;
@@ -80,6 +67,19 @@ class ValidationController extends AbstractController
 
 
 
+    /**
+     * Displays the validation page for a specific upload file.
+     *
+     * This function retrieves an upload record by its ID and renders the validation page
+     * where users can view and validate the document. If the file has already been validated,
+     * the user is redirected back to the previous page with an error message.
+     *
+     * @param int $uploadId The ID of the upload record to display for validation
+     * @param Request $request The HTTP request object containing headers and other request data
+     *
+     * @return Response A Symfony Response object that either renders the validation page
+     *                  or redirects to the previous page if the file is already validated
+     */
     #[Route('/validation/{uploadId}', name: 'app_validation')]
     public function validationViewBasePage(
         int $uploadId,
@@ -99,8 +99,24 @@ class ValidationController extends AbstractController
         ]);
     }
 
+    /**
+     * Displays a list of validated files for a specific parent entity or all entities.
+     *
+     * This function retrieves and displays validated uploads either for a specific parent entity
+     * or for all entities when the parent entity type is 'super'. The uploads are grouped and
+     * filtered to show only validated files in a list format.
+     *
+     * @param string $parentEntityType The type of the parent entity to filter uploads by.
+     *                                 Use 'super' to retrieve all uploads regardless of parent entity.
+     * @param int|null $entityId The ID of the specific parent entity to filter uploads by.
+     *                           This parameter is ignored when parentEntityType is 'super'.
+     *                           Defaults to null if not provided.
+     *
+     * @return Response A Symfony Response object that renders the validation list page
+     *                  containing the grouped validated uploads for the specified entity
+     */
     #[Route('/validation_list/{parentEntityType}/{entityId}', name: 'app_validation_list')]
-    public function uploadedFiles(string $parentEntityType, ?int $entityId = null): Response
+    public function validationsFilesList(string $parentEntityType, ?int $entityId = null): Response
     {
         $entityIdInt = (int) $entityId;
         if ($parentEntityType === 'super') {
@@ -110,10 +126,10 @@ class ValidationController extends AbstractController
             $uploads = $this->entityManagerFacade->uploadsByParentEntity(entityType: $parentEntityType, entity: $entity);
         }
         $uploadsArray = $this->contentManagerFacade->groupAllUploads(uploads: $uploads);
-        $groupedUploads = $uploadsArray[0];
+        $groupedValidatedUploads = $uploadsArray[1];
         return $this->render(
-            'services/uploads/uploaded_list.html.twig',
-            ['groupedUploads' => $groupedUploads]
+            'services/validation/validation_list.html.twig',
+            ['groupedValidatedUploads' => $groupedValidatedUploads]
         );
     }
 

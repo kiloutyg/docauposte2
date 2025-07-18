@@ -5,12 +5,10 @@ namespace App\Entity;
 use App\Repository\TrainingRecordRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\UX\Turbo\Attribute\Broadcast;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TrainingRecordRepository::class)]
-#[Broadcast]
 #[UniqueConstraint(name: 'unique_training_records_by_operator_upload_couple', columns: ['upload_id', 'operator_id'])]
 class TrainingRecord
 {
