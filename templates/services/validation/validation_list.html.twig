@@ -1,154 +1,157 @@
-{% block body %}
-	<div
-		class="accordion-item">
-		<h2
-			class="accordion-header"
-			id="headingValidatedList">
-			<button
-				class="accordion-button fs-3 collapsed"
-				type="button"
-				data-bs-toggle="collapse"
-				data-bs-target="#collapseValidatedList"
-				aria-expanded="false"
-				aria-controls="collapseValidatedList">
-				<strong>
-					Liste des validations :
-				</strong>
-			</button>
-		</h2>
+<turbo-frame
+	id='validation-list'>
+	{% block body %}
 		<div
-			id="collapseValidatedList"
-			class="accordion-collapse collapse"
-			aria-labelledby="headingValidatedList"
-			data-bs-parent="#accordionAdmin">
+			class="accordion-item">
+			<h2
+				class="accordion-header"
+				id="headingValidatedList">
+				<button
+					class="accordion-button fs-3 collapsed"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#collapseValidatedList"
+					aria-expanded="false"
+					aria-controls="collapseValidatedList">
+					<strong>
+						Liste des validations :
+					</strong>
+				</button>
+			</h2>
 			<div
-				class="accordion-body accordion-bg shadow shadow-inset">
+				id="collapseValidatedList"
+				class="accordion-collapse collapse"
+				aria-labelledby="headingValidatedList"
+				data-bs-parent="#accordionAdmin">
 				<div
-					class="row">
-					<div>
-						{% if (groupedValidatedUploads is defined) and (groupedValidatedUploads is not empty ) %}
-							<div
-								class="accordion col-11 mx-auto justify-content-center"
-								id="accordionValidationList">
+					class="accordion-body accordion-bg shadow shadow-inset">
+					<div
+						class="row">
+						<div>
+							{% if (groupedValidatedUploads is defined) and (groupedValidatedUploads is not empty ) %}
+								<div
+									class="accordion col-11 mx-auto justify-content-center"
+									id="accordionValidationList">
 
-								{% set outerIndex = 0 %}
-								{% for zoneName, zoneKey in groupedValidatedUploads %}
-									{% set outerIndex = outerIndex + 1 %}
-									<div
-										class="accordion-item shadow-lg shadow-lg-inset border border-dark">
-										<h2
-											class="accordion-header"
-											id="headingZoneValidationList{{ outerIndex }}">
-											<button
-												class="accordion-button collapsed"
-												type="button"
-												data-bs-toggle="collapse"
-												data-bs-target="#collapseZoneValidationList{{ outerIndex }}"
-												aria-expanded="false"
-												aria-controls="collapseZoneValidationList{{ outerIndex }}">
-												Zone:
-												{{ zoneName|split('.')|first|upper }}
-											</button>
-										</h2>
+									{% set outerIndex = 0 %}
+									{% for zoneName, zoneKey in groupedValidatedUploads %}
+										{% set outerIndex = outerIndex + 1 %}
 										<div
-											id="collapseZoneValidationList{{ outerIndex }}"
-											class="accordion-collapse collapse"
-											aria-labelledby="headingZoneValidationList{{ outerIndex }}"
-											data-bs-parent="#accordionValidationList">
+											class="accordion-item shadow-lg shadow-lg-inset border border-dark">
+											<h2
+												class="accordion-header"
+												id="headingZoneValidationList{{ outerIndex }}">
+												<button
+													class="accordion-button collapsed"
+													type="button"
+													data-bs-toggle="collapse"
+													data-bs-target="#collapseZoneValidationList{{ outerIndex }}"
+													aria-expanded="false"
+													aria-controls="collapseZoneValidationList{{ outerIndex }}">
+													Zone:
+													{{ zoneName|split('.')|first|upper }}
+												</button>
+											</h2>
 											<div
-												class="accordion-body">
-												{% set middleIndex = 0 %}
-												{% for productLineName, productLineKey in zoneKey %}
-													{% set middleIndex = middleIndex + 1 %}
-													<div
-														class="accordion"
-														id="productLineAccordionValidationList{{ outerIndex }}{{ middleIndex }}">
+												id="collapseZoneValidationList{{ outerIndex }}"
+												class="accordion-collapse collapse"
+												aria-labelledby="headingZoneValidationList{{ outerIndex }}"
+												data-bs-parent="#accordionValidationList">
+												<div
+													class="accordion-body">
+													{% set middleIndex = 0 %}
+													{% for productLineName, productLineKey in zoneKey %}
+														{% set middleIndex = middleIndex + 1 %}
 														<div
-															class="accordion-item">
-															<h2
-																class="accordion-header"
-																id="headingProductLineValidationList{{ outerIndex }}{{ middleIndex }}">
-																<button
-																	class="accordion-button collapsed"
-																	type="button"
-																	data-bs-toggle="collapse"
-																	data-bs-target="#collapseProductLineValidationList{{ outerIndex }}{{ middleIndex }}"
-																	aria-expanded="false"
-																	aria-controls="collapseProductLineValidationList{{ outerIndex }}{{ middleIndex }}">
-																	Produit:
-																	{{ productLineName|split('.')|first|upper }}
-																</button>
-															</h2>
+															class="accordion"
+															id="productLineAccordionValidationList{{ outerIndex }}{{ middleIndex }}">
 															<div
-																id="collapseProductLineValidationList{{ outerIndex }}{{ middleIndex }}"
-																class="accordion-collapse collapse"
-																aria-labelledby="headingProductLineValidationList{{ outerIndex }}{{ middleIndex }}"
-																data-bs-parent="#collapseZoneValidationList{{ outerIndex }}">
+																class="accordion-item">
+																<h2
+																	class="accordion-header"
+																	id="headingProductLineValidationList{{ outerIndex }}{{ middleIndex }}">
+																	<button
+																		class="accordion-button collapsed"
+																		type="button"
+																		data-bs-toggle="collapse"
+																		data-bs-target="#collapseProductLineValidationList{{ outerIndex }}{{ middleIndex }}"
+																		aria-expanded="false"
+																		aria-controls="collapseProductLineValidationList{{ outerIndex }}{{ middleIndex }}">
+																		Produit:
+																		{{ productLineName|split('.')|first|upper }}
+																	</button>
+																</h2>
 																<div
-																	class="accordion-body">
-																	{% set innerIndex = 0 %}
-																	{% for categoryName, categoryKey in productLineKey %}
-																		{% set innerIndex = innerIndex + 1 %}
-																		<div
-																			class="accordion"
-																			id="categoryAccordionValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
+																	id="collapseProductLineValidationList{{ outerIndex }}{{ middleIndex }}"
+																	class="accordion-collapse collapse"
+																	aria-labelledby="headingProductLineValidationList{{ outerIndex }}{{ middleIndex }}"
+																	data-bs-parent="#collapseZoneValidationList{{ outerIndex }}">
+																	<div
+																		class="accordion-body">
+																		{% set innerIndex = 0 %}
+																		{% for categoryName, categoryKey in productLineKey %}
+																			{% set innerIndex = innerIndex + 1 %}
 																			<div
-																				class="accordion-item">
-																				<h2
-																					class="accordion-header"
-																					id="headingCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
-																					<button
-																						class="accordion-button collapsed"
-																						type="button"
-																						data-bs-toggle="collapse"
-																						data-bs-target="#collapseCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}"
-																						aria-expanded="false"
-																						aria-controls="collapseCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
-																						Catégorie:
-																						{{ categoryName|split('.')|first|upper }}
-																					</button>
-																				</h2>
+																				class="accordion"
+																				id="categoryAccordionValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
 																				<div
-																					id="collapseCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}"
-																					class="accordion-collapse collapse"
-																					aria-labelledby="headingCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}"
-																					data-bs-parent="#collapseProductLineValidationList{{ outerIndex }}{{ middleIndex }}">
+																					class="accordion-item">
+																					<h2
+																						class="accordion-header"
+																						id="headingCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
+																						<button
+																							class="accordion-button collapsed"
+																							type="button"
+																							data-bs-toggle="collapse"
+																							data-bs-target="#collapseCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}"
+																							aria-expanded="false"
+																							aria-controls="collapseCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}">
+																							Catégorie:
+																							{{ categoryName|split('.')|first|upper }}
+																						</button>
+																					</h2>
 																					<div
-																						class="accordion-body">
-																						{% for buttonName, buttonKey in categoryKey %}
-																							<strong>
-																								Bouton:
-																							</strong>
-																							{{ buttonName|split('.')|first|upper }}
-																							{% include "services/validation/validation_list_components/validation_list_button_component.html.twig" %}
-																						{% endfor %}
+																						id="collapseCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}"
+																						class="accordion-collapse collapse"
+																						aria-labelledby="headingCategoryValidationList{{ outerIndex }}{{ middleIndex }}{{ innerIndex }}"
+																						data-bs-parent="#collapseProductLineValidationList{{ outerIndex }}{{ middleIndex }}">
+																						<div
+																							class="accordion-body">
+																							{% for buttonName, buttonKey in categoryKey %}
+																								<strong>
+																									Bouton:
+																								</strong>
+																								{{ buttonName|split('.')|first|upper }}
+																								{% include "services/validation/validation_list_components/validation_list_button_component.html.twig" %}
+																							{% endfor %}
+																						</div>
 																					</div>
 																				</div>
 																			</div>
-																		</div>
-																	{% endfor %}
+																		{% endfor %}
+																	</div>
 																</div>
 															</div>
 														</div>
-													</div>
-												{% endfor %}
+													{% endfor %}
+												</div>
 											</div>
 										</div>
-									</div>
-								{% endfor %}
-							</div>
-						{% else %}
-							<div
-								class="alert alert-danger">
-								<a
-									href="{{path('app_base')}}">
-									Il n'y a pas de documents disponible
-								</a>
-							</div>
-						{% endif %}
+									{% endfor %}
+								</div>
+							{% else %}
+								<div
+									class="alert alert-danger">
+									<a
+										href="{{path('app_base')}}">
+										Il n'y a pas de documents disponible
+									</a>
+								</div>
+							{% endif %}
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-{% endblock %}
+	{% endblock %}
+</turbo-frame>

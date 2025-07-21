@@ -31,26 +31,26 @@ class EntityManagerFacade
         return $this->em;
     }
 
-    public function find(string $entityType, int $id)
+    public function find(string $entityType, int $id): mixed
     {
         return $this->entityFetchingService->find($entityType, $id);
     }
 
-    public function findBy(string $entityType, array $criteria)
+    public function findBy(string $entityType, array $criteria): mixed
     {
         return $this->entityFetchingService->findBy(entityType: $entityType, criteria: $criteria);
     }
-    public function findOneBy(string $entityType, array $criteria)
+    public function findOneBy(string $entityType, array $criteria): mixed
     {
         return $this->entityFetchingService->findOneBy($entityType, $criteria);
     }
 
-    public function count(string $entityType, array $criteria)
+    public function count(string $entityType, array $criteria): mixed
     {
         return $this->entityFetchingService->count($entityType, $criteria);
     }
 
-    public function deleteEntity(string $entityType, int $id)
+    public function deleteEntity(string $entityType, int $id): bool|string
     {
         return $this->entityDeletionService->deleteEntity($entityType, $id);
     }
@@ -60,12 +60,12 @@ class EntityManagerFacade
         return $this->entityDeletionService->deleteFile($id);
     }
 
-    public function uploadsByParentEntity(string $entityType, $entity)
+    public function uploadsByParentEntity(string $entityType, ?object $entity = null): array
     {
         return $this->entityHeritanceService->uploadsByParentEntity($entityType, $entity);
     }
 
-    public function incidentsByParentEntity(string $entityType, $entity)
+    public function incidentsByParentEntity(string $entityType, ?object $entity = null): array
     {
         return $this->entityHeritanceService->incidentsByParentEntity($entityType, $entity);
     }

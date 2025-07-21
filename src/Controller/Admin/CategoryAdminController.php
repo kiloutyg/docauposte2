@@ -36,6 +36,18 @@ class CategoryAdminController extends AbstractController
         $this->errorService = $errorService;
     }
 
+    /**
+     * Displays the category administration page with category details and related entities.
+     *
+     * This method renders the admin interface for a specific category, showing its buttons,
+     * associated product line, and all categories within that product line. If no category
+     * object is provided, it attempts to find the category by ID.
+     *
+     * @param int|null $categoryId The ID of the category to display. Can be null if category object is provided.
+     * @param Category|null $category The category entity object. If null, will be fetched using categoryId.
+     *
+     * @return Response The rendered admin template with category data and related entities.
+     */
     #[Route('/{categoryId}', name: 'admin')]
     public function categoryAdmin(?int $categoryId = null, ?Category $category = null): Response
     {
@@ -49,29 +61,10 @@ class CategoryAdminController extends AbstractController
 
         $categoryButtons        = $category->getButtons();
         $productLine            = $category->getProductLine();
-        $zone                   = $productLine->getZone();
         $productLineCategories  = $productLine->getCategories();
-
-        $uploads = $this->entityManagerFacade->uploadsByParentEntity(
-            'category',
-            $category
-        );
-        $incidents = $this->entityManagerFacade->incidentsByParentEntity(
-            'category',
-            $category
-        );
-
-        $uploadsArray = $this->contentManagerFacade->groupAllUploads($uploads);
-        $groupedUploads = $uploadsArray[0];
-        $groupedValidatedUploads = $uploadsArray[1];
-        $groupIncidents = $this->contentManagerFacade->groupIncidents($incidents);
 
         return $this->render('admin_template/admin_index.html.twig', [
             'pageLevel'                 => $pageLevel,
-            'groupedUploads'            => $groupedUploads,
-            'groupedValidatedUploads'   => $groupedValidatedUploads,
-            'groupincidents'            => $groupIncidents,
-            'zone'                      => $zone,
             'productLine'               => $productLine,
             'category'                  => $category,
             'categoryButtons'           => $categoryButtons,
@@ -79,6 +72,21 @@ class CategoryAdminController extends AbstractController
         ]);
     }
 
+
+
+    /**
+     * Creates a new button within a specified category.
+     *
+     * This method handles the creation of a new button entity by validating the button name,
+     * checking for duplicates, and persisting the new button to the database. The button name
+     * is automatically prefixed with the category name. It also creates the necessary folder
+     * structure for the button and provides user feedback through flash messages.
+     *
+     * @param Request $request The HTTP request object containing the button name in POST data
+     * @param int|null $categoryId The ID of the category where the button will be created. Can be null.
+     *
+     * @return Response A redirect response to the category admin page with appropriate flash messages
+     */
     #[Route('/create_button/{categoryId}', name: 'admin_create_button')]
     public function createButton(Request $request, ?int $categoryId = null)
     {
@@ -114,6 +122,18 @@ class CategoryAdminController extends AbstractController
         }
     }
 
+    /**
+     * Deletes a button entity from the system.
+     *
+     * This method handles the deletion of a button entity by first checking if the current user
+     * has the required ROLE_LINE_ADMIN permission. If authorized, it attempts to delete the button
+     * and provides appropriate feedback through flash messages. The user is redirected back to
+     * the category admin page regardless of the operation outcome.
+     *
+     * @param int $buttonId The unique identifier of the button to be deleted
+     *
+     * @return Response A redirect response to the category admin page with success, error, or danger flash messages
+     */
     #[Route('/delete_button/{buttonId}', name: 'admin_delete_button')]
     public function deleteEntityButton(int $buttonId): Response
     {

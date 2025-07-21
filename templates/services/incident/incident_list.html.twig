@@ -87,12 +87,14 @@
 																<div
 																	class="d-flex flex-wrap gap-2">
 																	<a
-																		href="{{ path('app_incident_modify_file', {'incidentId': incident.id}) }}" class="btn btn-modify shadow">
+																		href="{{ path('app_incident_modify_file', {'incidentId': incident.id}) }}" class="btn btn-modify shadow"
+																		data-turbo-frame="_top">
 																		Modifier
 																	</a>
 																	{% if is_granted('ROLE_ADMIN') %}
 																		<a
-																			href="{{ path('app_incident_delete_file', { 'incidentId': incident.id }) }}" class="btn btn-danger shadow delete-incident">
+																			href="{{ path('app_incident_delete_file', { 'incidentId': incident.id }) }}" class="btn btn-danger shadow delete-incident"
+																			data-turbo-frame="_top">
 																			Supprimer
 																		</a>
 																	{% endif %}

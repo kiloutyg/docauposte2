@@ -39,8 +39,24 @@ class ProductLineAdminController extends AbstractController
     }
 
 
+    /**
+     * Displays the product line administration interface.
+     *
+     * This method renders the main administration page for a specific product line,
+     * providing access to manage categories and other product line-related entities.
+     * It retrieves the product line entity either from the provided parameter or by
+     * fetching it from the database using the product line ID. If the product line
+     * is not found, it redirects to an error page.
+     *
+     * @param int|null $productLineId The unique identifier of the product line to display.
+     *                                If null, the productLine parameter must be provided.
+     * @param ProductLine|null $productLine The product line entity object. If provided,
+     *                                      it takes precedence over productLineId parameter.
+     *
+     * @return Response A rendered response containing the product line admin interface
+     *                  or an error redirect if the product line is not found.
+     */
     #[Route('/{productLineId}', name: 'admin')]
-    // This function is responsible for rendering the productLine's admin interface
     public function productLineAdmin(?int $productLineId = null, ?ProductLine $productLine = null): Response
     {
         $pageLevel = 'productLine';
@@ -51,41 +67,32 @@ class ProductLineAdminController extends AbstractController
         if (!$productLine) {
             return $this->errorService->errorRedirectByOrgaEntityType($pageLevel);
         }
-
         $zone = $productLine->getZone();
-        $zoneProductLines = $zone->getProductLines();
-
-        // Get all the uploads and incidents related to the productLine
-        $uploads = $this->entityManagerFacade->uploadsByParentEntity(
-            'productLine',
-            $productLine
-        );
-        $incidents = $this->entityManagerFacade->incidentsByParentEntity(
-            'productLine',
-            $productLine
-        );
-
-        // Group the uploads and incidents by parents entity
-        $uploadsArray = $this->contentManagerFacade->groupAllUploads($uploads);
-        $groupedUploads = $uploadsArray[0];
-        $groupedValidatedUploads = $uploadsArray[1];
-        $groupIncidents = $this->contentManagerFacade->groupIncidents($incidents);
-
         return $this->render('admin_template/admin_index.html.twig', [
             'pageLevel'                 => $pageLevel,
-            'groupedUploads'            => $groupedUploads,
-            'groupedValidatedUploads'   => $groupedValidatedUploads,
-            'groupincidents'            => $groupIncidents,
             'zone'                      => $zone,
             'productLine'               => $productLine,
-            'incidentCategories'        => $this->entityManagerFacade->getIncidentCategories(),
-            'zoneProductLines'          => $zoneProductLines
+            'zoneProductLines'          => $zone->getProductLines()
         ]);
     }
 
 
 
     // This function will create a new category
+    /**
+     * Creates a new category within a specified product line.
+     *
+     * This method handles the creation of a new category entity by validating the category name,
+     * checking for duplicates, and persisting the new category to the database. The category name
+     * is automatically prefixed with the product line name and validated to ensure it doesn't
+     * contain dots. If successful, it also creates the corresponding folder structure and redirects
+     * back to the product line admin interface with appropriate flash messages.
+     *
+     * @param Request $request The HTTP request object containing the category name in the request data
+     * @param int|null $productLineId The unique identifier of the product line where the category will be created
+     *
+     * @return Response A redirect response to the product line admin page with success/error flash messages
+     */
     #[Route('/create_category/{productLineId}', name: 'admin_create_category')]
     public function createCategory(Request $request, ?int $productLineId = null)
     {
@@ -128,8 +135,19 @@ class ProductLineAdminController extends AbstractController
 
 
 
+    /**
+     * Deletes a category and all of its children entities from the system.
+     *
+     * This method handles the deletion of a category entity, including proper authorization
+     * checks and cascade deletion of related child entities. Only users with ROLE_LINE_ADMIN
+     * privileges are authorized to perform this operation. After deletion, the user is
+     * redirected back to the product line admin interface with appropriate flash messages.
+     *
+     * @param int $categoryId The unique identifier of the category to be deleted
+     *
+     * @return Response A redirect response to the product line admin page with success/error flash messages
+     */
     #[Route('/delete_category/{categoryId}', name: 'admin_delete_category')]
-    // This function will delete a category and all of its children entities, it depends on the entitydeletionService
     public function deleteEntityCategory(int $categoryId): Response
     {
         $entityType = 'category';

@@ -39,7 +39,19 @@ class ZoneAdminController extends AbstractController
         $this->errorService = $errorService;
     }
 
-    // This function is responsible for rendering the zone admin interface
+
+    /**
+     * Renders the zone administration interface with zone details and product lines.
+     *
+     * This method displays the admin interface for a specific zone, including all zones
+     * for navigation and the product lines associated with the current zone. If no zone
+     * is found, it redirects to an error page.
+     *
+     * @param int|null $zoneId The ID of the zone to display. Can be null if zone object is provided.
+     * @param Zone|null $zone The zone entity object. If null, will be fetched using zoneId.
+     *
+     * @return Response The rendered admin template with zone data or error redirect response.
+     */
     #[Route('/{zoneId}', name: 'admin')]
     public function zoneAdmin(?int $zoneId = null, ?Zone $zone = null): Response
     {
@@ -51,37 +63,33 @@ class ZoneAdminController extends AbstractController
             return $this->errorService->errorRedirectByOrgaEntityType($pageLevel);
         }
 
-        $productLines = $zone->getProductLines();
-
-        $uploads = $this->entityManagerFacade->uploadsByParentEntity('zone', $zone);
-        $incidents = $this->entityManagerFacade->incidentsByParentEntity('zone', $zone);
-
-        // Group the uploads and incidents by parent entity
-        $uploadsArray = $this->contentManagerFacade->groupAllUploads($uploads);
-        $groupedUploads = $uploadsArray[0];
-        $groupedValidatedUploads = $uploadsArray[1];
-        $groupIncidents = $this->contentManagerFacade->groupIncidents($incidents);
-
-
         return $this->render('admin_template/admin_index.html.twig', [
             'pageLevel'                 => $pageLevel,
-            'groupedUploads'            => $groupedUploads,
-            'groupedValidatedUploads'   => $groupedValidatedUploads,
-            'groupincidents'            => $groupIncidents,
             'zones'                     => $this->entityManagerFacade->getZones(),
-            'incidentCategories'        => $this->entityManagerFacade->getIncidentCategories(),
             'zone'                      => $zone,
-            'zoneProductLines'          => $productLines,
+            'zoneProductLines'          => $zone->getProductLines(),
         ]);
     }
 
 
 
-    // Creation of new productLine
+
+    /**
+     * Creates a new product line within a specified zone.
+     *
+     * This method handles the creation of a new product line by validating the input,
+     * checking for duplicates, and persisting the new entity to the database. It also
+     * creates the corresponding folder structure and provides user feedback through
+     * flash messages.
+     *
+     * @param Request $request The HTTP request object containing the product line name in POST data
+     * @param int|null $zoneId The ID of the zone where the product line will be created. Can be null.
+     *
+     * @return Response A redirect response to the zone admin page with appropriate flash messages
+     */
     #[Route('/create_productline/{zoneId}', name: 'admin_create_productline')]
     public function createProductLine(Request $request, ?int $zoneId = null): Response
     {
-
         if (!preg_match("/^[^.]+$/", $request->request->get('productLineName'))) {
             // Handle the case when productlinne name contains disallowed characters
             $this->addFlash('danger', 'Nom de ligne de produit invalide');
@@ -119,7 +127,22 @@ class ZoneAdminController extends AbstractController
     }
 
 
+
+
     // Delete a productLine and all its children entities, it depends on the entitydeletionService
+    /**
+     * Deletes a product line and all its associated child entities.
+     *
+     * This method handles the deletion of a product line by first checking if the current user
+     * has the required permissions (ROLE_LINE_ADMIN). If authorized, it deletes the product line
+     * and all its related entities through the EntityDeletionService. The corresponding folder
+     * structure is also removed. Appropriate flash messages are displayed based on the operation
+     * result, and the user is redirected back to the zone admin page.
+     *
+     * @param int $productLineId The unique identifier of the product line to be deleted
+     *
+     * @return Response A redirect response to the zone admin page with success, error, or danger flash messages
+     */
     #[Route('/delete_productline/{productLineId}', name: 'admin_delete_productline')]
     public function deleteEntityProductLine(int $productLineId): Response
     {
