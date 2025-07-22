@@ -68,7 +68,6 @@ class EntityDeletionController extends AbstractController
             $return = $this->redirect($request->headers->get('referer'));
         }
 
-
         $form = $this->createForm(EntityDeletionType::class, null, [
             'entityType' => $entityType,
             'entityId' => $entityId,

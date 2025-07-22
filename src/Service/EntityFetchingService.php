@@ -296,29 +296,25 @@ class EntityFetchingService extends AbstractController
         foreach ($uploads as $upload) {
 
             $button = $upload->getButton();
-            if (!$button) {
-                continue;
+            if ($button) {
+                $buttonName = $button->getName();
             }
 
             $category = $button->getCategory();
-            if (!$category) {
-                continue;
+            if ($category) {
+                $categoryName = $category->getName();
             }
 
             $productLine = $category->getProductLine();
-            if (!$productLine) {
-                continue;
+            if ($productLine) {
+                $productLineName = $productLine->getName();
             }
 
             $zone = $productLine->getZone();
-            if (!$zone) {
-                continue;
+            if ($zone) {
+                $zoneName = $zone->getName();
             }
 
-            $zoneName        = $zone->getName();
-            $productLineName = $productLine->getName();
-            $categoryName    = $category->getName();
-            $buttonName      = $button->getName();
 
             // Using reference to build the nested array
             $ref = &$groupedValidatedUploads;
@@ -335,6 +331,63 @@ class EntityFetchingService extends AbstractController
         return $groupedValidatedUploads;
     }
 
+
+
+    /**
+     * Retrieves ILUO checklist elements grouped by ILUO level, steps title, and steps subheadings.
+     *
+     * This function organizes ILUO checklist elements into a nested array structure based on their
+     * associations with ILUO levels, steps titles, and steps subheadings. The function iterates
+     * through each step, retrieves associated ILUO level, steps title, and steps subheadings, and
+     * organizes them into a hierarchical array.
+     *
+     * @return array A multi-dimensional array organizing ILUO checklist elements by their
+     *               hierarchical associations: ILUO level -> Steps title -> Steps subheadings -> Steps
+     */
+    public function getIluoChecklistElementsGrouped(): array
+    {
+        $steps = $this->getSteps();
+        $groupedSteps = [];
+        foreach ($steps as $step) {
+
+            $iluoLevel = $step->getIluoLevel();
+            $iluoLevelName = (string)null;
+            if ($iluoLevel) {
+                $iluoLevelName = $iluoLevel->getLevel();
+            }
+
+            $stepsTitle = $step->getStepsTitle();
+            $stepsTitleName = (string)null;
+            if ($stepsTitle) {
+                $stepsTitleName = $stepsTitle->getTitle();
+            }
+
+            $stepsSubheadings = $step->getStepsSubheadings();
+            $stepsSubheadingsName = (string)null;
+            if ($stepsSubheadings) {
+                $stepsSubheadingsName = $stepsSubheadings->getHeading();
+            }
+
+            $ref = &$groupedSteps;
+            foreach ([$iluoLevelName, $stepsTitleName, $stepsSubheadingsName] as $key) {
+                if ($key != null && !isset($ref[$key])) {
+                    $ref[$key] = [];
+                }
+                $ref = &$ref[$key];
+            }
+
+            $ref[] = $step;
+            unset($ref);
+        }
+        $this->logger->info(message: 'EntityFetchingService::getIluoChecklistElementsGrouped - groupedSteps', context: [$groupedSteps]);
+        return $groupedSteps;
+    }
+
+
+    public function getSteps()
+    {
+        return $this->findAll('steps');
+    }
 
     public function getProducts()
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Operator;
+namespace App\Service\Iluo;
 
 use Psr\Log\LoggerInterface;
 
@@ -46,7 +46,7 @@ class TrainingMaterialTypeService extends AbstractController
         $this->logger->debug(message: 'Processing training material type creation form', context: [$trainingMaterialTypeForm]);
         try {
             $trainingMaterialTypeData = $trainingMaterialTypeForm->getData();
-            $trainingMaterialTypeData->setName(strtoupper(string: $trainingMaterialTypeData->getName()));
+            $trainingMaterialTypeData->setName();
             $this->em->persist(object: $trainingMaterialTypeData);
             $this->em->flush();
         } finally {

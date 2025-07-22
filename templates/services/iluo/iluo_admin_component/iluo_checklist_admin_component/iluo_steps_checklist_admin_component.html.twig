@@ -23,16 +23,11 @@
 		{{ form_label(stepsForm.stepsSubheadings) }}
 		{{ form_widget(stepsForm.stepsSubheadings) }}
 	</div>
-	{# <div
+	<div
 		class="col-12">
 		{{ form_label(stepsForm.trainingMaterialType) }}
 		{{ form_widget(stepsForm.trainingMaterialType) }}
-	</div> #}
-	{# <div
-		class="col-12">
-		{{ form_label(stepsForm.upload) }}
-		{{ form_widget(stepsForm.upload) }}
-	</div> #}
+	</div>
 	<div
 		class="col-12">
 		{{ form_widget(stepsForm.save) }}
@@ -68,7 +63,7 @@
 						aria-expanded="false"
 						aria-controls="collapseStepsList">
 						<strong>
-							Liste des Produits
+							Liste des Questions d'Etape
 						</strong>
 					</button>
 				</h2>
@@ -85,11 +80,9 @@
 								<li
 									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
 									<strong>
-										{{ step.name }}
+										{{ step.question }}
 									</strong>
-
 									{{ delete_form('steps', step.id, 'app_iluo_steps_checklist_admin') }}
-
 								</li>
 							{% endfor %}
 						</ul>

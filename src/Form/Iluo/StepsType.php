@@ -4,11 +4,9 @@ namespace App\Form\Iluo;
 
 use App\Entity\Steps;
 use App\Entity\IluoLevels;
-use App\Entity\IluoChecklist;
 use App\Entity\StepsSubheadings;
 use App\Entity\StepsTitle;
 use App\Entity\TrainingMaterialType;
-use App\Entity\Upload;
 
 use App\Form\AbstractBaseFormType;
 
@@ -31,7 +29,7 @@ class StepsType extends AbstractBaseFormType
             fieldName: 'iluoLevel',
             label: 'Niveau ILUO',
             entityClass: IluoLevels::class,
-            choiceLabel: 'id',
+            choiceLabel: 'level',
             placeholder: 'Sélectionner un niveau ILUO',
             required: true
         );
@@ -40,7 +38,7 @@ class StepsType extends AbstractBaseFormType
             fieldName: 'stepsTitle',
             label: 'Titre d\'Étape',
             entityClass: StepsTitle::class,
-            choiceLabel: 'id',
+            choiceLabel: 'title',
             placeholder: 'Sélectionner un Titre d\'Étape',
             required: true
         );
@@ -49,29 +47,20 @@ class StepsType extends AbstractBaseFormType
             fieldName: 'stepsSubheadings',
             label: 'Sous-Titre d\'Étape',
             entityClass: StepsSubheadings::class,
-            choiceLabel: 'id',
+            choiceLabel: 'heading',
             placeholder: 'Sélectionner un Sous-Titre d\'Étape',
-            required: true
+            required: false
         );
         $this->addEntityField(
             builder: $builder,
             fieldName: 'trainingMaterialType',
             label: 'Type de Matériel d\'Apprentissage',
             entityClass: TrainingMaterialType::class,
-            choiceLabel: 'id',
+            choiceLabel: 'name',
             placeholder: 'Sélectionner un Type de Matériel d\'Apprentissage',
-            required: true,
+            required: false,
             additionalOptions: ['multiple' => true]
         );
-        // $this->addEntityField(
-        //     builder: $builder,
-        //     fieldName: 'uploads',
-        //     label: 'Fichier',
-        //     entityClass: Upload::class,
-        //     choiceLabel: 'id',
-        //     placeholder: 'Sélectionner un Fichier',
-        //     required: false,
-        // );
 
         $this->addSubmitButton($builder);
     }

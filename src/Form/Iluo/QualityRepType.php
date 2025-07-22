@@ -39,7 +39,7 @@ class QualityRepType extends AbstractType
                         ->orderBy('u.username', 'ASC');
                 },
                 'label_attr' => [
-                    'class' => 'form-label fs-4',
+                    'class' => 'form-label fs-6',
                     'style' => 'color: #ffffff;'
                 ],
                 'placeholder' => 'Ajouter un QualityRep :',

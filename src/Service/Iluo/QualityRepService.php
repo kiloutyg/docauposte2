@@ -41,6 +41,7 @@ class QualityRepService extends AbstractController
      */
     public function qualityRepCreationFormProcessing(Form $qualityRepForm): string
     {
+        $this->logger->debug(message: 'Processing quality report creation form', context: [$qualityRepForm]);
         try {
             $qualityRepData = $qualityRepForm->getData();
             $this->em->persist($qualityRepData);

@@ -8,23 +8,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Symfony\Component\Form\Form;
 
-use Symfony\Component\HttpFoundation\Response;
-
-use App\Repository\WorkstationRepository;
+use Psr\Log\LoggerInterface;
 
 class WorkstationService extends AbstractController
 {
 
     private $em;
-
-    private $workstationRepository;
+    private $logger;
 
     public function __construct(
         EntityManagerInterface $em,
-        WorkstationRepository $workstationRepository,
+        LoggerInterface $logger,
     ) {
         $this->em = $em;
-        $this->workstationRepository = $workstationRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -39,10 +36,11 @@ class WorkstationService extends AbstractController
      */
     public function workstationCreationFormProcessing(Form $workstationForm): string
     {
+        $this->logger->debug(message: 'Processing workstation creation form', context: [$workstationForm]);
         try {
             $workstationData = $workstationForm->getData();
             $workstationData->setName(strtoupper($workstationData->getName()));
-            
+
             $this->em->persist($workstationData);
             $this->em->flush();
         } finally {

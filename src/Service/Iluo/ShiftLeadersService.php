@@ -59,10 +59,10 @@ class ShiftLeadersService extends AbstractController
             $this->logger->debug(message: 'ShiftLeadersService::shiftLeadersCreationFormProcessing - Shift leader data', context: ['shiftLeaderData' => $shiftLeaderData]);
 
             if ($shiftLeaderData->getOperator() && ($shiftLeaderData->getOperator()->getUser())) {
-                $this->logger->info(message: 'ShiftLeadersService::shiftLeadersCreationFormProcessing - Operator set and linked User entity found');
+                $this->logger->debug(message: 'ShiftLeadersService::shiftLeadersCreationFormProcessing - Operator set and linked User entity found');
                 $shiftLeaderData->setUser($shiftLeaderData->getOperator()->getUser());
             } elseif ($shiftLeaderData->getUser() && ($shiftLeaderData->getUser()->getOperator())) {
-                $this->logger->info(message: 'ShiftLeadersService::shiftLeadersCreationFormProcessing - User set and linked Operator entity found');
+                $this->logger->debug(message: 'ShiftLeadersService::shiftLeadersCreationFormProcessing - User set and linked Operator entity found');
                 $shiftLeaderData->setOperator($shiftLeaderData->getUser()->getOperator());
             }
             $this->logger->debug(message: 'ShiftLeadersService::shiftLeadersCreationFormProcessing - Shift after user check', context: ['shiftLeaderData' => $shiftLeaderData]);

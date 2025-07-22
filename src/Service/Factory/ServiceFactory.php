@@ -51,7 +51,6 @@ class ServiceFactory
     public function getService(string $className)
     {
         $className = $this->formatClassName($className);
-        $this->logger->debug('ServiceFactory::getService: className: ' . $className);
 
         // Validate the format of the class name
         if (!$this->isValidClassNameFormat($className)) {
@@ -67,7 +66,6 @@ class ServiceFactory
 
         // Construct the fully qualified Service class name
         $serviceClass = 'App\\Service\\' . $className;
-        $this->logger->debug("ServiceFactory::getService - Attempting to retrieve service {$serviceClass}");
 
         // Check if the Service is available as a service in the container
         if ($this->container->has($serviceClass)) {
@@ -108,7 +106,6 @@ class ServiceFactory
      */
     private function formatClassName(string $className): string
     {
-        $this->logger->debug("ServiceFactory::formatClassname - string {$className}");
         if (strpos($className, '\\') !== false) {
             $parts = explode('\\', $className);
             $parts = array_map('ucfirst', $parts);

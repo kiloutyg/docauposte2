@@ -131,7 +131,7 @@ class WorkstationType extends AbstractType
 
             return $qb->orderBy('u.path', 'ASC');
         };
-
+        $this->logger->debug('WorstationType::addUploadField - Uploads Query builder: ', ['queryBuilder' => $queryBuilder]);
         $form->add(
             'upload',
             EntityType::class,
@@ -171,7 +171,7 @@ class WorkstationType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Nom du Poste de Travail',
                 'label_attr' => [
-                    'class' => 'form-label fs-4',
+                    'class' => 'form-label fs-6',
                     'style' => 'color: #ffffff;'
                 ],
                 'attr' => [
