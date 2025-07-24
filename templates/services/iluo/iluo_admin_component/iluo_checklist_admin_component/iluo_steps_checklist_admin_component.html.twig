@@ -46,10 +46,10 @@
 		{% endfor %}
 	</div>
 	{{ form_end(stepsForm) }}
-	{% if steps is not empty %}
+	{% if iluoLevels is defined and iluoLevels is not empty %}
 		<div
 			class="col-lg-6 col-md-12 col-sm-12 mt-auto mb-auto accordion"
-			id="accordionStepsList">
+			id="accordionAdminStepsList">
 			<div
 				class="accordion-item shadow-lg shadow-lg-inset border border-dark">
 				<h2
@@ -71,65 +71,172 @@
 					id="collapseStepsList"
 					class="accordion-collapse collapse "
 					aria-labelledby="headingStepsList"
-					data-bs-parent="#accordionStepsList">
+					data-bs-parent="#accordionAdminStepsList">
 					<div
 						class="accordion-body bg-white text-dark">
 						<ul
 							class="list-group">
 							{% set displayedSteps = [] %}
-							{% for iluoLevel in iluoLevels %}
-								{% if iluoLevel.stepsTitles is not empty or iluoLevel.steps is not empty %}
-									<li
-										class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
-										{{ iluoLevel.level }}
-									</li>
-									{% for stepTitle in iluoLevel.stepsTitles %}
-										{% if stepTitle.stepsSubheadings is not empty or stepTitle.steps is not empty %}
+							{% set iluoLevelIndex = 0 %}
+							<div
+								class="accordion"
+								id="accordionStepsList">
+								{% for iluoLevel in iluoLevels %}
+									{% if iluoLevel.stepsTitles is not empty or iluoLevel.steps is not empty %}
+										{% set iluoLevelIndex = iluoLevelIndex + 1 %}
+										<div
+											class="accordion-item shadow-lg shadow-lg-inset border border-dark">
 											<li
-												class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
-												{{ stepTitle.title }}
-											</li>
-											{% for stepSubheadings in stepTitle.stepsSubheadings %}
-												{% if stepSubheadings.steps is not empty %}
-													<li
-														class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
-														{{ stepSubheadings.heading }}
-													</li>
-													{% for step in stepSubheadings.steps %}
-														<li
-															class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
-															<strong>
-																{{step.id}}
-																#
-																{{ step.question }}
-															</strong>
-															{{ delete_form('steps', step.id, 'app_iluo_steps_checklist_admin') }}
-														</li>
-														{% set displayedSteps = displayedSteps|merge({step.id : step.id}) %}
-														{{ dump(displayedSteps) }}
-													{% endfor %}
-												{% endif %}
-											{% endfor %}
-											{% for step in stepTitle.steps %}
-												{% if displayedSteps[step.id] is not defined %}
-													<li
-														class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
-														<strong>
-															{{step.id}}
-															/
-															{{ step.question }}
-														</strong>
-														{{ delete_form('steps', step.id, 'app_iluo_steps_checklist_admin') }}
-													</li>
-													{% set displayedSteps = displayedSteps|merge({step.id : step.id}) %}
-													{{ dump(displayedSteps) }}
+												class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center accordion-header "
+												id="headingIluoLevelStepsList{{ iluoLevelIndex }}">
+												<button
+													class="accordion-button collapsed"
+													type="button"
+													data-bs-toggle="collapse"
+													data-bs-target="#collapseIluoLevelStepsList{{ iluoLevelIndex }}"
+													aria-expanded="false"
+													aria-controls="collapseIluoLevelStepsList{{ iluoLevelIndex }}">
+													<strong>
+														{{ iluoLevel.level }}
+													</strong>
 
-												{% endif %}
-											{% endfor %}
-										{% endif %}
-									{% endfor %}
-								{% endif %}
-							{% endfor %}
+												</button>
+											</li>
+											<div
+												id="collapseIluoLevelStepsList{{ iluoLevelIndex }}"
+												class="accordion-collapse collapse"
+												aria-labelledby="headingIluoLevelStepsList{{ iluoLevelIndex }}"
+												data-bs-parent="#accordionStepsList">
+												<div
+													class="accordion-body">
+													{% set stepTitleIndex = 0 %}
+													{% for stepTitle in iluoLevel.stepsTitles %}
+														{% if stepTitle.stepsSubheadings is not empty or stepTitle.steps is not empty %}
+															{% set stepTitleIndex = stepTitleIndex + 1 %}
+															<div
+																class="accordion"
+																id="stepTitleStepsList{{ iluoLevelIndex }}{{ stepTitleIndex }}">
+																<div
+																	class="accordion-item">
+																	<li
+																		class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center accordion-header"
+																		id="headingStepTitleStepsList{{ iluoLevelIndex }}{{ stepTitleIndex }}">
+																		<button
+																			class="accordion-button collapsed"
+																			type="button"
+																			data-bs-toggle="collapse"
+																			data-bs-target="#collapseStepTitleStepsList{{ iluoLevelIndex }}{{ stepTitleIndex }}"
+																			aria-expanded="false"
+																			aria-controls="collapseStepTitleStepsList{{ iluoLevelIndex }}{{ stepTitleIndex }}">
+																			<strong>
+																				{{ stepTitle.title }}
+																			</strong>
+
+																		</button>
+																	</li>
+																	<div
+																		id="collapseStepTitleStepsList{{ iluoLevelIndex }}{{ stepTitleIndex }}"
+																		class="accordion-collapse collapse"
+																		aria-labelledby="headingStepTitleStepsList{{ iluoLevelIndex }}{{ stepTitleIndex }}"
+																		data-bs-parent="#collapseIluoLevelStepsList{{ iluoLevelIndex }}">
+																		<div
+																			class="accordion-body">
+																			{% set stepsSubheadingsIndex = 0 %}
+
+																			{% for stepSubheadings in stepTitle.stepsSubheadings %}
+																				{% if stepSubheadings.steps is not empty %}
+																					{% set stepsSubheadingsIndex = stepsSubheadingsIndex + 1 %}
+																					<div
+																						class="accordion"
+																						id="stepSubheadingsStepsList{{ iluoLevelIndex }}{{ stepTitleIndex }}{{ stepsSubheadingsIndex }}">
+
+																						<div
+																							class="accordion-item">
+																							<li
+																								class="list-group-item bg-white text-dark d-flex justify-content-between align-items-centeraccordion-header"
+																								id="headingStepSubheadingsStepsList{{ iluoLevelIndex }}{{ stepTitleIndex }}{{ stepsSubheadingsIndex }}">
+																								<button
+																									class="accordion-button collapsed"
+																									type="button"
+																									data-bs-toggle="collapse"
+																									data-bs-target="#collapseStepSubheadingsStepsList{{ iluoLevelIndex }}{{ stepTitleIndex }}{{ stepsSubheadingsIndex }}"
+																									aria-expanded="false"
+																									aria-controls="collapseStepSubheadingsStepsList{{ iluoLevelIndex }}{{ stepTitleIndex }}{{ stepsSubheadingsIndex }}">
+																									<strong>
+																										{{ stepSubheadings.heading }}
+																									</strong>
+
+																								</button>
+																							</li>
+																							<div
+																								id="collapseStepSubheadingsStepsList{{ iluoLevelIndex }}{{ stepTitleIndex }}{{ stepsSubheadingsIndex }}"
+																								class="accordion-collapse collapse"
+																								aria-labelledby="headingStepSubheadingsStepsList{{ iluoLevelIndex }}{{ stepTitleIndex }}{{ stepsSubheadingsIndex }}"
+																								data-bs-parent="#collapseStepTitleStepsList{{ iluoLevelIndex }}{{ stepTitleIndex }}">
+
+																								<div
+																									class="accordion-body">
+																									{% for step in stepSubheadings.steps %}
+																										<li
+																											class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+																												{{ step.question }}
+																											<div
+																												class=" d-flex justify-content-between align-items-end">
+																												{{ delete_form('steps', step.id, 'app_iluo_steps_checklist_admin') }}
+																											</div>
+																										</li>
+																										{% set displayedSteps = displayedSteps|merge({(step.id): step.id}) %}
+																									{% endfor %}
+																								</div>
+																							</div>
+																						</div>
+																					</div>
+																				{% endif %}
+																			{% endfor %}
+																			{% for step in stepTitle.steps %}
+																				{% if step.id in displayedSteps %}
+																					{% else %}
+																						<li
+																							class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+																							<strong>
+																								{{ step.question }}
+																							</strong>
+																							<div
+																								class=" d-flex justify-content-between align-items-end">
+																								{{ delete_form('steps', step.id, 'app_iluo_steps_checklist_admin') }}
+																							</div>
+																						</li>
+																						{% set displayedSteps = displayedSteps|merge({(step.id): step.id}) %}
+																				{% endif %}
+																			{% endfor %}
+																		</div>
+																	</div>
+																</div>
+															</div>
+														{% endif %}
+													{% endfor %}
+													{% for step in iluoLevel.steps %}
+														{% if step.id in displayedSteps %}
+															{% else %}
+																<li
+																	class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+																	<strong>
+																		{{ step.question }}
+																	</strong>
+																	<div
+																		class=" d-flex justify-content-between align-items-end">
+																		{{ delete_form('steps', step.id, 'app_iluo_steps_checklist_admin') }}
+																	</div>
+																</li>
+																{% set displayedSteps = displayedSteps|merge({(step.id): step.id}) %}
+														{% endif %}
+													{% endfor %}
+												</div>
+											</div>
+										</div>
+									{% endif %}
+								{% endfor %}
+							</div>
 						</ul>
 					</div>
 				</div>

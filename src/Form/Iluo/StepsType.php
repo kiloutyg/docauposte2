@@ -40,7 +40,7 @@ class StepsType extends AbstractBaseFormType
             entityClass: StepsTitle::class,
             choiceLabel: 'title',
             placeholder: 'Sélectionner un Titre d\'Étape',
-            required: true
+            required: false
         );
         $this->addEntityField(
             builder: $builder,
