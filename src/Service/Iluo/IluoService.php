@@ -84,31 +84,38 @@ class IluoService extends AbstractController
     {
         $this->logger->debug(message: 'iluoService::iluoComponentFormManagement', context: [$entityType, $form, $request]);
         $form->handleRequest(request: $request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 // Convert entityType to service property name (e.g., 'shiftLeaders' -> 'shiftLeadersService')
                 $serviceProperty = lcfirst(string: $entityType) . 'Service';
                 $this->logger->debug(message: 'iluoService::iluoComponentFormManagement - Service property determined', context: ['servicProperty' => $serviceProperty]);
+
                 // Check if service property exists in the current class
                 if (!property_exists(object_or_class: $this, property: $serviceProperty)) {
                     throw new \InvalidArgumentException(message: "Service not found for entity type: $entityType");
                 }
                 $service = $this->$serviceProperty;
+
                 // Call the appropriate method
                 $methodName = lcfirst(string: $entityType) . 'CreationFormProcessing';
                 if (!method_exists(object_or_class: $service, method: $methodName)) {
                     throw new \InvalidArgumentException(message: "Method $methodName not found in service");
                 }
+
                 $entityName = $service->$methodName($form);
                 $this->addFlash(type: 'success', message: "L'entité $entityName a bien été ajoutée.");
+
             } catch (\Exception $e) {
                 $this->logger->error(message: 'iluoService::iluoComponentFormManagement - Issue in form submission', context: [$e->getMessage()]);
                 $this->addFlash(type: 'error', message: 'Issue in form submission ' . $e->getMessage());
             }
+
         } elseif ($form->isSubmitted()) {
             $this->logger->error(message: 'iluoService::iluoComponentFormManagement - Invalid form', context: [$form->getErrors()]);
             $this->addFlash(type: 'error', message: 'Invalid form ' . $form->getErrors());
         }
+
         $this->logger->debug(message: 'iluoService::iluoComponentFormManagement - Redirecting to route', context: ['entityType' => $entityType]);
         return $this->redirectToRoute(route: $this->routeNameDetermination(entityType: $entityType));
     }
@@ -133,16 +140,21 @@ class IluoService extends AbstractController
     public function routeNameDetermination(string $entityType): string
     {
         $this->logger->debug(message: 'iluoService::routeNameDetermination', context: [$entityType]);
+
         if (in_array(needle: $entityType, haystack: ['products', 'shiftLeaders', 'qualityRep'])) {
             $route = 'app_iluo_' . strtolower(string: $entityType) . '_general_elements_admin';
+
         } elseif (in_array(needle: $entityType, haystack: ['workstation'])) {
             $route = 'app_iluo_creation_workstation_admin';
+
         } elseif (in_array(needle: $entityType, haystack: ['trainingMaterialType', 'iluoLevels', 'stepsTitle', 'stepsSubheadings', 'steps'])) {
             $route = 'app_iluo_' . strtolower(string: $entityType) . '_checklist_admin';
+
         } else {
             $this->logger->error(message: 'iluoService::routeNameDetermination - Invalid entity type', context: [$entityType]);
             throw new \InvalidArgumentException(message: "Invalid entity type: $entityType");
         }
+        
         $this->logger->debug(message: 'iluoService::routeNameDetermination - Redirecting to route', context: [$route]);
         return $route;
     }

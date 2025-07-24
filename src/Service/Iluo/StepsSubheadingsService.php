@@ -39,10 +39,6 @@ class StepsSubheadingsService extends AbstractController
         $this->logger->debug(message: 'StepsSubheadingsService::stepsSubheadingsCreationFormProcessing - Processing stepsSubheadings creation form', context: [$stepsSubheadingsForm]);
         try {
             $stepsSubheadingsData = $stepsSubheadingsForm->getData();
-            $this->logger->debug(message: 'StepsSubheadingsService::stepsSubheadingsCreationFormProcessing - Persisting stepsSubheadings data to the database', context: [$stepsSubheadingsData]);
-            $stepsSubheadingsData->setHeading();
-            $stepsSubheadingsData->setIluoLevel($stepsSubheadingsData->getIluoLevel());
-            $stepsSubheadingsData->setStepsTitle($stepsSubheadingsData->getStepsTitle());
 
             $this->em->persist($stepsSubheadingsData);
             $this->em->flush();

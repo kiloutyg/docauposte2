@@ -62,14 +62,26 @@
 						class="accordion-body bg-white text-dark">
 						<ul
 							class="list-group">
-							{% for stepTitle in stepsTitle %}
-								<li
-									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
-									<strong>
-										{{ stepTitle.title }}
-									</strong>
-									{{ delete_form('stepsTitle', stepTitle.id, 'app_iluo_stepstitle_checklist_admin') }}
-								</li>
+							{% for iluoLevel in iluoLevels %}
+								{% if iluoLevel.stepsTitles is not empty %}
+
+									<li
+										class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+										<strong>
+											{{ iluoLevel.level }}
+										</strong>
+									</li>
+									{% for stepTitle in iluoLevel.stepsTitles %}
+										<li
+											class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+											<strong>
+												{{ stepTitle.title }}
+											</strong>
+											{{ delete_form('stepsTitle', stepTitle.id, 'app_iluo_stepstitle_checklist_admin') }}
+										</li>
+									{% endfor %}
+								{% endif %}
+
 							{% endfor %}
 						</ul>
 					</div>

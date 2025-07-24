@@ -382,7 +382,44 @@ class EntityFetchingService extends AbstractController
         $this->logger->info(message: 'EntityFetchingService::getIluoChecklistElementsGrouped - groupedSteps', context: [$groupedSteps]);
         return $groupedSteps;
     }
+    // public function getIluoChecklistElementsGrouped(): array
+    // {
+    //     $steps = $this->getSteps();
+    //     $groupedSteps = [];
+    //     foreach ($steps as $step) {
 
+    //         $iluoLevel = $step->getIluoLevel();
+    //         // $iluoLevelName = (string)null;
+    //         // if ($iluoLevel) {
+    //         //     $iluoLevelName = $iluoLevel->getLevel();
+    //         // }
+
+    //         $stepsTitle = $step->getStepsTitle();
+    //         // $stepsTitleName = (string)null;
+    //         // if ($stepsTitle) {
+    //         //     $stepsTitleName = $stepsTitle->getTitle();
+    //         // }
+
+    //         $stepsSubheadings = $step->getStepsSubheadings();
+    //         // $stepsSubheadingsName = (string)null;
+    //         // if ($stepsSubheadings) {
+    //         //     $stepsSubheadingsName = $stepsSubheadings->getHeading();
+    //         // }
+
+    //         $ref = &$groupedSteps;
+    //         foreach ([$iluoLevel, $stepsTitle, $stepsSubheadings] as $key) {
+    //             if ($key != null && !isset($ref[$key])) {
+    //                 $ref[$key] = [];
+    //             }
+    //             $ref = &$ref[$key];
+    //         }
+
+    //         $ref[] = $step;
+    //         unset($ref);
+    //     }
+    //     $this->logger->info(message: 'EntityFetchingService::getIluoChecklistElementsGrouped - groupedSteps', context: [$groupedSteps]);
+    //     return $groupedSteps;
+    // }
 
     public function getSteps()
     {

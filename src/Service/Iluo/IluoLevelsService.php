@@ -45,7 +45,6 @@ class IluoLevelsService extends AbstractController
         try {
             $iluoLevelsData = $iluoLevelsForm->getData();
             $iluoLevelsData->setLevel(strtoupper($iluoLevelsData->getLevel()));
-            $iluoLevelsData->setDescription($iluoLevelsData->getDescription());
 
             $this->em->persist($iluoLevelsData);
             $this->em->flush();

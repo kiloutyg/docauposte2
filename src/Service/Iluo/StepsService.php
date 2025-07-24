@@ -40,8 +40,6 @@ class StepsService extends AbstractController
         $this->logger->debug(message: 'StepsService::stepsCreationFormProcessing - Processing steps creation form', context: [$stepsForm]);
         try {
             $stepsData = $stepsForm->getData();
-            $this->logger->debug(message: 'StepsService::stepsCreationFormProcessing - Persisting steps data to the database', context: [$stepsData]);
-            $stepsData->setQuestion();
 
             $this->em->persist($stepsData);
             $this->em->flush();

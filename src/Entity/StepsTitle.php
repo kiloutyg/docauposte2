@@ -21,13 +21,13 @@ class StepsTitle
     /**
      * @var Collection<int, Steps>
      */
-    #[ORM\OneToMany(targetEntity: Steps::class, mappedBy: 'stepsTitle')]
+    #[ORM\OneToMany(targetEntity: Steps::class, mappedBy: 'stepsTitle', cascade: ['remove'])]
     private Collection $steps;
 
     /**
      * @var Collection<int, StepsSubheadings>
      */
-    #[ORM\OneToMany(targetEntity: StepsSubheadings::class, mappedBy: 'stepsTitle')]
+    #[ORM\OneToMany(targetEntity: StepsSubheadings::class, mappedBy: 'stepsTitle', cascade: ['remove'])]
     private Collection $stepsSubheadings;
 
     #[ORM\ManyToOne(inversedBy: 'stepsTitles')]

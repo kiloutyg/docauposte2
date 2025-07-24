@@ -39,9 +39,6 @@ class StepsTitleService extends AbstractController
         $this->logger->debug(message: 'StepsTitleService::stepsTitleCreationFormProcessing - Processing stepsTitle creation form', context: [$stepsTitleForm]);
         try {
             $stepsTitleData = $stepsTitleForm->getData();
-            $this->logger->debug(message: 'StepsTitleService::stepsTitleCreationFormProcessing - Persisting stepsTitle data to the database', context: [$stepsTitleData]);
-            $stepsTitleData->setTitle();
-            $stepsTitleData->setIluoLevel($stepsTitleData->getIluoLevel());
 
             $this->em->persist($stepsTitleData);
             $this->em->flush();

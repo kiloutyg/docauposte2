@@ -67,13 +67,15 @@ class IluoChecklistController extends AbstractController
     #[Route('admin/checklist/content', name: 'checklist_admin_content')]
     public function checklistAdminContentGet(): Response
     {
-        $groupesSteps = $this->entityFetchingService->getIluoChecklistElementsGrouped();
-
         return $this->render('services/iluo/iluo_admin_component/iluo_checklist_admin_content.html.twig', [
-            'groupesSteps' => $groupesSteps,
+            'groupedSteps' => $this->getIluoChecklistElementsGrouped(),
         ]);
     }
 
+    private function getIluoChecklistElementsGrouped(): array
+    {
+        return $this->entityFetchingService->getIluoChecklistElementsGrouped();
+    }
 
 
     /**
@@ -93,7 +95,6 @@ class IluoChecklistController extends AbstractController
     #[Route(path: 'admin/training_material_type_checklist', name: 'trainingmaterialtype_checklist_admin')]
     public function trainingMaterialTypeAdminPageGet(Request $request): Response
     {
-        $trainingMaterialTypes = $this->entityFetchingService->findAll(entityType: 'trainingMaterialType');
         $newTrainingMaterialType = new TrainingMaterialType;
         $trainingMaterialTypeForm = $this->createForm(type: TrainingMaterialTypeType::class, data: $newTrainingMaterialType);
         if ($request->isMethod(method: 'POST')) {
@@ -102,7 +103,7 @@ class IluoChecklistController extends AbstractController
         }
         return $this->render(view: '/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_training_material_type_checklist_admin_component.html.twig', parameters: [
             'trainingMaterialTypeForm' => $trainingMaterialTypeForm->createView(),
-            'trainingMaterialTypes'    => $trainingMaterialTypes,
+            'trainingMaterialTypes'    => $this->entityFetchingService->findAll(entityType: 'trainingMaterialType'),
         ]);
     }
 
@@ -127,7 +128,6 @@ class IluoChecklistController extends AbstractController
     #[Route(path: 'admin/iluo_levels', name: 'iluolevels_checklist_admin')]
     public function iluoLevelsAdminPageGet(Request $request): Response
     {
-        $iluoLevels = $this->entityFetchingService->findAll(entityType: 'iluoLevels');
         $newIluoLevel = new IluoLevels;
         $iluoLevelsForm = $this->createForm(type: IluoLevelsType::class, data: $newIluoLevel);
         if ($request->isMethod(method: 'POST')) {
@@ -136,7 +136,9 @@ class IluoChecklistController extends AbstractController
         }
         return $this->render(view: '/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_levels_checklist_admin_component.html.twig', parameters: [
             'iluoLevelsForm' => $iluoLevelsForm->createView(),
-            'iluoLevels'    => $iluoLevels,
+            'iluoLevels'    => $this->entityFetchingService->findAll(entityType: 'iluoLevels'),
+            'groupedSteps' => $this->getIluoChecklistElementsGrouped(),
+
         ]);
     }
 
@@ -161,7 +163,6 @@ class IluoChecklistController extends AbstractController
     #[Route(path: 'admin/steps_title_checklist', name: 'stepstitle_checklist_admin')]
     public function stepsTitleAdminPageGet(Request $request): Response
     {
-        $stepsTitle = $this->entityFetchingService->findAll(entityType: 'stepsTitle');
         $newStepTitle = new StepsTitle;
         $stepsTitleForm = $this->createForm(type: StepsTitleType::class, data: $newStepTitle);
         if ($request->isMethod(method: 'POST')) {
@@ -170,7 +171,9 @@ class IluoChecklistController extends AbstractController
         }
         return $this->render(view: '/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_steps_title_checklist_admin_component.html.twig', parameters: [
             'stepsTitleForm' => $stepsTitleForm->createView(),
-            'stepsTitle'    => $stepsTitle,
+            'groupedSteps' => $this->getIluoChecklistElementsGrouped(),
+            'iluoLevels'    => $this->entityFetchingService->findAll(entityType: 'iluoLevels'),
+            'stepsTitle'    => $this->entityFetchingService->findAll(entityType: 'stepsTitle'),
         ]);
     }
 
@@ -194,7 +197,6 @@ class IluoChecklistController extends AbstractController
     #[Route(path: 'admin/steps_subheadings_checklist', name: 'stepssubheadings_checklist_admin')]
     public function stepsSubheadingsAdminPageGet(Request $request): Response
     {
-        $stepsSubheadings = $this->entityFetchingService->findAll(entityType: 'stepsSubheadings');
         $newStepSubheadings = new StepsSubheadings;
         $stepsSubheadingsForm = $this->createForm(type: StepsSubheadingsType::class, data: $newStepSubheadings);
         if ($request->isMethod(method: 'POST')) {
@@ -203,7 +205,10 @@ class IluoChecklistController extends AbstractController
         }
         return $this->render(view: '/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_steps_subheadings_checklist_admin_component.html.twig', parameters: [
             'stepsSubheadingsForm' => $stepsSubheadingsForm->createView(),
-            'stepsSubheadings'    => $stepsSubheadings,
+            'groupedSteps' => $this->getIluoChecklistElementsGrouped(),
+            'iluoLevels'    => $this->entityFetchingService->findAll(entityType: 'iluoLevels'),
+            'stepsTitle'    => $this->entityFetchingService->findAll(entityType: 'stepsTitle'),
+            'stepsSubheadings'    => $this->entityFetchingService->findAll(entityType: 'stepsSubheadings'),
         ]);
     }
 
@@ -227,17 +232,19 @@ class IluoChecklistController extends AbstractController
     #[Route(path: 'admin/steps_checklist', name: 'steps_checklist_admin')]
     public function stepsAdminPageGet(Request $request): Response
     {
-        $steps = $this->entityFetchingService->findAll(entityType: 'steps');
         $newStep = new Steps;
         $stepsForm = $this->createForm(type: StepsType::class, data: $newStep);
         if ($request->isMethod(method: 'POST')) {
             $this->logger->debug(message: 'Steps form submitted', context: [$request->request->all()]);
             return $this->iluoService->iluoComponentFormManagement(entityType: 'steps', form: $stepsForm, request: $request);
         }
-        $this->logger->info(message: 'IluoChecklistController::stepsAdminPageGet ', context: ['stepsForm' => $stepsForm, 'steps' => $steps]);
         return $this->render(view: '/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_steps_checklist_admin_component.html.twig', parameters: [
             'stepsForm' => $stepsForm->createView(),
-            'steps'    => $steps,
+            'groupedSteps'          => $this->getIluoChecklistElementsGrouped(),
+            'iluoLevels'            => $this->entityFetchingService->findAll(entityType: 'iluoLevels'),
+            'stepsTitle'        => $this->entityFetchingService->findAll(entityType: 'stepsTitle'),
+            'stepsSubheadings'    => $this->entityFetchingService->findAll(entityType: 'stepsSubheadings'),
+            'steps'    => $this->entityFetchingService->findAll(entityType: 'steps'),
         ]);
     }
 }

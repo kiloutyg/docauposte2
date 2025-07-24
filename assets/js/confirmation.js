@@ -46,14 +46,15 @@ const initConfirmations = () => {
     { selector: ".delete-operator", message: "Êtes vous sûr de vouloir supprimer cet Opérateur?" },
     { selector: ".delete-all-inactive-operator", message: "Êtes vous sûr de vouloir supprimer ces Opérateurs définitivement?" },
     { selector: ".delete-productLine", message: "Êtes vous sûr de vouloir supprimer cette Ligne?" },
-    { selector: ".delete-products", message: "Êtes vous sûr de vouloir supprimer ce Produit?" },
-    { selector: ".delete-shiftLeaders", message: "Êtes vous sûr de vouloir enlever cet utilisateur de la liste des ShiftLeaders?" },
     { selector: ".delete-team", message: "Êtes vous sûr de vouloir supprimer cette Equipe?" },
     { selector: ".delete-uap", message: "Êtes vous sûr de vouloir supprimer cet UAP?" },
     { selector: ".delete-upload", message: "Êtes vous sûr de vouloir supprimer ce Document?" },
     { selector: ".delete-user", message: "Êtes vous sûr de vouloir supprimer cet Utilisateur?" },
-    { selector: ".delete-workstation", message: "Êtes vous sûr de vouloir supprimer cette Station de travail?" },
     { selector: ".delete-zone", message: "Êtes vous sûr de vouloir supprimer cette Zone?" },
+
+    { selector: ".delete-workstation", message: "Êtes vous sûr de vouloir supprimer cette Station de travail?" },
+    { selector: ".delete-products", message: "Êtes vous sûr de vouloir supprimer ce Produit?" },
+    { selector: ".delete-shiftLeaders", message: "Êtes vous sûr de vouloir enlever cet utilisateur de la liste des ShiftLeaders?" },
 
     { selector: ".download-non-validated-but-old", message: "CE DOCUMENT N'A PAS ENCORE ÉTÉ VALIDÉ. LE PRÉCÉDENT SERA AFFICHÉ. EN CAS DE QUESTION, CONTACTEZ VOTRE RESPONSABLE." },
     { selector: ".download-non-validated-upload", message: "CE DOCUMENT N'A PAS ENCORE ÉTÉ VALIDÉ. CONTINUER DE TOUTE MANIÈRE? EN CAS DE QUESTION, CONTACTER VOTRE RESPONSABLE." },
@@ -71,6 +72,7 @@ const initConfirmations = () => {
 
     { selector: ".transfer-work", message: "Êtes vous sûr de vouloir transferer le travail de cet utilisateur à un autre utilisateur?" },
 
+    
   ];
 
   // Attach all confirmations

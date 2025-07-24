@@ -76,14 +76,59 @@
 						class="accordion-body bg-white text-dark">
 						<ul
 							class="list-group">
-							{% for step in steps %}
-								<li
-									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
-									<strong>
-										{{ step.question }}
-									</strong>
-									{{ delete_form('steps', step.id, 'app_iluo_steps_checklist_admin') }}
-								</li>
+							{% set displayedSteps = [] %}
+							{% for iluoLevel in iluoLevels %}
+								{% if iluoLevel.stepsTitles is not empty or iluoLevel.steps is not empty %}
+									<li
+										class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+										{{ iluoLevel.level }}
+									</li>
+									{% for stepTitle in iluoLevel.stepsTitles %}
+										{% if stepTitle.stepsSubheadings is not empty or stepTitle.steps is not empty %}
+											<li
+												class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+												{{ stepTitle.title }}
+											</li>
+											{% for stepSubheadings in stepTitle.stepsSubheadings %}
+												{% if stepSubheadings.steps is not empty %}
+													<li
+														class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+														{{ stepSubheadings.heading }}
+													</li>
+													{% for step in stepSubheadings.steps %}
+														<li
+															class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+															<strong>
+																{{step.id}}
+																#
+																{{ step.question }}
+															</strong>
+															{{ delete_form('steps', step.id, 'app_iluo_steps_checklist_admin') }}
+														</li>
+														{% set displayedSteps = displayedSteps|merge({step.id : step.id}) %}
+														{{ dump(displayedSteps) }}
+													{% endfor %}
+												{% endif %}
+											{% endfor %}
+											{% for step in stepTitle.steps %}
+												{% if displayedSteps[step.id] is not defined %}
+													<li
+														class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+														<strong>
+															{{step.id}}
+															/
+															{{ step.question }}
+														</strong>
+														{{ delete_form('steps', step.id, 'app_iluo_steps_checklist_admin') }}
+													</li>
+													{% set displayedSteps = displayedSteps|merge({step.id : step.id}) %}
+													{{ dump(displayedSteps) }}
+
+												{% endif %}
+											{% endfor %}
+										{% endif %}
+									{% endfor %}
+								{% endif %}
 							{% endfor %}
 						</ul>
 					</div>

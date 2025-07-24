@@ -46,7 +46,7 @@ class TrainingMaterialTypeService extends AbstractController
         $this->logger->debug(message: 'Processing training material type creation form', context: [$trainingMaterialTypeForm]);
         try {
             $trainingMaterialTypeData = $trainingMaterialTypeForm->getData();
-            $trainingMaterialTypeData->setName();
+            $trainingMaterialTypeData->setName(strtoupper(string: $trainingMaterialTypeData->getName()));
             $this->em->persist(object: $trainingMaterialTypeData);
             $this->em->flush();
         } finally {
