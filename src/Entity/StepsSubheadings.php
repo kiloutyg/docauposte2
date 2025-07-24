@@ -21,7 +21,7 @@ class StepsSubheadings
     /**
      * @var Collection<int, Steps>
      */
-    #[ORM\OneToMany(targetEntity: Steps::class, mappedBy: 'stepsSubheadings')]
+    #[ORM\OneToMany(targetEntity: Steps::class, mappedBy: 'stepsSubheadings', cascade: ['remove'])]
     private Collection $steps;
 
     #[ORM\ManyToOne(inversedBy: 'stepsSubheadings')]

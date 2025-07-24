@@ -26,7 +26,7 @@ class StepsSubheadingsType extends AbstractBaseFormType
             fieldName: 'iluoLevel',
             label: 'Niveau ILUO correspondant',
             entityClass: IluoLevels::class,
-            choiceLabel: 'id',
+            choiceLabel: 'level',
             placeholder: 'Sélectionner un niveau ILUO',
             required: true
         );
@@ -35,7 +35,7 @@ class StepsSubheadingsType extends AbstractBaseFormType
             fieldName: 'stepsTitle',
             label: 'Titre d\'Étape',
             entityClass: stepsTitle::class,
-            choiceLabel: 'id',
+            choiceLabel: 'title',
             placeholder: 'Sélectionner un Titre d\'Étape',
             required: true
         );

@@ -47,15 +47,16 @@ abstract class AbstractBaseFormType extends AbstractType
             'choice_label' => $choiceLabel,
             'query_builder' => $queryBuilder,
             'label_attr' => [
-                'class' => 'form-label fs-4',
+                'class' => 'form-label fs-6',
                 'style' => 'color: #ffffff;'
             ],
             'placeholder' => $placeholder ?? $label,
             'attr' => [
                 'class' => 'form-control mx-auto mt-2',
                 'id' => $fieldName,
-                'required' => $required,
-            ]
+            ],
+            'required' => $required,
+
         ];
 
         // Merge additional options with proper handling of nested arrays
@@ -93,15 +94,16 @@ abstract class AbstractBaseFormType extends AbstractType
         $options = [
             'label' => $label,
             'label_attr' => [
-                'class' => 'form-label fs-4',
+                'class' => 'form-label fs-6',
                 'style' => 'color: #ffffff;'
             ],
             'attr' => [
                 'class' => 'form-control mx-auto mt-2',
                 'placeholder' => $placeholder ?? $label,
                 'id' => $fieldName,
-                'required' => $required,
-            ]
+            ],
+            'required' => $required,
+
         ];
 
         // Merge additional options with proper handling of nested arrays

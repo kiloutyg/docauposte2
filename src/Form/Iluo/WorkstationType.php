@@ -104,9 +104,11 @@ class WorkstationType extends AbstractType
         $queryBuilder = function (EntityRepository $er) use ($zone, $product): QueryBuilder {
             $qb = $er->createQueryBuilder('u')
                 ->select('u')
-                ->leftJoin('App\Entity\Validation', 'v', Join::WITH, 'v.Upload = u')
-                ->where('v.id IS NOT NULL')
-                ->andWhere('v.status = :isValidated')
+                ->leftJoin('u.validation', 'v')
+                // ->leftJoin('App\Entity\Validation', 'v', Join::WITH, 'v.Upload = u')
+                // ->innerJoin(join: 'u.validation', alias: 'v')
+                ->where('v.status = :isValidated')
+                ->andWhere('v.id IS NOT NULL')
                 ->setParameter('isValidated', true);
 
             // If a zone is selected, filter uploads related to that zone
@@ -128,10 +130,8 @@ class WorkstationType extends AbstractType
                 $qb->andWhere('LOWER(u.path) LIKE LOWER(:productPattern)')
                     ->setParameter('productPattern', '%' . $productNameSimplified . '%');
             }
-
             return $qb->orderBy('u.path', 'ASC');
         };
-
         $form->add(
             'upload',
             EntityType::class,
@@ -171,7 +171,7 @@ class WorkstationType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Nom du Poste de Travail',
                 'label_attr' => [
-                    'class' => 'form-label fs-4',
+                    'class' => 'form-label fs-6',
                     'style' => 'color: #ffffff;'
                 ],
                 'attr' => [

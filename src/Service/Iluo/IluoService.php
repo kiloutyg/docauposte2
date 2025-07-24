@@ -2,11 +2,7 @@
 
 namespace App\Service\Iluo;
 
-use App\Service\Iluo\ProductsService;
-use App\Service\Iluo\QualityRepService;
-use App\Service\Iluo\ShiftLeadersService;
-use App\Service\Iluo\WorkstationService;
-use App\Service\Operator\TrainingMaterialTypeService;
+use App\Service\Factory\ServiceFactory;
 
 use Psr\Log\LoggerInterface;
 
@@ -23,9 +19,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class IluoService extends AbstractController
 {
     private $logger;
+
+    private $serviceFactory;
+
+    private $iluoLevelsService;
     private $productsService;
     private $qualityRepService;
     private $shiftLeadersService;
+    private $stepsService;
+    private $stepsSubheadingsService;
+    private $stepsTitleService;
     private $workstationService;
     private $trainingMaterialTypeService;
 
@@ -37,28 +40,26 @@ class IluoService extends AbstractController
      * shift leaders, and workstations).
      *
      * @param LoggerInterface $logger The logger service for recording application events
-     * @param ProductsService $productsService Service for managing product-related operations
-     * @param QualityRepService $qualityRepService Service for managing quality representative operations
-     * @param ShiftLeadersService $shiftLeadersService Service for managing shift leader operations
-     * @param TrainingMaterialTypeService $trainingMaterialTypeService Service for managing training material type operations
-     * @param WorkstationService $workstationService Service for managing workstation operations
+     * @param ServiceFactory $serviceFactory Factory service for accessing services
      */
     public function __construct(
         LoggerInterface                     $logger,
 
-        ProductsService                     $productsService,
-        QualityRepService                   $qualityRepService,
-        ShiftLeadersService                 $shiftLeadersService,
-        TrainingMaterialTypeService         $trainingMaterialTypeService,
-        WorkstationService                  $workstationService,
+        ServiceFactory                      $serviceFactory,
     ) {
         $this->logger                       = $logger;
 
-        $this->productsService              = $productsService;
-        $this->qualityRepService            = $qualityRepService;
-        $this->shiftLeadersService          = $shiftLeadersService;
-        $this->trainingMaterialTypeService  = $trainingMaterialTypeService;
-        $this->workstationService           = $workstationService;
+        $this->serviceFactory               = $serviceFactory;
+
+        $this->iluoLevelsService            = $this->serviceFactory->getService(className: 'Iluo\\IluoLevels');
+        $this->productsService              = $this->serviceFactory->getService(className: 'Iluo\\Products');
+        $this->qualityRepService            = $this->serviceFactory->getService(className: 'Iluo\\QualityRep');
+        $this->shiftLeadersService          = $this->serviceFactory->getService(className: 'Iluo\\ShiftLeaders');
+        $this->stepsService                 = $this->serviceFactory->getService(className: 'Iluo\\Steps');
+        $this->stepsSubheadingsService      = $this->serviceFactory->getService(className: 'Iluo\\StepsSubheadings');
+        $this->stepsTitleService            = $this->serviceFactory->getService(className: 'Iluo\\StepsTitle');
+        $this->trainingMaterialTypeService  = $this->serviceFactory->getService(className: 'Iluo\\TrainingMaterialType');
+        $this->workstationService           = $this->serviceFactory->getService(className: 'Iluo\\Workstation');
     }
 
 
@@ -81,32 +82,41 @@ class IluoService extends AbstractController
      */
     public function iluoComponentFormManagement(string $entityType, Form $form, Request $request): Response
     {
-        $this->logger->info(message: 'iluoComponentFormManagement', context: [$entityType, $form, $request]);
+        $this->logger->debug(message: 'iluoService::iluoComponentFormManagement', context: [$entityType, $form, $request]);
         $form->handleRequest(request: $request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 // Convert entityType to service property name (e.g., 'shiftLeaders' -> 'shiftLeadersService')
                 $serviceProperty = lcfirst(string: $entityType) . 'Service';
+                $this->logger->debug(message: 'iluoService::iluoComponentFormManagement - Service property determined', context: ['servicProperty' => $serviceProperty]);
+
                 // Check if service property exists in the current class
                 if (!property_exists(object_or_class: $this, property: $serviceProperty)) {
                     throw new \InvalidArgumentException(message: "Service not found for entity type: $entityType");
                 }
                 $service = $this->$serviceProperty;
+
                 // Call the appropriate method
                 $methodName = lcfirst(string: $entityType) . 'CreationFormProcessing';
                 if (!method_exists(object_or_class: $service, method: $methodName)) {
                     throw new \InvalidArgumentException(message: "Method $methodName not found in service");
                 }
+
                 $entityName = $service->$methodName($form);
                 $this->addFlash(type: 'success', message: "L'entité $entityName a bien été ajoutée.");
+
             } catch (\Exception $e) {
-                $this->logger->error(message: 'Issue in form submission', context: [$e->getMessage()]);
+                $this->logger->error(message: 'iluoService::iluoComponentFormManagement - Issue in form submission', context: [$e->getMessage()]);
                 $this->addFlash(type: 'error', message: 'Issue in form submission ' . $e->getMessage());
             }
+
         } elseif ($form->isSubmitted()) {
-            $this->logger->error(message: 'Invalid form', context: [$form->getErrors()]);
+            $this->logger->error(message: 'iluoService::iluoComponentFormManagement - Invalid form', context: [$form->getErrors()]);
             $this->addFlash(type: 'error', message: 'Invalid form ' . $form->getErrors());
         }
+
+        $this->logger->debug(message: 'iluoService::iluoComponentFormManagement - Redirecting to route', context: ['entityType' => $entityType]);
         return $this->redirectToRoute(route: $this->routeNameDetermination(entityType: $entityType));
     }
 
@@ -129,17 +139,23 @@ class IluoService extends AbstractController
      */
     public function routeNameDetermination(string $entityType): string
     {
+        $this->logger->debug(message: 'iluoService::routeNameDetermination', context: [$entityType]);
+
         if (in_array(needle: $entityType, haystack: ['products', 'shiftLeaders', 'qualityRep'])) {
             $route = 'app_iluo_' . strtolower(string: $entityType) . '_general_elements_admin';
+
         } elseif (in_array(needle: $entityType, haystack: ['workstation'])) {
             $route = 'app_iluo_creation_workstation_admin';
-        } elseif (in_array(needle: $entityType, haystack: ['trainingMaterialType'])) {
+
+        } elseif (in_array(needle: $entityType, haystack: ['trainingMaterialType', 'iluoLevels', 'stepsTitle', 'stepsSubheadings', 'steps'])) {
             $route = 'app_iluo_' . strtolower(string: $entityType) . '_checklist_admin';
+
         } else {
-            $this->logger->error(message: 'Invalid entity type', context: [$entityType]);
+            $this->logger->error(message: 'iluoService::routeNameDetermination - Invalid entity type', context: [$entityType]);
             throw new \InvalidArgumentException(message: "Invalid entity type: $entityType");
         }
-        $this->logger->info(message: 'Redirecting to route', context: [$route]);
+        
+        $this->logger->debug(message: 'iluoService::routeNameDetermination - Redirecting to route', context: [$route]);
         return $route;
     }
 }

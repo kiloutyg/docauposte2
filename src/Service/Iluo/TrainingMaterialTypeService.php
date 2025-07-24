@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Operator;
+namespace App\Service\Iluo;
 
 use Psr\Log\LoggerInterface;
 

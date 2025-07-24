@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: IluoLevelsRepository::class)]
 class IluoLevels
@@ -22,19 +23,19 @@ class IluoLevels
     /**
      * @var Collection<int, Steps>
      */
-    #[ORM\OneToMany(targetEntity: Steps::class, mappedBy: 'iluoLevel')]
+    #[ORM\OneToMany(targetEntity: Steps::class, mappedBy: 'iluoLevel', cascade: ['remove'])]
     private Collection $steps;
 
     /**
      * @var Collection<int, StepsSubheadings>
      */
-    #[ORM\OneToMany(targetEntity: StepsSubheadings::class, mappedBy: 'iluoLevel')]
+    #[ORM\OneToMany(targetEntity: StepsSubheadings::class, mappedBy: 'iluoLevel', cascade: ['remove'])]
     private Collection $stepsSubheadings;
 
     /**
      * @var Collection<int, StepsTitle>
      */
-    #[ORM\OneToMany(targetEntity: StepsTitle::class, mappedBy: 'iluoLevel')]
+    #[ORM\OneToMany(targetEntity: StepsTitle::class, mappedBy: 'iluoLevel', cascade: ['remove'])]
     private Collection $stepsTitles;
 
     /**
