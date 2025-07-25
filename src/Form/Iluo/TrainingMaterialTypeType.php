@@ -23,17 +23,6 @@ class TrainingMaterialTypeType extends AbstractBaseFormType
             placeholder: 'Nom du Type de Support de Formation',
             required: true
         );
-
-        $this->addEntityField(
-            builder: $builder,
-            fieldName: 'upload',
-            label: 'Fichier spécifique à utiliser pour le Support de Formation',
-            entityClass: Upload::class,
-            choiceLabel: 'filename',
-            placeholder: 'Sélectionner un Fichier',
-            required: false
-        );
-
         $this->addEnumField(
             builder: $builder,
             fieldName: 'category',
@@ -41,7 +30,31 @@ class TrainingMaterialTypeType extends AbstractBaseFormType
             enumClass: TrainingMaterialTypeCategory::class,
             placeholder: 'Sélectionner une Catégorie',
             required: true,
+            additionalOptions: [
+                'attr' => [
+                    'data-training-material-type-form-target' => 'trainingMaterialTypeCateogorySelector',
+                    'data-action' => 'change->training-material-type-form#trainingMaterialTypeCateogorySelectorChange',
+                ]
+            ]
         );
+        $this->addEntityField(
+            builder: $builder,
+            fieldName: 'upload',
+            label: 'Fichier spécifique à utiliser pour le Support de Formation',
+            entityClass: Upload::class,
+            choiceLabel: 'filename',
+            placeholder: 'Sélectionner un Fichier',
+            required: false,
+            additionalOptions: [
+                'attr' => [
+                    'data-training-material-type-form-target' => 'uploadSelector',
+
+                ],
+                'disabled' => true,
+            ]
+        );
+
+
 
         $this->addSubmitButton($builder);
     }
