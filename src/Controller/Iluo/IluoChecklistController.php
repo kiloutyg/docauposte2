@@ -98,7 +98,9 @@ class IluoChecklistController extends AbstractController
         $newTrainingMaterialType = new TrainingMaterialType;
         $trainingMaterialTypeForm = $this->createForm(type: TrainingMaterialTypeType::class, data: $newTrainingMaterialType);
         if ($request->isMethod(method: 'POST')) {
-            $this->logger->debug(message: 'TrainingMaterialType form submitted', context: [$request->request->all()]);
+            $this->logger->debug(message: 'IluoController::trainingMaterialTypeAdminPageGet - TrainingMaterialType POST request', context: [$request->request->all()]);
+            $this->logger->debug(message: 'IluoController::trainingMaterialTypeAdminPageGet - TrainingMaterialType Form', context: [$trainingMaterialTypeForm]);
+
             return $this->iluoService->iluoComponentFormManagement(entityType: 'trainingMaterialType', form: $trainingMaterialTypeForm, request: $request);
         }
         return $this->render(view: '/services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_training_material_type_checklist_admin_component.html.twig', parameters: [

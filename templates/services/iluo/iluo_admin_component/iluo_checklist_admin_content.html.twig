@@ -5,7 +5,8 @@
 	<turbo-frame
 		id="training-material-type-section"
 		src="{{ path('app_iluo_trainingmaterialtype_checklist_admin') }}" loading="lazy"
-		class="row">
+		class="row"
+		data-controller="training-material-type-form">
 		{{ loading.content_placeholder('text', 2, '90%') }}
 	</turbo-frame>
 	<hr

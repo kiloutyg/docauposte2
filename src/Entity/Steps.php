@@ -19,12 +19,6 @@ class Steps
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $question = null;
 
-    /**
-     * @var Collection<int, Upload>
-     */
-    #[ORM\ManyToMany(targetEntity: Upload::class, inversedBy: 'steps')]
-    private Collection $uploads;
-
     #[ORM\ManyToOne(inversedBy: 'steps')]
     private ?StepsSubheadings $stepsSubheadings = null;
 
@@ -48,7 +42,6 @@ class Steps
 
     public function __construct()
     {
-        $this->uploads = new ArrayCollection();
         $this->iluoChecklists = new ArrayCollection();
         $this->trainingMaterialType = new ArrayCollection();
     }
@@ -70,30 +63,6 @@ class Steps
         return $this;
     }
     
-    /**
-     * @return Collection<int, Upload>
-     */
-    public function getUploads(): Collection
-    {
-        return $this->uploads;
-    }
-
-    public function addUpload(Upload $upload): static
-    {
-        if (!$this->uploads->contains($upload)) {
-            $this->uploads->add($upload);
-        }
-
-        return $this;
-    }
-
-    public function removeUpload(Upload $upload): static
-    {
-        $this->uploads->removeElement($upload);
-
-        return $this;
-    }
-
     public function getStepsSubheadings(): ?StepsSubheadings
     {
         return $this->stepsSubheadings;

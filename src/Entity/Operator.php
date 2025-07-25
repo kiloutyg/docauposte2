@@ -81,9 +81,6 @@ class Operator
     #[ORM\OneToMany(targetEntity: Iluo::class, mappedBy: 'operator')]
     private Collection $iluos;
 
-    #[ORM\Column(nullable: true, enumType: EmploymentType::class)]
-    private ?EmploymentType $employmentType = null;
-
     #[ORM\OneToOne(mappedBy: 'operator', cascade: ['persist'])]
     private ?User $user = null;
 
@@ -324,17 +321,6 @@ class Operator
         return $this;
     }
 
-    public function getEmploymentType(): ?EmploymentType
-    {
-        return $this->employmentType;
-    }
-
-    public function setEmploymentType(?EmploymentType $employmentType): static
-    {
-        $this->employmentType = $employmentType;
-
-        return $this;
-    }
 
     public function getUser(): ?User
     {
