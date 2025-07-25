@@ -71,12 +71,6 @@ class Upload
     private ?bool $forcedDisplay = null;
 
     /**
-     * @var Collection<int, Steps>
-     */
-    #[ORM\ManyToMany(targetEntity: Steps::class, mappedBy: 'uploads')]
-    private Collection $steps;
-
-    /**
      * @var Collection<int, Workstation>
      */
     #[ORM\OneToMany(targetEntity: Workstation::class, mappedBy: 'upload')]
@@ -91,7 +85,6 @@ class Upload
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
-        $this->steps = new ArrayCollection();
         $this->workstations = new ArrayCollection();
     }
 
@@ -285,32 +278,6 @@ class Upload
         return $this;
     }
 
-    /**
-     * @return Collection<int, Steps>
-     */
-    public function getSteps(): Collection
-    {
-        return $this->steps;
-    }
-
-    public function addStep(Steps $step): static
-    {
-        if (!$this->steps->contains($step)) {
-            $this->steps->add($step);
-            $step->addUpload($this);
-        }
-
-        return $this;
-    }
-
-    public function removeStep(Steps $step): static
-    {
-        if ($this->steps->removeElement($step)) {
-            $step->removeUpload($this);
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Workstation>

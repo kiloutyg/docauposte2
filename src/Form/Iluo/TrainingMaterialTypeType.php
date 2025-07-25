@@ -48,9 +48,9 @@ class TrainingMaterialTypeType extends AbstractBaseFormType
             additionalOptions: [
                 'attr' => [
                     'data-training-material-type-form-target' => 'uploadSelector',
+                    'disabled' => true,
 
-                ],
-                'disabled' => true,
+                ]
             ]
         );
 
