@@ -3,7 +3,11 @@
 namespace App\Form\Iluo;
 
 use App\Entity\TrainingMaterialType;
+use App\Entity\Upload;
+
 use App\Form\AbstractBaseFormType;
+
+use App\Model\TrainingMaterialTypeCategory;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,6 +22,25 @@ class TrainingMaterialTypeType extends AbstractBaseFormType
             label: 'Type de Support de Formation',
             placeholder: 'Nom du Type de Support de Formation',
             required: true
+        );
+
+        $this->addEntityField(
+            builder: $builder,
+            fieldName: 'upload',
+            label: 'Fichier spécifique à utiliser pour le Support de Formation',
+            entityClass: Upload::class,
+            choiceLabel: 'filename',
+            placeholder: 'Sélectionner un Fichier',
+            required: false
+        );
+
+        $this->addEnumField(
+            builder: $builder,
+            fieldName: 'category',
+            label: 'Catégorie du Type de Support de Formation (obligatoire)',
+            enumClass: TrainingMaterialTypeCategory::class,
+            placeholder: 'Sélectionner une Catégorie',
+            required: true,
         );
 
         $this->addSubmitButton($builder);

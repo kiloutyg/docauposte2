@@ -5,9 +5,11 @@ namespace App\Form;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+
 
 abstract class AbstractBaseFormType extends AbstractType
 {
@@ -161,5 +163,55 @@ abstract class AbstractBaseFormType extends AbstractType
                 $baseOptions[$key] = $value;
             }
         }
+    }
+
+    /**
+     * Adds an enum selection field to the form.
+     *
+     * This method creates a choice field based on an enum class with predefined styling
+     * and configuration. It automatically extracts enum cases and uses their values
+     * as both keys and labels.
+     *
+     * @param FormBuilderInterface $builder          The form builder instance
+     * @param string               $fieldName        The name of the field in the form
+     * @param string               $label            The label text to display for the field
+     * @param string               $enumClass        The fully qualified enum class name
+     * @param string|null          $placeholder      Optional placeholder text (defaults to label if null)
+     * @param bool                 $required         Whether the field is required (default: true)
+     * @param array                $additionalOptions Additional options to override or extend default configuration
+     *
+     * @return void
+     */
+    protected function addEnumField(
+        FormBuilderInterface $builder,
+        string $fieldName,
+        string $label,
+        string $enumClass,
+        ?string $placeholder = null,
+        bool $required = true,
+        array $additionalOptions = []
+    ): void {
+        $options = [
+            'label' => $label,
+            'class' => $enumClass,
+            'choice_label' => function ($choice) {
+                return $choice->value;
+            },
+            'label_attr' => [
+                'class' => 'form-label fs-6',
+                'style' => 'color: #ffffff;'
+            ],
+            'placeholder' => $placeholder ?? $label,
+            'attr' => [
+                'class' => 'form-control mx-auto mt-2',
+                'id' => $fieldName,
+            ],
+            'required' => $required,
+        ];
+
+        // Merge additional options with proper handling of nested arrays
+        $this->mergeOptions($options, $additionalOptions);
+
+        $builder->add($fieldName, EnumType::class, $options);
     }
 }
