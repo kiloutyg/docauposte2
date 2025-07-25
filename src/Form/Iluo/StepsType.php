@@ -22,7 +22,7 @@ class StepsType extends AbstractBaseFormType
             fieldName: 'question',
             label: 'Question d\'Etape',
             placeholder: 'Question d\'Etape',
-            required: true
+            required: true,
         );
         $this->addEntityField(
             builder: $builder,
