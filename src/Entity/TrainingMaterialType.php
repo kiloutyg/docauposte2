@@ -28,6 +28,9 @@ class TrainingMaterialType
     #[ORM\Column(enumType: TrainingMaterialTypeCategory::class)]
     private ?TrainingMaterialTypeCategory $category = null;
 
+    #[ORM\OneToOne(inversedBy: 'trainingMaterialType', cascade: ['persist', 'remove'])]
+    private ?Upload $upload = null;
+
     public function __construct()
     {
         $this->steps = new ArrayCollection();
@@ -85,6 +88,18 @@ class TrainingMaterialType
     public function setCategory(TrainingMaterialTypeCategory $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getUpload(): ?Upload
+    {
+        return $this->upload;
+    }
+
+    public function setUpload(?Upload $upload): static
+    {
+        $this->upload = $upload;
 
         return $this;
     }

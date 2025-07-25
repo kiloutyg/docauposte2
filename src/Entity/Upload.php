@@ -85,6 +85,9 @@ class Upload
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $originalFilePath = null;
 
+    #[ORM\OneToOne(mappedBy: 'upload', cascade: ['persist', 'remove'])]
+    private ?TrainingMaterialType $trainingMaterialType = null;
+
     public function __construct()
     {
         $this->trainingRecords = new ArrayCollection();
@@ -347,6 +350,28 @@ class Upload
     public function setOriginalFilePath(?string $originalFilePath): static
     {
         $this->originalFilePath = $originalFilePath;
+
+        return $this;
+    }
+
+    public function getTrainingMaterialType(): ?TrainingMaterialType
+    {
+        return $this->trainingMaterialType;
+    }
+
+    public function setTrainingMaterialType(?TrainingMaterialType $trainingMaterialType): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($trainingMaterialType === null && $this->trainingMaterialType !== null) {
+            $this->trainingMaterialType->setUpload(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($trainingMaterialType !== null && $trainingMaterialType->getUpload() !== $this) {
+            $trainingMaterialType->setUpload($this);
+        }
+
+        $this->trainingMaterialType = $trainingMaterialType;
 
         return $this;
     }
