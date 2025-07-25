@@ -13,6 +13,14 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 abstract class AbstractBaseFormType extends AbstractType
 {
+    // CSS class constants
+    private const FORM_LABEL_CLASSES = 'form-label fs-6';
+    private const FORM_CONTROL_CLASSES = 'form-control mx-auto mt-2';
+    private const SUBMIT_BUTTON_CLASSES = 'btn btn-primary btn-login text-uppercase fw-bold mt-2 mb-3 submit-entity-creation';
+
+    // Style constants
+    private const LABEL_STYLE = 'color: #ffffff;';
+
     /**
      * Adds an entity selection field to the form.
      *
@@ -49,12 +57,12 @@ abstract class AbstractBaseFormType extends AbstractType
             'choice_label' => $choiceLabel,
             'query_builder' => $queryBuilder,
             'label_attr' => [
-                'class' => 'form-label fs-6',
-                'style' => 'color: #ffffff;'
+                'class' => self::FORM_LABEL_CLASSES,
+                'style' => self::LABEL_STYLE
             ],
             'placeholder' => $placeholder ?? $label,
             'attr' => [
-                'class' => 'form-control mx-auto mt-2',
+                'class' => self::FORM_CONTROL_CLASSES,
                 'id' => $fieldName,
             ],
             'required' => $required,
@@ -96,11 +104,11 @@ abstract class AbstractBaseFormType extends AbstractType
         $options = [
             'label' => $label,
             'label_attr' => [
-                'class' => 'form-label fs-6',
-                'style' => 'color: #ffffff;'
+                'class' => self::FORM_LABEL_CLASSES,
+                'style' => self::LABEL_STYLE
             ],
             'attr' => [
-                'class' => 'form-control mx-auto mt-2',
+                'class' => self::FORM_CONTROL_CLASSES,
                 'placeholder' => $placeholder ?? $label,
                 'id' => $fieldName,
             ],
@@ -134,7 +142,7 @@ abstract class AbstractBaseFormType extends AbstractType
         $options = [
             'label' => $label,
             'attr' => [
-                'class' => 'btn btn-primary btn-login text-uppercase fw-bold mt-2 mb-3 submit-entity-creation',
+                'class' => self::SUBMIT_BUTTON_CLASSES,
                 'type' => 'submit',
             ]
         ];
@@ -198,12 +206,12 @@ abstract class AbstractBaseFormType extends AbstractType
                 return $choice->value;
             },
             'label_attr' => [
-                'class' => 'form-label fs-6',
-                'style' => 'color: #ffffff;'
+                'class' => self::FORM_LABEL_CLASSES,
+                'style' => self::LABEL_STYLE
             ],
             'placeholder' => $placeholder ?? $label,
             'attr' => [
-                'class' => 'form-control mx-auto mt-2',
+                'class' => self::FORM_CONTROL_CLASSES,
                 'id' => $fieldName,
             ],
             'required' => $required,
