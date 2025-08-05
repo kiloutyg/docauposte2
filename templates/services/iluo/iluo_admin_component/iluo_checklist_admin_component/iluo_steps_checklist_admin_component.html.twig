@@ -101,7 +101,6 @@
 														<strong>
 															{{ iluoLevel.level }}
 														</strong>
-
 													</button>
 												</li>
 												<div
@@ -133,7 +132,6 @@
 																				<strong>
 																					{{ stepTitle.title }}
 																				</strong>
-
 																			</button>
 																		</li>
 																		<div
@@ -144,14 +142,12 @@
 																			<div
 																				class="accordion-body">
 																				{% set stepsSubheadingsIndex = 0 %}
-
 																				{% for stepSubheadings in stepTitle.stepsSubheadings %}
 																					{% if stepSubheadings.steps is not empty %}
 																						{% set stepsSubheadingsIndex = stepsSubheadingsIndex + 1 %}
 																						<div
 																							class="accordion"
 																							id="stepSubheadingsStepsList{{ iluoLevelIndex }}{{ stepTitleIndex }}{{ stepsSubheadingsIndex }}">
-
 																							<div
 																								class="accordion-item">
 																								<li
@@ -177,7 +173,10 @@
 																									<div
 																										class="accordion-body">
 																										{% for step in stepSubheadings.steps %}
-																											{% include 'services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_steps_list_component/iluo_steps_lists_element.html.twig' %}
+																											{% if step.id not in displayedSteps %}
+																												{% include 'services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_steps_list_component/iluo_steps_lists_element.html.twig' %}
+																												{% set displayedSteps = displayedSteps|merge({(step.id): step.id}) %}
+																											{% endif %}
 																										{% endfor %}
 																									</div>
 																								</div>
@@ -186,7 +185,10 @@
 																					{% endif %}
 																				{% endfor %}
 																				{% for step in stepTitle.steps %}
-																					{% include 'services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_steps_list_component/iluo_steps_lists_element.html.twig' %}
+																					{% if step.id not in displayedSteps %}
+																						{% include 'services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_steps_list_component/iluo_steps_lists_element.html.twig' %}
+																						{% set displayedSteps = displayedSteps|merge({(step.id): step.id}) %}
+																					{% endif %}
 																				{% endfor %}
 																			</div>
 																		</div>
@@ -195,8 +197,10 @@
 															{% endif %}
 														{% endfor %}
 														{% for step in iluoLevel.steps %}
-															{% include 'services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_steps_list_component/iluo_steps_lists_element.html.twig' %}
-
+															{% if step.id not in displayedSteps %}
+																{% include 'services/iluo/iluo_admin_component/iluo_checklist_admin_component/iluo_steps_list_component/iluo_steps_lists_element.html.twig' %}
+																{% set displayedSteps = displayedSteps|merge({(step.id): step.id}) %}
+															{% endif %}
 														{% endfor %}
 													</div>
 												</div>
