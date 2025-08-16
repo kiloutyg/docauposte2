@@ -4,7 +4,7 @@ namespace App\Model;
 
 enum TrainingMaterialTypeCategory: string
 {
-    case UPLOAD = 'Upload';
+    case UPLOAD = 'Specific Upload';
     case WORKSTATION = 'Workstation';
     case OTHER = 'Other';
 }

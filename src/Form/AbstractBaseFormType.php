@@ -15,7 +15,7 @@ abstract class AbstractBaseFormType extends AbstractType
 {
     // CSS class constants
     private const FORM_LABEL_CLASSES = 'form-label fs-6';
-    private const FORM_CONTROL_CLASSES = 'form-control mx-auto mt-2';
+    private const FORM_CONTROL_CLASSES = 'form-control mx-auto mb-3';
     private const SUBMIT_BUTTON_CLASSES = 'btn btn-primary btn-login text-uppercase fw-bold mt-2 mb-3 submit-entity-creation';
 
     // Style constants
