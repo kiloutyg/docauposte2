@@ -21,6 +21,7 @@ class IluoService extends AbstractController
     private $logger;
 
     private $serviceFactory;
+    private $entityFetchingService;
 
     private $iluoLevelsService;
     private $productsService;
@@ -41,15 +42,18 @@ class IluoService extends AbstractController
      *
      * @param LoggerInterface $logger The logger service for recording application events
      * @param ServiceFactory $serviceFactory Factory service for accessing services
+     * @param EntityFetchingService $entityFetchingService Service for fetching entities
      */
     public function __construct(
         LoggerInterface                     $logger,
 
         ServiceFactory                      $serviceFactory,
+        EntityFetchingService               $entityFetchingService
     ) {
         $this->logger                       = $logger;
 
         $this->serviceFactory               = $serviceFactory;
+        $this->entityFetchingService        = $entityFetchingService;
 
         $this->iluoLevelsService            = $this->serviceFactory->getService(className: 'Iluo\\IluoLevels');
         $this->productsService              = $this->serviceFactory->getService(className: 'Iluo\\Products');
@@ -158,4 +162,8 @@ class IluoService extends AbstractController
         $this->logger->debug(message: 'iluoService::routeNameDetermination - Redirecting to route', context: [$route]);
         return $route;
     }
+
+
+
+
 }
