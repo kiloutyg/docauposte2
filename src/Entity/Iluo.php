@@ -38,6 +38,9 @@ class Iluo
     #[ORM\OneToOne(mappedBy: 'iluo', cascade: ['persist', 'remove'])]
     private ?IluoChecklist $iluoChecklist = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $OperatorMatricule = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -145,6 +148,18 @@ class Iluo
         }
 
         $this->iluoChecklist = $iluoChecklist;
+
+        return $this;
+    }
+
+    public function getOperatorMatricule(): ?string
+    {
+        return $this->OperatorMatricule;
+    }
+
+    public function setOperatorMatricule(?string $OperatorMatricule): static
+    {
+        $this->OperatorMatricule = $OperatorMatricule;
 
         return $this;
     }

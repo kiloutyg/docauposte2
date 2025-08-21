@@ -6,6 +6,7 @@
 		{{shiftLeader.user.username|upper|split('.')|last }}
 	</strong>
 </div>
+
 {% if shiftLeader.user.operator is defined and shiftLeader.user.operator is not empty %}
 	<div>
 		{{shiftLeader.user.operator.team.name }}
@@ -17,6 +18,7 @@
 		{{shiftLeader.user.department.name|capitalize}}
 	</div>
 {% endif %}
+
 {% if is_granted('ROLE_SUPER_ADMIN') %}
 	<a
 		id="modify_user_account"
@@ -37,4 +39,5 @@
 		</span>
 	</a>
 {% endif %}
+
 {{ delete_form('shiftLeaders', shiftLeader.id, 'app_iluo_shiftleaders_general_elements_admin') }}
