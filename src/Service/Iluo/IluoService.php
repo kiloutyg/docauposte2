@@ -109,7 +109,7 @@ class IluoService extends AbstractController
                 }
 
                 $entityName = $service->$methodName($form, $request);
-                $this->addFlash(type: 'success', message: "L'entité $entityName a bien été ajoutée.");
+                $this->addFlash(type: 'success', message: "L'entité \" $entityName \" a bien été ajoutée.");
             } catch (\Exception $e) {
                 $this->logger->error(message: 'iluoService::iluoComponentFormManagement - Issue in form submission', context: [$e->getMessage()]);
                 $this->addFlash(type: 'error', message: 'Issue in form submission ' . $e->getMessage());
