@@ -1,43 +1,45 @@
-{% if step.id not in displayedSteps %}
-	<li
-		class="list-group-item bg-white text-dark d-flex justify-content-between align-items-start py-3">
+<li
+	class="list-group-item bg-white text-dark d-flex justify-content-between align-items-start py-3">
+	<div
+		class="flex-grow-1 d-flex flex-column text-start">
 		<div
-			class="flex-grow-1 d-flex flex-column text-start">
-			<div
-				class="mb-2 align-self-start">
-				<span
-					class="font-weight-bold text-dark ">
-					<strong>
-						{{ step.question }}
-					</strong>
-				</span>
-			</div>
-			<div
-				class="text-muted  align-self-start">
-				<span
-					class="mr-1">
-					Types de support:
-				</span>
-				{% if step.trainingMaterialType is defined and step.trainingMaterialType is not empty %}
-					{% for trainingMaterialType in step.trainingMaterialType %}
-						<span
-							class="mr-1">
-							{{ trainingMaterialType.name }}
-						</span>
-					{% endfor %}
-				{% else %}
+			class="mb-2 align-self-start">
+			<span
+				class="font-weight-bold text-dark ">
+				<strong>
+					{{ step.question }}
+				</strong>
+			</span>
+		</div>
+		<div
+			class="text-muted  align-self-start">
+			<span
+				class="mr-1">
+				Types de support:
+			</span>
+			{% if step.trainingMaterialType is defined and step.trainingMaterialType is not empty %}
+				{% for trainingMaterialType in step.trainingMaterialType %}
 					<span
-						class="text-muted font-italic">
-						Aucun type de support défini
+						class="mr-1">
+						{% if trainingMaterialType.category.value == 'Upload' %}
+							{{ trainingMaterialType.name }}
+							-
+							{{ trainingMaterialType.upload.filename}}
+						{% else %}
+							{{ trainingMaterialType.name }}
+						{% endif %}
 					</span>
-				{% endif %}
-			</div>
+				{% endfor %}
+			{% else %}
+				<span
+					class="text-muted font-italic">
+					Aucun type de support défini
+				</span>
+			{% endif %}
 		</div>
-
-		<div
-			class="ml-3 d-flex align-self-center">
-			{{ delete_form('steps', step.id, 'app_iluo_steps_checklist_admin') }}
-		</div>
-	</li>
-	{% set displayedSteps = displayedSteps|merge({(step.id): step.id}) %}
-{% endif %}
+	</div>
+	<div
+		class="ml-3 d-flex align-self-center">
+		{{ delete_form('steps', step.id, 'app_iluo_steps_checklist_admin') }}
+	</div>
+</li>

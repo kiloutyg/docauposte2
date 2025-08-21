@@ -17,7 +17,6 @@
 				</h6>
 				<div
 					class="d-flex flex-fill">
-	
 					<input
 						type="text"
 						class="form-control "
@@ -50,18 +49,15 @@
 			<div
 				data-operator-trainer-target="trainerOperatorCodeMessage"
 				class="trainerOperatorCode-message d-flex justify-content-evenly"></div>
-
 			<form
 				action="{{path('app_training_new_operator', {'uploadId': upload.id, 'teamId': team.id, 'uapId': uap.id})}}" method="post"
 				name="newOperatorContainer"
 				id="newOperatorContainer"
 				data-turbo-frame="training-records-form"></form>
-
 		</div>
 	{% endif %}
 	<turbo-frame
 		id="training-records-form">
 		{% include "services/operators/training_component/_listOperator.html.twig" %}
 	</turbo-frame>
-
 </turbo-frame>

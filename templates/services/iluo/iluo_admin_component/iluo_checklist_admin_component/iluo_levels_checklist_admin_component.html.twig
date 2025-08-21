@@ -64,9 +64,10 @@
 							{% for iluoLevel in iluoLevels %}
 								<li
 									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
-									{{ iluoLevel.level }}
+									<strong>
+										{{ iluoLevel.level }}
+									</strong>
 									{{ delete_form('iluoLevels', iluoLevel.id, 'app_iluo_iluolevels_checklist_admin') }}
-
 								</li>
 								<li
 									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">

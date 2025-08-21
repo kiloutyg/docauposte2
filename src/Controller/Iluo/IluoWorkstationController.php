@@ -81,26 +81,25 @@ class IluoWorkstationController extends AbstractController
     #[Route('admin/workstation/creation', name: 'creation_workstation_admin')]
     public function workstationCreationAdminPageGet(Request $request): Response
     {
-        $this->logger->info(message: 'IluoWorkstationController::workstationCreationAdminPageGet - GET request on creation_workstation_admin full request : ', context: [$request->request->all()]);
         $newWorkstation = new Workstation();
         $workstationForm = $this->createForm(type: WorkstationType::class, data: $newWorkstation);
         if ($request->isMethod(method: 'POST')) {
-            $this->logger->info(message: 'IluoWorkstationController::workstationCreationAdminPageGet - workstation form submitted method POST ', context: [$request->request->all()]);
+            $this->logger->debug(message: 'IluoWorkstationController::workstationCreationAdminPageGet - workstation form submitted method POST ', context: [$request->request->all()]);
             // Check if this is an AJAX request for zone change
             if ($request->request->has(key: 'ajax_change')) {
-                $this->logger->info(message: 'IluoWorkstationController::workstationCreationAdminPageGet - workstation form submitted with AJAX zone change', context: [$request->request->all()]);
+                $this->logger->debug(message: 'IluoWorkstationController::workstationCreationAdminPageGet - workstation form submitted with AJAX zone change', context: [$request->request->all()]);
                 // Get the form data from the request
                 $formData = $request->request->has(key: 'workstation') ? $request->request->all(key: 'workstation') : [];
                 // Handle the form data
                 $workstationForm->submit(submittedData: $formData, clearMissing: false);
             } else {
-                $this->logger->info(message: 'IluoWorkstationController::workstationCreationAdminPageGet - workstation form submitted', context: [$request->request->all()]);
                 return $this->iluoService->iluoComponentFormManagement(entityType: 'workstation', form: $workstationForm, request: $request);
             }
         }
         return $this->render(view: '/services/iluo/iluo_admin_component/iluo_workstation_admin_component/iluo_creation_workstation_admin.html.twig', parameters: [
             'workstationForm' => $workstationForm->createView(),
             'workstations' => $this->entityFetchingService->getWorkstations(),
+            'zones' => $this->entityFetchingService->getZones(),
         ]);
     }
 }

@@ -5,7 +5,7 @@
 	) }}
 	<div
 		class="workstationName-message"
-		data-name-validation-target="workstationNameMessage"></div>
+		data-name-vadivdation-target="workstationNameMessage"></div>
 	<div
 		id="flash-messages">
 		{% for label, messages in app.flashes %}
@@ -20,71 +20,123 @@
 		{% endfor %}
 	</div>
 	{{ form_end(workstationForm) }}
+
 	{% if workstations is not empty %}
 		<div
 			class="col-lg-12 col-md-12 col-sm-12 mt-auto mb-auto accordion"
-			id="accordionWorkstationList">
+			id="accordionAdminWorkstationList">
 			<div
 				class="accordion-item shadow-lg shadow-lg-inset border border-dark">
 				<h2
 					class="accordion-header"
-					id="headingWorkstationList">
+					id="headingAdminWorkstationList">
 					<button
 						class="accordion-button bg-white text-dark collapsed"
 						type="button"
 						data-bs-toggle="collapse"
-						data-bs-target="#collapseWorkstationList"
+						data-bs-target="#collapseAdminWorkstationList"
 						aria-expanded="false"
-						aria-controls="collapseWorkstationList">
+						aria-controls="collapseAdminWorkstationList">
 						<strong>
 							Liste des workstations
 						</strong>
 					</button>
 				</h2>
 				<div
-					id="collapseWorkstationList"
+					id="collapseAdminWorkstationList"
 					class="accordion-collapse collapse "
-					aria-labelledby="headingWorkstationList"
-					data-bs-parent="#accordionWorkstationList">
+					aria-labelledby="headingAdminWorkstationList"
+					data-bs-parent="#accordionAdminWorkstationList">
 					<div
 						class="accordion-body bg-white text-dark">
 						<ul
 							class="list-group">
-							{% for workstation in workstations %}
-								<li
-									class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
-									<div
-										class="flex-grow-1">
-										<strong
-											class="flex-grow-1">
-											{{workstation.name}}
-										</strong>
-										<strong
-											class="flex-grow-1">
-											{{workstation.upload.filename}}
-										</strong>
-										<strong
-											class="flex-grow-1">
-											{{workstation.products.name}}
-										</strong>
-										<strong
-											class="flex-grow-1">
-											{{workstation.department.name}}
-										</strong>
-										<strong
-											class="flex-grow-1">
-											{{workstation.zone.name}}
-										</strong>
-										<strong
-											class="flex-grow-1">
-											{{workstation.uap.name}}
-										</strong>
-									</div>
-									{% if is_granted('ROLE_LINE_ADMIN') %}
-										{{ delete_form('workstation', workstation.id, 'app_iluo_creation_workstation_admin') }}
+							{% set zoneIndex = 0 %}
+							<div
+								class="accordion"
+								id="accordionWorkstationList">
+								{% for zone in zones %}
+									{% if zone.workstations is not empty %}
+
+										{% set zoneIndex = zoneIndex + 1 %}
+										<div
+											class="accordion-item shadow-lg shadow-lg-inset border border-dark">
+											<li
+												class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center accordion-header "
+												id="headingZoneWorkstationList{{ zoneIndex }}">
+												<button
+													class="accordion-button collapsed"
+													type="button"
+													data-bs-toggle="collapse"
+													data-bs-target="#collapseZoneWorkstationList{{ zoneIndex }}"
+													aria-expanded="false"
+													aria-controls="collapseZoneWorkstationList{{ zoneIndex }}">
+													<strong>
+														{{ zone.name }}
+													</strong>
+												</button>
+											</li>
+											<div
+												id="collapseZoneWorkstationList{{ zoneIndex }}"
+												class="accordion-collapse collapse"
+												aria-labelledby="headingZoneWorkstationList{{ zoneIndex }}"
+												data-bs-parent="#accordionWorkstationList">
+												<div
+													class="accordion-body">
+													{% for workstation in zone.workstations %}
+														<strong>
+															<ul
+																class="list-group-item bg-white text-dark d-flex justify-content-between align-items-center">
+																<div
+																	style="flex:0.3; text-align: center;"
+																	class="mx-auto">
+																	{{workstation.name}}
+																</div>
+																<div
+																	style="flex:0.01; text-align: center;"
+																	class="mx-auto"></div>
+																<div
+																	style="flex:0.3; text-align: center;"
+																	class="mx-auto">
+																	{{workstation.upload.filename}}
+																</div>
+																<div
+																	style="flex:0.01; text-align: center;"
+																	class="mx-auto"></div>
+																<div
+																	style="flex:0.3; text-align: center;"
+																	class="mx-auto">
+																	{{workstation.products.name}}
+																</div>
+																<div
+																	style="flex:0.01; text-align: center;"
+																	class="mx-auto"></div>
+																<div
+																	style="flex:0.3; text-align: center;"
+																	class="mx-auto">
+																	{{workstation.department.name}}
+																</div>
+																<div
+																	style="flex:0.01; text-align: center;"
+																	class="mx-auto"></div>
+																<div
+																	style="flex:0.3; text-align: center;"
+																	class="mx-auto">
+																	{{workstation.uap.name}}
+																</div>
+																{% if is_granted('ROLE_LINE_ADMIN') %}
+																	{{ delete_form('workstation', workstation.id, 'app_iluo_creation_workstation_admin') }}
+																{% endif %}
+															</ul>
+														</strong>
+													{% endfor %}
+												</div>
+											</div>
+										</div>
 									{% endif %}
-								</li>
-							{% endfor %}
+								{% endfor %}
+							</div>
+
 						</ul>
 					</div>
 				</div>
