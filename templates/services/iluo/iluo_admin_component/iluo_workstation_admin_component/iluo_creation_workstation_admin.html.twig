@@ -98,7 +98,11 @@
 																<div
 																	style="flex:0.3; text-align: center;"
 																	class="mx-auto">
-																	{{workstation.upload.filename}}
+																	<a
+																		href="{{ path('app_download_file', { 'uploadId': workstation.upload.id }) }}" target="_blank"
+																		data-turbo-frame="_top">
+																		{{workstation.upload.filename}}
+																	</a>
 																</div>
 																<div
 																	style="flex:0.01; text-align: center;"

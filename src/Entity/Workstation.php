@@ -31,7 +31,7 @@ class Workstation
     private ?Upload $upload = null;
 
     #[ORM\ManyToOne(inversedBy: 'workstations')]
-    private ?Products $product = null;
+    private ?Products $products = null;
 
     #[ORM\ManyToOne(inversedBy: 'workstations')]
     private ?Department $department = null;
@@ -82,14 +82,14 @@ class Workstation
         return $this;
     }
 
-    public function getProduct(): ?Products
+    public function getProducts(): ?Products
     {
-        return $this->product;
+        return $this->products;
     }
 
-    public function setProduct(?Products $product): static
+    public function setProducts(?Products $products): static
     {
-        $this->product = $product;
+        $this->products = $products;
 
         return $this;
     }

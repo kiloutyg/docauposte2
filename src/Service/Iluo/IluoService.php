@@ -21,7 +21,6 @@ class IluoService extends AbstractController
     private $logger;
 
     private $serviceFactory;
-    private $entityFetchingService;
 
     private $iluoLevelsService;
     private $productsService;
@@ -32,6 +31,7 @@ class IluoService extends AbstractController
     private $stepsTitleService;
     private $workstationService;
     private $trainingMaterialTypeService;
+    private $iluoChecklistService;
 
     /**
      * Constructor for the IluoService class.
@@ -42,18 +42,15 @@ class IluoService extends AbstractController
      *
      * @param LoggerInterface $logger The logger service for recording application events
      * @param ServiceFactory $serviceFactory Factory service for accessing services
-     * @param EntityFetchingService $entityFetchingService Service for fetching entities
      */
     public function __construct(
         LoggerInterface                     $logger,
 
         ServiceFactory                      $serviceFactory,
-        EntityFetchingService               $entityFetchingService
     ) {
         $this->logger                       = $logger;
 
         $this->serviceFactory               = $serviceFactory;
-        $this->entityFetchingService        = $entityFetchingService;
 
         $this->iluoLevelsService            = $this->serviceFactory->getService(className: 'Iluo\\IluoLevels');
         $this->productsService              = $this->serviceFactory->getService(className: 'Iluo\\Products');
@@ -64,6 +61,7 @@ class IluoService extends AbstractController
         $this->stepsTitleService            = $this->serviceFactory->getService(className: 'Iluo\\StepsTitle');
         $this->trainingMaterialTypeService  = $this->serviceFactory->getService(className: 'Iluo\\TrainingMaterialType');
         $this->workstationService           = $this->serviceFactory->getService(className: 'Iluo\\Workstation');
+        $this->iluoChecklistService         = $this->serviceFactory->getService(className: 'Iluo\\IluoChecklist');
     }
 
 
@@ -164,6 +162,35 @@ class IluoService extends AbstractController
     }
 
 
+    /**
+     * Checks for updates in the ILUO checklist.
+     *
+     * This method delegates the task of checking for ILUO updates to the
+     * `iluoChecklistService`. It is used to determine if there have been any
+     * changes that require updates to the ILUO records.
+     *
+     * @return mixed The result of the update check from the `iluoChecklistService`.
+     */
+    public function checkIluoUpdates()
+    {
+        $this->logger->debug(message: 'iluoService::iluoCheckUpdate');
+        // return $this->iluoChecklistService->checkIluoUpdatesByWorkstation();
+        return $this->iluoChecklistService->checkIluoUpdates();
+    }
 
 
+    /**
+     * Deletes all ILUO records.
+     *
+     * This method delegates the deletion of all ILUO records to the
+     * `iluoChecklistService`. It is a high-level function that triggers
+     * a complete wipe of the ILUO data.
+     *
+     * @return mixed The result of the deletion operation from the `iluoChecklistService`.
+     */
+    public function deleteAllIluos()
+    {
+        $this->logger->debug(message: 'iluoService::deleteAllIluos');
+        return $this->iluoChecklistService->deleteAllIluos();
+    }
 }

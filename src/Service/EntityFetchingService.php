@@ -441,6 +441,11 @@ class EntityFetchingService extends AbstractController
         return $this->findAll('qualityRep');
     }
 
+    public function getIluos()
+    {
+        return $this->findAll('iluo');
+    }
+
 
     /**
      * Retrieves operator suggestions based on a username pattern.

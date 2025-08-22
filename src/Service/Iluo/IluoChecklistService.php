@@ -4,8 +4,8 @@ namespace App\Service\Iluo;
 
 use App\Entity\Operator;
 use App\Entity\Iluo;
-use App\Entity\Workstation;
 use App\Entity\IluoChecklist;
+use App\Entity\Workstation;
 
 use App\Service\EntityFetchingService;
 
@@ -37,83 +37,453 @@ class IluoChecklistService extends AbstractController
 
 
 
-    public function iluoCheckUpdate()
+    /**
+     * Iterates through all operators to create initial ILUO records.
+     * This function fetches all operators and, for each one that already has associated ILUOs,
+     * it triggers the creation process for potentially new ILUOs based on their workstations.
+     *
+     * @return int The total number of new ILUOs created.
+     */
+    public function checkIluoUpdates()
     {
+        $count = 0;
         $allOperators = $this->entityFetchingService->getOperators();
+
         foreach ($allOperators as $operator) {
-            if (empty($operator->getIluos())) {
-                $this->initialIluoCreation(operator: $operator);
+            if (!empty($operator->getIluos())) {
+                $count += $this->initialIluoCreation(operator: $operator);
             }
         }
+        $this->em->flush();
+
+        return $count;
     }
 
-    private function initialIluoCreation(Operator $operator): void
+
+
+    /**
+     * Creates initial ILUO records for a specific operator.
+     * This function iterates through the UAPs and workstations associated with the given operator
+     * and triggers the creation of an ILUO for each valid operator-workstation combination.
+     *
+     * @param Operator $operator The operator for whom to create the ILUOs.
+     * @return int The number of new ILUOs created for the specified operator.
+     */
+    private function initialIluoCreation(Operator $operator): int
     {
-        // $this->logger->debug(message: 'iluoService::initialIluoCreation', context: ['operatorId' => $operator->getId()]);
+        // $this->logger->debug(message: 'iluoChecklistService::initialIluoCreation', context: ['operatorId' => $operator->getId()]);
         $operatorUaps = $operator->getUaps();
 
         if (empty($operatorUaps)) {
-            $this->logger->error(message: 'iluoService::initialIluoCreation - No UAPs found for operator', context: ['operatorId' => $operator->getId()]);
-            return;
+
+            $this->logger->error(
+                message: 'iluoChecklistService::initialIluoCreation - No UAPs found for operator',
+                context: ['operatorId' => $operator->getId()]
+            );
+
+            return 0;
         } else {
-            $this->logger->debug(message: 'iluoService::initialIluoCreation - Creating initial ILUO for operator', context: ['operatorId' => $operator->getId()]);
+
+            $this->logger->debug(
+                message: 'iluoChecklistService::initialIluoCreation - Creating initial ILUO for operator',
+                context: ['operatorId' => $operator->getId()]
+            );
+
             $workstations = [];
+            $count = 0;
+
             foreach ($operatorUaps as $uap) {
+
                 $workstations = $uap->getWorkstations();
+
                 if (empty($workstations)) {
-                    $this->logger->error(message: 'iluoService::initialIluoCreation - No workstations found for UAP', context: ['uapId' => $uap->getId()]);
+
+                    $this->logger->error(
+                        message: 'iluoChecklistService::initialIluoCreation - No workstations found for UAP',
+                        context: ['uapId' => $uap->getId()]
+                    );
+
                     continue;
-                }
-                foreach ($workstations as $workstation) {
-                    $this->logger->debug(message: 'iluoService::initialIluoCreation - Creating initial ILUO for workstation', context: ['workstationId' => $workstation->getId()]);
-                    $this->iluoCreation($operator, $workstation);
+                } else {
+
+                    foreach ($workstations as $workstation) {
+
+                        $this->logger->debug(
+                            message: 'iluoChecklistService::initialIluoCreation - Creating initial ILUO for workstation',
+                            context: ['workstationId' => $workstation->getId()]
+                        );
+
+                        if ($this->iluoCreation(operator: $operator, workstation: $workstation)) {
+                            $count++;
+                        }
+                    }
                 }
             }
         }
+        return $count;
     }
 
+
+    /**
+     * Iterates through all workstations to create ILUO records for their associated operators.
+     * This function ensures that an ILUO exists for every valid combination of an operator
+     * and a workstation within the same UAP.
+     *
+     * @return int The total number of new ILUOs created.
+     */
+    public function checkIluoUpdatesByWorkstation()
+    {
+        $count = 0;
+        $allWorkstations = $this->entityFetchingService->getWorkstations();
+        foreach ($allWorkstations as $workstation) {
+            if (!empty($workstation->getUap())) {
+                $allUapOperators = $workstation->getUap()->getOperators();
+                foreach ($allUapOperators as $operator) {
+                    if ($this->iluoCreation(operator: $operator, workstation: $workstation)) {
+                        $count++;
+                    }
+                }
+            }
+        }
+        $this->em->flush();
+
+        return $count;
+    }
+
+
+
+
+    /**
+     * Creates an ILUO record for a specific operator and workstation combination.
+     *
+     * This function first verifies if the operator is trained for the specific upload
+     * associated with the workstation. If the operator is trained and an ILUO does not
+     * already exist for this operator, workstation, and product, a new ILUO is created
+     * and persisted. It then triggers the creation of the corresponding ILUO checklist.
+     *
+     * @param Operator $operator The operator for whom the ILUO is to be created.
+     * @param Workstation $workstation The workstation associated with the ILUO.
+     * @return bool|null Returns true if a new ILUO was successfully created, or null otherwise (e.g., if the operator is not trained, the training record is missing, or the ILUO already exists).
+     */
     private function iluoCreation(Operator $operator, Workstation $workstation)
     {
         $upload = $workstation->getUpload();
-        $trainingRecord = $this->entityFetchingService->findBy(entityType: 'trainingRecords', criteria: [
-            'upload' => $upload,
-            'operator' => $operator
-        ]);
+        $trainingRecord = $this->entityFetchingService->findOneBy(
+            entityType: 'trainingRecord',
+            criteria: [
+                'upload' => $upload,
+                'operator' => $operator
+            ]
+        );
+
+        $this->logger->debug(
+            message: 'iluoChecklistService::iluoCreation - Checking training record for operator and upload',
+            context: [
+                $trainingRecord
+            ]
+        );
 
         if (empty($trainingRecord)) {
-            $this->logger->error(message: 'iluoService::initialIluoCreation - No training record found for upload', context: [
-                'uploadId' => $upload->getId(),
-                'operatorId' => $operator->getId()
-            ]);
+            $this->logger->error(
+                message: 'iluoChecklistService::iluoCreation - No training record found for upload',
+                context: [
+                    'uploadId' => $upload->getId(),
+                    'operatorId' => $operator->getId()
+                ]
+            );
             return;
         } elseif (!$trainingRecord->isTrained()) {
-            $this->logger->error(message: 'iluoService::initialIluoCreation - Operator not trained for upload', context: [
-                'uploadId' => $upload->getId(),
-                'operatorId' => $operator->getId()
-            ]);
+            $this->logger->error(
+                message: 'iluoChecklistService::iluoCreation - Operator not trained for upload',
+                context: [
+                    'uploadId' => $upload->getId(),
+                    'operatorId' => $operator->getId()
+                ]
+            );
             return;
         } else {
 
-            $this->logger->debug(message: 'iluoService::initialIluoCreation - Creating ILUO for operator', context: [
-                'operatorId' => $operator->getId(),
-                'workstationId' => $workstation->getId()
+            $this->logger->debug(
+                message: 'iluoChecklistService::iluoCreation - Creating ILUO for operator',
+                context: [
+                    'operatorId' => $operator->getId(),
+                    'workstationId' => $workstation->getId()
+                ]
+            );
+
+            // Check if an ILUO already exists for this combination
+            $existingIluo = $this->em->getRepository(Iluo::class)->findOneBy([
+                'operator' => $operator,
+                'workstation' => $workstation,
+                'product' => $workstation->getProducts(),
             ]);
 
+            if ($existingIluo) {
+                $this->logger->info(
+                    'iluoChecklistService::iluoCreation - ILUO already exists, skipping creation.',
+                    [
+                        'iluoId' => $existingIluo->getId(),
+                        'operatorId' => $operator->getId(),
+                        'workstationId' => $workstation->getId(),
+                        'productId' => $workstation->getProducts()->getId(),
+                    ]
+                );
+                return;
+            }
+
+            // Create a new ILUO if it doesn't exist
             $iluo = new Iluo();
             $iluo->setOperator(operator: $operator);
             $iluo->setWorkstation(workstation: $workstation);
-            $iluo->setProduct(product: $workstation->getProduct());
+            $iluo->setProduct(product: $workstation->getProducts());
             $iluo->setStartDate(startDate: new \DateTime());
+
             $this->em->persist(object: $iluo);
 
-            $this->logger->info(message: 'iluoService::initialIluoCreation - ILUO created successfully', context: [
-                'iluoId' => $iluo->getId(),
-                'operatorId' => $operator->getId()
-            ]);
+            $this->logger->info(
+                message: 'iluoChecklistService::iluoCreation - ILUO created successfully',
+                context: [
+                    'iluoId' => $iluo->getId(),
+                    'operatorId' => $operator->getId()
+                ]
+            );
+
+            $this->iluoCheckListCreation($iluo);
+            return true;
         }
     }
 
-    public function iluoCheckListCreation(Iluo $iluo){
 
+
+
+
+    /**
+     * Creates an ILUO checklist for a given ILUO entity.
+     *
+     * This function initializes a new IluoChecklist, associates it with the provided Iluo,
+     * and then populates it with relevant steps by calling separate methods for workstation-specific,
+     * upload-specific, and other general steps.
+     *
+     * @param Iluo $iluo The ILUO entity for which to create the checklist.
+     * @return void
+     */
+    public function iluoCheckListCreation(Iluo $iluo)
+    {
+        $this->logger->debug(
+            message: 'iluoChecklistService::iluoCheckListCreation',
+            context: ['iluoId' => $iluo->getId()]
+        );
+
+        $iluoChecklist = new IluoChecklist();
+        $iluoChecklist->setIluo(iluo: $iluo);
+
+        $this->em->persist(object: $iluoChecklist);
+        // $this->em->flush();
+
+        $this->logger->info(
+            message: 'iluoChecklistService::iluoCheckListCreation - Checklist created successfully',
+            context: ['iluoChecklistId' => $iluoChecklist->getId()]
+        );
+
+        $this->iluoChecklistWorkstationStepsCreation(iluoChecklist: $iluoChecklist);
+        $this->iluoChecklistSpecificUploadStepsCreation(iluoChecklist: $iluoChecklist);
+        $this->iluoChecklistOtherStepsCreation(iluoChecklist: $iluoChecklist);
+
+        return;
+    }
+
+
+
+
+
+
+    /**
+     * Populates an ILUO checklist with steps related to workstation training materials.
+     *
+     * This function finds all training material types categorized as 'Workstation' and adds
+     * their associated steps to the provided IluoChecklist.
+     *
+     * @param IluoChecklist $iluoChecklist The ILUO checklist entity to which the workstation-specific steps will be added.
+     * @return void
+     */
+    public function iluoChecklistWorkstationStepsCreation(IluoChecklist $iluoChecklist)
+    {
+        $this->logger->debug(
+            message: 'iluoChecklistService::iluoChecklistWorkstationStepsCreation',
+            context: ['iluoChecklistId' => $iluoChecklist->getId()]
+        );
+
+        $trainingMaterialTypeWorkstations = $this->entityFetchingService->findBy(
+            entityType: 'trainingMaterialType',
+            criteria: ['category' => 'Workstation']
+        );
+
+        if (!empty($trainingMaterialTypeWorkstations)) {
+
+            foreach ($trainingMaterialTypeWorkstations as $trainingMaterialTypeWorkstation) {
+
+                $this->logger->debug(
+                    message: 'iluoChecklistService::iluoChecklistWorkstationStepsCreation - Processing workstation training material type',
+                    context: ['trainingMaterialTypeId' => $trainingMaterialTypeWorkstation]
+                );
+
+                $stepsWorkstationRelated =  $trainingMaterialTypeWorkstation->getSteps();
+
+                foreach ($stepsWorkstationRelated as $step) {
+                    $iluoChecklist->addStep(step: $step);
+                }
+
+                $this->logger->info(
+                    message: 'iluoChecklistService::iluoChecklistWorkstationStepsCreation - Checklist steps created successfully',
+                    context: ['iluoChecklistId' => $iluoChecklist->getId()]
+                );
+            }
+            return;
+        }
+        $this->logger->info(
+            message: 'iluoChecklistService::iluoChecklistWorkstationStepsCreation - No workstation training material types found',
+            context: ['iluoChecklistId' => $iluoChecklist->getId()]
+        );
+        return;
+    }
+
+
+
+
+
+    /**
+     * Populates an ILUO checklist with steps related to specific upload training materials.
+     *
+     * This function finds all training material types categorized as 'Specific Upload' and adds
+     * their associated steps to the provided IluoChecklist, but only if the operator associated
+     * with the ILUO has a valid training record for the specific upload and is marked as trained.
+     *
+     * @param IluoChecklist $iluoChecklist The ILUO checklist entity to which the specific upload steps will be added.
+     * @return void
+     */
+    public function iluoChecklistSpecificUploadStepsCreation(IluoChecklist $iluoChecklist)
+    {
+        $this->logger->debug(
+            message: 'iluoChecklistService::iluoChecklistSpecificUploadStepsCreation',
+            context: ['iluoChecklistId' => $iluoChecklist->getId()]
+        );
+
+        $trainingMaterialTypepecificUploads = $this->entityFetchingService->findBy(
+            entityType: 'trainingMaterialType',
+            criteria: ['category' => 'Specific Upload']
+        );
+
+        if (!empty($trainingMaterialTypepecificUploads)) {
+
+            foreach ($trainingMaterialTypepecificUploads as $trainingMaterialTypepecificUpload) {
+
+                $trainingRecord = $this->entityFetchingService->findOneBy(
+                    entityType: 'trainingRecord',
+                    criteria: [
+                        'operator' => $iluoChecklist->getIluo()->getOperator(),
+                        'upload' => $trainingMaterialTypepecificUpload->getUpload(),
+                        'trained' => true
+                    ]
+                );
+
+                if (!empty($trainingRecord)) {
+
+                    $stepsSpecificUploadRelated = $trainingMaterialTypepecificUpload->getSteps();
+
+                    foreach ($stepsSpecificUploadRelated as $step) {
+                        $iluoChecklist->addStep(step: $step);
+                    }
+
+                    $this->logger->info(
+                        message: 'iluoChecklistService::iluoChecklistSpecificUploadStepsCreation - Checklist steps created successfully',
+                        context: ['iluoChecklistId' => $iluoChecklist->getId()]
+                    );
+                }
+            }
+
+            return;
+        }
+        $this->logger->info(
+            message: 'iluoChecklistService::iluoChecklistSpecificUploadStepsCreation - No specific upload training material types found',
+            context: ['iluoChecklistId' => $iluoChecklist->getId()]
+        );
+        return;
+    }
+
+
+
+
+
+    /**
+     * Populates an ILUO checklist with steps related to general training materials.
+     *
+     * This function finds all training material types categorized as 'Other' and adds
+     * their associated steps to the provided IluoChecklist. These are general steps
+     * that apply to all operators regardless of their specific workstation or upload training.
+     *
+     * @param IluoChecklist $iluoChecklist The ILUO checklist entity to which the general steps will be added.
+     * @return void
+     */
+    public function iluoChecklistOtherStepsCreation(IluoChecklist $iluoChecklist)
+    {
+        $this->logger->debug(
+            message: 'iluoChecklistService::iluoChecklistOtherStepsCreation',
+            context: ['iluoChecklistId' => $iluoChecklist->getId()]
+        );
+
+        $trainingMaterialTypeOthers = $this->entityFetchingService->findBy(
+            entityType: 'trainingMaterialType',
+            criteria: ['category' => 'Other']
+        );
+        if (!empty($trainingMaterialTypeOthers)) {
+            foreach ($trainingMaterialTypeOthers as $trainingMaterialTypeOther) {
+
+                $stepsOtherRelated = $trainingMaterialTypeOther->getSteps();
+
+                foreach ($stepsOtherRelated as $step) {
+                    $iluoChecklist->addStep(step: $step);
+                }
+
+                $this->logger->info(
+                    message: 'iluoChecklistService::iluoChecklistOtherStepsCreation - Checklist steps created successfully',
+                    context: ['iluoChecklistId' => $iluoChecklist->getId()]
+                );
+            }
+            return;
+        }
+
+        $this->logger->info(
+            message: 'iluoChecklistService::iluoChecklistOtherStepsCreation - No other training material types found',
+            context: ['iluoChecklistId' => $iluoChecklist->getId()]
+        );
+        return;
+    }
+
+
+
+    /**
+     * Deletes all ILUO records from the database.
+     *
+     * This function retrieves all existing ILUO entities and removes them from the database.
+     * It performs a bulk deletion operation and logs the number of deleted records for
+     * auditing purposes. The deletion is committed to the database using flush().
+     *
+     * @return int The total number of ILUO records that were deleted from the database.
+     */
+    public function deleteAllIluos()
+    {
+        $allIluos = $this->entityFetchingService->getIluos();
+        $count = 0;
+        foreach ($allIluos as $iluo) {
+            $this->em->remove(object: $iluo);
+            $count++;
+        }
+        $this->em->flush();
+
+        $this->logger->info(
+            message: 'iluoChecklistService::deleteAllIluos - All ILUOs deleted successfully',
+            context: ['deletedCount' => $count]
+        );
+        return $count;
     }
 }

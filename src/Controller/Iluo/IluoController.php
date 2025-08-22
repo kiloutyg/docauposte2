@@ -82,4 +82,48 @@ class IluoController extends AbstractController
         $this->addFlash('warning', 'Accés non authorisé');
         return $this->redirectToRoute('app_base');
     }
+
+
+
+    /**
+     * Tests the ILUO checklist update functionality.
+     *
+     * This route handler triggers the `checkIluoUpdates` method from the IluoService,
+     * which is responsible for checking and potentially applying updates to the ILUO checklist.
+     * After execution, it sets a success flash message indicating the number of updates
+     * and redirects the user to the ILUO admin page.
+     *
+     * @return Response A RedirectResponse to the ILUO admin page.
+     */
+    #[Route('test_checklist', name: 'test_checklist')]
+    public function testIluoCheckList(): Response
+    {
+        $count = $this->iluoService->checkIluoUpdates();
+
+        $this->addFlash('success', " $count Test ILUO checklist executed successfully.");
+
+        return $this->redirectToRoute('app_iluo_admin');
+    }
+
+
+
+    /**
+     * Deletes all ILUO checklists.
+     *
+     * This route handler triggers the `deleteAllIluos` method from the IluoService
+     * to remove all existing ILUO checklist entries from the database. After the deletion,
+     * it sets a success flash message indicating the number of deleted checklists
+     * and redirects the user to the ILUO admin page.
+     *
+     * @return Response A RedirectResponse to the ILUO admin page.
+     */
+    #[Route('delete_checklist', name: 'delete_checklist')]
+    public function deleteIluoCheckList(): Response
+    {
+        $count = $this->iluoService->deleteAllIluos();
+
+        $this->addFlash('success', "$count ILUO checklist deleted successfully.");
+
+        return $this->redirectToRoute('app_iluo_admin');
+    }
 }
