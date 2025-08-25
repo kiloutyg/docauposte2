@@ -13,17 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-use App\Entity\Products;
-use App\Entity\ShiftLeaders;
-use App\Entity\QualityRep;
-use App\Entity\Workstation;
+use App\Entity\Operator;
 
-use App\Form\Iluo\ProductType;
-use App\Form\Iluo\ShiftLeadersType;
-use App\Form\Iluo\QualityRepType;
-use App\Form\vWorkstationType;
-
-use App\Service\EntityFetchingService;
 use App\Service\Iluo\IluoService;
 
 
@@ -32,7 +23,6 @@ class IluoController extends AbstractController
 {
     private $logger;
     private $authChecker;
-    private $entityFetchingService;
     private $iluoService;
     /**
      * Constructor for the IluoController class.
@@ -42,20 +32,17 @@ class IluoController extends AbstractController
      *
      * @param LoggerInterface $logger An instance of LoggerInterface for logging purposes.
      * @param AuthorizationCheckerInterface $authChecker An instance of AuthorizationCheckerInterface for checking user permissions.
-     * @param EntityFetchingService $entityFetchingService A service for fetching various entities.
      * @param IluoService $iluoService A service specific to ILUO operations.
      */
     public function __construct(
         LoggerInterface                     $logger,
         AuthorizationCheckerInterface       $authChecker,
 
-        EntityFetchingService               $entityFetchingService,
         IluoService                         $iluoService
     ) {
         $this->logger                       = $logger;
         $this->authChecker                  = $authChecker;
 
-        $this->entityFetchingService        = $entityFetchingService;
         $this->iluoService                  = $iluoService;
     }
 
@@ -82,6 +69,20 @@ class IluoController extends AbstractController
         $this->addFlash('warning', 'Accés non authorisé');
         return $this->redirectToRoute('app_base');
     }
+
+
+
+
+    public function iluoCheckListUpdatebySpecificOperator(?int $operatorId = null, ?Operator $operatorEntity = null): Response
+    {
+        $count = $this->iluoService->checkIluoUpdates();
+
+        $this->addFlash('success', " $count ILUO checklist created successfully.");
+
+        return $this->redirectToRoute('app_iluo_admin');
+    }
+
+
 
 
 
@@ -120,9 +121,12 @@ class IluoController extends AbstractController
     #[Route('delete_checklist', name: 'delete_checklist')]
     public function deleteIluoCheckList(): Response
     {
-        $count = $this->iluoService->deleteAllIluos();
+        if ($this->authChecker->isGranted('ROLE_SUPER_ADMIN')) {
+            $count = $this->iluoService->deleteAllIluos();
+            $this->addFlash(type: 'success', message: "$count ILUO checklist deleted successfully.");
+        }
 
-        $this->addFlash('success', "$count ILUO checklist deleted successfully.");
+        $this->addFlash('warning', 'Vous n\'êtes pas autorisé à supprimer les checklists ILUO.');
 
         return $this->redirectToRoute('app_iluo_admin');
     }

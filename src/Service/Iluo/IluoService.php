@@ -174,11 +174,45 @@ class IluoService extends AbstractController
     public function checkIluoUpdates()
     {
         $this->logger->debug(message: 'iluoService::iluoCheckUpdate');
-        // return $this->iluoChecklistService->checkIluoUpdatesByWorkstation();
         return $this->iluoChecklistService->checkIluoUpdates();
     }
 
 
+    /**
+     * Checks for ILUO updates by a specific operator.
+     *
+     * This method triggers a check for ILUO updates in the database based on a specific operator.
+     * It delegates the task to the `iluoChecklistService` for performing the actual update check.
+     *
+     * @param int $operatorId The unique identifier of the operator for whom to check updates.
+     *
+     * @return mixed The result of the update check from the `iluoChecklistService`.
+     *               This could be a boolean value indicating success or failure, or an array of updated records.
+     */
+    public function iluoCheckListUpdatebyOperator(int $operatorId)
+    {
+        $this->logger->debug(message: 'iluoService::iluoCheckListUpdateByOperator');
+        return $this->iluoChecklistService->checkIluoUpdatesBySpecificOperator(operator: $operatorId);
+    }
+
+    /**
+     * Checks for ILUO updates by a specific upload.
+     *
+     * This method triggers a check for ILUO updates in the database based on a specific upload ID.
+     * It delegates the task to the `iluoChecklistService` for performing the actual update check.
+     *
+     * @param int $uploadId The unique identifier of the upload for which to check updates.
+     *
+     * @return mixed The result of the update check from the `iluoChecklistService`.
+     *               This could be a boolean value indicating success or failure, or an array of updated records.
+     */
+    public function iluoCheckListUpdatebySpecificUpload(int $uploadId)
+    {
+        $this->logger->debug(message: 'iluoService::iluoCheckListUpdateByOperator');
+        return $this->iluoChecklistService->checkIluoUpdatesBySpecificUpload(uploadId: $uploadId);
+    }
+
+    
     /**
      * Deletes all ILUO records.
      *

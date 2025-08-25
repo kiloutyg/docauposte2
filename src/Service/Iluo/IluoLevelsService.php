@@ -60,7 +60,7 @@ class IluoLevelsService extends AbstractController
 
             $priorityOrder = $iluoLevelsData->getPriorityOrder();
             $this->logger->debug(message: 'iluoLevelsService::iluoLevelsCreationFormProcessing - Priority order updated', context: ['priorityOrder' => $priorityOrder]);
-            if ($this->iluoLevelsRepository->priorityOrderExists($priorityOrder)) {
+            if ($this->iluoLevelsRepository->priorityOrderExists(priorityOrder: $priorityOrder)) {
                 $this->logger->debug(message: 'iluoLevelsService::iluoLevelsCreationFormProcessing - Priority order already exists', context: ['priorityOrder' => $priorityOrder]);
                 $this->updatePriorityOrders(
                     otherEntities: $this->iluoLevelsRepository->findAllExceptOne($iluoLevelsData->getId()),

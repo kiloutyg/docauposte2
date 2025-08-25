@@ -60,6 +60,80 @@ class IluoChecklistService extends AbstractController
     }
 
 
+    
+    /**
+     * Checks and updates ILUO records for a specific operator.
+     *
+     * This function retrieves the operator entity associated with the given operator ID.
+     * If no operator is found, an error message is logged and the function returns 0.
+     * Otherwise, it calls the `initialIluoCreation` method to create new ILUO records for the operator.
+     * The changes are then committed to the database using flush().
+     *
+     * @param int $operatorId The ID of the operator for which to check and update ILUO records.
+     * @return int The total number of ILUO records created for the specified operator.
+     */
+    public function checkIluoUpdatesBySpecificOperator(int $operatorId)
+    {
+
+        $count = 0;
+        $operator = $this->entityFetchingService->find(entityType: 'operator', entityId: $operatorId);
+        if (empty($operator)) {
+            $this->logger->error(
+                message: 'iluoChecklistService::checkIluoUpdatesBySpecificOperator - No operator found for the given ID',
+                context: ['operatorId' => $operatorId]
+            );
+            return $count;
+        }
+        $count += $this->initialIluoCreation(operator: $operator);
+        $this->em->flush();
+
+        return $count;
+    }
+
+
+    /**
+     * Checks and updates ILUO records for a specific upload.
+     *
+     * This function iterates through all operators associated with the UAP of the workstation
+     * associated with the given upload ID. For each operator, it creates a new ILUO record if
+     * one does not already exist. The function also ensures that the operator has a valid and
+     * completed training record for the upload associated with the workstation.
+     *
+     * @param int $uploadId The ID of the upload for which to check and update ILUO records.
+     * @return int The number of new ILUO records created for the specified upload.
+     */
+    public function checkIluoUpdatesBySpecificUpload(int $uploadId)
+    {
+        $count = 0;
+
+        // Fetch the workstation associated with the given upload ID
+        $workstation = $this->entityFetchingService->findOneBy(
+            entityType: 'workstation',
+            criteria: ['upload' => $uploadId]
+        );
+
+        // Ensure there is a valid workstation and UAP associated with the upload
+        if (empty($workstation) || empty($workstation->getUap())) {
+            $this->logger->error(
+                message: 'iluoChecklistService::checkIluoUpdatesBySpecificUpload - No workstation or UAP found for the given upload',
+                context: ['uploadId' => $uploadId]
+            );
+            return $count;
+        }
+
+        // Iterate through all operators associated with the UAP of the workstation
+        $allUapOperators = $workstation->getUap()->getOperators();
+        foreach ($allUapOperators as $operator) {
+            if ($this->iluoCreation(operator: $operator, workstation: $workstation)) {
+                $count++;
+            }
+        }
+
+        $this->em->flush();
+
+        return $count;
+    }
+
 
     /**
      * Creates initial ILUO records for a specific operator.
@@ -126,7 +200,7 @@ class IluoChecklistService extends AbstractController
      *
      * @return int The total number of new ILUOs created.
      */
-    public function checkIluoUpdatesByWorkstation()
+    public function checkIluoUpdatesByAllWorkstations()
     {
         $count = 0;
         $allWorkstations = $this->entityFetchingService->getWorkstations();
