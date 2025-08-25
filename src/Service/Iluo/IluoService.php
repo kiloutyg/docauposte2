@@ -189,9 +189,9 @@ class IluoService extends AbstractController
      * @return mixed The result of the update check from the `iluoChecklistService`.
      *               This could be a boolean value indicating success or failure, or an array of updated records.
      */
-    public function iluoCheckListUpdatebyOperator(int $operatorId)
+    public function iluoChecklistUpdatebyOperator(int $operatorId)
     {
-        $this->logger->debug(message: 'iluoService::iluoCheckListUpdateByOperator');
+        $this->logger->debug(message: 'iluoService::iluoChecklistUpdateByOperator');
         return $this->iluoChecklistService->checkIluoUpdatesBySpecificOperator(operator: $operatorId);
     }
 
@@ -206,13 +206,13 @@ class IluoService extends AbstractController
      * @return mixed The result of the update check from the `iluoChecklistService`.
      *               This could be a boolean value indicating success or failure, or an array of updated records.
      */
-    public function iluoCheckListUpdatebySpecificUpload(int $uploadId)
+    public function iluoChecklistUpdatebySpecificUpload(int $uploadId)
     {
-        $this->logger->debug(message: 'iluoService::iluoCheckListUpdateByOperator');
+        $this->logger->debug(message: 'iluoService::iluoChecklistUpdateByOperator');
         return $this->iluoChecklistService->checkIluoUpdatesBySpecificUpload(uploadId: $uploadId);
     }
 
-    
+
     /**
      * Deletes all ILUO records.
      *

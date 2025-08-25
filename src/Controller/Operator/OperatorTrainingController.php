@@ -249,9 +249,10 @@ class OperatorTrainingController extends AbstractController
     #[Route('/operator/trainingRecord/form/{uploadId}/{teamId}/{uapId}', name: 'app_training_record_form')]
     public function trainingRecordFormManagement(int $uploadId, Request $request, ?int $teamId = null, ?int $uapId = null): Response
     {
+        $iluoCounts = 0;
         try {
             $this->trainingRecordService->trainingRecordTreatment(request: $request);
-            $iluoCounts = $this->iluoService->iluoCheckListUpdatebySpecificUpload(uploadId: $uploadId);
+            $iluoCounts = $this->iluoService->iluoChecklistUpdatebySpecificUpload(uploadId: $uploadId);
         } catch (\Exception $e) {
             $this->logger->error('error during training record treatment', [$e]);
         } finally {

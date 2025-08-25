@@ -73,7 +73,21 @@ class IluoController extends AbstractController
 
 
 
-    public function iluoCheckListUpdatebySpecificOperator(?int $operatorId = null, ?Operator $operatorEntity = null): Response
+    /**
+     * Updates the ILUO checklist for a specific operator.
+     *
+     * This function triggers the `checkIluoUpdates` method from the IluoService,
+     * which is responsible for checking and potentially applying updates to the ILUO checklist.
+     * If an operator ID or entity is provided, the function will update the checklist for the specified operator.
+     * Otherwise, it will update the checklist for all operators. After execution, it sets a success flash message
+     * indicating the number of updates and redirects the user to the ILUO admin page.
+     *
+     * @param int|null $operatorId The ID of the operator for whom the checklist should be updated.
+     * @param Operator|null $operatorEntity The Operator entity for whom the checklist should be updated.
+     *
+     * @return Response A RedirectResponse to the ILUO admin page.
+     */
+    public function iluoChecklistUpdatebySpecificOperator(?int $operatorId = null, ?Operator $operatorEntity = null): Response
     {
         $count = $this->iluoService->checkIluoUpdates();
 
@@ -97,7 +111,7 @@ class IluoController extends AbstractController
      * @return Response A RedirectResponse to the ILUO admin page.
      */
     #[Route('test_checklist', name: 'test_checklist')]
-    public function testIluoCheckList(): Response
+    public function testIluoChecklist(): Response
     {
         $count = $this->iluoService->checkIluoUpdates();
 
@@ -119,14 +133,14 @@ class IluoController extends AbstractController
      * @return Response A RedirectResponse to the ILUO admin page.
      */
     #[Route('delete_checklist', name: 'delete_checklist')]
-    public function deleteIluoCheckList(): Response
+    public function deleteIluoChecklist(): Response
     {
         if ($this->authChecker->isGranted('ROLE_SUPER_ADMIN')) {
             $count = $this->iluoService->deleteAllIluos();
             $this->addFlash(type: 'success', message: "$count ILUO checklist deleted successfully.");
+        } else {
+            $this->addFlash('warning', 'Vous n\'êtes pas autorisé à supprimer les checklists ILUO.');
         }
-
-        $this->addFlash('warning', 'Vous n\'êtes pas autorisé à supprimer les checklists ILUO.');
 
         return $this->redirectToRoute('app_iluo_admin');
     }

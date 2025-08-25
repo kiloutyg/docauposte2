@@ -43,6 +43,9 @@ class IluoChecklist
     #[ORM\OneToOne(inversedBy: 'iluoChecklist', cascade: ['persist', 'remove'])]
     private ?Iluo $iluo = null;
 
+    #[ORM\Column]
+    private ?bool $retrainingNeeded = null;
+
     public function __construct()
     {
         $this->step = new ArrayCollection();
@@ -145,6 +148,18 @@ class IluoChecklist
     public function setIluo(?Iluo $iluo): static
     {
         $this->iluo = $iluo;
+
+        return $this;
+    }
+
+    public function isRetrainingNeeded(): ?bool
+    {
+        return $this->retrainingNeeded;
+    }
+
+    public function setRetrainingNeeded(bool $retrainingNeeded): static
+    {
+        $this->retrainingNeeded = $retrainingNeeded;
 
         return $this;
     }
