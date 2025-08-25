@@ -31,7 +31,7 @@ abstract class BaseRepository extends ServiceEntityRepository
      * @param string $parentFieldName The name of the field that represents the relationship to the parent entity
      * @return array An array of entities that belong to the specified parent and exclude the one with the specified ID
      */
-    public function findAllExceptOneByParent($entityId, $parentEntityId, $parentFieldName)
+    public function findAllExceptOneByParent($entityId, $parentEntityId, $parentFieldName): array
     {
         return $this->createQueryBuilder('e')
             ->join('e.' . $parentFieldName, 'p')
