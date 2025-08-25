@@ -41,8 +41,7 @@
 			<datalist
 				id="team-list">
 				{% for team in teams %}
-					{% if team.name is same as 'INDEFINI' %}
-					{% endif %}
+
 					<option
 						value="{{ team.name }}"></option>
 				{% endfor %}
@@ -60,8 +59,6 @@
 			<datalist
 				id="uap-list">
 				{% for uap in uaps %}
-					{% if uap.name is same as 'INDEFINI' %}
-					{% endif %}
 					<option
 						value="{{ uap.name }}"></option>
 				{% endfor %}

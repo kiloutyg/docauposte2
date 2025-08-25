@@ -17,7 +17,7 @@ class IluoLevels
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true, unique: true)]
     private ?string $level = null;
 
     /**
@@ -46,6 +46,9 @@ class IluoLevels
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
+
+    #[ORM\Column(nullable: true, unique: true)]
+    private ?int $priorityOrder = null;
 
     public function __construct()
     {
@@ -200,6 +203,18 @@ class IluoLevels
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getPriorityOrder(): ?int
+    {
+        return $this->priorityOrder;
+    }
+
+    public function setPriorityOrder(?int $priorityOrder): static
+    {
+        $this->priorityOrder = $priorityOrder;
 
         return $this;
     }

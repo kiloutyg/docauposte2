@@ -31,13 +31,11 @@
 							Équipe
 						</option>
 						{% for team in teams %}
-							{% if team.name is same as 'INDEFINI' %}
-								{% else %}
+		
 									<option
 										value="{{ team.id }}">
 										{{ team.name }}
 									</option>
-							{% endif %}
 						{% endfor %}
 					</select>
 
@@ -54,13 +52,11 @@
 							UAP
 						</option>
 						{% for uap in uaps %}
-							{% if uap.name is same as 'INDEFINI' %}
-								{% else %}
+
 									<option
 										value="{{ uap.id }}">
 										{{ uap.name }}
 									</option>
-							{% endif %}
 						{% endfor %}
 					</select>
 					<input

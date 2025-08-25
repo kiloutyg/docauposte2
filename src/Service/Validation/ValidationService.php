@@ -33,7 +33,6 @@ class ValidationService extends AbstractController
     private   $approbationRepository;
 
     private   $mailerService;
-
     private   $trainingRecordService;
 
 

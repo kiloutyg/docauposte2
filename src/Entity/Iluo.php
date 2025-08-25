@@ -6,7 +6,16 @@ use App\Repository\IluoRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 #[ORM\Entity(repositoryClass: IluoRepository::class)]
+#[UniqueEntity(
+    fields: ['operator', 'product', 'workstation'],
+    message: 'Une ILUO concernant cet opérateur, produit et poste de travail existe déjà.',
+    errorPath: 'operator',
+    repositoryMethod: 'findOneBy',
+)]
 class Iluo
 {
     #[ORM\Id]
@@ -37,6 +46,9 @@ class Iluo
 
     #[ORM\OneToOne(mappedBy: 'iluo', cascade: ['persist', 'remove'])]
     private ?IluoChecklist $iluoChecklist = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $OperatorMatricule = null;
 
     public function getId(): ?int
     {
@@ -149,4 +161,15 @@ class Iluo
         return $this;
     }
 
+    public function getOperatorMatricule(): ?string
+    {
+        return $this->OperatorMatricule;
+    }
+
+    public function setOperatorMatricule(?string $OperatorMatricule): static
+    {
+        $this->OperatorMatricule = $OperatorMatricule;
+
+        return $this;
+    }
 }

@@ -3,6 +3,9 @@
 namespace App\Controller\Operator;
 
 use App\Service\EntityFetchingService;
+
+use App\Service\Iluo\IluoService;
+
 use App\Service\Operator\TrainingRecordService;
 use App\Service\Operator\OperatorService;
 
@@ -22,12 +25,17 @@ class OperatorTrainingController extends AbstractController
     // Services methods
     public $trainingRecordService;
     public $entityFetchingService;
+
+    public $iluoService;
+
     public $operatorService;
+
     public function __construct(
         LoggerInterface                 $logger,
         // Services classes
         TrainingRecordService           $trainingRecordService,
         EntityFetchingService           $entityFetchingService,
+        IluoService                     $iluoService,
         OperatorService                 $operatorService,
     ) {
         $this->logger                       = $logger;
@@ -35,6 +43,7 @@ class OperatorTrainingController extends AbstractController
         // Variables related to the services
         $this->trainingRecordService        = $trainingRecordService;
         $this->entityFetchingService        = $entityFetchingService;
+        $this->iluoService                  = $iluoService;
         $this->operatorService              = $operatorService;
     }
 
@@ -218,29 +227,36 @@ class OperatorTrainingController extends AbstractController
 
 
 
+
     /**
-     * Processes the training record form submission.
+     * Handles the form submission for managing training records.
      *
-     * This method handles the form submission for creating or updating training records.
-     * It attempts to process the submitted data through the training record service and
-     * redirects back to the training records display page regardless of success or failure.
-     * Any exceptions during processing are logged but do not interrupt the user flow.
+     * This function processes the form data submitted for training records, updates the database,
+     * and redirects to the training records display page. It also updates the ILUO (Inspection List Unité Opérationnelle)
+     * counts based on the specific upload.
      *
-     * @param int $uploadId The ID of the upload associated with the training records
-     * @param Request $request The HTTP request containing the form data
-     * @param int|null $teamId The ID of the team filter to maintain after processing
-     * @param int|null $uapId The ID of the UAP filter to maintain after processing
+     * @Route("/operator/trainingRecord/form/{uploadId}/{teamId}/{uapId}", name="app_training_record_form")
      *
-     * @return Response A redirect response to the training records display page with the same filters
+     * @param int $uploadId The ID of the upload containing the training records to manage.
+     * @param Request $request The HTTP request containing the form data with training record information.
+     * @param int|null $teamId The ID of the team to filter operators by, null for all teams.
+     * @param int|null $uapId The ID of the UAP (Unit Assembly Process) to filter operators by, null for all UAPs.
+     *
+     * @return Response A redirect response to the training records display page with the updated data.
+     *
+     * @throws \Exception If an error occurs during the training record treatment.
      */
     #[Route('/operator/trainingRecord/form/{uploadId}/{teamId}/{uapId}', name: 'app_training_record_form')]
     public function trainingRecordFormManagement(int $uploadId, Request $request, ?int $teamId = null, ?int $uapId = null): Response
     {
+        $iluoCounts = 0;
         try {
-            $this->trainingRecordService->trainingRecordTreatment($request);
+            $this->trainingRecordService->trainingRecordTreatment(request: $request);
+            $iluoCounts = $this->iluoService->iluoChecklistUpdatebySpecificUpload(uploadId: $uploadId);
         } catch (\Exception $e) {
             $this->logger->error('error during training record treatment', [$e]);
         } finally {
+            $this->addFlash('success', 'Les données de formation ont été traitées avec succès' . ($iluoCounts ? " et $iluoCounts enregistrements ILUO ont été mis à jour." : '.'));
             return $this->redirectToRoute('app_render_training_records', [
                 'uploadId' => $uploadId,
                 'teamId' => $teamId,
