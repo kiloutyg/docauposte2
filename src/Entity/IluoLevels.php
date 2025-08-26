@@ -50,12 +50,19 @@ class IluoLevels
     #[ORM\Column(nullable: true, unique: true)]
     private ?int $priorityOrder = null;
 
+    /**
+     * @var Collection<int, Iluo>
+     */
+    #[ORM\OneToMany(targetEntity: Iluo::class, mappedBy: 'lastLevelKnown')]
+    private Collection $iluos;
+
     public function __construct()
     {
         $this->steps = new ArrayCollection();
         $this->stepsSubheadings = new ArrayCollection();
         $this->stepsTitles = new ArrayCollection();
         $this->iluoChecklists = new ArrayCollection();
+        $this->iluos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -215,6 +222,36 @@ class IluoLevels
     public function setPriorityOrder(?int $priorityOrder): static
     {
         $this->priorityOrder = $priorityOrder;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Iluo>
+     */
+    public function getIluos(): Collection
+    {
+        return $this->iluos;
+    }
+
+    public function addIluo(Iluo $iluo): static
+    {
+        if (!$this->iluos->contains($iluo)) {
+            $this->iluos->add($iluo);
+            $iluo->setLastLevelKnown($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIluo(Iluo $iluo): static
+    {
+        if ($this->iluos->removeElement($iluo)) {
+            // set the owning side to null (unless already changed)
+            if ($iluo->getLastLevelKnown() === $this) {
+                $iluo->setLastLevelKnown(null);
+            }
+        }
 
         return $this;
     }

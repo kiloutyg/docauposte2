@@ -66,7 +66,7 @@ class IluoChecklistService extends AbstractController
      * Checks and updates ILUO records for a specific operator.
      *
      * This function retrieves the operator entity associated with the given operator ID.
-     * If no operator is found, an error message is logged and the function returns 0.
+     * If no operator is found, an warning message is logged and the function returns 0.
      * Otherwise, it calls the `initialIluoCreation` method to create new ILUO records for the operator.
      * The changes are then committed to the database using flush().
      *
@@ -79,7 +79,7 @@ class IluoChecklistService extends AbstractController
         $count = 0;
         $operator = $this->entityFetchingService->find(entityType: 'operator', entityId: $operatorId);
         if (empty($operator)) {
-            $this->logger->error(
+            $this->logger->warning(
                 message: 'iluoChecklistService::checkIluoUpdatesBySpecificOperator - No operator found for the given ID',
                 context: ['operatorId' => $operatorId]
             );
@@ -115,7 +115,7 @@ class IluoChecklistService extends AbstractController
 
         // Ensure there is a valid workstation and UAP associated with the upload
         if (empty($workstation) || empty($workstation->getUap())) {
-            $this->logger->error(
+            $this->logger->warning(
                 message: 'iluoChecklistService::checkIluoUpdatesBySpecificUpload - No workstation or UAP found for the given upload',
                 context: ['uploadId' => $uploadId]
             );
@@ -179,7 +179,7 @@ class IluoChecklistService extends AbstractController
 
         if (empty($operatorUaps)) {
 
-            $this->logger->error(
+            $this->logger->warning(
                 message: 'iluoChecklistService::initialIluoCreation - No UAPs found for operator',
                 context: ['operatorId' => $operator->getId()]
             );
@@ -192,14 +192,13 @@ class IluoChecklistService extends AbstractController
             context: ['operatorId' => $operator->getId()]
         );
 
-
         foreach ($operatorUaps as $uap) {
 
             $workstations = $uap->getWorkstations();
 
             if (empty($workstations)) {
 
-                $this->logger->error(
+                $this->logger->warning(
                     message: 'iluoChecklistService::initialIluoCreation - No workstations found for UAP',
                     context: ['uapId' => $uap->getId()]
                 );
@@ -292,7 +291,7 @@ class IluoChecklistService extends AbstractController
             ]
         );
         if (empty($trainingRecord) || !$trainingRecord->isTrained()) {
-            $this->logger->error(
+            $this->logger->debug(
                 message: 'iluoChecklistService::iluoCreation - No training record found for upload or Operator not trained for upload',
                 context: [
                     'uploadId' => $upload->getId(),

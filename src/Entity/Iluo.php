@@ -50,6 +50,12 @@ class Iluo
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $OperatorMatricule = null;
 
+    #[ORM\ManyToOne(inversedBy: 'iluos')]
+    private ?IluoLevels $lastLevelKnown = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -169,6 +175,30 @@ class Iluo
     public function setOperatorMatricule(?string $OperatorMatricule): static
     {
         $this->OperatorMatricule = $OperatorMatricule;
+
+        return $this;
+    }
+
+    public function getLastLevelKnown(): ?IluoLevels
+    {
+        return $this->lastLevelKnown;
+    }
+
+    public function setLastLevelKnown(?IluoLevels $lastLevelKnown): static
+    {
+        $this->lastLevelKnown = $lastLevelKnown;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
