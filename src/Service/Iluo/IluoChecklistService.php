@@ -223,23 +223,22 @@ class IluoChecklistService extends AbstractController
 
 
 
+
     /**
-     * Creates a new ILUO record for a specific operator and workstation combination.
+     * Creates or updates an ILUO record for a specific operator and workstation.
      *
-     * This function first checks if an ILUO already exists for the given operator, workstation,
-     * and associated product. If it does, the function returns false. It then verifies that the
-     * operator has a valid and completed training record for the upload associated with the
-     * workstation. If the training record is missing or incomplete, the function also returns false.
-     * If all checks pass, a new Iluo entity is created, persisted, and a corresponding
-     * checklist is generated.
+     * This function first checks if an ILUO already exists for the given operator and workstation.
+     * If an ILUO exists, it calls the `iluoChecklistUpdate` method to update its checklist status.
+     * If no ILUO exists, it checks for a valid and completed training record for the operator
+     * on the workstation's associated upload. If the operator is trained, a new ILUO and its
+     * corresponding checklist are created.
      *
-     * @param Operator $operator The operator entity for whom the ILUO is to be created.
-     * @param Workstation $workstation The workstation entity associated with the ILUO.
-     * @return bool Returns true if a new ILUO was successfully created, false otherwise.
+     * @param Operator $operator The operator for whom the ILUO is being processed.
+     * @param Workstation $workstation The workstation associated with the ILUO.
+     * @return bool Returns true if an ILUO was created or its checklist was updated, false otherwise.
      */
     private function iluoCreation(Operator $operator, Workstation $workstation)
     {
-
         $this->logger->debug(
             message: 'iluoChecklistService::iluoCreation - Creating ILUO for operator',
             context: [
@@ -250,15 +249,13 @@ class IluoChecklistService extends AbstractController
 
         // Fetch the upload associated with the workstation
         $upload = $workstation->getUpload();
-        if (!empty($upload)) {
-            $trainingRecord = $this->entityFetchingService->findOneBy(
-                entityType: 'trainingRecord',
-                criteria: [
-                    'upload' => $upload,
-                    'operator' => $operator
-                ]
-            );
-        }
+        $trainingRecord = $this->entityFetchingService->findOneBy(
+            entityType: 'trainingRecord',
+            criteria: [
+                'upload' => $upload,
+                'operator' => $operator
+            ]
+        );
 
         // Check if an ILUO already exists for this combination
         $existingIluo = $this->entityFetchingService->findOneBy(
@@ -270,82 +267,72 @@ class IluoChecklistService extends AbstractController
             ]
         );
 
-        // If an ILUO already exists, return the iluo checklist update function
         if ($existingIluo) {
             $this->logger->debug(
-                'iluoChecklistService::iluoCreation - ILUO already exists, skipping creation.',
+                'iluoChecklistService::iluoCreation - ILUO already exists, calling update.',
                 [
                     'iluoId' => $existingIluo->getId(),
                     'operatorId' => $operator->getId(),
                     'workstationId' => $workstation->getId(),
-                    'productId' => $workstation->getProducts()->getId(),
                 ]
             );
             return $this->iluoChecklistUpdate(operator: $operator, iluo: $existingIluo, trainingRecord: $trainingRecord);
         }
 
-        $this->logger->debug(
-            message: 'iluoChecklistService::iluoCreation - Checking training record for operator and upload',
-            context: [
-                'trainingRecord' => $trainingRecord
-            ]
-        );
-        if (empty($trainingRecord) || !$trainingRecord->isTrained()) {
+        if ($trainingRecord && $trainingRecord->isTrained()) {
+            // Create a new ILUO if it doesn't exist and operator is trained
+            $iluo = new Iluo();
+            $iluo->setOperator(operator: $operator);
+            $iluo->setWorkstation(workstation: $workstation);
+            $iluo->setProduct(product: $workstation->getProducts());
+            $iluo->setStartDate(startDate: new \DateTime());
+            $this->em->persist(object: $iluo);
+
             $this->logger->debug(
-                message: 'iluoChecklistService::iluoCreation - No training record found for upload or Operator not trained for upload',
+                message: 'iluoChecklistService::iluoCreation - ILUO created successfully',
                 context: [
-                    'uploadId' => $upload->getId(),
-                    'operatorId' => $operator->getId(),
-                    'isTrained' => $trainingRecord ? 'true' : 'false',
+                    'iluoId' => $iluo->getId(),
+                    'operatorId' => $operator->getId()
                 ]
             );
-            return false;
+            $this->iluoChecklistCreation($iluo);
+
+            return true;
         }
 
-        // Create a new ILUO if it doesn't exist
-        $iluo = new Iluo();
-        $iluo->setOperator(operator: $operator);
-        $iluo->setWorkstation(workstation: $workstation);
-        $iluo->setProduct(product: $workstation->getProducts());
-        $iluo->setStartDate(startDate: new \DateTime());
-
-        $this->em->persist(object: $iluo);
-
         $this->logger->debug(
-            message: 'iluoChecklistService::iluoCreation - ILUO created successfully',
+            message: 'iluoChecklistService::iluoCreation - No training record found or Operator not trained,, cannot create ILUO.',
             context: [
-                'iluoId' => $iluo->getId(),
-                'operatorId' => $operator->getId()
+                'uploadId' => $upload->getId(),
+                'operatorId' => $operator->getId(),
             ]
         );
-        $this->iluoChecklistCreation($iluo);
-        return true;
+
+        return false;
     }
 
 
 
     /**
-     * Updates the ILUO checklist based on the operator's training record.
+     * Updates the retraining status of an ILUO checklist based on the operator's training record.
      *
-     * This function checks if the ILUO checklist associated with the provided ILUO
-     * is marked as needing retraining. If it does, it verifies if the operator
-     * has a valid and completed training record for the upload associated with
-     * the workstation. If the training record is missing or incomplete, the
-     * function sets the retrainingNeeded flag to true. If the checklist is not
-     * marked as needing retraining, it checks if the operator has a valid and
-     * completed training record. If the training record is missing or incomplete,
-     * the function sets the retrainingNeeded flag to true.
+     * This function checks the current state of the ILUO checklist's 'retrainingNeeded' flag
+     * and compares it with the operator's training status. If the operator has completed
+     * the required training and the flag is set, it resets the flag. Conversely, if the
+     * operator's training is no longer valid (or missing) and the flag is not set, it sets
+     * the flag to indicate that retraining is needed.
      *
-     * @param Operator $operator The operator entity for whom the ILUO checklist is to be updated.
-     * @param Iluo $iluo The ILUO entity associated with the checklist.
-     * @param TrainingRecord $trainingRecord The training record entity for the operator and upload.
-     * @return bool Returns true if the ILUO checklist was updated, false otherwise.
+     * @param Operator $operator The operator associated with the ILUO.
+     * @param Iluo $iluo The ILUO entity whose checklist needs to be updated.
+     * @param TrainingRecord|null $trainingRecord The training record for the operator, which can be null if not found.
+     * @return bool Returns true if the checklist was updated, false otherwise.
      */
-    private function iluoChecklistUpdate(Operator $operator, Iluo $iluo, TrainingRecord $trainingRecord): bool
+    private function iluoChecklistUpdate(Operator $operator, Iluo $iluo, ?TrainingRecord $trainingRecord = null): bool
     {
         $iluoChecklist = $iluo->getIluoChecklist();
         if ($iluoChecklist->isRetrainingNeeded()) {
-            if ($trainingRecord->isTrained()) {
+            if (!empty($trainingRecord) && $trainingRecord->isTrained()) {
+
                 $iluoChecklist->setRetrainingNeeded(retrainingNeeded: false);
                 $this->em->persist(object: $iluoChecklist);
 
@@ -357,10 +344,15 @@ class IluoChecklistService extends AbstractController
                         'trainingRecordId' => $trainingRecord->getId()
                     ]
                 );
+
+                $iluo->setUpdatedAt(updatedAt: new \DateTime());
+                $iluoChecklist->setUpdatedAt(updatedAt: new \DateTime());
+
                 return true;
             }
         } elseif (!$iluoChecklist->isRetrainingNeeded()) {
-            if (!$trainingRecord->isTrained()) {
+            if (empty($trainingRecord) || !$trainingRecord->isTrained()) {
+
                 $iluoChecklist->setRetrainingNeeded(retrainingNeeded: true);
                 $this->em->persist(object: $iluoChecklist);
 
@@ -369,9 +361,14 @@ class IluoChecklistService extends AbstractController
                     context: [
                         'iluoChecklistId' => $iluoChecklist->getId(),
                         'operatorId' => $operator->getId(),
-                        'trainingRecordId' => $trainingRecord->getId()
+                        'trainingRecordId' => $trainingRecord ? 'missing' : 'not trained'
+
                     ]
                 );
+
+                $iluo->setUpdatedAt(updatedAt: new \DateTime());
+                $iluoChecklist->setUpdatedAt(updatedAt: new \DateTime());
+
                 return true;
             }
         }

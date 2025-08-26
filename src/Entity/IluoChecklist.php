@@ -46,6 +46,9 @@ class IluoChecklist
     #[ORM\Column]
     private ?bool $retrainingNeeded = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
+
     public function __construct()
     {
         $this->step = new ArrayCollection();
@@ -160,6 +163,18 @@ class IluoChecklist
     public function setRetrainingNeeded(bool $retrainingNeeded): static
     {
         $this->retrainingNeeded = $retrainingNeeded;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

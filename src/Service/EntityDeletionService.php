@@ -243,8 +243,8 @@ class EntityDeletionService
         if ($entity->isIsTrainer()) {
             $repository = $this->repositoryFactory->getRepository('trainer');
             $trainerEntity = $repository->findOneBy(['operator' => $entity]);
-            $this->logger->debug('trainerEntity details: ', [$trainerEntity]);
-            $this->logger->debug('trainerEntity trainingRecords: ', [$trainerEntity->getTrainingRecords()]);
+            $this->logger->debug('EntityDeletion::deleteEntityOperator - trainerEntity details: ', [$trainerEntity]);
+            $this->logger->debug('EntityDeletion::deleteEntityOperator - trainerEntity trainingRecords: ', [$trainerEntity->getTrainingRecords()]);
             if (!$trainerEntity->getTrainingRecords()->isEmpty()) {
                 $entity->setToBeDeleted(new \DateTime('now'));
             } else {
