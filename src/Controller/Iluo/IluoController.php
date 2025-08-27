@@ -144,4 +144,34 @@ class IluoController extends AbstractController
 
         return $this->redirectToRoute('app_iluo_admin');
     }
+
+
+
+
+    #[Route(path: 'views', name: 'views')]
+    public function iluoViews(): Response
+    {
+        return $this->render('/services/iluo/iluo_views.html.twig');
+    }
+
+    #[Route(path: 'views_search', name: 'views_search')]
+    public function iluoViewsSearch(): Response
+    {
+        return $this->render('/services/iluo/iluo_views_component/iluo_views_search_component.html.twig');
+    }
+
+
+    #[Route(path: 'views_checklist', name: 'views_checklist')]
+    public function iluoViewsChecklist(): Response
+    {
+        return $this->render('/services/iluo/iluo_views_component/iluo_views_checklist_component.html.twig');
+    }
+
+
+
+    #[Route(path: 'views_matrices', name: 'views_matrices')]
+    public function iluoViewsMatrices(): Response
+    {
+        return $this->render('/services/iluo/iluo_views_component/iluo_views_matrices_component.html.twig');
+    }
 }

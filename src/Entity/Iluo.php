@@ -48,7 +48,7 @@ class Iluo
     private ?IluoChecklist $iluoChecklist = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $OperatorMatricule = null;
+    private ?string $operatorMatricule = null;
 
     #[ORM\ManyToOne(inversedBy: 'iluos')]
     private ?IluoLevels $lastLevelKnown = null;
@@ -169,12 +169,12 @@ class Iluo
 
     public function getOperatorMatricule(): ?string
     {
-        return $this->OperatorMatricule;
+        return $this->operatorMatricule;
     }
 
-    public function setOperatorMatricule(?string $OperatorMatricule): static
+    public function setOperatorMatricule(?string $operatorMatricule): static
     {
-        $this->OperatorMatricule = $OperatorMatricule;
+        $this->operatorMatricule = $operatorMatricule;
 
         return $this;
     }

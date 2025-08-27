@@ -9,9 +9,23 @@
 		{{ form_widget(iluoLevelsForm.level) }}
 	</div>
 	<div
-		class="col-3">
-		{{ form_label(iluoLevelsForm.priorityOrder) }}
-		{{ form_widget(iluoLevelsForm.priorityOrder) }}
+		class="col-12 row">
+		<div
+			class="col-3">
+			{{ form_label(iluoLevelsForm.priorityOrder) }}
+			{{ form_widget(iluoLevelsForm.priorityOrder) }}
+		</div>
+		<div
+			class="col-9 row">
+			<div
+				class="col-12">
+				{{ form_label(iluoLevelsForm.qualityRepNeeded) }}
+			</div>
+			<div
+				class="col-3">
+				{{ form_widget(iluoLevelsForm.qualityRepNeeded) }}
+			</div>
+		</div>
 	</div>
 	<div
 		class="col-12">
@@ -80,8 +94,8 @@
 										{{iluoLevel.priorityOrder}}
 									{% endif %}
 									&nbsp;
-																																				-
-																																				&nbsp;
+																																																																																																			-
+																																																																																																			&nbsp;
 
 									{% if iluoLevel.description is not empty %}
 										{{ iluoLevel.description }}

@@ -56,6 +56,9 @@ class IluoLevels
     #[ORM\OneToMany(targetEntity: Iluo::class, mappedBy: 'lastLevelKnown')]
     private Collection $iluos;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $qualityRepNeeded = null;
+
     public function __construct()
     {
         $this->steps = new ArrayCollection();
@@ -252,6 +255,18 @@ class IluoLevels
                 $iluo->setLastLevelKnown(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isQualityRepNeeded(): ?bool
+    {
+        return $this->qualityRepNeeded;
+    }
+
+    public function setQualityRepNeeded(?bool $qualityRepNeeded): static
+    {
+        $this->qualityRepNeeded = $qualityRepNeeded;
 
         return $this;
     }

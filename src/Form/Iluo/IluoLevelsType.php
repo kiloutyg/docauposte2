@@ -57,6 +57,28 @@ class IluoLevelsType extends AbstractBaseFormType
                 ],
             ]
         );
+        $builder->add(
+            'qualityRepNeeded',
+            ChoiceType::class,
+            [
+                'label' => 'Validation par Animateur Qualité requise?',
+                'label_attr' => [
+                    'class' => self::FORM_LABEL_CLASSES,
+                    'style' => self::LABEL_STYLE
+                ],
+                'choices' => [
+                    'Non' => false,
+                    'Oui' => true,
+
+                ],
+                'required' => true,
+                'attr' => [
+                    'class' => self::FORM_CONTROL_CLASSES,
+                    'placeholder' => 'Validation par Animateur Qualité requise?',
+                ],
+            ]
+        );
+
         $this->addSubmitButton($builder);
     }
 
