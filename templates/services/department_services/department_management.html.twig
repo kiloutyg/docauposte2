@@ -106,14 +106,12 @@
 										Aucune/Toutes
 									</option>
 									{% for uap in uaps %}
-										{% if uap.name is same as 'INDEFINI' %}
-											{% else %}
+									
 												<option
 													value="{{uap.id}}" {% if uap.id in department.uaps|map(u => u.id) %} selected
 													{% endif %}>
 													{{uap.name|upper}}
 												</option>
-										{% endif %}
 									{% endfor %}
 								</select>
 								<select

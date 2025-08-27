@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+{% import 'macros/accordion_loading_animations.html.twig' as loading %}
+
+{% block title %}
+	Matrices et Checklists ILUO |
+	{{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+	<div
+		class="container-fluid d-flex align-items-center flex-grow-1">
+
+			{{ loading.turbo_frame_loader(
+                'iluo-views-search', 
+                path('app_iluo_views_search'),
+                'form',
+                'Formulaire de recherche ILUO',
+                'fa-cogs',
+                'primary'
+                3,
+            ) }}
+
+			{{ loading.turbo_frame_loader(
+                'iluo-views-checklist', 
+                path('app_iluo_views_checklist'),
+                'checklist',
+                'Checklist ILUO',
+                'fa-tasks',
+                'success'
+                4,
+            ) }}
+
+			{{ loading.turbo_frame_loader(
+                'iluo-views-matrices', 
+                path('app_iluo_views_matrices'),
+                'cards',
+                'Matrices ILUO',
+                'fa-desktop',
+                'info',
+                2
+            ) }}
+	</div>
+{% endblock %}

@@ -13,17 +13,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-use App\Entity\Products;
-use App\Entity\ShiftLeaders;
-use App\Entity\QualityRep;
-use App\Entity\Workstation;
+use App\Entity\Operator;
 
-use App\Form\Iluo\ProductType;
-use App\Form\Iluo\ShiftLeadersType;
-use App\Form\Iluo\QualityRepType;
-use App\Form\vWorkstationType;
-
-use App\Service\EntityFetchingService;
 use App\Service\Iluo\IluoService;
 
 
@@ -32,7 +23,6 @@ class IluoController extends AbstractController
 {
     private $logger;
     private $authChecker;
-    private $entityFetchingService;
     private $iluoService;
     /**
      * Constructor for the IluoController class.
@@ -42,20 +32,17 @@ class IluoController extends AbstractController
      *
      * @param LoggerInterface $logger An instance of LoggerInterface for logging purposes.
      * @param AuthorizationCheckerInterface $authChecker An instance of AuthorizationCheckerInterface for checking user permissions.
-     * @param EntityFetchingService $entityFetchingService A service for fetching various entities.
      * @param IluoService $iluoService A service specific to ILUO operations.
      */
     public function __construct(
         LoggerInterface                     $logger,
         AuthorizationCheckerInterface       $authChecker,
 
-        EntityFetchingService               $entityFetchingService,
         IluoService                         $iluoService
     ) {
         $this->logger                       = $logger;
         $this->authChecker                  = $authChecker;
 
-        $this->entityFetchingService        = $entityFetchingService;
         $this->iluoService                  = $iluoService;
     }
 
@@ -81,5 +68,110 @@ class IluoController extends AbstractController
         }
         $this->addFlash('warning', 'Accés non authorisé');
         return $this->redirectToRoute('app_base');
+    }
+
+
+
+
+    /**
+     * Updates the ILUO checklist for a specific operator.
+     *
+     * This function triggers the `checkIluoUpdates` method from the IluoService,
+     * which is responsible for checking and potentially applying updates to the ILUO checklist.
+     * If an operator ID or entity is provided, the function will update the checklist for the specified operator.
+     * Otherwise, it will update the checklist for all operators. After execution, it sets a success flash message
+     * indicating the number of updates and redirects the user to the ILUO admin page.
+     *
+     * @param int|null $operatorId The ID of the operator for whom the checklist should be updated.
+     * @param Operator|null $operatorEntity The Operator entity for whom the checklist should be updated.
+     *
+     * @return Response A RedirectResponse to the ILUO admin page.
+     */
+    public function iluoChecklistUpdatebySpecificOperator(?int $operatorId = null, ?Operator $operatorEntity = null): Response
+    {
+        $count = $this->iluoService->checkIluoUpdates();
+
+        $this->addFlash('success', " $count ILUO checklist created successfully.");
+
+        return $this->redirectToRoute('app_iluo_admin');
+    }
+
+
+
+
+
+    /**
+     * Tests the ILUO checklist update functionality.
+     *
+     * This route handler triggers the `checkIluoUpdates` method from the IluoService,
+     * which is responsible for checking and potentially applying updates to the ILUO checklist.
+     * After execution, it sets a success flash message indicating the number of updates
+     * and redirects the user to the ILUO admin page.
+     *
+     * @return Response A RedirectResponse to the ILUO admin page.
+     */
+    #[Route('test_checklist', name: 'test_checklist')]
+    public function testIluoChecklist(): Response
+    {
+        $count = $this->iluoService->checkIluoUpdates();
+
+        $this->addFlash('success', " $count Test ILUO checklist executed successfully.");
+
+        return $this->redirectToRoute('app_iluo_admin');
+    }
+
+
+
+    /**
+     * Deletes all ILUO checklists.
+     *
+     * This route handler triggers the `deleteAllIluos` method from the IluoService
+     * to remove all existing ILUO checklist entries from the database. After the deletion,
+     * it sets a success flash message indicating the number of deleted checklists
+     * and redirects the user to the ILUO admin page.
+     *
+     * @return Response A RedirectResponse to the ILUO admin page.
+     */
+    #[Route('delete_checklist', name: 'delete_checklist')]
+    public function deleteIluoChecklist(): Response
+    {
+        if ($this->authChecker->isGranted('ROLE_SUPER_ADMIN')) {
+            $count = $this->iluoService->deleteAllIluos();
+            $this->addFlash(type: 'success', message: "$count ILUO checklist deleted successfully.");
+        } else {
+            $this->addFlash('warning', 'Vous n\'êtes pas autorisé à supprimer les checklists ILUO.');
+        }
+
+        return $this->redirectToRoute('app_iluo_admin');
+    }
+
+
+
+
+    #[Route(path: 'views', name: 'views')]
+    public function iluoViews(): Response
+    {
+        return $this->render('/services/iluo/iluo_views.html.twig');
+    }
+
+    #[Route(path: 'views_search', name: 'views_search')]
+    public function iluoViewsSearch(): Response
+    {
+        return $this->render('/services/iluo/iluo_views_component/iluo_views_search_component.html.twig');
+    }
+
+
+    #[Route(path: 'views_checklist', name: 'views_checklist')]
+    public function iluoViewsChecklist(): Response
+    {
+        return $this->render('/services/iluo/iluo_views_component/iluo_views_checklist_component.html.twig');
+    }
+
+
+
+    #[Route(path: 'views_matrices', name: 'views_matrices')]
+    public function iluoViewsMatrices(): Response
+    {
+        return $this->render('/services/iluo/iluo_views_component/iluo_views_matrices_component.html.twig');
     }
 }

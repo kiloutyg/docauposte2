@@ -28,6 +28,7 @@ class Workstation
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'workstations')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Upload $upload = null;
 
     #[ORM\ManyToOne(inversedBy: 'workstations')]

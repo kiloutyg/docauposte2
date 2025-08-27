@@ -6,7 +6,16 @@ use App\Repository\IluoRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 #[ORM\Entity(repositoryClass: IluoRepository::class)]
+#[UniqueEntity(
+    fields: ['operator', 'product', 'workstation'],
+    message: 'Une ILUO concernant cet opérateur, produit et poste de travail existe déjà.',
+    errorPath: 'operator',
+    repositoryMethod: 'findOneBy',
+)]
 class Iluo
 {
     #[ORM\Id]
@@ -37,6 +46,15 @@ class Iluo
 
     #[ORM\OneToOne(mappedBy: 'iluo', cascade: ['persist', 'remove'])]
     private ?IluoChecklist $iluoChecklist = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $operatorMatricule = null;
+
+    #[ORM\ManyToOne(inversedBy: 'iluos')]
+    private ?IluoLevels $lastLevelKnown = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -149,4 +167,39 @@ class Iluo
         return $this;
     }
 
+    public function getOperatorMatricule(): ?string
+    {
+        return $this->operatorMatricule;
+    }
+
+    public function setOperatorMatricule(?string $operatorMatricule): static
+    {
+        $this->operatorMatricule = $operatorMatricule;
+
+        return $this;
+    }
+
+    public function getLastLevelKnown(): ?IluoLevels
+    {
+        return $this->lastLevelKnown;
+    }
+
+    public function setLastLevelKnown(?IluoLevels $lastLevelKnown): static
+    {
+        $this->lastLevelKnown = $lastLevelKnown;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
 }

@@ -7,8 +7,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: IluoChecklistRepository::class)]
+#[UniqueEntity(fields: ['iluo'], message: 'Une checklist ILUO existe déjà pour cette ILUO.')]
 class IluoChecklist
 {
     #[ORM\Id]
@@ -39,6 +42,12 @@ class IluoChecklist
 
     #[ORM\OneToOne(inversedBy: 'iluoChecklist', cascade: ['persist', 'remove'])]
     private ?Iluo $iluo = null;
+
+    #[ORM\Column]
+    private ?bool $retrainingNeeded = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
 
     public function __construct()
     {
@@ -142,6 +151,30 @@ class IluoChecklist
     public function setIluo(?Iluo $iluo): static
     {
         $this->iluo = $iluo;
+
+        return $this;
+    }
+
+    public function isRetrainingNeeded(): ?bool
+    {
+        return $this->retrainingNeeded;
+    }
+
+    public function setRetrainingNeeded(bool $retrainingNeeded): static
+    {
+        $this->retrainingNeeded = $retrainingNeeded;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

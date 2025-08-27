@@ -17,7 +17,7 @@ class IluoLevels
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true, unique: true)]
     private ?string $level = null;
 
     /**
@@ -47,12 +47,25 @@ class IluoLevels
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[ORM\Column(nullable: true, unique: true)]
+    private ?int $priorityOrder = null;
+
+    /**
+     * @var Collection<int, Iluo>
+     */
+    #[ORM\OneToMany(targetEntity: Iluo::class, mappedBy: 'lastLevelKnown')]
+    private Collection $iluos;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $qualityRepNeeded = null;
+
     public function __construct()
     {
         $this->steps = new ArrayCollection();
         $this->stepsSubheadings = new ArrayCollection();
         $this->stepsTitles = new ArrayCollection();
         $this->iluoChecklists = new ArrayCollection();
+        $this->iluos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -200,6 +213,60 @@ class IluoLevels
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getPriorityOrder(): ?int
+    {
+        return $this->priorityOrder;
+    }
+
+    public function setPriorityOrder(?int $priorityOrder): static
+    {
+        $this->priorityOrder = $priorityOrder;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Iluo>
+     */
+    public function getIluos(): Collection
+    {
+        return $this->iluos;
+    }
+
+    public function addIluo(Iluo $iluo): static
+    {
+        if (!$this->iluos->contains($iluo)) {
+            $this->iluos->add($iluo);
+            $iluo->setLastLevelKnown($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIluo(Iluo $iluo): static
+    {
+        if ($this->iluos->removeElement($iluo)) {
+            // set the owning side to null (unless already changed)
+            if ($iluo->getLastLevelKnown() === $this) {
+                $iluo->setLastLevelKnown(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isQualityRepNeeded(): ?bool
+    {
+        return $this->qualityRepNeeded;
+    }
+
+    public function setQualityRepNeeded(?bool $qualityRepNeeded): static
+    {
+        $this->qualityRepNeeded = $qualityRepNeeded;
 
         return $this;
     }

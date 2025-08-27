@@ -13,6 +13,8 @@ use App\Entity\ProductLine;
 use App\Entity\Category;
 use App\Entity\Button;
 
+use App\Service\Factory\ServiceFactory;
+
 use App\Service\EntityFetchingService;
 use App\Service\AccountService;
 use App\Service\SettingsService;
@@ -31,11 +33,15 @@ class FrontController extends AbstractController
 
     private $authChecker;
 
+    private $serviceFactory;
+
     private $accountService;
     private $operatorService;
     private $entityFetchingService;
     private $settingsService;
     private $validationService;
+
+    private $iluoService;
 
 
 
@@ -47,6 +53,7 @@ class FrontController extends AbstractController
      *
      * @param LoggerInterface $logger                              Logger service for recording operation information and errors
      * @param AuthorizationCheckerInterface $authChecker           Service for checking user authorization
+     * @param ServiceFactory $serviceFactory                       Factory service for creating other services
      * @param SettingsService $settingsService                     Service for managing application settings
      * @param OperatorService $operatorService                     Service for operator-related operations
      * @param ValidationService $validationService                 Service for validation-related operations
@@ -58,21 +65,24 @@ class FrontController extends AbstractController
     public function __construct(
         LoggerInterface                     $logger,
         AuthorizationCheckerInterface       $authChecker,
+        ServiceFactory                      $serviceFactory,
 
         SettingsService                     $settingsService,
         OperatorService                     $operatorService,
         ValidationService                   $validationService,
         EntityFetchingService               $entityFetchingService,
-        AccountService                      $accountService,
     ) {
         $this->logger                       = $logger;
         $this->authChecker                  = $authChecker;
+        $this->serviceFactory               = $serviceFactory;
 
         $this->operatorService              = $operatorService;
         $this->settingsService              = $settingsService;
         $this->validationService            = $validationService;
         $this->entityFetchingService        = $entityFetchingService;
-        $this->accountService               = $accountService;
+
+        $this->accountService               = $this->serviceFactory->getService(className: 'account');
+        $this->iluoService                  = $this->serviceFactory->getService(className: 'iluo\\iluo');
     }
 
 
@@ -163,6 +173,7 @@ class FrontController extends AbstractController
                     '<a href="' . $operatorAdminUrl . '">' . $messageContent . '</a>'
                 );
             }
+            $this->iluoService->checkIluoUpdates();
         }
 
         return $this->render(
