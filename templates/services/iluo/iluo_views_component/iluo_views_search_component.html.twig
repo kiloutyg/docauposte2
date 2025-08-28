@@ -1,0 +1,88 @@
+
+<turbo-frame
+	id="iluoViewsSearch">
+	<ul>
+		<div
+			class="card bg-secondary container mt-3 "
+			{# data-controller="iluo-search"> #}
+			<form
+				class="row mt-2 gap-1 align-items-center top"
+				method="post"
+				action="{{ path('app_operator') }}" 
+                {# data-turbo-frame="adminListOperator"  #}
+                id="adminListOperator-form">
+				<input
+					type="hidden"
+					name="search"
+					value="true">
+				<input
+					{# data-iluo-search-target="iluoSearchNameInput" #}
+					{# data-action="keyup->iluo-search#submitSearchForm" #}
+					class="form-control shadow col"
+					type="search"
+					name="search_name"
+					id="search_name"
+					placeholder="Recherche par nom">
+				<input
+					{# data-iluo-search-target="iluoSearchCodeInput" #}
+					{# data-action="keyup->iluo-search#submitSearchForm" #}
+					class="form-control shadow col"
+					type="search"
+					pattern="\d{1,5}"
+					maxlength="5"
+					name="search_code"
+					id="search_code"
+					placeholder="Recherche par CodeOpé">
+				<input
+					{# data-iluo-search-target="iluoSearchTeamInput" #}
+					{# data-action="keyup->iluo-search#submitSearchForm" #}
+					class="form-control shadow col"
+					type="search"
+					name="search_team"
+					id="search_team"
+					placeholder="Recherche par Equipe"
+					list="team-list">
+				{# <datalist #}
+					id="team-list">
+					{% for team in teams %}
+						<option
+							value="{{ team.name }}"></option>
+					{% endfor %}
+				{# </datalist> #}
+
+				<input
+					{# data-iluo-search-target="iluoSearchUapInput" #}
+					{# data-action="keyup->iluo-search#submitSearchForm" #}
+					class="form-control shadow col"
+					type="search"
+					name="search_uap"
+					id="search_uap"
+					placeholder="Recherche par UAP"
+					list="uap-list">
+				{# <datalist #}
+					id="uap-list">
+					{% for uap in uaps %}
+						<option
+							value="{{ uap.name }}"></option>
+					{% endfor %}
+				{# </datalist> #}
+
+				<input
+					type="search"
+					{# data-iluo-search-target="iluoSearchIsTrainerInput" #}
+					{# data-action="change->iluo-search#submitSearchForm" #}
+					class="form-control shadow col"
+					placeholder="Est-il Formateur?"
+					name="search_trainer"
+					id="search_trainer"
+					list="trainer-list">
+			</input>
+
+			<input
+				{# data-iluo-search-target="iluoSearchSubmit" #}
+				class="btn btn-primary col"
+				placeholder="Search"
+				type="submit">
+		</form>
+	</div>
+</ul></turbo-frame>

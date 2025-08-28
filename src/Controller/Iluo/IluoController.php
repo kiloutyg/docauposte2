@@ -160,6 +160,33 @@ class IluoController extends AbstractController
         return $this->render('/services/iluo/iluo_views_component/iluo_views_search_component.html.twig');
     }
 
+    #[Route(path: 'views_search_form_processing', name: 'views_search_form_processing')]
+    public function iluoViewsSearchFormProcessing(Request $request): Response
+    {
+
+        
+        if ($request->isMethod('POST') && $request->request->get('search') == 'true') {
+            $iluos = $this->iluoService->iluoEntitySearchByRequest($request);
+        } elseif ($request->getSession()->has('iluoSearchParams')) {
+            $iluos = $this->iluoService->iluoEntitySearchByRequest($request);
+        } else {
+            $iluos = [];
+        }
+
+
+        $iluoForms = [];
+        $this->logger->info(message: 'iluoController: iluoViewsSearchFormProcessing - iluos', context: [$iluos]);
+
+        // Create and handle forms
+        foreach ($iluos as $iluo) {
+            $iluoForms[$iluo->getId()] = $this->createForm(OperatorType::class, $iluos, [
+                'operator_id' => $iluo->getId(),
+            ])->createView();
+        }
+        return $this->render('/services/iluo/iluo_views_component/iluo_views_search_component.html.twig');
+    }
+
+
 
     #[Route(path: 'views_checklist', name: 'views_checklist')]
     public function iluoViewsChecklist(): Response
