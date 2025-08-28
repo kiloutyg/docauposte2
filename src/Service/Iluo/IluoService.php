@@ -2,6 +2,7 @@
 
 namespace App\Service\Iluo;
 
+use App\Service\Facade\EntityManagerFacade;
 use App\Service\Factory\ServiceFactory;
 
 use Psr\Log\LoggerInterface;
@@ -20,6 +21,7 @@ class IluoService extends AbstractController
 {
     private $logger;
 
+    private $entityManagerFacade;
     private $serviceFactory;
 
     private $iluoLevelsService;
@@ -46,10 +48,12 @@ class IluoService extends AbstractController
     public function __construct(
         LoggerInterface                     $logger,
 
+        EntityManagerFacade                 $entityManagerFacade,
         ServiceFactory                      $serviceFactory,
     ) {
         $this->logger                       = $logger;
 
+        $this->entityManagerFacade          = $entityManagerFacade;
         $this->serviceFactory               = $serviceFactory;
 
         $this->iluoLevelsService            = $this->serviceFactory->getService(className: 'Iluo\\IluoLevels');
@@ -226,5 +230,42 @@ class IluoService extends AbstractController
     {
         $this->logger->debug(message: 'iluoService::deleteAllIluos');
         return $this->iluoChecklistService->deleteAllIluos();
+    }
+
+
+
+    public function iluoEntitySearchByRequest(Request $request): array
+    {
+        if ($request->getContentTypeFormat() == 'json') {
+            $data = json_decode($request->getContent(), true);
+            $name       = $data['search_name'];
+            $code       = $data['search_code'];
+            $team       = $data['search_team'];
+            $uap        = $data['search_uap'];
+        } else {
+            $name       = $request->request->get('search_name');
+            $code       = $request->request->get('search_code');
+            $team       = $request->request->get('search_team');
+            $uap        = $request->request->get('search_uap');
+        }
+
+        $session = $request->getSession();
+        if (!$session->isStarted()) {
+            $session->start();
+        }
+
+        $session->set('iluoSearchParams', [
+            'searched_name' => $name,
+            'searched_code' => $code,
+            'searched_team' => $team,
+            'searched_uap' => $uap,
+        ]);
+
+        return $this->entityManagerFacade->findIluoBySearchQuery(
+            $name,
+            $code,
+            $team,
+            $uap
+        );
     }
 }

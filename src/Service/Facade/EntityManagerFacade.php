@@ -120,6 +120,11 @@ class EntityManagerFacade
         return $this->entityFetchingService->findBySearchQuery($name, $code, $team, $uap, $trainer);
     }
 
+    public function findIluoBySearchQuery(?string $name = null, ?string $code = null, ?string $team = null, ?string $uap = null)
+    {
+        return $this->entityFetchingService->findIluoBySearchQuery(name: $name, code: $code, team: $team, uap: $uap);
+    }
+
     public function getTeams()
     {
         return $this->entityFetchingService->getTeams();

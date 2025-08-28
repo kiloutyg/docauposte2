@@ -197,6 +197,11 @@ class EntityFetchingService extends AbstractController
     }
 
 
+    public function findIluoBySearchQuery(?string $name = null, ?string $code = null, ?string $team = null, ?string $uap = null): array
+    {
+        return $this->fromNameToRepo('iluo')->findBySearchQuery($name, $code, $team, $uap);
+    }
+
     public function findOperatorWithNoRecentTraining()
     {
         return $this->fromNameToRepo('operator')->findOperatorWithNoRecentTraining();

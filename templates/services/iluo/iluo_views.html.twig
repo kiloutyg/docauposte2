@@ -12,36 +12,30 @@
 
 {% block body %}
 	<div
-		class="container-fluid d-flex align-items-center flex-grow-1">
+		class="container-fluid d-flex align-items-center flex-grow-1 card bg-light">
 
-			{{ loading.turbo_frame_loader(
-                'iluo-views-search', 
-                path('app_iluo_views_search'),
-                'form',
-                'Formulaire de recherche ILUO',
-                'fa-cogs',
-                'primary'
-                3,
-            ) }}
+		<turbo-frame
+			id="iluo-views-search"
+			src="{{ path('app_iluo_views_search') }}" loading="lazy"
+			class="row"
+			>
+			{{ loading.content_placeholder('form', 2, '90%') }}
+		</turbo-frame>
 
-			{{ loading.turbo_frame_loader(
-                'iluo-views-checklist', 
-                path('app_iluo_views_checklist'),
-                'checklist',
-                'Checklist ILUO',
-                'fa-tasks',
-                'success'
-                4,
-            ) }}
+		<turbo-frame
+			id="iluo-views-checklist"
+			src="{{ path('app_iluo_views_checklist') }}" loading="lazy"
+			class="row"
+			>
+			{{ loading.content_placeholder('form', 2, '90%') }}
+		</turbo-frame>
 
-			{{ loading.turbo_frame_loader(
-                'iluo-views-matrices', 
-                path('app_iluo_views_matrices'),
-                'cards',
-                'Matrices ILUO',
-                'fa-desktop',
-                'info',
-                2
-            ) }}
+		<turbo-frame
+			id="iluo-views-matrices"
+			src="{{ path('app_iluo_views_matrices') }}" loading="lazy"
+			class="row"
+			>
+			{{ loading.content_placeholder('form', 2, '90%') }}
+		</turbo-frame>
 	</div>
 {% endblock %}
