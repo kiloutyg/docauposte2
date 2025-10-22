@@ -828,7 +828,7 @@ class ValidationService extends AbstractController
      * @return array An array of Upload entities that have been waiting for validation for 14 days or more
      */
     private function uploadsWaitingValidationRaw(
-        ?array $nonValidatedValidations = null,
+        ?array $nonValidatedValidations = [],
         \DateTime $today
     ): array {
         foreach ($nonValidatedValidations as $validation) {
