@@ -10,11 +10,10 @@ composer install --no-dev --optimize-autoloader
 composer dump-env prod
 
 # Install JavaScript dependencies
-# yarn install --ignore-scripts --production
-yarn install --production
+yarn install --ignore-scripts --production
 
 # Clear Composer cache
-# composer clear-cache
+composer clear-cache
 
 # Generate migration files and apply them
 php bin/console doctrine:migrations:diff --no-interaction;
@@ -27,7 +26,8 @@ php ./bin/console cache:clear --no-warmup --env=prod
 php ./bin/console cache:warmup --env=prod
 
 # Build assets with Webpack Encore
-yarn encore prod
+# yarn encore prod
+yarn build
 
 # Start Apache in the foreground
 exec apache2-foreground
