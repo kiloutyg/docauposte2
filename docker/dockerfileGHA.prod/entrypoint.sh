@@ -10,10 +10,11 @@ composer install --no-dev --optimize-autoloader
 composer dump-env prod
 
 # Install JavaScript dependencies
-yarn install --ignore-scripts --production
+# yarn install --ignore-scripts --production
+yarn install --production
 
 # Clear Composer cache
-composer clear-cache
+# composer clear-cache
 
 # Generate migration files and apply them
 php bin/console doctrine:migrations:diff --no-interaction;
