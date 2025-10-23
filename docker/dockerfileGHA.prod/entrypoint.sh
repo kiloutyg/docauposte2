@@ -9,8 +9,21 @@ composer install --no-dev --optimize-autoloader
 # Caching dotenv variable
 composer dump-env prod
 
-# Install JavaScript dependencies
-yarn install --ignore-scripts --production
+# Install JavaScript dependencies (with retries to work around transient DNS/network errors)
+MAX_RETRIES=5
+RETRY_DELAY=5
+COUNT=0
+until [ $COUNT -ge $MAX_RETRIES ]
+do
+  yarn install --ignore-scripts --production && break
+  COUNT=$((COUNT+1))
+  echo "yarn install failed, retry $COUNT/$MAX_RETRIES in ${RETRY_DELAY}s..."
+  sleep $RETRY_DELAY
+done
+if [ $COUNT -ge $MAX_RETRIES ]; then
+  echo "yarn install failed after $MAX_RETRIES attempts"
+  exit 1
+fi
 
 # Clear Composer cache
 composer clear-cache
